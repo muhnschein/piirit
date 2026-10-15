@@ -1,30 +1,11 @@
 import QtQuick 2.0
 
 /*
- * Stands in for Silica's RemorseItem: the platform's countdown drawn
- * over the thing about to be destroyed, with a tap to call it off.
- *
- * Written from the real file rather than guessed at, because the last
- * guess about this type cost a release. What it does on `execute`:
- *
- *     parent = item.parent
- *     _item = item
- *     anchors.fill: _item
- *     PropertyChanges { target: _item; opacity: 0.0 }
- *
- * -- so it becomes a sibling of the item it covers, takes that item's
- * geometry, and *fades* the item rather than hiding it. The distinction
- * matters: hiding takes the item's children's `visible` with it, and
- * anything measuring `visible ? implicitHeight : 0` then collapses.
- *
- * It also runs the callback rather than dropping it when the countdown
- * is cut short -- by the item being destroyed, or by the page it is on
- * deactivating. The app does not rely on either (the deletion itself
- * belongs to components/PendingRemoval.qml, and this draws it), but the
- * stub does both so a test sees what a phone would.
- *
- * The countdown is 50ms rather than the real five seconds: a test says
- * what it wants and reads the answer on the next tick.
+ * Stub: platform countdown over item being destroyed; tap cancels. From real
+ * file. `execute`: sibling of item, faded not hidden (hiding also hides
+ * children's `visible`). Callback runs when cut short (item destroyed, page
+ * deactivated), not dropped; app relies on neither (PendingRemoval.qml owns
+ * deletion). Countdown 50ms, not five seconds.
  */
 Item {
     id: root
@@ -34,8 +15,7 @@ Item {
     signal canceled()
     signal triggered()
 
-    /// What it is drawn over, and whether it is drawn at all. A test
-    /// reads these to say "the platform's countdown is up on this row".
+    /// Drawn over; tests read: countdown up on this row.
     property Item _item: null
     readonly property bool active: root._item !== null
 
@@ -45,8 +25,7 @@ Item {
         root.text = title
         root._callback = callback
         root._item = item
-        // A sibling of what it covers, filling it, with the item faded
-        // rather than hidden -- see the note above.
+        // Sibling of covered item, faded not hidden.
         root.parent = item.parent
         root.anchors.fill = item
         item.opacity = 0.0
@@ -63,7 +42,7 @@ Item {
         root.canceled()
     }
 
-    /// The tap that a reader gives it, which is a cancel.
+    /// Tap by reader: cancel.
     function tap() {
         root.cancel()
     }
@@ -92,8 +71,7 @@ Item {
         onTriggered: root._run()
     }
 
-    // Cut short rather than cancelled: the real one acts rather than
-    // forgetting, and so does this.
+    // Cut short: acts, not forgets; so does stub.
     Component.onDestruction: {
         if (countdown.running) {
             root._run()

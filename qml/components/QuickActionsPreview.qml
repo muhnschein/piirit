@@ -3,59 +3,40 @@ import Sailfish.Silica 1.0
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * A cover, drawn small, with room for one quick action or for two: one
- * of the two choices on the quick actions' page (pages/
- * QuickActionsPage.qml), and a picture of what that choice puts on the
- * home screen.
- *
- * Drawn the way the cover draws itself (cover/CoverPage.qml): the same
- * staggered grid, three circles across with every other row shifted half
- * a circle and cut off at both edges and the first row seen from the
- * waist down; the same fade into the strip along the bottom edge, from
- * the same shader; and the actions' own icons, from the files the cover
- * hands the home screen, where the home screen puts them -- one in the
- * middle, or one in the middle of each half. Everything is scaled from a
- * real cover's size, so the icons are as big against the faces as they
- * will be. The circles are empty: this is a picture of where things go
- * rather than of whoever the reader talks to. An action not chosen yet
- * is a dot in its place.
- *
- * It reads no settings itself: the page hands it the icons, so it is
- * redrawn as the choices under it change.
+ * Small cover with one or two quick actions, as on home screen. Drawn like
+ * cover/CoverPage.qml, scaled from real cover so icons match. Circles empty;
+ * unchosen = dot. Reads no settings: page hands icons.
  */
 BackgroundItem {
     id: preview
 
-    /// How many actions this cover has room for: 1 or 2.
+    /// Action slots: 1 or 2.
     property int count: 1
-    /// The icons the actions wear, by name (QuickActions.iconName), left
-    /// and right; "" for an action not chosen yet. With room for one,
-    /// only the left is read.
+    /// Icon names (QuickActions.iconName), left and right; "" = not chosen.
     property string leftIcon
     property string rightIcon
-    /// Whether this is the choice the reader has made.
+    /// Reader's choice.
     property bool selected: false
-    /// What the choice is called, under the picture.
+    /// Choice name, under picture.
     property alias text: caption.text
 
-    /// The size of a real cover, which the picture is scaled from. Theme
-    /// says; a Theme that does not is taken to mean the Jolla phone's.
+    /// Real cover size: Theme's, else Jolla phone's.
     readonly property real coverWidth: Theme.coverSizeLarge
                                        && Theme.coverSizeLarge.width > 0
                                        ? Theme.coverSizeLarge.width : 234
     readonly property real coverHeight: Theme.coverSizeLarge
                                         && Theme.coverSizeLarge.height > 0
                                         ? Theme.coverSizeLarge.height : 374
-    /// How much smaller than a real cover the picture is.
+    /// Scale vs real cover.
     readonly property real ratio: preview.width / preview.coverWidth
 
-    // The cover's own measures, scaled; see CoverPage for each.
+    // Cover's own measures, scaled; see CoverPage.
     readonly property int cellSize: Math.floor(picture.width / 3)
     readonly property real gap: Theme.paddingMedium * preview.ratio
     readonly property real strip: Theme.itemSizeSmall * preview.ratio
     readonly property real iconSize: Theme.iconSizeSmall * preview.ratio
 
-    /// Where the circles go: `{x, y}` for each, laid out the cover's way.
+    /// Circle positions `{x, y}`, cover's layout.
     readonly property var cells: {
         var list = []
         var size = preview.cellSize
@@ -77,7 +58,7 @@ BackgroundItem {
         return list
     }
 
-    /// The picture for an icon, as a whole URL; none for "".
+    /// Icon as whole URL; none for "".
     function iconSource(name) {
         if (name === "") {
             return ""
@@ -115,11 +96,8 @@ BackgroundItem {
                     color: "transparent"
                     border.width: Math.max(1, Math.round(2 * preview.ratio))
                     border.color: Theme.secondaryColor
-                    // The cover's fade into the actions' strip
-                    // (QuickActions.fade), taken where each ring's middle
-                    // is: a ring is too thin a thing to fade across, and a
-                    // shader that did it is what the cover's faces were
-                    // mistaken for (Avatar.qml).
+                    // Fade at ring's middle (QuickActions.fade): too thin to fade across;
+                    // no shader (Avatar.qml).
                     opacity: 0.6 * QuickActions.fade(y + height / 2,
                                                      faces.height - 2 * preview.strip,
                                                      faces.height)
@@ -127,15 +105,14 @@ BackgroundItem {
             }
         }
 
-        // Where the home screen draws the actions: their tops about 18%
-        // of the cover's height up, as the cover measures it.
+        // Home screen: action tops ~18% of cover height up.
         Repeater {
             model: preview.count === 2 ? [preview.leftIcon, preview.rightIcon]
                                        : [preview.leftIcon]
 
             Item {
                 objectName: "previewAction" + index
-                /// The icon's picture, "" for the dot of one not chosen.
+                /// Icon; "" unchosen dot.
                 readonly property string source: preview.iconSource(modelData)
                 width: preview.iconSize
                 height: preview.iconSize

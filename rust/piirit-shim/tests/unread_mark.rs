@@ -1,10 +1,8 @@
-//! Where the reader left off, which is where the "new messages" line goes.
+//! Reader's last-read point: where "new messages" line goes.
 //!
-//! The core is asked once, when the chat is opened, and the answer is kept:
-//! everything on the screen is marked read a moment later, so a line that
-//! followed what is unread *now* would be gone before it was seen. What
-//! this pins is that the question is asked, that the answer reaches QML,
-//! and that reading the chat does not move the line.
+//! Core asked once when chat opens; answer kept. Screen marks all read a moment
+//! later, so a line tracking *current* unread would vanish unseen. Pinned: question
+//! asked, answer reaches QML, reading chat leaves line put.
 
 // Qt harness: see chat_actions.rs.
 #![allow(
@@ -45,7 +43,7 @@ fn the_line_is_read_once_when_a_chat_opens_and_stays_where_it_was() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -86,8 +84,7 @@ fn the_line_is_read_once_when_a_chat_opens_and_stays_where_it_was() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("opened", call!("mark"));
-        // Reading the chat is what would move a line that followed the
-        // unread state rather than the reader.
+        // Reading would move a line tracking unread state, not reader.
         record!("read", call!("readIt"));
     });
 
@@ -117,8 +114,7 @@ fn the_line_is_read_once_when_a_chat_opens_and_stays_where_it_was() {
     };
     let context = format!("steps: {steps:?}");
 
-    // The fake's chat 1 holds messages 1 and 2, and 2 is the unseen one --
-    // the same state its `get_messages` gives out.
+    // Fake chat 1: messages 1 and 2, 2 unseen. Same as `get_messages`.
     assert_eq!(
         value("opened"),
         "2",
@@ -143,8 +139,8 @@ fn the_line_is_read_once_when_a_chat_opens_and_stays_where_it_was() {
          off. {context}"
     );
 
-    // Once per opening, and never with the messages fetch still to come:
-    // the answer has to be the state the reader arrived to.
+    // Once per opening, never with messages fetch still to come: answer must be the state
+    // reader arrived to.
     let calls = common::calls(&journal);
     let asked = calls
         .iter()

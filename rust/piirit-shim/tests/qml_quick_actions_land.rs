@@ -1,12 +1,8 @@
-//! Where a quick action from the cover lands: the chat list, brought to
-//! the front, doing what the action asks.
+//! Quick action from cover lands: chat list comes front, doing what action asks.
 //!
-//! The search empties and asks for the keyboard. The QR code opens on the
-//! side the action names, and the profiles as the pull-down opens them. A
-//! chat is looked up before it is opened, so one deleted since the action
-//! was set up is said to be gone rather than opened empty; a chat in
-//! another profile puts that profile's list in place of the whole stack,
-//! and the chat is opened from it once it is on screen.
+//! Search empties and asks for keyboard. QR opens on named side. Chat is looked up first:
+//! deleted since, it is "gone", not opened empty. Chat in another profile replaces the
+//! whole stack with that profile's list, then opens from it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,7 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in; see `qml_chat_list.rs`.
+/// Probe, components dir filled in; see `qml_chat_list.rs`.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -134,9 +130,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-quick-land-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. Two profiles, so a chat can be in the
-    // other one.
+    // SAFETY: single-threaded; set before Qt and server start. Two profiles: chat can be in other.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -187,7 +181,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     let list = common::page_url("ChatListPage.qml");
     let other = list.clone();
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -200,7 +194,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("registered", call!("registered"));
         record!("on-top", call!("onTop", QString::from("true")));
 
-        // The search: emptied, and the keyboard asked for.
+        // Search: emptied, keyboard asked for.
         record!("typed", call!("type", QString::from("half a word")));
         record!("search", act!("search", 0, 0));
         record!(
@@ -215,23 +209,23 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("search-raised", call!("raised"));
         record!("search-stack", call!("stackLog"));
 
-        // The QR code, on the side the action names.
+        // QR on the side the action names.
         record!("qr", act!("qr", 0, 0));
         record!("qr-stack", call!("stackLog"));
         record!("scan", act!("scan", 0, 0));
         record!("scan-stack", call!("stackLog"));
 
-        // The profiles, as the pull-down opens them.
+        // Profiles, as pull-down opens them.
         record!("profiles", act!("profiles", 0, 0));
         record!("profiles-stack", call!("stackLog"));
 
-        // Over another page, that page goes first.
+        // Over another page: that page goes first.
         record!("covered", call!("onTop", QString::from("false")));
         record!("qr-over", act!("qr", 0, 0));
         record!("qr-over-stack", call!("stackLog"));
         record!("uncovered", call!("onTop", QString::from("true")));
 
-        // A chat of this profile, looked up and then opened.
+        // Chat of this profile: looked up, then opened.
         record!("chat", act!("chat", 1, 2));
     });
 
@@ -240,7 +234,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("delete", call!("deleteChat", 1));
     });
 
-    // A chat deleted since: said, and not opened.
+    // Chat deleted since: said, not opened.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("gone", act!("chat", 1, 1));
     });
@@ -251,13 +245,13 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
             "gone-banner",
             call!("get", QString::from("errorBanner"), QString::from("text"))
         );
-        // A chat of the other profile.
+        // Chat of the other profile.
         record!("elsewhere", act!("chat", 2, 2));
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("elsewhere-stack", call!("stackLog"));
-        // The list that replaced the stack, arriving with the chat to open.
+        // List that replaced stack, arriving with chat to open.
         record!(
             "arrived-load",
             call!(
@@ -275,8 +269,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("arrived-stack", call!("stackLog"));
 
-        // A page up mid-work -- a backup being written -- under a tap: the
-        // app comes forward onto it, and nothing is popped.
+        // Page up mid-work (backup being written) under a tap: app comes forward; nothing popped.
         call!("onTop", QString::from("false"));
         call!("paused", QString::from("true"));
         record!("paused-raised-before", call!("raised"));
@@ -286,9 +279,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         call!("paused", QString::from("false"));
         call!("onTop", QString::from("true"));
 
-        // A list attached beside a finished backup is not where quick
-        // actions land: it goes with a swipe back, and the one under it
-        // is still there.
+        // List attached beside finished backup: swipe back takes it; one under it stays.
         record!(
             "attach",
             call!(

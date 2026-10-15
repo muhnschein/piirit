@@ -6,115 +6,59 @@ import "."
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Point the camera at a QR code -- or, from the button under the
- * viewfinder, type or paste the link the code would carry. What either
- * says is handed out on `scanned` and the view waits; what to do with it
- * is the host's -- an invite is followed -- and the core is asked what
- * it is first, the same as for a pasted link.
+ * QR scanner, or type/paste link. Text out on `scanned`; host decides, core
+ * checks first. Loaded by URL (QR page, take-over page): only file naming a
+ * Camera, so no camera loses scanner, not host page. Host gives it rest of page
+ * (codes need pixels).
  *
- * A component of its own, loaded by URL by the pages that want it -- the
- * QR page for an invite, the take-over page for the code a device shows
- * while offering its profile: this is the only file that names a Camera,
- * so a device without one costs the scanner rather than the page around
- * it. Both give it the rest of the page, which is what a code needs to
- * land in enough pixels to read.
+ * Frames via `grabToImage` (only Qt 5.6 way to viewfinder pixels), to scanner
+ * as file, next grab after last decoded: slow decodes never queue.
  *
- * What it is looking for is the host's to say (`hintText`), and so is
- * whether the link behind the code can be typed instead (`offerLink`).
+ * Stays (camera off, busy) until host takes it down: Silica drops stack ops
+ * mid-transition, self-pop would lose host navigation. Same reason typed link
+ * is a panel, not dialog.
  *
- * Frames come through `grabToImage`, which is the one way QML on Qt 5.6
- * hands a viewfinder's pixels to anything, and go to the scanner as a
- * file. The next frame is grabbed only once the last has been decoded, so
- * a slow decode never queues frames behind it.
- *
- * Once a code is read the view stays, with the camera off and a busy
- * indicator on, until the host takes it down: Silica drops any stack
- * operation asked for while a transition is running, so a page that
- * popped itself here would have the host's own navigation -- opening the
- * chat the invite led to -- land during the pop and be lost. The typed
- * link is a panel over the viewfinder rather than a dialog for the same
- * reason: a dialog's own pop would be the transition the host's
- * navigation lands in.
- *
- * Focus is the camera's own: continuous autofocus, left to run, and a
- * tap on the viewfinder for a reader who wants the point under the
- * finger. Nothing else asks for a focus search, because in the video
- * pipeline a search does not search. The platform's camera stack turns
- * continuous focus into the Android HAL's "continuous-video" mode when
- * the camera captures video, and the HAL's own state machine says that a
- * focus trigger in that mode locks the lens where it is, at once,
- * mid-sweep or not -- unlike "continuous-picture", which finishes the
- * sweep first. A search every couple of seconds, which this view used to
- * run, therefore pinned the lens wherever it happened to be, from the
- * moment the camera started, and gave continuous focus no time between
- * the unlock and the next lock to find the code: the likeliest reason a
- * Jolla Phone's viewfinder stayed blurred until the system camera app,
- * opened alongside, took the lens over and focused it.
- * CodeReader and Foil Auth, which read codes on the same platform, run
- * continuous focus the same way and only search on a tap.
- *
- * A code that is small or far off is brought closer the platform
- * camera's way, with a pinch and its zoom line, or a thumb's: a button
- * steps through one, two and four times. Over the bottom of the picture,
- * as in the platform camera, are the torch -- a code on paper in a dim
- * room is otherwise unreadable -- one ring per back camera on a phone with
- * more than one, and the switch to the other side, for a code shown on a
- * screen held up to the front.
+ * Focus continuous; tap focuses point. No periodic search: video maps
+ * continuous to Android HAL "continuous-video", where trigger locks lens
+ * mid-sweep ("continuous-picture" finishes first); blurred Jolla Phone. CodeReader and Foil Auth also
+ * search only on tap. Front switch: codes on a screen.
  */
 Item {
     id: root
 
-    /// The view is the one on screen, with the app in front: the host
-    /// page says so, as Silica keeps a page active in the background
-    /// too. The camera runs only then, and frames are grabbed only then.
+    /// On screen, app in front: host says (Silica keeps background pages active).
+    /// Camera runs only then.
     property bool active: false
 
-    /// How the host page is turned, as Silica's `Orientation`. The
-    /// camera's frame is fixed to the phone, so the picture is turned
-    /// back by as much as the page is: upright on a page that turns with
-    /// the phone.
+    /// Host orientation (Silica `Orientation`); frame fixed to phone, turned back.
     property int pageOrientation: Viewfinder.portrait
 
-    /// A code was read, or a link typed, and this is its text.
+    /// Read or typed text.
     signal scanned(string text)
-    /// The scanner could not read a frame at all. The message is its own.
+    /// Scanner failed on a frame.
     signal failed(string message)
 
-    /// Set once a code is read, so a second frame in flight cannot
-    /// report the same code twice.
+    /// Set once read: in-flight frame can't report it twice.
     property bool done: false
-    /// The link panel is open. The camera keeps running behind it: a
-    /// reader who opened the panel and then found the code can still
-    /// hold the phone up to it.
+    /// Link panel open. Camera keeps running: may still find code.
     property bool typing: false
 
-    /// How far below the top of the view the line sits, for a host that
-    /// has its own words up there already.
+    /// Line offset from view top, for host's own words above.
     property real hintTopMargin: 0
 
-    /// The line saying what to point the camera at. The
-    /// host's words, because what a code means is the host's: an invite
-    /// on the QR page, the other phone's offer of a profile on the
-    /// take-over page.
+    /// What to point at (host's: invite, or other phone's offer).
     property string hintText: qsTr("Point the camera at someone's invite code")
 
-    /// Whether what the code carries can be typed or pasted instead.
-    /// Worth having wherever the reader can get at the text another way,
-    /// which is every camera in this app: a camera that will not read is
-    /// otherwise a dead end.
+    /// Link can be typed or pasted (no reading = dead end).
     property bool offerLink: true
 
-    /// What the typed half is called, since what the code carries
-    /// differs by host: an invite someone sent, or the string a device
-    /// shows beside the code it is offering its profile behind.
+    /// Typed-half label: invite, or string beside device code.
     property string linkButtonText: qsTr("Enter invite link")
     property string linkLabel: qsTr("Invite link")
     property string linkPlaceholder: "https://i.delta.chat/..."
     property string linkActionText: qsTr("Connect")
 
-    /// The starts of the things this host's code carries, lower case.
-    /// Only used to decide whether the clipboard is worth pasting into
-    /// the field; what the payload means is the core's call.
+    /// Link-form starts, lower case; only decides clipboard prefill.
     property var linkPrefixes: [
         "https://i.delta.chat/",
         "openpgp4fpr:",
@@ -122,7 +66,7 @@ Item {
         "dclogin:"
     ]
 
-    /// What was read or typed, once it is worth acting on.
+    /// Read or typed text, once worth acting on.
     function found(text) {
         if (root.done) {
             return
@@ -132,9 +76,7 @@ Item {
         root.scanned(text)
     }
 
-    /// Open the link panel, with the clipboard's contents in it when
-    /// they look like an invite: pasting is what the panel is for, and a
-    /// link copied a moment ago is the likely reason it was opened.
+    /// Open link panel, prefilled from clipboard if it looks like an invite.
     function typeLink() {
         root.typing = true
         var clip = Clipboard.text
@@ -143,9 +85,7 @@ Item {
         }
     }
 
-    /// Whether some text is one of the things this host's code carries,
-    /// so the clipboard is not pasted into the field when it holds a
-    /// shopping list.
+    /// Link form? Keeps shopping list out of field.
     function looksLikeInvite(text) {
         var trimmed = text.trim().toLowerCase()
         for (var i = 0; i < root.linkPrefixes.length; i++) {
@@ -171,7 +111,7 @@ Item {
         onError: root.failed(message)
     }
 
-    /// The cameras on each side, as device ids, in the platform's order.
+    /// Device ids per side, platform order.
     readonly property var backCameras:
         Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.backFace)
     readonly property var frontCameras:
@@ -182,11 +122,10 @@ Item {
     readonly property string otherCamera:
         Viewfinder.otherSide(QtMultimedia.availableCameras, root.facing, root.lastBackCamera)
 
-    /// The torch is on. Only on the back, which is where the light is.
+    /// Torch on. Back only.
     property bool torch: false
 
-    /// Change to another camera. The zoom and a tap's focus belong to the
-    /// one they were set on, and the torch to the back.
+    /// Switch camera; zoom and tap focus reset.
     function useCamera(deviceId) {
         if (deviceId.length === 0 || deviceId === camera.deviceId || root.done) {
             return
@@ -202,7 +141,7 @@ Item {
         camera.digitalZoom = 1
     }
 
-    /// Zoom to `value`, inside what the camera can do.
+    /// Zoom to `value`, within camera capability.
     function zoomTo(value) {
         camera.digitalZoom = Viewfinder.clampZoom(value, camera.maximumDigitalZoom)
         zoomIndicator.show()
@@ -211,48 +150,29 @@ Item {
     Camera {
         id: camera
         objectName: "camera"
-        // The video pipeline is where continuous autofocus runs, and
-        // where the flash is a torch.
+        // Autofocus and torch in video pipeline.
         captureMode: Camera.CaptureVideo
         flash.mode: root.torch && root.facing === Viewfinder.backFace
                     ? Viewfinder.flashTorch : Viewfinder.flashOff
-        // Continuous, except for the few seconds after a tap: a search in
-        // continuous video focus locks the lens where it is rather than
-        // looking, so a tap switches to plain autofocus, which does look,
-        // and switches back once the hold is over.
+        // Continuous, except few s after tap: continuous-video search locks, so tap
+        // uses plain autofocus (which looks).
         focus {
             focusMode: focusHold.running ? Camera.FocusAuto : Camera.FocusContinuous
             focusPointMode: focusHold.running ? Camera.FocusPointCustom : Camera.FocusPointAuto
         }
-        // The resolution is picked as soon as the camera can say what it
-        // has, which is before it goes active.
+        // Resolution picked once capabilities known.
         onCameraStatusChanged: root.chooseViewfinder()
     }
 
-    /// The long side this view wants from the camera and from a grab.
-    ///
-    /// A decoder reads a symbol out of the pixels each module lands in,
-    /// and wants three or four of them across a module to tell one from
-    /// its neighbour. The code a device shows while offering a profile
-    /// carries an address and a one-time secret, so it is a dense symbol
-    /// -- around seventy modules across with its quiet zone. At 640 a
-    /// code filling half the frame put under three pixels in a module
-    /// and would not read at all; the room here is what makes that
-    /// closer to six.
+    /// Long side wanted: decoder needs 3-4 px/module; dense device code (~70
+    /// modules) gets ~6 here, 640 gave under 3.
     readonly property int wantedLongSide: 1280
 
-    /// Set once the camera has been asked for a resolution, so a status
-    /// change later does not ask again.
+    /// Set once resolution asked.
     property bool viewfinderChosen: false
 
-    /// Ask the camera for the smallest viewfinder that is still big
-    /// enough, or the biggest it has when none of them are.
-    ///
-    /// Asked for rather than assumed: the platform's own default is
-    /// whatever is cheapest to run, and no grab can put back detail the
-    /// camera never captured. Guarded all the way down, because a
-    /// camera that cannot answer should leave the view working on
-    /// whatever it does give.
+    /// Smallest viewfinder big enough, else biggest. Asked: default is cheapest,
+    /// grab can't restore detail. Guarded.
     function chooseViewfinder() {
         if (root.viewfinderChosen
                 || typeof camera.supportedViewfinderResolutions !== "function") {
@@ -287,11 +207,7 @@ Item {
         root.viewfinderChosen = true
     }
 
-    /// Focus on a point of the viewfinder, given as a fraction of its
-    /// width and height. The hold starts first, so the camera is in
-    /// plain autofocus on that point before the search is asked for.
-    /// Unlocked first: a search that finds focus locks it, and a locked
-    /// focus is a fixed one.
+    /// Focus on point (fraction of width/height). Unlock first: locked is fixed.
     function focusAt(x, y) {
         focusHold.restart()
         camera.unlock()
@@ -299,9 +215,7 @@ Item {
         camera.searchAndLock()
     }
 
-    /// A tap on the viewfinder at `x`, `y` in its own coordinates: the
-    /// ring goes under the finger, and the camera is told the point in
-    /// its own frame.
+    /// Tap at `x`, `y` in view coords: ring under finger, camera gets point.
     function tapAt(x, y) {
         var mapped = typeof viewfinder.mapPointToSourceNormalized === "function"
                 ? viewfinder.mapPointToSourceNormalized(Qt.point(x, y)) : null
@@ -309,16 +223,13 @@ Item {
         if (!point) {
             return
         }
-        // The ring is beside the viewfinder, which may be turned.
+        // Ring is beside view, which may turn.
         var shown = viewfinder.mapToItem(root, x, y)
         reticle.at = Qt.point(shown.x, shown.y)
         root.focusAt(point.x, point.y)
     }
 
-    // How long a tap's focus is kept. Once it is over the lock comes off
-    // and continuous focus takes the lens back: a lock kept for good is
-    // a fixed focus, which the next code held up at another distance
-    // would not be read through.
+    // Tap focus lapses: permanent lock unreadable at other distances.
     Timer {
         id: focusHold
         objectName: "focusHold"
@@ -326,12 +237,7 @@ Item {
         onTriggered: camera.unlock()
     }
 
-    // The camera runs only while this view is the one on screen.
-    //
-    // The resolution is asked for here as well as on a status change: a
-    // camera that is already loaded has nothing left to change, and one
-    // that is not answers with nothing until it is. Whichever comes
-    // first settles it.
+    // Camera only while on screen. Resolution asked here too (loaded camera).
     onActiveChanged: {
         if (root.active && !root.done) {
             root.chooseViewfinder()
@@ -341,24 +247,16 @@ Item {
         }
     }
 
-    /// The long side of a grabbed frame: the same as the viewfinder's,
-    /// since grabbing smaller throws away the detail just asked for.
-    ///
-    /// It costs decode time, which the grabber already handles: the next
-    /// frame is taken only once the last has been read, so a slower
-    /// decode scans a little less often rather than queueing up.
+    /// Grab's long side = viewfinder's, else detail lost.
     readonly property int grabLongSide: root.wantedLongSide
 
-    /// That long side, in the viewfinder's own shape. A grab to a fixed
-    /// square stretches the modules by whatever the viewfinder is not
-    /// square by, and a decoder reading a square symbol as an oblong one
-    /// has that much less to work with.
+    /// Grab's long side in viewfinder's shape: square grab stretches modules.
     function grabSize() {
         var longest = Math.max(viewfinder.width, viewfinder.height)
         if (longest <= 0) {
             return Qt.size(root.grabLongSide, root.grabLongSide)
         }
-        // Never upscale: a small viewfinder has no more detail to give.
+        // No upscale: small viewfinder has no extra detail.
         var ratio = Math.min(1, root.grabLongSide / longest)
         return Qt.size(Math.max(1, Math.round(viewfinder.width * ratio)),
                        Math.max(1, Math.round(viewfinder.height * ratio)))
@@ -387,10 +285,8 @@ Item {
     VideoOutput {
         id: viewfinder
         objectName: "viewfinder"
-        // Turned against the host page, so it stays upright on the
-        // screen: the item itself rather than VideoOutput's own
-        // `orientation`, which on Qt 5.6 keeps the shape it had before
-        // the turn and squeezes the picture into it.
+        // Turned against page, not VideoOutput's `orientation` (Qt 5.6 squeezes
+        // picture).
         readonly property int turn: Viewfinder.pageTurn(root.pageOrientation)
         readonly property bool across: turn % 180 !== 0
         anchors.centerIn: parent
@@ -398,13 +294,10 @@ Item {
         height: across ? parent.width : parent.height
         rotation: -turn
         source: camera
-        // Filled rather than fitted. Fitted leaves bars down the sides
-        // of a tall view, and those bars are grabbed and decoded along
-        // with the picture -- pixels the code does not get. It also
-        // means what the reader sees is what is being read.
+        // Filled, not fitted: bars waste decoded pixels.
         fillMode: VideoOutput.PreserveAspectCrop
 
-        // Pinch to zoom, and tap to focus on what is under the finger.
+        // Pinch zoom; tap focus.
         PinchArea {
             objectName: "pinchArea"
             anchors.fill: parent
@@ -421,10 +314,7 @@ Item {
         }
     }
 
-    // Beside the viewfinder rather than in it, which the viewfinder
-    // shares its coordinates with: a frame is grabbed off the viewfinder
-    // and everything in it, and a ring drawn over the code is a ring the
-    // decoder has to read through.
+    // Sibling, not child: grab takes children, ring would be decoded.
     FocusReticle {
         id: reticle
         objectName: "reticle"
@@ -444,10 +334,8 @@ Item {
         maximumZoom: camera.maximumDigitalZoom
     }
 
-    // The camera's own controls, over the bottom of the picture and above
-    // the way to type the link: the torch on the left, the zoom step in
-    // the middle with the back cameras' rings above it, the other side on
-    // the right. Gone once a code is read, and while the link is typed.
+    // Controls over picture bottom: torch, zoom (lens rings above), other side.
+    // Gone once read and while typing link.
     Item {
         id: cameraControls
         objectName: "cameraControls"
@@ -487,7 +375,7 @@ Item {
             onSelected: root.useCamera(deviceId)
         }
 
-        // The zoom, one step at a time: one, two, four times, and back.
+        // Zoom steps: 1, 2, 4x, back.
         MouseArea {
             id: zoomButton
             objectName: "zoomButton"
@@ -528,7 +416,7 @@ Item {
         }
     }
 
-    // The code was read and the host is acting on it.
+    // Read; host acting on it.
     BusyIndicator {
         objectName: "acting"
         anchors.centerIn: parent
@@ -536,14 +424,10 @@ Item {
         size: BusyIndicatorSize.Large
     }
 
-    /// How many frames have been read and found nothing. Shown as a
-    /// spinner rather than a number: what the reader needs to know is
-    /// that the app is looking, not how hard.
+    /// Frames read, nothing found. Spinner, not number.
     property int framesTried: 0
 
-    // Beside the line, inside the page margin rather than anchored off
-    // the end of it: anchored to the line's own left edge, it hung half
-    // off the side of the screen.
+    // Inside page margin (line's left edge hung off screen).
     BusyIndicator {
         id: looking
         objectName: "looking"
@@ -556,9 +440,7 @@ Item {
         size: BusyIndicatorSize.Small
     }
 
-    // The other way in, where a thumb finds it: a button under the
-    // viewfinder that opens the panel for the link the code would carry,
-    // typed or pasted. Over the viewfinder rather than instead of it.
+    // Button under viewfinder opens link panel.
     Button {
         id: typeLinkButton
         objectName: "typeLinkButton"
@@ -617,9 +499,7 @@ Item {
         }
     }
 
-    // At the top rather than the foot: the phone is held up, the code
-    // is in the middle of the picture, and the words about it belong
-    // where the eye already is rather than down by the hand.
+    // At top: phone held up, eye there.
     Label {
         id: hint
         objectName: "hint"

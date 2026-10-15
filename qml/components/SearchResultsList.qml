@@ -2,33 +2,21 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * A search's answer: chats, then contacts, then messages, each under a
- * heading that says how many there were.
- *
- * One flat model with a `kind` role rather than three lists in a
- * flickable: QML sections a flat model, a view takes one model, and
- * nested flickables on Silica fight each other for the drag.
- *
- * Its own file rather than a second list inside the chat list page, so
- * each list's delegate can be checked against the one model it binds --
- * see tests/qml_syntax.rs.
+ * Chats, contacts, messages under count headings. Flat `kind` model for
+ * sections (nested flickables fight drag). Own file for tests/qml_syntax.rs.
  */
 SilicaListView {
     id: root
 
-    /// The SearchResults object whose rows these are.
+    /// Source SearchResults object.
     property QtObject search
 
-    /// A chat result, or a message in one, was tapped. `messageId` is 0
-    /// for a chat result and the matching message for a message result:
-    /// the chat should then open at that message, not at the newest.
+    /// `messageId` 0 = chat; else open at that message.
     signal chatActivated(int chatId, string chatName, int messageId)
-    /// A contact result was tapped. There may be no chat with them yet,
-    /// which is why this is not chatActivated -- and why the name comes
-    /// with it: the chat that gets made has no title to read yet.
+    /// Contact tapped; carries name as chat may not exist.
     signal contactActivated(int contactId, string contactName)
 
-    // Delegates draw outside the list's own box otherwise.
+    // Else delegates draw outside box.
     clip: true
     model: root.search ? root.search.rows : null
 
@@ -40,9 +28,7 @@ SilicaListView {
                   ? qsTr("Chats (%1)").arg(root.search.chat_count)
                   : section === "contact"
                     ? qsTr("Contacts (%1)").arg(root.search.contact_count)
-                    // Only the first of a big pile is listed, and saying
-                    // how many were listed out of how many matched is the
-                    // honest way to show that.
+                    // Big piles listed in part: show listed of matched.
                     : root.search.message_total > root.search.message_count
                       ? qsTr("Messages (%1 of %2)").arg(root.search.message_count)
                                                    .arg(root.search.message_total)
@@ -67,8 +53,7 @@ SilicaListView {
             if (model.kind === "contact") {
                 root.contactActivated(model.contact_id, model.title)
             } else {
-                // A message result opens the chat it is in, at the
-                // message that matched.
+                // Message result opens its chat at the match.
                 root.chatActivated(model.chat_id, model.title,
                                    model.kind === "message" ? model.message_id : 0)
             }
@@ -77,9 +62,7 @@ SilicaListView {
 
     ViewPlaceholder {
         objectName: "noResultsPlaceholder"
-        // `loaded` keeps this off the screen between a keystroke and its
-        // answer, where the model is empty but nothing has been searched
-        // for yet.
+        // `loaded`: hide between keystroke and answer.
         enabled: root.search && root.search.loaded && root.search.count === 0
         text: qsTr("Nothing found")
     }

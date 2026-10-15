@@ -1,19 +1,10 @@
-//! The page a webxdc app runs on: what it points the view at, and what it
-//! says while there is nothing to point it at yet.
+//! Webxdc app page: what it points view at, and what it says until it can.
 //!
-//! The view itself is a stub (`tests/silica-stubs`), because the browser
-//! engine is a device question this cannot answer. What it *can* answer is
-//! everything around it: that the page starts the app, hands the view the
-//! address the shim served it on, names the app in its own header, offers
-//! the source only when the app has one, and stops serving on the way out.
-//!
-//! Leaving is the page being destroyed, which is what popping one and
-//! replacing the stack both are -- and *not* another page opening over
-//! it. `sendToChat` opens the chat picker over the app at the app's own
-//! request, so a page that stopped its app whenever it deactivated
-//! stopped it in the middle of the request that asked. Both halves are
-//! here, and the address is asked rather than assumed: a host that has
-//! stopped refuses the connection.
+//! View is a stub (engine is a device question). Checked: page starts app, hands view the
+//! address shim served, names app in header, offers source only if app has one, stops serving
+//! on way out. Leaving = page destroyed (pop or stack replace), not covered: `sendToChat` opens
+//! picker over app at its request, so stopping on deactivate killed that request. Address
+//! asked, not assumed: stopped host refuses connection.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -31,8 +22,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: the page pops
-/// itself when the message it is running is deleted.
+/// Silica's `pageStack`, recorded. Pops on message delete.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -134,7 +124,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// What was recorded under `label`, for a step that needs an earlier one.
+/// Value recorded under `label`.
 fn value_of(steps: &[(&str, String)], label: &str) -> String {
     steps
         .iter()
@@ -143,12 +133,8 @@ fn value_of(steps: &[(&str, String)], label: &str) -> String {
         .unwrap_or_default()
 }
 
-/// Whether anything is still listening where the app was served.
-///
-/// The url the view was given, asked rather than assumed: a host that has
-/// been stopped closes its listener, and the connection is refused. This
-/// is the only way from here to tell an app that is still running from
-/// one that is not -- the page that held it may itself be gone.
+/// Whether anything still listens where app was served: stopped host refuses connection.
+/// Only way to tell running app from stopped; page holding it may be gone.
 fn reachable(url: &str) -> String {
     let rest = url.strip_prefix("http://").unwrap_or(url);
     let Some(authority) = rest.split('/').next().filter(|at| at.contains(':')) else {
@@ -167,7 +153,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -224,8 +210,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
                 5
             )
         );
-        // Before the host has answered: the view has nowhere to go and
-        // the page says it is working on it.
+        // Host not answered yet: page says working.
         record!(
             "early-url",
             call!("get", QString::from("webxdcView"), QString::from("url"))
@@ -245,8 +230,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
             "url",
             call!("get", QString::from("webxdcView"), QString::from("url"))
         );
-        // Served, but not drawn yet: the page is still saying so, and
-        // saying what it is waiting on.
+        // Served, not drawn: page says what it waits on.
         record!(
             "serving-busy",
             call!("get", QString::from("webxdcBusy"), QString::from("running"))
@@ -255,9 +239,8 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
             "serving-said",
             call!("get", QString::from("webxdcWaiting"), QString::from("text"))
         );
-        // A reason to show instead: the banner clears itself after a few
-        // seconds, and a view that never drew anything would be left
-        // saying nothing at all.
+        // Reason shown on page: banner clears itself in seconds; a never-drawn view would say
+        // nothing.
         record!(
             "failed",
             call!("fail", QString::from("cannot serve the app: no such file"))
@@ -301,7 +284,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
             "banner",
             call!("get", QString::from("errorBanner"), QString::from("text"))
         );
-        // Off its own address, and back where it belongs.
+        // Off its own address, back home.
         record!(
             "wander",
             call!("wander", QString::from("https://example.org/pay"))
@@ -314,8 +297,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        // Covered: the app is still there, and still being served. An
-        // app that asked for the picker is waiting on an answer from it.
+        // Covered: app still there and served; app that asked for picker awaits its answer.
         record!(
             "after-cover",
             call!("get", QString::from("webxdcView"), QString::from("url"))
@@ -328,7 +310,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
-        // Not while covered: the page on top is the one a pop would take.
+        // Not popped while covered: a pop would take the page on top.
         record!(
             "popped-covered",
             (*stack_ptr).pinned().borrow().log.to_string()
@@ -339,7 +321,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
     });
 
     single_shot(Duration::from_secs(7), move || unsafe {
-        // Left: the page is gone, and so is the host it was pointing at.
+        // Left: page and its host gone.
         record!(
             "after-leave",
             call!("get", QString::from("webxdcView"), QString::from("url"))

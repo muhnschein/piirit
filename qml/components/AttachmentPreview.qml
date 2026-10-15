@@ -1,5 +1,4 @@
-// 2.5 rather than 2.0 for Image.autoTransform, which is what reads a
-// photo's orientation tag. Harbour allows QtQuick up to 2.6.
+// 2.5: Image.autoTransform needs it for photo orientation. Harbour max 2.6.
 import QtQuick 2.5
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
@@ -7,95 +6,53 @@ import Nemo.Thumbnailer 1.0
 import "../js/Format.js" as Format
 
 /*
- * What a message's attachment looks like, whatever kind it is.
- *
- * The core classifies every attachment from the file itself and hands back
- * a `viewType`; nothing here inspects a file, and nothing should start.
- * This picks a renderer from that answer, and falls back to naming the file
- * for the kinds nothing better can be done with.
- *
- * Its own component because MessageDelegate is already the longest file in
- * the tree, and because a preview that can be loaded on its own is one a
- * test can drive through every kind in turn.
- *
- * Laid out by bindings rather than a Column, for the same reason
- * MessageDelegate is: a positioner sizes itself in a polish pass, which
- * never runs headlessly, so a row built from one cannot be measured. Every
- * renderer sits at y 0, and the height is the one that is there.
- *
- * Each kind's renderer is behind a Loader of its own, active only for that
- * kind. A row is built for every message scrolled past, and a picture row
- * that also built a sound player, a poster, a contact card and an app card
- * -- all of them unseen -- was about forty objects more than it draws, and
- * the sound player alone a media pipeline. The sound player is a step
- * further back still: it is made on the first press of play.
+ * Renderer per core `viewType`; never inspects files; fallback names file. Own component
+ * (MessageDelegate too long), testable per kind. Bindings, not Column: positioner sizes in
+ * polish pass, never headless. Renderers at y 0; height is loaded one's. Each kind behind own
+ * Loader: scrolled row builds only what it shows. Nothing starts on its own.
  */
 Item {
     id: root
 
-    /// Absolute path to the file in the core's blob directory.
+    /// Path in blob dir.
     property string filePath: ""
-    /// What to call it.
+    /// Display name.
     property string fileName: ""
-    /// The core's MIME type for it, empty when it has none.
+    /// Core MIME type; empty if none.
     property string fileMime: ""
-    /// Size in bytes, 0 when unknown. A real, not an int: QML has no
-    /// 64-bit integer and a large file overflows one.
+    /// Bytes; 0 unknown. `real`: QML has no 64-bit int; large file overflows.
     property real fileBytes: 0
-    /// Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc,
-    /// Vcard -- the core's own enum.
+    /// Core kind: Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc, Vcard.
     property string viewType: "Text"
-    /// Pixel size when the core knows it. Often 0: it reads PNG and JPEG
-    /// but returned 0x0 for a valid GIF, so nothing here may divide by
-    /// these without checking.
+    /// Pixel size; often 0 (core 0x0 for valid GIF): check before dividing.
     property int imageWidth: 0
     property int imageHeight: 0
-    /// True for a message the reader has not seen before: one that came in
-    /// while the chat was open, or was unread when it was opened. The only
-    /// GIFs that play by themselves.
+    /// Unseen: arrived while open, or unread at open. Only such GIFs autoplay.
     property bool isNew: false
-    /// How long a sound is, in milliseconds, when the core knows: the
-    /// sending client writes it in for a recording, and the core reads
-    /// nothing out of a file it is merely handed, so it is often 0. What
-    /// the row says before the player has been made, which is until the
-    /// reader first presses play.
+    /// Sound ms if core knows (sender writes it for recordings, none for handed file), often 0.
+    /// Shown till first play builds player.
     property int durationMs: 0
-    /// The list this sits in is being dragged or flicked. A GIF holds its
-    /// frame meanwhile rather than decoding the next on the thread the
-    /// scrolling is drawn on.
+    /// List moving: GIF holds frame instead of decoding on scroll thread.
     property bool scrolling: false
-    /// A shared contact, for `Vcard`.
+    /// Shared contact, for `Vcard`.
     property string vcardName: ""
     property string vcardAddr: ""
     property string vcardColor: ""
-    /// A webxdc app, for `Webxdc`: what the core reads out of the app
-    /// itself. The name is what says the app could be read at all; a
-    /// .xdc the core would not open has none, and draws as a file.
+    /// webxdc app for `Webxdc`; no name: unreadable .xdc, drawn as file.
     property string webxdcName: ""
     property string webxdcDocument: ""
     property string webxdcSummary: ""
     property string webxdcIcon: ""
-    /// Whether webxdc apps are on. Off, a `.xdc` is drawn as the file it
-    /// is and handed to the system on a tap -- the same row the core's
-    /// own refusal to read one already lands on -- rather than as an app
-    /// with a tap that would run it. The page binds it from the reader's
-    /// setting, as it does the Markdown mode.
+    /// webxdc apps on; off: `.xdc` drawn as file, opened by system. Page binds it.
     property bool appsEnabled: false
-    /// How wide the bubble lets this be.
+    /// Bubble max width.
     property real contentWidth: 0
 
-    /// A long press landed on one of the small controls here -- the
-    /// play button, the mark on a GIF -- which take the press for
-    /// themselves. The row's menu is what a long press means anywhere on
-    /// a message, so the control passes it on rather than swallowing it.
+    /// Long press on small controls passes to row menu.
     signal menuRequested()
 
     readonly property bool hasFile: root.filePath.length > 0
-    // Encoded, not concatenated: attachments are named by whoever sent
-    // them, and a "#" or a "%" in the name makes a plain "file://" + path
-    // into a URL that points somewhere else, or nowhere. Per segment,
-    // with encodeURIComponent: encodeURI leaves "#" and "?" alone as
-    // URL syntax, which is exactly what they must not be here.
+    // Sender names: `#`/`%` break file:// + path. Encode per segment (encodeURI keeps `#`, `?`).
     readonly property url fileUrl: root.hasFile
         ? Qt.resolvedUrl("file://" + root.filePath.split("/")
                                          .map(encodeURIComponent).join("/"))
@@ -105,52 +62,35 @@ Item {
                                     || root.viewType === "Sticker"
     readonly property bool isAnimated: root.viewType === "Gif"
     readonly property bool isVideo: root.viewType === "Video"
-    /// Height over width for a video: its own, within reason, or 16:9.
+    /// Video height/width: own within reason, else 16:9.
     readonly property real videoAspect:
         root.imageWidth > 0 && root.imageHeight > 0
         ? Math.min(root.imageHeight / root.imageWidth, 16 / 9) : 9 / 16
     readonly property bool isSound: root.viewType === "Audio"
                                     || root.viewType === "Voice"
     readonly property bool isCard: root.viewType === "Vcard"
-    /// An app somebody sent, where apps are on. A tap on one runs it
-    /// rather than handing it to another app, so the row says so whether
-    /// or not the core could read enough of it to draw a card.
+    /// Sent app: tap runs it, not handed off.
     readonly property bool isApp: root.viewType === "Webxdc"
                                   && root.appsEnabled
-    /// A picture of some kind.
+    /// Picture kind.
     readonly property bool isPicture: root.isStill || root.isAnimated
-    /// True when this kind reads better filling the bubble than hugging
-    /// its own text, which is what the bubble sizes itself by otherwise.
+    /// Fills bubble, not hugging text.
     readonly property bool wantsFullWidth: root.isPicture || root.isVideo
                                            || root.isSound || root.isCard
                                            || app.shown
-    /// The text the fallback row shows, so the bubble can measure it
-    /// without reaching inside here for the label.
+    /// Fallback row text; bubble measures it.
     readonly property string genericText: generic.text
-    /// Whether a tap on the message opens this: a picture, a video, or a
-    /// file for another app. A sound plays where it sits, and a shared
-    /// contact is drawn rather than opened. The tap itself is the row's:
-    /// nothing here takes a press, so a long press anywhere on the
-    /// message -- the picture included -- reaches the row's menu.
+    /// Tap opens picture, video, file; sound plays in place. Press passes to row: long press
+    /// reaches menu.
     readonly property bool openable: root.hasFile
                                      && (root.isPicture || root.isVideo || generic.shown)
 
-    /// `Audio.PlayingState`, written as its value.
-    ///
-    /// The enum lives on the type rather than the instance, and the
-    /// headless stub that stands in for QtMultimedia is a QML component,
-    /// which cannot declare one on Qt 5.6. Comparing against
-    /// `Audio.PlayingState` therefore reads as `undefined` under test and
-    /// silently never matches -- the play button would simply never become
-    /// a pause button, and nothing would fail.
+    /// `Audio.PlayingState` as value: headless QtMultimedia stub is QML, can't declare enums on
+    /// Qt 5.6; name reads `undefined` under test, button never turns to pause.
     readonly property int playingState: 1
 
-    // Only one renderer is ever built, and the rest are not there to
-    // measure. Read off the loaded item rather than the Loader, so one
-    // with nothing in it is zero by construction rather than by whatever
-    // size it was last given. The animation is
-    // inside the still image rather than beside it, so it is not in this
-    // sum.
+    // One renderer built; read loaded item, not Loader (empty = 0). Animation inside still,
+    // not summed.
     height: (still.item ? still.item.height : 0)
             + (video.item ? video.item.height : 0)
             + (sound.item ? sound.item.height : 0)
@@ -158,41 +98,22 @@ Item {
             + (app.item ? app.item.height : 0)
             + generic.height
 
-    /// A file size a person can read: Format.readableSize, reachable on
-    /// the preview because the fallback row is where a size is shown.
+    /// Readable size.
     function readableSize(bytes) {
         return Format.readableSize(bytes)
     }
 
-    /// m:ss from milliseconds, which is what QtMultimedia reports.
+    /// m:ss from ms.
     function clock(milliseconds) {
         var total = Math.floor(milliseconds / 1000)
         var seconds = total % 60
         return Math.floor(total / 60) + ":" + (seconds < 10 ? "0" : "") + seconds
     }
 
-    /// How tall a picture `width` wide should be.
-    ///
-    /// From the dimensions the row was handed, before the picture has
-    /// been decoded and after: a row that is the right height from the
-    /// start does not change height when the picture lands, and a row
-    /// that changes height moves every row below it, which under a
-    /// reader scrolling through a chat full of pictures is the list
-    /// jumping about as they decode. The core reads PNG and JPEG
-    /// headers and the model reads a GIF's, so the dimensions are nearly
-    /// always there.
-    ///
-    /// The decoded picture wins only where it disagrees. The header's
-    /// dimensions are the stored ones, before any turn the orientation
-    /// tag asks for: a photo taken in portrait is stored landscape and
-    /// marked, and a box shaped from the stored size is the wrong way
-    /// round for it. Same shape, to within rounding, means the header
-    /// was right and the row stays put.
-    ///
-    /// A square is the fallback when neither is known, because a height
-    /// of zero is an attachment the reader cannot see at all, and
-    /// `PreserveAspectFit` shows the whole picture in a square box
-    /// whatever shape it turns out to be.
+    /// Picture height for `width`, from row's dimensions (core reads PNG/JPEG headers, model
+    /// GIF's): right from start, rows below don't jump on decode. Decoded size wins only if
+    /// shape disagrees (header pre-orientation: portrait stored landscape). Neither known:
+    /// square (0 hides; PreserveAspectFit shows all).
     function pictureHeight(width, item) {
         var stored = root.imageWidth > 0 && root.imageHeight > 0
                      ? root.imageHeight / root.imageWidth : 0
@@ -207,44 +128,28 @@ Item {
         return width
     }
 
-    /// How many runs of the animation are left to play. A run is one pass
-    /// through the frames. Three of them is what a GIF the reader has not
-    /// seen before gets, and what the mark on a stopped one buys; a GIF
-    /// from last week does not start on its own.
+    /// Passes left: unseen GIF 3, older 0.
     property int runsLeft: 0
     readonly property int runsPerPlay: 3
 
-    /// Play the animation, three runs' worth.
+    /// Play 3 passes.
     function replay() {
         root.runsLeft = root.runsPerPlay
     }
 
-    /// Whether there is an animation here to play at all.
+    /// Animated at all.
     readonly property bool animatable: root.isAnimated && root.hasFile
 
-    // Both, because the row learns what it is in either order: a
-    // placeholder is filled in as a GIF that is already new, or a message
-    // arrives and is new before its file is there.
+    // Type may arrive before or after file.
     onAnimatableChanged: if (root.animatable && root.isNew) root.replay()
     onIsNewChanged: if (root.animatable && root.isNew) root.replay()
 
-    // Every picture, animated or not. A GIF is this image with the
-    // animation laid over it, rather than a second renderer beside it, for
-    // two reasons that both come down to AnimatedImage being unreliable
-    // about what it is holding: it reports no implicit size until its
-    // movie has decoded a frame -- headlessly it never does -- and if the
-    // decode fails it draws nothing at all. An Image reads the first frame
-    // of a GIF regardless. So the Image sizes the row and shows the still,
-    // and the animation covers it when there is one to play.
+    // GIF = image with animation over it: AnimatedImage has no size till decoded, draws nothing
+    // on failure; Image always reads frame 1.
     Loader {
         id: still
-        // Each renderer is built, and loads its file, by its own reason
-        // to be here rather than by `visible`: that reads the effective
-        // visibility, which the platform takes away from the whole page
-        // while another is over it -- and a picture, a poster or a sound
-        // player that unloaded on every such hiding was loaded again on
-        // every return, while the page was still sliding in. See
-        // MessageDelegate, and qml_hidden_rows.rs.
+        // Own `shown`, not `visible`: visibility drops while covered, so each return reloaded
+        // mid-slide-in. See MessageDelegate, qml_hidden_rows.rs.
         readonly property bool shown: root.isPicture && root.hasFile
         active: still.shown
         sourceComponent: Component {
@@ -255,29 +160,14 @@ Item {
                 height: root.pictureHeight(width, picture)
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
-                // Decoded no wider than it is drawn. A picture is kept as
-                // a texture of four bytes a pixel for as long as its row
-                // is built, and a phone's own photo is several times the
-                // width of its screen; this is most of what a chat full
-                // of pictures costs in memory, and the bound on what a
-                // crafted file can make the app allocate. Only the width,
-                // so the height follows the picture's own shape.
+                // Decode at drawn width (4 bytes/px; photos many screens wide): bounds memory,
+                // crafted-file alloc. Width only: keeps shape.
                 sourceSize.width: root.contentWidth
-                // A camera reads its sensor out landscape however the
-                // phone is held and writes which way to turn it into an
-                // EXIF tag rather than into the pixels. Every other client
-                // honours the tag; Image does not unless it is asked,
-                // which is why a photo sent from here arrived upright for
-                // whoever received it and lay on its side in our own
-                // message view.
+                // EXIF orientation honoured only with autoTransform: own photo lay sideways.
                 autoTransform: true
                 source: root.fileUrl
 
-                // The movie, while there are runs left to play, and
-                // nothing at all otherwise: a stopped movie still holds
-                // every frame it decoded, and a long conversation of GIFs
-                // holding theirs is the memory a phone notices. Unloaded,
-                // the still underneath shows its first frame.
+                // Movie only while passes left: stopped one holds decoded frames. Else still.
                 AnimatedImage {
                     id: animated
                     objectName: "attachmentAnimation"
@@ -285,26 +175,15 @@ Item {
                     readonly property bool shown: root.animatable && root.runsLeft > 0
                     visible: animated.shown
                     fillMode: Image.PreserveAspectFit
-                    // Each frame decoded as it comes round rather than
-                    // every frame kept: Qt's default caches the whole
-                    // movie at full size, which for a GIF of a hundred
-                    // frames is tens of megabytes held for one row.
+                    // Decode per frame: Qt default caches whole movie.
                     cache: false
-                    // Runs only while actually on screen -- `visible` is
-                    // the effective one, and a page hidden under another
-                    // has no business decoding frames -- but keeps its
-                    // file by its own reason to be here, so coming back is
-                    // not a reload.
+                    // Runs on screen only; file kept: no reload on return.
                     playing: animated.visible
-                    // Held on its frame while the list moves under the
-                    // reader's finger, and carried on from there.
+                    // Held while list moves.
                     paused: root.scrolling
                     source: animated.shown ? root.fileUrl : ""
 
-                    // The frame before this one: a smaller number now is
-                    // the movie having gone round. Counted here rather
-                    // than from a clock, because a GIF's frames each carry
-                    // their own delay.
+                    // Lower frame = wrapped. Counted, not clocked (per-frame delays).
                     property int lastFrame: 0
                     onSourceChanged: animated.lastFrame = 0
                     onFrameChanged: {
@@ -313,14 +192,8 @@ Item {
                         }
                         animated.lastFrame = animated.currentFrame
                     }
-                    // A movie that is not running while it is meant to be
-                    // has had its run: a GIF made to play once, or a file
-                    // the movie reader could not start on at all, which
-                    // the still shows as well as anything could. Asked a
-                    // pass later rather than in the handler: the movie
-                    // reports this from inside the load its own `source`
-                    // binding started, and changing `runsLeft` there is
-                    // changing what `visible` is being worked out from.
+                    // Stopped when meant to run: pass done (or unstartable). Checked a pass later:
+                    // movie reports inside own `source` load; `runsLeft` there changes `visible`.
                     onPlayingChanged: if (!animated.playing) stopped.restart()
 
                     Timer {
@@ -335,10 +208,7 @@ Item {
                     }
                 }
 
-                // The mark on a GIF that is not playing. Its own tap, so a
-                // tap on the mark plays the movie here rather than opening
-                // the picture; a long press on it still goes to the row's
-                // menu.
+                // Stopped GIF mark: tap plays here; long press to menu.
                 Rectangle {
                     id: gifMark
                     objectName: "gifMark"
@@ -355,8 +225,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.bold: true
                         textFormat: Text.PlainText
-                        // The format's name, which is the same in every
-                        // language.
+                        // Format name: untranslated.
                         text: "GIF"
                     }
 
@@ -370,9 +239,7 @@ Item {
         }
     }
 
-    // A video: the platform thumbnailer's poster frame, with a play mark
-    // over it. A tap on the row opens it on the video page; nothing here
-    // takes the press.
+    // Video: poster with play mark; tap opens video page.
     Loader {
         id: video
         readonly property bool shown: root.isVideo && root.hasFile
@@ -381,11 +248,7 @@ Item {
             Item {
                 objectName: "attachmentVideo"
                 width: root.contentWidth
-                // The video's own shape where it is known -- what the
-                // sender wrote in, or the file's track header read by the
-                // model -- so a video taken upright stands upright; 16:9
-                // where it is not. The thumbnailer crops to whatever it is
-                // given.
+                // Own shape (sender's or track header), else 16:9; thumbnailer crops.
                 height: Math.round(width * root.videoAspect)
 
                 Rectangle {
@@ -400,16 +263,12 @@ Item {
                     anchors.fill: parent
                     sourceSize.width: width
                     sourceSize.height: height
-                    // fillMode left at the thumbnailer's own default,
-                    // which crops to the size asked for. Naming a value
-                    // would mean naming an enum on the type, which the
-                    // headless stub cannot carry.
+                    // Default fillMode crops; naming enum breaks headless stub.
                     mimeType: root.fileMime
                     source: root.fileUrl
                 }
 
-                // Over the frame rather than beside it: the frame is the
-                // control.
+                // Frame is the control.
                 Rectangle {
                     anchors.centerIn: parent
                     width: Theme.itemSizeSmall
@@ -429,10 +288,7 @@ Item {
         }
     }
 
-    // A voice message or a music file, played where it sits. The length
-    // is the core's when it has one, which it has for a recording whose
-    // sender wrote it in, and the player's own once there is a player:
-    // the core reads none out of a file it is merely handed.
+    // Sound played in place. Length: core's, else player's.
     Loader {
         id: sound
         readonly property bool shown: root.isSound && root.hasFile
@@ -442,24 +298,18 @@ Item {
                 id: soundRow
                 objectName: "attachmentAudio"
                 width: root.contentWidth
-                // Measured rather than fixed: the two labels and the track
-                // have to fit beside a button whose size is the theme's,
-                // not ours.
+                // Labels, track fit beside theme-sized button.
                 height: Math.max(playButton.height,
                                  soundName.height + soundTime.height
                                  + track.height + 2 * Theme.paddingSmall)
 
-                /// The reader has pressed play on this row: the player is
-                /// made then and not before. On Sailfish a player is a
-                /// GStreamer pipeline, made when the player is and, with
-                /// the default `autoLoad`, taken as far as paused on the
-                /// file straight away -- streaming threads and an audio
-                /// stream, for every sound scrolled past.
+                /// Player made on first play: on Sailfish each is a GStreamer pipeline paused on
+                /// file at once (`autoLoad`), threads per scrolled-past sound otherwise.
                 property bool wanted: false
-                /// The player, null until then.
+                /// Player; null until then.
                 readonly property QtObject player: playerLoader.item
                                                    ? playerLoader.item.player : null
-                /// How long the sound is, 0 while nobody knows.
+                /// Sound length; 0 unknown.
                 readonly property int duration:
                     soundRow.player && soundRow.player.duration > 0
                     ? soundRow.player.duration : root.durationMs
@@ -472,8 +322,7 @@ Item {
                     id: playerLoader
                     active: soundRow.wanted
                     sourceComponent: Component {
-                        // In an Item because a Loader on Qt 5.6 loads
-                        // nothing else, and Audio is not one.
+                        // Item: Qt 5.6 Loader loads only Items.
                         Item {
                             objectName: "audioPlayer"
                             property alias player: audio
@@ -481,13 +330,9 @@ Item {
                             Audio {
                                 id: audio
                                 source: root.fileUrl
-                                // Loaded by the press of play that made
-                                // it, and not by being made.
+                                // Loaded by play press.
                                 autoLoad: false
-                                // Nothing autoplays. A conversation that
-                                // starts talking when it is scrolled past
-                                // is the worst possible behaviour on a
-                                // phone that may be in a pocket.
+                                // No autoplay: talking in pocket.
                                 autoPlay: false
                             }
                         }
@@ -502,9 +347,7 @@ Item {
                                  ? "image://theme/icon-m-pause"
                                  : "image://theme/icon-m-play"
                     onClicked: {
-                        // Made here, the first time, and there by the
-                        // next line: a Loader that is not asynchronous
-                        // builds as it is switched on.
+                        // First use; sync Loader builds on switch.
                         soundRow.wanted = true
                         var player = soundRow.player
                         if (!player) {
@@ -539,9 +382,7 @@ Item {
                           : root.fileName
                 }
 
-                // Position over duration, once there is a duration to be
-                // over. Blank rather than "0:00" while nobody knows: a
-                // length of zero is a claim, and an empty label is not.
+                // Position / duration once known; blank, not 0:00.
                 Label {
                     id: soundTime
                     objectName: "audioTime"
@@ -582,9 +423,7 @@ Item {
         }
     }
 
-    // A shared contact. The core parses the card and hands back the name,
-    // the address and the colour it would give that contact; nothing here
-    // reads vCard syntax.
+    // Shared contact: core parses card (name, address, colour).
     Loader {
         id: card
         readonly property bool shown: root.isCard
@@ -634,19 +473,14 @@ Item {
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
                     textFormat: Text.PlainText
-                    // The card usually carries the address as the name
-                    // too, and saying it twice reads as a bug rather than
-                    // as thoroughness.
+                    // Name often = address; twice reads as bug.
                     text: root.vcardAddr === root.vcardName ? "" : root.vcardAddr
                 }
             }
         }
     }
 
-    // A webxdc app: its own icon, its name, and the line it keeps about
-    // itself -- "3 votes", a score -- which changes as the chat plays
-    // with it. All three are the core's, read out of the app; a tap runs
-    // it (MessageDelegate).
+    // webxdc app: core-read icon, name, status ("3 votes"). Tap runs it.
     Loader {
         id: app
         readonly property bool shown: root.isApp && root.webxdcName.length > 0
@@ -669,9 +503,7 @@ Item {
                     color: Theme.rgba(Theme.highlightBackgroundColor,
                                       Theme.highlightBackgroundOpacity)
 
-                    // The app's own icon when it has one. The mark stands
-                    // in where it has not, so the row is never a blank
-                    // square.
+                    // No icon: mark, not blank square.
                     AppMark {
                         anchors.centerIn: parent
                         visible: root.webxdcIcon.length === 0
@@ -684,8 +516,7 @@ Item {
                         anchors.margins: Theme.paddingSmall
                         fillMode: Image.PreserveAspectFit
                         asynchronous: true
-                        // Encoded a segment at a time, as every file URL
-                        // here is.
+                        // Segment-encoded, as all file URLs here.
                         source: root.webxdcIcon.length > 0
                                 ? Qt.resolvedUrl("file://" + root.webxdcIcon.split("/")
                                                      .map(encodeURIComponent).join("/"))
@@ -705,8 +536,7 @@ Item {
                     }
                     truncationMode: TruncationMode.Fade
                     color: Theme.primaryColor
-                    // The app named itself; it is the sender's text like
-                    // any other.
+                    // App name is sender text.
                     textFormat: Text.PlainText
                     text: root.webxdcName
                 }
@@ -719,8 +549,7 @@ Item {
                         right: parent.right
                         top: appName.bottom
                     }
-                    // An app that has said nothing about itself takes no
-                    // line for saying so.
+                    // None when app says nothing.
                     readonly property bool shown: text.length > 0
                     visible: appState.shown
                     height: appState.shown ? implicitHeight : 0
@@ -728,8 +557,7 @@ Item {
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
                     textFormat: Text.PlainText
-                    // The document it is editing, then what it says about
-                    // itself.
+                    // Document it's editing, then its status.
                     text: {
                         var parts = []
                         if (root.webxdcDocument.length > 0) {
@@ -745,9 +573,7 @@ Item {
         }
     }
 
-    // Everything else that has a file: named, sized, and handed to the
-    // system on a tap on the row. A webxdc the core could not read enough
-    // of to draw as an app lands here too, marked as one.
+    // Any other file, undrawable webxdc too: named, sized, system on tap.
     Label {
         id: generic
         objectName: "attachmentLabel"
@@ -763,17 +589,8 @@ Item {
         color: Theme.highlightColor
         textFormat: Text.PlainText
         text: {
-            // A .vcf the core would not call a Vcard still says what
-            // it is. It declines the classification when the card
-            // holds no email address or more than one contact -- a
-            // phone-only contact exported from the address book is
-            // both common and not someone Delta Chat can open a chat
-            // with -- and a paperclip makes that look like a mystery
-            // blob rather than a contact this app cannot use.
-            //
-            // A .xdc that got this far is one the core would not open
-            // as an app, so it is drawn as the file it turned out to be
-            // rather than as an app that does not work.
+            // .vcf core won't class Vcard (no email, or >1 contact; phone-only common): still
+            // marked as card. Unopenable .xdc: drawn as file.
             var mark = root.fileMime === "text/vcard" ? "📇" : "📎"
             var name = root.fileName.length > 0 ? root.fileName : root.filePath
             var size = root.readableSize(root.fileBytes)

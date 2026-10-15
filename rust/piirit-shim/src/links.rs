@@ -1,17 +1,7 @@
-//! Tracking parameters taken out of links.
-//!
-//! A link pasted from a browser or another app carries whatever the site
-//! appended to it: click ids, campaign tags, the sharer's account. None of
-//! it is the page, and all of it tells the site who sent the link to whom.
-//! The rules are parla's (github.com/trufae/parla, `link_cleaner.vala`):
-//! parameters that carry content -- a video id, a timestamp, a search --
-//! are kept, and everything not on a list is left byte for byte as it was.
-//!
-//! Nothing here fetches anything. The text is rewritten on the way out and
-//! the reader sees the result in their own bubble.
+//! Tracking params stripped from outgoing links; parla's rules (github.com/trufae/parla,
+//! `link_cleaner.vala`). Content params stay; unlisted left byte for byte. Nothing fetched.
 
-/// Ad-click and campaign ids that platforms append regardless of the
-/// destination site, so they are safe to drop anywhere.
+/// Ad-click and campaign ids: safe on any site.
 const GLOBAL_PARAMS: &[&str] = &[
     "fbclid",
     "gclid",
@@ -38,13 +28,12 @@ const GLOBAL_PARAMS: &[&str] = &[
     "oly_enc_id",
 ];
 
-/// Prefixes of the same kind: Google Analytics, Matomo, `HubSpot` ads.
+/// Analytics prefixes: Google, Matomo, `HubSpot`.
 const GLOBAL_PREFIXES: &[&str] = &["utm_", "pk_", "mtm_", "piwik_", "hsa_"];
 
-/// What one site appends to its own links.
+/// One site's tracking params.
 struct SiteRule {
-    /// A host matches itself and its subdomains; `brand.*` matches the
-    /// brand under any country domain (`amazon.co.uk`, `smile.amazon.de`).
+    /// Host and subdomains. `brand.*`: any country domain.
     hosts: &'static [&'static str],
     params: &'static [&'static str],
     prefixes: &'static [&'static str],
@@ -152,8 +141,7 @@ const SITE_RULES: &[SiteRule] = &[
         params: &["tt_content", "tt_medium"],
         prefixes: &[],
     },
-    // YouTube's thumbnail CDN: rendering hints and signatures the plain
-    // picture does not need.
+    // YouTube thumbnail CDN: rendering hints.
     SiteRule {
         hosts: &["ytimg.com"],
         params: &["sqp", "rs", "usqp"],
@@ -210,15 +198,12 @@ const SITE_RULES: &[SiteRule] = &[
     },
 ];
 
-/// The text with every `http(s)` link in it cleaned. Anything that is not
-/// a link passes through unchanged.
+/// Text with every `http(s)` link cleaned.
 pub(crate) fn clean_text(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut at = 0;
     for (start, end) in url_spans(text) {
-        // The spans are character boundaries, so both always slice. Were
-        // one not to, the text up to the next link still goes out with it
-        // as it was: a link left uncleaned, and no words lost.
+        // Bad span: sent uncleaned, no words lost.
         if let (Some(before), Some(url)) = (text.get(at..start), text.get(start..end)) {
             out.push_str(before);
             out.push_str(&clean_url(url));
@@ -229,8 +214,7 @@ pub(crate) fn clean_text(text: &str) -> String {
     out
 }
 
-/// The byte ranges of every `http://` or `https://` link in the text, in
-/// order.
+/// Byte ranges of each `http://` or `https://` link.
 pub(crate) fn url_spans(text: &str) -> Vec<(usize, usize)> {
     let mut spans = Vec::new();
     let mut from = 0;
@@ -242,7 +226,7 @@ pub(crate) fn url_spans(text: &str) -> Vec<(usize, usize)> {
     spans
 }
 
-/// Where the next link starts at or after `from`, if there is one.
+/// Start of next link at or after `from`.
 fn url_start(text: &str, from: usize) -> Option<usize> {
     let mut at = from;
     while let Some(offset) = text.get(at..)?.find("http") {
@@ -256,10 +240,8 @@ fn url_start(text: &str, from: usize) -> Option<usize> {
     None
 }
 
-/// Where a link starting at `start` ends: at whitespace or a quote or an
-/// angle bracket, less any trailing punctuation that belongs to the
-/// sentence rather than the link. A `)` or `]` counts as the sentence's
-/// only when the link itself has no opening one for it.
+/// End of link at `start`: whitespace, quote or angle bracket. Trailing punctuation is
+/// sentence's; `)`/`]` too unless opened.
 fn url_end(text: &str, start: usize) -> usize {
     let tail = text.as_bytes().get(start..).unwrap_or_default();
     let mut link = tail
@@ -271,10 +253,7 @@ fn url_end(text: &str, start: usize) -> usize {
         })
         .next()
         .unwrap_or_default();
-    // The closers the link has no opener for, counted once and then kept
-    // in step as closers come off the end. Counting them again for every
-    // character taken off made a message ending in thousands of `)`
-    // quadratic to render.
+    // Closers counted once; recount per char was quadratic.
     let mut parens = unopened(link, b'(', b')');
     let mut brackets = unopened(link, b'[', b']');
     while let Some((&last, shorter)) = link.split_last() {
@@ -295,7 +274,7 @@ fn url_end(text: &str, start: usize) -> usize {
     start.saturating_add(link.len())
 }
 
-/// How many more `close` than `open` the span holds.
+/// Closers beyond openers in `span`.
 fn unopened(span: &[u8], open: u8, close: u8) -> usize {
     let (mut opens, mut closes) = (0_usize, 0_usize);
     for byte in span {
@@ -308,11 +287,10 @@ fn unopened(span: &[u8], open: u8, close: u8) -> usize {
     closes.saturating_sub(opens)
 }
 
-/// One link with its tracking parameters taken out. The fragment is kept,
-/// and so is every parameter not on a list.
+/// Link with tracking params removed; fragment kept.
 pub(crate) fn clean_url(url: &str) -> String {
     let host = host_of(url);
-    // The fragment keeps its `#`, and a `?` after it is part of it.
+    // `#` kept; `?` after it is fragment's.
     let (before_fragment, fragment) = url
         .find('#')
         .and_then(|at| Some((url.get(..at)?, url.get(at..)?)))
@@ -322,8 +300,7 @@ pub(crate) fn clean_url(url: &str) -> String {
         None => (before_fragment, None),
     };
 
-    // Amazon appends the click source as a path segment rather than a
-    // parameter: `/dp/B0XXXXXXXX/ref=sr_1_3`.
+    // Amazon click source is a path segment: `/dp/.../ref=sr_1_3`.
     if host_matches(&host, "amazon.*") {
         if let Some((path, _)) = base.split_once("/ref=") {
             base = path;
@@ -372,8 +349,7 @@ fn is_tracking(name: &str, site: Option<&SiteRule>) -> bool {
     })
 }
 
-/// The host, lowercased, without user info, a port, or a leading `www.`
-/// or `m.`.
+/// Lowercased host without user info, port, `www.`, `m.`.
 fn host_of(url: &str) -> String {
     let Some((_, rest)) = url.split_once("://") else {
         return String::new();
@@ -391,12 +367,10 @@ fn host_of(url: &str) -> String {
     host
 }
 
-/// `example.com` matches the domain and its subdomains; `brand.*` matches
-/// the brand under any country domain.
+/// `example.com`: domain and subdomains. `brand.*`: any country.
 fn host_matches(host: &str, pattern: &str) -> bool {
     if let Some(brand) = pattern.strip_suffix('*') {
-        // `brand` still ends in the dot: `amazon.` matches `amazon.co.uk`
-        // at the start, and `smile.amazon.de` after a dot.
+        // `amazon.co.uk` at start, `smile.amazon.de` after a dot.
         return host
             .find(brand)
             .and_then(|at| host.get(..at))
@@ -419,12 +393,12 @@ mod tests {
             clean_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=tracker&t=42"),
             "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42"
         );
-        // Nothing to remove: byte for byte as it came.
+        // Nothing to remove: unchanged.
         assert_eq!(
             clean_url("https://example.org/a?b=c#frag"),
             "https://example.org/a?b=c#frag"
         );
-        // Every parameter gone leaves no lone `?`, and the fragment stays.
+        // No lone `?`; fragment stays.
         assert_eq!(
             clean_url("https://youtu.be/abc?si=xyz#t=1"),
             "https://youtu.be/abc#t=1"
@@ -433,7 +407,7 @@ mod tests {
 
     #[test]
     fn site_rules_apply_to_their_hosts_only() {
-        // `ref` is Facebook's and Amazon's, not everyone's.
+        // `ref` only for Facebook, Amazon.
         assert_eq!(
             clean_url("https://example.org/?ref=home"),
             "https://example.org/?ref=home"
@@ -442,7 +416,7 @@ mod tests {
             clean_url("https://m.facebook.com/story?ref=home&story=1&__tn__=x"),
             "https://m.facebook.com/story?story=1"
         );
-        // A brand under any country domain, and its path-style click id.
+        // Any country domain; path-style click id.
         assert_eq!(
             clean_url("https://www.amazon.co.uk/dp/B0ABCDEF/ref=sr_1_3?tag=aff-21&th=1"),
             "https://www.amazon.co.uk/dp/B0ABCDEF?th=1"
@@ -466,22 +440,22 @@ mod tests {
             clean_text(text),
             "see https://example.org/a, and (https://example.org/b)."
         );
-        // A bracket the link itself opened is part of it.
+        // Bracket link opened is part of it.
         assert_eq!(
             clean_text("https://en.wikipedia.org/wiki/Foo_(bar)?utm_x=1"),
             "https://en.wikipedia.org/wiki/Foo_(bar)"
         );
-        // Not a link: no scheme separator.
+        // Not a link: no `://`.
         assert_eq!(clean_text("httpx and http:/x"), "httpx and http:/x");
         assert_eq!(clean_text(""), "");
     }
 
     #[test]
     fn closers_after_a_link_are_counted_once() {
-        // Each `)` used to recount the whole link: half a minute for this.
+        // `)` recount made this half a minute.
         let text = format!("https://example.org/a{}", ")".repeat(100_000));
         assert_eq!(url_spans(&text), [(0, 21)]);
-        // The link's own pairs stay with it, the rest go to the sentence.
+        // Link's own pairs stay; rest is sentence.
         let text = "(see https://example.org/(a)[b]).]";
         assert_eq!(url_spans(text), [(5, 31)]);
     }

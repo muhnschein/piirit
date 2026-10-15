@@ -1,12 +1,6 @@
-//! Opening a chat at a search result.
-//!
-//! The prefetch fills in the page the found message is on, so the page is
-//! built already showing it. Opening the chat on its newest messages and
-//! then going looking would show today's messages for a moment before
-//! yanking the reader up to the one they asked for.
-//!
-//! Reaching the beginning of a chat is `qml_paging`'s: every message has a
-//! row, so the first one is row 0 and scrolling to the top arrives at it.
+//! Chat opened at search result: prefetch fills found message's page, so page is built
+//! showing it. Opening on newest then seeking would flash today's messages before yanking
+//! reader up. Reaching chat start is `qml_paging`'s.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -24,9 +18,9 @@ use qmetaobject::*;
 
 mod common;
 
-/// Long enough that the message below is nowhere near either end.
+/// Long enough that message below is nowhere near either end.
 const MESSAGES: u32 = 117;
-/// The message a search found, in the middle of the chat.
+/// Found message, mid-chat.
 const FOUND: u32 = 65;
 
 const PROBE_QML: &str = r"
@@ -126,8 +120,7 @@ fn a_search_result_is_on_the_page_the_moment_it_is_built() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -184,9 +177,8 @@ fn a_search_result_is_on_the_page_the_moment_it_is_built() {
                 i32::try_from(FOUND).unwrap_or(0)
             ),
         ));
-        // In the same callback as the load: whatever is here was put here
-        // by the page building itself, with no turn in between for a
-        // transition to run, let alone for a jump to be seen.
+        // Same callback as load: what's here was put by page building itself, no turn for a
+        // transition or a visible jump.
         (*steps_ptr).push(("rows-while-arriving", call!("rowCount")));
         (*steps_ptr).push(("settle", call!("settle")));
     });
@@ -194,8 +186,7 @@ fn a_search_result_is_on_the_page_the_moment_it_is_built() {
         (*steps_ptr).push(("landed", call!("middleId")));
     });
     single_shot(Duration::from_secs(6), move || unsafe {
-        // The rows settle after the page arrives; the reader must not be
-        // carried off the message they came for.
+        // Rows settle late; keep reader on the message.
         (*steps_ptr).push(("relayout", call!("relayout")));
         (*steps_ptr).push(("landed-after", call!("middleId")));
         (*engine_ptr).quit();

@@ -1,13 +1,8 @@
-//! Video in a call: the camera as the call screen switches it, and the
-//! pictures as the page reports them.
+//! Camera in a call, and pictures page reports.
 //!
-//! The camera is the page's to open and the bridge's to switch
-//! (`call_video.js`, tested in Node). What runs here is the `Call` a
-//! window holds and the host between it and the page: which way the page
-//! is loaded -- camera on or off -- what it is told when the reader
-//! switches the camera, turns it or leaves the app, and what becomes of
-//! what it reports. The page's side is played over a real socket, as the
-//! bridge plays it.
+//! Page opens camera, bridge switches it (`call_video.js`, tested in Node). Here: `Call` and host
+//! between it and page: load camera on/off, what page is told on switch/turn/away, and reports.
+//! Page side played over real socket.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -63,20 +58,19 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The commands waiting for the page, as the bridge collects them.
+/// Commands queued for page.
 fn commands(url: &str) -> String {
     let answer = get(&authority_of(url), &format!("{}/commands", api_of(url)));
     body_of(&answer).to_string()
 }
 
-/// What the bridge reports on `/video`, answered.
+/// `/video` report, answered.
 fn report(url: &str, body: &str) -> String {
     let answer = post(&authority_of(url), &format!("{}/video", api_of(url)), body);
     status_of(&answer).to_string()
 }
 
-/// Run `steps` one after another: the first `first` from now, each of the
-/// rest `gap` after the one before has finished.
+/// Run `steps` in order: first after `first`, each next `gap` after previous ends.
 fn run_steps(mut steps: Vec<Box<dyn FnMut()>>, first: Duration, gap: Duration) {
     if steps.is_empty() {
         return;
@@ -95,7 +89,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -137,19 +131,16 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
         };
     }
 
-    // One step after another, each a moment after the last has finished:
-    // what a step asked of the host has reached the call before the next
-    // one looks.
+    // Each step waits for last: host's ask reaches call before next looks.
     let script: Vec<Box<dyn FnMut()>> = vec![
-        // SAFETY for every step: these run only while `exec()` runs on
-        // this thread, and everything they point at outlives it.
+        // SAFETY for every step: fire only inside `exec()`.
         Box::new(move || unsafe {
-            // Nothing to switch without a call.
+            // No call, nothing to switch.
             record!("idle", call!("camera", true));
             record!("place", call!("place", true));
             record!("placing", call!("video"));
         }),
-        // A video call's page starts with its camera on.
+        // Video call starts camera on.
         Box::new(move || unsafe {
             let url = call!("url");
             record!("url", url.clone());
@@ -169,25 +160,22 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
             let url = (*url_ptr).clone();
             record!("reported", call!("video"));
             record!("changed", call!("changes"));
-            // Off, turned, on: each told to the page as it happens.
+            // Off, turned, on: each told.
             record!("off", call!("camera", false));
             record!("off-told", commands(&url));
             record!("flip", call!("flip"));
             record!("flip-told", commands(&url));
             record!("on", call!("camera", true));
             record!("on-told", commands(&url));
-            // Away: the camera let go and the pictures not drawn, and the
-            // reader's camera still wanted.
+            // Away: camera let go, pictures not drawn; reader still wants camera.
             record!("away", call!("away", true));
             record!("away-told", commands(&url));
-            // Switched off and on while away: nothing to tell the page,
-            // whose camera is closed either way.
+            // Off/on while away: nothing to tell.
             record!("off-away", call!("camera", false));
             record!("on-away", call!("camera", true));
             record!("back", call!("away", false));
             record!("back-told", commands(&url));
-            // What the page reports, taken: their picture, and which way
-            // the camera faces.
+            // Page report: picture, camera facing.
             record!(
                 "theirs",
                 report(&url, r#"{"local":true,"remote":true,"front":true}"#)
@@ -196,7 +184,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
         Box::new(move || unsafe {
             let url = (*url_ptr).clone();
             record!("theirs-shown", call!("video"));
-            // A camera that would not open.
+            // Camera won't open.
             report(
                 &url,
                 r#"{"local":false,"remote":true,"front":true,"failed":true}"#,
@@ -206,7 +194,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
             record!("failed", call!("video"));
             record!("hang-up", call!("hangUp"));
             record!("reset", call!("reset"));
-            // A voice call's page starts with its camera off.
+            // Voice call starts camera off.
             record!("place-voice", call!("place", false));
             record!("voice", call!("video"));
         }),
@@ -215,8 +203,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
             record!("voice-url", url);
             call!("hangUp");
             call!("reset");
-            // A video call rings, its camera on until switched off; turned
-            // and sent away before it is answered.
+            // Video call rings, camera on until switched off; turned and sent away before answer.
             record!("ring", call!("ring", 9100, true));
             record!("ring-off", call!("camera", false));
             record!("ring-flip", call!("flip"));
@@ -230,7 +217,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
             call!("away", false);
             call!("hangUp");
             call!("reset");
-            // A voice call rings with the camera off; answered with it on.
+            // Voice call rings camera off; answered on.
             record!("ring-voice", call!("ring", 9101, false));
             record!("ring-on", call!("camera", true));
             record!("answer-on", call!("answer"));
@@ -242,7 +229,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
         }),
     ];
     // The core first has to come up.
-    // Whole seconds: the vendored `single_shot` drops the fraction.
+    // Whole seconds: vendored `single_shot` drops fraction.
     run_steps(script, Duration::from_secs(2), Duration::from_secs(1));
 
     engine.exec();

@@ -1,34 +1,21 @@
 /*
- * The H.264 encoder a video call's picture goes out through, as a Gecko
- * Media Plugin around x264.
+ * H.264 encoder for video calls: Gecko Media Plugin around x264.
  *
- * Delta Chat on iOS offers and answers H.264 and nothing else, and the
- * Sailfish WebView's Gecko encodes H.264 only through a media plugin: a
- * library of its own (this one, built as libpiirit.so beside a
- * piirit.info that says what it does), which Gecko loads in a process of
- * its own from the directories MOZ_GMP_PATH names. The phone's hardware
- * encoder reaches Gecko the same way, through Jolla's gmp-droid, and
- * where that is installed the app leaves Gecko to it
- * (piirit-shim/src/call_host.rs). This is for every phone where it is not.
+ * iOS Delta Chat speaks H.264 only; Sailfish WebView's Gecko takes it only from a
+ * media plugin: this, libpiirit.so beside piirit.info, loaded in own process from
+ * `MOZ_GMP_PATH`. With Jolla's gmp-droid (hardware) installed, app leaves Gecko to
+ * it (piirit-shim/src/call_host.rs).
  *
- * Cheap, because it runs for as long as a call shows a picture:
+ * Cheap (runs whole call):
+ *  - Constrained Baseline (Gecko offers, all decode). x264 "superfast" zerolatency:
+ *    one ref, no lookahead/B-frames, one thread, NEON on ARM. Fastest preset with
+ *    deblocking, most of what "ultrafast" loses at call bit rates.
+ *  - Picture read in place.
+ *  - Bit rate: Gecko congestion control's ask, 1s buffer; per-second rate raised for
+ *    fewer camera pictures. Keyframe on far-end ask, not clock.
  *
- *  - Constrained Baseline, which is what Gecko offers and every receiver
- *    decodes, and x264's "superfast" preset tuned for zero latency: one
- *    reference, no lookahead, no B-frames, one thread, NEON on ARM. It is
- *    the fastest preset that keeps the deblocking filter, which is most
- *    of what "ultrafast" gives up in picture at a call's bit rates.
- *  - The picture is read where Gecko put it, not copied first.
- *  - The bit rate is the one Gecko's congestion control asks for, held to
- *    a second's worth of buffer and made good per second when the camera
- *    gives fewer pictures than the call was set up for, and a keyframe is
- *    made when the far end asks for one rather than on a clock.
- *
- * What it costs is written to the call's log when the app names one
- * (PIIRIT_CALL_LOG), in CPU time per frame, so a test call says it.
- *
- * Every method is called on the plugin process's main thread, one at a
- * time, and an encoded picture is handed back from inside Encode().
+ * CPU per frame to call log if named (PIIRIT_CALL_LOG). Methods on plugin main
+ * thread, one at a time; encoded picture returned inside Encode().
  */
 #include <array>
 #include <cerrno>
@@ -54,35 +41,27 @@
 
 namespace {
 
-/* What a call starts at when Gecko does not say: Gecko's own default
- * for a new video stream. */
+/* Start rate if Gecko gives none: its new-stream default. */
 constexpr uint32_t FALLBACK_KBPS = 300;
-/* Below this x264's rate control stops meaning anything at 640x480. */
+/* x264 rate control floor at 640x480. */
 constexpr uint32_t MIN_KBPS = 30;
 constexpr uint32_t FALLBACK_FPS = 30;
-/* Below this the rate stops being spread over fewer pictures: while the
- * camera is off Gecko sends a black picture now and then, and those are
- * small whatever they are allowed. */
+/* Floor for spreading rate over fewer pictures: camera off, Gecko sends rare
+ * black pictures, small anyway. */
 constexpr uint64_t MIN_FPS = 5;
-/* How long the camera's frame rate is measured over. */
+/* Camera fps window. */
 constexpr uint64_t PACE_WINDOW_US = 1000000;
-/* libwebrtc's own default distance between keyframes, in frames. A
- * receiver that loses one asks for the next, so this is only the floor
- * under a call where nobody ever asks. */
+/* libwebrtc default keyframe interval, frames: floor if nobody asks (loser asks). */
 constexpr int KEYFRAME_INTERVAL = 3000;
-/* Level 3.1, the level Gecko offers H.264 at (profile-level-id 42e01f). */
+/* Level 3.1: Gecko's H.264 offer (profile-level-id 42e01f). */
 constexpr int LEVEL = 31;
-/* How often the log is told what encoding costs: in picture time, in
- * microseconds, which is what Gecko's timestamps count. */
+/* Cost summary interval, us of picture time (Gecko timestamp unit). */
 constexpr uint64_t SUMMARY_EVERY_US = 30000000;
-/* x264 writes four bytes of NAL unit size in front of each unit when it
- * is not asked for Annex B start codes; Gecko reads the same four bytes,
- * in this machine's byte order rather than x264's big-endian. */
+/* 4-byte NAL size prefix (no Annex B). x264 writes big-endian; Gecko reads native. */
 constexpr int LENGTH_BYTES = 4;
 
-/* One line in the call's log, when the app has named one. The file is
- * the call host's: it is made, and emptied, when a call starts, so a
- * plugin with no call log to write to writes nothing. */
+/* Call-log line if named. File is call host's (made, emptied at call start): never
+ * created here. */
 void note(const char *line)
 {
     const char *path = std::getenv("PIIRIT_CALL_LOG");
@@ -93,13 +72,13 @@ void note(const char *line)
     if (fd < 0) {
         return;
     }
-    /* "encoder" fills the column the call host writes its seconds in. */
+    /* "encoder" fills call host's seconds column. */
     std::array<char, 400> text{};
     if (int length = std::snprintf(text.data(), text.size(), "encoder %s\n", line);
         length > 0) {
         auto size = static_cast<size_t>(length);
         if (size >= text.size()) {
-            /* Cut short, and still a line of its own. */
+            /* Cut short, still a line. */
             size = text.size() - 1;
             text[size - 1] = '\n';
         }
@@ -111,13 +90,12 @@ void note(const char *line)
     close(fd);
 }
 
-/* x264's own complaints, which are errors only (see open_x264). */
+/* x264 errors only (see open_x264). */
 void note_x264(void *, int, const char *format, va_list args)
 {
     std::array<char, 300> line{};
     int length = std::vsnprintf(line.data(), line.size(), format, args);
-    /* A format that failed leaves nothing; a line cut short has its last
-     * byte given to the NUL. */
+    /* Failed format: nothing; cut line ends NUL. */
     if (length < 0) {
         length = 0;
     } else if (length >= static_cast<int>(line.size())) {
@@ -131,8 +109,7 @@ void note_x264(void *, int, const char *format, va_list args)
     note(text.data());
 }
 
-/* CPU time this thread has used, in nanoseconds: what encoding costs in
- * battery, as opposed to how long it took while other threads ran. */
+/* CPU ns this thread used: battery cost, not wall time. */
 int64_t cpu_ns()
 {
     timespec now{};
@@ -161,9 +138,8 @@ public:
                                                  : settings.mStartBitrate);
         fps_ = settings.mMaxFramerate == 0 ? FALLBACK_FPS
                                            : settings.mMaxFramerate;
-        /* Gecko says 0 when the call packs a picture in as many packets
-         * as it needs (packetization mode 1, the usual one), and the
-         * packet size when each unit has to fit one (mode 0). */
+        /* Gecko: 0 = any packet count (packetization mode 1, usual); else size each
+         * unit must fit (mode 0). */
         max_slice_ = max_payload;
         if (!open_x264(settings.mWidth, settings.mHeight)) {
             fail("cannot start");
@@ -182,8 +158,7 @@ public:
 
     void SetChannelParameters(uint32_t, uint32_t) override
     {
-        /* The loss and round trip are already in the rate Gecko asks for,
-         * which comes in SetRates. */
+        /* Loss, round trip already in Gecko's rate (SetRates). */
     }
 
     void SetRates(uint32_t kbps, uint32_t) override
@@ -198,7 +173,7 @@ public:
 
     void SetPeriodicKeyFrames(bool) override
     {
-        /* Gecko never asks, and keyframes come when the far end asks. */
+        /* Gecko never asks; keyframes come when far end asks. */
     }
 
     void EncodingComplete() override
@@ -208,8 +183,7 @@ public:
     }
 
 private:
-    /* A bit rate Gecko asks for, held between the floor x264 needs and
-     * the ceiling the call was set up with. */
+    /* Gecko's bit rate, held between x264's floor and call's ceiling. */
     uint32_t held(uint32_t kbps) const
     {
         if (max_kbps_ != 0 && kbps > max_kbps_) {
@@ -218,10 +192,7 @@ private:
         return kbps < MIN_KBPS ? MIN_KBPS : kbps;
     }
 
-    /* x264 shares the rate out per picture at the frame rate it was
-     * opened with; at fewer pictures than that each one is given more,
-     * so that a second still costs what Gecko asked for. The buffer
-     * holds a second of it. */
+    /* Fewer pictures than opened fps get more each: a second costs what Gecko asked. */
     void set_rate(x264_param_t &param) const
     {
         uint32_t paced = paced_fps_ == 0 ? fps_ : paced_fps_;
@@ -244,9 +215,7 @@ private:
         x264_encoder_reconfig(x264_, &param);
     }
 
-    /* The frame rate the camera actually gives, measured over a second
-     * of timestamps, and the rate adjusted to it when it moves by more
-     * than a tenth. */
+    /* Camera fps over 1s of timestamps; rate re-set on >10% move. */
     void pace(uint64_t pts)
     {
         if (window_frames_ == 0 || pts < window_pts_) {
@@ -281,8 +250,7 @@ private:
     bool open_x264(uint32_t width, uint32_t height)
     {
         close_x264();
-        /* 4:2:0 halves each side for colour, so x264 takes even sizes
-         * only; an odd column or row is left off. */
+        /* 4:2:0 needs even sizes; odd column/row dropped. */
         width &= ~1U;
         height &= ~1U;
         if (width == 0 || height == 0) {
@@ -298,16 +266,13 @@ private:
         param.i_threads = 1;
         param.b_sliced_threads = 0;
         param.i_level_idc = LEVEL;
-        /* A constant frame rate, though a camera's is not: x264 holds a
-         * picture back until the next one says how long it lasted when
-         * told to go by timestamps, and a call cannot spare the wait.
-         * pace() makes up the difference in the bit rate. */
+        /* Constant fps: timestamp-driven x264 holds each picture till next gives its
+         * duration; call can't wait. pace() fixes rate. */
         param.i_fps_num = fps_;
         param.i_fps_den = 1;
         param.i_keyint_max = KEYFRAME_INTERVAL;
         param.i_scenecut_threshold = 0;
-        /* SPS and PPS before every keyframe, so a receiver can start at
-         * any of them -- which is what one that asked for it does. */
+        /* SPS, PPS before each keyframe: receivers can start there. */
         param.b_repeat_headers = 1;
         param.b_annexb = 0;
         param.i_slice_max_size = static_cast<int>(max_slice_);
@@ -341,8 +306,7 @@ private:
 
     void encode(GMPVideoi420Frame &input, bool key)
     {
-        /* Gecko starts a new encoder when the camera's size changes, but
-         * a picture of another size must not reach x264 either way. */
+        /* Gecko renews encoder on size change; other size must never reach x264. */
         if (uint32_t width = static_cast<uint32_t>(input.Width()) & ~1U,
                              height = static_cast<uint32_t>(input.Height()) & ~1U;
             (width != width_ || height != height_) && !open_x264(width, height)) {
@@ -378,9 +342,7 @@ private:
         }
     }
 
-    /* The units of one picture, each behind its size, as Gecko reads
-     * them. SEI is left out: x264 writes its version and settings into
-     * the first one, which no receiver reads. */
+    /* Units behind size prefix. SEI (x264 version, unread) dropped. */
     void deliver(const x264_nal_t *nals, int count, const x264_picture_t &out)
     {
         uint32_t total = 0;
@@ -422,8 +384,7 @@ private:
         GMPCodecSpecificInfo info{};
         info.mCodecType = kGMPVideoCodecH264;
         info.mBufferType = GMP_BufferLength32;
-        /* The API takes the info as uint8_t bytes, so a copy of the struct's
-         * bytes goes out rather than the struct's address being cast. */
+        /* API takes uint8_t bytes: copy struct's bytes, not address. */
         std::array<uint8_t, sizeof info> info_bytes{};
         std::memcpy(info_bytes.data(), &info, sizeof info);
         callback_->Encoded(encoded, info_bytes.data(), sizeof info);
@@ -470,8 +431,7 @@ private:
         note(line.data());
     }
 
-    /* Gecko sends nothing more once told; the call goes on without a
-     * picture rather than with a broken one. */
+    /* Then Gecko sends nothing; call goes on pictureless, not broken. */
     void fail(const char *why)
     {
         failed_ = true;
@@ -510,8 +470,7 @@ private:
 
 } // namespace
 
-/* The three functions Gecko looks the library up by. Nothing else in it
- * is visible: x264's own symbols stay inside (build.rs). */
+/* Three exports Gecko looks up; rest hidden (x264 stays inside, build.rs). */
 
 GMP_EXPORT GMPErr GMPInit(const GMPPlatformAPI *)
 {
@@ -530,5 +489,5 @@ GMP_EXPORT GMPErr GMPGetAPI(const char *name, void *host, void **api)
 
 GMP_EXPORT void GMPShutdown()
 {
-    /* Nothing is held between encoders. */
+    /* Nothing held between encoders. */
 }

@@ -1,24 +1,15 @@
-//! Running a webxdc app: what the loopback host serves, and to whom.
+//! Webxdc app served over loopback host: what it gets, and to whom.
 //!
-//! The app is served rather than unpacked, so every file it loads is a
-//! request that has to reach the core and come back as the right bytes
-//! with the right headers -- and every request that is *not* the app's has
-//! to be refused. Both halves are driven here over a real socket, against
-//! the fake core, with the same `WebxdcApp` a page instantiates.
+//! App files must reach core and come back with right bytes and headers; every
+//! non-app request refused. Driven over a real socket against fake core, with the
+//! same `WebxdcApp` as page.
 //!
-//! The round trip is the point of the last part: an update posted by the
-//! page reaches the core, the core says so as an event, and the app's
-//! request for updates -- held by the host until there is one -- wakes
-//! with it. That is the whole bridge, in the direction that cannot be
-//! checked by reading the JavaScript. The event wakes that request and
-//! nothing else: the app's info is not asked for again.
+//! Round trip: page's update reaches core, core emits event, app's held update
+//! request wakes with it. Only that request wakes; app info not re-asked. JS
+//! can't check this direction.
 //!
-//! `sendToChat` is the other direction and does not go to the core at
-//! all: the specification says the reader is asked which chat, so the
-//! host writes the file out and raises it on the object for the page to
-//! act on. What is pinned here is that a request reaches that signal
-//! with a file on the disk to show for it, and that an app cannot use
-//! it to write outside the cache.
+//! `sendToChat` skips core: host writes file and raises signal for page. Pinned:
+//! signal carries file on disk; app can't write outside cache.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -53,9 +44,8 @@ const PROBE_QML: &str = r"
             onHanded_over: log += 'to-chat:' + file_path
                                              + '|' + text + ';'
         }
-        // Nothing can be asked of the core until it is up, and it may
-        // well be up before this page exists -- which is why the same
-        // step runs on the signal and on the way in.
+        // Nothing asked of core until it is up; it may be up before this page
+        // exists, so same step runs on the signal and on the way in.
         function open() {
             if (core.status === 'ready') {
                 app.reload()
@@ -78,14 +68,13 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// One request, one answer, one closed connection: what the host does.
-/// `Err` is nothing listening, which is what a stopped app should be.
+/// One request, one answer, one closed connection. `Err`: nothing listening, as for a
+/// stopped app.
 fn ask(authority: &str, request: &str) -> Result<String, String> {
     ask_within(authority, request, Duration::from_secs(5))
 }
 
-/// The same, waiting up to `patience` for the answer: a request for
-/// updates is held until there is one.
+/// Like `ask`, waiting up to `patience`; update requests held until one exists.
 fn ask_within(authority: &str, request: &str, patience: Duration) -> Result<String, String> {
     let mut stream =
         std::net::TcpStream::connect(authority).map_err(|err| format!("connect: {err}"))?;
@@ -102,14 +91,10 @@ fn ask_within(authority: &str, request: &str, patience: Duration) -> Result<Stri
     Ok(String::from_utf8_lossy(&answer).into_owned())
 }
 
-/// A POST whose head and body are separate writes, which is what a real
-/// one is: the head goes out, then the body follows in whatever writes the
-/// network gives it. `ask` puts both in one, and a host that answers
-/// before it has read the body looks fine there and closes the connection
-/// under a real client's feet.
+/// POST with head and body as separate writes, as real clients send (`ask`
+/// sends both at once, hiding a host that answers before reading body).
 ///
-/// The error is the client's own, because that is the half that matters:
-/// a write that fails is what the app sees as a host it could not reach.
+/// Failed write = app sees unreachable host.
 fn post_apart(authority: &str, target: &str, body: &str) -> Result<String, String> {
     let mut stream =
         std::net::TcpStream::connect(authority).map_err(|err| format!("connect: {err}"))?;
@@ -138,7 +123,7 @@ fn post_apart(authority: &str, target: &str, body: &str) -> Result<String, Strin
     Ok(String::from_utf8_lossy(&answer).into_owned())
 }
 
-/// A GET for `path` on the host, as a browser on the phone would send it.
+/// GET `path` on host, as a phone browser sends it.
 fn get(authority: &str, path: &str) -> Result<String, String> {
     ask(
         authority,
@@ -146,17 +131,14 @@ fn get(authority: &str, path: &str) -> Result<String, String> {
     )
 }
 
-/// The address the app was given. Its files are at the root of it.
+/// App's address. Files at its root.
 fn authority_of(url: &str) -> String {
     let rest = url.strip_prefix("http://").unwrap_or(url);
     rest.split('/').next().unwrap_or_default().to_string()
 }
 
-/// Where the chat is, read out of the bridge the app is served.
-///
-/// The token appears nowhere else -- not in the app's address, not in
-/// any page -- which is the point of it: the app is told, and nothing
-/// that merely found the port is.
+/// Chat's address, from served bridge. Token appears nowhere else (not app address, not
+/// any page): app is told; whatever merely found the port is not.
 fn api_of(bridge: &str) -> String {
     bridge
         .split("var API = \"")
@@ -175,22 +157,19 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     let cache = temp.join("cache");
     std::fs::create_dir_all(&cache).expect("create cache dir");
 
-    // A handover from a run that ended before the page could save it.
-    // Nothing will ever ask for it again, so starting the app is what
-    // clears it: without that, every export a reader ever made would
-    // still be on the phone.
+    // Handover from a run that ended before page could save it. Nothing asks for it again,
+    // so starting app clears it; else every export would stay on phone.
     let outbox = cache.join("piirit/piirit/webxdc/outbox/5");
     std::fs::create_dir_all(&outbox).expect("create outbox");
     let stale = outbox.join("stale.bin");
     std::fs::write(&stale, "left over").expect("write a stale handover");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // The app icon is written here rather than into the runner's own
-        // cache, and a fresh directory is what proves it was written.
+        // Icon written here, not runner's cache; fresh dir proves it.
         std::env::set_var("XDG_CACHE_HOME", &cache);
     }
 
@@ -209,14 +188,13 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
-    // The app's request for updates, waiting on its own thread while the
-    // rest of the test goes on: what it was answered, and whether it had
-    // been by the time the app sent its move.
+    // App's update request, on its own thread: records answer, and whether it
+    // came before move.
     let (waited_tx, waited_rx) = mpsc::channel::<String>();
     let mut waited_tx = Some(waited_tx);
     let answered = Arc::new(AtomicBool::new(false));
     let answered_early = Arc::clone(&answered);
-    // How often the app's info was asked for, before the move and after.
+    // App's info asks, before move and after.
     let info_calls = move || {
         common::methods(&journal)
             .iter()
@@ -240,8 +218,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and `engine` outlives it.
+    // SAFETY: fire only while `exec()` runs; `engine` outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
@@ -259,14 +236,13 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             "index",
             get(&authority, "/index.html").unwrap_or_else(|err| err)
         );
-        // The one the phone found: a bundler writes an absolute path into
-        // a directory, and a host that keeps the app under a prefix
-        // answers nothing to it.
+        // Found on phone: bundler writes absolute path into a dir; host keeping app under a
+        // prefix answers nothing to it.
         record!(
             "asset",
             get(&authority, "/assets/app.js").unwrap_or_else(|err| err)
         );
-        // The address itself, with nothing after it.
+        // Address itself, nothing after.
         record!("root", get(&authority, "/").unwrap_or_else(|err| err));
         let bridge = get(&authority, "/webxdc.js").unwrap_or_else(|err| err);
         record!("bridge", bridge.clone());
@@ -276,9 +252,8 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             return;
         }
 
-        // The app's request for updates, as the bridge makes it once it
-        // has caught up. Nothing has been sent yet, so the host holds it.
-        // Made now, so that it is waiting long before the move below.
+        // App's update request, as bridge makes it once caught up. Held until
+        // move; made early so it waits.
         if let Some(waited) = waited_tx.take() {
             let authority = authority.clone();
             let answered = Arc::clone(&answered);
@@ -294,8 +269,8 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             });
         }
 
-        // Another app on the phone, guessing the port: it can have the
-        // files their reader was sent anyway, and nothing of the chat.
+        // Other app guessing port: may get the files its reader was sent anyway, nothing of
+        // the chat.
         record!(
             "no-token",
             get(&authority, "/webxdc-api/updates?serial=0").unwrap_or_else(|err| err)
@@ -308,7 +283,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             )
             .unwrap_or_else(|err| err)
         );
-        // A page in the browser, which would arrive under its own name.
+        // Page in browser, under its own name.
         record!(
             "wrong-host",
             ask(
@@ -327,8 +302,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             get(&authority, "/nothing.js").unwrap_or_else(|err| err)
         );
 
-        // The app handing a file over, the way `sendToChat` does now:
-        // the file *is* the body, and its name is in the query.
+        // App hands file over as `sendToChat` does: body is file, name in query.
         record!(
             "to-chat",
             post_apart(
@@ -339,7 +313,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             .unwrap_or_else(|err| err)
         );
 
-        // A name that tries to leave the cache keeps only its last part.
+        // Name leaving cache keeps last part only.
         record!(
             "to-chat-escape",
             post_apart(
@@ -350,15 +324,14 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             .unwrap_or_else(|err| err)
         );
 
-        // Neither a file nor a word: the app's mistake, and refused.
+        // No file, no words: app's mistake, refused.
         record!(
             "to-chat-empty",
             post_apart(&authority, &format!("{api}/to-chat"), "").unwrap_or_else(|err| err)
         );
 
-        // A file the size a shared one actually is, in separate writes
-        // the way a browser sends one. Nothing here holds it: it goes
-        // from the socket to the cache a chunk at a time.
+        // Shared-size file, separate writes as browser sends. Held nowhere: socket
+        // to cache, a chunk at a time.
         let big = "A".repeat(4 * 1024 * 1024);
         record!(
             "to-chat-big",
@@ -366,9 +339,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
                 .unwrap_or_else(|err| err)
         );
 
-        // And one past 100 MB. Nothing holds it either, so the only thing
-        // that can stop it is the disk -- a video an app made is exactly
-        // the case a cap would be in the way of.
+        // Past 100 MB. Only disk stops it; a cap would block an app's own video.
         let huge = "A".repeat(101 * 1024 * 1024);
         record!(
             "to-chat-huge",
@@ -381,7 +352,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
             "held-before-send",
             (!answered_early.load(Ordering::SeqCst)).to_string()
         );
-        // The app sending a move, the way `webxdc.js` does.
+        // App sends a move, as `webxdc.js` does.
         let update = "{\"payload\":{\"move\":\"e4\"}}";
         record!(
             "send",
@@ -402,8 +373,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         );
     });
 
-    // The event the send produced has had a turn of the loop to arrive,
-    // and the request that was waiting has been woken by it.
+    // Send's event had a loop turn to arrive; woken request answered by then.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!(
             "woken",
@@ -438,7 +408,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         value("url").starts_with("http://127.0.0.1:"),
         "the app was not served on the loopback interface. {context}"
     );
-    // Nothing has been played yet, so the app says nothing about itself.
+    // Nothing played yet: app says nothing about itself.
     assert_eq!(
         value("info"),
         "Checkers||icon",
@@ -456,9 +426,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
          {context}",
         value("root")
     );
-    // What a bundler writes, and what the app on a phone asked for and
-    // did not get: an absolute path into a directory. The app is served
-    // from the root of its address for this reason.
+    // Bundler's absolute path: app asked for it, got nothing; hence root serving.
     let asset = value("asset");
     assert!(
         asset.starts_with("HTTP/1.1 200 OK") && asset.contains("window.playing = true"),
@@ -493,8 +461,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         "the API still has its placeholders in it. {context}"
     );
 
-    // The chat is what the token keeps: asking without it, or with the
-    // wrong one, is told nothing at all.
+    // Token keeps chat: no token, or wrong one, gets nothing.
     assert!(
         value("api").starts_with("/webxdc-api/") && value("api").len() > 20,
         "the bridge does not carry an unguessable address for the chat: {}. \
@@ -548,7 +515,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         value("to-chat-empty")
     );
 
-    // What the page is told, and what is on the disk for it to act on.
+    // What page is told, and what is on disk for it to act on.
     let said = value("log");
     let handed: Vec<&str> = said
         .split(';')
@@ -611,7 +578,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         updates.contains("\"payload\":{\"move\":\"e4\"}") && updates.contains("\"serial\":1"),
         "the update did not come back with a serial on it: {updates}. {context}"
     );
-    // Held, and woken by the move rather than answered with nothing.
+    // Held, and woken by the move, not answered empty.
     assert_eq!(
         value("held-before-send"),
         "true",
@@ -626,8 +593,8 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         "the waiting request for updates was not woken with the move: \
          {woken}. {context}"
     );
-    // An update changes nothing the page shows, so nothing is reloaded:
-    // asking the core for the app's info makes it open the archive.
+    // Update changes nothing shown, so no reload: asking core for app info makes it open
+    // the archive.
     assert_eq!(
         value("info-calls-after"),
         value("info-calls-before"),
@@ -644,17 +611,15 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         "a closed app still answers: {}. {context}",
         value("after-stop")
     );
-    // Nothing went wrong and the app was never declared gone. The
-    // handovers are in this log too and are read out below; what must
-    // not be in it is a failure.
+    // Nothing went wrong; app never declared gone. Handovers are in this log;
+    // failure must not be.
     let log = value("log");
     assert!(
         !log.contains("error:") && !log.contains("gone;"),
         "the app reported: {log}"
     );
 
-    // The icon came out of the archive and was written where a row can
-    // draw it from.
+    // Icon came from archive, written where row draws it.
     let icons = cache.join("piirit/piirit/webxdc");
     assert!(
         icons.join("1-5.png").exists(),

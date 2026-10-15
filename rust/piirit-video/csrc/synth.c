@@ -1,9 +1,6 @@
 /*
- * A clip to test with, made from nothing: a moving pattern under noise,
- * so that it costs real bits, and a tone. Encoded the way a phone's
- * camera would leave it -- H.264 with B-frames, AAC, an MP4 with the
- * phone's turn in its display matrix -- so the recoder meets what it
- * meets on a device, without a binary fixture in the tree.
+ * Test clip: moving pattern under noise (costs real bits), tone. As phone
+ * camera: H.264 with B-frames, AAC, MP4 with display-matrix turn. No fixture.
  */
 #include "recode.h"
 
@@ -160,8 +157,7 @@ static int open_streams(struct clip *clip, const struct piirit_clip *made)
         if (!matrix) {
             return -1;
         }
-        /* Clockwise, as a phone means it; av_display_rotation_set
-         * takes it that way round. */
+        /* Clockwise, as phones mean it (av_display_rotation_set agrees). */
         av_display_rotation_set((int32_t *)matrix->data, made->rotation);
     }
 
@@ -174,7 +170,7 @@ static int open_streams(struct clip *clip, const struct piirit_clip *made)
         clip->aac->sample_fmt = AV_SAMPLE_FMT_FLTP;
         clip->aac->sample_rate = SAMPLE_RATE;
         av_channel_layout_default(&clip->aac->ch_layout, 2);
-        /* What a phone's camera records the sound at. */
+        /* Phone cameras' sound bit rate. */
         clip->aac->bit_rate = 192000;
         clip->aac->time_base = (AVRational){1, SAMPLE_RATE};
         clip->aac->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
@@ -191,7 +187,7 @@ static int open_streams(struct clip *clip, const struct piirit_clip *made)
     return 0;
 }
 
-/* A gradient that moves, under noise that does not repeat. */
+/* Moving gradient under non-repeating noise. */
 static void draw(const x264_picture_t *picture, int32_t width, int32_t height,
                  int frame, unsigned *seed)
 {
@@ -214,7 +210,7 @@ static void draw(const x264_picture_t *picture, int32_t width, int32_t height,
     }
 }
 
-/* One frame of AAC's worth of the tone, from `sample` on. */
+/* One AAC frame of tone from `sample`. */
 static int put_tone(struct clip *clip, int64_t sample)
 {
     av_frame_unref(clip->sound);
@@ -252,7 +248,7 @@ static int write_clip(struct clip *clip, const char *path,
         if (put_video(clip, &clip->picture) < 0) {
             return -1;
         }
-        /* The sound up to the end of this frame. */
+        /* Sound up to end of frame. */
         while (clip->aac
                 && sample < (int64_t)(frame + 1) * SAMPLE_RATE / FPS) {
             if (put_tone(clip, sample) < 0) {

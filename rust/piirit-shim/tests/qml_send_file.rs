@@ -1,13 +1,7 @@
-//! The attach flow on the page itself: what a picker hands back becomes a
-//! bar above the field, a send that carries the file, and a bar that clears
-//! itself afterwards.
-//!
-//! The page is loaded from a copy of the QML tree with `EnterKey` taken
-//! out; see `common::qml_tree_without_enter_key` for why the shipped file
-//! cannot be loaded headlessly as it stands. The pickers themselves are not
-//! driven -- they are `pageStack.push`ed, and there is no page stack here --
-//! but `attach()` is the function their handlers call, so everything after
-//! the choosing is covered.
+//! Attach flow: picked file -> bar above field; send carries it; bar clears.
+//! Page loaded from QML tree copy without `EnterKey` (why: `common::qml_tree_without_enter_key`).
+//! Pickers not driven (pushed; no page stack here), but `attach()` is what their handlers
+//! call, so all after choosing is covered.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -86,27 +80,17 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The last second at which the send is still given a chance to have
-/// cleared the pending file. Reached only by a page that never clears it,
-/// which is the regression this test exists for; nextest warns at 30s.
+/// Last second a send may still clear the pending file. Reached only by a page that never
+/// clears it: the regression this test exists for. nextest warns at 30s.
 const SETTLE_BY: u64 = 12;
 
-/// Record the page's pending file once it clears, and stop the engine.
+/// Records pending file once cleared; stops engine.
+/// Polled once a second from 6s, not read once: send delay is wide so earlier reads land
+/// mid-send, and a fixed read 2s later left 0.5s margin a busy runner ate (false
+/// regression). Prompt page still finishes at 6s; never-clearing page recorded at
+/// `SETTLE_BY` and fails same assertion.
 ///
-/// Asked for once a second from the sixth, rather than read once at a fixed
-/// moment. The send is answered only after `PIIRIT_FAKE_SEND_DELAY_MS`,
-/// which this test makes deliberately wide so the reads before it land while
-/// the send is still outstanding -- and reading the result two seconds later
-/// left a margin of half a second, which a runner compiling the rest of the
-/// suite alongside eats. The file was still armed, and the test reported a
-/// regression that was not there.
-///
-/// A page that clears promptly still finishes at six seconds; one that never
-/// clears is recorded as it stands at `SETTLE_BY`, and fails the assertion
-/// with the same message and the same step trail as before.
-///
-/// Whole seconds: qmetaobject 0.2.10 truncates the sub-second part of a
-/// Duration to zero, so a finer poll would spin (rust/clippy.toml).
+/// Whole seconds: qmetaobject 0.2.10 zeroes sub-second Durations (`rust/clippy.toml`).
 unsafe fn settle_pending(engine: *mut QmlEngine, steps: *mut Vec<(&'static str, String)>) {
     for second in 6..=SETTLE_BY {
         single_shot(Duration::from_secs(second), move || unsafe {
@@ -135,13 +119,12 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Wide enough that the reads below land while the send is still
-        // outstanding, which is the state the button has to refuse in.
+        // Wide: reads land mid-send, the state send button must refuse in.
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "1500");
     }
 
@@ -225,7 +208,7 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
         probe!("send-enabled-after", "sendButton", "enabled");
         probe!("placeholder", "messageField", "placeholderText");
         (*steps_ptr).push(("send", call!("send")));
-        // Read in the same callback, so the core cannot have answered yet.
+        // Same callback: core not answered yet.
         probe!("send-enabled-during", "sendButton", "enabled");
         probe!("busy-during", "sendBusy", "running");
     });
@@ -238,7 +221,7 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
     assert_outcome(&steps, &journal);
 }
 
-/// What a run has to show for itself, read back by label.
+/// Run's recorded values, by label.
 fn value_of<'a>(steps: &'a [(&str, String)], label: &str) -> &'a str {
     steps
         .iter()
@@ -246,8 +229,7 @@ fn value_of<'a>(steps: &'a [(&str, String)], label: &str) -> &'a str {
         .map_or("", |(_, value)| value.as_str())
 }
 
-/// The tray: closed until the plus is tapped, closed again by a tap
-/// anywhere beside it, and open again on the next plus.
+/// Tray: closed until plus; tap beside closes it; next plus reopens.
 fn assert_tray(steps: &[(&str, String)]) {
     let value = |label: &str| value_of(steps, label);
     let context = format!("steps: {steps:?}");
@@ -284,9 +266,7 @@ fn assert_tray(steps: &[(&str, String)]) {
     );
 }
 
-/// Everything the run has to show for itself, out of the test body: what a
-/// Qt harness can do in one function is bounded, and the assertions are the
-/// part worth reading.
+/// Run's assertions, out of test body (Qt harness limit).
 fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     let value = |label: &str| value_of(steps, label);
     let context = format!("steps: {steps:?}");
@@ -326,8 +306,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the field still asks for a message when it is asking for a caption. {context}"
     );
 
-    // A picture goes through `send_msg` named `Image`, which is what puts
-    // it through the core's own recoding; see `media.rs`.
+    // Picture sent as `Image`: core recodes it (`media.rs`).
     let sends: Vec<(String, Value)> = common::calls(journal)
         .into_iter()
         .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
@@ -351,8 +330,8 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the page's send did not carry the picked file. {context}. Sends: {sends:?}"
     );
 
-    // Cleared by `onSent`, with the model's own answer -- not optimistically
-    // on the way out, which would drop the file on a send that failed.
+    // Cleared by `onSent` with model's answer, not optimistically on way out (would drop file
+    // on failed send).
     assert_eq!(
         value("send-enabled-during"),
         "false",

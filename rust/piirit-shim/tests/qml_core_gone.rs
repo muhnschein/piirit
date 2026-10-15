@@ -1,14 +1,9 @@
-//! What the chat list says while the core is being restarted.
+//! Chat list while core restarts: banner reads core state, not waits for change. Page opened while
+//! core is away never saw the transition a handler would catch, and would look like an account
+//! with no history.
 //!
-//! The banner has to read the core's state rather than wait for it to
-//! change: a page opened while the core is away never saw the transition a
-//! handler would have caught, and would otherwise look like an account with
-//! no history in it.
-//!
-//! The server here dies 300ms after every spawn, so the app spends most of
-//! its time between attempts rather than connected -- the backoff widens
-//! from one second to two to four, which is what makes the window the reads
-//! below land in a wide one rather than a race.
+//! Server dies 300ms after every spawn, so app is mostly between attempts; backoff widens 1s, 2s,
+//! 4s, making the window reads below land in wide, not a race.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -60,14 +55,12 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-core-gone-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Every server, including each replacement. By the third failure the
-        // app waits four seconds before trying again, and the reads below
-        // fall inside that.
+        // Every server incl. replacements. After third failure app waits 4 s; reads below fall
+        // inside that.
         std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "300");
     }
 
@@ -125,7 +118,7 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
     single_shot(Duration::from_secs(5), move || unsafe {
         probe!("away-shown", "errorLabel", "text");
         probe!("away-timeout", "errorBanner", "timeout");
-        // A page opened while the core is away never saw it go.
+        // Page opened while core away never saw it go.
         (*steps_ptr).push((
             "reopen",
             call!(
@@ -146,9 +139,7 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body: what a Qt
-/// harness can do in one function is bounded, and the assertions are the
-/// part worth reading.
+/// What run shows.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

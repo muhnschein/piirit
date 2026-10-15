@@ -1,23 +1,12 @@
-// What a quick action on the cover is, and what it is drawn as, for the
-// three places that need it: the cover, which offers the actions; the
-// window, which does them; and the settings page, which picks them. The
-// cover's action during a call is drawn the same way, from the same
-// files.
-//
-// A library for the reason Relays.js is one: nothing here is translated,
-// and the lists are shared rather than copied.
+// Cover quick actions: cover offers, window does, settings picks; call action drawn alike.
+// Library: nothing translated, lists shared (as Relays.js).
 .pragma library
 
-/// What an action can do, as Settings keeps it: open a chat, search the
-/// chat list, show this profile's QR code, read someone else's, open the
-/// list of profiles, or take a picture or a video -- with the back camera
-/// or the front one -- and send it to a chat picked afterwards.
+/// Kinds Settings stores. Photo/video: chat picked after.
 var kinds = ["chat", "search", "qr", "scan", "profiles",
              "photo", "video", "selfie", "selfie-video"]
 
-/// The kinds that start with the camera, and how each opens it: `mode` as
-/// the camera page takes it, 0 for a still and 1 for a video, and whether
-/// it opens on the front camera.
+/// Camera kinds. `mode`: 0 still, 1 video. `front`: front cam.
 var captures = {
     "photo": { mode: 0, front: false },
     "video": { mode: 1, front: false },
@@ -25,29 +14,22 @@ var captures = {
     "selfie-video": { mode: 1, front: true }
 }
 
-/// Whether an action of `kind` starts with the camera.
+/// `kind` starts with camera?
 function isCapture(kind) {
     return Object.keys(captures).indexOf(kind) >= 0
 }
 
-/// The icons an action for a chat can wear, in the order the settings page
-/// offers them. The first is the one a new action gets.
+/// Chat icons, settings order. First = default.
 var chatIcons = ["heart", "star", "person", "group", "home", "bubble", "robot", "school",
                  "work", "office", "dog", "cat", "ball"]
 
-/// The icons of the one action the cover has while a call is up, which
-/// nobody picks: the microphone, drawn as what a tap does -- `mic-off`
-/// while it is on, `mic` while it is off.
+/// Call cover icons, fixed. `mic-off` while on, `mic` off.
 var callIcons = ["mic", "mic-off"]
 
-/// The sizes scripts/render-cover-icons.sh draws every icon at: Silica's
-/// small icon at each scale a phone runs at, 1.0 to 2.0.
+/// Sizes render-cover-icons.sh draws at: Silica small icon, scales 1.0-2.0.
 var sizes = [32, 40, 48, 56, 64]
 
-/// One side's action, read out of Settings: `side` is "left" or "right".
-///
-/// A kind this version does not know is no action. dconf answers
-/// `undefined` for a key it has not read yet, which is none as well.
+/// `side` (left/right) action from Settings; unknown or unread (`undefined`): none.
 function read(settings, side) {
     var prefix = side === "right" ? "quickActionRight" : "quickActionLeft"
     var kind = "" + settings[prefix]
@@ -57,20 +39,17 @@ function read(settings, side) {
         chatId: settings[prefix + "Chat"] > 0 ? settings[prefix + "Chat"] : 0,
         icon: chatIcons.indexOf("" + settings[prefix + "Icon"]) >= 0
               ? "" + settings[prefix + "Icon"] : chatIcons[0],
-        // Only a yes is a yes: a key dconf has not read yet is no.
+        // Only `true` counts. Unread key = no.
         sendNow: settings[prefix + "SendNow"] === true
     }
 }
 
-/// How many actions the reader chose to have: 2, or 1 for anything else,
-/// a key dconf has not read yet included.
+/// Actions chosen: 2 or 1. Unread key = 1.
 function count(settings) {
     return settings.quickActionCount === 2 ? 2 : 1
 }
 
-/// The action the cover offers on `side`: what `read` says, except that
-/// with one action chosen there is none on the right. What was set up
-/// there stays in the settings, for when two are chosen again.
+/// `read`, but right blanked when one chosen (setup kept).
 function shown(settings, side) {
     var action = read(settings, side)
     if (side === "right" && count(settings) < 2) {
@@ -79,17 +58,13 @@ function shown(settings, side) {
     return action
 }
 
-/// The icon an action wears: the one picked for a chat, and otherwise the
-/// kind's own, whose file is named after it.
+/// Icon name: chat's picked icon, else kind (file name).
 function iconName(action) {
     return action.kind === "chat" ? action.icon : action.kind
 }
 
-/// Where an icon's picture is, relative to qml/: drawn at the size nearest
-/// `size`, in white for a dark ambience and black for a light one.
-///
-/// The home screen draws a cover action's picture itself, as the file is,
-/// so the file has to be the one that fits and shows.
+/// Icon path rel. to qml/: nearest `size` (home screen draws as-is), white on dark ambience
+/// else black.
 function iconFile(name, size, onDark) {
     var best = sizes[0]
     for (var i = 1; i < sizes.length; i++) {
@@ -100,23 +75,13 @@ function iconFile(name, size, onDark) {
     return "art/cover/" + name + "-" + best + "-" + (onDark ? "white" : "black") + ".png"
 }
 
-/// Whether text in `colour` is light, which is what a dark ambience draws
-/// in: the ambience's own primary colour says which kind it is.
+/// Whether `colour` is light. Dark ambience draws light text.
 function isLight(colour) {
     return 0.299 * colour.r + 0.587 * colour.g + 0.114 * colour.b > 0.5
 }
 
-/// The fade that makes room for the actions: whatever it is drawn over
-/// runs out towards the bottom edge, from `from` down to `to`, eased
-/// rather than straight, as vuo's cover eases its texture away -- most of
-/// the way down the faces keep their strength, and they give up the rest
-/// near the bottom. How much is kept at `at`, in whatever units the two
-/// are in: the cover's grid, and the previews on the quick actions' page,
-/// which are drawn the same way so they look the same.
-///
-/// The same curve src/pictures.rs fades a face's picture by. It was a
-/// ShaderEffect over the whole grid; see Avatar.qml for why nothing here
-/// is drawn by a shader any more.
+/// Fade under actions, `from` to `to` (`at` same units), eased as vuo cover; cover grid,
+/// previews. Curve = src/pictures.rs face fade. No ShaderEffect: see Avatar.qml.
 function fade(at, from, to) {
     if (!(to > from)) {
         return 1

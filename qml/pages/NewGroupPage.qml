@@ -4,28 +4,15 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Name a group, give it a picture and pick its members, laid out the way
- * the group's own page will be once it exists (GroupPage.qml): the
- * picture with its badge, the name under it, the members, and the way to
- * more of them where the next one would be listed. What is different is
- * what is not there yet -- the group -- so everything chosen here is held
- * on the page and handed to the core in one go when the group is made.
- * Groups are created encrypted, which is what the reference client's
- * "New Group" does.
- *
- * The members are asked for by id (`ContactList.picked_rows`) rather than
- * drawn by hiding everybody else. A Repeater over every contact built a
- * row -- and an avatar, and the two effects behind it -- for each one,
- * twice over, the moment the contacts landed, which is the moment this
- * page was arriving over the chat list; what it cost to open was the
- * size of an address book that had nothing to do with the group.
+ * Name group, picture, members; laid out as GroupPage.qml. Sent to core in
+ * one go at create, encrypted ("New Group"). Members by id
+ * (`ContactList.picked_rows`): Repeater per contact scaled with address book.
  */
 Page {
     id: page
 
-    // A move the core asked for, held until this page is the one on
-    // screen: a call's page may be over it, and a move made then would
-    // take that page instead (PendingNavigation.qml).
+    // Core move held until on screen: else may take covering call page
+    // (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -34,23 +21,17 @@ Page {
 
     property int accountId
     property string errorMessage: ""
-    // True from tapping create until the core answers, so a second tap
-    // cannot make a second group.
+    // Create tap until core answers: no second group from second tap.
     property bool creating: false
-    /// Contact ids picked so far, besides the reader's own.
+    /// Picked contact ids, besides own.
     property var members: []
 
-    /// The reader's own row, as a list of one -- or of none, until the
-    /// contacts have arrived. A list because that is what a Repeater
-    /// takes, and the row is drawn apart from the picked ones: there is
-    /// nothing to do with oneself here, so it carries no menu.
+    /// Own row as list of one, none until contacts load. No menu on self.
     property var selfRow: []
-    /// The picked members' rows, in the order they were picked.
+    /// Picked members' rows, in pick order.
     property var pickedRows: []
 
-    /// Ask the contact list for the rows to draw, and split off the
-    /// reader's own. Run whenever either half can have changed: the
-    /// picks, and the contacts they are looked up in.
+    /// Ask contact list for rows; split off own. Rerun on any change.
     function refreshMemberRows() {
         var rows = contacts.picked_rows(page.members)
         var mine = rows.length > 0 && rows[0].is_self ? [rows[0]] : []
@@ -58,19 +39,16 @@ Page {
         page.pickedRows = rows.slice(mine.length)
     }
 
-    /// The picture chosen for the group, empty for none. Held as a path:
-    /// the core takes a picture only for a chat that exists.
+    /// Picture path; empty for none. Core takes it only for existing chat.
     property string picturePath: ""
 
-    /// What AddMembersPage asks of the group it adds to. There is no
-    /// group yet, so the page answers for it: who is in, and whom to add.
+    /// What AddMembersPage asks: no group yet, so page answers.
     readonly property var pendingGroup: ({
         is_member: function(contactId) { return page.isMember(contactId) },
         add_members: function(contactIds) { page.addMembers(contactIds) }
     })
 
-    // Every contact, the reader's own last: the members are drawn from
-    // these rows, so a picked id has a name and a picture to show.
+    // All contacts, own last: picked ids need name and picture.
     ContactList {
         id: contacts
         objectName: "contacts"
@@ -99,8 +77,7 @@ Page {
         return false
     }
 
-    /// Take a picked member off again. Nothing has been sent, so there
-    /// is nothing to undo on the core.
+    /// Unpick member. Nothing sent, nothing to undo.
     function removeMember(contactId) {
         var next = []
         for (var i = 0; i < page.members.length; i++) {
@@ -111,7 +88,7 @@ Page {
         page.members = next
     }
 
-    /// Add what the picker ticked, once each.
+    /// Add ticked picks, once each.
     function addMembers(contactIds) {
         var next = page.members.slice()
         for (var i = 0; i < contactIds.length; i++) {
@@ -122,8 +99,7 @@ Page {
         page.members = next
     }
 
-    // The same picker the group's page uses, handed the stand-in above
-    // where that page hands its ChatInfo.
+    // Same picker as group page; stand-in given where it gives ChatInfo.
     function pickMembers() {
         pageStack.push(Qt.resolvedUrl("AddMembersPage.qml"), {
             accountId: page.accountId,
@@ -131,8 +107,8 @@ Page {
         })
     }
 
-    // The gallery, through the same page GroupPage uses, so the picker
-    // page is the one place Sailfish.Pickers is imported.
+    // Gallery via AttachPhotoPage, as GroupPage: only picker pages import
+    // Sailfish.Pickers.
     function pickPicture() {
         var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
         if (picker) {
@@ -154,11 +130,10 @@ Page {
         contacts.create_group(name, page.members, page.picturePath)
     }
 
-    // Picking somebody, or taking them off again, changes what is drawn.
+    // Pick or unpick changes what is drawn.
     onMembersChanged: page.refreshMemberRows()
 
-    // The name is what a new group needs first, so the cursor is in the
-    // field when the page arrives.
+    // Name first: cursor in field on arrival.
     onStatusChanged: {
         if (status === PageStatus.Active && nameField.text.length === 0) {
             nameField.edit()
@@ -167,7 +142,7 @@ Page {
 
     Connections {
         target: core
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 contacts.reload()
@@ -177,8 +152,7 @@ Page {
 
     Connections {
         target: contacts
-        // The contacts arrive after the page does, and the reader's own
-        // row is among them.
+        // Contacts arrive after page; own row among them.
         onRows_changed: page.refreshMemberRows()
     }
 
@@ -210,9 +184,8 @@ Page {
                 title: qsTr("New group")
             }
 
-            // The picture is the control, not a preview of one: tapping
-            // it opens the gallery, and the badge says so. Until one is
-            // chosen it shows the name's initial, as the group will.
+            // Picture is the control: tap opens gallery, badge says so. Name's initial
+            // until chosen.
             Item {
                 width: parent.width
                 height: bigAvatar.height + 2 * Theme.paddingLarge
@@ -252,8 +225,7 @@ Page {
                 }
             }
 
-            // The name, under the picture, as the group's page shows it.
-            // The field is what is read; see EditableName.qml.
+            // Name under picture (EditableName.qml).
             EditableName {
                 id: nameField
                 objectName: "groupNameControl"
@@ -276,9 +248,7 @@ Page {
                 text: qsTr("%n member(s)", "", page.members.length + 1)
             }
 
-            // The reader, who is in the group by being the one making
-            // it. No menu: leaving a group one is making is not making
-            // it.
+            // Reader is in group by making it; no menu.
             Repeater {
                 model: page.selfRow
 
@@ -299,7 +269,7 @@ Page {
                 }
             }
 
-            // Then whoever was picked, in the order they were picked.
+            // Picked members, in pick order.
             Repeater {
                 model: page.pickedRows
 
@@ -308,9 +278,7 @@ Page {
                     width: column.width
                     contentHeight: picked.height
 
-                    // Taking someone off the list again, from the row,
-                    // as the group's page offers it. No countdown: nothing
-                    // has been sent yet.
+                    // Unpick from row; no countdown: nothing sent.
                     menu: ContextMenu {
                         MenuItem {
                             objectName: "removeItem"
@@ -330,7 +298,7 @@ Page {
                 }
             }
 
-            // The way to more members.
+            // Way to more members.
             PlusRow {
                 objectName: "addMembersButton"
                 width: column.width

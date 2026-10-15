@@ -1,16 +1,9 @@
-//! The settings page, and the object every page reads the settings
-//! through.
+//! Settings page and `Settings` singleton every page reads through. Each control writes one value;
+//! shown choice follows it back, so a change anywhere reaches page, and one on page reaches
+//! conversation. Both loaded vs stub `ConfigurationValue` that holds a value, stores nothing.
 //!
-//! Each control on the page writes one value of the `Settings` singleton,
-//! and the choice it shows follows the value back -- so a change made
-//! anywhere reaches the page, and a change made on the page reaches the
-//! conversation. Both are loaded here against a stub `ConfigurationValue`
-//! that holds a value and stores nothing.
-//!
-//! The deletion period is the one setting the page does not write on the
-//! tap: it asks the core how much would go first, and the core here has
-//! not been started, so what this pins is that nothing was written and
-//! the page said why. The whole of that flow, dialog included, is
+//! Deletion period is the one setting not written on tap: core asked how much would go first, and
+//! core here isn't started, so pinned: nothing written, page said why. Full flow, dialog included:
 //! `qml_auto_delete_flow.rs`.
 
 // Qt harness: see qml_pages.rs.
@@ -30,8 +23,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe imports the app's components by absolute URL: it is loaded
-/// from data, which has no directory of its own to resolve one against.
+/// Probe imports components by absolute URL: data has no dir.
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -137,16 +129,15 @@ fn probe_qml() -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_settings_page_writes_what_the_app_reads() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
 
-    // The quick actions look their chat up through the shim's own types.
+    // Quick actions look chat up via shim types.
     piirit_shim::register_qml_types();
 
-    // The page asks the core how much a deletion period would take; a
-    // core never started answers that it is not there.
+    // Deletion-size question: unstarted core answers not there.
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
@@ -154,7 +145,7 @@ fn the_settings_page_writes_what_the_app_reads() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
-    // Named for the page before it is loaded, as Silica names its own.
+    // Named for page before load, as Silica does.
     let stack = engine.invoke_method("stackObject".into(), &[]);
     engine.set_property("pageStack".into(), stack);
 
@@ -185,7 +176,7 @@ fn the_settings_page_writes_what_the_app_reads() {
     }
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // The keys, under the app's own path.
+        // Keys under app's own path.
         record!(
             "app-markdown-key",
             call!("appKey", QString::from("markdownConfig"))
@@ -226,8 +217,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "load",
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
-        // What a fresh phone shows. What leaves the phone stands first
-        // under Messages, and how a message is drawn last.
+        // Fresh phone: what leaves the phone first under Messages, how a message is drawn last.
         record!(
             "first-under-messages",
             call!("firstUnder", QString::from("Messages"))
@@ -236,8 +226,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "last-under-messages",
             call!("lastBefore", QString::from("Notifications"))
         );
-        // The return key is a line break and nothing else, so there is
-        // no setting for it, on the page or behind it.
+        // Return key: line break only; no setting for it, on page or behind it.
         record!("enter-switch", get!("enterSendsSwitch", "checked"));
         record!(
             "enter-setting",
@@ -288,7 +277,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("webxdcEnabled"))
         );
         record!("apps-switch", get!("webxdcSwitch", "checked"));
-        // Each control writes its setting, and the choice shown follows it.
+        // Each control writes its setting; shown choice follows.
         record!(
             "pick-markdown",
             call!("click", QString::from("markdownSwitch"))
@@ -357,8 +346,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "notification-shown",
             get!("notificationCombo", "currentIndex")
         );
-        // Mentions are on until the reader says otherwise, as the
-        // reference clients have them.
+        // Mentions on until reader says otherwise, as reference clients.
         record!(
             "flip-mentions",
             call!("click", QString::from("mentionsSwitch"))
@@ -376,10 +364,8 @@ fn the_settings_page_writes_what_the_app_reads() {
             "mentions-on",
             call!("appReads", QString::from("mentionNotifications"))
         );
-        // Apps are the one setting the rest of the app hides behind, so
-        // both ways round it goes matter: off is what a phone that has
-        // never been asked reads, and the switch says so. Turning an
-        // experimental feature on asks first; turning it off does not.
+        // Apps: the one setting rest of app hides behind, so both directions matter. Off is what a
+        // never-asked phone reads, and switch says so. Experimental on asks first; off doesn't.
         record!("flip-apps", call!("click", QString::from("webxdcSwitch")));
         record!("apps-asked", call!("pushed"));
         record!(
@@ -399,14 +385,12 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("webxdcEnabled"))
         );
         record!("apps-switch-off", get!("webxdcSwitch", "checked"));
-        // Calls are not experimental any more (#119): no switch to turn
-        // them on, nothing asked, and whether one rings is a setting of
-        // its own that works on a phone that has never been asked.
+        // Calls not experimental (#119): no switch, nothing asked; ringing is own setting, usable
+        // on a never-asked phone.
         record!("calls-switch", get!("callsSwitch", "visible"));
         record!("calls-ring-usable", get!("callsRingSwitch", "enabled"));
         record!("calls-ring-default", get!("callsRingSwitch", "checked"));
-        // A deletion period is not written on the tap: the core is asked
-        // first, and this one is not there to answer.
+        // Deletion period not written on tap: core asked first; absent here.
         record!(
             "pick-deletion",
             call!("click", QString::from("deletionOption3600"))
@@ -416,9 +400,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("deleteDeviceAfter"))
         );
         record!("deletion-shown", get!("deletionCombo", "currentIndex"));
-        // The other direction: a change made anywhere else reaches the
-        // page's choice. A stored 2, which an older build wrote for "as
-        // written", still reads as that.
+        // Change elsewhere reaches page. Stored 2 (older build's "as written") reads as that.
         record!(
             "app-write",
             call!("appWrites", QString::from("markdownMode"), 2)
@@ -430,9 +412,8 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("deletion-follows", get!("deletionCombo", "currentIndex"));
 
-        // Whether anything is announced at all stands first under
-        // Notifications, on by default, and off it greys out the two
-        // settings under it rather than hiding them.
+        // Announce-at-all first under Notifications, default on; off greys two settings under it,
+        // not hides them.
         record!(
             "first-under-notifications",
             call!("firstUnder", QString::from("Notifications"))
@@ -471,7 +452,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("detail-usable-again", get!("notificationCombo", "enabled"));
     });
-    // The core's refusal arrives a turn later.
+    // Core refusal arrives a turn later.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("deletion-error", get!("errorBanner", "text"));
         (*engine_ptr).quit();
@@ -501,8 +482,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("markdown-default", "0"),
         ("markdown-switch", "true"),
         ("app-quality-key", "/apps/harbour-piirit/media_quality"),
-        // Balanced, which is the core's own default and both reference
-        // clients'.
+        // Balanced: core default, both reference clients'.
         ("quality-default", "0"),
         ("quality-index", "0"),
         ("pick-worse", "ok"),

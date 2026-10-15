@@ -1,58 +1,31 @@
-# Sailfish/OBS packaging for Piirit.
+# Sailfish/OBS packaging for Piirit (template: Whisperfish spec; docs/PROJECT.md).
+# Sources: rust/, qml/, separately fetched deltachat-rpc-server (scripts/fetch-rpc-server.sh).
+# C libs built from source by build scripts with target compiler: LAME (in mp3lame-sys crate),
+# FFmpeg and x264 (third_party/ submodules, so Source0 must carry them; docs/BUILDING.md,
+# "Making a video smaller").
 #
-# Modeled on real-world prior art for Rust+Qt5/QML Sailfish apps -- notably
-# Whisperfish's rpm/harbour-whisperfish.spec, which docs/PROJECT.md names as
-# the architectural and build-tooling template -- but simplified: the
-# Rust workspace under rust/, the qml/ tree, and a *separately obtained*
-# deltachat-rpc-server binary (scripts/fetch-rpc-server.sh, see
-# vendor/deltachat-rpc-server/). Three C libraries are linked in, each
-# from source by a build script that runs its configure and make with the
-# target's compiler: LAME, inside the mp3lame-sys crate, and FFmpeg and
-# x264, the git submodules under third_party/, which Source0 has to carry
-# (docs/BUILDING.md, "Making a video smaller").
+# `sfdk build` fetches crates; `sfdk build -- --with vendor` uses vendor.tar.xz (OBS/Chum, no
+# network; scripts/vendor-crates.sh).
 #
-# Two build modes:
-#   sfdk build                  -- crates are fetched from crates.io by the
-#                                  build engine, which has network access.
-#   sfdk build -- --with vendor -- crates come from a pre-generated
-#                                  vendor.tar.xz; required on OBS/Chum,
-#                                  which build without network. Generate
-#                                  the two extra sources with
-#                                  scripts/vendor-crates.sh.
-#
-# Harbour's listing rules apply here: the package name, the install paths
-# and every Requires are constrained by them, and ci/harbour-check.sh
-# fails a build that breaks one. docs/HARBOUR.md is the map, including the
-# two rules this package still breaks.
+# Harbour rules constrain name, paths, Requires; ci/harbour-check.sh fails a build breaking one.
+# docs/HARBOUR.md maps them, incl. the two rules this package still breaks.
 
 %bcond_with vendor
 
-# Upstream publishes no 32-bit x86 musl build of deltachat-rpc-server, so
-# i486 (SDK emulator) packages cannot bundle one: the app there needs a
-# server supplied via PIIRIT_RPC_SERVER instead. Every device arch
-# (aarch64, armv7hl) bundles the server as usual.
+# No i486 server (no musl build upstream): i486 needs PIIRIT_RPC_SERVER. Device arches bundle it.
 %ifarch %ix86
 %define bundle_rpc_server 0
 %else
 %define bundle_rpc_server 1
 %endif
 
-# Harbour requires the `harbour-` prefix and lowercase throughout; the
-# name users see is the .desktop file's Name= and the Store's Title field,
-# not this.
+# Harbour: `harbour-` prefix, lowercase. Users see .desktop Name=, not this.
 Name:       harbour-piirit
 Summary:    Native SailfishOS client for Delta Chat
 Version:    2.1.0
 Release:    1
-# Piirit's own code is GPL-3.0-or-later; the bundled
-# deltachat-rpc-server is upstream's unmodified MPL-2.0 binary; and the
-# page a call runs in, compiled into the app, is upstream's GPL-3.0
-# calls-webapp with Preact (MIT) and Material Symbols icons (Apache-2.0)
-# built into it (vendor/calls-webapp/SOURCE.md); and the emoji are
-# Twemoji's pictures (CC-BY-4.0) with emojibase's list of them (MIT) and
-# CLDR's names (Unicode-3.0) (vendor/emoji/SOURCE.md); and FFmpeg
-# (LGPL-2.1-or-later) and x264 (GPL-2.0-or-later) are built into the
-# binary. The tag describes the contents of the binary package.
+# Licences: GPL-3.0-or-later app; MPL-2.0 server; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
+# emoji CC-BY-4.0, MIT, Unicode-3.0; FFmpeg LGPL-2.1+, x264 GPL-2.0+. Tag = package contents.
 %if 0%{?bundle_rpc_server}
 License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %else
@@ -66,79 +39,57 @@ Source1:    vendor.tar.xz
 Source2:    vendor.toml
 %endif
 
-# Unversioned, and only what Harbour's allowed_requires.conf lists: the
-# validator hands each whitespace-separated token to its allow-list, so a
-# versioned dependency arrives as three of them and the operator and the
-# version are both rejected. Harbour derives its own compatibility range
-# from these, so the OS floor this app needs -- 4.5.0, for the
-# `[X-Sailjail]` section to be honoured -- goes in the submission form's
-# "From OS version" field instead.
+# Unversioned; only allowed_requires.conf names. Validator splits on whitespace, so operator
+# and version are rejected; Harbour derives its own range. OS floor 4.5.0 (for [X-Sailjail])
+# goes in submission form's "From OS version".
 #
-# No libsailfishapp-launcher: that package provides `sailfish-qml`, which
-# only a QML-only app is launched through, and requiring it without using
-# it is an error of its own.
+# No libsailfishapp-launcher: it provides `sailfish-qml`, used only by QML-only apps;
+# requiring it unused is an error itself.
 Requires:   sailfishsilica-qt5
-# One package per QML module the UI imports beyond Silica: QtMultimedia,
-# QtSensors, Nemo.Thumbnailer, Nemo.Notifications.
-# All on Harbour's allowed list, and all on every device image -- but a
-# package that relies on a module and does not say so depends on it by
-# luck.
+# One package per QML module beyond Silica (QtMultimedia, QtSensors, Nemo.Thumbnailer,
+# Nemo.Notifications): all allowed, on every image. Declared, not relied on by luck.
 Requires:   qt5-qtdeclarative-import-multimedia
 Requires:   qt5-qtdeclarative-import-sensors
 Requires:   nemo-qml-plugin-notifications-qt5
 Requires:   nemo-qml-plugin-thumbnailer-qt5
-# Nemo.DBus, for the name a tapped notification calls back to.
+# Nemo.DBus: name a tapped notification calls back to.
 Requires:   nemo-qml-plugin-dbus-qt5
-# Nemo.Configuration, for the settings that belong to no profile: they
-# live in dconf, so a change on the settings page reaches every open page.
+# Nemo.Configuration: profile-less settings in dconf, so a change reaches every open page.
 Requires:   nemo-qml-plugin-configuration-qt5
-# Nemo.KeepAlive, which keeps the phone awake while a call is up and its
-# screen on while one rings (qml/components/CallCenter.qml). The package
-# carries the QML module beside the library.
+# Nemo.KeepAlive: phone awake during a call, screen on while ringing
+# (qml/components/CallCenter.qml). Package carries QML module beside the library.
 Requires:   libkeepalive
-# Sailfish.WebView, for running a webxdc app and for the store it comes
-# from (qml/pages/Webxdc*Page.qml). The only two pages that name the type,
-# so a device without the browser engine loses those and nothing else --
-# but the package says it needs it rather than hoping.
-#
-# The other two are not imported here: Silica's own WebView.qml imports
-# Sailfish.WebView.Popups and .Pickers, and a WebView that cannot resolve
-# them is a page that will not load at all.
+# Sailfish.WebView: webxdc apps and store only (qml/pages/Webxdc*Page.qml); a device without
+# engine loses those alone.
+# Silica's WebView.qml imports Sailfish.WebView.Popups/.Pickers; unresolved, that page never loads.
 Requires:   sailfish-components-webview-qt5
 Requires:   sailfish-components-webview-qt5-popups
 Requires:   sailfish-components-webview-qt5-pickers
 
-# Harbour allows no Provides: at all, and rpm generates one from any shared
-# library it finds in the package. Neither of the app's private directories
-# holds one today; this keeps intake clean if one is ever added there.
+# Harbour allows no Provides:, and rpm generates one from any packaged shared library (e.g.
+# libpiirit.so under %%{appdatadir}/lib). Exclude both private dirs.
 %define __provides_exclude_from ^(%{_datadir}/%{name}|%{_libexecdir}/%{name})/.*$
 
-# Sailfish ships Rust 1.75.0 (sailfishos/rust); rust/Cargo.lock is kept in
-# the v3 lockfile format because Cargo only learned to read v4 in 1.78.
-# `rust-std-static` is the virtual provide of the native std library; the
-# *cross* std for the target triple comes from
-# rust-std-static-%%{rusttarget}, which the SDK target normally already has.
-# If a build fails with "can't find crate for `std`", install it into the
-# tooling, the way Whisperfish's build docs describe:
+# Sailfish Rust 1.75.0. rust/Cargo.lock v3 (Cargo reads v4 from 1.78).
+# rust-std-static: native std. Cross std is rust-std-static-%%{rusttarget}; if "can't find crate
+# for `std`", install into tooling:
 #   sfdk tools exec <tooling> zypper in rust-std-static-%%{rusttarget}
 BuildRequires:  rust >= 1.75
 BuildRequires:  rust-std-static >= 1.75
 BuildRequires:  cargo >= 1.75
-# qmetaobject-rs compiles C++ glue (the cpp/cpp_build crates) against Qt.
+# qmetaobject-rs: C++ glue against Qt.
 BuildRequires:  gcc-c++
 BuildRequires:  git
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
-# QAudioRecorder, for the voice recorder (piirit-shim/src/recorder.rs).
-# The runtime package it links, qt5-qtmultimedia, is one rpm derives from
-# the binary itself; Harbour allows it.
+# QAudioRecorder for recorder (piirit-shim/src/recorder.rs). Runtime qt5-qtmultimedia: rpm
+# derives it from binary; Harbour allows it.
 BuildRequires:  pkgconfig(Qt5Multimedia)
-# libpulse, for the call's microphone watch (piirit-shim/src/mic_watch.rs):
-# libpulse.so.0, which Harbour allows.
+# libpulse for mic watch (piirit-shim/src/mic_watch.rs); libpulse.so.0 Harbour-allowed.
 BuildRequires:  pkgconfig(libpulse)
-# lrelease, which compiles the translation catalogs in %%build.
+# lrelease: translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 
 %ifarch %arm
@@ -148,29 +99,21 @@ BuildRequires:  qt5-qttools-linguist
 %define rusttarget aarch64-unknown-linux-gnu
 %endif
 %ifarch %ix86
-# NOTE: upstream publishes no 32-bit x86 deltachat-rpc-server build, so the
-# i486 emulator target cannot be packaged; use the x86_64 emulator.
+# No i486 server build: use x86_64 emulator.
 %define rusttarget i686-unknown-linux-gnu
 %endif
 %ifarch x86_64
 %define rusttarget x86_64-unknown-linux-gnu
 %endif
 
-# How many cargo jobs to run inside scratchbox2, and only there: outside
-# sb2 -- a native OBS worker -- cargo picks its own. One. Four takes the
-# build from 142 s to 82 s when it finishes, but at two or four cargo
-# stalls under sb2 -- it has been seen to futex-wait forever on an
-# unreaped child while qmetaobject's C++ glue compiles -- often enough
-# that the waiting costs more than the parallelism saves. It stays a
-# define so a build can try more with --define "jobs N" instead of a
-# patch. .github/workflows/rpm.yml passes one this way on every run, and
-# docs/BUILDING.md has the numbers.
+# cargo jobs under sb2 only (native OBS worker: cargo picks). One: four finishes faster
+# (142 s to 82 s), but at 2-4 cargo stalls under sb2 (futex-wait on unreaped child during
+# qmetaobject C++ glue) often enough to cost more than it saves. `--define "jobs N"`
+# overrides; rpm.yml passes one every run (numbers: docs/BUILDING.md).
 %{!?jobs: %global jobs 1}
 
-# Where cargo leaves the binary. Under sb2, SB2_RUST_TARGET_TRIPLE (see
-# %%build) makes it write to target/<triple>/release; a native build -- an
-# OBS worker that is not cross-compiling -- gets plain target/release.
-# Both are checked at install time rather than guessed here.
+# Binary dir: under sb2 target/<triple>/release (SB2_RUST_TARGET_TRIPLE, %%build); native
+# target/release. Checked at install.
 %define builddir rust/target/%{rusttarget}/release
 %define nativedir rust/target/release
 %define appdatadir %{_datadir}/%{name}
@@ -187,8 +130,7 @@ importantly, its non-goals.
 %prep
 %setup -q -n %{name}-%{version}
 %if %{with vendor}
-# vendor.tar.xz contains rust/vendor/ (cargo vendor output); vendor.toml is
-# the [source] replacement stanza cargo prints when generating it.
+# vendor.tar.xz = rust/vendor/; vendor.toml = [source] stanza.
 %setup -q -T -D -a 1 -n %{name}-%{version}
 mkdir -p rust/.cargo
 install -m 644 %{SOURCE2} rust/.cargo/config.toml
@@ -198,57 +140,32 @@ install -m 644 %{SOURCE2} rust/.cargo/config.toml
 rustc --version
 cargo --version
 
-# Cross-compiling Rust under Sailfish's scratchbox2 (sb2) requires the
-# Docker build engine (the VirtualBox build engine does not support it);
-# see docs/BUILDING.md. Under sb2 the accelerated rustc would otherwise
-# emit host (x86) code, so tell it the real target explicitly -- same
-# mechanism Whisperfish's spec uses (see the xulrunner-qt5.spec comment it
-# cites).
+# sb2 cross-compile needs Docker build engine (docs/BUILDING.md). Accelerated rustc emits x86
+# unless given the real target (as Whisperfish, xulrunner-qt5.spec).
 export SB2_RUST_TARGET_TRIPLE=%{rusttarget}
 
-# qttypes' build script shells out to `qmake -query` by default, but rust
-# build scripts running under sb2 cannot reliably exec the target's qmake
-# binary. Both env vars set together make qttypes skip qmake entirely and
-# detect the Qt version from qtcoreversion.h (verified against the crate's
-# build.rs) -- these are the target-rootfs paths as seen from inside sb2.
+# qttypes runs `qmake -query`; build scripts under sb2 can't reliably exec target qmake. Both
+# vars set: qttypes skips qmake, reads qtcoreversion.h (per crate build.rs). Target-rootfs paths
+# as seen in sb2.
 export QT_INCLUDE_PATH=%{_includedir}/qt5
 export QT_LIBRARY_PATH=%{_libdir}
 
-# SBOX_SESSION_DIR is set by sb2 itself inside build sessions, and is what
-# tells a cross build here from a native one. It gates the job count the
-# preamble defines, and the linker override below.
-# Build scripts and proc-macros are compiled for the tooling's own
-# architecture, and rustc links them by calling plain `cc` -- which sb2
-# rewrites to the *cross* compiler, producing "unrecognized command-line
-# option '-m32'" and killing the build before the first crate is done.
-# scratchbox2 exposes the native compiler as `host-gcc` (SBOX_HOST_GCC_NAME
-# in the target's sb2.config) precisely for this; point the host triple's
-# linker at it. Outside sb2 nothing is overridden.
+# SBOX_SESSION_DIR: set by sb2 in sessions; marks cross build. Gates job count and linker override.
+# Build scripts/proc-macros link with `cc`, which sb2 maps to the cross compiler ("-m32" fails).
+# Point host linker at `host-gcc` (SBOX_HOST_GCC_NAME). Outside sb2: no override.
 if [ -n "${SBOX_SESSION_DIR:-}" ]; then
     host_triple=$(rustc -vV | sed -n 's/^host: //p')
     export "CARGO_TARGET_$(echo "$host_triple" | tr 'a-z-' 'A-Z_')_LINKER"=host-gcc
 fi
 
-# A parallel link under sb2 can lose an object file it has just written
-# ("symbols.o: No such file or directory") when its temporaries go through
-# the shared /tmp. Whisperfish's spec keeps them in the build directory for
-# the same reason.
+# Parallel link under sb2 can lose objects via shared /tmp: temporaries in build dir.
 export TMPDIR=${TMPDIR:-"$PWD/.tmp"}
 mkdir -p "$TMPDIR"
 
-# Deliberately *no* `--target`: under sb2 that would make cargo treat this
-# as a cross build and look for a target std it cannot find. Instead
-# SB2_RUST_TARGET_TRIPLE (above) tells the sb2-accelerated rustc what to
-# emit, and cargo still writes the result to target/<triple>/release --
-# the same convention upstream Sailfish Rust apps rely on (Whisperfish's
-# spec likewise passes no --target).
-#
-# From inside rust/, not the source root. cargo reads .cargo/config.toml
-# from the directory it runs in and that directory's parents, never from
-# beside the manifest it is pointed at -- and the vendored-sources stanza
-# %%prep installs lives at rust/.cargo/config.toml. Run from the root that
-# stanza was never read, and an --offline build failed on the first crate.
-# target/ is the workspace's either way, so %%install's paths are the same.
+# No `--target`: sb2 would look for a cross std. SB2_RUST_TARGET_TRIPLE does the job;
+# cargo writes target/<triple>/release.
+# Run from rust/: cargo reads .cargo/config.toml from cwd and parents, not manifest dir. %%prep
+# installs vendor stanza at rust/.cargo/; from root --offline fails. target/ same either way.
 (
 cd rust
 cargo build \
@@ -262,9 +179,7 @@ cargo build \
     --package piirit-app
 )
 
-# The translation catalogs: translations/piirit-<lang>.ts, compiled
-# here into the .qm files the app loads. Made at build time rather than
-# checked in, as the binary is.
+# translations/piirit-<lang>.ts -> .qm at build time (not checked in).
 ./scripts/release-translations.sh
 
 %install
@@ -275,62 +190,39 @@ builddir=%{builddir}
 install -Dm 755 "$builddir/%{name}" \
     %{buildroot}%{_bindir}/%{name}
 
-# The H.264 encoder video calls send through, which the browser engine
-# loads as a media plugin of its own: rust/piirit-video/build.rs builds it
-# from the same x264 the binary carries and lays it out beside the binary
-# the way Gecko looks for one. A private library under %%{appdatadir}/lib,
-# the one place Harbour allows one; piirit-app points Gecko at it.
+# H.264 for video calls: media plugin for Gecko, built from x264 by rust/piirit-video/build.rs.
+# Lives in %%{appdatadir}/lib (Harbour's one allowed private lib); piirit-app points Gecko at it.
 install -Dm 755 "$builddir/gmp-piirit/1.0/libpiirit.so" \
     %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/libpiirit.so
 install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
     %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/piirit.info
 
-# QML UI, installed under our own app-private data dir (not /usr/bin) so
-# piirit-app's qml_dir() lookup (PIIRIT_QML_DIR env var, then this
-# path, then a source-tree-relative fallback for local dev) finds it.
-# Only what the engine reads. A stray editor backup or .orig under qml/
-# would otherwise ship, and Harbour would then have an opinion about it.
-# The .png files are qml/art/: the mark the first screen leads with and
-# the pictures the introduction puts over each fact (docs/PROJECT.md).
+# QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
+# source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
+# qml/art/ .png files: first-screen mark and intro pictures.
 (cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name qmldir \) -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/qml/{}" \; )
 
-# The compiled catalogs, beside the QML: piirit-app looks for them at
-# this path, the way it looks for qml/ above. Only the .qm files; the .ts
-# sources they were built from stay in the tree.
+# Compiled .qm beside QML, where piirit-app looks; .ts stay in tree.
 (cd translations && find . -type f -name 'piirit-*.qm' -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/translations/{}" \; )
 
-# Bundled deltachat-rpc-server: see vendor/deltachat-rpc-server/ and
-# scripts/fetch-rpc-server.sh. Installed under a private libexec dir rather
-# than %%{_bindir} so it can't be picked up as a generic system
-# "deltachat-rpc-server" by anything else that happens to look for one on
-# PATH -- piirit-app defaults to this exact path.
+# Bundled server in private libexec, not %%{_bindir}: nothing searching PATH picks it up as a
+# generic deltachat-rpc-server. piirit-app defaults to this exact path.
 #
-# %%{_target_cpu}, *not* %%{_arch}: rpm canonicalises every armv7h* target to
-# the arch name "arm" (rpm's installplatform: `armv7h*) CANONARCH=arm`), so
-# %%{_arch} would look for vendor/deltachat-rpc-server/arm/ while
-# scripts/fetch-rpc-server.sh writes armv7hl/. %%{_target_cpu} keeps the
-# Sailfish arch names (armv7hl, aarch64, x86_64) that the script uses.
+# %%{_target_cpu}, not %%{_arch}: rpm maps armv7h* to "arm"; fetch script writes armv7hl/.
 %if 0%{?bundle_rpc_server}
 install -Dm 755 vendor/deltachat-rpc-server/%{_target_cpu}/deltachat-rpc-server \
     %{buildroot}%{appexecdir}/deltachat-rpc-server
 %endif
 
-# LICENSE is Piirit's own GPLv3 text. SOURCE.md discharges MPL-2.0
-# clause 3.2(a) for bundling deltachat-rpc-server's Executable Form:
-# recipients must be told how to obtain its Source Code Form, and it names
-# the upstream repository, the exact tag, and the sha256 of every binary.
+# SOURCE.md: MPL-2.0 3.2(a) for bundled server (upstream repo, tag, sha256s).
 install -Dm 644 vendor/deltachat-rpc-server/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/deltachat-rpc-server/SOURCE.md
-# The same for the page a call runs in: it is compiled into the binary
-# rather than installed (rust/piirit-shim/src/call_host.rs), and this
-# names the GPL-3.0 source it was built from and the notices of what was
-# built into it.
+# Same for call page (rust/piirit-shim/src/call_host.rs): GPL-3.0 source and notices.
 install -Dm 644 vendor/calls-webapp/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/calls-webapp/SOURCE.md
-# The emoji pictures and the list of them: CC-BY-4.0 asks for the
-# attribution this carries to travel with them.
+# Emoji attribution (CC-BY-4.0) travels with them.
 install -Dm 644 vendor/emoji/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/emoji/SOURCE.md
 install -Dm 644 LICENSE \
@@ -356,8 +248,7 @@ install -Dm 644 icons/256x256/%{name}.png \
 %{_bindir}/%{name}
 %{appdatadir}
 %if 0%{?bundle_rpc_server}
-# The directory as well as the file: listing only the file leaves
-# /usr/libexec/%%{name} behind on uninstall.
+# Own the directory too: listing only the file leaves /usr/libexec/%%{name} on uninstall.
 %dir %{appexecdir}
 %{appexecdir}/deltachat-rpc-server
 %endif

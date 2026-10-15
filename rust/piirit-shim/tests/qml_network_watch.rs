@@ -1,17 +1,8 @@
-//! What the app does with connman's account of the network.
-//!
-//! Two things come out of it, and they are not symmetrical. Arriving at a
-//! network that works means `maybe_network`: the core may have a dead
-//! socket to replace, and a handover is several announcements taken as the
-//! one change they are, so the ask waits a moment to collect them.
-//!
-//! Losing one means stopping IO, which costs messages if it is wrong -- so
-//! that waits much longer, long enough that no handover can look like an
-//! outage. A loss that does not last is never announced at all.
-//!
-//! The component is loaded as shipped, against the stub `Nemo.DBus`: what
-//! a device's bus would deliver arrives here as the call the interface
-//! makes when it hears connman.
+//! App's reaction to connman. Arrival at working network: `maybe_network` (dead socket
+//! may need replacing), after short wait to merge handover announcements into one change. Loss
+//! stops IO, costly if wrong: waits much longer, so no handover looks like an outage. Brief loss
+//! never announced. Loaded as shipped
+//! vs stub `Nemo.DBus`.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -56,7 +47,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -85,8 +76,7 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
 
     let steps: common::Steps = common::Steps::default();
 
-    // One handover, as connman describes it: the old connection goes, the
-    // new one comes up, and it reaches the internet. Three announcements,
+    // One handover: old connection goes, new up, reaches internet. Three announcements,
     // one change.
     let loading = steps.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
@@ -98,25 +88,24 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
         call!("say", QString::from("idle"));
         call!("say", QString::from("ready"));
         call!("say", QString::from("online"));
-        // Nothing yet: the component waits to see whether more is coming.
+        // Nothing yet: waiting to see if more comes.
         common::record(&loading, "during", call!("count").into());
     });
 
     let settled = steps.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
         common::record(&settled, "after-handover", call!("count").into());
-        // The network goes, and connman changes its mind about which kind
-        // of nothing it has -- which must not put the announcement off.
+        // Network goes; connman changes kind of nothing: must not delay announcement.
         call!("say", QString::from("offline"));
         call!("say", QString::from("idle"));
-        // Something about connman that is not the connection at all.
+        // Non-connection connman news.
         call!("sayOther");
     });
 
     let lost = steps.clone();
     single_shot(Duration::from_secs(5), move || unsafe {
         common::record(&lost, "after-loss", call!("count").into());
-        // Back, and then connman repeating itself.
+        // Back, then connman repeats itself.
         call!("say", QString::from("online"));
         call!("say", QString::from("online"));
     });
@@ -124,8 +113,7 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
     let back = steps.clone();
     single_shot(Duration::from_millis(7000), move || unsafe {
         common::record(&back, "after-return", call!("count").into());
-        // A blink: gone and back again well inside the wait. A handover
-        // looks like this, and nothing should come of it.
+        // Blink: gone and back inside wait. Handover looks like this; nothing should follow.
         call!("say", QString::from("offline"));
     });
 

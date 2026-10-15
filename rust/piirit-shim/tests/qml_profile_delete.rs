@@ -1,18 +1,8 @@
-//! A profile the reader asked to delete goes, even if they left before
-//! the page was told they were leaving.
+//! Deleted profile goes even if reader left before page heard.
 //!
-//! The wait before a profile goes lives beside the list (`PendingRemoval`),
-//! and the profiles page empties it on the way out -- "leaving is exactly
-//! when a timer has not fired yet". But `Deactivating` and "gone" are two
-//! moments, and a back gesture that is already under way when the menu
-//! item is tapped puts the tap in between them: the wait is armed on a
-//! page that has had its warning already, and then the page is destroyed
-//! with the timer still on it. Nothing was deleted, nothing said so, and
-//! the profile was still there when the reader looked again.
-//!
-//! So the page empties it as it is destroyed as well. What that costs is
-//! one flush over an empty set, which is nothing; what it buys is that no
-//! deletion depends on a page status arriving first.
+//! Wait lives in `PendingRemoval`; profiles page flushes it on exit. But `Deactivating`
+//! and "gone" are separate moments: a back gesture can land between them, and the timer
+//! dies with the page. So page also flushes on destroy. Cost: flush of empty set.
 
 // Qt harness: see qml_profile_rows.rs.
 #![allow(
@@ -96,13 +86,12 @@ fn a_deletion_asked_for_on_the_way_out_still_goes() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and
-    // before the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Two profiles, so the one deleted is not also the last one.
+        // Two profiles: deleted one is not the last.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
@@ -137,14 +126,14 @@ fn a_deletion_asked_for_on_the_way_out_still_goes() {
         }};
     }
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push(("refresh", call!("refresh")));
     });
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("load", call!("load", common::page_url("ProfilesPage.qml"))));
         (*steps_ptr).push(("ask", call!("askDelete", "2")));
-        // No PageStatus.Deactivating first: the page is simply gone.
+        // No Deactivating first: page simply gone.
         (*steps_ptr).push(("gone", call!("destroyPage")));
     });
     single_shot(Duration::from_secs(4), move || unsafe {

@@ -1,23 +1,15 @@
-//! Typing in the chat list's search field has to reach a model.
+//! Typing in chat-list search reaches a model. Ordinary list: grouped search (chats, contacts,
+//! messages); chat list underneath left as is, so clearing costs nothing. Archived list filters
+//! itself.
 //!
-//! On the ordinary list that model is the grouped search, which looks at
-//! chats, contacts and messages; the chat list underneath is left as it
-//! is, so clearing the field costs nothing. The archived list is a mode
-//! over one kind of thing and filters itself.
+//! Field lives in list's `header` (Component property, own scope): page timer reading
+//! `searchField.text` threw `ReferenceError` per keystroke, query never set -- field looked live,
+//! did nothing.
 //!
-//! The field lives in the list's `header`, which is a Component property,
-//! so everything inside it gets its own scope. A page-level timer reading
-//! `searchField.text` therefore threw a `ReferenceError` on every keystroke
-//! and the query was never set -- the field looked live and did nothing.
+//! Archived pulley checked too: every item in it was hidden, so it opened onto nothing.
 //!
-//! The archived pulley is checked here too: every item in it was hidden,
-//! so it opened onto nothing.
-//!
-//! What a *row* offers in archived mode is not checked. A `ContextMenu` is
-//! held in a property rather than among an item's children, and is not
-//! reachable from this probe -- so the archived row's menu (Unarchive and
-//! Delete, rather than the ordinary chat's actions) rests on review and
-//! `qml-lint`, not on a test.
+//! Archived row's menu (Unarchive, Delete) not checked: `ContextMenu` held in a property, not among
+//! children, unreachable from probe. Rests on review and `qml-lint`.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -79,7 +71,7 @@ fn typing_in_the_search_field_reaches_the_model() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-search-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -128,7 +120,7 @@ fn typing_in_the_search_field_reaches_the_model() {
         ));
     });
 
-    // Both chats are there before anything is typed.
+    // Both chats there before typing.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push((
             "before",
@@ -144,7 +136,7 @@ fn typing_in_the_search_field_reaches_the_model() {
         ));
     });
 
-    // Past the 250ms debounce and the round trip.
+    // Past 250ms debounce and round trip.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push((
             "query",
@@ -186,8 +178,7 @@ fn typing_in_the_search_field_reaches_the_model() {
     assert_outcome(&steps);
 }
 
-/// The field drives the model, and the archived mode does not offer a
-/// pulley that opens onto nothing.
+/// Field drives model; archived pulley not dead.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

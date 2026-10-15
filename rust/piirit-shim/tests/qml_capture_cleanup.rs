@@ -1,18 +1,9 @@
-//! What a picture taken in a chat, or a video made smaller for one, leaves
-//! in the cache, and what takes it away again.
+//! Picture or smaller video left in cache: what removes it. Page discards capture when sent,
+//! replaced, cancelled. Leaks: chat closed with capture on bar (page clears it); chat closed
+//! mid-send (core may still read file: left to sweep). Sweep: captures and recoded dirs older than
+//! 1 day, at first `Captures` of run.
 //!
-//! The page discards a capture once it is sent, replaced or cancelled.
-//! That left two ways for one to stay on the phone for good: the chat
-//! closed with the capture still on the bar, and the chat closed while
-//! the send was under way, which takes the answer the page was waiting
-//! for with it. The first is the page's to clear as it goes; the second
-//! is not -- the core may still be reading the file -- and is left to
-//! the sweep, which takes whatever in the captures and recoded
-//! directories is more than a day old as the first `Captures` of a run
-//! is made.
-//!
-//! The page is loaded from a copy of the QML tree with `EnterKey` taken
-//! out, as in `qml_send_file.rs`.
+//! Page loaded from QML tree copy with `EnterKey` taken out, as in `qml_send_file.rs`.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -72,7 +63,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// A file at `path` with something in it, last written `age` ago.
+/// File at `path`, last written `age` ago.
 fn a_file(path: &Path, age: Duration) {
     std::fs::write(path, b"made here").expect("write a test file");
     let when = SystemTime::now()
@@ -100,16 +91,15 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     std::fs::create_dir_all(&recoded).expect("create the recoded directory");
 
     let day = Duration::from_secs(24 * 60 * 60);
-    // Left by a run before this one: two days old, and swept.
+    // Left by earlier run: two days old, swept.
     let old_capture = captures.join("photo-20260101-120000.jpg");
     a_file(&old_capture, day * 2);
     let old_video = recoded.join("video-1-0.mp4");
     a_file(&old_video, day * 2);
-    // An hour old, and kept: the sweep is no quicker than a day.
+    // An hour old: kept.
     let young_capture = captures.join("voice-20260101-120000.mp3");
     a_file(&young_capture, Duration::from_secs(60 * 60));
-    // What the two pages below are handed, as if the camera had just
-    // taken them.
+    // Pages handed these, as if camera just took them.
     let closed = captures.join("photo-closed.jpg");
     a_file(&closed, Duration::ZERO);
     let sending = captures.join("photo-sending.jpg");
@@ -117,13 +107,13 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
 
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("XDG_CACHE_HOME", &cache);
-        // Long enough that the page is gone before the core answers.
+        // Long enough: page gone before core answers.
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "3000");
     }
 
@@ -161,7 +151,7 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     let page = common::page_url_in(&tree, "ConversationPage.qml");
     let exists = |path: &PathBuf| path.exists().to_string();
 
-    // A capture on the bar, and the chat closed on it.
+    // Capture on bar, chat closed.
     let (url, path) = (page.clone(), closed.clone());
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push(("load", call!("load", QString::from(url.clone()))));
@@ -173,14 +163,14 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
 
     let (old, video, young) = (old_capture, old_video, young_capture);
     single_shot(Duration::from_secs(2), move || unsafe {
-        // The sweep has had a second on its thread.
+        // Sweep has had a second on its thread.
         (*steps_ptr).push(("old-capture", exists(&old)));
         (*steps_ptr).push(("old-video", exists(&video)));
         (*steps_ptr).push(("young-capture", exists(&young)));
         (*steps_ptr).push(("close", call!("close")));
     });
 
-    // A capture sent, and the chat closed before the core has answered.
+    // Capture sent, chat closed before core answered.
     let (url, gone, path) = (page, closed.clone(), sending.clone());
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("closed-capture", exists(&gone)));

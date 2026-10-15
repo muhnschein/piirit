@@ -3,99 +3,45 @@ import QtQuick 2.0
 import Nemo.Configuration 1.0
 
 /*
- * The settings that belong to no profile: how a message is drawn, what
- * goes out with a link, how much of a picture or a video leaves with it,
- * how much of an attachment arrives unasked, how long a message is kept,
- * whether anything is announced at all and if so how much a notification
- * gives away and whether a muted group can still raise one, whether
- * webxdc apps are offered at all, whether a call rings here, how many
- * quick actions the cover offers and which, the emoji last reacted with
- * from the picker, and the camera's flash, self-timer and grid. One more
- * key is read and never written: the labels the phone gives the platform
- * camera's lenses, which the camera page's rings wear too.
- *
- * They live in dconf under the app's own path, and every page reads
- * them through this one object: the settings page (qml/pages/
- * SettingsPage.qml) writes it, and each value follows its key, so a
- * change made there reaches every open page without either side being
- * told. dconf rather than a property of the window, so the values
- * outlive the app the way a setting should.
- *
- * A singleton rather than a property handed down page by page: a message
- * row three components deep wants the same answer as the page that
- * sends, and the row is loaded on its own in a test.
+ * Profile-less settings (drawing, links, media, notifications, calls, cover,
+ * camera) plus read-only lens labels; dconf under app path (outlives app).
+ * qml/pages/SettingsPage.qml writes; pages read here, each value following its
+ * key, so changes reach open pages. Singleton: deep row, loaded alone in
+ * tests, needs same answer.
  */
 QtObject {
-    /// 0 draws Markdown; anything else shows a message as written, the 1
-    /// an older install may still hold included.
+    /// 0 draws Markdown; else shows message as written (1 = old installs).
     property alias markdownMode: markdownValue.value
-    /// Take known tracking parameters out of links before sending.
+    /// Strip known tracking parameters from links before sending.
     property alias cleanLinks: cleanLinksValue.value
-    /// How much a picture or a video is compressed on its way out: 0
-    /// balanced, 1 worse quality and less data. The core's own
-    /// `media_quality`, applied to every profile, and what the camera
-    /// records a video at. The reference clients' setting, with their
-    /// two choices and their default.
+    /// Send compression: 0 balanced, 1 less data. Core's `media_quality`, all
+    /// profiles; camera video too.
     property alias mediaQuality: mediaQualityValue.value
-    /// Attachments bigger than this many bytes wait to be asked for; 0
-    /// fetches everything. The core's own `download_limit`, applied to
-    /// every profile.
+    /// Attachments over this many bytes wait to be asked for; 0 = all. Core's
+    /// `download_limit`, all profiles.
     property alias downloadLimit: downloadLimitValue.value
-    /// Messages older than this many seconds are deleted from the phone,
-    /// in every chat of every profile, whatever a chat's own disappearing
-    /// messages timer says; 0 keeps them. The core's own
-    /// `delete_device_after`, applied to every profile the way the
-    /// download limit is.
+    /// Delete from phone messages older than this many s, all chats, over chat
+    /// timers; 0 keeps. Core's `delete_device_after`, all profiles.
     property alias deleteDeviceAfter: deleteDeviceAfterValue.value
-    /// Whether anything is announced at all. Off, no message raises a
-    /// notification whatever the two settings below say; they are kept
-    /// for when it is on again.
+    /// Off: no notifications, whatever below says. Kept for re-enable.
     property alias notificationsEnabled: notificationsEnabledValue.value
-    /// How much a notification says: 0 who wrote and what, 1 who wrote,
-    /// 2 only that something arrived. What the lock screen shows to
-    /// whoever is looking at it.
+    /// Notification detail (lock screen too): 0 who and what, 1 who, 2 arrival.
     property alias notificationDetail: notificationDetailValue.value
-    /// Whether a reply to one of the reader's own messages is announced
-    /// even from a muted group. What the reference clients call mention
-    /// notifications, and on by default as they have it.
+    /// Reply to own message announced even from muted group (on by default).
     property alias mentionNotifications: mentionNotificationsValue.value
-    /// The profile the chat list was last on, or 0 for a phone that has
-    /// never had one.
-    ///
-    /// The core remembers this as well, and better -- it is the one that
-    /// knows whether the profile still exists. But it only answers once
-    /// it has started, and starting it is a process spawn and a round
-    /// trip: long enough that a phone with a profile sat on a blank
-    /// first screen waiting to be told what it already knew. This is
-    /// read from dconf before any of that, so the app opens where it
-    /// belongs and the core catches up behind it.
+    /// Last chat-list profile, 0 = none. Read before core starts (slow).
     property alias lastAccountId: lastAccountValue.value
-    /// Whether webxdc apps are offered: the tray's app entry, the store
-    /// behind it, and running one somebody sent. Off until it is asked
-    /// for, and every one of those three reads this rather than deciding
-    /// for itself.
+    /// Webxdc apps offered (tray, store, running). Off until asked.
     property alias webxdcEnabled: webxdcEnabledValue.value
-    /// Whether a call from a contact rings here. The reference clients'
-    /// "Calls" notification setting, and on by default as they have it.
-    /// The core's own `who_can_call_me`, applied to every profile.
-    ///
-    /// Calls themselves are not a setting: they were an experimental one,
-    /// off until asked for, and are on for everybody now, as they are in
-    /// the reference clients (#119). The old key,
-    /// /apps/harbour-piirit/calls_enabled, is no longer read.
+    /// Contact calls ring here. Core's `who_can_call_me`, all profiles. On for all
+    /// since #119; old key /apps/harbour-piirit/calls_enabled unread.
     property alias callsRing: callsRingValue.value
-    /// How many quick actions the cover has room for: 1, or 2. With one,
-    /// the left action is the one, and what was set up on the right is
-    /// kept for when there are two again.
+    /// Cover quick-action slots, 1 or 2; with 1, left used, right kept.
     property alias quickActionCount: quickActionCountValue.value
-    /// The cover's quick actions, the left one and the right: what each
-    /// does -- "" for nothing, "chat", "search", "qr", "scan", "profiles",
-    /// or one of the camera's: "photo", "video", "selfie" or
-    /// "selfie-video" -- and, for a chat, the profile and chat it opens and
-    /// the icon it wears; for the camera's, whether what is taken is sent
-    /// as soon as its chat is picked rather than waiting on the chat's
-    /// send button.
-    /// qml/js/QuickActions.js reads them.
+    /// Cover quick actions, left and right. Kind: "" none, "chat", "search", "qr",
+    /// "scan", "profiles", or camera "photo", "video", "selfie", "selfie-video".
+    /// Chat: profile, chat, icon. Camera: send on chat pick. Read by
+    /// qml/js/QuickActions.js.
     property alias quickActionLeft: quickActionLeftValue.value
     property alias quickActionLeftAccount: quickActionLeftAccountValue.value
     property alias quickActionLeftChat: quickActionLeftChatValue.value
@@ -106,27 +52,17 @@ QtObject {
     property alias quickActionRightChat: quickActionRightChatValue.value
     property alias quickActionRightIcon: quickActionRightIconValue.value
     property alias quickActionRightSendNow: quickActionRightSendNowValue.value
-    /// The emoji last reacted with from the reaction picker, newest
-    /// first, which it offers before everything else. Only the picker's:
-    /// the quick reactions are a tap away already.
+    /// Recent reactions, newest first, offered before all. Picker only.
     property alias recentReactions: recentReactionsValue.value
-    /// The camera's own settings, kept between one picture and the next
-    /// the way the platform camera keeps them: the flash mode asked for
-    /// (Camera.FlashMode's value; see qml/js/Viewfinder.js), the
-    /// self-timer's delay in seconds, and whether the viewfinder draws
-    /// its grid.
+    /// Camera settings as platform camera keeps them: flash mode
+    /// (qml/js/Viewfinder.js), self-timer s, grid.
     property alias cameraFlash: cameraFlashValue.value
     property alias cameraTimer: cameraTimerValue.value
     property alias cameraGrid: cameraGridValue.value
-    /// What the platform camera writes on its back cameras' rings
-    /// ("1.0", "0.5"), one per camera in the platform's order. Not this
-    /// app's setting: the phone's adaptation gives it to the platform
-    /// camera, and it is read here and never written. Empty on a phone
-    /// whose adaptation gives none.
+    /// Back lens labels platform camera writes ("1.0", "0.5"); empty if none.
     readonly property var backLensLabels: backLensLabelsValue.value || []
 
-    // The keys, named here and nowhere else: tests/qml_syntax.rs holds
-    // every other file to reading them through this object.
+    // Keys named only here: tests/qml_syntax.rs makes others read via this.
     property ConfigurationValue markdownConfig: ConfigurationValue {
         id: markdownValue
         key: "/apps/harbour-piirit/markdown_mode"
@@ -142,32 +78,28 @@ QtObject {
     property ConfigurationValue mediaQualityConfig: ConfigurationValue {
         id: mediaQualityValue
         key: "/apps/harbour-piirit/media_quality"
-        // Balanced, which is the core's own default and the reference
-        // clients'.
+        // Balanced: core's and reference clients' default.
         defaultValue: 0
     }
 
     property ConfigurationValue downloadLimitConfig: ConfigurationValue {
         id: downloadLimitValue
         key: "/apps/harbour-piirit/download_limit"
-        // One megabyte, as parla defaults it: a photo arrives, a video
-        // waits to be asked for.
+        // 1 MB, as parla: photo arrives, video waits.
         defaultValue: 1048576
     }
 
     property ConfigurationValue deleteDeviceAfterConfig: ConfigurationValue {
         id: deleteDeviceAfterValue
         key: "/apps/harbour-piirit/delete_device_after"
-        // Kept for good until the reader says otherwise, which is the
-        // core's own default and the only one that loses nothing.
+        // Kept forever until changed: core's default, loses nothing.
         defaultValue: 0
     }
 
     property ConfigurationValue notificationsEnabledConfig: ConfigurationValue {
         id: notificationsEnabledValue
         key: "/apps/harbour-piirit/notifications_enabled"
-        // On: a chat client that says nothing when a message arrives is
-        // not doing its job until it is asked to stop.
+        // On: chat client silent on arrival is not doing its job.
         defaultValue: true
     }
 
@@ -193,11 +125,8 @@ QtObject {
     property ConfigurationValue webxdcEnabledConfig: ConfigurationValue {
         id: webxdcEnabledValue
         key: "/apps/harbour-piirit/webxdc_enabled"
-        // Off on a phone that has never been asked. Running somebody
-        // else's code, however sandboxed the engine is, is not a thing
-        // to switch on for a reader who did not ask for it -- and the
-        // half of it that is ours is new enough to still be finding out
-        // what it gets wrong.
+        // Off until asked: others' code, however sandboxed, not for unasked readers;
+        // our half still new, finding bugs.
         defaultValue: false
     }
 
@@ -207,8 +136,7 @@ QtObject {
         defaultValue: true
     }
 
-    // One, and that one none, on a phone that has never been asked: the
-    // cover is the faces alone until the reader puts something on it.
+    // One, none on fresh phone: cover is faces alone until user adds.
     property ConfigurationValue quickActionCountConfig: ConfigurationValue {
         id: quickActionCountValue
         key: "/apps/harbour-piirit/quick_action_count"
@@ -284,7 +212,7 @@ QtObject {
     property ConfigurationValue cameraFlashConfig: ConfigurationValue {
         id: cameraFlashValue
         key: "/apps/harbour-piirit/camera_flash"
-        // Automatic, the platform camera's own default.
+        // Automatic: platform camera default.
         defaultValue: 1
     }
 

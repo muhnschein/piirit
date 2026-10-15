@@ -1,9 +1,7 @@
 import QtQuick 2.0
 
-// Stands in for Nemo.Notifications' Notification, which only exists on a
-// device. It imitates no behaviour beyond recording what it was asked to
-// do, so a test can see whether a notification was raised and taken back
-// down again -- see tests/silica-stubs/Sailfish/Silica for the same idea.
+// Stub: device-only Notification. Records raise and take-down. Same idea as
+// tests/silica-stubs/Sailfish/Silica.
 QtObject {
     property string appName
     property string appIcon
@@ -12,8 +10,7 @@ QtObject {
     property string previewSummary
     property string previewBody
     property string category
-    // The real type's enum, on its C++ class there, so that
-    // `Notification.Critical` resolves here as it does on a device.
+    // Real enum on C++ class: `Notification.Critical` resolves here.
     enum Urgency { Low, Normal, Critical }
     // Normal.
     property int urgency: 1
@@ -30,7 +27,7 @@ QtObject {
     function publish() {
         isPublished = true
         publishCount += 1
-        // The real one allocates an id on first publish and reuses it.
+        // Real one allocates id on first publish, reuses it.
         if (replacesId === 0) {
             replacesId = publishCount
         }

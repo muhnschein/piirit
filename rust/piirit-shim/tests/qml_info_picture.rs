@@ -1,12 +1,7 @@
-//! A tap on the picture of a contact or a group shows it larger.
-//!
-//! Loaded headlessly against the stub Silica module and the recording
-//! double, as the group and contact page tests are. Ada has a picture
-//! (`PIIRIT_FAKE_CONTACT_PICTURE`), so a tap on hers opens the picture
-//! page on that file; the group starts with none, so a tap on its disc
-//! opens nothing, until the picture it is given through the pull-down
-//! is there to show. Changing the group's picture is in the pull-down,
-//! and the picture wears no edit badge.
+//! Tap on contact/group picture opens it larger. Ada has picture
+//! (`PIIRIT_FAKE_CONTACT_PICTURE`): opens on that file. Group has none: tap opens
+//! nothing until pull-down sets one. Changing group picture is in pull-down; no edit badge on
+//! picture.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,8 +19,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Ada's picture, as the core would name it: a space and a `#` in it,
-/// which only a path encoded one segment at a time keeps.
+/// Ada's picture: space and `#` in name, kept only by per-segment encoding.
 const ADA_PICTURE: &str = "/tmp/piirit-blobs/ada #1.jpg";
 const ADA_URL: &str = "file:///tmp/piirit-blobs/ada%20%231.jpg";
 const GROUP_PICTURE: &str = "/tmp/piirit-blobs/hikers.png";
@@ -114,7 +108,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -163,7 +157,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         };
     }
 
-    // Ada: chat 1, whose one member has a picture.
+    // Ada: chat 1, one member with picture.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load-contact",
@@ -180,7 +174,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("contact-tappable", get!("pictureTap", "enabled"));
         record!("contact-tap", call!("tap", QString::from("pictureTap")));
         record!("contact-opened", call!("pushed"));
-        // The group: chat 2, with no picture yet.
+        // Group: chat 2, no picture yet.
         record!(
             "load-group",
             call!("load", QString::from(common::page_url("GroupPage.qml")), 2)
@@ -193,7 +187,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("group-tappable", get!("pictureTap", "enabled"));
         record!("group-tap", call!("tap", QString::from("pictureTap")));
         record!("group-opened-bare", call!("pushed"));
-        // Changing the picture is in the pull-down, and opens the gallery.
+        // Picture change in pull-down, opens gallery.
         record!("change-offered", get!("changePicture", "visible"));
         record!("change", call!("click", QString::from("changePicture")));
         record!("change-opened", call!("pushed"));
@@ -205,7 +199,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("group-tappable-now", get!("pictureTap", "enabled"));
         record!("group-tap-now", call!("tap", QString::from("pictureTap")));
         record!("group-opened", call!("pushed"));
-        // A one-to-one chat on the group page has nothing to change.
+        // One-to-one chat has nothing to change.
         record!(
             "load-single",
             call!("load", QString::from(common::page_url("GroupPage.qml")), 1)
@@ -246,7 +240,7 @@ fn assert_taps(steps: &[(&str, String)]) {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
 
-    // Ada's picture: shown, tappable, and opened large, on her file.
+    // Ada's picture: shown, tappable, opened large.
     assert_eq!(
         value("contact-picture"),
         ADA_PICTURE,
@@ -263,8 +257,7 @@ fn assert_taps(steps: &[(&str, String)]) {
         "a tap on a contact's picture does not open it large. {context}"
     );
 
-    // The group, with no picture: nothing to tap and nothing opened, and
-    // no badge on the disc.
+    // Group, no picture: nothing to tap or open, no badge.
     assert_eq!(
         value("group-loaded"),
         "true",
@@ -286,7 +279,7 @@ fn assert_taps(steps: &[(&str, String)]) {
         "a tap on a group with no picture opened something. {context}"
     );
 
-    // Changing it: in the pull-down, to the gallery.
+    // Changing: pull-down, to gallery.
     assert_eq!(
         value("change-offered"),
         "true",
@@ -298,8 +291,7 @@ fn assert_taps(steps: &[(&str, String)]) {
         "changing the picture does not open the gallery. {context}"
     );
 
-    // Once it has one, a tap shows it large, and does not open the
-    // gallery again.
+    // Once set, tap shows it large, no gallery again.
     assert_eq!(
         value("group-picture"),
         GROUP_PICTURE,

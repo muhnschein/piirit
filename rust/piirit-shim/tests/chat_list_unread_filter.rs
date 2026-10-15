@@ -1,9 +1,5 @@
-//! The unread filter on the chat list.
-//!
-//! It shows the chats with something unread, and keeps a chat read since
-//! it went on until it is told to let go: the reader who opens a chat
-//! from the filtered list and comes back should find the row where they
-//! left it.
+//! Unread filter: shows chats with something unread. Chat read while it's on stays listed until
+//! filter is told to let go, so a reader back from that chat finds the row where they left it.
 
 // Qt harness: see chat_list.rs.
 #![allow(
@@ -40,7 +36,7 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
     let temp = std::env::temp_dir().join(format!("piirit-unread-filter-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: one thread; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -81,7 +77,7 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    // The fake's two chats, neither of them unread.
+    // Two chats, neither unread.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("all", call!("count"));
         record!("filtered-on", call!("filter", true));

@@ -1,13 +1,9 @@
-//! The calls with one contact, behind the Calls tile on their page: the
-//! chat's calls, newest first, each saying which way it went and what
-//! became of it, and a first row to call them from.
+//! Calls with one contact, behind Calls tile on their page: chat's calls newest first, each saying
+//! which way it went and what became of it, plus a first row to call from.
 //!
-//! Against the fake core, with a call ringing in from the contact before
-//! the page is opened. What is checked is the wiring: the tile is there
-//! only while calls are on, the page lists the call the chat holds in the
-//! chat's own words, the row to call from names the contact as plain
-//! text and places a call through the window, and a tap on a call still
-//! ringing takes it up rather than calling back.
+//! Vs fake core, call ringing in from contact before page opens. Checks wiring: tile there only
+//! while calls are on; page lists chat's call in chat's own words; call row names contact as plain
+//! text and places call through window; tap on a still-ringing call takes it up, not calls back.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -110,7 +106,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -154,8 +150,9 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they
+
+    // point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         let tiles = common::component_url("MediaKinds.qml");
         record!(
@@ -163,8 +160,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
             call!("tileKinds", QString::from(tiles.clone()), false)
         );
         record!("tiles-on", call!("tileKinds", QString::from(tiles), true));
-        // No setting is written first: calls are on for everybody, as
-        // they are in the reference clients (#119).
+        // No setting written first: calls on for everybody, as in reference clients (#119).
         record!(
             "load",
             call!("load", QString::from(common::page_url("CallsPage.qml")))

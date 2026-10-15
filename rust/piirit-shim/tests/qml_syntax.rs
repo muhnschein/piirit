@@ -1,16 +1,12 @@
-//! Guards QML rules that no host-Qt run can check: syntax newer than
-//! Sailfish's Qt 5.6, and list rows whose height ignores their text.
-//!
-//! A text scan on purpose: host Qt 5.15 accepts the newer form and only
-//! warns, while on device the handlers silently never fire.
+//! QML rules host Qt can't check: syntax newer than Sailfish Qt 5.6, row heights.
+//! Text scan: host Qt 5.15 accepts newer syntax, only warns. Device handlers never fire.
 
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// The lines of the element that declares `marker`, up to the blank line
-/// that follows it. A whole-file `contains` cannot say which element a
-/// string came from, and once two of them carry it the check stops being
-/// able to fail.
+/// Element declaring `marker`, to next blank line.
+/// Whole-file `contains` can't tell which element a string is from: once two carry it, the
+/// check can no longer fail.
 fn block_of(text: &str, marker: &str) -> String {
     text.lines()
         .skip_while(|line| !line.contains(marker))
@@ -66,18 +62,14 @@ fn qml_avoids_qt_5_15_only_signal_handler_syntax() {
     );
 }
 
-/// A platform type's enum property is bound by name, never by number.
+/// Platform enum property bound by name, never number.
 ///
-/// Qt's QML compiler checks a literal bound to an enum property against
-/// the enum's key names, and "2" is not one: the file fails to compile.
-/// For a component the window creates, that is the whole window -- the
-/// app opens on an empty white screen, as it did with `urgency: 2` on a
-/// Nemo notification. No test run on the host sees it: the stubs stand in
-/// for these types in QML, which can declare an enum but not a property
-/// of one, so theirs are `int`s and take any number.
+/// Qt's QML compiler checks a literal on an enum property against key names; "2" is none,
+/// so the file fails to compile. For a window-created component that is the whole window:
+/// white screen (as with `urgency: 2` on a Nemo notification). Host runs miss it: QML stubs
+/// can declare an enum but not a property of one, so theirs are `int`s.
 ///
-/// The properties below are enum-typed on the device; a name is only
-/// listed once the tree binds it, so that the list says what is checked.
+/// Properties below are enum-typed on device; a name is listed only once the tree binds it.
 #[test]
 fn platform_enum_properties_are_bound_by_name() {
     const ENUM_PROPERTIES: &[(&str, &str)] = &[
@@ -135,24 +127,17 @@ fn platform_enum_properties_are_bound_by_name() {
     );
 }
 
-/// A list row holding a wrapping `Label` must take its height from that
-/// label. With a constant `contentHeight` a long message -- a device
-/// message runs to a dozen wrapped lines -- overlaps its neighbours and the
-/// header.
+/// Wrapping `Label` row takes height from it; constant height overlaps neighbours.
 ///
-/// A scan rather than a measurement: `tests/qml_conversation_list.rs` loads
-/// the list, but a row collapsed to nothing would leave its assertions
-/// about scrolling passing anyway.
+/// Scan, not measurement: `tests/qml_conversation_list.rs` loads the list, but a collapsed
+/// row still passes its scrolling assertions.
 #[test]
 fn wrapping_list_rows_size_to_their_text() {
     let path =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components/ConversationList.qml");
     let text = fs::read_to_string(&path).expect("read ConversationList.qml");
 
-    // The whole binding, not the line it starts on. It wraps -- a row's
-    // height is its message plus the day heading it may carry -- and
-    // reading only the first line would fail a row that does follow its
-    // delegate, or pass one that stopped.
+    // Whole binding: it wraps. First line alone misjudges height.
     let lines: Vec<&str> = text.lines().collect();
     let start = lines
         .iter()
@@ -175,12 +160,10 @@ fn wrapping_list_rows_size_to_their_text() {
     );
 }
 
-/// Every `model.<role>` a delegate binds has to be a field the model
-/// actually has: a rename on either side is otherwise a blank row that
-/// nothing catches.
+/// Delegate's `model.<role>` must exist on model: rename = blank row, uncaught.
 #[test]
 fn delegates_bind_only_roles_their_models_have() {
-    /// The `model.<role>` names a file reads.
+    /// Roles a file reads.
     fn bound_roles(text: &str) -> Vec<String> {
         text.split("model.")
             .skip(1)
@@ -199,8 +182,7 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/components/ConversationList.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
-        // The media pages' rows are messages, in the conversation's own
-        // shape.
+        // Media pages: message rows.
         (
             "qml/pages/ChatMediaPage.qml",
             names_of::<piirit_shim::MessageListItem>(),
@@ -209,13 +191,12 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/ChatListPage.qml",
             names_of::<piirit_shim::ChatListItem>(),
         ),
-        // One chat list per profile; the people themselves come out of
-        // those lists as JSON and are bound as `modelData`, not roles.
+        // One chat list per profile: people as JSON, `modelData`.
         (
             "qml/cover/CoverPage.qml",
             names_of::<piirit_shim::AccountItem>(),
         ),
-        // The chats, and the profiles its choice of profile lists.
+        // Chats and profiles.
         (
             "qml/pages/ChatPickerPage.qml",
             [
@@ -244,8 +225,7 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/ContactPage.qml",
             names_of::<piirit_shim::ContactItem>(),
         ),
-        // The block list and the picker in front of it: contacts either
-        // way, the blocked ones and the ones that can still be written to.
+        // Block list, picker: contacts.
         (
             "qml/pages/BlockedContactsPage.qml",
             names_of::<piirit_shim::ContactItem>(),
@@ -258,7 +238,7 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/components/SearchResultsList.qml",
             names_of::<piirit_shim::SearchItem>(),
         ),
-        // The relay rows on the profile page draw a transport each.
+        // Profile relay rows: one transport each.
         (
             "qml/pages/ProfilePage.qml",
             names_of::<piirit_shim::TransportItem>(),
@@ -282,12 +262,9 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 }
 
-/// The rows a group being made draws come from `ContactList.picked_rows`
-/// rather than from the model, so they are `modelData.<name>` -- and the
-/// names still have to be a contact's.
-///
-/// The page is not in the case list above for that reason: it binds no
-/// roles at all any more. Without this it would bind whatever it liked.
+/// New-group rows: `modelData.<name>` from `ContactList.picked_rows`; names must still be
+/// a contact's. Page binds no roles, so is not in the case list above; without this it would
+/// bind anything.
 #[test]
 fn the_new_group_page_reads_only_what_a_contact_row_carries() {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/NewGroupPage.qml");
@@ -316,11 +293,7 @@ fn the_new_group_page_reads_only_what_a_contact_row_carries() {
     }
 }
 
-/// The contact list on the new chat page clips.
-///
-/// It is anchored under the search field rather than inside a view
-/// header, so without clipping its rows are drawn over the field the
-/// moment the list is flicked.
+/// New chat contact list must clip: anchored under search field, rows draw over it else.
 #[test]
 fn the_new_chat_list_clips_away_from_its_search_field() {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/NewChatPage.qml");
@@ -332,17 +305,11 @@ fn the_new_chat_list_clips_away_from_its_search_field() {
     );
 }
 
-/// A row's time label must position itself off the row, never off the
-/// label whose width it decides.
-///
-/// `SearchResultRow` had the two referring to each other -- the title's
-/// width subtracted the time label's width, and the time label anchored
-/// to the title's top. On a device that cycle left the title at its
-/// natural width and a long chat name ran off the right-hand edge; the
-/// offscreen engine used by the tests resolves it and shows nothing, so
-/// this is a scan rather than a measurement. `ChatListDelegate` is the
-/// shape that works: its time label is placed off `root.width`, and the
-/// name takes its width from that label's `x`.
+/// Time label positions off row, not off label its width decides.
+/// `SearchResultRow` had a cycle (title width minus time label's; time label anchored to
+/// title): on device title kept natural width, long names ran off edge.
+/// `ChatListDelegate` is the working shape (time label off `root.width`, name width off
+/// its `x`). Offscreen engine hides it: scan, not measure.
 #[test]
 fn a_time_label_does_not_depend_on_the_label_it_sizes() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -367,14 +334,13 @@ fn a_time_label_does_not_depend_on_the_label_it_sizes() {
     }
 }
 
-/// The role names a model row exposes to QML.
+/// Roles a model row exposes to QML.
 fn names_of<T: qmetaobject::listmodel::SimpleListItem>() -> Vec<String> {
     T::names().iter().map(ToString::to_string).collect()
 }
 
-/// A list draws its delegates outside its own box unless told not to, and
-/// both list pages sit above translucent things -- a message field, an
-/// error banner -- that the content then shows through.
+/// List draws delegates outside its box unless clipped; both list pages sit above translucent
+/// things (message field, error banner) content would show through.
 #[test]
 fn list_pages_clip_and_leave_room_for_what_sits_below_them() {
     for (page, list) in [
@@ -390,20 +356,16 @@ fn list_pages_clip_and_leave_room_for_what_sits_below_them() {
             list_text.contains("clip: true"),
             "{list} does not clip, so its rows draw over what is below them"
         );
-        // Scoped to the list's own block: the jump button anchors to the
-        // same thing, so searching the whole file finds a match whatever
-        // the list does.
+        // Scoped to list block: jump button anchors to same thing, so whole-file search matches
+        // whatever list does.
         let list_block = block_of(&text, "id: listView");
         assert!(
             list_block.contains("bottom: banner.top"),
             "{page}'s list runs under the banner instead of stopping at it"
         );
-        // Losing the core is a state, not an event: a page opened after it
-        // went away never saw the transition that a handler would have
-        // caught, so the banner has to read the status rather than wait for
-        // it to change. Both halves, because a page that only knows
-        // "stopped" says "restart Piirit" through a reconnection that is
-        // already under way.
+        // Losing core is a state, not an event: page opened later missed the transition, so
+        // banner reads status. Both states: a page knowing only "stopped" says "restart
+        // Piirit" during a reconnect already under way.
         for state in ["reconnecting", "stopped"] {
             assert!(
                 text.contains(&format!("core.status === \"{state}\"")),
@@ -419,18 +381,12 @@ fn list_pages_clip_and_leave_room_for_what_sits_below_them() {
     }
 }
 
-/// A list says it is empty only once its model has answered.
+/// Placeholder says "empty" only after model answered.
 ///
-/// An empty model means one of two opposite things: nothing there, or no
-/// answer from the core yet. A placeholder bound to the count alone says
-/// the first while the second is true, so "No contacts" flashed over one
-/// list after another on its way in. Every placeholder that reads a count
-/// also reads whether that count is an answer.
-///
-/// The profiles page is the one exception: its list is the core's own
-/// account list, read before the chat list it is reached from is shown.
-///
-/// One line at a time, so a binding wrapped across two escapes it.
+/// Empty model means nothing there or no answer yet; count alone flashed "No contacts" while
+/// loading. Every count-reading placeholder also reads whether count is an answer.
+/// Profiles page exempt: its list is core's account list, read before chat list is shown.
+/// One line at a time: wrapped binding escapes.
 #[test]
 fn no_list_says_it_is_empty_before_it_has_been_answered() {
     let mut checked = 0;
@@ -445,7 +401,7 @@ fn no_list_says_it_is_empty_before_it_has_been_answered() {
             if !line.contains("ViewPlaceholder {") {
                 continue;
             }
-            // The placeholder's own `enabled`, not one nested inside it.
+            // Placeholder's own `enabled`, not nested one.
             let (mut opened, mut closed) = (0, 0);
             for (number, inner) in lines.iter().enumerate().skip(start) {
                 let binding = inner.trim();
@@ -466,7 +422,7 @@ fn no_list_says_it_is_empty_before_it_has_been_answered() {
             }
         }
     }
-    // Otherwise this passes by finding nothing to check.
+    // Else passes by finding nothing.
     assert!(
         checked >= 10,
         "only {checked} placeholders read a count; there should be ten -- \
@@ -483,8 +439,7 @@ fn no_list_says_it_is_empty_before_it_has_been_answered() {
     );
 }
 
-/// Copying a message says so, and the reply bar and jump button are the
-/// components the tests measure rather than one-off items on the page.
+/// Copy says so. Reply bar and jump button are the tested components, not one-off items.
 #[test]
 fn the_conversation_page_uses_the_pieces_that_are_tested() {
     let path =
@@ -501,31 +456,22 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
         text.contains("Clipboard.text = body") && text.contains("notice.show("),
         "copying a message does not say that it happened"
     );
-    // The field insets itself on the left; without the same on the right
-    // the send button sits nearer the edge than the field does. Scoped to
-    // the row: the jump button carries the same inset, so a whole-file
-    // search cannot fail.
+    // Right inset must match left, or send sits nearer edge. Scoped to row: jump button has
+    // same inset, so whole-file search can't fail.
     assert!(
         block_of(&text, "id: inputRow").contains("rightMargin: Theme.horizontalPageMargin"),
         "the send button is flush against the edge of the screen"
     );
-    // Two things the page has to do on its way out, both of them a timer
-    // that has not fired yet: write the draft, and send the deletes the
-    // reader asked for. The list's own end of the second is
-    // `qml_delete_run.rs`; what cannot be tested by loading the list on
-    // its own is that the page ever asks.
+    // Flush draft and pending deletes on leave (timers not fired).
+    // `qml_delete_run.rs` covers list end; loading list alone can't prove page asks.
     assert!(
         block_of(&text, "PageStatus.Deactivating").contains("listView.flushDeletes()"),
         "leaving the chat does not send the deletes still waiting, so a \
          reader who asked for a message to go and then left keeps it"
     );
-    // Both ends of deleting a message, neither of which can be loaded
-    // headlessly: the menu leads to the page that asks which kind of
-    // delete this is, and what the wait then answers with decides which
-    // of the core's two calls is made. A page that made one call for both
-    // answers would take a message off everybody's phone that the reader
-    // asked to take off their own, or leave it on everybody's when they
-    // asked for the opposite -- and neither can be taken back.
+    // Both delete ends, neither loadable headless: menu leads to page asking which kind;
+    // its answer picks which of core's two calls. One call for both would delete from
+    // everyone's phone what reader meant for own, or the reverse. Irreversible.
     let choosing = block_of(&text, "onDeleteChoiceRequested");
     assert!(
         choosing.contains("DeleteMessageDialog.qml") && choosing.contains("confirmDelete"),
@@ -539,11 +485,8 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
         "the conversation does not make both of the core's deletions, so \
          one of the two answers the reader can give is not the one acted on"
     );
-    // The return key puts in a line break and nothing else, as in both
-    // reference clients: sending is the button's. No test can press the
-    // key -- every test loads the page with the `EnterKey.` lines taken
-    // out (common::qml_tree_without_enter_key) -- so the shipped file is
-    // held to carrying none.
+    // Return = line break only, as in reference clients; sending is the button's. Tests strip
+    // `EnterKey.` lines (common::qml_tree_without_enter_key), so shipped file must carry none.
     assert!(
         !text.contains("EnterKey."),
         "the message field gives the return key a job of its own, when it \
@@ -551,23 +494,16 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
     );
 }
 
-/// Anything showing a string the other end chose has to say it is plain
-/// text. The default is `Text.AutoText`, which sniffs the string and
-/// switches to rich text when it looks like markup -- so a message body of
-/// `<img src="https://tracker/p.gif">` fetches that image the moment its
-/// row is drawn, from an app whose whole point is that the network cannot
-/// watch. It also mismeasures: the hidden copies that size a bubble would
-/// measure the rendered width, not the literal one.
+/// Remote text must say plain: default `Text.AutoText` sniffs markup, so a body of
+/// `<img src="https://tracker/p.gif">` fetches it on draw (network must not watch). Also
+/// mismeasures: hidden bubble-sizing copies measure rendered width.
 ///
-/// Silica's `PageHeader`, `SectionHeader` and `ViewPlaceholder` draw their
-/// text in labels of their own with no `textFormat` to set, so a remote
-/// string reaching one of those is an offender outright: the conversation
-/// page's header carried the chat's name that way, and this check only
-/// looked at `Label` and `Text`. `ConversationHeader` is the replacement.
+/// `PageHeader`, `SectionHeader`, `ViewPlaceholder` have no `textFormat`: remote string in
+/// one is an offender outright (conversation header once carried chat name so).
+/// `ConversationHeader` replaces it.
 #[test]
 fn text_from_the_other_end_is_pinned_to_plain() {
-    // Bindings the core fills in from a message, a contact or a chat.
-    // Anything reading one of these is showing remote input.
+    // Bindings core fills from message, contact or chat: remote input.
     const REMOTE: [&str; 29] = [
         "model.",
         "root.messageText",
@@ -600,7 +536,7 @@ fn text_from_the_other_end_is_pinned_to_plain() {
         "page.myInvite",
     ];
 
-    /// The element a line sits in, as the nearest `Foo {` above it.
+    /// Element a line sits in: nearest `Foo {` above.
     fn element_of(lines: &[&str], index: usize) -> String {
         lines[..index]
             .iter()
@@ -625,8 +561,7 @@ fn text_from_the_other_end_is_pinned_to_plain() {
             if !is_text && !is_title {
                 continue;
             }
-            // Only the things that render text themselves. A MenuItem's
-            // label is a translated literal, whatever it switches on.
+            // Only own-text elements. MenuItem label is translated literal.
             let element = element_of(&lines, number);
             let renders = (element == "Label" || element == "Text") && is_text;
             let unpinnable = matches!(
@@ -636,8 +571,7 @@ fn text_from_the_other_end_is_pinned_to_plain() {
             if !renders && !unpinnable {
                 continue;
             }
-            // The binding runs on while its lines stay further indented
-            // than the `text:` that opened it.
+            // Binding continues while lines indented past `text:`.
             let indent = line.len() - trimmed.len();
             let mut value = trimmed.to_string();
             for next in &lines[number + 1..] {
@@ -660,8 +594,7 @@ fn text_from_the_other_end_is_pinned_to_plain() {
                 ));
                 continue;
             }
-            // `textFormat` sits in the same element block, which starts at
-            // the `{` found above.
+            // `textFormat` sits in same element block, from `{` above.
             let start = number.saturating_sub(16);
             let block = lines[start..=number].join("\n");
             if !block.contains("textFormat:") {
@@ -678,13 +611,8 @@ fn text_from_the_other_end_is_pinned_to_plain() {
     );
 }
 
-/// The dconf keys are named in `Settings.qml` and nowhere else, and are
-/// the app's own -- but for the platform's few it reads.
-///
-/// Every page reads and writes the settings through that one object; a
-/// second file naming a key would be a second definition of it, and the
-/// two would drift the way the app and its page in the Settings app once
-/// could.
+/// dconf keys named only in `Settings.qml`; all app's own but platform's few it reads.
+/// Second naming file = second definition, drift.
 #[test]
 fn only_the_settings_object_names_the_dconf_keys() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
@@ -730,8 +658,7 @@ fn only_the_settings_object_names_the_dconf_keys() {
          it reads: {foreign:?}"
     );
 
-    // The platform's keys are read, never written: each is a read-only
-    // property's, and nothing sets the object behind it.
+    // Platform keys: read, never written (read-only properties, nothing sets object).
     let settings = fs::read_to_string(root.join("components/Settings.qml")).expect("read");
     for key in PLATFORM_KEYS_READ {
         assert!(
@@ -759,21 +686,15 @@ fn only_the_settings_object_names_the_dconf_keys() {
     );
 }
 
-/// dconf keys outside the app's path that it reads and never writes: the
-/// lens labels each phone's adaptation gives the platform camera, which
-/// the camera page's rings wear too.
+/// Platform keys outside app path: read only; lens labels for camera.
 const PLATFORM_KEYS_READ: [&str; 1] = ["/apps/jolla-camera/backCameraLabels"];
 
-/// A file that reads its own directory's singleton imports that directory
-/// by name, with `import "."`.
+/// File reading its directory's singleton imports it: `import "."`.
 ///
-/// Qt 5.6 reads a directory's `qmldir` only for an import that names the
-/// directory; the implicit one a file gets for its own directory skips
-/// it. Without the line, `Settings` in a component next to Settings.qml
-/// is the plain type rather than the one object: every read of it throws,
-/// every binding on it keeps its default, and nothing written reaches
-/// dconf. Host Qt 5.15 hands the singleton out either way, so the quick
-/// actions' settings passed every test here and did nothing on a phone.
+/// Qt 5.6 reads `qmldir` only for an import naming the dir; implicit own-dir import skips
+/// it. Without the line, `Settings` beside `Settings.qml` is the plain type: reads throw,
+/// bindings keep defaults, writes miss dconf. Host Qt 5.15 gives singleton anyway: quick
+/// actions settings passed all tests and did nothing on phone.
 #[test]
 fn a_singleton_read_beside_it_is_imported_by_its_directory() {
     let mut offenders = Vec::new();
@@ -813,20 +734,12 @@ fn a_singleton_read_beside_it_is_imported_by_its_directory() {
     );
 }
 
-/// No deletion hangs off the row it was asked for on.
+/// No deletion wait on the row it was asked on.
 ///
-/// `ListItem.remorseAction` is Silica's shortcut: it makes a
-/// `RemorseItem` in the row and hands it the action. Deleting out of a
-/// list is exactly what destroys rows, and a run of deletes lost most of
-/// itself that way -- in the conversation, and open to the same thing in
-/// the chat list, the profiles list and a group's members.
-///
-/// What replaced it keeps the two halves apart. The *action* is the
-/// list's (components/PendingRemoval.qml), which outlives every row. The
-/// *look* is still Silica's `RemorseItem`, raised by the row and handed
-/// a callback that does nothing --
-/// `every_pending_removal_is_drawn_by_the_platform` holds it to that. So
-/// this bans the shortcut, not the widget.
+/// `ListItem.remorseAction` puts wait in row; deleting from a list destroys rows, so a run
+/// of deletes lost most of itself. Action lives in list (`components/PendingRemoval.qml`);
+/// look is still Silica's `RemorseItem`, raised by row with no-op callback
+/// (`every_pending_removal_is_drawn_by_the_platform`). Bans shortcut, not widget.
 #[test]
 fn no_wait_before_a_deletion_lives_on_the_row_it_was_asked_on() {
     let mut offenders = Vec::new();
@@ -847,12 +760,8 @@ fn no_wait_before_a_deletion_lives_on_the_row_it_was_asked_on() {
     );
 }
 
-/// The wait is drawn by the platform, not by us.
-///
-/// Silica's `RemorseItem` is what a Sailfish reader already knows a
-/// countdown to look like: the bar, the seconds, "Tap to cancel", the
-/// fade over what is going. A hand-made stand-in looks wrong on a phone,
-/// so every list that holds a wait has to raise the real one.
+/// Wait drawn by platform: Silica's `RemorseItem` (bar, seconds, "Tap to cancel").
+/// Hand-made stand-in looks wrong on phone.
 #[test]
 fn every_pending_removal_is_drawn_by_the_platform() {
     let mut offenders = Vec::new();
@@ -874,18 +783,12 @@ fn every_pending_removal_is_drawn_by_the_platform() {
     );
 }
 
-/// The drawn countdown is given the list's own number, never its own.
+/// Drawn countdown uses list's number, never own.
 ///
-/// A row raises Silica's `RemorseItem` over what is going, and the list
-/// deletes when the wait is up. Those are two clocks, and they have to
-/// end at the same moment: when they did not, the countdown ran out and
-/// the platform put the message back while the list was still waiting,
-/// and everything went together at the end instead. So the only value a
-/// row may hand `execute` is `PendingRemoval.countdownFor(id)`, which
-/// answers with what is left of that id's own wait.
-///
-/// Counted rather than matched line by line, because the call wraps: as
-/// many `countdownFor(` as there are `.execute(`.
+/// Row's `RemorseItem` and list's delete are two clocks: must end together. Else countdown
+/// ran out, platform put message back while list still waited. Only
+/// `PendingRemoval.countdownFor(id)` (what is left of that id's wait) may go to `execute`.
+/// Counted (as many `countdownFor(` as `.execute(`): call wraps.
 #[test]
 fn the_drawn_countdown_is_asked_for_rather_than_chosen() {
     let mut offenders = Vec::new();
@@ -912,19 +815,13 @@ fn the_drawn_countdown_is_asked_for_rather_than_chosen() {
     );
 }
 
-/// A row waiting to go is faded, not hidden.
+/// Waiting row is faded, not hidden.
 ///
-/// Hiding an item takes its children's `visible` with it, and the parts
-/// of a row measure `visible ? implicitHeight : 0` -- so hiding the
-/// content of a waiting row collapses the row to nothing. What replaces
-/// the content is centred in that nothing and drawn across the rows
-/// above and below: three messages deleted at once put three "Deleting"
-/// on top of each other on a phone, which is how this was found.
-/// `opacity` leaves the height alone, and `enabled` is what stops a tap
-/// reaching controls that can no longer be seen.
+/// Hiding takes children's `visible`; row parts measure `visible ? implicitHeight : 0`, so
+/// row collapses and its replacement draws over neighbours (three "Deleting" stacked on
+/// phone). `opacity` keeps height; `enabled` stops taps on unseen controls.
 ///
-/// One line at a time, so a binding wrapped across two escapes it. The
-/// five files it applies to are counted by
+/// One line at a time: wrapped binding escapes. Five files: counted by
 /// `every_pending_removal_is_emptied_on_the_way_out`.
 #[test]
 fn a_row_waiting_to_go_is_faded_rather_than_hidden() {
@@ -953,14 +850,12 @@ fn a_row_waiting_to_go_is_faded_rather_than_hidden() {
     );
 }
 
-/// Every wait is emptied when what holds it is left.
+/// Every wait emptied when its holder is left.
 ///
-/// A wait that nobody empties is a deletion the reader asked for and did
-/// not get: they tapped Delete, then went somewhere else inside four
-/// seconds. Each page that holds one flushes it as it deactivates, for
-/// the reason `ConversationPage` writes its draft there. `ConversationList`
-/// is not a page and offers `flushDeletes()` for its own page to call,
-/// which `the_conversation_page_uses_the_pieces_that_are_tested` checks.
+/// Unemptied wait = deletion reader asked for, never got (left within the wait). Pages
+/// flush on deactivate, as `ConversationPage` writes its draft.
+/// `ConversationList` offers `flushDeletes()`; checked by
+/// `the_conversation_page_uses_the_pieces_that_are_tested`.
 #[test]
 fn every_pending_removal_is_emptied_on_the_way_out() {
     let pages = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages");
@@ -981,8 +876,7 @@ fn every_pending_removal_is_emptied_on_the_way_out() {
             offenders.push(file.display().to_string());
         }
     }
-    // Otherwise this passes by finding nothing to check, which is what it
-    // would do if the five of them were quietly put back on their rows.
+    // Else passes by finding nothing.
     assert!(
         holders >= 5,
         "only {holders} files hold a PendingRemoval; there should be five \
@@ -998,13 +892,9 @@ fn every_pending_removal_is_emptied_on_the_way_out() {
     );
 }
 
-/// A path the other end named becomes a URL one segment at a time.
+/// Path from other end becomes URL one segment at a time.
 ///
-/// `encodeURI` leaves `#` and `?` alone -- to it they are URL syntax --
-/// so an attachment called `a#b.png` made a URL whose path stopped at the
-/// `a`, and the file never loaded. It also contradicted the comment above
-/// it, which said it handled exactly that. `encodeURIComponent` on each
-/// segment between the slashes encodes everything that is not a slash.
+/// `encodeURI` keeps `#`/`?`: `a#b.png` cut at `a`. Per-segment `encodeURIComponent` fixes.
 #[test]
 fn file_urls_are_encoded_per_segment() {
     let mut offenders = Vec::new();
@@ -1026,19 +916,9 @@ fn file_urls_are_encoded_per_segment() {
     );
 }
 
-/// Only the picker pages name a `Sailfish.Pickers` type.
-///
-/// Those types resolve when the file that names them is loaded, so a type
-/// that is not there on some future release takes that whole file down
-/// with it. Kept to files that exist for nothing else -- pushed by URL and
-/// connected to -- the cost is one button; in a page it is the page.
-/// `SettingsPage` had its own `ImagePickerPage` for the profile picture,
-/// and with it its own unguarded copy of the pick handler.
-///
-/// Named one by one rather than matched by prefix: three of them belong
-/// to the attachment tray and one to taking a profile over from a backup
-/// file, and adding to the list should be a decision rather than a side
-/// effect of what a file is called.
+/// Only picker pages name `Sailfish.Pickers`: missing type takes whole file down. Kept to
+/// dedicated files (pushed by URL), cost is one button, not a page.
+/// Named one by one: adding one is a decision.
 #[test]
 fn only_the_picker_pages_import_sailfish_pickers() {
     const ALLOWED: [&str; 4] = [
@@ -1071,16 +951,9 @@ fn only_the_picker_pages_import_sailfish_pickers() {
     );
 }
 
-/// The two webxdc pages and the call's view are the only files naming a
-/// `Sailfish.WebView` type.
-///
-/// The same rule as the pickers above, for the same reason and a sharper
-/// case: the browser engine is a separate package, and a release without
-/// it -- or a device where it is not installed -- would take down every
-/// file naming the type. Here that is the page that runs one app, pushed
-/// by URL from the conversation, so a chat still opens and every other
-/// attachment still works; and the view a call's media runs in, loaded
-/// by the call page, so a call that rings can still be seen and declined.
+/// Only webxdc pages and call view name `Sailfish.WebView`: engine is a separate package;
+/// missing, it takes down files naming it. These are pushed/loaded apart, so chats still
+/// open and a ringing call can still be seen and declined.
 #[test]
 fn only_the_webxdc_pages_import_sailfish_webview() {
     const ALLOWED: [&str; 3] = ["WebxdcPage.qml", "WebxdcStorePage.qml", "CallView.qml"];
@@ -1108,14 +981,10 @@ fn only_the_webxdc_pages_import_sailfish_webview() {
     );
 }
 
-/// Neither webxdc page may decide when its `WebView` is active.
+/// Webxdc page must not set its `WebView`'s `active`.
 ///
-/// `Sailfish.WebView`'s own `WebView.qml` binds `active` to the page's
-/// status and to whether the app is in front -- which is what decides
-/// when the engine renders and when it hands the GPU back. Binding it
-/// here overrides that, and a view whose activation no longer follows the
-/// page transition draws as a grey rectangle where the app should be.
-/// That is what the first device build did.
+/// `WebView.qml` binds it to page status and app-in-front (when engine renders, returns
+/// GPU); override leaves view a grey rectangle (first device build).
 #[test]
 fn the_webxdc_pages_leave_the_views_activation_alone() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages");
@@ -1135,17 +1004,11 @@ fn the_webxdc_pages_leave_the_views_activation_alone() {
     }
 }
 
-/// The call's view decides when its `WebView` is active, and only after
-/// the page has come up.
+/// Call view holds its `WebView` active for the whole call.
 ///
-/// The opposite of the rule above, and for a reason of its own: an
-/// inactive view is a hidden document, and the engine pauses a hidden
-/// document's media -- which for a call is the other end's voice, gone
-/// the moment the reader looks at another app. So the view is held
-/// active for as long as the call lasts. Until the page has come up it
-/// follows what `WebView.qml` itself would follow, handed in as `shown`,
-/// since a view that is never activated by its page's transition draws
-/// nothing.
+/// Opposite of rule above: inactive = hidden document, engine pauses its media (other end's
+/// voice). Before page up, follows `shown` (what `WebView.qml` follows): never activated
+/// by page transition, view draws nothing.
 #[test]
 fn the_call_view_holds_its_page_running_only_once_it_has_come_up() {
     let file = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components/CallView.qml");
@@ -1163,21 +1026,11 @@ fn the_call_view_holds_its_page_running_only_once_it_has_come_up() {
     );
 }
 
-/// The share methods the desktop file offers are the ones the app
-/// answers.
+/// Share methods in desktop file must match `ShareProvider`s in app.
 ///
-/// An app is in the phone's share sheet because its desktop file says so
-/// -- `X-Share-Methods`, and a group per method -- and what arrives goes
-/// to a `ShareProvider` of the same name inside the app. A name in one
-/// file and not the other is an entry in the sheet that does nothing, or
-/// a provider nothing ever reaches; neither shows up anywhere but on a
-/// phone.
-///
-/// The words are checked too: the sheet reads them from the desktop
-/// file, which no catalogue reaches, so `ShareTarget.qml` carries the
-/// same strings under `qsTr` for `lupdate` to collect. A description
-/// that drifts from the one beside it is a share method translated
-/// nowhere.
+/// Mismatch = dead sheet entry or unreached provider, phone only.
+/// Sheet reads descriptions from desktop file, which no catalogue reaches: repeated in
+/// `ShareTarget.qml` under `qsTr` for `lupdate`, and must match.
 #[test]
 fn the_share_methods_and_what_answers_them_agree() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -1186,7 +1039,7 @@ fn the_share_methods_and_what_answers_them_agree() {
     let target =
         fs::read_to_string(root.join("qml/share/ShareTarget.qml")).expect("read the share target");
 
-    // The desktop entry's side: the list, and a group for each name.
+    // Desktop entry side: list, and group per name.
     let offered: Vec<String> = desktop
         .lines()
         .find_map(|line| line.trim().strip_prefix("X-Share-Methods="))
@@ -1204,9 +1057,7 @@ fn the_share_methods_and_what_answers_them_agree() {
          the phone's share sheet at all"
     );
 
-    // The app's side: one provider per method.
-    // Comments blanked and strings kept: the names are string literals,
-    // which `code_only` blanks along with everything else quoted.
+    // App side: one provider per method. Names are literals, which `code_only` blanks.
     let answered: Vec<String> = code_only_keeping_strings(&target)
         .lines()
         .filter_map(|line| {
@@ -1248,13 +1099,8 @@ fn the_share_methods_and_what_answers_them_agree() {
     }
 }
 
-/// `Sailfish.Share` is named in the share target alone.
-///
-/// The same rule as the pickers and the webxdc pages, for the same
-/// reason: the import resolves only on a release that ships the module,
-/// and a file that names it is a file that fails without it. Here that
-/// file is loaded by a `Loader` from the window, so a release without it
-/// costs sharing rather than the app.
+/// `Sailfish.Share` only in share target: missing module fails file.
+/// `Loader` from window: missing module costs sharing, not app.
 #[test]
 fn only_the_share_target_imports_sailfish_share() {
     let mut offenders = Vec::new();
@@ -1280,17 +1126,10 @@ fn only_the_share_target_imports_sailfish_share() {
     );
 }
 
-/// The app's own name on the cover is not a string to be translated.
+/// Every frame script a page loads is a shipped file.
 ///
-/// Every frame script a page hands the browser engine is a file that
-/// ships.
-///
-/// `loadFrameScript` takes a URL and says nothing about whether anything
-/// is there: a renamed or unpackaged script is a store that quietly stops
-/// catching taps on an app, on a phone and nowhere else. Nothing else can
-/// notice -- the stub view records what it was asked to load without
-/// looking -- so the path is checked here, against the tree the package
-/// is built from.
+/// `loadFrameScript` ignores missing files: store silently stops catching taps, on phone
+/// only. Stub view doesn't look, so path checked here against package tree.
 #[test]
 fn the_frame_scripts_the_pages_load_are_there() {
     let mut loaded = Vec::new();
@@ -1306,9 +1145,7 @@ fn the_frame_scripts_the_pages_load_are_there() {
                     file.display()
                 );
             };
-            // `Qt.resolvedUrl` reads the path against the file that
-            // names it, so this walks the same way: one directory up for
-            // every `../`, then whatever is left.
+            // `Qt.resolvedUrl`: resolves against naming file; one dir up per `../`.
             let mut here = file.parent().expect("a file is in a directory");
             let mut rest = path;
             while let Some(above) = rest.strip_prefix("../") {
@@ -1333,16 +1170,10 @@ fn the_frame_scripts_the_pages_load_are_there() {
     );
 }
 
-/// A file an app hands over is kept, not put into a chat.
+/// File app hands over is kept, not put into a chat.
 ///
-/// The webxdc call is `sendToChat` and a chat is the only destination its
-/// name can carry, but the button an app draws over it is a download --
-/// `sharer`'s is a download arrow -- and what the reader means by that is
-/// the file, on their phone. So it is saved where the file manager looks,
-/// and nothing is asked: a chooser between opening and keeping is two taps
-/// in front of the one thing already asked for. Nothing
-/// else can check this: the page names `Sailfish.WebView`, so it is never
-/// loaded off a phone.
+/// Call is `sendToChat`, but app's button is a download: reader means the file. Saved where
+/// file manager looks, no chooser. Page names `Sailfish.WebView`: only checked here.
 #[test]
 fn the_webxdc_page_keeps_a_handed_over_file() {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/WebxdcPage.qml");
@@ -1367,9 +1198,7 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
         !text.contains("HandoverDialog"),
         "the page still asks what to do with the file rather than keeping it"
     );
-    // The cache copy is the page's to clean up: nothing else knows the
-    // save has happened, and an export that leaves one behind costs the
-    // phone twice over for every file an app ever makes.
+    // Page deletes cache copy: nothing else knows save happened; leftover doubles storage.
     assert!(
         offer.contains("handoverSaver.handedOver ="),
         "the page does not keep the path it is saving from, so it has \
@@ -1382,12 +1211,9 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
     );
 }
 
-/// Every copy the reader keeps goes to the one folder.
+/// Every kept copy goes to one folder.
 ///
-/// `AttachmentSaver` names that folder, and is the only thing that makes
-/// a `FileSaver`: a page that made its own would pick a folder of its
-/// own, and the reader would be looking in several places for what they
-/// kept. A page asks it to `keep` a file, which takes no folder.
+/// Only `AttachmentSaver` makes a `FileSaver` (else per-page folders); `keep` takes no folder.
 #[test]
 fn every_copy_goes_to_the_one_folder() {
     let mut makers = Vec::new();
@@ -1416,7 +1242,7 @@ fn every_copy_goes_to_the_one_folder() {
         "a FileSaver is made somewhere other than AttachmentSaver, so a \
          copy can go to a folder of its own"
     );
-    // Otherwise this passes by finding nothing to check.
+    // Else passes by finding nothing.
     assert!(
         keepers >= 5,
         "only {keepers} files keep a copy through AttachmentSaver; there \
@@ -1431,15 +1257,11 @@ fn every_copy_goes_to_the_one_folder() {
     );
 }
 
-/// Being covered by another page does not stop the app under it.
+/// Covered page must not stop its app.
 ///
-/// The dialog a handover opens is pushed *over* the app, so a page that
-/// stops its app whenever it deactivates stops it in the middle of the
-/// request that asked for it: the app's fetch is answered by a
-/// closed socket and it reports that its host is gone. Leaving is
-/// destruction -- a popped page is destroyed, and a replaced stack takes
-/// its pages with it -- and that is where the app is stopped. The page
-/// names `Sailfish.WebView`, so nothing else can check this.
+/// Handover dialog pushed over app; stopping on deactivate kills the request that asked
+/// (closed socket). Stop on destruction (pop, stack replace). Page names `Sailfish.WebView`:
+/// only checked here.
 #[test]
 fn the_webxdc_page_keeps_serving_an_app_it_has_opened_a_page_over() {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/WebxdcPage.qml");
@@ -1459,14 +1281,10 @@ fn the_webxdc_page_keeps_serving_an_app_it_has_opened_a_page_over() {
     );
 }
 
-/// Every page the app pushes is a page that exists.
+/// Every page the app pushes exists.
 ///
-/// A page is pushed by name, resolved at the moment of the tap, and a
-/// name that is wrong fails there and nowhere earlier: the reader taps
-/// and the app does nothing, which is exactly the bug the file page was
-/// added to stop being. Nothing else checks these -- a page only some
-/// device path reaches is never loaded by a test -- so the names are
-/// checked here.
+/// Name resolved at tap: wrong name = tap does nothing. Device-only pages never loaded by a
+/// test, so names checked here.
 #[test]
 fn the_pages_the_app_pushes_are_there() {
     let mut pushed = Vec::new();
@@ -1476,10 +1294,8 @@ fn the_pages_the_app_pushes_are_there() {
             let Some(rest) = line.split_once("Qt.resolvedUrl(") else {
                 continue;
             };
-            // Only the literal ones that name a file in the tree: a
-            // path built from a variable is one this cannot follow, and
-            // `Qt.resolvedUrl("file://" + path)` is a file on the phone
-            // rather than a page of ours.
+            // Literal paths only: variable-built ones can't be followed.
+            // `Qt.resolvedUrl("file://" + path)` is a phone file, not ours.
             let Some(path) = rest.1.split('"').nth(1) else {
                 continue;
             };
@@ -1490,8 +1306,7 @@ fn the_pages_the_app_pushes_are_there() {
             if kind != "qml" && kind != "js" {
                 continue;
             }
-            // `Qt.resolvedUrl` reads the path against the file that
-            // names it; see the frame scripts above.
+            // `Qt.resolvedUrl` resolves against naming file; see frame scripts above.
             let mut here = file.parent().expect("a file is in a directory");
             let mut rest = path;
             while let Some(above) = rest.strip_prefix("../") {
@@ -1522,15 +1337,11 @@ fn the_pages_the_app_pushes_are_there() {
     );
 }
 
-/// The file with its comments blanked out and its strings left alone.
-///
-/// `code_only` cannot be used where the string is the point: the paths
-/// this scans for are string literals.
+/// Comments blanked, strings kept. Scanned paths are string literals.
 fn code_only_keeping_strings(text: &str) -> String {
     text.lines()
         .map(|line| match line.split_once("//") {
-            // A `//` inside a string is not a comment: the only ones here
-            // are in URLs, which are not what this scans for.
+            // `//` in string is not comment; only URLs here.
             Some((code, _)) if !code.contains('"') => code,
             _ => line,
         })
@@ -1538,11 +1349,8 @@ fn code_only_keeping_strings(text: &str) -> String {
         .join("\n")
 }
 
-/// The file with every comment and string body blanked out, newlines kept.
-///
-/// A scan that does not do this reads prose and translated text as code:
-/// a URL in a string ends a line comment, and from there every quote
-/// pairs up with the wrong one and whole blocks of real code disappear.
+/// Comments and string bodies blanked, newlines kept.
+/// Else a URL in a string ends a line comment; quotes pair wrong.
 fn code_only(text: &str) -> String {
     let chars: Vec<char> = text.chars().collect();
     let blank = |c: char| if c == '\n' { '\n' } else { ' ' };
@@ -1591,7 +1399,7 @@ fn code_only(text: &str) -> String {
     out
 }
 
-/// Identifiers and single punctuation marks, in order.
+/// Identifiers and punctuation, in order.
 fn tokens(code: &str) -> Vec<String> {
     let mut out = Vec::new();
     let mut word = String::new();
@@ -1613,12 +1421,9 @@ fn tokens(code: &str) -> Vec<String> {
     out
 }
 
-/// Every name the file itself introduces: ids, properties and their
-/// types, functions and their parameters, signal parameters, `var`s.
+/// Every name file introduces: ids, properties, functions, params, `var`s.
 ///
-/// Deliberately greedy -- a type name landing in here alongside the
-/// property it types costs nothing. Over-collecting only makes the check
-/// weaker, while missing a declaration would make it wrong.
+/// Greedy: extra name harmless; missing declaration breaks check.
 fn declared_names(code: &str) -> std::collections::HashSet<String> {
     fn is_name(token: &str) -> bool {
         token
@@ -1631,8 +1436,7 @@ fn declared_names(code: &str) -> std::collections::HashSet<String> {
     let mut names = std::collections::HashSet::new();
     let mut i = 0;
     while i < tokens.len() {
-        // Everything after the keyword, up to the token that ends the
-        // declaration.
+        // Tokens after keyword, up to end of declaration.
         let (skip, stop): (usize, &[&str]) = match tokens[i].as_str() {
             "id" if tokens.get(i + 1).map(String::as_str) == Some(":") => (2, &[]),
             "property" => (1, &[":", "{", "}"]),
@@ -1644,7 +1448,7 @@ fn declared_names(code: &str) -> std::collections::HashSet<String> {
             }
         };
         let mut j = i + skip;
-        // A bare `id:` or `var` names exactly one thing.
+        // Bare `id:` or `var` names one thing.
         let single = stop.is_empty() || tokens[i] == "var";
         while j < tokens.len() && !stop.contains(&tokens[j].as_str()) {
             if is_name(&tokens[j]) {
@@ -1660,8 +1464,7 @@ fn declared_names(code: &str) -> std::collections::HashSet<String> {
     names
 }
 
-/// Every `foo.` in the code, with the line it is on: a name being read
-/// for something on it.
+/// Every `foo.` in code, with its line.
 fn qualified_uses(code: &str) -> Vec<(usize, String)> {
     let chars: Vec<char> = code.chars().collect();
     let is_word = |c: char| c.is_alphanumeric() || c == '_' || c == '$';
@@ -1681,14 +1484,12 @@ fn qualified_uses(code: &str) -> Vec<(usize, String)> {
         if start == end {
             continue;
         }
-        // `a.b.c` reads `b` off `a`; only the head of the chain is a name
-        // that has to exist on its own.
+        // `a.b.c` reads `b` off `a`; only chain head must exist.
         if start > 0 && (chars[start - 1] == '.' || is_word(chars[start - 1])) {
             continue;
         }
         let name: String = chars[start..end].iter().collect();
-        // Types, attached properties and enums are capitalised; numbers
-        // are not names at all.
+        // Types, attached props, enums capitalised; numbers not names.
         if !name.starts_with(|c: char| c.is_lowercase() && c.is_alphabetic()) {
             continue;
         }
@@ -1698,69 +1499,52 @@ fn qualified_uses(code: &str) -> Vec<(usize, String)> {
     out
 }
 
-/// A name read as `<name>.something` has to be one the file introduces or
-/// one QML puts in scope.
+/// Name read as `<name>.something` must be declared in file or QML scope.
 ///
-/// An id that is not there any more is not a load error. The binding that
-/// reads it throws at runtime, that one binding never runs, and whatever
-/// it fed keeps its default -- everything else on the page carries on. A
-/// patch deleted `SearchResultRow`'s `Avatar` and left the three
-/// references to it behind; the row's height is measured off it, so every
-/// search result collapsed to nothing and a search showed "Chats (1)"
-/// with no chat under it. The file still parsed, the page still loaded,
-/// and nothing in the suite could see it.
+/// Missing id: no load error; binding throws, fed value keeps default. `SearchResultRow`
+/// lost `Avatar` but kept references: rows collapsed, "Chats (1)" over nothing.
 #[test]
 fn qml_reads_no_name_that_is_not_there() {
-    // What QML puts in scope without the file saying so.
+    // In scope without declaring.
     const IN_SCOPE: [&str; 24] = [
-        // Grouped properties, and properties of the element being
-        // configured read without qualifying them.
+        // Grouped props and configured element's props, unqualified.
         "anchors",
         "font",
         "icon",
         "text",
         "parent",
-        // A MouseArea's grouped property for what it drags, and how far:
-        // the call page's own picture is moved through it.
+        // MouseArea drag group.
         "drag",
-        // A Rectangle's outline: the capture page's shutter wears one.
+        // Rectangle outline.
         "border",
-        // Camera's grouped property for what goes into the file: the
-        // capture page writes the orientation through it.
+        // Camera metaData group (file contents).
         "metaData",
-        // Camera's grouped properties for the flash and the white
-        // balance, which the viewfinders set through them.
+        // Camera flash and imageProcessing groups.
         "flash",
         "imageProcessing",
-        // An animation's easing curve.
+        // Animation easing curve.
         "easing",
-        // An Item's own texture, and the effect drawn from it: Avatar
-        // takes the colour out of a picture through one.
+        // Item layer and its effect (Avatar desaturates).
         "layer",
-        // On Image, AnimatedImage and Nemo's Thumbnail: how big to decode.
+        // Image, AnimatedImage, Nemo Thumbnail: decode size.
         "sourceSize",
-        // PinchArea's own grouped property, and the PinchEvent its
-        // handlers are passed under the same name.
+        // PinchArea `pinch` group; PinchEvent to handlers.
         "pinch",
-        // The MouseEvent a MouseArea's handlers are passed.
+        // MouseEvent to MouseArea handlers.
         "mouse",
-        // A delegate's scope.
+        // Delegate scope.
         "model",
         "modelData",
         "section",
         "index",
-        // Set from Rust in main.rs, and Silica's own.
+        // Set from Rust (main.rs), and Silica's own.
         "core",
         "pageStack",
-        // The root window's id in piirit.qml, in scope for every
-        // page it loads. A page loaded on its own in a test has none,
-        // which is why ChatListPage reads it behind a typeof check.
+        // Root window id from piirit.qml. Test-loaded page has none: ChatListPage uses typeof.
         "appWindow",
-        // ContentPickerPage hands its answer to the handler under this
-        // name; see AttachPhotoPage.
+        // ContentPickerPage answer; see AttachPhotoPage.
         "selectedContentProperties",
-        // What a WebView's `recvAsyncMessage` carries beside the message
-        // name: whatever the frame script sent. See WebxdcStorePage.
+        // WebView `recvAsyncMessage` payload; see WebxdcStorePage.
         "data",
     ];
 
@@ -1795,8 +1579,7 @@ fn qml_reads_no_name_that_is_not_there() {
     );
 }
 
-/// The text of a QML file with its comments taken out, so that a comment
-/// explaining why something is not used is not taken for a use of it.
+/// QML text minus comments, so a comment saying why unused is not a use.
 fn without_comments(text: &str) -> String {
     let mut out = String::new();
     let mut in_block = false;
@@ -1829,8 +1612,7 @@ fn without_comments(text: &str) -> String {
     out
 }
 
-/// Whether `line` has `word` in it as a word of its own: `player.` is not
-/// `layer.`.
+/// Whether `line` has `word` as own word.
 fn names(line: &str, word: &str) -> bool {
     line.match_indices(word).any(|(at, _)| {
         !line[..at]
@@ -1840,16 +1622,12 @@ fn names(line: &str, word: &str) -> bool {
     })
 }
 
-/// No QML in the app draws through a shader of its own.
+/// No QML draws through its own shader.
 ///
-/// Sailfish's Qt 5.6 deletes every `ShaderEffect`'s material type each
-/// time a window is hidden while the effects and the renderer's programs
-/// keyed by that type's address live on, so an effect made afterwards can
-/// be drawn with another effect's program: the cover's faces came out as
-/// white squares (see `qml_avatar_shaders.rs`). A `layer` with an effect
-/// and everything in `QtGraphicalEffects` are `ShaderEffect`s too. A
-/// picture that needs work is made the way it is seen first, by the app's
-/// image provider (`image://piirit/`, `src/pictures.rs`).
+/// Sailfish Qt 5.6 deletes `ShaderEffect` material types on window hide while programs keyed
+/// by type address live on: later effect may draw with another's program. Cover faces came
+/// out white (`qml_avatar_shaders.rs`). `layer` effects and `QtGraphicalEffects` count too.
+/// Make pictures in image provider (`image://piirit/`, `src/pictures.rs`).
 #[test]
 fn qml_draws_nothing_through_a_shader_of_its_own() {
     let files = qml_files();

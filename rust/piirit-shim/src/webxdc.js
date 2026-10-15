@@ -1,45 +1,25 @@
 /*
- * `window.webxdc`, as the app running inside the WebView sees it.
- *
- * Served by the shim's own loopback host (webxdc_host.rs), which injects a
- * script tag for it into the app's index.html before anything of the app's
- * own runs -- the API has to be there when the first line of the app
- * executes, and `selfAddr` has to be readable without waiting.
- *
- * The placeholders are filled in by the host as JSON literals.
- *
- * Updates travel over the same host: sending is a POST, receiving is a
- * long poll, which the host holds until the chat has something new for
- * the app. Nothing here talks to Qt -- a page cannot -- and nothing here
- * knows the core; both are on the other side of those two requests.
- *
- * XMLHttpRequest rather than fetch: Gecko has both, and this one is
- * older than every release this could run on.
+ * `window.webxdc`, injected by webxdc_host.rs before app code (API and `selfAddr` ready at
+ * first line); placeholders filled as JSON literals. Sends POST, receives long-poll. No Qt or
+ * core access. XHR, not fetch: predates every Gecko this runs on.
  */
 (function () {
     "use strict";
 
-    /* Where the chat is: `/webxdc-api/<token>`, which the host fills
-     * in. The app's own files are at the root; this is the part of
-     * the host nothing but the app is told about. */
+    /* `/webxdc-api/<token>`, host-filled; app files at root. */
     var API = __API__;
     var SELF_ADDR = __SELF_ADDR__;
     var SELF_NAME = __SELF_NAME__;
     var MAX_SIZE = __MAX_SIZE__;
-    /* Milliseconds to wait before asking for updates again after a
-     * request for them failed. One that was answered is followed at
-     * once: the host holds it until there is something new. */
+    /* Ms before re-asking after failure; answered asks follow at once. */
     var RETRY = __RETRY__;
 
-    /* What setUpdateListener was given, and how far it has been fed. */
+    /* Listener, and how far it has been fed. */
     var listener = null;
     var lastSerial = 0;
-    /* Resolves the promise setUpdateListener returned, once the updates
-     * that existed when it was called have all been delivered. */
+    /* Resolves setUpdateListener's promise once existing updates are delivered. */
     var caughtUp = null;
-    /* The request for updates in flight, if any. One at a time: a send
-     * asks for one immediately, and that must not race the one already
-     * waiting. */
+    /* Update request in flight; one at a time, so a send can't race it. */
     var current = null;
     var timer = null;
 
@@ -84,9 +64,7 @@
                 try {
                     listener(update);
                 } catch (err) {
-                    /* The app's own handler threw. Its problem, not the
-                     * next update's: one that stopped the loop would
-                     * leave the app frozen at the update it choked on. */
+                    /* Handler threw: keep looping, else app freezes. */
                     if (window.console) {
                         window.console.error(err);
                     }
@@ -108,9 +86,7 @@
         if (current !== null) {
             return;
         }
-        /* Held by the host until there is something new -- except while
-         * catching up, which setUpdateListener's promise waits on: that
-         * one is answered with what there is now. */
+        /* Held until news, except while catching up. */
         var path = "/updates?serial=" + lastSerial + (caughtUp ? "" : "&wait=1");
         var mine = request("GET", path, null,
             function (text) {
@@ -126,15 +102,11 @@
                 }
                 deliver(updates);
                 settle();
-                /* And straight back to waiting for the next. */
+                /* Wait for next. */
                 poll();
             },
             function () {
-                /* The host is gone -- the app was closed, or the shim
-                 * stopped it. Keep asking: nothing else here can tell
-                 * the difference between that and a lost connection,
-                 * and an app left running with a dead listener is
-                 * worse than a request that fails every RETRY ms. */
+                /* Host gone; keep asking: dead listener is worse than a failure per RETRY. */
                 if (current !== mine) {
                     return;
                 }
@@ -148,17 +120,13 @@
     window.webxdc = {
         selfAddr: SELF_ADDR,
         selfName: SELF_NAME,
-        /* The core's own limits, which apps are expected to respect. */
+        /* Core's limits; apps should respect them. */
         sendUpdateInterval: __INTERVAL__,
         sendUpdateMaxSize: MAX_SIZE,
 
         /*
-         * Send one update to everyone in the chat, including this app's
-         * own listener -- the core echoes it back with a serial.
-         *
-         * `description` is accepted and ignored: the core dropped it, and
-         * an app that passes one is not wrong for having been written
-         * against the older API.
+         * Update to whole chat, own listener too (core echoes with serial). `description`
+         * ignored: core dropped it.
          */
         sendUpdate: function (update, description) {
             var body = JSON.stringify(update);
@@ -167,10 +135,7 @@
             }
             request("POST", "/send", body,
                 function () {
-                    /* The core has it, and says so to the host, which
-                     * wakes the request waiting for updates: the app
-                     * sees its own move at once. Asked for here too, for
-                     * when none is waiting -- after a failed one. */
+                    /* Host wakes waiting request so app sees own move; poll too if none. */
                     poll();
                 },
                 function (err) {
@@ -181,17 +146,14 @@
         },
 
         /*
-         * Take every update from `serial` on, and every one after.
-         * Resolves once the updates that already existed have been
-         * handed over, which is what apps wait on before drawing.
+         * Updates from `serial` on. Resolves once existing ones are handed over.
          */
         setUpdateListener: function (callback, serial) {
             listener = callback;
             lastSerial = typeof serial === "number" ? serial : 0;
             return new Promise(function (resolve) {
                 caughtUp = resolve;
-                /* A request already waiting asked from the old serial,
-                 * and may wait a while yet: this one is asked now. */
+                /* Waiting request has old serial: abort, ask now. */
                 if (current !== null) {
                     var waiting = current;
                     current = null;
@@ -202,22 +164,9 @@
         },
 
         /*
-         * Hand a file, a piece of text, or both out of the app.
-         *
-         * The specification calls this `sendToChat` and warns the app
-         * that it may not come back. What the reader is asked is not
-         * which chat, though: an app draws a *download* over this, and
-         * what they mean by it is the file on their phone. So the host
-         * writes the file out and the page keeps it. The promise settles
-         * once the host has it, which is the last moment anything here
-         * still knows what happened.
-         *
-         * A file arrives in one of three shapes and leaves as the
-         * request body itself: base64 and text are turned into a Blob
-         * here, and a Blob is sent as it is. Nothing is encoded on the
-         * way out: reading the file into a base64 string and wrapping it
-         * in JSON would hold the whole of it at both ends, and a file
-         * worth exporting is exactly the size that cannot afford that.
+         * Hand file and/or text out. Spec says `sendToChat`, but app draws a download: host
+         * writes file, page keeps it. Settles once host has it (last known outcome). Body is
+         * the file as Blob; base64-in-JSON would hold it whole at both ends.
          */
         sendToChat: function (message) {
             return new Promise(function (resolve, reject) {
@@ -258,11 +207,7 @@
         }
     };
 
-    /* Hand one over to the host, which writes it out and tells the page.
-     *
-     * The name and the words go in the query, so the body is the file and
-     * only the file: the host copies it onto the disk as it arrives and
-     * never holds it. */
+    /* To host, which streams body (file only) to disk and tells page; name, text in query. */
     function handOver(name, body, words, resolve, reject) {
         var path = "/to-chat?name=" + encodeURIComponent(name)
                    + "&text=" + encodeURIComponent(words);
@@ -272,8 +217,7 @@
                 "application/octet-stream");
     }
 
-    /* base64 as the bytes it stands for. `atob` gives one character per
-     * byte, and a Uint8Array of those is what a Blob takes. */
+    /* base64 -> bytes via `atob` (char per byte) into Uint8Array for Blob. */
     function fromBase64(encoded) {
         var binary = window.atob(encoded);
         var bytes = new Uint8Array(binary.length);
@@ -283,7 +227,5 @@
         return new Blob([bytes]);
     }
 
-    /* Nothing else is offered: importFiles and joinRealtimeChannel are
-     * absent rather than present and failing, so an app that
-     * feature-tests for them takes its own other path. */
+    /* No importFiles/joinRealtimeChannel: absent, so feature tests fall back. */
 }());

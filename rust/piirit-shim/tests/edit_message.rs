@@ -1,11 +1,7 @@
-//! Changing the text of a message already sent.
+//! Editing a sent message.
 //!
-//! The core's `send_edit_request` takes the message and the new text,
-//! and the row is re-read so it shows the change -- and says it was
-//! changed -- by the time the page hears `edited` and clears its field.
-//! A refusal reaches the page the way a refused send does, and leaves
-//! the row as it was. The model also says whether the chat takes
-//! messages at all, which is what decides whether Edit is offered.
+//! Core `send_edit_request` takes message and new text. Row re-read, marked edited, before page
+//! hears `edited`. Refusal leaves row as was. Model's flag decides if Edit is offered.
 
 // Qt harness: see message_actions.rs.
 #![allow(
@@ -69,8 +65,7 @@ fn an_edit_reaches_the_core_and_the_row_shows_the_change() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -164,8 +159,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         "the row did not start as the message the fake seeds. {context}"
     );
     assert_eq!(value("edit"), "ok", "the edit was not asked for. {context}");
-    // send_edit_request params: account, message, new text -- trimmed,
-    // since the field's whitespace is not part of the message.
+    // Params: account, message, trimmed text (field whitespace isn't message).
     assert_eq!(
         params_of("send_edit_request"),
         vec![

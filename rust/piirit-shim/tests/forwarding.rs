@@ -1,8 +1,6 @@
 //! Forwarding a message into another chat.
 //!
-//! Two things have to be true: the copy is asked of the core with the
-//! destination, and the picker offering that destination only lists chats
-//! the core would accept one into.
+//! Copy asked of core with destination. Picker lists only chats core accepts forwards into.
 
 // Qt harness: see chat_list.rs.
 #![allow(
@@ -38,7 +36,7 @@ fn a_forward_names_its_destination_and_the_picker_asks_for_valid_ones() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -110,8 +108,7 @@ fn a_forward_names_its_destination_and_the_picker_asks_for_valid_ones() {
          land back where it started: {params:?}"
     );
 
-    // DC_GCL_FOR_FORWARDING, so the picker cannot offer a chat the core
-    // would then refuse the forward into.
+    // `DC_GCL_FOR_FORWARDING`: picker can't offer a chat core would refuse.
     let asked_for_forwarding = calls
         .iter()
         .filter(|(method, _)| method == "get_chatlist_entries")

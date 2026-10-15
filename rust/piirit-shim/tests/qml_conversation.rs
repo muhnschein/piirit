@@ -1,14 +1,9 @@
-//! The message delegate, loaded on its own. `ConversationPage` cannot be
-//! loaded headlessly -- Silica's `EnterKey` attached property has no stub --
-//! so the part worth testing lives in a component that can be.
-//!
-//! Reads happen a tick after the write that caused them: a positioner sizes
-//! itself in a polish pass, which only runs while the event loop does.
+//! Message delegate, loaded alone: `ConversationPage` can't load headlessly (no `EnterKey` stub).
+//! Reads happen a tick after write: positioner sizes in polish pass, run only while event loop
+//! does.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -64,10 +59,10 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_message_shows_its_sender_time_quote_and_attachment() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
-        // Fixes what `Qt.formatTime` renders.
+        // Fixes `Qt.formatTime` rendering.
         std::env::set_var("TZ", "UTC");
     }
 
@@ -108,7 +103,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         };
     }
 
-    // An incoming message in a group, at 1970-01-02 03:04 UTC.
+    // Incoming group message, 1970-01-02 03:04 UTC.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -135,9 +130,9 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         );
         record!("short-height", call!("height"));
 
-        // A one-to-one chat says nothing about the sender: there is one.
+        // One-to-one: no sender shown (only one).
         set!("showSender", false);
-        // Wrapping text has to make the row taller, or messages overlap.
+        // Wrapped text grows row, else messages overlap.
         set!(
             "messageText",
             QString::from(
@@ -145,7 +140,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
                  of the delegate, which is the case a fixed row height gets wrong"
             )
         );
-        // Outgoing: the delivery mark rides along with the time.
+        // Outgoing: delivery mark with time.
         set!("isOutgoing", true);
         set!("deliveryState", 26);
     });
@@ -168,7 +163,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         record!("file-shown", get!("attachmentLabel", "visible"));
         record!("file-name", get!("attachmentLabel", "text"));
 
-        // An image is shown rather than named.
+        // Image shown, not named.
         set!("viewType", QString::from("Image"));
     });
 
@@ -176,15 +171,15 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         record!("image-shown", get!("attachmentImage", "visible"));
         record!("image-not-named", get!("attachmentLabel", "visible"));
 
-        // A core notice is not a message: no bubble.
+        // Core notice: no bubble.
         set!("isInfo", true);
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("info-shown", get!("infoLabel", "visible"));
         record!("info-has-no-bubble", get!("bubble", "visible"));
-        // Back to an ordinary message, and mark it forwarded. Its own
-        // tick: `set` persists, and the info flag hides the whole bubble.
+        // Ordinary message again, marked forwarded. Own tick: `set` persists, and info flag hides
+        // whole bubble.
         set!("isInfo", false);
         set!("isForwarded", true);
     });
@@ -192,7 +187,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("forwarded-shown", get!("forwardedLabel", "visible"));
         record!("forwarded-text", get!("forwardedLabel", "text"));
-        // It has to sit above the quote, not overlap it.
+        // Sits above quote, not overlapping.
         record!("forwarded-y", get!("forwardedLabel", "y"));
         record!("quote-y", get!("quoteRow", "y"));
         set!("isForwarded", false);
@@ -200,9 +195,8 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
 
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("plain-not-forwarded", get!("forwardedLabel", "visible"));
-        // Markdown, as the setting wants it: the shim's rendering drawn
-        // as StyledText, or the message as written. Anything but 0 is
-        // as written -- the 2 an older build stored included.
+        // Markdown setting: 0 = shim's rendering as StyledText; anything else (incl. 2 an older
+        // build stored) = as written.
         set!("messageText", QString::from("**bold** words"));
         set!("styledText", QString::from("<b>bold</b> words"));
         set!("markdownMode", 0);
@@ -214,21 +208,20 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("markdownMode", 2);
         record!("stale-text", get!("messageLabel", "text"));
         record!("stale-format", get!("messageLabel", "textFormat"));
-        // A message whose text the sender changed afterwards says so in
-        // its footer, and the bubble widens to hold the word.
+        // Edited message: footer says so; bubble widens.
         record!("footer-plain", get!("footerLabel", "text"));
         set!("isEdited", true);
         record!("footer-edited", get!("footerLabel", "text"));
         record!("footer-width", get!("footerLabel", "width"));
         record!("footer-wanted", get!("footerLabel", "implicitWidth"));
         set!("isEdited", false);
-        // Drawn, but with nothing rendered to draw: never the raw text as
-        // StyledText, which is the case the plain-text pinning exists for.
+        // Rendering on, nothing rendered: never raw text as StyledText (case plain-text pinning
+        // exists for).
         set!("markdownMode", 0);
         set!("styledText", QString::from(""));
         record!("unrendered-text", get!("messageLabel", "text"));
         record!("unrendered-format", get!("messageLabel", "textFormat"));
-        // A message the download limit held back offers the rest.
+        // Download-limited message offers rest.
         record!("download-hidden", get!("downloadButton", "visible"));
         set!("downloadState", QString::from("Available"));
         record!("download-shown", get!("downloadButton", "visible"));
@@ -245,8 +238,8 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
     assert_markdown_and_download(&steps);
 }
 
-/// The body follows the Markdown setting, is `StyledText` only when the
-/// shim rendered it, and a held-back message offers its rest.
+/// Body follows Markdown setting, is `StyledText` only when shim rendered; held-back message
+/// offers its rest.
 fn assert_markdown_and_download(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -256,7 +249,7 @@ fn assert_markdown_and_download(steps: &[(&str, String)]) {
             .map(|(_, value)| value.clone())
             .unwrap_or_default()
     };
-    // Text.PlainText is 0 and Text.StyledText is 4.
+    // `Text.PlainText` 0, `Text.StyledText` 4.
     assert_eq!(
         (value("drawn-text").as_str(), value("drawn-format").as_str()),
         ("<b>bold</b> words", "4"),
@@ -322,7 +315,7 @@ fn assert_markdown_and_download(steps: &[(&str, String)]) {
     );
 }
 
-/// Everything the conversation view has to get right about one message.
+/// Everything view gets right per message.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
@@ -419,7 +412,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
     );
 }
 
-/// A forwarded message says so in the sender's own client too.
+/// Forwarded message says so in sender's client too.
 fn assert_forwarded(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

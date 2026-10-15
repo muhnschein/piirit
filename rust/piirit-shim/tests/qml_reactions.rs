@@ -1,14 +1,10 @@
-//! Reactions as the conversation draws them: chips hung off the bubble's
-//! inside bottom corner, ours lit, and the quick-reaction row at the top
-//! of a row's menu.
+//! Reactions as conversation draws them: chips hung off bubble's inside bottom
+//! corner, ours lit; quick-reaction row atop a row's menu.
 //!
-//! The delegate and the list are loaded on their own, as the other QML
-//! tests load them: the page cannot be loaded headlessly.
+//! Delegate and list loaded alone, as other QML tests: page cannot load headlessly.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -154,7 +150,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn reactions_are_chips_on_the_message_and_a_row_in_its_menu() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -316,9 +312,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "true",
         "a message with reactions does not show them. {context}"
     );
-    // Ours is marked, the count shows only past one, both are drawn as
-    // pictures rather than text (a `~` would say text), and the second
-    // chip sits after the first rather than on top of it.
+    // Ours marked; count shows only past one; both drawn as pictures, not text (`~` would
+    // say text); second chip after first, not on top.
     let chips = value("chips");
     let parts: Vec<&str> = chips.split('|').collect();
     assert_eq!(
@@ -348,10 +343,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         bare > 0.0 && reacted > bare,
         "the row does not grow for its reactions (bare {bare}, reacted {reacted}). {context}"
     );
-    // The strip hangs off the bubble: below the footer, which is the
-    // bubble's last line, straddling the bubble's bottom edge, and at the
-    // inside corner -- the right-hand one for a message from someone
-    // else, whose bubble sits on the left.
+    // Strip hangs off bubble: below footer (bubble's last line), straddling bubble's bottom
+    // edge, at inside corner: right one for others' messages (bubble on left).
     let number = |label: &str| value(label).parse::<f64>().unwrap_or(-1.0);
     let (row_y, row_height) = (number("row-y"), number("row-height"));
     let (row_x, row_width) = (number("row-x"), number("row-width"));
@@ -366,8 +359,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the strip does not straddle the bubble's bottom edge below the footer \
          (strip {row_y}+{row_height}, footer {footer_y}, bubble {bubble_height}). {context}"
     );
-    // Inside the bubble, ending at its right-hand padding rather than
-    // starting at its left-hand one.
+    // Inside bubble, ending at right padding, not starting at left.
     let bubble_right = bubble_x + bubble_width;
     let row_right = row_x + row_width;
     assert!(

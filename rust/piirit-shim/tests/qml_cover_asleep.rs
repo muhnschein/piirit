@@ -1,13 +1,8 @@
-//! The cover does no work while nobody is looking at it.
+//! Cover does no work while nobody looks. It's drawn only when app is minimised, home screen shows
+//! and display is on. Rest of the time (most of it, all night) app still receives and cover's chat
+//! lists follow every arrival, so every message used to rebuild a face grid nothing would draw.
 //!
-//! A cover is drawn only when the app is minimised, the home screen is
-//! showing and the display is on. The rest of the time -- which is most of
-//! it, and all of the night -- the app is still receiving and the cover's
-//! chat lists are still following every arrival, so every message used to
-//! rebuild a grid of faces that nothing was going to draw.
-//!
-//! What it must not do is stay wrong: whatever it missed has to be there by
-//! the time it is looked at. Both halves are here.
+//! Must not stay wrong: whatever it missed is there once looked at. Both halves checked.
 
 // Qt harness: see qml_cover.rs.
 #![allow(
@@ -25,9 +20,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Loads the cover at a size and out of sight -- `Cover.Inactive`, which is
-/// what the stub's `status` stands in for -- and reads back both what it has
-/// drawn and what it knows.
+/// Loads cover at a size, out of sight (`Cover.Inactive`, which stub's `status` stands in for);
+/// reads back what it drew and what it knows.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -70,8 +64,7 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
     let temp = std::env::temp_dir().join(format!("piirit-cover-asleep-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -125,8 +118,7 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
         );
     });
 
-    // Everything has arrived by now: the lists have their chats and have
-    // told the cover so. Nothing is looking at it.
+    // Everything arrived; nothing looking.
     let asleep = steps.clone();
     single_shot(Duration::from_secs(4), move || unsafe {
         common::record(&asleep, "lists", call!("lists").into());

@@ -1,22 +1,16 @@
-//! Adding to a group that already exists.
+//! Adding to an existing group.
 //!
-//! The picker greys whoever is already in, narrows the list to what is
-//! typed into its search field, adds whoever was ticked through the group
-//! it was handed, and goes back to that group's page. It says there is
-//! nobody to add only once the core has said so.
+//! Picker greys members already in, narrows list to search, adds ticked people to the group it was
+//! handed, returns to its page. Says nobody to add only once core has said so.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` decls must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -28,7 +22,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
+/// Silica's `pageStack`, recorded not performed.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -56,8 +50,7 @@ impl PageStackProbe {
     }
 }
 
-// The group is the one the page that opens this one owns; here that is
-// the probe's.
+// Group is the opening page's; here, the probe's.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -117,8 +110,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -168,7 +160,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         };
     }
 
-    // Loaded once the group is, so the rows can tell who is in it.
+    // Loaded once group is, so rows know who's in it.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!(
             "load",
@@ -177,21 +169,19 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
                 QString::from(common::page_url("AddMembersPage.qml"))
             )
         );
-        // Nothing has been read yet. An empty model means "no answer"
-        // this early and "no contacts" later, and the two are opposite.
+        // Nothing read yet. Empty model: "no answer" early, "no contacts" later.
         record!("placeholder-fresh", get!("contactsPlaceholder", "enabled"));
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        // Ada is in already; Grace is not.
+        // Ada already in; Grace not.
         record!("in-greyed", get!("memberRow10", "enabled"));
         record!("out-offered", get!("memberRow11", "enabled"));
         record!("nothing-picked", get!("addButton", "enabled"));
-        // Tapping someone already in does nothing.
+        // Tapping someone in does nothing.
         record!("tap-in", call!("click", QString::from("memberRow10")));
         record!("still-nothing", get!("addButton", "enabled"));
-        // Searching narrows the list to Grace, whom the fake core finds by
-        // her address.
+        // Search narrows to Grace, found by address.
         record!(
             "search",
             call!(
@@ -208,7 +198,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         record!("tap-out", call!("click", QString::from("memberRow11")));
         record!("picked", get!("addButton", "enabled"));
         record!("add", call!("click", QString::from("addButton")));
-        // A search no contact answers to, so the list really is empty.
+        // Search no contact answers: list really empty.
         record!(
             "search-nobody",
             call!(
@@ -219,8 +209,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         );
     });
 
-    // The core has answered and there is nobody to show: now the
-    // placeholder is the one thing that should be on the list.
+    // Core answered, nobody to show: placeholder is the only thing on list.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("placeholder-empty", get!("contactsPlaceholder", "enabled"));
         (*engine_ptr).quit();
@@ -235,8 +224,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
     );
 }
 
-/// Only the one who was not in could be picked, and picking them added
-/// them to the group and went back.
+/// Only the one not in could be picked; picking added them and went back.
 fn assert_outcome(steps: &[(&str, String)], navigation: &str, calls: &[(String, Value)]) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("steps: {steps:?}\nnavigation: {navigation}\ncalls: {names:?}");

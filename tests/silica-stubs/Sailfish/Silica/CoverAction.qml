@@ -1,7 +1,6 @@
 import QtQuick 2.0
 
-// Silica's CoverAction: the picture the home screen draws for it, and
-// the signal a tap on it sends.
+// Silica CoverAction: picture home screen draws, and signal tap sends.
 QtObject {
     property url iconSource
     signal triggered()

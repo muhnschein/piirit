@@ -1,15 +1,9 @@
-// What a call is called, wherever one is listed: its row in the chat,
-// and the contact's Calls page. Shared, so the two cannot come to say
-// different things about the same call.
+// Call labels for chat row and Calls page.
 //
-// No `.pragma library`, for the reason Format.js gives: qsTr() translates
-// in the context of the file it is written in, and a shared library has
-// none.
+// No `.pragma library`: qsTr() needs importing file's context.
 
-/// What a call row says first: what kind of call, or what became of it.
-/// Delta Chat's own words, so its translations apply. `state` is the
-/// core's name for where the call stands: Alerting, Active, Completed,
-/// Missed, Declined or Canceled.
+/// Call row first line: kind or outcome, Delta Chat's words (its translations). `state`:
+/// Alerting, Active, Completed, Missed, Declined, Canceled.
 function title(state, hasVideo) {
     if (state === "Missed") {
         return qsTr("Missed call")
@@ -23,9 +17,7 @@ function title(state, hasVideo) {
     return hasVideo ? qsTr("Video call") : qsTr("Audio call")
 }
 
-/// The line under it: how long a call lasted, or that one is still
-/// ringing. Nothing for a call that never connected, whose title already
-/// says so.
+/// Second line: length, or ringing; none if never connected.
 function detail(state, duration, outgoing) {
     if (state === "Completed") {
         if (duration < 60) {
@@ -41,7 +33,7 @@ function detail(state, duration, outgoing) {
     return ""
 }
 
-/// A call that did not happen, drawn in the colour that says so.
+/// Call that didn't happen: warning colour.
 function failed(state) {
     return state === "Missed" || state === "Declined" || state === "Canceled"
 }

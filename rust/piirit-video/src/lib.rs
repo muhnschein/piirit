@@ -1,22 +1,11 @@
-//! Make a video small enough to send.
+//! Shrinks video to send: phone video often exceeds `sys.msgsize_max_recommended` (~22 MB),
+//! refused by some relays; core recodes only pictures. FFmpeg decodes, scales; x264 encodes
+//! at media quality's rate (in-app camera's, `qml/pages/CapturePage.qml`). Built in
+//! (`build.rs`): Harbour app may not link platform codecs deltachat-android uses.
 //!
-//! A video picked from the gallery or shared into Piirit is whatever the
-//! phone recorded, which is commonly well past what the core recommends
-//! (`sys.msgsize_max_recommended`, about 22 MB) and so past what some
-//! relays take. The core recodes pictures and leaves videos alone, so
-//! this recodes them first: decoded by FFmpeg, scaled, encoded again by
-//! x264 at the bit rate the outgoing media quality setting chooses -- the
-//! rates the in-app camera records at (`qml/pages/CapturePage.qml`) --
-//! and aimed under the recommendation. deltachat-android does the same
-//! with the platform's codecs (`VideoRecoder.java`); a Harbour app may
-//! not link the platform's, so these are built in (`build.rs`).
-//!
-//! Three steps, so the shim can say what is about to happen before it
-//! happens: [`probe`] reads a file's header, [`plan`] decides from that
-//! whether recoding is worth it and at what size, and [`recode`] does it.
+//! [`probe`] reads header, [`plan`] decides, [`recode`] does it: shim says what's coming.
 
-// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
-// says the rest.
+// Shipped code: stricter lints than tests; see piirit-shim/src/lib.rs.
 #![cfg_attr(
     not(test),
     deny(
@@ -34,76 +23,75 @@
 use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::path::Path;
 
-/// The outgoing media quality the core calls "balanced": its own
-/// default.
+/// Core's "balanced" (default).
 pub const BALANCED: i32 = 0;
-/// The one it calls "worse quality", for slow or expensive connections.
+/// Core's "worse": slow or costly links.
 pub const WORSE: i32 = 1;
 
-/// The video in a file, as far as this can decode it.
+/// Video in a file, as far as decodable.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VideoCodec {
-    /// No video at all.
+    /// No video.
     None,
-    /// H.264, what most phones record.
+    /// H.264: most phones record this.
     H264,
-    /// HEVC, what newer iPhones and some Android phones record.
+    /// HEVC: newer iPhones, some Android.
     Hevc,
-    /// Something this cannot decode, which is then sent as it is.
+    /// Undecodable; sent as is.
     Other,
 }
 
-/// The sound in a file.
+/// Sound in a file.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AudioCodec {
     /// No sound.
     None,
-    /// AAC, which is encoded again at the quality's rate.
+    /// AAC; re-encoded at quality's rate.
     Aac,
-    /// Anything else, which is copied as it is.
+    /// Other; copied as is.
     Other,
 }
 
-/// What a file holds, from its header.
+/// What a file holds, from header.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Probe {
-    /// How long it plays, in milliseconds; 0 when the file does not say.
+    /// Play length, ms; 0 if unknown.
     pub duration_ms: u64,
-    /// The picture as stored, before the phone's turn is applied.
+    /// Picture as stored, before rotation.
     pub width: u32,
     /// See [`Self::width`].
     pub height: u32,
-    /// The phone's turn, clockwise: 0, 90, 180 or 270.
+    /// Rotation, clockwise: 0, 90, 180 or 270.
     pub rotation: u32,
-    /// What the picture is encoded as.
+    /// Picture encoding.
     pub video_codec: VideoCodec,
-    /// What the picture costs, in bits a second; 0 when unknown.
+    /// Picture bit/s; 0 if unknown.
     pub video_bit_rate: u64,
-    /// What the sound is encoded as.
+    /// Sound encoding.
     pub audio_codec: AudioCodec,
-    /// What the sound costs, in bits a second; 0 when unknown.
+    /// Sound bit/s; 0 if unknown.
     pub audio_bit_rate: u64,
 }
 
 /// What to make of a video.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Target {
-    /// The picture's size as stored; even, as 4:2:0 needs.
+    /// Picture size as stored; even (4:2:0).
     pub width: u32,
     /// See [`Self::width`].
     pub height: u32,
-    /// The picture's bit rate.
+    /// Picture bit/s.
     pub video_bit_rate: u64,
-    /// The sound's bit rate; 0 copies the sound as it is.
+    /// Sound bit/s; 0 copies sound.
     pub audio_bit_rate: u64,
-    /// How long it plays, which with the rates is how large it comes out.
+    /// Play length; with rates, sets output size.
     pub duration_ms: u64,
-    /// What the sound costs when it is copied rather than encoded again.
+    /// Sound bit/s when copied.
     pub copied_audio_bit_rate: u64,
 }
 
 impl Target {
-    /// About how large the new file will be, in bytes.
+    /// Approx. new file size, bytes.
     #[must_use]
     pub fn predicted_bytes(&self) -> u64 {
         let audio = if self.audio_bit_rate > 0 {
@@ -118,8 +106,7 @@ impl Target {
     }
 }
 
-/// One outgoing media quality: what a second of video may cost, how
-/// large a picture that buys, and the least it may be squeezed to.
+/// Outgoing quality: video and audio bit rates, long side, video floor.
 struct Quality {
     video: u64,
     audio: u64,
@@ -127,19 +114,12 @@ struct Quality {
     least_video: u64,
 }
 
-/// What a second of a recoded video may cost at each quality. Worse is
-/// what `CapturePage.qml` records at for it, deltachat-ios's low preset,
-/// at a phone screen's width. Balanced is recoded only to fit under the
-/// recommended size, so it spends twice what the camera records: at
-/// 1.5 Mbit/s, 720p smears wherever the picture moves, and a video that
-/// came near the limit has the room. A long one is squeezed below it to
-/// fit, as `plan` says.
+/// Video bit/s per quality. Worse: `CapturePage.qml`'s (deltachat-ios low preset) at phone
+/// screen width. Balanced recodes only to fit: twice camera's rate (1.5 Mbit/s smears 720p
+/// in motion). Long ones squeezed (`plan`).
 ///
-/// The least is how far a long video is squeezed, and no further: 480p
-/// at 700 kbit/s and 360p at 300 kbit/s still show faces and moving
-/// hands. Below them the picture is mush, so a video that cannot fit at
-/// its least is sent at it, past the recommended size, and the
-/// conversation says it is large, as it says of any file.
+/// Least: floor for long video (480p 700 kbit/s, 360p 300 kbit/s still show faces, hands).
+/// Not fitting at least: sent at it, past recommendation, flagged large.
 const BALANCED_QUALITY: Quality = Quality {
     video: 3_000_000,
     audio: 64_000,
@@ -153,32 +133,19 @@ const WORSE_QUALITY: Quality = Quality {
     least_video: 300_000,
 };
 
-/// How close to the recommended size, in percent of it, a video has to
-/// come before balanced quality makes it smaller. Below it the video is
-/// sent as it was recorded: it fits, and recoding would only cost
-/// picture. Worse quality asks for small files, so it recodes whatever
-/// size the video is.
+/// Balanced recodes only within this percent of recommended size (below, only costs
+/// picture). Worse: any.
 const NEAR_LIMIT_PERCENT: u64 = 80;
 
-/// What the container costs on top of the streams, as a share of the
-/// budget held back: a few percent for the index of a long file.
+/// Container overhead: percent of budget held back (long file's index).
 const CONTAINER_SHARE: u64 = 5;
 
-/// Whether to recode a file and at what size, or `None` to send it as it
-/// is.
+/// Recode or not, at what size. `None` sends as is: undecodable, length unknown, saving
+/// under a fifth (in-app camera already at these rates), or balanced not near limit
+/// (`NEAR_LIMIT_PERCENT`).
 ///
-/// At balanced quality only a video that comes near the recommended size
-/// (`NEAR_LIMIT_PERCENT`) is recoded; at worse quality any video is.
-/// Either way it is sent as it is when it is not a video this can
-/// decode, when it does not say how long it is, or when recoding would
-/// not save at least a fifth of it -- a video the in-app camera recorded
-/// is already at these rates, and recoding one again would only cost
-/// picture.
-///
-/// `limit` is the core's recommended largest attachment, 0 while unknown.
-/// A video that would come out past it is given a lower bit rate to fit,
-/// down to the quality's least, below which the picture is not worth
-/// sending.
+/// `limit`: core's recommended max, 0 if unknown. Output past it gets lower rate, down to
+/// quality's least.
 #[must_use]
 pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> Option<Target> {
     if !matches!(probe.video_codec, VideoCodec::H264 | VideoCodec::Hevc)
@@ -206,7 +173,7 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
 
     let mut video_bit_rate = quality.video;
     if limit > 0 {
-        // `duration_ms` is not 0, by the first check.
+        // `duration_ms` non-zero: first check.
         let budget = limit
             .saturating_mul(8000)
             .checked_div(probe.duration_ms)
@@ -216,7 +183,7 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
         video_bit_rate =
             video_bit_rate.min(budget.saturating_sub(audio_cost).max(quality.least_video));
     }
-    // Fewer pixels for fewer bits, so each one is worth having.
+    // Fewer bits, fewer pixels.
     let long_side = if video_bit_rate >= 1_000_000 {
         1280
     } else if video_bit_rate >= 450_000 {
@@ -235,20 +202,18 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
         duration_ms: probe.duration_ms,
         copied_audio_bit_rate,
     };
-    // At least a fifth smaller, or not worth the picture it costs.
+    // Under a fifth smaller: not worth the picture cost.
     (target.predicted_bytes().saturating_mul(5) < file_bytes.saturating_mul(4)).then_some(target)
 }
 
-/// `width` by `height` scaled to fit `long_side`, never up, each side
-/// even.
+/// `width` x `height` scaled to fit `long_side`; never up; sides even.
 fn fit(width: u32, height: u32, long_side: u32) -> (u32, u32) {
     let long = width.max(height);
     let (width, height) = if long <= long_side {
         (width, height)
     } else {
         let scale = |side: u32| {
-            // Rounded, in integers: the sides are a few thousand at most.
-            // `long` is past `long_side`, so it is not 0.
+            // Integer rounding (sides few thousand max); `long` > `long_side`, so not 0.
             let scaled = u64::from(side)
                 .saturating_mul(u64::from(long_side))
                 .saturating_add(u64::from(long) / 2)
@@ -262,27 +227,26 @@ fn fit(width: u32, height: u32, long_side: u32) -> (u32, u32) {
     (even(width), even(height))
 }
 
-/// How a recoding ended, when it did not fail.
+/// How recoding ended, if not failed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Outcome {
-    /// The new file is written.
+    /// Written.
     Done,
-    /// Stopped because `progress` said so; what was written is partial.
+    /// `progress` said stop; `output` partial.
     Cancelled,
 }
 
-/// Read what a file holds from its header. Cheap: nothing is decoded.
+/// Reads a file's header. Nothing decoded.
 ///
 /// # Errors
 ///
-/// When the file cannot be opened, or is not a container this reads.
+/// When file can't be opened or isn't a container.
 pub fn probe(path: &Path) -> Result<Probe, String> {
     let path = c_path(path)?;
     let mut raw = ffi::Probe::default();
     let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
-    // SAFETY: `path` is a NUL-terminated string that outlives the call,
-    // `raw` is a struct of the layout recode.h declares, and the error
-    // buffer's length is passed beside it.
+    // SAFETY: `path` NUL-terminated, outlives call; `raw` matches recode.h;
+    // error buffer's length passed beside it.
     #[allow(unsafe_code)]
     let result =
         unsafe { ffi::piirit_video_probe(path.as_ptr(), &mut raw, error.as_mut_ptr(), ERROR_LEN) };
@@ -310,17 +274,12 @@ pub fn probe(path: &Path) -> Result<Probe, String> {
     })
 }
 
-/// Recode `input` into `output`, an MP4, as `target` says.
-///
-/// `progress` hears how far along it is, from 0.0 to 1.0, and answers
-/// whether to keep going. It is called on this thread, so this is a call
-/// for a worker thread: a minute of phone video is some seconds of work.
+/// Recodes `input` to `output` (MP4) per `target`; `progress` gets 0.0..=1.0 on this thread,
+/// returns go on. Blocks (seconds per video minute): call from worker.
 ///
 /// # Errors
 ///
-/// When the file cannot be read, decoded or written. What was written
-/// of `output` is then partial, as it is after a cancel, and the caller
-/// removes it.
+/// On read, decode or write failure; partial `output` left for caller to remove.
 pub fn recode<F>(
     input: &Path,
     output: &Path,
@@ -340,10 +299,8 @@ where
     };
     let mut progress = progress;
     let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
-    // SAFETY: both paths are NUL-terminated and outlive the call; `raw`
-    // has recode.h's layout; `context` points at `progress`, which lives
-    // on this frame for the whole call, and is only ever handed back to
-    // `report::<F>`, the one function that knows its type.
+    // SAFETY: paths NUL-terminated, outlive call; `raw` matches recode.h;
+    // `context` is `progress`, alive for the call, only given to `report::<F>`.
     #[allow(unsafe_code)]
     let result = unsafe {
         ffi::piirit_video_recode(
@@ -363,13 +320,12 @@ where
     }
 }
 
-/// Write a test clip: `seconds` of moving H.264 at `width` by `height`
-/// and `bit_rate`, with a tone in AAC when `with_sound`, turned by
-/// `rotation` degrees clockwise. For tests, which have no camera.
+/// Test clip: `seconds` of moving H.264, `width` x `height`, `bit_rate`; AAC tone if
+/// `with_sound`; `rotation` degrees clockwise.
 ///
 /// # Errors
 ///
-/// When the file cannot be written.
+/// When file can't be written.
 #[doc(hidden)]
 pub fn synth(
     path: &Path,
@@ -391,8 +347,7 @@ pub fn synth(
         bit_rate: i64::try_from(bit_rate).unwrap_or(i64::MAX),
         with_sound: i32::from(with_sound),
     };
-    // SAFETY: as for `probe`; `clip` is the layout recode.h declares,
-    // and is only read.
+    // SAFETY: as `probe`; `clip` matches recode.h; read-only.
     #[allow(unsafe_code)]
     let result =
         unsafe { ffi::piirit_video_synth(path.as_ptr(), &clip, error.as_mut_ptr(), ERROR_LEN) };
@@ -403,19 +358,15 @@ pub fn synth(
     }
 }
 
-/// Room for what the C side says went wrong.
+/// Error buffer size for C messages.
 const ERROR_LEN: usize = 256;
 
-/// Called by the C side with the progress, and answering whether to
-/// stop: the closure says whether to keep going, so the answer is its
-/// opposite.
+/// Called by C with progress; reply is opposite of closure's keep-going.
 extern "C" fn report<F: FnMut(f64) -> bool>(context: *mut c_void, permille: i32) -> c_int {
-    // SAFETY: `context` is the `&mut F` that `recode` passed, which is
-    // alive and not otherwise borrowed for the length of that call.
+    // SAFETY: `context` is `recode`'s `&mut F`, alive and unborrowed during the call.
     #[allow(unsafe_code)]
     let progress = unsafe { &mut *context.cast::<F>() };
-    // Unwinding through C is undefined, so a panic stops the recoding
-    // instead.
+    // Unwinding through C is UB: a panic stops recoding instead.
     let keep_going = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         progress(f64::from(permille) / 1000.0)
     }))
@@ -435,8 +386,7 @@ fn c_path(path: &Path) -> Result<CString, String> {
 }
 
 fn message(error: &[c_char]) -> String {
-    // SAFETY: the C side writes a NUL-terminated string into the buffer
-    // or leaves it zeroed, which is the empty string.
+    // SAFETY: C writes NUL-terminated string, or leaves buffer zeroed.
     #[allow(unsafe_code)]
     let text = unsafe { CStr::from_ptr(error.as_ptr()) };
     let text = text.to_string_lossy().into_owned();
@@ -455,7 +405,7 @@ fn unsigned32(value: i32) -> u32 {
     u32::try_from(value).unwrap_or(0)
 }
 
-/// The C side, as `csrc/recode.h` declares it.
+/// C side, as `csrc/recode.h` declares it.
 mod ffi {
     use std::ffi::{c_char, c_int, c_void};
 
@@ -527,8 +477,7 @@ mod ffi {
 mod tests {
     use super::{fit, plan, AudioCodec, Probe, Target, VideoCodec, BALANCED, WORSE};
 
-    /// A minute of 1080p H.264 at 17 Mbit/s with AAC, as a phone records
-    /// it: about 128 MB.
+    /// Minute of 1080p H.264 at 17 Mbit/s plus AAC, as phones record: ~128 MB.
     fn phone_minute() -> (Probe, u64) {
         let probe = Probe {
             duration_ms: 60_000,
@@ -562,7 +511,7 @@ mod tests {
     fn a_minute_is_given_what_fits_under_the_recommendation() {
         let (probe, bytes) = phone_minute();
         let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
-        // 3 Mbit/s would come out past 22 MiB; still enough for 720p.
+        // 3 Mbit/s would land past 22 MiB; lower rate still enough for 720p.
         assert!(
             (2_500_000..3_000_000).contains(&target.video_bit_rate),
             "{target:?}"
@@ -605,7 +554,7 @@ mod tests {
         assert_eq!((target.width, target.height), (854, 480));
         assert!(target.predicted_bytes() > LIMIT);
 
-        // Worse quality squeezes eight minutes ...
+        // Worse squeezes eight minutes ...
         probe.duration_ms = 8 * 60_000;
         let target = plan(&probe, bytes, WORSE, LIMIT).unwrap();
         assert!(
@@ -613,7 +562,7 @@ mod tests {
             "{target:?}"
         );
         assert!(target.predicted_bytes() <= LIMIT, "{target:?}");
-        // ... but not an hour.
+        // ... not an hour.
         probe.duration_ms = 60 * 60_000;
         let target = plan(&probe, bytes * 6, WORSE, LIMIT).unwrap();
         assert_eq!(target.video_bit_rate, 300_000);
@@ -625,15 +574,15 @@ mod tests {
     fn at_balanced_quality_only_a_video_near_the_limit_is_made_smaller() {
         let (mut probe, _) = phone_minute();
         probe.duration_ms = 5_000;
-        // 17 Mbit/s for five seconds: about 10.7 MB, half the limit.
+        // 17 Mbit/s, 5 s: ~10.7 MB, half the limit.
         let bytes = 17_128_000 / 8 * 5;
         assert_eq!(plan(&probe, bytes, BALANCED, LIMIT), None);
-        // Just under four fifths of it is still sent as it is ...
+        // Just under four fifths: as is ...
         assert_eq!(plan(&probe, LIMIT * 4 / 5 - 1, BALANCED, LIMIT), None);
-        // ... and from there on it is made smaller.
+        // ... above: smaller.
         let target = plan(&probe, LIMIT * 4 / 5 + 1, BALANCED, LIMIT).unwrap();
         assert_eq!(target.video_bit_rate, 3_000_000);
-        // At worse quality the half-limit one is made smaller too.
+        // Worse: half-limit one still made smaller.
         assert!(plan(&probe, bytes, WORSE, LIMIT).is_some());
     }
 
@@ -648,8 +597,7 @@ mod tests {
 
     #[test]
     fn a_video_already_at_these_rates_is_left_alone() {
-        // What the in-app camera records: 1.5 Mbit/s and 64 kbit/s, at the
-        // recommended size itself, so only the rates decide.
+        // Camera rates (1.5 Mbit/s, 64 kbit/s) at recommended size: rates decide.
         let probe = Probe {
             duration_ms: 30_000,
             width: 1280,
@@ -662,7 +610,7 @@ mod tests {
         };
         let bytes = 1_564_000 * 30 / 8;
         assert_eq!(plan(&probe, bytes, BALANCED, bytes), None);
-        // ... but at worse quality, a third of that is worth making.
+        // ... worse: a third of that, worth making.
         assert!(plan(&probe, bytes, WORSE, bytes).is_some());
     }
 
@@ -714,10 +662,10 @@ mod tests {
     #[test]
     fn a_picture_is_scaled_to_fit_and_never_up() {
         assert_eq!(fit(1920, 1080, 1280), (1280, 720));
-        // Portrait as stored, which some phones write.
+        // Portrait as stored (some phones write it).
         assert_eq!(fit(1080, 1920, 1280), (720, 1280));
         assert_eq!(fit(640, 480, 1280), (640, 480));
-        // Odd sides are made even, and rounded rather than cut.
+        // Odd sides made even; rounded, not cut.
         assert_eq!(fit(1919, 1081, 1280), (1280, 720));
         assert_eq!(fit(641, 361, 1280), (640, 360));
         assert_eq!(fit(4000, 3, 1280), (1280, 2));

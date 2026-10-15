@@ -1,263 +1,83 @@
 # Harbour
 
-Piirit is packaged for [Jolla's Harbour store](https://harbour.jolla.com).
-Harbour's rules are not advice: a validator failure is a guaranteed
-rejection, and several of them constrain things — the package name, the
-install paths, the linker flags — that are expensive to change once code
-is built around them.
-
-So they are a CI gate. `ci/harbour-check.sh` runs on every pull request
-and is mandatory.
+Target: [Jolla's Harbour store](https://harbour.jolla.com). Validator fail = rejection; name, install paths, linker flags costly to change later. So `ci/harbour-check.sh` = mandatory gate, every PR.
 
 ## The two checks
 
 | | `ci/harbour-check.sh` | `sfdk check -s harbour` |
 |---|---|---|
-| Runs | every pull request (`ci.yml`) | when an RPM is built (`rpm.yml`) |
-| Reads | the source tree | the built package |
-| Needs | rpm, file, binutils, a host build | the Sailfish SDK, minutes of runner time |
+| Runs | every PR (`ci.yml`) | RPM built (`rpm.yml`) |
+| Reads | source tree | built package |
+| Needs | rpm, file, binutils, host build | Sailfish SDK, minutes |
 | Authority | no | **yes** |
 
-The second is Jolla's own `rpmvalidation.sh`, fetched and run against the
-RPM the SDK produces by `ci/harbour-validate-rpm.sh`. It is the one that
-decides. The first exists because the second cannot run on every push, and
-because a rule broken in a pull request is cheaper to fix than one
-discovered at intake.
-
-It runs *after* the artifact upload, and the blockers below do not fail it:
-a package Harbour would reject is still one worth putting on a phone, and a
-workflow that is red for a reason nobody intends to fix this week is a
-workflow people stop reading. Anything not in `ci/harbour/waivers.conf`
-fails it.
-
-They are kept honest against each other: `ci/harbour/` holds the
-validator's own allow-lists, copied verbatim by
-`scripts/update-harbour-rules.sh`, and the `rpm.yml` step warns if those
-copies have fallen behind upstream. `ci/harbour-check.sh` reimplements the
-logic around them, from `rpmvalidation.sh`.
+- `sfdk check` = Jolla's `rpmvalidation.sh` on RPM via `ci/harbour-validate-rpm.sh`; decides. Source check: sfdk can't run every push; PR fix cheaper than intake.
+- `sfdk check` runs after artifact upload; waived blockers don't fail it (rejected package still worth phone-testing; workflow red for known reason stops being read). Anything not in `ci/harbour/waivers.conf` fails.
+- `ci/harbour/` = validator's allow-lists, verbatim via `scripts/update-harbour-rules.sh`; `rpm.yml` warns if behind upstream. `ci/harbour-check.sh` reimplements logic around them from `rpmvalidation.sh`.
 
 ## What the source check covers
 
-Check IDs follow Jolla's own numbering.
+Check IDs = Jolla's.
 
-**Naming** (1.1) — the `harbour-` prefix and lowercase package name;
-Version digits and periods only; Release digits, underscores and periods,
-*including the Release `rpm.yml` stamps onto each build*; only Harbour
-architectures offered.
+- **Naming** (1.1): `harbour-` prefix, lowercase. Version: digits, periods. Release: digits, `_`, periods, incl. `rpm.yml` stamp. Harbour arches only.
+- **Layout** (1.2): `%files` per device arch in 4 permitted locations. `.desktop`, binary present. Nothing under `/home`, no debug dirs, no world/group-writable, setuid, setgid.
+- **.desktop** (1.3): non-empty `Name=`. `Exec=`, `Icon=` = package name. `Type=Application`. `X-Nemo-Application-Type=silica-qt5`. `[X-Sailjail]`, never `[Sailjail]` or empty.
+- **Sailjail** (1.4): 4 allowed keys only. `OrganizationName`, `ApplicationName` vs regex, reserved names. Permissions whitelisted. `ExecDBus` = `Exec`.
+- **Icons** (1.5): 4 sizes, real PNGs, pixel dims = dir names.
+- **QML** (1.6): imports vs allow-list, blocked prefixes. No absolute imports. Relative imports resolve in installed tree. No ELF outside 2 allowed places.
+- **Binary** (1.6.1, 1.7): linked libs allowed. Links `__libc_start_main`. **Exports `main()` dynamic** (below). Symbol *version* (SDK's) visible only in built RPM.
+- **RPM metadata** (1.8): no `Vendor:`, `Provides:`, `Obsoletes:`, `Conflicts:`, `Recommends:`, `Suggests:`, `Supplements:`, `Enhances:`. `Requires:` unversioned, allowed. No scriptlets/triggers. `libsailfishapp-launcher` iff `sailfish-qml` launcher. `qt5-qtdeclarative-import-xmllistmodel` if `QtQuick.XmlListModel` imported.
+- **Runtime** (2.1, 2.5, 2.6): no hardcoded `/home/nemo`, `/home/defaultuser`. Data path spelled as sandbox grant. Nothing written to installed path.
 
-**Layout** (1.2) — every path in `%files`, for each device architecture,
-against the four locations Harbour permits; the .desktop file and the
-binary present; nothing under `/home`; no debug directories; no
-world- or group-writable, setuid or setgid install modes.
-
-**The .desktop file** (1.3) — a non-empty `Name=`; `Exec=` and `Icon=`
-exactly the package name; `Type=Application`;
-`X-Nemo-Application-Type=silica-qt5`; `[X-Sailjail]`, never `[Sailjail]`,
-and never empty.
-
-**Sailjail** (1.4) — only the four allowed keys; `OrganizationName` and
-`ApplicationName` against their regexes and the reserved-name list; every
-permission on the whitelist; `ExecDBus` agreeing with `Exec`.
-
-**Icons** (1.5) — all four sizes present, real PNGs, pixel dimensions
-matching their directory names.
-
-**QML** (1.6) — every import against the allow-list and the blocked-prefix
-patterns; no absolute-path imports; relative imports resolving inside the
-installed tree; no ELF file outside the two places one may live.
-
-**The binary** (1.6.1, 1.7) — every linked library against the allowed
-list; that it links `__libc_start_main`; and that it **exports `main()` as
-a dynamic symbol**. See below. The source check cannot see the *version* of
-that symbol, which is what the SDK decides; only the built RPM shows it.
-
-**RPM metadata** (1.8) — no `Vendor:`; no `Provides:`, `Obsoletes:`,
-`Conflicts:`, `Recommends:`, `Suggests:`, `Supplements:` or `Enhances:`;
-every `Requires:` unversioned and on the allowed list; no scriptlets or
-triggers; `libsailfishapp-launcher` required if and only if the
-`sailfish-qml` launcher is used; `qt5-qtdeclarative-import-xmllistmodel`
-required if `QtQuick.XmlListModel` is imported.
-
-**Runtime policy** (2.1, 2.5, 2.6) — no hardcoded `/home/nemo` or
-`/home/defaultuser`; the data path the app builds spelled the same way as
-the sandbox grant it depends on; nothing written to a path the package
-installs.
-
-`ci/harbour-check-selftest.sh` breaks each of these in a throwaway copy of
-the tree and asserts the check names it. A gate that only ever prints
-"ok" is indistinguishable from one that has stopped looking.
+`ci/harbour-check-selftest.sh` breaks each rule in throwaway copy, asserts check names it: "ok"-only gate looks like one that stopped looking.
 
 ## The SDK version is a Harbour rule
 
-Harbour requires the binary to link `__libc_start_main@GLIBC_2.34`, and the
-version is the point: 2.34 is where glibc merged libpthread and libdl into
-libc and re-versioned the symbol. A binary built against an older glibc
-references `@GLIBC_2.17` on aarch64 and is rejected outright.
+- Binary must link `__libc_start_main@GLIBC_2.34` (glibc 2.34 merged libpthread, libdl into libc, re-versioned symbol). Older glibc → `@GLIBC_2.17` on aarch64 → rejected. Only 5.x SDK provides it; first real run (4.6.0.13 build) failed on this, rest = known blockers:
 
-Only a 5.x SDK provides it. The first real validator run, against a package
-built with 4.6.0.13, failed on exactly this while every other finding was
-one of the two known blockers:
+        FAIL /usr/bin/harbour-piirit -- Binary does not link to __libc_start_main@GLIBC_2.34.
 
-    FAIL /usr/bin/harbour-piirit -- Binary does not link to __libc_start_main@GLIBC_2.34.
-
-`rpm.yml` therefore defaults to **5.2.0.15**, the Jolla Phone's baseline.
-That is a deliberate floor, not a compromise: a binary from a newer SDK can
-call symbols an older phone lacks, and this project does not support phones
-older than the current one (`PROJECT.md`).
+- `rpm.yml` default **5.2.0.15** (Jolla Phone baseline): deliberate floor (`PROJECT.md`).
 
 ## Exporting `main()`
 
-Harbour rejects a Silica app whose binary does not export `main()`: the
-`silica-qt5` booster in mapplauncherd `dlopen()`s the binary and looks the
-symbol up dynamically. C++ apps mark it `Q_DECL_EXPORT`.
-
-Rust has no equivalent. `fn main` becomes an ordinary global symbol, which
-lives only in `.symtab` — and `.symtab` is stripped on the way into the
-package, so by the time Harbour looks there is nothing there.
-`rust/piirit-app/build.rs` passes `--dynamic-list` at link time to put
-`main` in `.dynsym`, where stripping cannot reach it.
-
-Who does the stripping is worth being exact about, because this tree
-assumed rpmbuild did and it does not: every package built before
-`rust/Cargo.toml` grew a `[profile.release]` shipped a binary the
-validator called out as `file is not stripped!`, carrying 2.08 MB of
-symbol tables a phone never reads. `strip = "symbols"` in that profile is
-what removes them now. It is `--strip-all` under the hood and `.dynsym`
-survives it, so the booster still finds `main` — which is the whole
-reason the export is made there rather than left in `.symtab`.
-
-`--dynamic-list` rather than `--export-dynamic-symbol`, which needs
-binutils 2.35 and so may not exist in the SDK, or `--export-dynamic`,
-which would export every symbol in the binary.
+- Silica binary must export `main()`: `silica-qt5` booster (mapplauncherd) `dlopen()`s it, looks up dynamically. C++: `Q_DECL_EXPORT`. Rust: none; `fn main` only in `.symtab`, stripped for package. `rust/piirit-app/build.rs` passes `--dynamic-list` → `main` in `.dynsym`.
+- Stripping = `strip = "symbols"` (`--strip-all`) in `rust/Cargo.toml` `[profile.release]`; rpmbuild doesn't (BUILDING.md, "What a package weighs"). `.dynsym` survives: why export goes there.
+- `--dynamic-list`, not `--export-dynamic-symbol` (binutils 2.35, maybe not in SDK) or `--export-dynamic` (exports all).
 
 ## The media plugin
 
-The package ships one private library: `libpiirit.so`, the H.264
-encoder video calls send through (docs/CALLS.md), at
-`/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside the `piirit.info`
-Gecko reads it by. Under `/usr/share/<name>/lib/`, the one place Harbour
-allows an ELF file other than the binary, and linked only against
-libraries on the allowed list -- libc, libm, libstdc++, libgcc_s -- with
-x264 built into it as it is into the binary. Neither check needs a
-waiver for it.
-
-The validator does warn about it, and the warning is right that it
-cannot tell: "The RPM contains shared libraries, but it can't be
-determined for sure if they are needed by the binary, if so then the
-rpath must be set accordingly." The binary does not link the library,
-so it needs no rpath. Gecko loads it, by its full path, in a plugin
-process of its own, from the directory the app names in `MOZ_GMP_PATH`
-before Gecko starts (`prepare_media_plugins` in
-`rust/piirit-shim/src/call_host.rs`). Setting an environment variable
-in its own process is nothing Harbour rules on, and the plugin process
-is Gecko's own `plugin-container`, run inside the app's sandbox.
+- `libpiirit.so` = H.264 encoder for video calls, at `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside `piirit.info` Gecko finds it by. `/usr/share/<name>/lib/` = only ELF place besides binary; links only libc, libm, libstdc++, libgcc_s; x264 built in. No waiver.
+- Validator warns "...then the rpath must be set accordingly": binary doesn't link it, no rpath. Gecko loads full path in own `plugin-container` (in app sandbox), dir from `MOZ_GMP_PATH` set before Gecko starts (`prepare_media_plugins`, `rust/piirit-shim/src/call_host.rs`). Env vars: Harbour silent.
 
 ## Waivers
 
-`ci/harbour/waivers.conf` records rules this package knowingly breaks, one
-line each with a reason. Nothing belongs there that can be fixed: every
-entry is a submission blocker.
-
-A line is `<check id> <subject glob> <message glob>`. The source check
-matches its findings on the id and the subject; the RPM check matches the
-real validator's subject *and* message, so a waiver excuses one known
-error about a path and never every error the validator might raise about
-it -- a setuid bit or a dynamic link on the bundled server would still
-fail.
-
-A waiver that stops matching anything fails the check, so the file cannot
-outlive what it excuses. Its entries cover the two blockers below.
+- `ci/harbour/waivers.conf`: knowingly broken rules, one line + reason each. Every entry = submission blocker, so nothing fixable there.
+- Line: `<check id> <subject glob> <message glob>`. Source check matches id + subject; RPM check subject *and* message: one known error on one path, not all (setuid or dynamic link on bundled server still fails).
+- Waiver matching nothing fails check: can't outlive what it excuses.
 
 ## QtWidgets, and the vendored qmetaobject
 
-`qmetaobject-rs` builds its QML engine on `QApplication`, which comes from
-QtWidgets — a library Harbour does not allow, since a Silica app is
-expected to use QtGui's `QGuiApplication`. Upstream carries that
-unconditionally, on the released crate and on master, with no feature to
-turn it off.
-
-Nothing here needs QtWidgets. The application object is used only for
-`exec()` and `quit()`, both of which `QGuiApplication` provides. So
-`third_party/qmetaobject` is upstream 0.2.10 plus
-`third_party/qmetaobject.patch`: three lines, swapping the include, the
-member type and the constructor.
-
-`qttypes` separately passes `-lQt5Widgets` unconditionally, which would
-record the dependency even with nothing using it. Rather than fork a
-second crate for one line, `rust/piirit-app/build.rs` links with
-`--as-needed`, which drops any library no symbol refers to. That only
-works *because* the patch removed the last reference — with `QApplication`
-still in use the library is genuinely needed and `--as-needed` keeps it.
-
-Carrying someone else's crate in-tree is only safe while the difference is
-visible, so `ci/vendor-check.sh` fetches the crates.io tarball, applies the
-patch, and requires the result to match the vendored tree exactly. A stray
-edit fails it; so does a patch that stops describing the tree.
-
-The crate's own `tests/` are not vendored, and the check drops them from
-both sides. Cargo never builds a dependency's tests, so they are 1,200
-lines that cannot run, and CodeQL would scan them anyway and report
-high-severity findings in code this repository does not compile.
-
-The same scanner reports the same kind of finding on our own code. **Every
-`#[derive(QObject)]` a pull request adds draws a high-severity "Access of
-invalid pointer" alert**, on the `#[derive]` line itself: the macro
-generates the dispatcher and destructor Qt calls through raw pointers, and
-CodeQL attributes expanded code to the macro. The alert follows the derive
-rather than the file, and the derives already throughout `src/` do not
-report only because CodeQL comments on lines a pull request changed.
-
-Nothing in the code answers it. Test scaffolding that stands in for a
-`pageStack` has to be a QObject, because a page loaded on its own reads
-`pageStack` from the QML context and nothing else can be put there.
-Rewriting a test to avoid the derive means putting it somewhere it does
-not belong, which costs more than the alert does. Dismiss it in the
-Security tab, or -- for a lasting answer -- move the repository from
-CodeQL's default setup to an advanced one whose configuration can exclude
-`rust/piirit-shim/tests/`.
-
-The real fix is upstream: a feature flag choosing between `QApplication`
-and `QGuiApplication` would serve every Sailfish app built on qmetaobject,
-all of which hit this. Until then the fork is three lines and rebases
-cleanly.
+- `qmetaobject-rs` builds QML engine on `QApplication` (QtWidgets, Harbour-banned; Silica uses `QGuiApplication`); no upstream off switch. App needs only `exec()`, `quit()`: `QGuiApplication` has both.
+- `third_party/qmetaobject` = upstream 0.2.10 + `third_party/qmetaobject.patch` (3 lines: include, member type, constructor). Upstream fix: feature flag picking app class, would serve every Sailfish qmetaobject app; until then fork rebases clean.
+- `qttypes` always passes `-lQt5Widgets`; no second fork: `rust/piirit-app/build.rs` links `--as-needed` (drops unreferenced libs), works only since patch removed last reference.
+- `ci/vendor-check.sh`: crates.io tarball + patch must equal vendored tree exactly. Crate `tests/` not vendored, dropped both sides: 1,200 lines cargo never builds; CodeQL would flag high-severity in uncompiled code.
+- **Each `#[derive(QObject)]` a PR adds = high-severity CodeQL "Access of invalid pointer"** on derive line: macro's dispatcher, destructor call Qt via raw pointers, attributed to macro. Existing `src/` derives silent (CodeQL comments changed lines only). No code fix: test `pageStack` stand-in must be QObject (lone page reads `pageStack` from QML context); moving test costs more than alert. Dismiss in Security tab, or CodeQL advanced setup excluding `rust/piirit-shim/tests/`.
 
 ## The open blockers
 
-**Piirit cannot be submitted to Harbour today.** One rule is broken,
-and it is structural: it cannot be fixed by editing anything in this
-repository.
+**Piirit cannot be submitted to Harbour today.** One structural rule broken; unfixable in this repo.
 
 ### The bundled core
 
-`deltachat-rpc-server` is an ELF executable, bundled at
-`/usr/libexec/harbour-piirit/`, spawned as a subprocess and spoken to
-over JSON-RPC on stdio. Harbour allows ELF files in exactly two places:
-`/usr/bin/<NAME>`, and `*.so` under `/usr/share/<NAME>/lib/`. Neither fits
-a second executable, so this is three validator errors — the path, the
-binary in it, and its executable bit.
+- `deltachat-rpc-server` = ELF at `/usr/libexec/harbour-piirit/`, subprocess, JSON-RPC over stdio. Harbour allows ELF only at `/usr/bin/<NAME>`, `*.so` under `/usr/share/<NAME>/lib/`: 3 errors (path, binary, executable bit).
 
-There are three ways to hold the core, and each is blocked differently:
-
-| | Current API? | Buildable here? |
+| Core option | Current API? | Buildable here? |
 |---|---|---|
-| `libdeltachat.so` (C interface) | **no — being deprecated** | yes: a C ABI spans the compiler gap |
-| `deltachat-jsonrpc` crate, in-process | yes | **no**: needs Rust 1.89, the SDK ships 1.75, and Rust will not mix compiler versions |
-| `deltachat-rpc-server` subprocess *(today)* | **yes — what upstream recommends** | yes |
+| `libdeltachat.so` (C interface) | **no, being deprecated** | yes: C ABI spans compiler gap |
+| `deltachat-jsonrpc` crate, in-process | yes | **no**: needs Rust 1.89, SDK 1.75; Rust won't mix compilers |
+| `deltachat-rpc-server` subprocess *(today)* | **yes, upstream recommends** | yes |
 
-Upstream is explicit that `libdeltachat` "is going to be deprecated and
-only exists because Android, iOS and Ubuntu Touch are still using it", and
-that new projects should use the JSON-RPC API. Migrating onto it to satisfy
-a packaging rule would mean adopting a dying interface. The Rust-native
-replacement cannot be compiled by the Rust the SDK ships, and Rust refuses
-to link output from two compiler versions.
-
-So the remaining move is not technical. Harbour's one-executable rule
-predates upstreams shipping self-contained helper binaries as the
-recommended integration, and Delta Chat's is reproducibly built,
-checksum-pinned (`scripts/fetch-rpc-server.sh`) and confined by the same
-sandbox as the app. That is a case to put to Jolla, on the forum their
-validator's README points at, rather than to engineer around.
-
-Renaming the binary to `.so` would pass the validator. It is also
-precisely what that README calls circumvention, and it says such apps are
-removed from the store even after approval. Not an option.
+- Upstream: `libdeltachat` "is going to be deprecated and only exists because Android, iOS and Ubuntu Touch are still using it"; new projects: JSON-RPC.
+- Remaining move not technical: rule predates upstreams shipping self-contained helpers; ours reproducible, checksum-pinned (`scripts/fetch-rpc-server.sh`), in app's sandbox. Case for Jolla, on forum validator README links; don't engineer around.
+- `.so` rename passes validator, but README calls it circumvention; such apps removed even after approval. Not an option.

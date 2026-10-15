@@ -1,12 +1,8 @@
-//! The per-chat message model: what it asks the core for, and when.
+//! Per-chat message model: what it asks core for, and when.
 //!
-//! Two instances are driven at once, which is the case the old single shared
-//! model got wrong -- opening a second conversation reset the first.
+//! Two instances at once: old shared model reset the first on second open.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -23,9 +19,7 @@ use serde_json::{json, Value};
 
 mod common;
 
-/// Two models over different chats, plus a way to read their row counts and
-/// to send. Written in the Qt 5.6 dialect with the shim's `snake_case`
-/// names.
+/// Two models on different chats; read row counts, send. Qt 5.6 dialect, `snake_case` names.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -74,22 +68,14 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // This test is about the ordering where a send's own reply is
-        // dealt with before the event the same send produced: the row is
-        // already in the model by the time the event arrives, so the
-        // refresh it triggers has nothing left to fetch. Which of the two
-        // wins is otherwise a race between queued callbacks on the Qt
-        // thread, and it went the other way on a loaded CI runner --
-        // where the model correctly fetched a message it did not have
-        // yet, and the assertions below, which only describe this
-        // ordering, failed. The other ordering has tests of its own:
-        // chat_send_race.rs and chat_sync_race.rs.
+        // Event delayed so send's reply lands first: row already held, refresh fetches nothing.
+        // Undelayed, order raced and flipped on loaded CI. Other order's tests: chat_send_race.rs,
+        // chat_sync_race.rs.
         std::env::set_var("PIIRIT_FAKE_EVENT_DELAY_MS", "1500");
     }
 
@@ -108,8 +94,7 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let mut counts_after_load = String::new();
     let counts_ptr: *mut String = std::ptr::addr_of_mut!(counts_after_load);
 
-    // The models load as soon as the QML sets their ids, which needs the
-    // core to be up: load the probe a tick after start.
+    // Models load once QML sets ids: load probe a tick after core is up.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
@@ -132,8 +117,7 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
 
     engine.exec();
 
-    // If the send never happened the rest says nothing, and would say it
-    // as a confusing count mismatch rather than as what went wrong.
+    // Send never happened: rest would show as count mismatch, not cause.
     assert_eq!(
         ever_sent, "yes",
         "the models never both finished loading, so nothing was sent"
@@ -142,14 +126,13 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let calls = common::calls(&journal);
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
 
-    // The two chats are seeded with two messages and one. Separate models,
-    // separate contents.
+    // Two chats seeded with two and one messages; separate models, separate contents.
     assert_eq!(
         counts_after_load, "2/1",
         "the two models do not hold their own chats. Calls were: {names:?}"
     );
 
-    // One call for the whole chat, not one per message.
+    // One call for whole chat, not per message.
     assert!(
         !names.contains(&"get_message"),
         "messages were fetched one at a time: {names:?}"
@@ -164,23 +147,20 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
                 .map_or(0, Vec::len)
         })
         .collect();
-    // One load per model. The two race, so which lands first is not fixed --
-    // assert on the set, not the order.
+    // One load per model; they race, so assert on set not order.
     assert_eq!(batches.len(), 2, "expected one batch per model: {names:?}");
     assert!(
         batches.contains(&2),
         "the two-message chat did not come back in one call: {batches:?}"
     );
 
-    // Sending appends to the sending model only, and the IncomingMsg the
-    // core answers with must not duplicate the row.
+    // Send appends to sending model only; reply must not duplicate row.
     assert_eq!(
         counts_after_send, "3/1",
         "a sent message did not land exactly once in its own chat"
     );
 
-    // Opening a chat marks its unread messages read, which is what sends
-    // the read receipt. Only the unread ones, and only once.
+    // Opening chat marks unread read (read receipt). Only unread, once.
     let seen: Vec<Value> = calls
         .iter()
         .filter(|(name, _)| name == "markseen_msgs")
@@ -192,9 +172,7 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
         "the unread message was not marked seen exactly once: {names:?}"
     );
 
-    // The event path fetched only what it did not have -- which, after a
-    // send, is nothing: the row is already in the model. So the event costs
-    // one id-list call and no message fetch at all.
+    // Event fetched only what it lacked: nothing after a send. One id-list call.
     let after_send: Vec<&str> = names
         .iter()
         .skip_while(|name| **name != "misc_send_msg")

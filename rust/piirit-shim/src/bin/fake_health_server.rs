@@ -1,13 +1,11 @@
-//! JSON-RPC double answering `get_system_info` only, for the smoke test.
-//! Separate from the transport crate's because `CARGO_BIN_EXE_*` only
-//! covers binaries in the same package.
+//! JSON-RPC double answering `get_system_info` only, for smoke test.
+//! Separate from transport crate's: `CARGO_BIN_EXE_*` covers own package only.
 
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 fn main() {
-    // By hand rather than `#[tokio::main]`, which is the `macros` feature
-    // and a proc-macro crate the app's own build does not need.
+    // Not `#[tokio::main]`: needs `macros` feature, a proc-macro crate app build doesn't need.
     let runtime = match tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -37,9 +35,7 @@ async fn serve() {
         let Some(id) = request.get("id").cloned() else {
             continue;
         };
-        // The real core's event long poll blocks until there is something
-        // to say. Answering it with anything else looks like the server
-        // died, which is what the client would then report.
+        // Real core's event long poll blocks until event; else server looks dead.
         if request.get("method").and_then(Value::as_str) == Some("get_next_event_batch") {
             continue;
         }

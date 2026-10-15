@@ -1,12 +1,8 @@
-//! Where a camera quick action from the cover lands: the chat list, brought
-//! to the front, opens the camera -- in a still or a video, on the back
-//! camera or the front, as the action says -- and the picture or video it
-//! takes is asked a chat for, in the camera's place. The chat picked opens
-//! in the picker's place with it on the attachment bar, told whether to
-//! send it at once. Backing out of the picker throws the capture away, as
-//! does another camera action over it; a chat that took it keeps it until
-//! it is sent. One reported after the
-//! reader had left the camera is thrown away without asking.
+//! Camera quick action from cover: chat list comes front, opens camera (still or video,
+//! back or front). Taken item is asked of a chat in camera's place; chat opens in picker's
+//! place with it on attachment bar, told whether to send at once. Backing out of picker, or
+//! another camera action over it, throws it away; a chat that took it keeps it until sent.
+//! Reported after camera left: thrown away without asking.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,7 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in; see `qml_chat_list.rs`.
+/// Probe, components dir filled in; see `qml_chat_list.rs`.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -129,8 +125,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-quick-camera-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -178,7 +173,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
             call!("act", QString::from($kind), QString::from($now))
         };
     }
-    // A capture the camera wrote, on disk in the captures directory.
+    // Capture the camera wrote, on disk in captures dir.
     macro_rules! capture {
         () => {{
             let path = call!("newCapture");
@@ -190,7 +185,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
 
     let list = common::page_url("ChatListPage.qml");
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -203,8 +198,8 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         call!("arrive");
         call!("stackLog");
 
-        // Each kind opens the camera as it says, and asks it not to take
-        // itself down: the picker goes in its place.
+        // Each kind opens camera as it says, asking camera not to take itself down: picker goes
+        // in its place.
         for (label, kind) in [
             ("photo-stack", "photo"),
             ("video-stack", "video"),
@@ -215,7 +210,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
             record!(label, call!("stackLog"));
         }
 
-        // A photo taken: which chat, in the camera's place.
+        // Photo taken: which chat, in camera's place.
         let kept = capture!();
         record!("kept-path", kept.clone());
         act!("photo", "false");
@@ -223,15 +218,14 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         call!("leave");
         record!("take", call!("take", QString::from(kept.as_str())));
         record!("picker-stack", call!("stackLog"));
-        // A chat picked: it opens in the picker's place with the photo,
-        // to wait for the send button.
+        // Chat picked: opens in picker's place with photo, waiting for send.
         record!("choose", call!("choose", 5, QString::from("Lake house")));
         record!("chat-stack", call!("stackLog"));
-        // Back from that chat to the list, the photo is still the chat's.
+        // Back to list from that chat: photo still the chat's.
         call!("arrive");
         record!("kept-after-return", exists(&kept));
 
-        // Set to send at once, the chat is told so.
+        // Set to send at once: chat told.
         let now = capture!();
         act!("selfie", "true");
         call!("stackLog");
@@ -242,7 +236,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         record!("now-stack", call!("stackLog"));
         call!("arrive");
 
-        // Backed out of the picker: nothing will send it, so it goes.
+        // Backed out of picker: nothing sends it, so it goes.
         let dropped = capture!();
         act!("video", "false");
         call!("leave");
@@ -252,9 +246,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         record!("dropped-after-return", exists(&dropped));
         record!("dropped-stack", call!("stackLog"));
 
-        // The camera left before its video was finished -- the reader
-        // backed out while it was being written -- and the file reported
-        // after: nobody is asked about it, and it goes.
+        // Camera left mid-video: file reported late; nobody asked, it goes.
         let late = capture!();
         act!("video", "false");
         call!("arrive");
@@ -263,8 +255,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         record!("late-stack", call!("stackLog"));
         record!("late-kept", exists(&late));
 
-        // Tapped again while the picker still asks about the last one:
-        // that one is not going anywhere now.
+        // Tapped again while picker asks about last one: that one goes nowhere now.
         let earlier = capture!();
         act!("photo", "false");
         call!("leave");

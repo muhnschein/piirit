@@ -2,28 +2,18 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Blocking somebody, or letting them back in, asked about once. Both
- * ways round in one dialog because the question is the same shape and
- * the two are each other's undo.
- *
- * The words are the reference clients' own -- deltachat-android's
- * `menu_block_contact`, `menu_unblock_contact`, `ask_block_contact` and
- * `ask_unblock_contact` -- down to what the blocking one says about
- * groups, which is the part a reader would otherwise have to find out by
- * being surprised. Who it is about is the name on its own line above the
- * question: a name is nobody's to translate.
- *
- * A page of its own rather than a countdown on the row: the row is what
- * the reader tapped, and on the blocked list it goes away the moment the
- * block does. The page that pushed this connects to `accepted` and does
- * the blocking.
+ * Block or unblock confirm, one dialog both ways (each other's undo). Words
+ * from deltachat-android (`menu_block_contact`, `menu_unblock_contact`,
+ * `ask_block_contact`, `ask_unblock_contact`), incl. groups note; name on own
+ * line (untranslated). Own page: row vanishes once blocked. Pusher handles
+ * `accepted`.
  */
 Dialog {
     id: dialog
 
-    /// Who the question is about, as the list shows them.
+    /// Subject: contact as list shows.
     property string contactName
-    /// Which way it goes: blocking, or unblocking.
+    /// Direction: block or unblock.
     property bool blocking: true
 
     readonly property string action: dialog.blocking ? qsTr("Block contact")
@@ -46,8 +36,7 @@ Dialog {
             wrapMode: Text.Wrap
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.highlightColor
-            // The name is the contact's own, or whatever they were
-            // called here.
+            // Contact's own name, or given one.
             textFormat: Text.PlainText
             text: dialog.contactName
         }

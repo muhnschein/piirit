@@ -1,23 +1,19 @@
 #!/bin/sh
-# Fetch the page a call runs in: upstream's calls-webapp, one built .html
-# attached to each of its GitHub releases, and the same page every other
-# Delta Chat client has run. See vendor/calls-webapp/SOURCE.md.
+# Fetches the page a call runs in: upstream calls-webapp's built .html from its
+# GitHub releases (the page every Delta Chat client runs). See
+# vendor/calls-webapp/SOURCE.md.
 #
-# Unlike the core binaries, the page is committed: it is 44 KB of text,
-# the shim compiles it into the app (src/call_host.rs), and a build that
-# needed the network to find it would be a build that fails offline for
-# a file nobody changed. What this script is for is changing it -- and
-# proving the committed copy is still exactly upstream's.
+# Page is committed, unlike core binaries: 44 KB, compiled into app
+# (src/call_host.rs); builds must not need network. This script changes it and
+# proves the copy matches upstream.
 #
 #     scripts/fetch-calls-webapp.sh           fetch, verify, install
 #     scripts/fetch-calls-webapp.sh --check   fetch, verify, and require
 #                                             the committed copy to match
 #
-# Pinned: bump VERSION *and* SHA256 together, then update SOURCE.md to
-# match. The release asset is upstream's CI build of the tag, and the
-# build is reproducible -- `pnpm install --frozen-lockfile && pnpm build`
-# at the tag gives the same bytes -- so the checksum below is also what
-# anyone can rebuild from source.
+# Pinned: bump VERSION and SHA256 together, then SOURCE.md. Asset is upstream's
+# CI build of the tag, reproducible (`pnpm install --frozen-lockfile && pnpm
+# build` at the tag gives same bytes), so anyone can rebuild the checksum.
 
 set -eu
 
@@ -34,8 +30,8 @@ if [ "${1:-}" = "--check" ]; then
 fi
 
 if ! command -v curl >/dev/null 2>&1; then
-    # A check that passes without its tool is not a check: a skip
-    # locally, a failure on a runner, where GitHub sets CI.
+    # A check passing without its tool is no check: skip locally, fail on CI
+    # (GitHub sets CI).
     if [ "$check" = 1 ] && [ -z "${CI:-}" ]; then
         echo "fetch-calls-webapp: SKIP curl not found"
         exit 0
@@ -47,8 +43,7 @@ fi
 workdir=$(mktemp -d)
 trap 'rm -rf "$workdir"' EXIT
 
-# -L follows the redirect to GitHub's object store; the two --proto flags
-# keep every hop on HTTPS.
+# -L follows redirect to GitHub's store; both --proto flags keep hops on HTTPS.
 if ! curl -sSfL --proto '=https' --proto-redir '=https' "$url" -o "$workdir/index.html"; then
     echo "fetch-calls-webapp: FAIL could not fetch $url" >&2
     exit 1

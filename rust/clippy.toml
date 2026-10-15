@@ -1,21 +1,16 @@
-# Two failures that only reproduce on device, encoded so they cannot recur.
+# Device-only failures, encoded to stay fixed.
 
 disallowed-methods = [
-    # Building a tokio runtime on the Qt main thread panics on the Sailfish
-    # aarch64 build. Everything goes through `CoreRuntime`, which owns its
-    # own thread. `Builder::build` is not banned: `#[tokio::main]` and
-    # `#[tokio::test]` expand to it, and CoreRuntime itself uses it to
-    # size the pool.
+    # Tokio runtime on Qt main thread panics on Sailfish aarch64: use `CoreRuntime`.
+    # `Builder::build` ok: macros expand to it.
     { path = "tokio::runtime::Runtime::new", reason = "use CoreRuntime (piirit-shim/src/runtime.rs)" },
 
-    # qmetaobject 0.2.10 truncates the sub-second part of a Duration to 0,
-    # so anything under a second fires immediately. Pass whole seconds.
+    # qmetaobject 0.2.10: sub-second Duration becomes 0. Whole seconds only.
     { path = "qmetaobject::single_shot", reason = "pass whole-second Durations only" },
 ]
 
 allow-unwrap-in-tests = true
 allow-expect-in-tests = true
 
-# Names that are words in prose rather than code, which `doc_markdown`
-# would otherwise want in backticks. ".." keeps clippy's own list.
+# Prose words, not code (`..` keeps clippy's list).
 doc-valid-idents = ["FFmpeg", "PulseAudio", "QuickTime", ".."]

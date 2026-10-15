@@ -1,21 +1,10 @@
-//! Load the catalog for the reader's language.
+//! Load catalog for reader's language.
 //!
-//! The one `unsafe` in the tree, and the reason for the C++ toolchain in
-//! this crate's build: `QTranslator` is not bound by qmetaobject, and the
-//! only way to install one is to call it. The exception is kept to this
-//! module, and to a block short enough to be checked by reading.
-//!
-//! Silica's own strings come translated with the system; these are the
-//! app's, from `translations/piirit-<lang>.qm`, which the RPM builds
-//! from the `.ts` catalogs with `lrelease`. Which file is loaded follows
-//! the reader's Language setting, through the locale the system starts
-//! the app under: `piirit-de_DE.qm` if there is one, else
-//! `piirit-de.qm`, and nothing at all for a language the app has no
-//! catalog for -- which leaves every string as it was written.
+//! Crate's only `unsafe` and C++ build step: qmetaobject doesn't bind `QTranslator`. Silica
+//! strings come translated with system; these are app's: `translations/piirit-<lang>.qm` (RPM
+//! runs lrelease on `.ts`). Startup locale: `de_DE`, then `de`; no catalog: strings as written.
 
-// `cpp!` expands to a call across the FFI boundary, which is `unsafe` by
-// construction. Scoped to this file: the workspace denies it everywhere
-// else, and docs/PROJECT.md says why this one is allowed.
+// `cpp!` call crosses FFI, so unsafe. Only this file; see docs/PROJECT.md.
 #![allow(unsafe_code)]
 
 use cpp::cpp;
@@ -28,24 +17,18 @@ cpp! {{
     #include <QtCore/QTranslator>
 }}
 
-/// The file name every catalog starts with.
+/// Catalog file name prefix.
 const CATALOG: &str = "piirit";
 
-/// Install the catalog for `locale` from `dir`, and say whether one was
-/// found. An empty `locale` is the system's, which is the one the reader
-/// chose in Settings; anything else is a name such as `de_DE`, for tests.
-///
-/// Must run after the application object exists -- after the view is
-/// made, in `main` -- and before any QML is loaded: Qt 5.6 has no way to
-/// retranslate a page that is already built.
+/// Install catalog for `locale` from `dir`; true if found. Empty `locale`: system's (reader's
+/// Settings); else e.g. `de_DE`, for tests. Call after app object (after view, in `main`),
+/// before QML: Qt 5.6 can't retranslate built pages.
 pub fn install(dir: &str, locale: &str) -> bool {
     let dir = QString::from(dir);
     let locale = QString::from(locale);
     let name = QString::from(CATALOG);
-    // SAFETY: the three arguments are QStrings owned by this frame, read
-    // by value on the C++ side. The translator is parented to the
-    // application object, which owns it from here on, and nothing keeps a
-    // pointer to it in Rust.
+    // SAFETY: QStrings owned by this frame, read by value. Translator parented to (owned by)
+    // app object; no Rust pointer kept.
     cpp!(unsafe [dir as "QString", locale as "QString", name as "QString"] -> bool as "bool" {
         QCoreApplication *app = QCoreApplication::instance();
         if (!app) {
@@ -53,10 +36,7 @@ pub fn install(dir: &str, locale: &str) -> bool {
         }
         QTranslator *translator = new QTranslator(app);
         QLocale which = locale.isEmpty() ? QLocale() : QLocale(locale);
-        // "-" is what sits between the name and the locale in the file
-        // name; load() tries the locale's languages from the most specific
-        // form down, so piirit-pt_BR.qm wins over piirit-pt.qm where
-        // both exist.
+        // "-" between name and locale. Most specific first: pt_BR beats pt.
         if (!translator->load(which, name, QStringLiteral("-"), dir)) {
             delete translator;
             return false;
@@ -65,10 +45,8 @@ pub fn install(dir: &str, locale: &str) -> bool {
     })
 }
 
-// Qt harness, as the shim's tests are: `unused_unsafe` because
-// `env::set_var` is only unsafe from edition 2024 on, `borrow_as_ptr` for
-// the engine pointer, `disallowed_methods` for `single_shot`'s Duration,
-// and `expect_used` for a test's own setup.
+// Qt harness, as shim tests: `unused_unsafe` (`set_var` unsafe from edition 2024),
+// `borrow_as_ptr` (engine pointer), `disallowed_methods` (`single_shot` Duration), `expect_used`.
 #[cfg(test)]
 #[allow(
     unused_unsafe,
@@ -84,14 +62,12 @@ mod tests {
 
     use super::install;
 
-    /// The catalogs in the source tree.
+    /// Catalogs in source tree.
     fn translations_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../translations")
     }
 
-    /// Compile one catalog into `out`, with the `lrelease` the packaging
-    /// job installs. None if there is no `lrelease` on this machine,
-    /// which is a skip locally and a failure under CI.
+    /// Compile catalog into `out` via `lrelease`. None if absent: local skip, CI failure.
     fn compile(language: &str, out: &std::path::Path) -> Option<()> {
         let lrelease = ["lrelease", "lrelease-qt5"].into_iter().find(|tool| {
             std::process::Command::new(tool)
@@ -120,8 +96,7 @@ mod tests {
         Some(())
     }
 
-    // One test: the application object can be made once per process, and
-    // Qt 5's translators apply to what is loaded after them.
+    // One app object per process; translators apply to later loads.
     #[test]
     fn the_readers_language_is_loaded_and_its_plurals_counted() {
         let out = std::env::temp_dir().join(format!("piirit-translations-{}", std::process::id()));
@@ -130,11 +105,11 @@ mod tests {
             return;
         }
 
-        // SAFETY: single-threaded test binary; set before Qt starts.
+        // SAFETY: single-threaded; set before Qt starts.
         unsafe {
             std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         }
-        // The application object, which the translator needs to exist.
+        // App object: translator needs it.
         let mut engine = QmlEngine::new();
         let dir = out.to_string_lossy().into_owned();
 
@@ -148,11 +123,8 @@ mod tests {
             "the German catalog did not load from {dir}"
         );
 
-        // Asked with the context each string is under in its page, as a
-        // qsTr() in that file would be.
-        // And the core's own words, from the table the window hands it:
-        // `qsTr()` in a script file translates under the file's name,
-        // which has to be the context lupdate filed them under.
+        // Context as qsTr() in that page; core words via window's table. Script context = file
+        // name, must match lupdate.
         let stock = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/js/StockStrings.js");
         engine.load_data(QByteArray::from(
             r"

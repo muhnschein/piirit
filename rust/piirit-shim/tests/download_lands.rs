@@ -1,11 +1,7 @@
-//! A message the download limit held back fills in where it stands.
+//! Held-back message fills in where it stands.
 //!
-//! The rest of such a message is asked for with `download_full_message`,
-//! and the core announces the download landing as `MsgsChanged` with the
-//! message's id -- and nothing else changed: the id list is the same,
-//! so a sync that only reconciles ids found nothing to do, and the row
-//! said "Downloading…" until the chat was opened again. The row has to
-//! be re-read on that event, in the chat the reader is looking at.
+//! Core announces landing as `MsgsChanged` with id only; id list unchanged, so row stuck on
+//! "Downloading…". Re-read row on that event.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -23,7 +19,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The seeded message the fake core holds back.
+/// Seeded message fake core holds back.
 const HELD_BACK: u32 = 2;
 
 const PROBE_QML: &str = r"
@@ -65,8 +61,7 @@ fn a_finished_download_reaches_the_row_without_reopening_the_chat() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);

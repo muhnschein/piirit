@@ -1,16 +1,10 @@
-//! Switching profile must leave exactly one chat list on the page stack.
+//! Switching profile leaves exactly one chat list on page stack.
 //!
-//! `replace` swaps out only the profiles page, so the chat list for the
-//! account just left stays underneath it -- one swipe back into the
-//! account the reader thought they had left. `replaceAbove(null, ...)`
-//! replaces the whole stack, which is what the onboarding pages already do
-//! when they hand over to the chat list.
+//! `replace` swaps only profiles page, so the old account's chat list stays underneath:
+//! one swipe back into it. `replaceAbove(null, ...)` replaces whole stack.
 //!
-//! The rest of the page's navigation is here too, since the stack is
-//! already being modelled: the one plus under the list, which asks which
-//! of the three ways in the reader wants, and the three things a row's
-//! menu offers about the profile itself -- its invite code, offering it
-//! to a second device, and its backup.
+//! Also here: plus under list (three ways in), and three row-menu items
+//! (invite, second device, backup).
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -30,12 +24,11 @@ use qmetaobject::*;
 
 mod common;
 
-/// Records navigation instead of performing it, and models the resulting
-/// stack -- the depth is the whole point here.
+/// Records navigation, not performed; models stack. Depth is the point.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
-    /// The page names on the stack, innermost first.
+    /// Page names on stack, innermost first.
     stack: qt_property!(QString; NOTIFY stack_changed),
     stack_changed: qt_signal!(),
 
@@ -49,14 +42,12 @@ struct StackProbe {
 }
 
 impl StackProbe {
-    /// The page's file name, and for a page that is two flows in one
-    /// file, which of them was asked for. The take-over page is opened
-    /// from two rows here and the name alone cannot tell them apart, so
-    /// a row that opened the wrong half would go unnoticed.
+    /// File name; for two-flows-in-one-file pages, which flow. Take-over page opens from two
+    /// rows: name alone cannot tell them apart.
     fn name_of(page: &QString, properties: &QVariantMap) -> String {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
-        // `QVariantMap` in qttypes 0.2 can be queried but not iterated.
+        // `QVariantMap` in qttypes 0.2: queried, not iterated.
         let half = properties.value(QString::from("from"), QVariant::default());
         match QString::from_qvariant(half).map(|text| text.to_string()) {
             Some(half) if !half.is_empty() => format!("{name}:{half}"),
@@ -181,7 +172,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-accounts-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -230,9 +221,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        // The *second* account is current, so the first row -- the one
-        // findIn reaches -- is one to switch to rather than the one
-        // already open.
+        // *Second* account is current: first row (the one findIn reaches) is one to switch to.
         (*steps_ptr).push((
             "load",
             call!(
@@ -245,13 +234,10 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
 
     single_shot(Duration::from_secs(7), move || unsafe {
         (*steps_ptr).push(("seeded", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // Another profile is made from the plus under the list, on top
-        // of this page.
+        // Another profile made from plus under list, on top of this page.
         (*steps_ptr).push(("add", call!("addProfile")));
         (*steps_ptr).push(("added", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // The three things a row's menu offers besides the profile's
-        // own page: they are about this profile and nothing else, so
-        // they are where the profile is picked.
+        // Three row-menu items: about this profile only, so profile is picked here.
         (*steps_ptr).push((
             "invite",
             call!("clickOnFirstRow", QString::from("inviteItem")),
@@ -275,8 +261,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
 
     single_shot(Duration::from_secs(9), move || unsafe {
         (*steps_ptr).push(("after", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // Reload the profiles page and delete from it. Two profiles
-        // remain, so this is not the last-one case.
+        // Reload profiles page, delete from it. Two remain: not last-one case.
         call!(
             "load",
             QString::from(common::page_url("ProfilesPage.qml")),
@@ -360,8 +345,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
          {context}",
         value("backing-up")
     );
-    // Also the guard that the list really had rows: with no accounts there
-    // is no row to tap and nothing here would be under test.
+    // Guards that list had rows: no rows, no tap, nothing tested.
     assert_eq!(
         value("tap"),
         "ok",

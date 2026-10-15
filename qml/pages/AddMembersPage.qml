@@ -4,30 +4,20 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick who to add to a group: everyone already in is greyed, and so is
- * anyone the core would refuse. A search field at the top narrows the
- * list, for the reader with more contacts than fit on a screen.
- *
- * The group is the page that opened this one's, handed in rather than
- * loaded again, and the adding is done on it -- so what it shows is
- * updated by the same reload that answers every other change to it.
- * For a group that does not exist yet, NewGroupPage hands in a stand-in
- * that answers the same two questions.
+ * Pick members; already-in or core-refused greyed. Adds on opener's group
+ * (its own reload shows change); NewGroupPage passes a stand-in.
  */
 Page {
     id: page
 
     property int accountId
-    /// The group being added to: a ChatInfo, or NewGroupPage's stand-in
-    /// for one. Asked `is_member(contactId)` and told `add_members(ids)`.
+    /// Group: ChatInfo or NewGroupPage stand-in (`is_member`, `add_members`).
     property var chat
     property string errorMessage: ""
-    // Contact ids the user has ticked.
+    // Ticked contact ids.
     property var members: []
 
-    // The core has said who is in this profile, whatever that was. An
-    // empty list before then is no answer rather than no contacts: see
-    // NewChatPage.
+    // Empty before core answers: unknown, not none. See NewChatPage.
     property bool contactsLoaded: false
 
     ContactList {
@@ -35,13 +25,11 @@ Page {
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
+        // Emitted after rows set.
         onRows_changed: page.contactsLoaded = true
     }
 
-    // A keystroke's worth of quiet before the core is asked, so typing
-    // a name is one search rather than one per letter.
+    // Debounce: one search per pause.
     Timer {
         id: searchDebounce
         objectName: "searchDebounce"
@@ -74,8 +62,7 @@ Page {
         return false
     }
 
-    // Straight back to the group: the core answers on the group's own
-    // signals, and the page that owns it is the one showing them.
+    // Core answers on group's signals; owner shows them.
     function addPicked() {
         page.chat.add_members(page.members)
         pageStack.pop()
@@ -83,7 +70,7 @@ Page {
 
     Connections {
         target: core
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 contacts.reload()
@@ -91,8 +78,7 @@ Page {
         }
     }
 
-    // One flickable for the whole page, owning the pulley; see
-    // NewGroupPage.
+    // Page-wide flickable owns pulley; see NewGroupPage.
     SilicaFlickable {
         id: pulleyHost
         anchors.fill: parent
@@ -120,8 +106,7 @@ Page {
                 title: qsTr("Add members")
             }
 
-            // Outside the list, for the reason NewChatPage documents: a
-            // field in a view's header moves with the rows under it.
+            // Outside list: header moves with rows (see NewChatPage).
             SearchField {
                 id: searchField
                 objectName: "searchField"
@@ -151,9 +136,7 @@ Page {
             delegate: ListItem {
                 objectName: "memberRow" + model.contact_id
                 contentHeight: body.height
-                // Greyed where there is nothing to do: already in, or an
-                // address contact the core will not take into an
-                // encrypted group.
+                // Already in, or address contact refused in encrypted group.
                 readonly property bool addable:
                     model.is_key_contact && !page.chat.is_member(model.contact_id)
                 enabled: addable
@@ -186,7 +169,7 @@ Page {
 
             ViewPlaceholder {
                 objectName: "contactsPlaceholder"
-                // Not until the core has answered: see `contactsLoaded`.
+                // Not until core answered: see `contactsLoaded`.
                 enabled: page.contactsLoaded && contacts.count === 0
                 text: searchField.text.trim().length > 0 ? qsTr("Nobody matches")
                                                           : qsTr("No contacts to add")

@@ -2,39 +2,20 @@ import QtQuick 2.0
 import Sailfish.Share 1.0
 
 /*
- * What the platform hands this app when something is shared to it: a
- * picture from the gallery, a link from the browser, a file from the file
- * manager.
- *
- * An app becomes one of the entries in the share sheet by saying so in
- * its own desktop file -- `X-Share-Methods`, and a group per method
- * naming what it is called and which types it takes -- and by having a
- * `ShareProvider` of the same name running in it. Nothing is installed
- * outside the app for this: the older way, a plugin in the transfer
- * engine's own directory, is not open to a Harbour package and this is.
- *
- * Loaded rather than declared, from piirit.qml, for the reason the
- * webxdc pages are pushed by URL: `Sailfish.Share` resolves only on a
- * release that has it, and an import that does not resolve must cost this
- * file rather than the window every page is loaded into.
- *
- * What arrives is taken to the window, which asks which chat it is for.
+ * What platform hands app on share: picture, link, or file. Share-sheet entry:
+ * `X-Share-Methods`, a group per method in desktop file, same-named
+ * `ShareProvider`. Nothing installed outside app (transfer-engine plugin dir
+ * closed to Harbour). Loaded from piirit.qml, not declared: failed
+ * `Sailfish.Share` import costs this file, not window. Shares go to window.
  */
 Item {
     id: root
 
     /*
-     * The words the share sheet shows.
-     *
-     * It reads them from the desktop file, which no catalogue reaches --
-     * a desktop entry carries its own translations, as `Description[de]`
-     * and so on. They are written here as well so `lupdate` collects
-     * them and the desktop file can be filled from the same catalogues
-     * everything else is translated in. harbour-maelstrom, which is
-     * where this app learnt the mechanism, does the same.
-     *
-     * Both must match the `Description=` of the group of the same name
-     * in harbour-piirit.desktop, which tests/qml_syntax.rs checks.
+     * Share sheet words. Sheet reads desktop file (own translations); here so
+     * `lupdate` collects them and desktop file fills from catalogues (as
+     * harbour-maelstrom). Must match `Description=` of same-named group in
+     * harbour-piirit.desktop (tests/qml_syntax.rs).
      */
     //: Shown in the phone's share sheet, for a file shared to this app.
     readonly property string filesDescription: qsTr("Send in a chat")
@@ -42,14 +23,14 @@ Item {
     //: this app.
     readonly property string textDescription: qsTr("Send as a message")
 
-    /// A file: the gallery's picture, the file manager's document.
+    /// File: gallery picture or document.
     ShareProvider {
         objectName: "shareFiles"
         method: "files"
         onTriggered: root.take(resources)
     }
 
-    /// Text, and the links that are text with a title on them.
+    /// Text, and links with a title.
     ShareProvider {
         objectName: "shareText"
         method: "text"
@@ -57,20 +38,9 @@ Item {
         onTriggered: root.take(resources)
     }
 
-    /// Take what was shared to the window, which knows what to do with
-    /// it.
-    ///
-    /// The first file, or the first piece of text: the desktop file says
-    /// neither method takes more than one, and the conversation carries
-    /// one attachment at a time.
-    ///
-    /// Told apart by what each resource carries rather than by
-    /// `ShareResource.FilePathType` and its sibling. Those names cannot
-    /// be stood in for -- QML refuses a property whose name begins with
-    /// a capital, so no stub can offer them -- and a comparison that
-    /// only resolves on a phone is one nothing here could check. A
-    /// resource has a path or it has data, and that is the same
-    /// question.
+    /// Shared item to window, which handles it. First file or text: desktop file
+    /// allows one each. Told apart by contents, not `ShareResource.FilePathType`:
+    /// QML refuses capitalised property names, so stubs can't offer it.
     function take(resources) {
         var filePath = ""
         var text = ""
@@ -87,9 +57,7 @@ Item {
         if (filePath.length === 0 && text.length === 0) {
             return
         }
-        // The window first: a share can arrive while the app is behind
-        // something else, and a chat picker nobody can see is worse than
-        // no picker at all.
+        // Window first: picker hidden behind the app is worse than none.
         appWindow.activate()
         appWindow.shareInto(filePath, text)
     }

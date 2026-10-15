@@ -2,16 +2,13 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Leaving a group, asked about once. There is no way back in without
- * someone else adding you, and a countdown on a pull-down is easy to
- * miss with a thumb already moving -- so this is a page of its own, with
- * the platform's accept and cancel at the top. The group page connects
- * to `accepted` and does the leaving.
+ * Leave-group confirm. Own page: no way back unless re-added, countdown easy
+ * to miss. Group page handles `accepted`.
  */
 Dialog {
     id: dialog
 
-    /// The group about to be left, for the question.
+    /// Group to leave.
     property string groupName
 
     Column {
@@ -30,7 +27,7 @@ Dialog {
             width: parent.width - 2 * Theme.horizontalPageMargin
             wrapMode: Text.Wrap
             color: Theme.highlightColor
-            // The group's name is whatever its members chose.
+            // Name: whatever members chose.
             textFormat: Text.PlainText
             //: %1 is the group's name.
             text: qsTr("Leave %1? Only a member can add you back.").arg(dialog.groupName)

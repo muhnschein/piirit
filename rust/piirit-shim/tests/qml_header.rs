@@ -1,14 +1,10 @@
-//! The conversation header is laid out as Silica's `PageHeader` lays out
-//! its own.
+//! Conversation header laid out as Silica `PageHeader` lays out its own. Title on page indicator's
+//! line, right-aligned, text width, at most page less margins; page's own colour once header leads
+//! somewhere.
 //!
-//! The title on the line the page indicator sits on, right-aligned, as
-//! wide as its text and no wider than the page less its margins, and in
-//! the page's own colour once the header leads somewhere.
-//!
-//! And the second line under it, where `PageHeader` puts its description:
-//! what a group's header says about itself. The header keeps its height
-//! whatever is in it, so the line is drawn only while both fit inside
-//! that height -- otherwise it would reach over the first message.
+//! Second line under it (where `PageHeader` puts description): what a group's header says about
+//! itself. Header keeps its height, so line drawn only while both fit -- else it would reach over
+//! first message.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -88,7 +84,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn the_header_is_laid_out_as_a_page_header() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -128,7 +124,7 @@ fn the_header_is_laid_out_as_a_page_header() {
             call!("load", QString::from(header.clone()), QString::from(long))
         );
         record!("long", call!("layout"));
-        // A short title is not widened to the room it has.
+        // Short title not widened.
         record!(
             "load-short",
             call!("load", QString::from(header.clone()), QString::from("Ada"))
@@ -136,10 +132,10 @@ fn the_header_is_laid_out_as_a_page_header() {
         record!("short", call!("layout"));
         call!("setInteractive", true);
         record!("leads", call!("layout"));
-        // The line a group's header carries under its name.
+        // Group second line.
         record!("subtitle", call!("setSubtitle", QString::from("7 members")));
         record!("second-line", call!("secondLine"));
-        // And the same header with no room for it.
+        // No room.
         record!("shrink", call!("setHeight", 20));
         record!("no-room", call!("secondLine"));
         (*engine_ptr).quit();
@@ -150,8 +146,7 @@ fn the_header_is_laid_out_as_a_page_header() {
     assert_layout(&steps);
 }
 
-/// `PageHeader`'s height and colours, the page less its margins for a
-/// long title, and a short one at its own width.
+/// `PageHeader` height and colours; long title capped at page less margins, short one at own width.
 fn assert_layout(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -178,10 +173,8 @@ fn assert_layout(steps: &[(&str, String)]) {
     for label in ["load", "load-short"] {
         assert_eq!(value(label), "ok", "the header did not load. {context}");
     }
-    // The stub theme: itemSizeLarge 120, horizontalPageMargin 24, and a
-    // header that is highlight-coloured until it leads somewhere. A long
-    // title reaches well past the middle, ends at the right margin, and
-    // never crosses the left one.
+    // Stub theme: itemSizeLarge 120, horizontalPageMargin 24, header highlight-coloured until it
+    // leads somewhere. Long title reaches past middle, ends at right margin, never crosses left.
     let (height, width, x, colour) = layout("long");
     assert!(
         close(height, 120.0)
@@ -192,7 +185,7 @@ fn assert_layout(steps: &[(&str, String)]) {
         "a long title is not laid out as PageHeader lays one out: \
          {height} {width} {x} {colour}. {context}"
     );
-    // A short title is as wide as its text and no wider, right-aligned.
+    // Short title: text width.
     let (_, width, x, _) = layout("short");
     assert!(
         width < 200.0 && close(x + width, 1080.0 - 24.0),
@@ -206,10 +199,8 @@ fn assert_layout(steps: &[(&str, String)]) {
     assert_second_line(&value("second-line"), &value("no-room"), context.as_str());
 }
 
-/// The second line: right-aligned at its own width under the title, with
-/// no gap, the pair centred where the title alone sat, and in the
-/// quieter of the two colours the title is drawn from. Gone entirely
-/// from a header with no room for both.
+/// Second line: right-aligned at own width under title, no gap, pair centred where title alone
+/// sat, in title's quieter colour. Gone entirely when no room for both.
 fn assert_second_line(shown: &str, cramped: &str, context: &str) {
     let parts: Vec<&str> = shown.split(',').collect();
     assert_eq!(parts.len(), 7, "unexpected second line. {context}");

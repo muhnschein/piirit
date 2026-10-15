@@ -4,56 +4,40 @@ import "../components"
 import Piirit 1.0
 
 /*
- * QR codes, both ways: this profile's invite drawn as a code, for a phone
- * held up to this one, and the scanner for someone else's -- a switch at
- * the top picks which, the way an inline view switcher does on the
- * desktop. Reached from the chat list's pull-down, from the profile
- * page's "Show invite code", and from the cover's quick actions, which
- * open it on either side.
+ * QR codes both ways: profile's invite, scanner for others'. Top switch picks side. From
+ * chat list, profile, cover actions.
  *
- * The code is how anyone gets in touch with a profile: an address alone
- * cannot be encrypted to (docs/PROJECT.md), and a chatmail address is
- * nothing anybody types. The link the code carries is there to copy into
- * anything else. Someone else's code is read by the scanner, which is
- * also where a link can be typed or pasted, so nothing is pasted here.
+ * Code is how anyone reaches a profile (address alone can't be encrypted to;
+ * docs/PROJECT.md). Scanner also takes typed/pasted links.
  *
- * The code is an Image of a file the shim writes rather than a Canvas:
- * a Canvas is drawn into the window's GL context, which the platform
- * takes away from an app in the background, and it came back blank; an
- * Image is reloaded from its file. The scanner is loaded by URL when its
- * side is picked: ScanView.qml is the only file that names a Camera, so
- * a device without one costs that side rather than this page.
+ * Code is Image of shim-written file, not Canvas: Canvas draws into window's GL context,
+ * which platform takes from background apps (came back blank); Image reloads from file.
+ * Scanner loaded by URL: ScanView.qml only Camera user, so no camera costs that side only.
  *
- * Whatever the scanner reads is followed as an invite, and the chat it
- * leads to replaces this page, above the one that opened it. A relay's
- * code (`dcaccount:`, `dclogin:`) is a relay to add to this profile, and
- * the page that adds one replaces this page instead, asking first.
+ * Scanned invite followed: chat replaces page (above opener). Relay codes (dcaccount:,
+ * dclogin:): add-relay page replaces it, asks first.
  */
 Page {
     id: page
 
-    // A move the core asked for, held until this page is the one on
-    // screen: a call's page may be over it, and a move made then would
-    // take that page instead (PendingNavigation.qml).
+    // Core move held until on screen: call page may cover, move would take it
+    // (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
         ready: page.status === PageStatus.Active
     }
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would drop a code halfway through being shown or read. See
-    /// piirit.qml.
+    /// No quick actions: jump drops code mid-read. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
     property int accountId
     property string errorMessage: ""
     property string myInvite: ""
     property bool joining: false
-    /// Which side is showing: 0 this profile's code, 1 the scanner.
+    /// Side showing: 0 this profile's code, 1 scanner.
     property int mode: 0
-    /// The app is the one in front. Not read-only: a test, which has no
-    /// app in front, says it is.
+    /// App in front. Writable: tests (no app in front) set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     ContactList {
@@ -65,9 +49,7 @@ Page {
             page.errorMessage = message
         }
         onInvite_ready: page.myInvite = link
-        // A relay's code rather than an invite: one more relay for this
-        // profile, asked about on the page that adds one, rather than a
-        // profile of its own. In place of this page, as a chat would be.
+        // Relay code, not invite: one more relay; replaces page.
         onRelay_offered: {
             page.joining = false
             navigation.replaceAbove(pageStack.previousPage(page),
@@ -92,7 +74,7 @@ Page {
 
     Connections {
         target: core
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 contacts.fetch_invite()
@@ -100,23 +82,21 @@ Page {
         }
     }
 
-    /// What the scanner read, followed. The scanner stays up, busy, until
-    /// the chat replaces the page or the error lands.
+    /// Scanned text followed. Scanner busy until chat replaces page or error.
     function follow(text) {
         page.errorMessage = ""
         page.joining = true
         contacts.join_by_invite(text)
     }
 
-    // The invite as a picture, for a phone held up to this one.
+    // Invite picture for phone held to this one.
     QrCode {
         id: qr
         objectName: "qr"
         text: page.myInvite
     }
 
-    // Whose code this is: with more than one profile, the code side says
-    // which of them it is showing.
+    // Whose code: several profiles, code names which.
     Profile {
         id: profile
         objectName: "profile"
@@ -137,10 +117,7 @@ Page {
                 title: qsTr("QR code")
             }
 
-            // The switch, drawn the way Silica's own tab bar draws one:
-            // the two names side by side across the page, the chosen one
-            // in the highlight colour with a bar under it, a hairline
-            // under both.
+            // Drawn like Silica tab bar; chosen highlighted.
             Item {
                 id: switcher
                 objectName: "viewSwitcher"
@@ -200,8 +177,7 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                // Whose: the profile the code belongs to, drawn as the
-                // profiles page draws it.
+                // Profile code belongs to.
                 ContactRow {
                     objectName: "profileRow"
                     width: parent.width
@@ -224,10 +200,8 @@ Page {
                     text: qsTr("Let someone scan this code, or send them the link.")
                 }
 
-                // Drawn on white whatever the ambience: a code is read by
-                // contrast, and an ambience can have little. Not
-                // smoothed: the modules stay square edges rather than
-                // blur into each other.
+                // White whatever ambience: codes read by contrast. Unsmoothed: modules keep square
+                // edges.
                 Image {
                     objectName: "inviteQr"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -261,8 +235,7 @@ Page {
                 }
             }
 
-            // Someone else's, through the camera. The rest of the page,
-            // down to the bottom.
+            // Camera scanner; rest of page down.
             Item {
                 id: scanArea
                 objectName: "scanArea"
@@ -277,8 +250,7 @@ Page {
                     id: scanLoader
                     objectName: "scanLoader"
                     anchors.fill: parent
-                    // Loaded only while its side is showing: the camera
-                    // goes with it when the reader switches back.
+                    // Loaded only while side shows: camera goes on switch back.
                     active: page.mode === 1
                     source: Qt.resolvedUrl("../components/ScanView.qml")
                     onLoaded: {
@@ -289,11 +261,8 @@ Page {
                     }
                 }
 
-                // The camera runs while this page and this side are on
-                // screen, and stops while an invite is being followed.
-                // Not while the app is in the background or the screen
-                // is off either: Silica keeps the page active then, with
-                // nobody to hold a code up to it.
+                // Camera runs while page and side shown; stops while invite followed, in
+                // background, screen off (Silica keeps page active then).
                 Binding {
                     target: scanLoader.item
                     property: "active"

@@ -1,10 +1,6 @@
-//! A message edited or deleted in a chat is restated, once the list has
-//! read the chat's row back: what a notification standing for it should
-//! say now, and how much is still unread there.
+//! Edited or deleted message restated once list reads chat's row: notification text, unread count.
 //!
-//! An edit reaches the app as `MsgsChanged` on the message, a deletion as
-//! `MsgDeleted`; neither is an arrival, so neither is announced. Other
-//! list traffic restates nothing.
+//! Edit = `MsgsChanged`, delete = `MsgDeleted`; neither is arrival, so neither announced.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -54,8 +50,7 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
     let temp = std::env::temp_dir().join(format!("piirit-list-restates-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -94,7 +89,7 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
 
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("loaded", call!("loaded")));
-        // List traffic that is neither: nothing to restate.
+        // Other list traffic: nothing to restate.
         (*steps_ptr).push((
             "other",
             call!("feed", "ChatlistItemChanged", r#"{"chatId":2}"#),
@@ -147,8 +142,7 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
         announced, "",
         "an edit or a deletion was announced as an arrival. {context}"
     );
-    // The fake's row summary is "last in <chat>" and its rows have
-    // nothing unread; the order is the set's, so compared as a set.
+    // Fake row summary is "last in <chat>", no unread; order is set's, compared as set.
     let mut restated: Vec<&str> = restated
         .split('|')
         .filter(|part| !part.is_empty())

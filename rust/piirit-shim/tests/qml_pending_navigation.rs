@@ -1,14 +1,8 @@
-//! A move the core asks for waits for its page to be on screen, however
-//! long that takes.
+//! Core-asked move waits for its page on screen.
 //!
-//! Every move a page makes when the core answers acts on the top of the
-//! stack: a pop takes the top page, a replace takes it, and a replace
-//! above a target takes everything over that target. A call's page is
-//! pushed over whatever is on screen (CallCenter.qml), so a relay added
-//! or a chat made while a call was up took the call's page instead, and
-//! the call with it. The move now waits in `PendingNavigation` until its
-//! page is the one on screen again, and `patience` bounds only the wait
-//! on a busy stack -- a call lasts longer than any patience would.
+//! Moves act on stack top. Call page pushed over screen (`CallCenter.qml`): a relay add or
+//! chat made mid-call took the call page. Move waits in `PendingNavigation`; `patience`
+//! bounds only the busy-stack wait, not call length.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -63,7 +57,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_move_waits_for_its_page_to_be_on_screen() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -93,23 +87,22 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY: callbacks run only inside `exec()` on this thread; all they point at outlives it.
     single_shot(Duration::from_millis(0), move || unsafe {
         record!("load", call!("load", QString::from(navigation.clone())));
-        // The relay is added while a call's page is over the owner.
+        // Relay added while call page over owner.
         record!("asked", call!("pop"));
         record!("pending", call!("pending"));
     });
 
-    // Well past `patience`: the call is still up, and nothing has moved.
+    // Past `patience`: call still up, nothing moved.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("waited", call!("log"));
-        // The call is over, and its page gone: the owner is on screen.
+        // Call over, page gone: owner on screen.
         record!("on-screen", call!("ready", true));
         record!("pending-after", call!("pending"));
 
-        // The same for a replace of the owner.
+        // Same for replace of owner.
         call!("ready", false);
         record!("replace-asked", call!("replace"));
     });
@@ -117,8 +110,7 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("replace-on-screen", call!("ready", true));
 
-        // On screen, with the stack still animating: that wait is the
-        // one patience bounds.
+        // Stack still animating: the wait `patience` bounds.
         call!("busy", true);
         record!("busy-asked", call!("replaceAbove"));
     });

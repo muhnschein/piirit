@@ -1,12 +1,8 @@
 import QtQuick 2.0
 
-// One shared thing: a file by path, or a piece of text.
-//
-// Never created by an app -- the platform hands the resources over -- and
-// the app tells the two kinds apart by which of these carries anything,
-// since the real type's enum names cannot be stood in for here (QML
-// refuses a property whose name begins with a capital). A test hands the
-// provider plain objects of this shape.
+// One shared thing: file by path, or text. Never app-made: platform hands them
+// over. App tells kinds apart by which field is set. Test hands provider plain
+// objects.
 QtObject {
     property int type: 0
     property string filePath: ""

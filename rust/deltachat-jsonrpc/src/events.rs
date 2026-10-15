@@ -8,29 +8,22 @@ use tokio::task::JoinHandle;
 use crate::client::RpcClient;
 use crate::error::RpcError;
 
-/// One event as delivered by `get_next_event_batch`.
-///
-/// `event` stays a raw [`serde_json::Value`]: hand-typing the core's several
-/// dozen event variants would be the protocol reimplementation
-/// `docs/PROJECT.md` rules out. Callers match on `event["kind"]`.
+/// One event from `get_next_event_batch`. Raw [`serde_json::Value`] (typing dozens of variants
+/// reimplements protocol, against `docs/PROJECT.md`): match on `event["kind"]`.
 #[derive(Debug, Clone, Deserialize)]
 pub struct CoreEvent {
-    /// Which account (the core calls it a "context") the event belongs to.
+    /// Account (core's "context").
     #[serde(rename = "contextId")]
     pub context_id: u32,
-    /// The event object itself, tagged by its `kind` field.
+    /// Event, tagged by `kind`.
     pub event: serde_json::Value,
 }
 
-/// How long to wait after an answer that was not a batch of events before
-/// asking again, and the ceiling that wait doubles towards. The loop never
-/// gives up on anything but the transport closing: ending the stream is
-/// read by the shim as the server having died, and a server that is
-/// answering -- even wrongly -- has not.
+/// Backoff after non-batch answer, doubling to ceiling.
 const ERROR_BACKOFF_MIN: Duration = Duration::from_millis(50);
 const ERROR_BACKOFF_MAX: Duration = Duration::from_secs(5);
 
-/// The wait after `failures` consecutive bad answers.
+/// Wait after `failures` bad answers.
 fn error_backoff(failures: u32) -> Duration {
     ERROR_BACKOFF_MIN
         .saturating_mul(
@@ -41,14 +34,13 @@ fn error_backoff(failures: u32) -> Duration {
         .min(ERROR_BACKOFF_MAX)
 }
 
-/// Handle to the polling task. Cancels on drop, as well as through
-/// [`EventLoopHandle::stop`].
+/// Polling handle. Cancels on drop or [`EventLoopHandle::stop`].
 pub struct EventLoopHandle {
     task: JoinHandle<()>,
 }
 
 impl EventLoopHandle {
-    /// Cancel the polling task.
+    /// Cancel task.
     pub fn stop(self) {
         self.task.abort();
     }
@@ -56,20 +48,13 @@ impl EventLoopHandle {
 
 impl Drop for EventLoopHandle {
     fn drop(&mut self) {
-        // Dropping a `JoinHandle` on its own detaches the task, which would
-        // leave it polling a server nobody is listening to.
+        // Dropping `JoinHandle` alone detaches: task would poll dead listener.
         self.task.abort();
     }
 }
 
-/// Poll `get_next_event_batch` in a loop, pushing each event to the returned
-/// channel until the transport closes or the handle is stopped.
-///
-/// The core has no unsolicited notifications: the call blocks server-side
-/// until an event is available, so this is an ordinary RPC call repeated.
-///
-/// The stream ending means one thing only: the transport closed. Callers
-/// rely on that -- the shim restarts the server when the stream ends.
+/// Poll `get_next_event_batch` (blocks server-side; core has no unsolicited notifications) into
+/// channel till stop or transport close. Only close ends stream: shim restarts server on it.
 pub fn spawn_event_loop(
     client: Arc<RpcClient>,
 ) -> (mpsc::UnboundedReceiver<CoreEvent>, EventLoopHandle) {
@@ -89,14 +74,10 @@ pub fn spawn_event_loop(
                         }
                     }
                 }
-                // The server is gone; nothing to poll.
+                // Server gone.
                 Err(RpcError::TransportClosed) => return,
-                // Anything else is one bad answer, not a dead core: an
-                // event shape we could not read, or a call the core
-                // refused. Giving up after a handful of these would end the
-                // stream, which the shim reads as the server having died --
-                // and it would kill a running server to start another. So:
-                // wait, longer each time, and ask again.
+                // Else bad answer (unreadable event, refused call); core alive. Ending stream would
+                // make shim replace a running server: back off, retry.
                 Err(_) => {
                     failures = failures.saturating_add(1);
                     tokio::time::sleep(error_backoff(failures)).await;

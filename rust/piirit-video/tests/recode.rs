@@ -1,9 +1,7 @@
-//! A phone's video, made smaller: what comes out plays the same way,
-//! for as long, and weighs what the plan said.
+//! Phone video made smaller: same play and length, weighs what plan said.
 //!
-//! The clips are made here (`piirit_video::synth`) the way a phone's
-//! camera leaves one -- H.264 with B-frames, AAC, a turn in the display
-//! matrix -- rather than carried as binary fixtures.
+//! Clips from `piirit_video::synth`, like phone camera output (H.264 with
+//! B-frames, AAC, display-matrix turn), not binary fixtures.
 
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
@@ -11,7 +9,7 @@ use std::path::PathBuf;
 
 use piirit_video::{plan, probe, recode, synth, AudioCodec, Outcome, VideoCodec, BALANCED};
 
-/// A directory of this test's own, gone again afterwards.
+/// Test's own directory, removed after.
 struct Scratch(PathBuf);
 
 impl Scratch {
@@ -57,10 +55,10 @@ fn a_large_video_comes_out_smaller_and_plays_the_same_way() {
     let before = probe(&clip).expect("probe the clip");
     let bytes = std::fs::metadata(&clip).expect("measure the clip").len();
 
-    // At the relay's limit, so balanced quality makes it smaller.
+    // At relay's limit: balanced quality makes it smaller.
     let target = plan(&before, bytes, BALANCED, bytes).expect("worth recoding");
-    // Below the quality's own size and rate, so the scaling is exercised
-    // too and the result is well under the clip.
+    // Under quality's own size and rate: scaling exercised too, result well under
+    // clip.
     let target = piirit_video::Target {
         width: 640,
         height: 360,
@@ -86,14 +84,14 @@ fn a_large_video_comes_out_smaller_and_plays_the_same_way() {
     );
     let smaller = std::fs::metadata(&out).expect("measure the result").len();
     assert!(smaller * 3 < bytes, "{bytes} -> {smaller}");
-    // Within a quarter of what was planned.
+    // Within a quarter of plan.
     let planned = target.predicted_bytes();
     assert!(
         smaller.abs_diff(planned) * 4 < planned,
         "planned {planned}, made {smaller}"
     );
 
-    // Progress only ever moves forward, and ends at the end.
+    // Progress only moves forward, ends at 1.0.
     assert!(seen.windows(2).all(|pair| pair[0] <= pair[1]), "{seen:?}");
     assert_eq!(seen.last().copied(), Some(1.0));
 }

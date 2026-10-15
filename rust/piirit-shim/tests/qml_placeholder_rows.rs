@@ -1,13 +1,9 @@
-//! A row whose message has not been fetched yet builds no message.
+//! Unfetched row builds no message.
 //!
-//! The list is as long as the chat from the start, and a row stands at
-//! one line until its message arrives. That row used to hold a whole
-//! message, hidden -- three dozen items and their bindings for a blank
-//! line -- and a fast flick up through history nobody had fetched yet
-//! built a screenful of them a frame and threw them away again. What is
-//! pinned here is that a placeholder holds nothing, stands at the height
-//! it did, takes a tap without acting on it, and holds its message as
-//! soon as the message is there.
+//! List is chat-long; row stands one line until its message arrives. Once a row held a
+//! hidden whole message, and fast flicks through unfetched history built and discarded a
+//! screenful per frame. Pinned: placeholder holds nothing, keeps height, takes tap silently,
+//! holds its message once message arrives.
 
 // Qt harness: see qml_delete_run.rs.
 #![allow(
@@ -98,7 +94,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_placeholder_row_holds_no_message_until_it_has_one() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -142,7 +138,7 @@ fn a_placeholder_row_holds_no_message_until_it_has_one() {
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("before", call!("rowsNow"));
         record!("tap", call!("tapLast"));
-        // The fourth message arrives.
+        // Fourth message arrives.
         record!("arrive", call!("arrive", 3));
     });
     single_shot(Duration::from_secs(3), move || unsafe {
@@ -171,8 +167,7 @@ fn a_placeholder_row_holds_no_message_until_it_has_one() {
     );
     assert_eq!(after.len(), 6, "the list lost rows. {context}");
 
-    // Theme.itemSizeExtraSmall in the stubs: the line a placeholder
-    // stands at.
+    // `Theme.itemSizeExtraSmall` in stubs: placeholder line height.
     for (index, row) in before.iter().enumerate() {
         let wanted = if index < 3 { ":1" } else { "40:0" };
         assert!(

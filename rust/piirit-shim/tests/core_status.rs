@@ -1,10 +1,6 @@
-//! What the app is told when the core fails: an `Error` event reaches QML as
-//! a typed signal, and a server that dies is replaced rather than mourned.
+//! Core failure reaches app: `Error` event is a typed QML signal; dead server replaced.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -49,16 +45,13 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // After the failing send has been answered, and long enough before
-        // the last read for the restart to have landed. Inherited by the
-        // replacement too, which is why the reads below stop at 8s: the
-        // second server dies around 10.
+        // Server exits after failing send answered, early enough before last read for restart to
+        // land. Replacement inherits it: reads stop at 8s (second server dies ~10).
         std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "4500");
     }
 
@@ -125,9 +118,8 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
         "the server died and nothing replaced it. Statuses seen: {trail:?}"
     );
 
-    // A fresh server has the account files but no IO running. Without the
-    // resume the app comes back able to read its history and unable to
-    // receive anything -- which looks exactly like working.
+    // Fresh server: account files, no IO. Without resume app reads history, receives nothing:
+    // looks like working.
     let resumes = common::methods(&journal)
         .into_iter()
         .filter(|method| method == "start_io")

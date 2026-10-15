@@ -1,18 +1,12 @@
-//! The microphone watch against a real sound server.
+//! Microphone watch against real sound server.
 //!
-//! The app changes a call's audio route only while the watch knows that
-//! no recording stream of its own is open, because moving the browser
-//! engine's takes `PulseAudio` down with it. So what is pinned here is
-//! mostly about "known": that it comes only from a full listing, that it
-//! goes the moment the server does and comes back with it, and that a
-//! stream coming or going while the answer is "closed" withdraws the
-//! answer until it has been listed again. And, of course, that "open"
-//! follows a stream of the watched process and of no other.
+//! Audio route moves only when watch knows no own recording stream is open (moving browser engine's
+//! takes `PulseAudio` down). "Known" comes only from full listing; lost with server; a stream
+//! coming or going while "closed" withdraws answer until relisted. "Open" follows watched process's
+//! streams only.
 //!
-//! The daemon is a private one (`common/pulse.rs`); the streams are
-//! `parec`'s, made to carry this test's process id where a stream of its
-//! own is wanted, which is what a stream Gecko opens in the app's process
-//! carries.
+//! Daemon private (`common/pulse.rs`). Streams are `parec`'s, carrying test pid where wanted, as a
+//! Gecko stream in the app's process carries its pid.
 
 use std::path::Path;
 use std::sync::mpsc::{channel, Receiver, RecvTimeoutError};
@@ -23,9 +17,9 @@ use piirit_shim::{MicState, MicWatcher};
 #[path = "common/pulse.rs"]
 mod pulse;
 
-/// Long enough for anything that is going to happen to have happened.
+/// Long enough for anything pending to happen.
 const WAIT: Duration = Duration::from_secs(5);
-/// A reconnection waits a second or two before it tries.
+/// Reconnect waits a second or two.
 const RECONNECT: Duration = Duration::from_secs(10);
 
 const KNOWN_CLOSED: MicState = MicState {
@@ -41,7 +35,7 @@ const UNKNOWN: MicState = MicState {
     open: false,
 };
 
-/// A watcher, and every state it has reported, in order.
+/// Watcher and every state it reported, in order.
 struct Watch {
     name: &'static str,
     _watcher: MicWatcher,
@@ -65,12 +59,12 @@ impl Watch {
         }
     }
 
-    /// Where the next `wait_since` starts looking.
+    /// Where next `wait_since` starts.
     fn mark(&self) -> usize {
         self.seen.len()
     }
 
-    /// The state now: the last one reported, or unknown before any.
+    /// State now: last reported, or unknown.
     fn now(&mut self) -> MicState {
         while let Ok(state) = self.states.try_recv() {
             self.seen.push(state);
@@ -78,7 +72,7 @@ impl Watch {
         self.seen.last().copied().unwrap_or_default()
     }
 
-    /// Wait until the state is `want`.
+    /// Wait until state is `want`.
     fn wait(&mut self, want: MicState, within: Duration, why: &str) {
         if self.now() == want {
             return;
@@ -87,7 +81,7 @@ impl Watch {
         self.wait_since(mark, want, within, why);
     }
 
-    /// Wait until `want` has been reported since `mark`, and say where.
+    /// Wait until `want` reported since `mark`.
     fn wait_since(&mut self, mark: usize, want: MicState, within: Duration, why: &str) -> usize {
         let deadline = Instant::now() + within;
         loop {
@@ -137,9 +131,8 @@ fn a_recording_of_this_process_is_followed_through_the_server_going_and_coming_b
         "something other than the first listing's answer was reported first"
     );
 
-    // A stream of this process's: open for ours, and for the other a
-    // "closed" withdrawn until the listing after the event has said so
-    // again -- and still closed.
+    // Own process's stream: open for ours. For other: "closed" withdrawn until listing says so
+    // again, and still closed.
     let other_mark = other.mark();
     let recording = daemon.record(Some(me));
     ours.wait(
@@ -177,8 +170,7 @@ fn a_recording_of_this_process_is_followed_through_the_server_going_and_coming_b
          for the rest of the call",
     );
 
-    // A stream that carries its own process's id, not one it was given:
-    // the id is read off the stream, whoever made it.
+    // Stream carries its process's id, not one it was given: id read off stream.
     let ours_mark = ours.mark();
     let theirs = daemon.record(None);
     let mut parec = Watch::start("parec", theirs.pid(), Some(&server));
@@ -198,8 +190,7 @@ fn a_recording_of_this_process_is_followed_through_the_server_going_and_coming_b
     parec.wait(KNOWN_CLOSED, WAIT, "parec's stream going was not seen");
     drop(parec);
 
-    // The server dies. Not known, at once -- not "closed", which is what a
-    // dead server has and the reason the route must not move.
+    // Server dies: unknown, not "closed" (route must not move).
     daemon.kill();
     ours.wait(
         UNKNOWN,
@@ -207,8 +198,7 @@ fn a_recording_of_this_process_is_followed_through_the_server_going_and_coming_b
         "the server going away left an answer standing",
     );
 
-    // Back, as systemd brings it: known again, from a fresh listing, and
-    // subscribed again, so a new stream is seen.
+    // Back as systemd brings it: known again from fresh listing, resubscribed.
     let mark = ours.mark();
     daemon.restart();
     ours.wait_since(
@@ -227,8 +217,7 @@ fn a_recording_of_this_process_is_followed_through_the_server_going_and_coming_b
     drop(recording);
     ours.wait(KNOWN_CLOSED, WAIT, "the stream going was not seen");
 
-    // A stream that was open when the server went is not open in the
-    // server that replaced it, and the answer comes from the new listing.
+    // Stream open when server went isn't open in replacement; answer from new listing.
     let recording = daemon.record(Some(me));
     ours.wait(KNOWN_OPEN, WAIT, "the stream was not seen");
     let mark = ours.mark();
@@ -253,7 +242,7 @@ fn a_server_that_is_not_there_is_not_known() {
     let scratch = pulse::Scratch::new();
     let server = format!("unix:{}", scratch.dir.join("native").display());
     let mut watch = Watch::start("nobody", std::process::id(), Some(&server));
-    // Long enough for two attempts to reconnect, a second apart.
+    // Long enough for two reconnects, a second apart.
     std::thread::sleep(Duration::from_millis(3500));
     assert_eq!(
         watch.now(),
@@ -278,7 +267,7 @@ fn starting_and_stopping_at_any_moment_is_safe() {
     let server = daemon.server();
     let me = std::process::id();
     let recording = daemon.record(Some(me));
-    // Dropped at once, mid-connection, mid-listing, and once answered.
+    // Dropped at once: mid-connection, mid-listing, after answer.
     for round in 0..40_u64 {
         let watch = Watch::start("churn", me, Some(&server));
         std::thread::sleep(Duration::from_micros(round * 250));
@@ -293,7 +282,7 @@ fn starting_and_stopping_at_any_moment_is_safe() {
          stream already open"
     );
     drop(watch);
-    // And while waiting to reconnect, with nothing there to reconnect to.
+    // Waiting to reconnect, nothing to reconnect to.
     daemon.kill();
     let mut watch = Watch::start("waiting", me, Some(&server));
     std::thread::sleep(Duration::from_millis(1200));
@@ -302,17 +291,14 @@ fn starting_and_stopping_at_any_moment_is_safe() {
     drop(recording);
 }
 
-/// Set for the child below, to the directory it looks for a server in.
+/// Env var for child below: dir it looks for server in.
 const CHILD: &str = "PIIRIT_MIC_WATCH_CHILD";
 
 #[test]
 fn no_daemon_is_ever_started_from_here() {
-    // The watch, looking for a server where libpulse's own lookup would,
-    // finds none. libpulse would start one there unless told not to --
-    // except as root, where it never does, so this proves something only
-    // when run as another user, as CI's runner is. It runs in a child,
-    // with an environment pointing that lookup at an empty directory and
-    // autospawn turned on.
+    // Watch looks where libpulse would, finds none. libpulse autospawns unless told not to, but
+    // never as root: proves only as another user (as CI runs). Child: lookup at empty dir,
+    // autospawn on.
     if let Some(dir) = std::env::var_os(CHILD) {
         let mut watch = Watch::start("lookup", std::process::id(), None);
         std::thread::sleep(Duration::from_millis(3500));

@@ -1,16 +1,10 @@
-//! A profile with more than one transport says which relay is its own.
+//! Profile with several transports says which relay is its own.
 //!
-//! The core lets a profile have several transports, keeps the profile's
-//! own address -- the one its invite link and its own contact carry --
-//! in `configured_addr`, and reports on all of them at once. Two places
-//! used to take whichever came first instead of that one: the account
-//! list, which carries no address since core 2.61 and before that gave
-//! the core's deprecated `addr` key, holding the address of a transport
-//! set up long ago; and the connectivity report, whose first quota bar
-//! belongs to the oldest transport rather than to this profile's relay.
-//! Reported from a phone whose profiles page named a relay that was no
-//! longer the profile's own, under a mailbox figure that belonged to a
-//! third one.
+//! Core keeps own address (invite link, contact) in `configured_addr`. Account
+//! list and connectivity report took the first transport instead: list (no
+//! address since 2.61; old `addr` key held an old transport's) and report (first
+//! quota bar is oldest transport's). Result: stale relay named, with a third
+//! relay's mailbox.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -32,8 +26,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
     Item {
-        // Nobody's until the core is up: a profile asked about before
-        // that has nothing to ask.
+        // Nobody's until core is up: a profile asked before that has nothing to ask.
         Profile { id: profile; account_id: 0 }
         function refresh() { core.refresh_accounts(); return 'ok' }
         function watch(id) { profile.account_id = id; return 'ok' }
@@ -49,16 +42,14 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // The profile was on this relay first, and its own address is on
-        // another now: it is the first transport the core lists, and what
-        // the first quota bar in the report belongs to.
+        // Set up on this relay first; own address now on another. This one is first transport
+        // core lists and owns the report's first quota bar.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 

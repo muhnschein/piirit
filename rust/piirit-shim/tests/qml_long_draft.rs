@@ -1,15 +1,6 @@
-//! Writing a message longer than one line.
-//!
-//! The field a message is written in takes more than a line: with the
-//! return key sending, a message written here would be one line however
-//! long it ran, and a paragraph could not be typed at all. It grows with
-//! the draft and stops growing before it has eaten the conversation
-//! above it.
-//!
-//! And where the row sits: off the bottom edge rather than on it, with
-//! the two round buttons level with the field rather than floating
-//! above it, and beside the *last* line of a draft that has grown
-//! rather than its first.
+//! Message field grows past one line (return sends, so no paragraphs otherwise).
+//! Stops growing before eating conversation above. Row off bottom edge; buttons level
+//! with field, beside last line.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -86,8 +77,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// A draft past the point where the core cuts a body: 40 lines, where
-/// its limit is 38.
+/// Draft past core's body cut: 40 lines, limit 38.
 fn a_long_draft() -> String {
     let mut out = String::new();
     for number in 1..=40 {
@@ -104,7 +94,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -155,8 +145,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
 
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("one-line-height", call!("fieldHeight"));
-        // A paragraph: three lines, which the old field could not hold
-        // at all.
+        // Paragraph: three lines; old field held none.
         record!("typed", call!("type", QString::from("one\ntwo\nthree")));
     });
 
@@ -167,8 +156,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
 
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("capped-height", call!("fieldHeight"));
-        // Back to a short draft, so the row below is measured at its
-        // ordinary height rather than at the cap.
+        // Back to short draft: row below measured at ordinary height, not cap.
         record!("shortened", call!("type", QString::from("never mind")));
     });
 
@@ -179,8 +167,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
             "attach-lift",
             call!("liftOf", QString::from("attachButton"))
         );
-        // A button lifted off the bottom of a row shorter than it would
-        // be drawn above the row, over the bar above it.
+        // Button lifted off bottom of shorter row drawn over bar above.
         record!("send-top", call!("rowTopOf", QString::from("sendButton")));
         (*engine_ptr).quit();
     });
@@ -211,8 +198,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
          the writer can see one line of what they are writing -- and the \
          line breaks in it are not line breaks at all. {context}"
     );
-    // A third of the page: past that the conversation being written in
-    // would be gone.
+    // A third of page: past that, conversation written in is gone.
     assert!(
         number("capped-height") <= 320.0,
         "a forty-line draft grew the field to {} on a 960-tall page, \
@@ -220,9 +206,8 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
         number("capped-height")
     );
 
-    // Where the row sits. Measured as a rule rather than as pixels: what
-    // a stub is tall is nothing like what Silica is, and what matters is
-    // the order -- the screen's edge, then the field, then the buttons.
+    // Row position measured as rule, not pixels: stub heights differ from Silica.
+    // Order: screen edge, field, buttons.
     let field_lift = number("field-lift");
     let send_lift = number("send-lift");
     let attach_lift = number("attach-lift");
@@ -231,10 +216,8 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
         "the field sits on the bottom edge of the screen ({field_lift} \
          above it). {context}"
     );
-    // Level with the field's bottom edge, which is a little above its
-    // underline: a Silica field keeps room under its line for what hangs
-    // below a letter. Lifted further, as this was first written, the
-    // buttons read as floating over the row rather than belonging to it.
+    // Level with field's bottom, a little above underline (Silica keeps room under line
+    // for descenders). Lifted higher, buttons float over row.
     assert!(
         (send_lift - field_lift).abs() < 1.0 && (attach_lift - field_lift).abs() < 1.0,
         "the send and attach buttons ({send_lift}, {attach_lift} above \

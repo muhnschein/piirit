@@ -1,10 +1,8 @@
-//! The tokio runtime, kept off the Qt main thread.
+//! Tokio runtime off Qt main thread.
 //!
-//! `Runtime::new` and dropping a `Runtime` both touch tokio's thread-local
-//! context, which panics with `already borrowed: BorrowMutError` on the Qt
-//! main thread of the Sailfish aarch64 build. `CoreRuntime` therefore
-//! builds and drops the runtime on a thread of its own and hands back only
-//! a `Handle`, whose `spawn` never enters the runtime context.
+//! `Runtime::new` and drop touch tokio's thread-local context, which on Qt main thread
+//! (Sailfish aarch64) panics `already borrowed: BorrowMutError`. So built and dropped on own
+//! thread; only a `Handle` returned (its `spawn` never enters runtime context).
 
 use std::future::Future;
 use std::sync::mpsc;
@@ -14,22 +12,19 @@ use std::time::Duration;
 use tokio::runtime::{Builder, Handle};
 use tokio::task::JoinHandle;
 
-/// Bounded so a wedged thread cannot hang the UI. A thread spawn plus a
-/// runtime build is milliseconds.
+/// Bounded: wedged thread cannot hang UI.
 const HANDLE_TIMEOUT: Duration = Duration::from_secs(5);
 
-/// Two, not one per core: everything here is one pipe to one process,
-/// and a phone's cores are wanted for drawing the page.
+/// Two: one pipe to one process; keep cores for drawing.
 const WORKER_THREADS: usize = 2;
 
-/// Handle to a tokio runtime on its own thread. Clones share it; when the
-/// last one drops, that thread shuts down and drops the runtime.
+/// Handle to runtime thread. Last clone dropped shuts it down.
 #[derive(Clone)]
 pub struct CoreRuntime(Arc<RuntimeThread>);
 
 struct RuntimeThread {
     handle: Handle,
-    /// Dropping this sender is what tells the runtime thread to finish.
+    /// Dropping sender stops runtime thread.
     _shutdown: mpsc::Sender<()>,
 }
 
@@ -41,7 +36,7 @@ impl CoreRuntime {
         std::thread::Builder::new()
             .name("piirit-tokio".to_string())
             .spawn(move || {
-                // The one place a runtime may be built: this thread.
+                // Only place runtime built.
                 let runtime = match Builder::new_multi_thread()
                     .worker_threads(WORKER_THREADS)
                     .enable_all()
@@ -49,7 +44,7 @@ impl CoreRuntime {
                 {
                     Ok(runtime) => runtime,
                     Err(err) => {
-                        // Gone only if the caller stopped waiting.
+                        // Caller gone: ignore.
                         handle_tx.send(Err(err.to_string())).ok();
                         return;
                     }
@@ -57,9 +52,7 @@ impl CoreRuntime {
                 if handle_tx.send(Ok(runtime.handle().clone())).is_err() {
                     return;
                 }
-                // Parks until every clone is gone, then drops the runtime
-                // here rather than on the Qt thread. A message and a
-                // hung-up channel both mean exactly that.
+                // Park until clones gone; drop runtime here, not on Qt thread.
                 shutdown_rx.recv().ok();
             })
             .map_err(|err| format!("could not start runtime thread: {err}"))?;
@@ -74,7 +67,7 @@ impl CoreRuntime {
         }
     }
 
-    /// Spawn onto the runtime. Goes through `Handle`, which only enqueues.
+    /// Spawn via `Handle` (enqueue only).
     pub fn spawn<F>(&self, future: F) -> JoinHandle<F::Output>
     where
         F: Future + Send + 'static,

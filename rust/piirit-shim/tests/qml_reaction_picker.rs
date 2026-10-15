@@ -1,9 +1,7 @@
-//! The reaction picker: any emoji as a reaction, drawn as a picture.
+//! Reaction picker: any emoji as a reaction, drawn as a picture.
 //!
-//! The page on its own, as the other page tests load theirs, with
-//! `pageStack` recorded rather than performed; and the one emoji
-//! component every reaction is drawn with, which falls back to text only
-//! for an emoji no picture is shipped for.
+//! Loaded alone, `pageStack` recorded not performed. Emoji component every reaction
+//! is drawn with falls back to text only for emoji with no picture shipped.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -167,7 +165,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -290,8 +288,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
 
     assert_eq!(value("load"), "ok", "the picker did not load. {context}");
 
-    // Pictures wherever one is shipped, the same one whichever way the
-    // emoji is spelled, and the text only for what has none.
+    // Pictures wherever shipped, same one however emoji is spelled; text only for ones with none.
     assert_eq!(
         value("glyph-thumbs"),
         "picture:1f44d.png",
@@ -313,19 +310,16 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         "what is not an emoji is not drawn as the text it is. {context}"
     );
 
-    // 540 wide over 90-wide medium items in the stubs: room around
-    // each emoji, not a grid packed edge to edge.
+    // 540 wide over 90-wide medium items in stubs: room around each emoji, not a packed grid.
     assert_eq!(value("columns"), "6", "{context}");
-    // The recent ones first, without what has no picture, then the
-    // groups in Unicode's order.
+    // Recent ones first (without picture-less), then groups in Unicode order.
     assert_eq!(
         value("rows"),
         "#Recent|🔥❤️|#Smileys & emotion|😀😃😄😁😆😅",
         "the grid does not open on the recent emoji and then the smileys. {context}"
     );
-    // A heading is inset from both margins, its text right-aligned
-    // against its right edge: handed the row's full width it keeps its
-    // inset and pushes the text off the screen.
+    // Heading inset from both margins, text right-aligned: given full row width it keeps
+    // inset and pushes text off screen.
     assert!(
         value("heading-fit").starts_with("true "),
         "a heading reaches past the right edge of its row, so its text is \
@@ -384,8 +378,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         "a search that finds nothing does not say so. {context}"
     );
 
-    // A pick is reported and the page goes; the reader's own is reported
-    // spelled the way it was sent, so the core takes it off.
+    // Pick reported and page goes; own reaction reported spelled as sent, so core takes it off.
     assert_eq!(value("tap-fire"), "ok", "{context}");
     assert_eq!(value("tap-mine"), "ok", "{context}");
     assert_eq!(

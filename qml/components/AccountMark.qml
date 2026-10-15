@@ -2,35 +2,25 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * The mark for an account: the outline of a head and shoulders inside a
- * ring, which is what every phone draws where a person's picture would
- * go before there is one.
- *
- * Drawn rather than named, for AppMark's reason: the theme has an icon
- * for most things and this app asks it only for names it has been seen
- * to have, and the one place this mark stands is the tile that starts
- * the app -- a tile whose icon is not there is a reader who cannot
- * start. Three rings cost nothing, scale with whatever size they are
- * given, and take the colour of whatever they are put in.
- *
- * The shoulders are the top of a ring the bottom of which is cut off,
- * which `clip` can do because the cut is a straight line.
+ * Account mark: head and shoulders in ring, as phones draw before a picture exists. Drawn,
+ * not named (see AppMark): theme icon may be missing, and this tile starts app. Rings scale
+ * with size, take host colour. Shoulders: ring top, bottom cut straight by `clip`.
  */
 Item {
     id: root
 
-    /// How big the whole mark is, ring and all.
+    /// Whole mark size, ring included.
     property real size: Theme.iconSizeMedium
-    /// What colour to draw the lines in.
+    /// Line colour.
     property color color: Theme.primaryColor
 
-    /// How thick every line is.
+    /// Line thickness.
     readonly property real stroke: Math.max(1, Math.round(root.size / 14))
 
     width: root.size
     height: root.size
 
-    // The ring.
+    // Ring.
     Rectangle {
         objectName: "accountRing"
         anchors.fill: parent
@@ -40,7 +30,7 @@ Item {
         border.color: root.color
     }
 
-    // The head: a small circle, a little above the middle.
+    // Head: small circle, above middle.
     Rectangle {
         objectName: "accountHead"
         width: root.size * 0.3
@@ -53,9 +43,7 @@ Item {
         border.color: root.color
     }
 
-    // The shoulders: the upper part of a wider circle, cut off where the
-    // ring's inner edge is, so the figure sits in the ring rather than
-    // on it.
+    // Shoulders: top of wider circle, cut at ring's inner edge: figure sits in ring.
     Item {
         objectName: "accountShoulders"
         clip: true

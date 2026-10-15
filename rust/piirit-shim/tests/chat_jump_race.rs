@@ -1,21 +1,9 @@
-//! The beginning of a chat stays where it is, whatever the core says.
+//! Chat start stays put, whatever core says.
 //!
-//! This started as the reproduction for a race: the model held a moving
-//! window of loaded messages, going to the beginning replaced its contents,
-//! and a reconciliation that overlapped the move compared the old window's
-//! anchors against the new window's rows, agreed with neither, and reloaded
-//! -- onto the newest page. The jump undid itself, and whether it did
-//! depended on whether an event happened to be in the air. In a chat full
-//! of media, where the core reports on every download, one usually was.
-//!
-//! There is no jump any more, and no window: the model holds a row for
-//! every message in the chat, so the first message is row 0 from the moment
-//! the id list arrives. What that race was about cannot happen, and what is
-//! worth keeping is the guarantee underneath it -- events landing at any
-//! moment, in any number, never move where the beginning of the chat is.
-//!
-//! The fetches are slowed down so the events really do land mid-flight; on
-//! a device that costs nothing to arrange.
+//! Was a race: moving window reconciled against old anchors, reloaded newest page. Jump undid
+//! itself, depending on events in air (common with media downloads). Now row per message:
+//! row 0 is first. Guarantee kept: events at any moment never move chat start.
+//! Fetches slowed so events land mid-flight.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -69,14 +57,12 @@ fn the_first_message_stays_row_zero_however_much_the_core_talks() {
     let temp = std::env::temp_dir().join(format!("piirit-jump-race-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // Long enough that the events below land while something is still
-        // in the air, which on a device they do without any help.
+        // Long enough: events land while something in air.
         std::env::set_var("PIIRIT_FAKE_FETCH_DELAY_MS", "700");
     }
 
@@ -112,7 +98,7 @@ fn the_first_message_stays_row_zero_however_much_the_core_talks() {
     });
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("opened", call!("edges")));
-        // Reading the top of the chat, with the core talking over it.
+        // Top of chat read, core talking over it.
         (*steps_ptr).push(("read-top", call!("readTop")));
         (*steps_ptr).push(("stir-1", call!("stir")));
     });

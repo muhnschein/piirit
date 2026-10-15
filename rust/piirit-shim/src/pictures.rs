@@ -1,39 +1,16 @@
-//! Pictures drawn the way the app shows them, made ready before they reach
-//! the screen: an avatar cut to a circle, greyed, tinted and faded; an
-//! introduction drawing in the ambience's colours; a call's backdrop
-//! blurred. QML asks for them as `image://piirit/<kind>?<recipe>`
-//! ([`Recipe`]) and draws what comes back with a plain `Image`.
+//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop), drawn
+//! by QML as plain `Image` of `image://piirit/<kind>?<recipe>` ([`Recipe`]).
 //!
-//! They were `ShaderEffects`, and on Sailfish's Qt 5.6 a `ShaderEffect` made
-//! after its window has once been hidden can be drawn with another
-//! `ShaderEffect`'s program. Hiding a window with a persistent scene graph
-//! -- the cover, every time the app comes to the front -- runs
-//! `QQuickShaderEffectMaterial::cleanupMaterialCache()`, which deletes
-//! every `ShaderEffect` material type of that window while the materials
-//! and the renderer's program cache, both keyed by those types, live on.
-//! The next `ShaderEffect` made there gets a type from the allocator, and
-//! when that is the address of a deleted one, the renderer hands it the
-//! deleted type's program -- with its own uniforms set by position into
-//! that program's slots. On the cover that was the grid's fade: every new
-//! face a square of its whole picture, its colour kept, its width written
-//! into `qt_Opacity` (white), dimming only at its foot. Before 2.1.0 the
-//! same thing among the `OpacityMask`, `Desaturate` and `ColorOverlay` of each
-//! face made the flat squares of issue #102. Qt fixed it in 5.15 by
-//! clearing the cache only when the scene graph goes with it; Sailfish
-//! ships 5.6.
+//! Not `ShaderEffect`: Sailfish Qt 5.6 (fixed 5.15) hiding a persistent-scene-graph window
+//! (cover, each return to front) runs `cleanupMaterialCache()`, freeing material types while
+//! program cache keyed by them lives on; new `ShaderEffect` at freed address gets dead one's
+//! program, uniforms by position: flat squares (issue #102).
 //!
-//! A plain `Image` is drawn with Qt's own texture material, whose type is
-//! static and never deleted, so nothing here can be drawn with anything
-//! else. The arithmetic the shaders did per pixel on the GPU is done here
-//! once per picture, and Qt's pixmap cache keeps the result.
-//!
-//! Decoding and scaling are Qt's (`QImageReader`, `QImage::scaled`), in
-//! the C++ provider below; the arithmetic is Rust, on straight
-//! (non-premultiplied) ARGB32 pixels, and is what the tests pin.
+//! `Image`'s texture material is static, never freed. Shader math done once per picture,
+//! kept in Qt's pixmap cache. Qt decodes, scales (C++ below); Rust does arithmetic on
+//! straight ARGB32, pinned by tests.
 
-// `cpp!` expands to a call across the FFI boundary, which is `unsafe` by
-// construction. Scoped to this file: the workspace denies it everywhere
-// else, and docs/BUILDING.md says why this one is allowed.
+// `cpp!` is FFI, so `unsafe`. Allowed here only: see docs/BUILDING.md.
 #![allow(unsafe_code)]
 
 use cpp::cpp;
@@ -46,8 +23,7 @@ cpp! {{
     #include <QtQml/QQmlEngine>
     #include <QtQuick/QQuickImageProvider>
 
-    // What the provider reads: a file path, or a file URL (InkArt's
-    // `source` is one).
+    // Provider reads a file path or file URL.
     static QString piirit_local(const QString &file) {
         if (file.startsWith(QLatin1String("file:"))) {
             return QUrl(file).toLocalFile();
@@ -55,22 +31,17 @@ cpp! {{
         return file;
     }
 
-    // The size a picture of `natural` pixels is made at for one kind of
-    // recipe, `requested` by the Image or not.
+    // Size per recipe kind; `requested` from Image or not.
     static QSize piirit_want(int kind, const QSize &natural, const QSize &requested) {
         if (kind == 2) {
-            // A blur keeps nothing a small copy does not have: blurred
-            // small and drawn large is the same picture, for a fraction
-            // of the work.
+            // Blur loses nothing to small copy: blur small, draw large.
             return natural.scaled(QSize(64, 64), Qt::KeepAspectRatio);
         }
         return requested.isValid() && requested.width() > 0 && requested.height() > 0
                ? requested : natural.boundedTo(QSize(256, 256));
     }
 
-    // Decode, scale and crop for one recipe, hand the pixels to Rust, and
-    // return what it made. A null image is an Image in error, which every
-    // caller already falls back from.
+    // Decode, scale, crop per recipe; pixels to Rust. Null: fallback.
     static QImage piirit_picture(const QString &id, const QSize &requested) {
         QString file;
         int kind = rust!(PiiritPictures_kind [id: &QString as "const QString &", file: &mut QString as "QString &"] -> i32 as "int" {
@@ -86,13 +57,8 @@ cpp! {{
             return QImage();
         }
         QImageReader reader(piirit_local(file));
-        // Decoded no larger than it is drawn, where the file says how
-        // large it is: a photo picked from the gallery for a group is
-        // twelve megapixels, 48 MB decoded, for a circle a couple of
-        // hundred pixels across. Large enough to cover what is drawn,
-        // in the picture's own proportions, so that what follows cuts
-        // and scales it just as it did the whole of it; and never
-        // larger than the picture is.
+        // Decode at drawn size (12 MP photo = 48 MB for 200 px circle): covering draw in own
+        // proportions, never above natural.
         QSize natural = reader.size();
         if (natural.isValid() && !natural.isEmpty()) {
             QSize decode = natural.scaled(piirit_want(kind, natural, requested),
@@ -114,8 +80,7 @@ cpp! {{
         if (kind == 2) {
             scaled = source.scaled(want, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         } else if (kind == 0) {
-            // The middle of the long side, the whole of the short one:
-            // what PreserveAspectCrop showed.
+            // Middle of long side, whole short: as `PreserveAspectCrop`.
             QImage cover = source.scaled(want, Qt::KeepAspectRatioByExpanding,
                                          Qt::SmoothTransformation);
             scaled = cover.copy((cover.width() - want.width()) / 2,
@@ -143,9 +108,8 @@ cpp! {{
             let Some(length) = stride.checked_mul(height) else {
                 return false;
             };
-            // SAFETY: `bits` is the QImage's own buffer, `stride` 32-bit
-            // pixels a line for `height` lines, and the image outlives
-            // this call.
+            // SAFETY: `bits` is QImage's buffer, `stride` 32-bit pixels per line for `height`
+            // lines, alive for this call.
             let pixels = unsafe { std::slice::from_raw_parts_mut(bits, length) };
             recipe.bake(pixels, width, height, stride);
             true
@@ -167,12 +131,8 @@ cpp! {{
 
 }}
 
-/// Give `engine` the provider: `image://piirit/<recipe>` (its `Recipe` says what one holds).
-///
-/// An image provider belongs to one engine, so whoever makes an engine
-/// that draws avatars adds it -- the app to its view's, and each test that
-/// reads a picture to its own. Without it the pictures fail to load, and
-/// an avatar shows its initial, as for any picture that does not load.
+/// Give `engine` the provider: `image://piirit/<recipe>`. Per engine: app's view and each
+/// picture test add it; without, avatars show initial.
 pub fn install(engine: &qmetaobject::QmlEngine) {
     let engine = engine.cpp_ptr();
     cpp!(unsafe [engine as "QQmlEngine *"] {
@@ -182,11 +142,7 @@ pub fn install(engine: &qmetaobject::QmlEngine) {
     });
 }
 
-/// Draw `id` (what follows `image://piirit/`) the way the provider does, at
-/// `width` by `height`: straight ARGB32, a line after another. `None` for a
-/// recipe or file the provider would answer with no picture.
-///
-/// The provider's own path through Qt, for tests to read the pixels of.
+/// Draw `id` as provider would, `width` by `height`, straight ARGB32; `None` if no picture.
 #[must_use]
 pub fn render(id: &str, width: i32, height: i32) -> Option<(Vec<u32>, usize, usize)> {
     let id = QString::from(id);
@@ -205,8 +161,7 @@ pub fn render(id: &str, width: i32, height: i32) -> Option<(Vec<u32>, usize, usi
             for (int x = 0; x < straight.width(); ++x) {
                 uint pixel = line[x];
                 rust!(PiiritPictures_push [out: *mut Vec<u32> as "void *", pixel: u32 as "uint"] {
-                    // SAFETY: `out` is the vector `render` lent, alive
-                    // for the whole of this block.
+                    // SAFETY: `out` is `render`'s vector, alive for this block.
                     unsafe { (*out).push(pixel) };
                 });
             }
@@ -222,18 +177,18 @@ pub fn render(id: &str, width: i32, height: i32) -> Option<(Vec<u32>, usize, usi
     found.then_some((pixels, size.0, size.1))
 }
 
-/// Which picture a recipe makes; the numbers are what the C++ reads.
+/// Picture a recipe makes; numbers are read by C++.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
-    /// An avatar: the middle of the picture, cut to a circle.
+    /// Avatar: middle, cut to a circle.
     Face = 0,
-    /// An introduction drawing: red is the ink, green the accent.
+    /// Intro drawing: red ink, green accent.
     Ink = 1,
-    /// A call's backdrop.
+    /// Call backdrop.
     Blur = 2,
 }
 
-/// A colour as the straight channels a recipe carries.
+/// Colour as straight channels.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Colour {
     /// Red, 0 to 1.
@@ -245,8 +200,7 @@ pub struct Colour {
 }
 
 impl Colour {
-    /// `rrggbb` or `#rrggbb`, which is how QML prints an opaque colour;
-    /// `aarrggbb` loses its alpha, which a recipe carries apart.
+    /// `rrggbb` or `#rrggbb`; `aarrggbb` drops its alpha.
     fn parse(text: &str) -> Option<Self> {
         let hex = text.trim_start_matches('#');
         let hex = match hex.len() {
@@ -267,39 +221,35 @@ impl Colour {
     }
 }
 
-/// What to draw and how, read off the provider's id: the kind, then a
-/// query of `key=value` pairs, each value percent-encoded as
-/// `encodeURIComponent` leaves it.
+/// Draw spec: kind, then `encodeURIComponent`-encoded `key=value` pairs.
 ///
-/// - `file`: the picture, a path or a `file:` URL. Every kind.
-/// - `grey=1`: the colour taken out (a face).
-/// - `tint`, `strength`: a colour laid over the greyed face, part of the
-///   way (a face the cover lights).
-/// - `from`, `to`: where a face fades out, as fractions of its height from
-///   its top -- whole above `from`, gone by `to`, eased in between.
-/// - `ink`, `lit`, `inkStrength`, `litStrength`: the drawing's colours
-///   and how much of each.
-/// - `radius`: how far a blur reaches, in pixels of the 64 it is made at.
+/// - `file`: path or `file:` URL.
+/// - `grey=1`: colour removed (a face).
+/// - `tint`, `strength`: tint over the face, part of the way.
+/// - `from`, `to`: face fade, height fractions from top: whole above `from`, gone by `to`, eased
+///   between.
+/// - `ink`, `lit`, `inkStrength`, `litStrength`: drawing colours, strengths.
+/// - `radius`: blur reach, in pixels of the 64-pixel copy.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Recipe {
-    /// Which picture.
+    /// Picture kind.
     pub kind: Kind,
-    /// The file it is made from.
+    /// File it is made from.
     pub file: String,
-    /// Drawn without its colour.
+    /// Drawn without colour.
     pub grey: bool,
-    /// Laid over the face, and how much of the way.
+    /// Laid over the face, and how much.
     pub tint: Option<(Colour, f64)>,
     /// Where the face fades out.
     pub fade: Option<(f64, f64)>,
-    /// The drawing's ink and accent, each with its strength.
+    /// Ink and accent, each with strength.
     pub ink: Option<((Colour, f64), (Colour, f64))>,
-    /// How far a blur reaches.
+    /// Blur reach, pixels.
     pub radius: usize,
 }
 
 impl Recipe {
-    /// Read an id, `None` for one that says nothing drawable.
+    /// Read an id; `None` if nothing drawable.
     #[must_use]
     pub fn parse(id: &str) -> Option<Self> {
         let (kind, query) = id.split_once('?')?;
@@ -340,8 +290,7 @@ impl Recipe {
             _ => None,
         };
         let radius = number("radius").map_or(8, |radius| {
-            // Whole pixels of a 64-pixel copy: anything past half of it
-            // is the same flat colour.
+            // 64-pixel copy: past half is flat colour anyway.
             let clamped = radius.clamp(0.0, 32.0).round();
             #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
             let whole = clamped as usize;
@@ -358,11 +307,9 @@ impl Recipe {
         })
     }
 
-    /// Make the picture out of `pixels`, straight ARGB32 as Qt's
-    /// `Format_ARGB32` lays them out, `stride` to a line.
+    /// Make the picture from `pixels`: straight ARGB32, `stride` per line.
     pub fn bake(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
-        // What the provider refuses before it gets here; said again so
-        // that the walks below, `stride` at a step, never step by 0.
+        // Provider refuses these; repeated so `stride` never steps by 0.
         if width == 0 || height == 0 || stride < width {
             return;
         }
@@ -373,8 +320,7 @@ impl Recipe {
         }
     }
 
-    /// The face: greyed and tinted as asked, cut to the circle that fits,
-    /// its rim softened over a pixel, and faded towards its foot.
+    /// Face: greyed or tinted, cut to a circle, rim softened, faded.
     fn face(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
         let diameter = to_f64(width.min(height));
         let (middle_x, middle_y) = (to_f64(width) / 2.0, to_f64(height) / 2.0);
@@ -402,8 +348,7 @@ impl Recipe {
         }
     }
 
-    /// The drawing in two colours: red is how much of the ink, green how
-    /// much of the accent, and nothing is drawn where neither is.
+    /// Two colours: red is ink share, green accent share.
     fn colour_ink(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
         let ((ink, ink_strength), (lit, lit_strength)) = self.ink.unwrap_or((
             (
@@ -447,17 +392,14 @@ impl Recipe {
     }
 }
 
-/// How much of a face is kept `across` its height: all of it above
-/// `from`, none past `to`, and squared between, so most of the way down
-/// it keeps its strength and gives up the rest near the end -- a straight
-/// ramp reads as a wash laid over it.
+/// Share of face kept at `across` height: all above `from`, none past `to`, squared between
+/// (straight ramp reads as wash).
 fn eased(across: f64, from: f64, to: f64) -> f64 {
     let sink = ((to - across) / (to - from)).clamp(0.0, 1.0);
     sink * sink
 }
 
-/// A blur three box passes deep each way, which is close enough to a
-/// Gaussian for a backdrop nobody reads.
+/// Three box passes each way: close to Gaussian for a backdrop.
 fn blur(pixels: &mut [u32], width: usize, height: usize, stride: usize, radius: usize) {
     if radius == 0 {
         return;
@@ -473,7 +415,7 @@ fn blur(pixels: &mut [u32], width: usize, height: usize, stride: usize, radius: 
             }
         }
         for x in 0..width {
-            // The column: every `stride`th pixel, from `x`.
+            // The column: every `stride`th pixel from `x`.
             line.clear();
             line.extend(pixels.iter().skip(x).step_by(stride).take(height));
             let averaged = box_pass(&line, radius);
@@ -485,8 +427,7 @@ fn blur(pixels: &mut [u32], width: usize, height: usize, stride: usize, radius: 
     }
 }
 
-/// Each pixel of a line as the mean of those within `radius` of it, the
-/// line's ends standing in for what is past them.
+/// Line pixel: mean within `radius`; line ends stand in past them.
 fn box_pass(line: &[u32], radius: usize) -> Vec<u32> {
     let (Some(&first), Some(&last)) = (line.first(), line.last()) else {
         return Vec::new();
@@ -504,8 +445,7 @@ fn box_pass(line: &[u32], radius: usize) -> Vec<u32> {
                 }
                 count += 1.0;
             }
-            // Pixels before the start are the first one, as many times as
-            // the window reaches past it.
+            // Before start: first pixel, once per step window reaches past.
             let before = radius.saturating_sub(at);
             for (total, channel) in sum.iter_mut().zip(first) {
                 *total += channel * to_f64(before);
@@ -516,12 +456,12 @@ fn box_pass(line: &[u32], radius: usize) -> Vec<u32> {
         .collect()
 }
 
-/// The channels of a straight ARGB32 pixel, alpha first, 0 to 1.
+/// ARGB32 pixel to channels, alpha first, 0 to 1.
 fn unpack(pixel: u32) -> [f64; 4] {
     pixel.to_be_bytes().map(|byte| f64::from(byte) / 255.0)
 }
 
-/// The other way, rounding and clamping.
+/// Channels to pixel, rounding and clamping.
 fn pack(channels: [f64; 4]) -> u32 {
     u32::from_be_bytes(channels.map(|channel| {
         let scaled = (channel.clamp(0.0, 1.0) * 255.0).round();
@@ -532,14 +472,13 @@ fn pack(channels: [f64; 4]) -> u32 {
     }))
 }
 
-/// A pixel count as a coordinate. Pictures are far below 2^52 pixels.
+/// Pixel count as coordinate; pictures far below 2^52 pixels.
 #[allow(clippy::cast_precision_loss)]
 fn to_f64(count: usize) -> f64 {
     count as f64
 }
 
-/// `encodeURIComponent` undone. `None` for a broken escape or bytes that
-/// are not UTF-8.
+/// `encodeURIComponent` undone. `None` on broken escape or non-UTF-8.
 fn percent_decode(text: &str) -> Option<String> {
     let mut rest = text.as_bytes();
     let mut out = Vec::with_capacity(rest.len());
@@ -594,7 +533,7 @@ mod tests {
         assert!((tint.red - 1.0).abs() < 1e-9 && (tint.green - 128.0 / 255.0).abs() < 1e-9);
         assert!((strength - 0.75).abs() < 1e-9);
         assert_eq!(face.fade, Some((0.2, 1.4)));
-        // A fade that ends before it starts is none.
+        // Fade ending before its start: none.
         assert_eq!(Recipe::parse("face?file=a&from=1&to=1").unwrap().fade, None);
 
         let ink = Recipe::parse("ink?file=a&ink=ffffff&lit=%2300ff00&litStrength=0.5").unwrap();
@@ -604,7 +543,7 @@ mod tests {
 
         assert_eq!(Recipe::parse("blur?file=a&radius=99").unwrap().radius, 32);
         assert_eq!(Recipe::parse("blur?file=a").unwrap().radius, 8);
-        // An eight-digit colour is QML's #aarrggbb; its alpha is dropped.
+        // #aarrggbb: alpha dropped.
         let tinted = Recipe::parse("face?file=a&tint=80ff0000").unwrap();
         assert!((tinted.tint.unwrap().0.red - 1.0).abs() < 1e-9);
         assert_eq!(Recipe::parse("face?file=a&tint=red").unwrap().tint, None);
@@ -626,7 +565,6 @@ mod tests {
             255,
             "the circle is not as wide as the face"
         );
-        // Its colour untouched.
         assert_eq!(pixels[(side / 2) * side + side / 2].to_be_bytes()[1], 200);
     }
 
@@ -650,8 +588,7 @@ mod tests {
             .unwrap()
             .bake(&mut lit, side, side, side);
         let [_, r, g, b] = lit[4 * side + 4].to_be_bytes();
-        // Greyed first, then three quarters of the way to the tint: a
-        // third, then a twelfth for red and green and five sixths for blue.
+        // Greyed: 1/3 each; 3/4 toward tint: red, green 1/12; blue 5/6.
         assert_eq!((r, g), (21, 21));
         assert!((212..=213).contains(&b), "blue is {b}");
     }
@@ -685,7 +622,6 @@ mod tests {
         assert_eq!(pixels[0].to_be_bytes(), [128, 255, 0, 0]);
         assert_eq!(pixels[1].to_be_bytes(), [255, 0, 0, 255]);
         assert_eq!(pixels[2].to_be_bytes()[0], 0, "blank paper is drawn");
-        // With no colours given the drawing is white.
         let mut plain = vec![u32::from_be_bytes([255, 255, 0, 0])];
         Recipe::parse("ink?file=a")
             .unwrap()

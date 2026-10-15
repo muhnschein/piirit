@@ -1,8 +1,7 @@
 import QtQuick 2.0
 
-// Silica's `EnterKey` attached property is missing and cannot be stubbed:
-// QML forbids capitalised property names and qmetaobject cannot register
-// attached types. Pages using it cannot be loaded here.
+// Silica `EnterKey` attached property can't be stubbed: QML forbids capitalised
+// names, qmetaobject can't register attached types. Pages using it won't load.
 Item {
     property string text: ""
     property string label
@@ -16,8 +15,8 @@ Item {
     property bool labelVisible: true
     property int textTopMargin: 0
     property font font
-    // Silica draws the text and the placeholder in its own colours, and
-    // the name fields ask for others.
+    // Silica draws text and placeholder in own colours; name fields ask for
+    // others.
     property color color: "#ffffff"
     property color placeholderColor: "#a0a0a0"
     signal clicked()

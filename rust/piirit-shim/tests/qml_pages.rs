@@ -1,26 +1,18 @@
-//! Loads the real onboarding pages and drives them headlessly.
+//! Loads real onboarding pages, headless.
 //!
-//! `Sailfish.Silica` ships only in the SDK, so `tests/silica-stubs/`
-//! declares just enough of each component for the page files to instantiate
-//! under host Qt. The stubs imitate no layout or behaviour: this says what a
-//! page *does* -- which shim methods it calls, where it navigates, how it
-//! reacts -- not how it looks.
-//!
-//! Interaction goes through `objectName`, which is production-safe, rather
-//! than test hooks in the pages.
+//! `Sailfish.Silica` is SDK-only: `tests/silica-stubs/` fake just enough. Stubs copy
+//! no layout: checks what pages do (shim calls, navigation, reactions), not look. Interaction via
+//! `objectName` (production-safe), not test hooks in pages.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -36,8 +28,8 @@ use serde_json::Value;
 
 mod common;
 
-/// QML forbids capitalised property names, so a `.qml` stub cannot provide
-/// `BusyIndicatorSize.Large`; a registered enum can.
+/// QML bans capitalised property names: a `.qml` stub can't give `BusyIndicatorSize.Large`; a
+/// registered enum can.
 #[derive(QEnum)]
 #[repr(u8)]
 enum BusyIndicatorSize {
@@ -54,12 +46,10 @@ enum TruncationMode {
     Fade = 1,
 }
 
-/// Records navigation instead of performing it, and models the resulting
-/// page stack. A context property, as in the app: a QML object in the probe
-/// would not be visible inside a separately loaded page.
+/// Records navigation, models page stack.
 ///
-/// Method names are camelCase because they stand in for Silica's own API,
-/// which the pages call; `qmetaobject` exposes Rust identifiers verbatim.
+/// Context property: probe's QML object is invisible to loaded page. `camelCase`: Silica API
+/// names, which pages call; `qmetaobject` exposes Rust names verbatim.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -67,15 +57,14 @@ struct PageStackProbe {
     /// `push:AddProfileDialog.qml|replaceAbove:ChatListPage.qml|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// The stack as it now stands, bottom first, comma separated.
+    /// Stack, bottom first, comma separated.
     stack: qt_property!(QString; NOTIFY log_changed),
-    /// The properties handed to the most recent navigation, as JSON.
+    /// Last navigation's properties, JSON.
     last_properties: qt_property!(QString; NOTIFY log_changed),
 
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
     replace: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    /// Silica's `replaceAbove(target, page, properties)`. A `null` target
-    /// replaces the whole stack.
+    /// Silica `replaceAbove`. `null` target: whole stack.
     replaceAbove:
         qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
     pop: qt_method!(fn(&mut self)),
@@ -86,14 +75,13 @@ struct PageStackProbe {
 #[allow(non_snake_case)]
 impl PageStackProbe {
     fn record(&mut self, action: &str, page: &QString, properties: &QVariantMap) -> String {
-        // Only the file name matters; the rest is a checkout path.
+        // File name only.
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
         let current = self.log.to_string();
         self.log = format!("{current}{action}:{name}|").into();
 
-        // `QVariantMap` in qttypes 0.2 can be queried but not iterated, so
-        // these are the keys the pages pass.
+        // qttypes 0.2 `QVariantMap`: queried, not iterated. Keys: what pages pass.
         let mut rendered = Vec::new();
         for key in [
             "accountId",
@@ -134,9 +122,8 @@ impl PageStackProbe {
 
     fn replaceAbove(&mut self, target: QVariant, page: QString, properties: QVariantMap) {
         let name = self.record("replaceAbove", &page, &properties);
-        // Only the whole-stack form is used here; a non-null target would
-        // need the page it names to decide where to cut.
-        // QML's `null` arrives as an empty QVariant.
+        // Whole-stack form only; non-null target needs its page to cut.
+        // QML `null` = empty QVariant.
         let target_is_null =
             QString::from_qvariant(target).map_or(true, |value| value.to_string().is_empty());
         assert!(
@@ -156,7 +143,7 @@ impl PageStackProbe {
     }
 }
 
-/// Owns a `Loader` and walks the loaded page's children by `objectName`.
+/// Owns `Loader`; walks page children by `objectName`.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -235,13 +222,12 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Temp directories and environment, returning the journal path.
+/// Temp dirs and env; returns journal path.
 fn prepare_environment() -> PathBuf {
     let temp = std::env::temp_dir().join(format!("piirit-qml-pages-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // SAFETY: single-threaded, and set before Qt starts and before the
-    // server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -250,8 +236,7 @@ fn prepare_environment() -> PathBuf {
     journal
 }
 
-// The engine, the QObject boxes and every step share one scope: all must
-// outlive `exec()`. The assertions are in the helpers below.
+// Engine, QObjects, steps: one scope, must outlive `exec()`.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn onboarding_pages_drive_the_core_and_navigate() {
@@ -261,11 +246,11 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     let stack_box = QObjectBox::new(PageStackProbe::default());
 
     let mut engine = QmlEngine::new();
-    // Without this the page files do not parse their imports.
+    // Needed for page imports to parse.
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
-    // The two enum namespaces the .qml stubs cannot express.
+    // Two enum namespaces `.qml` stubs cannot express.
     let uri = CString::new("Sailfish.Silica").expect("static uri");
     qml_register_enum::<BusyIndicatorSize>(
         &uri,
@@ -291,8 +276,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks run only inside `exec()`; `engine` outlives them.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -305,7 +289,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         }};
     }
 
-    // One step per tick; whole seconds only (clippy.toml).
+    // One step per tick; whole seconds (clippy.toml).
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
         common::record(
@@ -321,9 +305,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "welcome-click", call!("click", "setupTile"));
     });
 
-    // Where that lands: the two ways into a profile. One asks where the
-    // reader's existing profile is; the other goes on to the relay
-    // dialog.
+    // Two ways into profile: existing-profile lookup, or relay dialog.
     let s = steps.clone();
     single_shot(Duration::from_secs(3), move || {
         common::record(
@@ -335,9 +317,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "start-create", call!("click", "createProfileTile"));
     });
 
-    // The dialog: nothing to accept until there is a name, the relays
-    // left to the core, and the choice of one shut away under
-    // "Advanced" until it is opened.
+    // Dialog: nothing accepted unnamed; relays left to core; choice hidden under "Advanced".
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(
@@ -445,9 +425,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "dialog-handed", call!("handed"));
     });
 
-    // The setup page, made before it is on screen the way Silica makes
-    // a dialog's destination, with what the dialog hands it: nothing is
-    // asked of the core until the page is the one on screen.
+    // Setup page built before on screen, as Silica does; core asked only once on screen.
     let s = steps.clone();
     single_shot(Duration::from_secs(5), move || {
         common::record(
@@ -496,7 +474,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     assert_wire_calls(&journal);
 }
 
-/// Every page file must instantiate; nothing below means anything if not.
+/// Every page must instantiate, else nothing below means anything.
 fn assert_pages_loaded(steps: &[(String, String)], context: &str) {
     for step in ["welcome-load", "start-load", "dialog-load", "setup-load"] {
         assert_eq!(
@@ -507,10 +485,8 @@ fn assert_pages_loaded(steps: &[(String, String)], context: &str) {
     }
 }
 
-/// With no configured account the welcome page stops probing and shows its
-/// buttons; the setup one starts the profile path, and the page it opens
-/// leads both ways from there: to where an existing profile is taken over
-/// from, and on to the relay dialog.
+/// No account: welcome stops probing. Setup starts profile path;
+/// its page leads to takeover or relay dialog.
 fn assert_welcome_and_navigation(
     steps: &[(String, String)],
     navigation: &str,
@@ -545,10 +521,8 @@ fn assert_welcome_and_navigation(
     );
 }
 
-/// The dialog: no accepting without a name, the relays the core's until
-/// the reader opens "Advanced" and picks or types one, a choice made
-/// there still shown once it is shut, and what was chosen is what the
-/// setup page is handed.
+/// Dialog: no accept unnamed; relays core's until "Advanced" pick; choice persists once shut;
+/// what was chosen is what setup page is handed.
 fn assert_dialog(steps: &[(String, String)], context: &str) {
     for step in [
         "dialog-name",
@@ -576,9 +550,7 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
         "false",
         "the dialog can be accepted without a name",
     );
-    // "Automatic" on arrival: the core picks, and keeps the profile on
-    // several relays. No relay of the dialog's own choosing is handed
-    // over, and none is put in front of the reader.
+    // "Automatic": core picks, several relays. No dialog relay handed over.
     expect("dialog-index", "0", "the dialog did not open on Automatic");
     expect(
         "dialog-provider",
@@ -608,8 +580,7 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
     assert_dialog_relays(steps, context);
 }
 
-/// Inside "Advanced": the list, Other relay and its field, what each
-/// says under it, and a choice that outlasts the section being shut.
+/// Inside "Advanced": list, Other relay, hints; choice outlives section.
 fn assert_dialog_relays(steps: &[(String, String)], context: &str) {
     let expect = |step: &str, want: &str, why: &str| {
         assert_eq!(common::value_of(steps, step), want, "{why}. {context}");
@@ -691,8 +662,7 @@ fn assert_dialog_relays(steps: &[(String, String)], context: &str) {
     );
 }
 
-/// The setup page asks the core once it is on screen, not when it is
-/// made, and progress reaches it.
+/// Setup asks core once on screen, not when made; progress reaches it.
 fn assert_profile_creation(steps: &[(String, String)], context: &str) {
     assert_eq!(
         common::value_of(steps, "setup-early"),
@@ -718,7 +688,7 @@ fn assert_profile_creation(steps: &[(String, String)], context: &str) {
     );
 }
 
-/// A tap produced the right calls on the wire.
+/// Tap made right wire calls.
 fn assert_wire_calls(journal: &std::path::Path) {
     let calls = common::records(journal);
     let method_names: Vec<&str> = calls

@@ -1,12 +1,9 @@
 #!/bin/sh
-# Compile every translations/piirit-<lang>.ts into a .qm beside it, or
-# into the directory given, with lrelease. What the RPM's %build runs, what
-# `make translations` runs, and what ci/packaging-lint.sh runs to prove
-# the catalogs compile at all -- a numerus form too few, or a stray tag,
-# is an error here and a missing language on a phone.
+# Compile translations/piirit-<lang>.ts to .qm, or into dir given. Run by RPM
+# %build, make translations, ci/packaging-lint.sh. Bad numerus or stray tag
+# fails here, else language missing on phone.
 #
-# piirit.ts itself is the untranslated source catalog, kept for lupdate
-# to read the strings from; it is not compiled.
+# piirit.ts: source catalog for lupdate, not compiled.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -23,8 +20,8 @@ count=0
 for catalog in "$root"/translations/piirit-*.ts; do
     [ -f "$catalog" ] || continue
     name=$(basename "$catalog" .ts)
-    # -silent: lrelease otherwise reports every catalog's counts, and a
-    # warning would be lost in forty of them. It still prints warnings.
+    # -silent: hides per-catalog counts (a warning would drown in forty).
+    # Warnings still print.
     "$lrelease" -silent "$catalog" -qm "$out/$name.qm"
     count=$((count + 1))
 done

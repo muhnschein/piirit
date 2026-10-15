@@ -1,32 +1,20 @@
-//! The walk through what Delta Chat is.
-//!
-//! Five facts, one per screen, and a swipe past the last one is the way
-//! on to the setup path. What is checked here is what a headless engine
-//! can see: that the pictures are there in the shape the shader reads,
-//! that every fact carries one and says something, that the last fact is
-//! the one that offers the way on, and that pulling past it asks for the
-//! next page exactly once. What it looks like is a manual check
+//! Five-fact walkthrough, one per screen; swipe past last = way to setup. Checks: picture
+//! shape, facts complete, last offers way on, pull past asks next page once. Look: manual
 //! (docs/HARBOUR.md).
 //!
-//! Turning the phone is here because it went wrong on one: the view's
-//! width changes before the content it has scrolled does, which measured
-//! as a pull past the last fact and carried the reader off the page with
-//! no finger on it. Only a drag asks for the next page now, so a turn --
-//! and any other move the reader did not make -- has to leave the walk
-//! where it is.
+//! Phone turn checked because it went wrong on one: view width changes before scrolled content
+//! does, which measured as a pull past last fact and carried reader off page untouched. Only a drag
+//! asks now, so a turn (or any move reader didn't make) leaves walk where it is.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe` (edition 2024+),
+// `borrow_as_ptr`, `single_shot` whole secs.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher: piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -36,7 +24,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The pictures, and the shape the shader reads them in.
+/// Pictures; shape shader reads.
 const PICTURES: [&str; 5] = [
     "intro-profile.png",
     "intro-invite.png",
@@ -44,21 +32,14 @@ const PICTURES: [&str; 5] = [
     "intro-group.png",
     "intro-relay.png",
 ];
-/// The smallest a picture may be painted: it is shown at about two
-/// fifths of a phone's width, so anything under this would be drawn
-/// bigger than it was painted.
+/// Smallest: ~2/5 phone width; smaller drawn bigger than painted.
 const SMALLEST_PICTURE: u32 = 400;
-/// The largest, which is a packaging rule rather than a drawing one. A
-/// picture is drawn at `min(width * 0.42, height * 0.30)` (`IntroPage`),
-/// which is 453 px on the tallest phone Sailfish runs on and 614 px on
-/// the Jolla Tablet, and PNG is already compressed, so every pixel past
-/// that is paid for twice: once in the package the reader downloads and
-/// once in the one installed on the phone. Five masters at 1254 square
-/// were 3.05 MB of a 14.3 MB package, more than the app's own binary.
+/// Largest is packaging: `IntroPage` draws at `min(width * 0.42, height * 0.30)`: 453 px on
+/// tallest phone, 614 px Jolla Tablet. PNG already compressed: pixels past that cost twice
+/// (download, install). Five 1254-square masters: 3.05 MB of 14.3 MB package.
 const LARGEST_PICTURE: u32 = 800;
 
-/// Silica's `pageStack`, recorded rather than performed: where the end of
-/// the walk leads, and how often.
+/// Silica `pageStack`, recorded: where walk's end leads, how often.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -93,8 +74,7 @@ impl PageStackProbe {
     }
 }
 
-/// Loads the page at a phone's size and works the view the way a thumb
-/// does: one fact at a time, and a pull past the last one.
+/// Phone-size page; thumb-style: one fact at a time, pull past last.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -165,16 +145,10 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The pictures are what the shader reads: two channels of an 8-bit RGB
-/// PNG, square, not interlaced. One re-exported as grayscale or with an
-/// alpha channel would lose its accents or tint them wrong, and one that
-/// is not square would be drawn stretched, since `InkArt` does not
-/// letterbox.
-///
-/// How big is pinned at both ends: a phone scales whatever they are down
-/// to the box it has for them, so a picture under the floor is drawn
-/// bigger than it was painted, and one over the ceiling is package
-/// weight nothing on a phone can show.
+/// Pictures: shader reads two channels of 8-bit RGB PNG, square, not interlaced. Gray or alpha
+/// re-export loses accents or tints them wrong;
+/// non-square stretches (`InkArt` no letterbox). Size bounded both ends: under floor drawn
+/// bigger than painted; over ceiling is weight no phone shows.
 #[test]
 fn the_intro_pictures_are_the_shape_the_shader_reads() {
     for file in PICTURES {
@@ -205,7 +179,7 @@ fn the_intro_pictures_are_the_shape_the_shader_reads() {
 
 #[test]
 fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
-    // SAFETY: single-threaded, and set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -221,8 +195,7 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks run only inside `exec()`; `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -252,7 +225,7 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
         r("first-picture", call!("picture", "slideArt0"));
     });
 
-    // The pictures load off the main thread; a second is plenty.
+    // Pictures load off main thread.
     let r = record.clone();
     single_shot(Duration::from_secs(2), move || {
         r("drawn", call!("get", "slideArt0", "ready"));
@@ -263,11 +236,8 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
         r("hint-late", call!("get", "swipeHint", "visible"));
     });
 
-    // The last fact exists to be read from only now: a view makes a
-    // delegate when it comes near, not when the page is loaded. Then the
-    // two ways the view can end up past the end -- a turn of the phone,
-    // which is not a reader asking for anything, and a drag, which is --
-    // and a second drag, which must not ask again.
+    // Last fact read only now (views make delegates near). Past-end: phone turn is no request,
+    // drag is; second drag must not ask again.
     let r = record.clone();
     single_shot(Duration::from_secs(3), move || {
         r("last-picture", call!("picture", "slideArt4"));
@@ -292,8 +262,7 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
     assert_walk(&steps.borrow(), &navigation);
 }
 
-/// Every fact carries a picture and words, the last one offers the way
-/// on, and pulling past it asks for the setup page once.
+/// Each fact: picture and words; last offers way on; pull past asks setup once.
 fn assert_walk(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps

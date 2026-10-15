@@ -1,18 +1,12 @@
-//! The profile page reads the profile out of the core and writes it back.
+//! Profile page reads profile from core and writes it back.
 //!
-//! Name, signature and picture are core config keys rather than a record
-//! of their own, and the picture is the odd one: `selfavatar` takes a
-//! *path to a file the core copies*, refuses an empty string outright, and
-//! is cleared with null. A picker hands back a `file://` URL, so the path
-//! has to be unwrapped before it goes anywhere near the core.
+//! Name, signature, picture are core config keys. Picture is odd: `selfavatar` takes a
+//! *path the core copies*, refuses empty string, clears with null. Picker gives `file://`
+//! URL: unwrap before core.
 //!
-//! The rest of the page is what parla's profile dialog shows: the relays
-//! and the address on each (their own test is `relays.rs`; here only that
-//! the one with the profile's own address is listed first), and what the
-//! relays and the phone say about the profile -- the space taken on the
-//! device, and per relay the connection in the core's own words and the
-//! mailbox quota read off its report, said as used of the whole. The
-//! name is a field under the picture, with nothing under it.
+//! Rest is parla's profile dialog: relays and address (`relays.rs`; own-address relay
+//! first), relay and phone status: space on device, per-relay connection, mailbox quota.
+//! Name is a field under picture, nothing under it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -21,8 +15,7 @@
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -34,8 +27,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: only which page
-/// the invite button opens is asked about.
+/// Silica `pageStack`, recorded; only which page invite opens is asked.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -154,13 +146,12 @@ fn the_profile_page_round_trips_the_profile() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A profile the core lists, so the profiles page's row for it
-        // is there to be watched.
+        // Profile core lists, so profiles page row for it exists to watch.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
     }
 
@@ -207,8 +198,7 @@ fn the_profile_page_round_trips_the_profile() {
             (*steps_ptr).push(($label, $value))
         };
     }
-    // The row the profiles page draws for this profile: name and
-    // picture as the core's account list has them right now.
+    // Row profiles page draws: name and picture as core's account list has them.
     macro_rules! listed {
         () => {
             listed_row(&(*core_ptr).pinned().borrow(), 1)
@@ -228,22 +218,17 @@ fn the_profile_page_round_trips_the_profile() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // The row as it stands before anything is typed.
+        // Row before anything typed.
         record!("listed-before", listed!());
-        // What the relay and the phone say, as parla's dialog shows it.
-        // The address is the first relay row's: the profile page lists
-        // the relays now, the one with the profile's own address first
-        // (tests/relays.rs).
+        // Relay and phone status, as parla's dialog shows. Address: first relay row's.
         record!("address", get!("relayRow0", "addr"));
-        // That relay is reported on first: the core's own words about
-        // its connection, and its mailbox.
+        // That relay reported first: core's connection words, and mailbox.
         record!("connection", get!("reportStatus", "text"));
         record!("quota-shown", get!("reportQuota", "visible"));
         record!("quota-words", get!("reportQuota", "label"));
         record!("quota-value", get!("reportQuota", "value"));
         record!("storage", get!("storageLabel", "text"));
-        // The name: a name with a badge, and a field with a hint once
-        // the badge is tapped.
+        // Name: badge, and field with hint once badge tapped.
         record!("hint-before", get!("nameHint", "visible"));
         record!("field-before", get!("profileNameField", "visible"));
         record!("edit", call!("edit", QString::from("profileNameControl")));
@@ -271,8 +256,7 @@ fn the_profile_page_round_trips_the_profile() {
         );
     });
 
-    // Nothing is confirmed and nothing is tapped: the pause after typing
-    // is the whole mechanism, so this waits it out rather than saving.
+    // Pause after typing is the mechanism: wait it out, nothing tapped.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("autosaved", call!("pageProperty", QString::from("edited")));
         record!("receipts-before", get!("profile", "read_receipts"));
@@ -282,13 +266,10 @@ fn the_profile_page_round_trips_the_profile() {
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("saved-name", get!("profile", "display_name"));
         record!("saved-bio", get!("profile", "status"));
-        // The profiles page under this one: its row, without it being
-        // opened again.
+        // Profiles page under this one: its row, not reopened.
         record!("listed-name", listed!());
-        // Opened again, on a profile that now has a name in it. Filling
-        // the fields from the core must not read as the reader typing:
-        // leaving the page would then write them straight back, and a
-        // page left before the load landed would write empties.
+        // Reopened on named profile. Filling from core must not read as typing: leaving would
+        // write back; a page left before load landed would write empties.
         record!(
             "reopen",
             call!(
@@ -299,11 +280,11 @@ fn the_profile_page_round_trips_the_profile() {
         );
     });
 
-    // A picker hands back a URL; the core wants a path.
+    // Picker hands URL; core wants path.
     single_shot(Duration::from_secs(10), move || unsafe {
         record!("receipts-after", get!("profile", "read_receipts"));
         record!("refilled", get!("profileNameField", "text"));
-        // A page opened anew holds the saved name.
+        // Reopened page holds saved name.
         record!("name-reopened", get!("profileNameField", "text"));
         record!("hint-reopened", get!("nameHint", "visible"));
         record!(
@@ -401,7 +382,7 @@ fn the_profile_page_round_trips_the_profile() {
          {context}"
     );
 
-    // The picture is a path, and the URL a picker hands over is not one.
+    // Picture is a path; picker URL is not.
     let avatar_sets: Vec<&Value> = calls
         .iter()
         .filter(|(name, params)| {
@@ -441,8 +422,7 @@ fn the_profile_page_round_trips_the_profile() {
     assert_profiles_row_follows(&steps, &context);
 }
 
-/// The row the profiles page draws for the profile: `name|picture`, or
-/// a note that the list has no such row.
+/// Profiles page row for profile: `name|picture`, or note that list has no such row.
 fn listed_row(core: &DeltaChatCore, account_id: u32) -> String {
     core.account_list
         .borrow()
@@ -454,9 +434,8 @@ fn listed_row(core: &DeltaChatCore, account_id: u32) -> String {
         )
 }
 
-/// The profiles page under this one draws its rows off the core's
-/// account list, and a name or picture saved here has to reach that row
-/// before the swipe back, not on the next visit.
+/// Profiles page draws rows off core's account list; saved name or picture must reach
+/// that row before swipe back.
 fn assert_profiles_row_follows(steps: &[(&str, String)], context: &str) {
     let value = |label: &str| {
         steps
@@ -491,11 +470,7 @@ fn assert_profiles_row_follows(steps: &[(&str, String)], context: &str) {
     );
 }
 
-/// The address, and the connection and the mailbox as the fake relay
-/// reports them.
-///
-/// The invite is not here any more: it is on the profile's row on the
-/// profiles page, with the backup, and is checked there.
+/// Address, connection, mailbox as fake relay reports. Invite is on profile's row, checked there.
 fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str) {
     let value = |label: &str| {
         steps
@@ -526,8 +501,7 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     );
     for (label, expected) in [
         ("hint-before", "false"),
-        // No hint under the name any more: what read as help to one
-        // reader read as a subtitle to another.
+        // No hint under name: help to one reader, subtitle to another.
         ("field-before", "true"),
         ("edit", "true"),
         ("hint-editing", "false"),

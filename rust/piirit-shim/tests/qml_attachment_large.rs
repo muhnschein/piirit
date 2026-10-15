@@ -1,17 +1,10 @@
-//! A file bigger than the core recommends is said to be large, and sent.
+//! File over core's recommended size is said to be large, and sent.
 //!
-//! The conversation asks the core for the largest attachment it
-//! recommends (`sys.msgsize_max_recommended`, see `media.rs`). That is one
-//! constant for every relay, and many relays take more -- issue #101 is a
-//! relay taking 200 MB that Piirit would not hand a 25 MB file to. So a
-//! file past it gets a notice above the field, and the send button stays
-//! on and sends it. A picture gets no notice, whatever it weighs, because
-//! the core recodes one on its way out.
+//! Conversation asks core for largest recommended attachment (`sys.msgsize_max_recommended`, see
+//! `media.rs`). One constant for all relays, though many take more (issue #101). File past it gets
+//! a notice; send stays on. Pictures get no notice: core recodes them.
 //!
-//! The fake core is told a ceiling of a kilobyte
-//! (`PIIRIT_FAKE_MSGSIZE_MAX`), so the files here are small enough to
-//! write in a test rather than the twenty-odd megabytes the real
-//! recommendation is.
+//! Fake ceiling 1 KB (`PIIRIT_FAKE_MSGSIZE_MAX`): test files stay small.
 
 // Qt harness: see qml_send_file.rs.
 #![allow(
@@ -81,15 +74,14 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // Both past the ceiling below. One of them is a picture, which the
-    // core shrinks on the way out, so its size on the phone decides
+    // Both past ceiling. One is a picture, shrunk by core on the way out: its phone size decides
     // nothing.
     let video = temp.join("holiday clip.mp4");
     let picture = temp.join("holiday photo.jpg");
     std::fs::write(&video, vec![0_u8; 4096]).expect("write the video");
     std::fs::write(&picture, vec![0_u8; 4096]).expect("write the picture");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -172,7 +164,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
-        // Sent, so the bar and the notice with it are gone.
+        // Sent: bar and notice gone.
         probe!("bar-after-send", "largeFileBar", "visible");
         (*steps_ptr).push((
             "attach-picture",
@@ -213,8 +205,8 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         "nothing says the picked file is bigger than some relays take, so \
          the reader finds out only from a send that fails. {context}"
     );
-    // Both sizes, and that the send may fail: the reader decides from
-    // this whether to send a file the relay may refuse.
+    // Both sizes, and that send may fail: reader decides whether to send a file relay may
+    // refuse.
     assert_eq!(
         value("bar-text"),
         "At 4.1 kB, this file is bigger than the 1.0 kB most relays accept. \
@@ -222,8 +214,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         "the notice does not say how big the file is, how big the core \
          recommends, and that the send may fail. {context}"
     );
-    // Issue #101: the recommendation is the core's, the same for every
-    // relay, and a relay that takes more is common. It is a warning.
+    // Issue #101: recommendation is core's, same for all relays; a warning only.
     assert_eq!(
         value("send-enabled"),
         "true",
@@ -265,8 +256,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         "the notice outlived the file it is about. {context}"
     );
 
-    // The core recodes a picture before it sends it, so what it weighs on
-    // the phone says nothing about what leaves.
+    // Core recodes pictures before sending: phone size says nothing about what leaves.
     assert_eq!(
         value("bar-for-picture"),
         "false",

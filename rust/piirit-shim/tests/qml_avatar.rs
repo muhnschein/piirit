@@ -1,17 +1,11 @@
-//! A chat with a picture has to read as a circle, like the generated
-//! initials beside it do.
+//! Chat picture reads as a circle, like the initials beside it.
 //!
-//! An `Image` does not inherit its parent's corner radius, and `clip` cuts
-//! only to the bounding box, so the picture is cut to a circle before it
-//! reaches the screen, by the app's own image provider (`src/pictures.rs`;
-//! `qml_pictures.rs` checks what it makes). This pins that the avatar asks
-//! for that circle rather than for the raw file, and at the size it is
-//! drawn, so the circle is as wide as the avatar.
+//! `Image` doesn't inherit corner radius; `clip` cuts only to bounding box. So app's image provider
+//! cuts picture to circle (`src/pictures.rs`, checked by `qml_pictures.rs`). Avatar asks for that
+//! circle at drawn size, not raw file.
 //!
-//! And what an avatar is drawn *in*: its own colour on a page, the
-//! ambience's where the cover lights up whoever has written -- and what
-//! it is drawn as in the moment before the picture has loaded, which is
-//! a moment every row of a chat list spends.
+//! Also what avatar is drawn in: own colour on a page, ambience's where cover lights up; and its
+//! look before picture loads.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -62,7 +56,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_picture_avatar_is_drawn_cut_to_a_circle() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -113,14 +107,12 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
             call!("set", QString::from("chatName"), QString::from("Ada"))
         );
 
-        // No picture: the initial stands in, and no picture is drawn.
+        // No picture: initial stands in; none drawn.
         record!("plain-picture", get!("avatarImage", "visible"));
         record!("plain-initial", get!("avatarInitial", "visible"));
 
-        // A picture, from the frame the path arrives in. It is loaded
-        // off the main thread, so this frame is the one where there is
-        // a path and no picture -- which is the frame a chat list is
-        // built in.
+        // Picture from frame path arrives in. Loaded off main thread: this frame has path, no
+        // picture; chat lists are built in this frame.
         record!(
             "set-picture",
             call!(
@@ -133,13 +125,13 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         record!("loading-picture", get!("avatarImage", "visible"));
     });
 
-    // A second later the picture has loaded, and it is what is drawn.
+    // A second later: picture loaded, drawn.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("picture-status", get!("avatarImage", "status"));
         record!("picture-shown", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
         record!("picture-source", get!("avatarImage", "source"));
-        // What the provider made, which is what is drawn.
+        // What provider made, which is drawn.
         record!("made-width", get!("avatarImage", "implicitWidth"));
         record!("made-height", get!("avatarImage", "implicitHeight"));
         record!("face-width", get!("avatarImage", "width"));
@@ -153,7 +145,7 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
     assert_avatar(&steps);
 }
 
-/// What was read off the avatar, before its picture and after it.
+/// What was read off avatar, before and after picture.
 fn assert_avatar(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -181,7 +173,7 @@ fn assert_avatar(steps: &[(&str, String)]) {
         "ok",
         "the picture could not be set. {context}"
     );
-    // Image.Ready is 1.
+    // `Image.Ready` is 1.
     assert_eq!(
         value("picture-status"),
         "1",
@@ -223,9 +215,8 @@ fn assert_avatar(steps: &[(&str, String)]) {
          {source}. {context}"
     );
 
-    // A circle, not an oval or a disc inside a square: the face is made
-    // square, at the size it is drawn, so its one-pixel rim is one pixel
-    // on screen too.
+    // Circle, not oval or disc in square: square at drawn size, so one-pixel rim is one pixel on
+    // screen.
     let number = |label: &str| value(label).parse::<f64>().unwrap_or_default();
     let (width, height) = (number("face-width"), number("face-height"));
     let (made_width, made_height) = (number("made-width"), number("made-height"));

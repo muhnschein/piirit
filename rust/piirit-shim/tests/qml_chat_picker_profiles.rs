@@ -1,12 +1,7 @@
-//! The chat picker's choice of profile: offered to a caller whose chat can
-//! be any profile's, and to no other.
-//!
-//! Asked for, and with more than one profile to choose from, a choice over
-//! the list names the profile the list is on, the way the profiles page
-//! names it, and turning it to another profile turns the list to that
-//! profile's chats -- which is where `accountId`, read back by the caller,
-//! says the picked chat is from. Not asked for, there is no choice:
-//! forwarding and sharing send from the profile they were started in.
+//! Chat picker profile choice: only for callers whose chat can be any profile's. Asked for, >1
+//! profile: choice over list names list's profile as profiles page does; turning it turns list to
+//! that profile's chats, and `accountId` (read back by caller) says picked chat's profile. Not
+//! asked: no choice; forward/share send from starting profile.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,7 +19,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in; see `qml_chat_list.rs`.
+/// Probe with components dir; see `qml_chat_list.rs`.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -85,8 +80,7 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         std::env::temp_dir().join(format!("piirit-qml-picker-profiles-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. Two profiles, so there is a choice.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits. Two profiles: choice exists.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -143,13 +137,15 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         };
     }
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they
+
+    // point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("read-profiles", call!("readProfiles"));
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
-        // Asked for: the choice, on the profile the picker opened on.
+        // Asked for: choice, on profile picker opened on.
         record!(
             "load-choice",
             load!(r#"{"accountId": 1, "profileChoice": true}"#)
@@ -159,7 +155,7 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         record!("choice-says", get!("pickerProfileCombo", "value"));
         record!("list-on", get!("pickerChats", "account_id"));
 
-        // Turned to the other profile, the list follows.
+        // Turned to other profile: list follows.
         record!("turn", call!("click", QString::from("pickerProfile2")));
         record!("page-on", call!("page", QString::from("accountId")));
         record!("list-turned", get!("pickerChats", "account_id"));
@@ -170,12 +166,12 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         record!("turned-loaded", call!("page", QString::from("chatsLoaded")));
         record!("turned-count", get!("pickerChats", "count"));
 
-        // Not asked for: no choice, whatever there is to choose from.
+        // Not asked for: no choice.
         record!("load-plain", load!(r#"{"accountId": 1}"#));
         record!("plain-hidden", get!("pickerProfileCombo", "visible"));
 
-        // Opened on a profile deleted since -- a quick action's -- with
-        // the profile the settings were opened from to fall back on.
+        // Opened on since-deleted profile (a quick action's): falls back to profile settings were
+        // opened from.
         record!(
             "load-gone",
             load!(r#"{"accountId": 9, "profileChoice": true, "fallbackAccountId": 2}"#)
@@ -187,7 +183,7 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         record!("gone-list", get!("pickerChats", "account_id"));
         record!("gone-loaded", call!("page", QString::from("chatsLoaded")));
         record!("gone-error", call!("page", QString::from("errorMessage")));
-        // With nothing to fall back on, the first profile there is.
+        // Nothing to fall back on: first profile.
         record!(
             "load-gone-first",
             load!(r#"{"accountId": 9, "profileChoice": true}"#)

@@ -1,17 +1,11 @@
-//! A profile's unread count is read once per burst of events, not once
-//! per event.
+//! Unread count read once per burst of events, not per event.
 //!
-//! The count on a profile's row follows every event that could have
-//! moved it, and a message arriving is three or four of those: the
-//! message, the chat's messages, the chat list, the chat's row. Each
-//! read is `get_fresh_msgs`, which answers with the id of every unread
-//! message the profile has. So the core object keeps one read out per
-//! profile: what asks while one is out is noted, and one more read goes
-//! when it lands -- one, however many asked, and after all of them, so
-//! the count still ends up where the last event left it.
+//! Each event that could move count (message, chat's messages, chat list, chat row)
+//! asks for `get_fresh_msgs`. Core keeps one read out per profile: asks during one
+//! are noted; one more read after it lands. However many asked, read after all, so
+//! count ends where last event left it.
 //!
-//! The fake core holds each read back for half a second, so the events
-//! that come together are all in before the first read lands.
+//! Fake core holds reads back half a second, so burst is all in before first read.
 
 // Qt harness: see download_limit.rs.
 #![allow(
@@ -30,7 +24,7 @@ use serde_json::{json, Value};
 
 mod common;
 
-/// The `get_fresh_msgs` calls made so far, by their parameters.
+/// `get_fresh_msgs` calls so far, by params.
 fn reads(journal: &std::path::Path) -> Vec<Value> {
     common::calls(journal)
         .into_iter()
@@ -45,23 +39,20 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Eight events that could each have moved profile 1's count, in
-        // one batch -- two messages arriving, as the core announces them
-        // -- and a line of its log among them, which moves nothing.
+        // Eight events that could move profile 1's count, one batch: two messages
+        // arriving, plus a log line that moves nothing.
         std::env::set_var(
             "PIIRIT_FAKE_SEED_EVENTS",
             "IncomingMsg,MsgsChanged,ChatlistChanged,ChatlistItemChanged,Info,\
              IncomingMsg,MsgsChanged,ChatlistChanged,ChatlistItemChanged",
         );
         std::env::set_var("PIIRIT_FAKE_FRESH_DELAY_MS", "500");
-        // And one more message, well after both reads have landed: a
-        // count that has been read is free to be read again.
+        // One more message after both reads landed: count may be read again.
         std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL_MS", "4000");
     }
 
@@ -81,8 +72,8 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
     let mut after_burst: Vec<Value> = Vec::new();
     let after_burst_ptr: *mut Vec<Value> = std::ptr::addr_of_mut!(after_burst);
 
-    // SAFETY for both blocks: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for both blocks: fire only while `exec()` runs on this thread; all they point
+    // at outlives it.
     let seen = journal.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
         *after_burst_ptr = reads(&seen);

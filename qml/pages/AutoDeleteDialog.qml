@@ -2,27 +2,17 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Deleting old messages, asked about once.
- *
- * Setting a period deletes every message older than it the moment the
- * core hears of it, in every chat of every profile, read or not -- and
- * keeps doing so from then on. That is the one setting a tap should not
- * be enough for, so it is a page of its own, the way deltachat-android
- * and deltachat-ios ask: how many messages go now, what that includes,
- * and a switch the reader has to turn before accept means anything. The
- * settings page connects to `accepted` and writes the setting; a dialog
- * left by the back edge writes nothing.
+ * Deleting old messages, asked on own page (as deltachat-android/ios): every
+ * chat of every profile, read or not, now and on. Switch on before accept.
+ * Settings page writes on `accepted`; back edge writes nothing.
  */
 Dialog {
     id: dialog
 
-    /// The period the reader picked, in seconds, and how the settings
-    /// page names it -- said again here, since the choice is off the
-    /// screen by now.
+    /// Picked period, seconds, and settings page's label (choice now off screen).
     property int seconds: 0
     property string periodLabel: ""
-    /// How many messages would go now, across every profile: what the
-    /// core answered when asked.
+    /// Messages going now, all profiles: core's count.
     property int count: 0
 
     canAccept: confirm.checked
@@ -97,8 +87,7 @@ Dialog {
             }
         }
 
-        // Off until the reader turns it: accept does nothing before that,
-        // which is the checkbox the reference clients put on this dialog.
+        // Accept disabled till on (reference clients' checkbox).
         TextSwitch {
             id: confirm
             objectName: "confirmSwitch"

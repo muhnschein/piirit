@@ -3,62 +3,45 @@ import Sailfish.Silica 1.0
 import "../js/Relays.js" as Relays
 
 /*
- * Add a profile: a name, and nothing else unless the reader asks for it.
- * The relay mints the address and credentials; the keys are made on this
- * device (docs/PROJECT.md).
+ * Add profile: name only unless asked; relay mints address and credentials,
+ * keys made on device (docs/PROJECT.md). Accept hands off to ProfileSetupPage.
+ * Shape from parla (github.com/trufae/parla).
  *
- * A dialog rather than a form with a button, the way Silica asks a
- * question: what was typed is on this page, and accepting it goes to
- * ProfileSetupPage, which does the work and shows the progress. The shape
- * of the page follows parla's account dialog (github.com/trufae/parla).
- *
- * The relays are the core's to pick: it makes the profile on whichever of
- * its relays answers first and adds more in the background, so that one
- * relay going down does not cut the profile off (init_transports, core
- * 2.61). That is the whole of the page as it opens, a name and Create.
- * Choosing a relay is under "Advanced", shut until it is opened: the
- * list (Relays.js, shared with the page that adds a relay to a profile),
- * and "Other relay", which brings up a field for one that is not on it,
- * since anyone can run a relay. A relay chosen there is that relay alone,
- * and the section says so. Shut again, it still names the relay, so a
- * choice made there is never one the page does not show.
+ * Core uses first answering relay, adds more later, so one down doesn't cut
+ * profile off (init_transports, core 2.61). Shut "Advanced" holds relay choice
+ * (Relays.js list or "Other relay"); a chosen one is used alone, named in header.
  */
 Dialog {
     id: dialog
 
-    /// The cover offers no quick actions while this is up: a profile is
-    /// being made from it. See piirit.qml.
+    /// No quick actions while making profile. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
-    /// The menu's entries: "Automatic", "Other relay", then the list.
+    /// Menu: "Automatic", "Other relay", then list.
     readonly property int otherIndex: 1
     readonly property int firstRelayIndex: 2
 
-    /// "Advanced" is open.
+    /// "Advanced" open.
     property bool advanced: false
-    /// The core picks the relays: the first entry, "Automatic", picked.
+    /// First entry, "Automatic", is core's pick.
     readonly property bool automatic: relayCombo.currentIndex === 0
-    /// The relay chosen: the one typed for "Other relay", else the one
-    /// picked from the list; empty for "Automatic".
+    /// Typed or picked relay; empty for "Automatic".
     property string domain: relayCombo.currentIndex === otherIndex
                             ? customField.text.trim()
                             : (relayCombo.currentIndex >= firstRelayIndex
                                && relayCombo.currentIndex - firstRelayIndex < relays.length
                                ? relays[relayCombo.currentIndex - firstRelayIndex].domain : "")
-    /// What the core is handed: `dcaccount:` and a relay, which it takes
-    /// with or without the `https://.../new` around it. Empty for
-    /// "Automatic", which the shim hands over as no relay at all.
+    /// `dcaccount:` + relay (core takes it with or without `https://.../new`). Empty for
+    /// "Automatic": shim passes none.
     property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
-    // The public relays, as chatmail.at/relays lists them (Relays.js).
+    // Relays.js (chatmail.at/relays).
     readonly property var relays: Relays.list
 
-    // A name, and relays: the core's, or one picked or typed.
+    // Name and relays: core's, or picked/typed.
     canAccept: nameField.text.trim().length > 0 && (automatic || domain.length > 0)
 
-    // The setup page does the work, with what was typed here. Silica
-    // makes that page as soon as this one is on screen, so what was
-    // typed is handed over on accept rather than at its making.
+    // Setup page does work. Silica builds it when dialog shows: values passed on accept.
     acceptDestination: Qt.resolvedUrl("ProfileSetupPage.qml")
     onAccepted: {
         dialog.acceptDestinationInstance.displayName = nameField.text.trim()
@@ -97,10 +80,7 @@ Dialog {
                 placeholderText: label
             }
 
-            // The section's header, drawn the way Silica draws one that
-            // opens: its title on the right, an arrow saying which way it
-            // goes. A relay chosen inside is named under the title, so a
-            // shut section still shows what Create will do.
+            // Silica-style header; chosen relay named while shut.
             BackgroundItem {
                 objectName: "advancedToggle"
                 width: parent.width
@@ -167,10 +147,9 @@ Dialog {
                     //: The relays the profile is made on: the core's
                     //: ("Automatic"), one from the list, or another.
                     label: qsTr("Relay")
-                    // "Automatic": several relays, the core's choice.
+                    // "Automatic": several relays, core's choice.
                     currentIndex: 0
-                    // What the choice means, under it: why several, while
-                    // that is what Create will do; one alone otherwise.
+                    // Automatic: why several; else one only.
                     description: dialog.automatic
                                  ? qsTr("Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.")
                                  : qsTr("Only this relay. More can be added later on the profile page.")
@@ -218,9 +197,7 @@ Dialog {
                     color: Theme.secondaryColor
                     linkColor: Theme.highlightColor
                     textFormat: Text.StyledText
-                    // What a relay is, for a reader who has an e-mail
-                    // account and wonders whether it will do: it will not,
-                    // and the page that explains why is the one to point at.
+                    // Why e-mail won't do: see explainer page.
                     text: qsTr("Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see <a href=\"https://chatmail.at\">chatmail.at</a>. A full list of public, free-to-use chatmail relays is at <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a>.")
                     onLinkActivated: Qt.openUrlExternally(link)
                 }

@@ -3,53 +3,34 @@ import Sailfish.WebView 1.0
 import Sailfish.WebEngine 1.0
 
 /*
- * The page a call's media runs in: upstream's calls-webapp, served by the
- * shim on a loopback address of its own (call_host.rs), in the browser
- * engine that has the peer connection, the codecs and the echo
- * cancellation.
- *
- * A component of its own, loaded by the call page, for the reason the
- * webxdc page is pushed by URL: `Sailfish.WebView` is the one type in
- * this tree that resolves only on a release that ships the browser
- * engine. Missing, it costs this and nothing else -- a call that rings
- * can still be seen, and declined, on a phone that could never have
- * answered it.
- *
- * Nothing here decides anything about the call. The page carries its own
- * controls -- the red button, the microphone -- and what they do reaches
- * the core through the host; the call page around this draws who and
- * how. What is decided here is how the engine treats the page, in two
- * places where a call is not an ordinary page.
+ * Call media page: upstream calls-webapp, served on loopback (call_host.rs),
+ * run by browser engine (peer connection, codecs, echo cancel). Own component:
+ * `Sailfish.WebView` missing on some releases, only this breaks. Decides
+ * nothing about the call; only how engine treats the page.
  */
 Item {
     id: root
 
-    /// Where the call's page is, command and all. Empty for none.
+    /// Call page URL.
     property string url: ""
 
-    /// Whether the page is the one on screen with the app in front: when
-    /// an ordinary page would be running.
+    /// Page on screen, app in front.
     property bool shown: true
 
-    /// Whether the call is still up. While it is, the page runs whether
-    /// or not it is shown.
+    /// Call up: page runs shown or not.
     property bool holding: false
 
-    /// The page has drawn at least once.
+    /// Page drawn once.
     readonly property bool loaded: view.loaded
 
-    /// Whether the page may come up: once the call's sound has its way
-    /// out (CallAudio.ready). Up any sooner, it could open the microphone
-    /// before the sound is moved, and moving it then brings the phone's
-    /// sound server down (CallAudio.qml says why). Only coming up waits:
-    /// a page that is up is not taken down for it.
+    /// Page up once call sound routed (CallAudio.ready): earlier, mic opens
+    /// before sound moves, killing sound server (CallAudio.qml). Up page stays.
     property bool allowed: true
 
-    /// Where the view goes: `url`, once the microphone has been granted
-    /// to it. Set rather than bound, so the grant is always first.
+    /// Target URL, once mic granted. Set, not bound: grant first.
     property string target: ""
 
-    /// The address the page is served on, `127.0.0.1:port`.
+    /// Page address: `127.0.0.1:port`.
     function authorityOf(where) {
         var at = ("" + where).indexOf("//")
         if (at < 0) {
@@ -60,10 +41,7 @@ Item {
         return slash < 0 ? rest : rest.substring(0, slash)
     }
 
-    /// Put the view back if the page takes itself somewhere else. The
-    /// page never does -- it changes its own hash, which is not moving --
-    /// but the view is one that holds a microphone, and it stays where
-    /// it was put. See WebxdcPage.qml, which does the same for an app.
+    /// Put view back if page navigates; holds mic, so stays. As WebxdcPage.qml.
     function keepInside() {
         var here = root.authorityOf(view.url)
         var ours = root.authorityOf(root.target)
@@ -74,27 +52,16 @@ Item {
         view.url = Qt.binding(function () { return root.target })
     }
 
-    /// The origin the microphone and the camera are granted to, while
-    /// they are.
+    /// Origin granted mic and camera while held.
     property string granted: ""
 
-    /// What the call's page is granted: what a call is made with. The
-    /// camera opens only when it is switched on (call_video.js), and the
-    /// grant is what keeps that switch from opening on a prompt too.
+    /// Device grants. Camera opens only when switched on (call_video.js); grant
+    /// keeps switch from prompting.
     readonly property var devices: ["microphone", "camera"]
 
-    /// Grant the call's own page the microphone and the camera before it
-    /// asks.
-    ///
-    /// The engine asks the reader about every page that wants either,
-    /// per origin, and the call's origin is a new port every call -- so
-    /// "remember" never would, and every call would open on a browser's
-    /// permission prompt. The reader has already said: they placed the
-    /// call, or answered it, or switched the camera on. So the page is
-    /// granted both for the session, exactly as the prompt's own allow
-    /// does, and they are taken back when the call goes. Only this
-    /// origin: the engine-wide switch that would do the same would do it
-    /// for every webxdc app as well.
+    /// Grant page mic and camera before it asks. Engine prompts per origin, new
+    /// port each call ("remember" fails); reader consented already. Session
+    /// grant, revoked at end. Origin only: engine-wide hits webxdc apps too.
     function grant(origin) {
         if (root.granted === origin) {
             return
@@ -108,7 +75,7 @@ Item {
                 "msg": "add",
                 "uri": "http://" + origin,
                 "type": root.devices[i],
-                // ALLOW_ACTION, for the session: the prompt's own answer.
+                // ALLOW_ACTION: session only.
                 "permission": 1,
                 "expireType": 1
             })
@@ -130,15 +97,9 @@ Item {
         root.granted = ""
     }
 
-    /// Grant the page's origin, then point the view at the page: before
-    /// the page is there, it cannot ask. A page not allowed yet is
-    /// nowhere, and a page that was somewhere else goes.
-    ///
-    /// Not before the engine is up. It starts on the event loop after
-    /// this file first imports it -- on the first call of a run, that is
-    /// now -- and until then it drops what it is told, with a warning
-    /// and nothing else: the grant would be lost, and the call would open
-    /// on the engine's own microphone prompt.
+    /// Grant origin, then point view. Not before engine up (event loop after first
+    /// import, i.e. first call): earlier requests dropped with warning, call opens
+    /// on mic prompt.
     function go() {
         if (!WebEngine.isInitialized()) {
             return
@@ -163,14 +124,9 @@ Item {
     Component.onCompleted: root.go()
     Component.onDestruction: root.revoke()
 
-    // `active` is what WebView.qml's own binding would be -- the page on
-    // screen, the app in front; the call page works that out and hands
-    // it in as `shown` -- until the page has come up. A view that is
-    // never made active by its page's transition draws nothing at all
-    // (see WebxdcPage.qml). From then on, for as long as the call lasts,
-    // it stays active: an inactive view is a hidden document, and the
-    // engine pauses a hidden document's media -- which for a call is the
-    // other end's voice, gone the moment the reader looks at another app.
+    // `active`: WebView.qml's binding (`shown`) until page up. Hidden document
+    // pauses media (other end's voice): active for the call. Never-active view
+    // draws nothing (WebxdcPage.qml).
     WebView {
         id: view
         objectName: "callView"

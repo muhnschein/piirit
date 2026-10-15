@@ -1,15 +1,8 @@
-//! A message that sorts into the middle of a chat lands there, in place.
+//! Message sorting into chat middle lands in place, not appended.
 //!
-//! The core does not only append. It sorts a received message below the
-//! newest *seen* message and no further, so while the reader is up in the
-//! history -- where nothing arriving is marked seen -- a late message from
-//! a busy group, or an older one synced from another device, goes in among
-//! the unread ones rather than after them.
-//!
-//! Answering that by starting the model over would replace the rows, lose
-//! the view's place, and blank the rows the reader had filled in. What is
-//! pinned here is that an arrival anywhere in the chat is one more row
-//! where it belongs, and that nothing else moves or empties.
+//! Core sorts a received message below newest *seen*; while reader is up in history nothing is seen,
+//! so a late or synced message lands among unread. Restarting model would drop rows.
+//! Pinned: arrival = one more row; nothing else moves or empties.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -27,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// More than a page, so the top of the chat is somewhere a reload would
-/// leave empty.
+/// More than a page, so chat top is somewhere reload would leave empty.
 const MESSAGES: u32 = 130;
 
 const PROBE_QML: &str = r"
@@ -73,14 +65,13 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // After the top of the chat has been read, below.
+        // After chat top read, below.
         std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL_MS", "5000");
     }
 
@@ -117,7 +108,7 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("opened", call!("count")));
         (*steps_ptr).push(("opened-edges", call!("edges")));
-        // Up in the history, with the rows there filled in.
+        // Up in history, rows filled in.
         (*steps_ptr).push(("read-top", call!("readTop")));
     });
     single_shot(Duration::from_millis(4500), move || unsafe {
@@ -143,7 +134,7 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
     assert_outcome(&steps, &journal);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run shows, out of test body.
 fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     let value = |label: &str| {
         steps
@@ -171,7 +162,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
          run says nothing about what an arrival does to it. {context}"
     );
 
-    // One more row, where the core put it: before the last message.
+    // One more row, where core put it: before last message.
     assert_eq!(
         value("arrived"),
         (MESSAGES + 1).to_string(),
@@ -194,8 +185,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the late message was put in a row and left blank. {context}"
     );
 
-    // And nothing else moved or emptied: the rows the reader had filled in
-    // are still filled in, which a reload would have undone.
+    // Nothing else moved or emptied: filled rows still filled (reload would undo).
     assert_eq!(
         value("top-still-filled"),
         "true",

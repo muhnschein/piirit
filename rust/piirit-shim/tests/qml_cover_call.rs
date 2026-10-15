@@ -1,19 +1,11 @@
-//! The cover while a call is up: the call, instead of the grid.
+//! Cover while call up, not grid. Who, large, near top; under it duration, or state until
+//! connected. Their picture behind it all, else plain cover with avatar. Pills: mic off, camera
+//! paused, each only when so. One action, mic: icon is what a tap does, tap does it -- never hangs
+//! up, never camera; none while only ringing. Reader's own quick actions gone for call, back after.
+//! Grid not re-laid out under it; call clock ticks only when looked at.
 //!
-//! Who, large, near the top; under it how long, or how the call stands
-//! until it is connected; their picture behind it all when they have one,
-//! and the plain cover with their avatar when they have none. In the
-//! middle, a pill for the microphone being off and one for the camera
-//! being paused, each only when it is so. One action, the microphone,
-//! whose icon is what a tap does and whose tap does it -- never hanging
-//! up, never the camera -- and none while the call only rings. The
-//! reader's own quick actions are gone for the call and back after it,
-//! the grid is not laid out again under it, and the call's clock ticks
-//! only while somebody is looking.
-//!
-//! The call is a stand-in with the real one's names (`calls.rs`), so the
-//! cover can be put in each state at will; the probe checks the names
-//! against a real `Call` so the two cannot drift apart.
+//! Call is a stand-in with real one's names (`calls.rs`), so cover can be put in any state; probe
+//! checks names against a real `Call` so the two can't drift.
 
 // Qt harness: see qml_cover.rs.
 #![allow(
@@ -31,8 +23,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in so it can write the
-/// `Settings` the cover reads.
+/// Probe; components dir filled in for `Settings`.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -357,18 +348,15 @@ fn the_cover_shows_the_call_while_one_is_up() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-cover-call-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let picture = common::a_real_picture();
-    // A file that is there and is not a picture: it never loads.
+    // Not a picture: never loads.
     let not_a_picture = temp.join("not-a-picture.png");
     std::fs::write(&not_a_picture, b"not a picture").expect("write a broken picture");
     let not_a_picture = not_a_picture.display().to_string();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. Two profiles with people in them, so the
-    // grid has something to be stale about.
+    // SAFETY: single thread; pre-Qt, pre-fork. Two profiles with people: grid can be stale.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
-        // The probe's window needs a scene graph to grab the cover from;
-        // the software one needs no GL context.
+        // Probe window needs a scene graph to grab cover from; software one needs no GL.
         std::env::set_var("QT_QUICK_BACKEND", "software");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
@@ -429,10 +417,10 @@ fn the_cover_shows_the_call_while_one_is_up() {
         };
     }
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()`.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("names", call!("missingNames"));
-        // One quick action of the reader's own, to see it go and come back.
+        // Own quick action: goes, comes back.
         record!("count", call!("count", 1));
         record!(
             "set-left",
@@ -448,8 +436,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("idle-drawn", call!("drawn"));
     });
 
-    // The lists are in. A video call rings here, from someone without a
-    // picture.
+    // Lists in. Video call rings, from someone without picture.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("idle-grid", call!("grid"));
         record!("ring", state!("ringing", "Alice", "", -1, "true", "true"));
@@ -460,15 +447,14 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("ring-drawn", call!("drawn"));
         record!("ring-backdrop", call!("backdrop"));
 
-        // Someone writes during the call: the grid waits.
+        // Writes during call: grid waits.
         record!("mark", call!("markUnread", 0, 1));
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("ring-grid", call!("grid"));
 
-        // A voice call placed from here, ringing at the other end, and then
-        // being set up.
+        // Voice call placed: ringing, then set up.
         record!(
             "calling",
             state!("calling", "Bob", "", -1, "false", "false")
@@ -483,7 +469,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
         record!("connecting-time", text!("callTime"));
 
-        // Connected a minute and five seconds ago.
+        // Connected 65 s ago.
         record!(
             "connected",
             state!("connected", "Bob", "", 65, "false", "false")
@@ -494,7 +480,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("voice-backdrop", call!("backdrop"));
         record!("live-icon", call!("micIcon"));
 
-        // The microphone, off from the cover, and on again.
+        // Mic off, then on, from cover.
         record!("tap-off", call!("tapMic"));
         record!("muted-icon", call!("micIcon"));
         record!("muted-notes", call!("notes"));
@@ -506,18 +492,18 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("unmuted-notes", call!("notes"));
         record!("unmuted-icon", call!("micIcon"));
 
-        // A light ambience gets the black ink.
+        // Light ambience: black ink.
         record!("light", call!("ink", QString::from("#000000")));
         record!("light-icon", call!("micIcon"));
         record!("dark", call!("ink", QString::from("#ffffff")));
 
-        // Nobody looking: the clock stops. Looked at again: it goes on.
+        // Nobody looking: clock stops; looked at: goes on.
         record!("away", call!("look", 0));
         record!("away-ticking", call!("ticking"));
         record!("back", call!("look", 2));
         record!("back-ticking", call!("ticking"));
 
-        // A video call with the camera wanted, and their picture.
+        // Video call, camera wanted, their picture.
         record!(
             "video",
             state!("connected", "Carol", picture.clone(), 3725, "true", "true")
@@ -532,20 +518,19 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("both-notes", call!("notes"));
         record!("both-drawn", call!("drawn"));
         record!("unmute", call!("setMuted", QString::from("false")));
-        // The camera switched off in a video call: nothing to say of it.
+        // Camera off in video call: nothing to say.
         record!("camera-off", call!("setCamera", QString::from("false")));
         record!("camera-off-notes", call!("notes"));
     });
 
-    // Their picture has loaded off the main thread.
+    // Their picture loads off main thread.
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("pictured-backdrop", call!("backdrop"));
         record!("pictured-shaders", call!("drawnThrough"));
         record!("pictured-name", text!("callName"));
     });
 
-    // The clock has ticked at least once since. Then nobody looks for a
-    // while.
+    // Clock ticked since; then nobody looks a while.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("later-time", text!("callTime"));
         record!("asleep", call!("look", 0));
@@ -557,7 +542,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("awake", call!("look", 2));
         record!("awake-time", text!("callTime"));
 
-        // A picture that never loads is no picture.
+        // Never-loading picture is no picture.
         record!(
             "broken",
             state!(
@@ -574,8 +559,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("broken-backdrop", call!("backdrop"));
 
-        // Over: the grid and the reader's action come back, with what
-        // arrived during the call.
+        // Over: grid and action back, arrivals included.
         record!("ended", state!("ended", "Dave", "", 10, "false", "false"));
         record!("ended-mode", call!("mode"));
         record!("ended-lists", call!("lists"));
@@ -586,10 +570,8 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("reset-mode", call!("mode"));
     });
 
-    // How the call fits the cover, with the theme's sizes as a phone has
-    // them: the worst a name, a missing picture and both pills can do, on
-    // the large cover and on the small one. Each case is grabbed to a
-    // picture on a tick of its own, as the grab is taken on the next frame.
+    // Call fits cover at phone theme sizes: worst name, no picture, both pills; large and
+    // small. Each grabbed on own tick (grab lands next frame).
     let picture_dir = std::env::var_os("PIIRIT_COVER_SHOTS")
         .map_or_else(|| temp.join("shots"), std::path::PathBuf::from);
     std::fs::create_dir_all(&picture_dir).expect("create the shots directory");
@@ -608,7 +590,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     single_shot(Duration::from_secs(12), move || unsafe {
         record!("phone-theme", call!("phoneTheme"));
         record!("large", call!("size", 234, 374));
-        // Before it is connected, and while it rings: nothing to switch.
+        // Unconnected, ringing: nothing to switch.
         state!("ringing", long_name, "", -1, "true", "true");
         record!("fit-ringing", call!("layout"));
         state!("calling", long_name, "", -1, "true", "true");
@@ -679,8 +661,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     });
 
-    // Back to the large cover, with their picture, which loads off the
-    // main thread.
+    // Back to large cover; their picture, off main thread.
     single_shot(Duration::from_secs(15), move || unsafe {
         call!("size", 234, 374);
         state!("connected", long_name, pictured.clone(), 12, "true", "true");
@@ -695,8 +676,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     });
 
-    // The voice call, with the microphone off: the same picture, so it
-    // stays loaded.
+    // Voice call, mic off: same picture stays loaded.
     let to_file = picture_at;
     single_shot(Duration::from_secs(17), move || unsafe {
         call!("setName", QString::from(short_name));
@@ -730,7 +710,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     );
     assert_eq!(value("load"), "ok", "the cover did not load. {context}");
 
-    // No call: the grid, and the reader's action.
+    // No call: grid and action.
     assert_eq!(value("idle-mode"), "false|true", "{context}");
     assert_eq!(
         value("idle-lists"),
@@ -739,7 +719,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     );
     assert_eq!(value("idle-drawn"), "search-32-white.png", "{context}");
 
-    // Ringing here: the call, with how it stands, and nothing to tap.
+    // Ringing here: call state, nothing to tap.
     assert_eq!(
         value("ring-mode"),
         "true|false",
@@ -763,7 +743,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "without a picture the cover is not the plain one with their avatar. {context}"
     );
 
-    // The grid is not laid out under the call, and catches up after it.
+    // Grid laid out after call, not under it.
     assert_eq!(value("idle-grid"), "0|fresh", "{context}");
     assert_eq!(
         value("ring-grid"),
@@ -776,7 +756,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "what arrived during the call is not on the grid after it. {context}"
     );
 
-    // Before it is connected, the call page's words.
+    // Unconnected: call page's words.
     assert_eq!(value("calling-time"), "Ringing…", "{context}");
     assert_eq!(value("connecting-time"), "Connecting…", "{context}");
     assert_eq!(
@@ -791,7 +771,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     );
     assert_eq!(value("calling-notes"), "false|false", "{context}");
 
-    // Connected: how long, ticking.
+    // Connected: duration ticking.
     let connected = value("connected-time");
     assert!(
         ["00:01:05", "00:01:06", "00:01:07"].contains(&connected.as_str()),
@@ -803,9 +783,8 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "an hour-long call does not count its hours: {long}. {context}"
     );
     assert_eq!(value("connected-ticking"), "true", "{context}");
-    // Carol's call is the same call from 6 s to 10 s: the clock moves on
-    // while it is looked at, holds while it is not, and is right again the
-    // moment it is looked at again.
+    // Carol's call, 6 s to 10 s: clock moves when looked at, holds when not, right again once
+    // looked at.
     assert_ne!(
         value("later-time"),
         long,
@@ -833,7 +812,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "the call's clock ticks on after the call. {context}"
     );
 
-    // The pills: each only when it is so.
+    // Pills: only when so.
     assert_eq!(
         value("voice-notes"),
         "false|false",
@@ -868,8 +847,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "a video call has more than the microphone on the cover. {context}"
     );
 
-    // The microphone action: its icon is what a tap does, and a tap does
-    // it.
+    // Mic action: icon is what a tap does, and a tap does it.
     assert!(
         value("live-icon").ends_with("/art/cover/mic-off-32-white.png"),
         "with the microphone on, the action is not drawn as switching it off. {context}"
@@ -907,7 +885,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     }
 
-    // Their picture, behind it all, and no avatar over the name.
+    // Their picture behind all; no avatar over name.
     assert_eq!(value("voice-backdrop"), "false|false|true", "{context}");
     assert_eq!(
         value("pictured-backdrop"),
@@ -926,7 +904,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "a picture that never loads leaves the cover without the avatar. {context}"
     );
 
-    // Over: the grid and the reader's own action again.
+    // Over: grid and action again.
     assert_eq!(
         value("ended-mode"),
         "false|true",
@@ -940,9 +918,8 @@ fn the_cover_shows_the_call_while_one_is_up() {
     assert_eq!(value("ended-drawn"), "search-32-white.png", "{context}");
     assert_eq!(value("reset-mode"), "false|true", "{context}");
 
-    // How the call fits the cover, at a phone's sizes. Every case: nothing
-    // past the side margins or into the action's strip, nothing over
-    // anything else, the name on one line or two, and the largest words.
+    // Call fits cover at phone sizes. Every case: nothing past side margins or into action strip,
+    // nothing over anything else, name on one or two lines, largest words.
     assert_eq!(value("phone-theme"), "ok", "{context}");
     let fit = |label: &str| {
         let layout = value(label);
@@ -1009,10 +986,8 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     }
 
-    // A long name takes two lines, and is cut short after them. (Whether
-    // a shorter one fits on one line depends on the font the test machine
-    // has.) Without a picture, the avatar is there while there is room
-    // for it over the rest, and gone when there is not.
+    // Long name: two lines, cut short (one-line depends on test font). No picture: avatar
+    // while room, else gone.
     assert_eq!(size("fit-long-bare-both", "lines"), 2, "{context}");
     assert_eq!(size("fit-long-pictured-both", "lines"), 2, "{context}");
     assert_eq!(

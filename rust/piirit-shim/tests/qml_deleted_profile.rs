@@ -1,18 +1,11 @@
-//! Deleting the profile the app is on, with another left, moves the app
-//! to the other one -- and so does launching on a profile that is gone.
+//! Deleting current profile (another left) moves app to the other; so does launch on a
+//! gone profile. Bug: stayed on deleted profile, dconf remembered it so next launch resumed onto
+//! it: empty list, "account with id N not found" from every page opened there (chats, settings,
+//! quick-action chat picker). Quick action whose chat was in it kept pointing into it too.
 //!
-//! What it used to do was nothing. The chat list stayed open on the
-//! deleted profile, and dconf kept remembering it, so the next launch
-//! resumed onto it as well: an empty list, and "account with id N not
-//! found" from every page opened from there -- the chats, the settings,
-//! the chat picker a quick action is set up with. A quick action whose
-//! chat was in that profile kept pointing into it too.
-//!
-//! The window owns the move, for the reasons `qml_last_profile` gives:
-//! the deletion lands as the profiles page is leaving and the stack is
-//! mid-transition, so the move is held until the stack can make it. What
-//! the next launch reads is written at once, though: the app can be
-//! closed before the move is made.
+//! Window owns move (reasons in `qml_last_profile`): deletion lands as profiles page leaves, stack
+//! mid-transition, so move held until stack can make it. Next-launch read written at once: app can
+//! close before move is made.
 
 // Qt harness: see qml_startup.rs.
 #![allow(
@@ -30,7 +23,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The window, loaded the way `qml_last_profile` loads it.
+/// Window, loaded as `qml_last_profile` does.
 fn probe_qml(components: &std::path::Path) -> String {
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
 }
@@ -117,14 +110,14 @@ const PROBE_QML: &str = r"
 fn the_app_leaves_a_deleted_profile_for_one_there_is() {
     let temp = std::env::temp_dir().join(format!("piirit-deleted-profile-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; see common::qml_tree_without_enter_key.
+    // `EnterKey` has no stub: see common::qml_tree_without_enter_key.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Two profiles, so one is left when the other goes.
+        // Two profiles: one left when other goes.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
@@ -138,7 +131,7 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    // The real one is handed in by main.rs; the value is never read here.
+    // Real one handed in by main.rs; never read here.
     engine.set_property(
         "rpcServerPath".into(),
         QString::from(env!("CARGO_BIN_EXE_fake-core-server")).into(),
@@ -170,9 +163,8 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
-    // 1s: the app on profile 1, with a quick action into each profile's
-    // chats and one that is not a chat's.
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // 1s: app on profile 1; a quick action into each profile's chats, and one not a chat's.
+    // SAFETY: callbacks run only inside `exec()`.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push(("load", call!("load", root.clone())));
         (*steps_ptr).push(("on-1", call!("onProfile", "1")));
@@ -181,9 +173,8 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
         (*steps_ptr).push(("refresh", call!("refresh")));
     });
 
-    // 3s: both profiles are there, so nothing moved. Profile 1 is deleted
-    // with the stack busy, which is what a swipe back off the profiles
-    // page leaves behind.
+    // 3s: both there, nothing moved. Profile 1 deleted with stack busy (as swipe back off profiles
+    // page leaves it).
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("kept", call!("stackLog")));
         (*steps_ptr).push(("left-kept", call!("holds", "left")));
@@ -191,7 +182,7 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
         (*steps_ptr).push(("delete", call!("deleteProfile", "1")));
     });
 
-    // 5s: the move is held, but what the next launch reads is not.
+    // 5s: move held; next-launch read not.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push(("held", call!("stackLog")));
         (*steps_ptr).push(("remembered", call!("remembered")));
@@ -201,9 +192,7 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
         (*steps_ptr).push(("settled", call!("transition", "false")));
     });
 
-    // 6s: it lands. Then a launch that resumes onto a profile the core
-    // does not have -- one remembered from before this was fixed, or
-    // deleted from another client -- once the core lists the profiles.
+    // 6s: it lands. Then launch resumes onto profile core lacks (stale or deleted elsewhere).
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("landed", call!("stackLog")));
         (*steps_ptr).push(("stale", call!("onProfile", "9")));

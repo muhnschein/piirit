@@ -1,24 +1,19 @@
 #!/bin/sh
-# Build the Piirit RPM for a Sailfish device, using the Sailfish SDK.
+# Builds Piirit's RPM for a Sailfish device with the Sailfish SDK.
 #
 #     scripts/build-rpm.sh [<arch>] [<sfos-target-version>]
 #
-# Defaults to aarch64 and whatever SDK target that arch resolves to; pass a
-# version to pin one, e.g.:
+# Defaults: aarch64, its SDK target. Pass a version to pin:
 #
 #     scripts/build-rpm.sh aarch64 5.0.0.62
 #     scripts/build-rpm.sh armv7hl
 #
-# Requirements (none of which can be substituted -- see docs/BUILDING.md):
-#   * Sailfish SDK with the *Docker* build engine. The VirtualBox build
-#     engine cannot compile Rust.
-#   * An installed build target for the arch. `sfdk tools list -a` lists
-#     what is available.
+# Needs (none substitutable; docs/BUILDING.md):
+#   * Sailfish SDK, Docker engine (VirtualBox engine can't compile Rust).
+#   * Installed build target for the arch (`sfdk tools list -a`).
 #
-# `sfdk build` runs every SPEC section except %prep, i.e. it builds from
-# this working tree in place -- which is why the deltachat-rpc-server
-# binaries fetched below (gitignored, not committed) are picked up without
-# any tarball/vendoring step.
+# `sfdk build` runs every SPEC section but %prep: builds this tree in place,
+# so the rpc-server binaries fetched below (gitignored) are used as is.
 
 set -eu
 
@@ -67,5 +62,5 @@ sfdk -c target="$target" build
 
 echo
 echo "RPMs:"
-# Plain `find`: -newermt is a GNU extension and this is /bin/sh.
+# Plain `find`: -newermt is GNU-only; this is /bin/sh.
 find RPMS -name '*.rpm' 2>/dev/null || echo "  (none under RPMS/)"

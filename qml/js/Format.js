@@ -1,24 +1,9 @@
-// What the rows that show a time or a delivery mark have in common, so a
-// chat reads the same in every list it appears in. Shared rather than
-// copied: the two copies of timeLabel had already started to drift.
-//
-// No `.pragma library`: qsTr() translates in the context of the component
-// that imports this, and a shared library has none.
+// Time and delivery-mark helpers, shared so lists agree. No `.pragma library`:
+// qsTr() needs importing component's context.
 
-/// How long ago, in as few characters as will say it.
-///
-/// "10 min" reads faster than "14:32" when the answer wanted is
-/// "recently", and it does not need the reader to know what time it is
-/// now. Past a week the elapsed count stops meaning anything, so it goes
-/// back to a date.
-///
-/// `now` is the present in milliseconds, and the caller passes
-/// `Clock.now` rather than leaving it to be read here: a binding that
-/// reads `Date.now()` is never told the time has changed, and kept saying
-/// "now" for as long as the row lived (see Clock.qml). It is what makes
-/// the label be worked out again; the time itself is the later of it and
-/// the real one, because the clock is up to a tick behind, and a message
-/// three days old read a tick ago as "2 days".
+/// Elapsed time, fewest chars ("10 min" over "14:32"); past a week: date. `now`
+/// from `Clock.now` (bindings never re-run on `Date.now()`); later of it and
+/// real clock, which lags a tick.
 function timeLabel(seconds, now) {
     if (seconds <= 0) {
         return ""
@@ -35,20 +20,15 @@ function timeLabel(seconds, now) {
         return qsTr("%1 h").arg(Math.floor(elapsed / 3600000))
     }
     if (elapsed < 7 * 86400000) {
-        // %n, so a language with three plural forms gets all three. The
-        // English catalog is what turns the source's "day(s)" into a
-        // word, which is why the app falls back to it for a language it
-        // has no catalog for: without one loaded, %n shows the source
-        // text as it stands.
+        // %n: plural forms. English catalog words "day(s)"; fallback for
+        // untranslated languages (else raw source).
         //: How long ago a chat's last message was. %n is a count of days.
         return qsTr("%n day(s)", "", Math.floor(elapsed / 86400000))
     }
     return Qt.formatDate(when, Qt.DefaultLocaleShortDate)
 }
 
-/// A size a person can read. Decimal units, as the platform's own file
-/// manager uses; whole bytes, one decimal for everything else -- "1.5 MB",
-/// not "1.5 B".
+/// Human size: decimal units, whole bytes, else one decimal ("1.5 MB").
 function readableSize(bytes) {
     if (bytes <= 0) return ""
     var units = ["B", "kB", "MB", "GB"]
@@ -61,8 +41,8 @@ function readableSize(bytes) {
     return (step === 0 ? Math.round(size) : size.toFixed(1)) + " " + units[step]
 }
 
-/// The mark beside a message we sent, from its DC_STATE_*: 20 pending,
-/// 24 failed, 26 delivered, 28 read. Nothing for an incoming message.
+/// Mark on own sent message from DC_STATE_*: 20 pending, 24 failed, 26
+/// delivered, 28 read. None if incoming.
 function stateMark(state) {
     if (state === 28) return "✓✓"
     if (state === 26) return "✓"

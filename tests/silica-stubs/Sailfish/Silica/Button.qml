@@ -1,10 +1,10 @@
 import QtQuick 2.0
 
-// A label and a clicked() signal the harness can emit for a tap.
+// Label plus clicked(), which harness emits for tap.
 Item {
     property string text
     property bool down: false
-    // Silica's: the colour the label and the outline are drawn in.
+    // Colour of label and outline.
     property color color
     signal clicked()
     implicitWidth: 200

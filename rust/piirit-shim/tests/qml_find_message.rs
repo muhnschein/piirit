@@ -1,18 +1,7 @@
-//! A message a search found opens its chat at that message.
-//!
-//! Opening at the newest message instead is the difference between
-//! finding something and being told roughly where it is: the reader
-//! searched for a word from last March and landed at the bottom of a
-//! thousand-message thread with no idea which row matched.
-//!
-//! The other way a message is asked for is from a page over this one: a
-//! media page's Show in chat tells the conversation which message, then
-//! pops back to it. The ask has to survive the page being away, and land
-//! over the place the page puts back on its way in rather than under it.
-//!
-//! The page is loaded from a copy of the QML tree with `EnterKey` taken
-//! out; see `common::qml_tree_without_enter_key` for why the shipped file
-//! cannot be loaded headlessly as it stands.
+//! Search hit opens chat at that message, not newest. Media page's Show in chat asks
+//! for a message, then pops back: ask survives page away, lands over (not under) the place page
+//! puts back on its way in. Loaded from QML copy with `EnterKey` removed
+//! (`common::qml_tree_without_enter_key`).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -113,10 +102,9 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Chat 1 in the fake holds messages 1 and 2; message 1 is the older one,
-/// so a jump to it is a jump away from the newest.
+/// Chat 1 holds messages 1 and 2; 1 is older, so jumping to it leaves newest.
 const OLDER_MESSAGE: i32 = 1;
-/// The other one, asked for from a page over the chat.
+/// The other, asked from a page over the chat.
 const NEWER_MESSAGE: i32 = 2;
 
 #[test]
@@ -126,7 +114,7 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -202,9 +190,8 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
                 QString::from("stickToBottom")
             )
         );
-        // Away under another page, asked for the other message from
-        // there, and back: the ask is kept and acted on over the place
-        // the page puts back.
+        // Away under another page, other message asked from there, back: ask kept and acted on
+        // over the place page puts back.
         record!("forget", call!("forgetFound"));
         record!("leave", call!("leave"));
         record!("ask", call!("ask", NEWER_MESSAGE));
@@ -245,30 +232,27 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         "the chat did not mark the message the search found, so the reader \
          lands in a wall of text with no idea which row matched. {context}"
     );
-    // The row itself has to change, not just a number on the list.
+    // Row itself must change, not just a list number.
     assert_eq!(
         value("lit"),
         "yes",
         "no message on screen was ever marked, so the reader arrives in a \
          wall of text with nothing picked out. {context}"
     );
-    // And the flash gets out of the way again: a message left lit for the
-    // rest of the session reads as a state, not as an answer.
+    // Flash cleared again: lit message left for session reads as state, not answer.
     assert_eq!(
         value("flash-cleared"),
         "0",
         "the found message stayed lit. {context}"
     );
-    // The jump is only real if the view stopped following the newest
-    // message: otherwise the next arrival drags it straight back down.
+    // Jump real only if view stopped following newest; else next arrival drags it back.
     assert_eq!(
         value("following"),
         "false",
         "the view is still stuck to the newest message, so the jump would \
          be undone by the next thing to arrive. {context}"
     );
-    // Asked for from a page over the chat: nothing happens while the page
-    // is away, and the message is lit once it is back on screen.
+    // Asked from page over chat: nothing while page away; lit once back on screen.
     for (label, expected, complaint) in [
         ("leave", "ok", "the page could not be left"),
         ("ask", "ok", "the page has no showMessage to ask"),

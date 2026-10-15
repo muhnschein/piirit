@@ -1,13 +1,7 @@
-//! Fetches for the rows around a moving reader overlap.
+//! Row fetches for a fast-moving reader overlap.
 //!
-//! One fetch at a time was not enough. A reader flinging up through the
-//! history moves faster than a round trip, and a fetch for rows they had
-//! already passed held up the fetch for the rows in front of them until it
-//! landed: a screen of blanks for as long as that took, reported from a
-//! phone as an empty screen for a second on a fast scroll.
-//!
-//! What is pinned here is that a second ask, made while the first is still
-//! in the air, goes out at once -- and that both land in place.
+//! One fetch at a time was too few: a fling outruns the round trip, and passed rows' fetch blocked
+//! rows ahead (blank screen on fast scroll). Pinned: second ask goes out while first is in air; both land.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -26,7 +20,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Several pages, so two asks can be about rows a page apart.
+/// Several pages, so two asks can be a page apart.
 const MESSAGES: u32 = 130;
 
 const PROBE_QML: &str = r"
@@ -55,15 +49,13 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // Long enough that the second ask is made while the first is
-        // still being answered, which on a phone takes no arranging.
+        // Long enough: second ask made while first still answering.
         std::env::set_var("PIIRIT_FAKE_FETCH_DELAY_MS", "700");
     }
 
@@ -99,8 +91,7 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
     });
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("opened", call!("count")));
-        // The top of the chat, and then somewhere a page further down,
-        // before the first ask can possibly have been answered.
+        // Chat top, then a page further down, before first ask can be answered.
         (*steps_ptr).push(("ask-top", call!("ask", 0, 10)));
         (*steps_ptr).push(("ask-far", call!("ask", 70, 80)));
     });
@@ -120,7 +111,7 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
     assert_outcome(&steps, &journal);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run shows, out of test body.
 fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     let value = |label: &str| {
         steps
@@ -137,10 +128,8 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the chat did not open with a row per message. {context}"
     );
 
-    // The one fetch that opened the chat, and then both asks. Whether the
-    // second waited for the first is read off the fake core's own clock:
-    // an answer takes 700 milliseconds, so two asks that reached it closer
-    // together than that were in the air at once.
+    // Fetch that opened chat, then both asks. Second waiting on first read off fake's clock:
+    // answer takes 700 ms; asks reaching it closer than that were in air at once.
     let arrivals: Vec<u64> = common::records(journal)
         .iter()
         .filter(|call| call.get("method").and_then(Value::as_str) == Some("get_messages"))
@@ -168,7 +157,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "rows were on their way and the model did not say so. {context}"
     );
 
-    // Both land, each where it was asked for.
+    // Both land, each where asked.
     assert_eq!(
         value("top-filled"),
         "true",

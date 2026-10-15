@@ -1,9 +1,7 @@
 import QtQuick 2.0
 
 /*
- * The rule of thirds over the viewfinder: two lines each way, thin and
- * pale, as the platform camera draws its grid. Plain rectangles: the
- * platform's own line is a private Silica type.
+ * Thirds grid. Plain rects: platform's line is a private Silica type.
  */
 Item {
     id: grid

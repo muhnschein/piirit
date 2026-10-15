@@ -4,26 +4,13 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Who this profile hears nothing from. Reached from the settings page,
- * where the reference clients keep it too (deltachat-android's
- * BlockedContactsActivity, under Chats and media; deltachat-ios's
- * BlockedContactsViewController, under the same heading).
+ * Who this profile hears nothing from. From settings page, as reference clients
+ * (deltachat-android BlockedContactsActivity). Per profile (core's list per account):
+ * `accountId` handed in.
  *
- * The list is the profile's, not the phone's: the core keeps a block
- * list per account, so blocking someone on one profile leaves the other
- * profiles able to hear from them. Which profile is the one whose chats
- * the settings page was pulled down from, and it is handed in as
- * `accountId`.
- *
- * A tap on a row lets that person back in, asked about first -- the row
- * is the whole of what a thumb can hit here, and an accidental one
- * undoes a decision the reader made on purpose. Blocking someone new is
- * the plus under the last row, which opens the contacts to pick from
- * (BlockContactPage.qml): a blocked contact is in neither list the rest
- * of the app offers, so this page is the only way back to them.
- *
- * The words are the reference clients' own, which is also how they come
- * translated into the forty languages this ships in.
+ * Tap lets someone back in, asked first. Blocking new: plus under last row
+ * (BlockContactPage.qml). Blocked contacts in no other list: only way back to them.
+ * Words reference clients' (deltachat-android/ios): their translations apply.
  */
 Page {
     id: page
@@ -31,12 +18,9 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    // The core has said who is blocked, whatever that was. An empty list
-    // before then is no answer rather than nobody: see NewChatPage.
+    // Empty before core answers: unknown. See NewChatPage.
     property bool blockListLoaded: false
-    // Or it would not say: the error is on the banner, and the list is
-    // blank for want of an answer -- which is no reason to stop anyone
-    // being blocked from here.
+    // Failed answer: list blank, blocking allowed.
     property bool blockListFailed: false
 
     ContactList {
@@ -50,17 +34,15 @@ Page {
                 page.blockListFailed = true
             }
         }
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
+        // Emitted after rows set.
         onRows_changed: page.blockListLoaded = true
     }
 
     Connections {
         target: core
-        // Blocking from another device, or a contact renamed: the core
-        // says contacts changed and the list is read again.
+        // Blocked elsewhere or renamed: core says reread.
         onCore_event: blockList.handle_event(context_id, kind, payload_json)
-        // A model made before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 blockList.reload()
@@ -68,16 +50,14 @@ Page {
         }
     }
 
-    // Coming back from the picker, where someone was just blocked. The
-    // core announces that as well, and this is the cheap belt to its
-    // braces: one call on the way back in, against a list that is short.
+    // Back from picker: core announces blocks; extra call.
     onStatusChanged: {
         if (status === PageStatus.Active) {
             blockList.reload()
         }
     }
 
-    /// Ask about letting someone back in, and do it if the reader agrees.
+    /// Ask to let someone back in.
     function unblock(contactId, contactName) {
         var dialog = pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
             contactName: contactName,
@@ -115,11 +95,8 @@ Page {
             onClicked: page.unblock(model.contact_id, model.display_name)
         }
 
-        // The next one to block. Not until the core has answered, as
-        // with the placeholder: drawn under a list still empty, the plus
-        // would drop below the rows when they arrive, and a tap aimed at
-        // it would land on the first of them. An answer that is a failure
-        // counts: it is the only way on this page to block anyone.
+        // Wait for core: early plus drops under rows, tap hits first row. Failed answer counts:
+        // only way to block here.
         footer: PlusRow {
             objectName: "blockSomeone"
             width: listView.width
@@ -133,10 +110,9 @@ Page {
 
         ViewPlaceholder {
             objectName: "nobodyBlocked"
-            // Not until the core has answered: see `blockListLoaded`.
+            // Not until core answered: see `blockListLoaded`.
             enabled: page.blockListLoaded && blockList.count === 0
-            // deltachat-android's `blocked_empty_hint`, as the words
-            // on this page are its words throughout.
+            // deltachat-android `blocked_empty_hint` (their words).
             text: qsTr("Blocked contacts will appear here.")
         }
     }

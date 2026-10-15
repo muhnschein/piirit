@@ -1,16 +1,9 @@
-//! What a message's context menu sends: a reply carries the quote, and
-//! delete and resend name the message they act on.
+//! Message menu sends: reply carries quote; delete and resend name their message.
 //!
-//! Delete is two calls rather than one -- the message goes from this
-//! account's devices, or the other ends are asked to delete their copies
-//! too -- and which of them the reader picked has to reach the core
-//! intact. Which kind is asked on a page (`qml_delete_choice`); this is
-//! the far end of it.
+//! Delete is two calls: this account's devices, or other ends too. Reader's choice must reach core
+//! intact. Choice made on page (`qml_delete_choice`).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -86,8 +79,7 @@ fn a_reply_carries_its_quote_and_the_rest_name_their_message() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -126,9 +118,8 @@ fn a_reply_carries_its_quote_and_the_rest_name_their_message() {
         call!("reply");
     });
     single_shot(Duration::from_secs(5), move || unsafe {
-        // Read once the send has been answered, not before: the quote is
-        // cleared when the message is really gone, so that a send which
-        // fails leaves the reader the reply they chose.
+        // Read after send answered: quote clears only when message gone; failed send keeps
+        // reply.
         (*steps_ptr).push(("quote-cleared", call!("stillQuoting")));
         (*steps_ptr).push(("after-reply", call!("count")));
         call!("replyAndFail");
@@ -161,7 +152,7 @@ fn a_reply_carries_its_quote_and_the_rest_name_their_message() {
     assert_outcome(&common::calls(&journal), &steps);
 }
 
-/// The wire calls, and what they did to the model.
+/// Wire calls, and what they did to model.
 fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -182,7 +173,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
 
     assert_eq!(value("loaded"), "2", "the chat did not load. {context}");
 
-    // misc_send_msg's last parameter is the message being quoted.
+    // misc_send_msg's last param: quoted message.
     let sends = params_of("misc_send_msg");
     assert_eq!(
         sends.first().and_then(|params| params.pointer("/6")),
@@ -206,7 +197,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         "the reply is not in the chat. {context}"
     );
 
-    // Two deletions: the menu's, and the one that forces a reload later.
+    // Two deletions: menu's, and one forcing reload.
     assert!(
         params_of("delete_messages").contains(&serde_json::json!([1, [2]])),
         "deleting did not name its message. {context}"
@@ -221,18 +212,16 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         vec![serde_json::json!([1, [1]])],
         "resending did not name its message. {context}"
     );
-    // The reply sent above, deleted the other way: the core's own
-    // `delete_messages_for_all`, which is the call that asks the other
-    // ends to delete their copies as well.
+    // Reply deleted the other way: core's `delete_messages_for_all`, asks other ends to delete
+    // too.
     assert_eq!(
         params_of("delete_messages_for_all"),
         vec![serde_json::json!([1, [101]])],
         "deleting for everyone did not reach the core as the call that \
          means it. {context}"
     );
-    // A resend leaves the id list alone, so the sync a core event triggers
-    // fetches nothing: without an explicit re-read the row keeps the failed
-    // state it had, mark and "Send again" and all.
+    // Resend leaves id list alone: sync fetches nothing. Without explicit re-read row keeps
+    // failed state.
     let refetched_after_resend = calls
         .iter()
         .skip_while(|(name, _)| name != "resend_messages")
@@ -259,7 +248,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         .filter_map(|(_, params)| params.pointer("/1").and_then(Value::as_array).cloned())
         .map(|ids| ids.iter().filter_map(Value::as_u64).collect())
         .collect();
-    // 102 is what the far end sent while the reader was up in the history.
+    // 102 is what far end sent while reader was up in history.
     let arrived: Vec<&Vec<u64>> = seen_ids.iter().filter(|ids| ids.contains(&102)).collect();
     assert_eq!(
         arrived.len(),

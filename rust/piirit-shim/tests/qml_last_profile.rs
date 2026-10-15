@@ -1,26 +1,14 @@
-//! The last profile going takes the app back to the welcome page.
+//! Last profile deleted takes app to welcome page. Chat list on gone account reads and writes
+//! nothing, answers taps with "account with id N not found"; so empty account list is a way back.
 //!
-//! A chat list left open on an account the core no longer has is a page
-//! that can read nothing and write nothing, and answers a tap on a chat
-//! with "account with id N not found". So an account list that comes
-//! back empty is a way back to the first screen.
+//! Move belongs to window, not a page; both halves pinned. Not a page's: reader deletes on profiles
+//! page and swipes back, so deletion lands as that page is destroyed and chat list is
+//! mid-transition. Page that asked is gone, and Silica refuses moves during transition (stderr
+//! only). Left: chat list showing a gone profile's chats, profiles page behind showing none. Both
+//! pages carrying the handler was the other half: the one time both were alive, both asked.
 //!
-//! The move belongs to the window rather than to any page, and both
-//! halves of that are what this pins.
-//!
-//! It cannot be a page's, because of when it happens: the reader deletes
-//! from the profiles page and swipes back, so the deletion lands while
-//! the profiles page is being destroyed and the chat list under it is
-//! mid-transition. The page that asked is gone, and Silica refuses a
-//! move asked for during a transition -- on stderr, and nowhere the
-//! reader will see. What was left was a chat list showing chats of a
-//! profile that no longer existed, with a profiles page behind it
-//! showing none. Both pages carrying the same handler was the other half
-//! of it: the one time they were both alive to hear it, they both asked.
-//!
-//! And it cannot fire on every empty list, or a phone that has never had
-//! a profile would be sent to the welcome page it is already looking at,
-//! from under the reader's first tap.
+//! Not on every empty list either: never-profiled phone would be sent to the welcome page it's
+//! already on, from under reader's first tap.
 
 // Qt harness: see qml_startup.rs.
 #![allow(
@@ -38,9 +26,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// The window, loaded the way `qml_startup` loads it: from a copy of the
-/// tree, with the components directory imported so the probe can reach
-/// the `Settings` singleton the window reads.
+/// Window, loaded as `qml_startup` does: copy of tree, components dir imported for
+/// `Settings` singleton.
 fn probe_qml(components: &std::path::Path) -> String {
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
 }
@@ -112,11 +99,11 @@ const PROBE_QML: &str = r"
 fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
     let temp = std::env::temp_dir().join(format!("piirit-last-profile-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the copy keeps this test to one reason to
-    // fail. See common::qml_tree_without_enter_key.
+    // `EnterKey` has no stub; copy keeps test to one fail reason. See
+    // common::qml_tree_without_enter_key.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -130,7 +117,7 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    // The real one is handed in by main.rs; the value is never read here.
+    // Real one handed in by main.rs; never read here.
     engine.set_property(
         "rpcServerPath".into(),
         QString::from(env!("CARGO_BIN_EXE_fake-core-server")).into(),
@@ -162,37 +149,33 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
-    // 1s: a phone that has never had a profile. dconf outlives the test
-    // binary, so the key is set rather than assumed.
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // 1s: phone never had profile. dconf outlives binary, so key set, not assumed.
+    // SAFETY: callbacks run only inside `exec()`.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push(("forget", call!("remember", "0")));
         (*steps_ptr).push(("load", call!("load", root.clone())));
         (*steps_ptr).push(("refresh", call!("refresh")));
     });
 
-    // 3s: nothing was moved for the empty list it started with, and a
-    // profile is made.
+    // 3s: nothing moved for empty start; a profile is made.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("fresh", call!("stackLog")));
         (*steps_ptr).push(("make", call!("makeProfile")));
     });
 
-    // 5s: the list is read again, the way every arrival on the chat list
-    // reads it. That is the window learning this phone has a profile.
+    // 5s: list read again, as every chat-list arrival reads it: window learns phone has profile.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push(("reread", call!("refresh")));
     });
 
-    // 6s: it is deleted with the stack busy, which is what a swipe back
-    // off the profiles page leaves behind.
+    // 6s: deleted with stack busy, as swipe back off profiles page leaves.
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("before", call!("stackLog")));
         (*steps_ptr).push(("transition", call!("transition", "true")));
         (*steps_ptr).push(("delete", call!("deleteProfile", "1")));
     });
 
-    // 8s: the move has not been made -- and is not lost either.
+    // 8s: move not made, not lost either.
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("held", call!("stackLog")));
         (*steps_ptr).push(("settled", call!("transition", "false")));

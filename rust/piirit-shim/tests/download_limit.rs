@@ -1,13 +1,7 @@
-//! The download limit reaches every account the core has.
+//! Download limit reaches every account.
 //!
-//! It is one setting for the whole app, held in dconf, and the core's
-//! `download_limit` is per account: so the core object writes it to each
-//! account when it is set, and whenever the account list is read to each
-//! account it has not been written to yet -- which is how a profile added
-//! later gets it too. Only then: the list is read again all the time, and
-//! a write each time is the core's work for nothing. Nothing is written
-//! before QML has handed a value over, so a default nobody chose is never
-//! applied.
+//! Per-account in core: write each on set, and unwritten ones on list read (new profiles), not
+//! every read. Nothing written before QML sets a value.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -58,8 +52,7 @@ fn the_limit_is_written_to_each_account_when_set_and_when_the_list_is_read() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -96,11 +89,11 @@ fn the_limit_is_written_to_each_account_when_set_and_when_the_list_is_read() {
     single_shot(Duration::from_secs(3), move || unsafe {
         call!("refresh");
     });
-    // Changed once the first write has had time to land.
+    // Changed once first write has landed.
     single_shot(Duration::from_secs(4), move || unsafe {
         call!("change", 0);
     });
-    // And read again after the change, which wrote it already.
+    // Read after change: already written.
     single_shot(Duration::from_secs(5), move || unsafe {
         call!("refresh");
     });

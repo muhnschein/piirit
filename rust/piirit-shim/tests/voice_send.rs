@@ -1,6 +1,5 @@
-//! A voice message goes out as one: `send_msg` with the Voice view type,
-//! which is the one kind the core has to be told, and the row the reader
-//! sees is the one the core then holds.
+//! Voice message goes out as one: `send_msg` with Voice view type (the one kind core
+//! must be told); row shown is the one core holds.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -62,8 +61,7 @@ fn a_recording_is_sent_as_a_voice_message() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -101,8 +99,7 @@ fn a_recording_is_sent_as_a_voice_message() {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
     single_shot(Duration::from_secs(3), move || unsafe {
-        // As the recorder hands it over: a plain path in the captures
-        // directory.
+        // Recorder's path as handed over: plain path in captures dir.
         call!(
             "send",
             QString::from("/tmp/piirit-fake/captures/voice-20260904-151212.mp3")
@@ -149,9 +146,7 @@ fn a_recording_is_sent_as_a_voice_message() {
                 1,
                 1,
                 {
-                    // A recording carries neither a caption nor a name
-                    // anyone sees; both slots go over as null, which is
-                    // what the core reads as absent.
+                    // Recording has no caption or name: both null (core reads as absent).
                     "text": null,
                     "file": "/tmp/piirit-fake/captures/voice-20260904-151212.mp3",
                     "filename": null,

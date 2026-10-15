@@ -2,45 +2,28 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * A picture in the ambience's colours: one of the drawings the
- * introduction (pages/IntroPage.qml) puts above each fact, painted ahead
- * of time by tools/faces/scenes.py into qml/art/.
- *
- * Two channels rather than a colour picture: what ships has no colour in
- * it, the red channel is what the theme's primary colour draws and the
- * green what its highlight draws, so one file is right on every ambience
- * -- a light one included -- and nothing has to be redrawn when Sailfish
- * gains another.
- *
- * The pictures are square and this does not letterbox: give it a square.
+ * Intro picture (pages/IntroPage.qml) from tools/faces/scenes.py into qml/art/.
+ * Square. Red/green recoloured per ambience: one file fits all.
  */
 Item {
     id: art
 
-    /// The picture, as a URL relative to the file that sets it.
+    /// Picture URL, relative to setting file.
     property url source
 
-    /// The colours: the drawing in the first, its accents in the second.
+    /// Drawing colour; accents in litColour.
     property color colour: Theme.primaryColor
     property color litColour: Theme.highlightColor
-    /// How much of each. A picture is what the reader is looking at, so
-    /// it is drawn nearly full strength -- unlike the field behind it.
+    /// Strength; near full.
     property real ink: 0.9
     property real litInk: 1.0
 
-    /// True once there is something to draw.
+    /// Image loaded.
     readonly property bool ready: drawing.status === Image.Ready
 
-    // Painted off the main thread at the size it is drawn, in the
-    // ambience's colours (src/pictures.rs): red is how much of `colour`,
-    // green how much of `litColour`. Scaled down from the master before
-    // it is painted, smoothly, which is what mipmaps did for the shader
-    // this was.
-    //
-    // Not a shader any more: one made after the window had once been
-    // hidden -- the introduction can come up after the app was in the
-    // background -- could be drawn on the phone's Qt with another one's
-    // program (Avatar.qml says how).
+    // Off main thread at drawn size (src/pictures.rs): red = `colour`, green =
+    // `litColour`. No shader: one made after window hid got another's program
+    // (Avatar.qml).
     Image {
         id: drawing
         anchors.fill: parent

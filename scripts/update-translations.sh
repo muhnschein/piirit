@@ -1,30 +1,23 @@
 #!/bin/sh
-# Regenerate the catalogs from the qsTr() calls in qml/: piirit.ts, the
-# untranslated source catalog, and every piirit-<lang>.ts beside it.
-# One lupdate run over all of them, so a string added to the source shows
-# up as unfinished in every language at once.
+# Regenerate catalogs from qsTr() in qml/: piirit.ts and each piirit-<lang>.ts.
+# One lupdate run: new string shows unfinished everywhere.
 #
-# The argument is the directory holding the catalogs, for ci/ to run this
-# over a copy; the default is the tree's own.
+# Arg: catalog dir (ci/ runs it on a copy). Default: tree's own.
 #
-# `-locations none`: with locations in, the catalog changes every time a
-# line moves, so it would conflict on every unrelated edit and the check
-# in ci/ would fail for no reason. Without them it changes only when the
-# strings themselves do, which is the thing worth reviewing.
+# `-locations none`: locations change whenever a line moves, conflicting and
+# failing ci/ check for nothing. Without them catalog changes only with strings.
 #
-# `-no-obsolete`: a string that no longer exists in the source is dropped
-# rather than kept as a tombstone. The catalog is regenerated from source,
-# not maintained by hand.
+# `-no-obsolete`: removed strings dropped. Never hand-maintained.
 #
-# To add a language, write its header to translations/piirit-<lang>.ts:
+# New language: write translations/piirit-<lang>.ts as
 #
 #     <?xml version="1.0" encoding="utf-8"?>
 #     <!DOCTYPE TS>
 #     <TS version="2.1" language="<lang>"></TS>
 #
-# and run this. lupdate fills in every string, with as many numerus forms
-# as the language has. <lang> is what QTranslator matches against the
-# reader's locale: `de` serves every German locale, `pt_BR` only Brazil.
+# then run; lupdate fills every string with the language's numerus forms.
+# <lang> is matched by QTranslator to locale: `de` serves all German, `pt_BR`
+# Brazil only.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -36,8 +29,7 @@ if [ -z "$lupdate" ]; then
     exit 1
 fi
 
-# The source catalog first, then the languages in name order, so the
-# order lupdate reports them in is the same every run.
+# Source first, then languages by name: stable lupdate report order.
 set -- "$dir/piirit.ts"
 for catalog in "$dir"/piirit-*.ts; do
     [ -f "$catalog" ] || continue

@@ -1,13 +1,8 @@
-//! The core rings for contacts, as it does by default, until the reader
-//! switches ringing off -- and only that tells it "nobody".
+//! Core rings for contacts by default; only reader switching ringing off tells it "nobody".
 //!
-//! `who_can_call_me` is per device and never synced, but it lives in the
-//! profile's database, and a backup or a second device takes that
-//! database whole. The window once wrote "nobody" for every profile
-//! whenever calls were off, as they were by default while they were
-//! experimental, so a Delta Chat set up from a Piirit profile never rang
-//! for anyone without its reader having chosen that anywhere. Calls are
-//! not a setting any more (#119); ringing still is.
+//! `who_can_call_me` is per device, but lives in profile DB that backup or second device takes
+//! whole. Window once wrote "nobody" for every profile while calls were off: Delta Chat from
+//! Piirit profile never rang. Ringing is a setting; calls are not (#119).
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -32,8 +27,7 @@ struct StackProbe {
     base: qt_base_class!(trait QObject),
 }
 
-/// The window, with the components directory imported so the probe can
-/// write the settings.
+/// Window, components dir imported so probe can write settings.
 fn probe_qml(components: &std::path::Path) -> String {
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
 }
@@ -54,7 +48,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Every value `who_can_call_me` was set to, in order, one per account.
+/// Every `who_can_call_me` value set, in order.
 fn written(journal: &std::path::Path) -> Vec<String> {
     common::calls(journal)
         .into_iter()
@@ -68,11 +62,10 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
     let temp = std::env::temp_dir().join(format!("piirit-calls-ring-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -118,8 +111,7 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
         }};
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
     single_shot(Duration::from_secs(1), move || unsafe {
         assert_eq!(call!("loadWindow", QString::from(window.clone())), "ok");
     });
@@ -128,14 +120,14 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
         call!("refresh");
     });
 
-    // The core is up and has been told, nothing having been set.
+    // Core up and told; nothing set yet.
     let fresh = seen.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("fresh", written(&fresh)));
         call!("ring", QString::from("false"));
     });
 
-    // Ringing switched off; then on again.
+    // Ringing off, then on.
     let silent = seen.clone();
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("silent", written(&silent)));

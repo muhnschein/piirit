@@ -1,21 +1,14 @@
-//! Coming back to the app asks the core to look at the network again.
+//! Coming back to app asks core to re-check network.
 //!
-//! A connection killed by a change of network -- wi-fi to mobile data on
-//! the way out of the house -- dies silently: nothing arrives on it and
-//! nothing says so. The core finds out when its IDLE times out five
-//! minutes later, and until then the phone is holding a socket to nowhere.
+//! Connection killed by network change dies silently; core learns only when IDLE times out, five
+//! minutes on.
 //!
-//! The window asks on the way back in, which is both when the reader is
-//! watching for a message and when the phone has most likely moved between
-//! networks in a pocket. Nothing is asked on the way out: the app carries
-//! on receiving in the background, which on this platform is the only way
-//! a message arrives at all.
+//! Window asks on the way back in: reader watching, phone likely moved networks. Nothing asked on
+//! way out: app keeps receiving in background, the only way messages arrive.
 //!
-//! The other way round matters more, and is here too: connman says the
-//! network changed while the app is off screen, and the core is asked then
-//! and there. That is the path a notification arrives by when nobody is
-//! looking at the phone. What the component makes of connman's own words
-//! is `qml_network_watch`; this is that it reaches the core.
+//! More important: connman says network changed while app off screen; core asked then. That's how a
+//! notification arrives. Component's reading of connman: `qml_network_watch`; here: it reaches
+//! core.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -33,9 +26,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, which the window binds a `PendingNavigation` to
-/// and this test never makes it use. Present because a binding to nothing
-/// is a `ReferenceError`, not because anything here is navigated.
+/// Silica's `pageStack`, bound by window to `PendingNavigation`; never navigated. Needed:
+/// binding to nothing is `ReferenceError`.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -84,11 +76,10 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     let temp = std::env::temp_dir().join(format!("piirit-network-hint-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -133,7 +124,7 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
         *loaded_ptr = call!("loadWindow", QString::from(window.clone()));
     });
 
-    // Switched away from, with the core up: nothing is asked here.
+    // Switched away, core up: nothing asked.
     let mut status = String::new();
     let status_ptr: *mut String = std::ptr::addr_of_mut!(status);
     let mut while_away = 0usize;
@@ -148,12 +139,11 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
             .into_iter()
             .filter(|method| method == "maybe_network")
             .count();
-        // Off screen, and the phone changes network under the app.
+        // Off screen; phone changes network under app.
         *reached_ptr = call!("connman", QString::from("online"));
     });
 
-    // The watch waits to see whether more announcements are coming
-    // (`NetworkWatch.settleMs`), so this reads after that wait.
+    // Watch waits for more announcements (`NetworkWatch.settleMs`); read after that wait.
     let mut while_off_screen = 0usize;
     let off_screen_ptr: *mut usize = std::ptr::addr_of_mut!(while_off_screen);
     let off_screen_journal = journal.clone();

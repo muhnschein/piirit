@@ -1,27 +1,12 @@
-//! Writing a profile out to a backup file.
+//! Write profile to backup file.
 //!
-//! The other half of taking a profile over from one (`signup.rs`), and the
-//! core's own export: `export_backup` puts one account's messages, its
-//! contacts and its key into a single `.tar`, which is exactly what
-//! `import_backup` reads back. It is per profile, not per phone -- the
-//! core takes an account id and writes that account -- so this is a small
-//! object a profile's page owns rather than anything on the core object.
+//! Core `export_backup`; other half of `signup.rs` takeover. Page-owned, per profile.
 //!
-//! Two things the core does not do for the caller, and both are here.
+//! Core names file, says nothing: found by folder diff. `ImexFileWritten` unusable: events
+//! polled separately (`deltachat-jsonrpc` event loop), may arrive after answer; page would hang.
 //!
-//! The core names the file itself and answers with nothing, so the name is
-//! found by looking at the folder before and after. The event that carries
-//! it (`ImexFileWritten`) is no use for that: events are polled on a call
-//! of their own (`deltachat-jsonrpc`'s event loop), so one emitted before
-//! the export answers can still arrive after it, and a page that waited
-//! for it would sometimes wait for ever. What is in the folder is not a
-//! race.
-//!
-//! And the export reports itself in `ImexProgress` events, the same ones
-//! an import reports itself in, with nothing in them to say which. The
-//! page feeds the core's events in (`handle_event`), as the chat models
-//! do, so the progress this object shows is the progress of the write it
-//! started and nothing else.
+//! Progress: `ImexProgress`, shared with import, unlabelled; page feeds events (`handle_event`),
+//! shown only while this writes.
 
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -32,7 +17,7 @@ use qmetaobject::*;
 use crate::core::connection;
 use crate::json;
 
-/// One profile's backup, written to a folder on the phone.
+/// Profile backup, written to a folder.
 ///
 /// ```qml
 /// Backup { id: backup; account_id: page.accountId }
@@ -42,9 +27,7 @@ use crate::json;
 pub struct Backup {
     base: qt_base_class!(trait QObject),
 
-    /// Which profile is written. The core's export takes an account, so
-    /// this is the whole of what "which backup" means. Set once, by the
-    /// page that owns this object, from the profile it was opened for.
+    /// Account written. Set once by owning page.
     pub account_id: qt_property!(u32),
 
     /// True while the core is writing.
@@ -52,45 +35,35 @@ pub struct Backup {
     /// Emitted when [`Self::running`] changes.
     pub running_changed: qt_signal!(),
 
-    /// How far the write has got, in permille, as the core counts it.
+    /// Write progress, permille.
     pub permille: qt_property!(u32; NOTIFY permille_changed),
     /// Emitted when [`Self::permille`] changes.
     pub permille_changed: qt_signal!(),
 
-    /// Write this profile into `folder`, which is made if it is not
-    /// there. Answers on `written` or `error`.
+    /// Write into `folder`, made if absent. Answers `written` or `error`.
     pub write: qt_method!(fn(&mut self, folder: QString)),
 
-    /// Stop a write that is running. The core's refusal of the stopped
-    /// export is then the reader's own doing, and is not reported.
+    /// Stop write. Core's refusal not reported.
     pub cancel: qt_method!(fn(&mut self)),
 
-    /// Feed a `core_event` in. Events for other accounts, and every kind
-    /// but the progress of this write, are ignored -- so a page can
-    /// connect this without filtering first.
+    /// Feed `core_event`. Other accounts and non-progress kinds ignored.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// The backup is written. `path` is the file when it could be named
-    /// and the folder it went into when it could not; either way it is
-    /// where the reader has to look.
+    /// Written to `path`, or folder if file unnamed.
     pub written: qt_signal!(path: QString),
 
-    /// Nothing was written, in the core's own words.
+    /// Nothing written; core's words.
     pub error: qt_signal!(message: QString),
 
-    /// The reader asked for the write to stop, so the core refusing it is
-    /// not a failure to report.
+    /// Reader stopped; core's refusal not a failure.
     cancelled: bool,
 }
 
 impl Backup {
-    /// Write this profile's backup into `folder`.
+    /// Write backup into `folder`.
     pub fn write(&mut self, folder: QString) {
-        // A second write while one is running would be refused by the
-        // core -- one ongoing process per account -- and the refusal
-        // would land on the page as a failure of the write it is already
-        // showing.
+        // Core refuses second (one process per account): would read as failure.
         if self.running {
             return;
         }
@@ -115,8 +88,7 @@ impl Backup {
             let cancelled = this.borrow().cancelled;
             match result {
                 Ok(path) => this.borrow().written(path.into()),
-                // A write the reader stopped ends in the core's refusal
-                // of it, which is not news to them.
+                // Stopped write's refusal is not news.
                 Err(err) => {
                     if !cancelled {
                         this.borrow().error(err.into());
@@ -130,28 +102,26 @@ impl Backup {
         });
     }
 
-    /// Stop a write that is running.
+    /// Stop running write.
     pub fn cancel(&mut self) {
         if !self.running {
             return;
         }
-        // Set before the call goes out: the export answers with the
-        // core's refusal, and by then this has to say who asked.
+        // Set first: refusal answer must know who asked.
         self.cancelled = true;
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
             return;
         };
         runtime.spawn(async move {
-            // Fire and forget: the write's own answer is what clears the
-            // page, and it comes either way.
+            // Fire and forget; write's answer clears page.
             rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
                 .await
                 .ok();
         });
     }
 
-    /// Take in one core event: the progress of the write, or nothing.
+    /// Take one core event: write progress, or nothing.
     pub fn handle_event(&mut self, context_id: u32, kind: QString, payload_json: QString) {
         if !self.running || self.account_id == 0 || context_id != self.account_id {
             return;
@@ -164,9 +134,7 @@ impl Backup {
         let Some(permille) = json::u32_opt(&payload, "progress") else {
             return;
         };
-        // The core reports a failure as progress 0. The call answers with
-        // the reason a moment later, in words; a bar that drops back to
-        // nothing first says less than that and looks like a restart.
+        // 0 = failure, reason in call answer; reset would look like restart.
         if permille > 0 {
             self.set_permille(permille);
         }
@@ -189,14 +157,9 @@ impl Backup {
     }
 }
 
-/// Run the core's export into `folder` and answer with what it wrote.
+/// Run core export into `folder`; answer with what it wrote.
 ///
-/// The file is found by difference: what `.tar` files the folder held
-/// before the export, and what it holds after. One new file is the
-/// backup. Anything else -- none, because the core wrote somewhere this
-/// cannot read back, or several, because something else was writing into
-/// the same folder -- answers with the folder, which is still where the
-/// reader has to go looking.
+/// One new `.tar` = backup; none or several: folder.
 async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String, String> {
     let path = folder.to_string();
     let before = off_the_runtime(move || prepare(&path)).await?;
@@ -218,13 +181,9 @@ async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String
     }
 }
 
-/// Run one piece of blocking filesystem work somewhere it can block.
+/// Run blocking fs work off runtime threads.
 ///
-/// `std::fs` stops the thread it is called on, and the threads this
-/// future runs on are the runtime's: the same ones carrying the core's
-/// connection and draining its events. `spawn_blocking` has a pool kept
-/// for exactly this. A folder with a thousand files in it is not a long
-/// wait, but it is not the core's wait to take.
+/// Runtime threads carry core's connection and events; `spawn_blocking` pool takes `std::fs`.
 async fn off_the_runtime<T, F>(work: F) -> Result<T, String>
 where
     F: FnOnce() -> Result<T, String> + Send + 'static,
@@ -232,27 +191,20 @@ where
 {
     match tokio::task::spawn_blocking(work).await {
         Ok(result) => result,
-        // The pool dropped the work, which on this runtime means it is
-        // shutting down: the app is on its way out.
+        // Pool dropped work: runtime shutting down.
         Err(err) => Err(err.to_string()),
     }
 }
 
-/// Make the folder if it is not there, and answer with the `.tar` files
-/// already in it.
+/// Make folder if absent; answer existing `.tar`s.
 ///
-/// The core makes the folder itself, but only once it has got that far:
-/// a folder that cannot be made is worth saying before a minute of
-/// writing rather than after it. A plain function, like `tars_in` below
-/// and for the same reason: what blocks belongs where it can be handed
-/// to `off_the_runtime` whole.
+/// Core makes it too, but late: fail now, not after a minute. Plain fn for `off_the_runtime`.
 fn prepare(folder: &str) -> Result<BTreeSet<PathBuf>, String> {
     std::fs::create_dir_all(folder).map_err(|err| format!("cannot use {folder}: {err}"))?;
     Ok(tars_in(folder))
 }
 
-/// The `.tar` files in a folder, or nothing at all for a folder that
-/// cannot be read.
+/// `.tar` files in folder; none if unreadable.
 fn tars_in(folder: &str) -> BTreeSet<PathBuf> {
     let Ok(entries) = std::fs::read_dir(folder) else {
         return BTreeSet::new();

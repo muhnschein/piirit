@@ -1,48 +1,15 @@
-//! Making a profile, or taking one over: one attempt at a time, each
-//! given a deadline.
+//! Make profile (chatmail relay or own mailbox, `transport_call`) or take one over (device or
+//! backup, `restore`): one attempt at a time, with deadline.
 //!
-//! Two ways in. A profile can be *made*, on a chatmail relay or a mailbox
-//! of the reader's own, which is the long transport call described below.
-//! Or an existing one can be *taken over* from somewhere else -- another
-//! device holding it, over the local network, or a backup file -- which
-//! is the core's import, `restore` below. Both end with an account this
-//! device can write from, both are one at a time, and both can be given
-//! up on, so they share the bookkeeping.
+//! Attempt: account, name, core transport call (asks relay for address or tries mailbox, stores,
+//! starts IO); silent relay holds it for minutes of connection attempts. Past [`DEADLINE`]
+//! (under call's one-minute client limit): `profile_timed_out`, core process stopped. Page has
+//! Cancel throughout, "try another relay" from 4 s.
 //!
-//! An attempt is an account for the profile to be built on, the display
-//! name, and then the core's one transport call -- which asks the relay
-//! for an address (or tries the mailbox it was given), stores what comes
-//! back and starts IO. That last call is the long one, and the length of
-//! it is the core's: a relay that does not answer holds the call for as
-//! long as the core's own connection attempts take, which is minutes.
-//! The same call adds a *second* relay to a profile that has one
-//! (`add_transport` below): the account and the name are already there,
-//! so an attempt at that is the transport call alone, with the same
-//! deadline and the same way out.
-//!
-//! Two things follow from that, and both were met on a phone.
-//!
-//! An attempt has to be given up on. A relay that has not answered in
-//! [`DEADLINE`] is not going to, so the attempt stops the core's process
-//! and says so (`profile_timed_out`); the page has had a Cancel button
-//! all along and, since the fourth second, its suggestion to try another
-//! relay. The call's own limit is the client's minute; this is shorter,
-//! and it is what the reader sees.
-//!
-//! An attempt given up on is still running in the core. The core allows
-//! one ongoing process per account, and the account stays unconfigured
-//! until that process ends -- so a retry that picked "the unconfigured
-//! account" back up, as the first retry did, was refused with "There is
-//! already another ongoing process running". The accounts an attempt is
-//! still holding are kept here (`busy`), and a retry takes a fresh one.
-//! And an attempt given up on can still succeed -- the relay answers
-//! late, after the reader cancelled -- and its result is not the
-//! reader's any more: the profile it made is removed, and nothing is
-//! signalled for it. A relay added late to a profile that was there
-//! already is the one exception: the profile is the reader's, and what
-//! the relay answered is one more row on its page, which the page's
-//! own remove takes off again. Removing the profile for it would be
-//! answering a cancelled "add" with a delete.
+//! Core runs one process per account: given-up attempt still holds it, account unconfigured
+//! till it ends; reusing it was refused ("There is already another ongoing process running").
+//! `busy` tracks held accounts; retry takes a fresh one. Late success after cancel: removed,
+//! unsignalled; relay added to existing profile kept (page's remove undoes it).
 
 use std::collections::BTreeSet;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -54,91 +21,72 @@ use deltachat_jsonrpc::RpcClient;
 use crate::json;
 use crate::runtime::CoreRuntime;
 
-/// How long a relay is given, in all. Long enough for a slow connection
-/// to be asked for an address and then logged into twice; short enough
-/// that a relay which is down is reported as such while the reader is
-/// still looking at the page.
+/// Relay's whole budget: address plus two logins on slow link; down relay reported while reader
+/// watches.
 pub const DEADLINE: Duration = Duration::from_secs(30);
 
-/// What a profile is reached through: relays the core picks, a chatmail
-/// relay's `dcaccount:` payload, or a mailbox of the reader's own.
+/// Where profile is reached: core-picked relays, `dcaccount:`, or own mailbox.
 pub(crate) enum Transport {
-    /// `init_transports`: the core makes the profile on whichever of its
-    /// relays answers first, and since 2.61 adds more in the background
-    /// once it is up -- the only way in that does. A relay the reader
-    /// names is that one relay and no other: the core turns its own
-    /// additions on for this call alone.
+    /// `init_transports`: first answering core relay; since 2.61 core adds more in background
+    /// (only path that does). Named relay: that one only; extras enabled for this call alone.
     Automatic,
-    /// `add_transport_from_qr`: the relay mints the address.
+    /// `add_transport_from_qr`: relay mints address.
     Qr(String),
-    /// `add_or_update_transport` with the two fields of an
-    /// `EnteredLoginParam` that cannot be autoconfigured.
+    /// `add_or_update_transport`: fields `EnteredLoginParam` cannot autoconfigure.
     Mailbox {
-        /// The address.
+        /// Address.
         addr: String,
-        /// Its password.
+        /// Password.
         password: String,
     },
 }
 
-/// Where a profile taken over from elsewhere comes from.
+/// Where taken-over profile comes from.
 pub(crate) enum Source {
-    /// `get_backup`: the code another device shows while it offers
-    /// itself, and then a transfer over the local network.
+    /// `get_backup`: code from other device, then LAN transfer.
     Device(String),
-    /// `import_backup`: a backup file the reader points at.
+    /// `import_backup`: backup file.
     File(String),
 }
 
-/// How taking a profile over ended.
+/// How taking over ended.
 pub(crate) enum Taken {
-    /// The profile is on this device, as `account_id`.
+    /// Profile on this device, as `account_id`.
     Done(u32),
-    /// A reason of this app's own, for the page to put into the reader's
-    /// language: `not-a-backup`, `too-new`, `stalled` or `already-here`.
+    /// App reason, page translates: `not-a-backup`, `too-new`, `stalled`, `already-here`.
     Refused(&'static str),
-    /// The core refused, in its own words.
+    /// Core refused, its words.
     Failed(String),
 }
 
-/// How long a transfer is given. Not a deadline the reader should ever
-/// meet: a backup is megabytes over a local network, and the page shows
-/// it arriving the whole way. It is here so that a transfer whose other
-/// end went away ends by itself rather than leaving a progress bar up
-/// for the rest of the day.
+/// Cap on transfer, not a deadline: ends one whose far end vanished.
 pub const TRANSFER_DEADLINE: Duration = Duration::from_secs(30 * 60);
 
-/// How an attempt ended.
+/// How attempt ended.
 pub(crate) enum Outcome {
-    /// The profile is made and `account_id` has a working transport.
+    /// Made; `account_id` has working transport.
     Created(u32),
-    /// The core refused, with its own words.
+    /// Core refused.
     Failed(String),
-    /// The relay did not answer in this many seconds.
+    /// Relay silent this many seconds.
     TimedOut(u32),
 }
 
-/// The attempts there have been, shared with each attempt's tasks.
-///
-/// Held by the core object and read from its thread; the tasks share it
-/// through the `Arc`, so the counters are atomics and the set is under a
-/// lock that is never held across an await.
+/// Attempts, shared with tasks. Atomic counters; set lock never held across await.
 #[derive(Default)]
 pub(crate) struct Attempts {
-    /// The attempt whose result the reader is waiting for: the latest
-    /// begun, or 0 once cancelled.
+    /// Attempt reader waits on: latest, or 0 once cancelled.
     current: AtomicU64,
-    /// How many have begun, which is where the next id comes from.
+    /// Attempts begun; next id.
     begun: AtomicU64,
-    /// Accounts whose transport call has not returned yet.
+    /// Accounts with transport call running.
     busy: Mutex<BTreeSet<u32>>,
 }
 
 impl Attempts {
-    /// Start an attempt, which becomes the one that counts.
+    /// Start attempt; it counts.
     pub(crate) fn begin(self: &Arc<Self>, deadline: Duration) -> Attempt {
-        // Wrapping, as `fetch_add` itself does; an id only has to differ
-        // from the one before it.
+        // Wrapping, as `fetch_add`.
         let id = self.begun.fetch_add(1, Ordering::SeqCst).wrapping_add(1);
         self.current.store(id, Ordering::SeqCst);
         Attempt {
@@ -149,15 +97,13 @@ impl Attempts {
         }
     }
 
-    /// The reader gave up: no attempt counts any more. The accounts
-    /// still held are returned, for the caller to stop the core's
-    /// process on each.
+    /// Reader gave up: nothing counts. Returns held accounts.
     pub(crate) fn cancel(&self) -> Vec<u32> {
         self.current.store(0, Ordering::SeqCst);
         self.busy().iter().copied().collect()
     }
 
-    /// Whether `attempt` is still the one the reader is waiting for.
+    /// Whether `attempt` is still awaited.
     pub(crate) fn is_current(&self, attempt: u64) -> bool {
         self.current.load(Ordering::SeqCst) == attempt
     }
@@ -168,7 +114,7 @@ impl Attempts {
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
-    /// The account is nobody's now.
+    /// Account is nobody's now.
     fn release(&self, account_id: u32) {
         self.busy().remove(&account_id);
     }
@@ -179,27 +125,22 @@ pub(crate) struct Attempt {
     id: u64,
     shared: Arc<Attempts>,
     deadline: Duration,
-    /// Cleared when the deadline passes. The call may still complete
-    /// after that, and what it made is then not wanted.
+    /// Cleared at deadline; result then unwanted.
     wanted: Arc<AtomicBool>,
 }
 
 impl Attempt {
-    /// Which attempt this is, for the completion path to compare.
+    /// Attempt id.
     pub(crate) fn id(&self) -> u64 {
         self.id
     }
 
-    /// Hold `account_id` now, on the caller's thread, before a task is
-    /// spawned for it. Held only inside the task, the account was not
-    /// there yet for a cancel that came in the same turn, and the core's
-    /// process on it was never stopped.
+    /// Hold `account_id` before task spawns, for same-turn cancel.
     pub(crate) fn hold(&self, account_id: u32) {
         self.shared.busy().insert(account_id);
     }
 
-    /// Do the work: an account, the name, the transport -- the last
-    /// within the deadline.
+    /// Do the work: account, name, transport.
     pub(crate) async fn run(
         &self,
         runtime: &CoreRuntime,
@@ -211,9 +152,7 @@ impl Attempt {
             Ok(account_id) => account_id,
             Err(err) => return Outcome::Failed(err),
         };
-        // Before the transport call, so the name is in place when the
-        // core announces the account. Cancelled meanwhile: nothing is
-        // waiting for the answer, so the relay is not asked.
+        // Name before transport call: set when core announces account. Cancelled: relay unasked.
         let prepared = set_display_name(&rpc, account_id, display_name).await;
         if prepared.is_err() || !self.shared.is_current(self.id) {
             self.shared.release(account_id);
@@ -226,11 +165,7 @@ impl Attempt {
             .await
     }
 
-    /// Add a relay to a profile that has one: the transport call alone,
-    /// on the account the profile already is, within the deadline. The
-    /// account is held while the call runs, as a signup's is, so that a
-    /// cancel stops the core's process on it and a retry is refused in
-    /// the core's own words rather than started over the first.
+    /// Add relay to existing profile: transport call alone, same deadline, held for cancel.
     pub(crate) async fn add_transport(
         &self,
         runtime: &CoreRuntime,
@@ -243,12 +178,8 @@ impl Attempt {
             .await
     }
 
-    /// The transport call, given up on at the deadline.
-    ///
-    /// A task of its own, so that giving up on it here leaves it to
-    /// finish: the account is held until the core answers, whenever that
-    /// is, and a late success is dealt with by the task itself -- removed
-    /// when the account was made for it, kept when it was not.
+    /// Transport call, given up at deadline. Own task finishes anyway; account held till core
+    /// answers.
     async fn transport_within_deadline(
         &self,
         runtime: &CoreRuntime,
@@ -271,8 +202,7 @@ impl Attempt {
             Ok(Err(err)) => Outcome::Failed(err.to_string()),
             Err(_) => {
                 self.wanted.store(false, Ordering::SeqCst);
-                // Best effort: the attempt is abandoned whatever the core
-                // answers, and `wanted` already keeps it from landing.
+                // Abandoned: `wanted` stops it landing.
                 rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
                     .await
                     .ok();
@@ -281,16 +211,8 @@ impl Attempt {
         }
     }
 
-    /// Take a profile over from elsewhere: an account to put it on, the
-    /// code read first if there is one, and then the core's import --
-    /// which reports itself in `ImexProgress` events the whole way.
-    ///
-    /// A failed import leaves the account behind, so it is removed
-    /// rather than released: unlike a refused signup, which leaves a
-    /// clean unconfigured account for the next attempt to reuse, a
-    /// half-written one is good for nothing. So is a second copy of a
-    /// profile this phone already has (`already_here`), which is undone
-    /// the same way.
+    /// Take profile over: account, code read, core import (`ImexProgress`). Failed import or
+    /// duplicate: account removed, not released (half-written useless, unlike refused signup's).
     pub(crate) async fn restore(
         &self,
         runtime: &CoreRuntime,
@@ -307,8 +229,7 @@ impl Attempt {
                 return Taken::Refused(reason);
             }
         }
-        // A task of its own, as the transport call is, so that giving up
-        // on it here leaves it to finish and clean up after itself.
+        // Own task, like transport call.
         let call = runtime.spawn(import_call(
             rpc.clone(),
             self.shared.clone(),
@@ -318,14 +239,8 @@ impl Attempt {
         ));
         match tokio::time::timeout(self.deadline, call).await {
             Ok(Ok(Ok(()))) => {
-                // A profile already on this phone must not arrive a
-                // second time. Two accounts on one address are two
-                // copies of the same mailbox, each fetching it: every
-                // message counted twice on the profiles page, notified
-                // twice, and answered from whichever copy the reader
-                // happened to open. The import is undone rather than
-                // kept, as a failed one is -- the copy already here is
-                // the profile, and it is untouched.
+                // Second copy of mailbox fetches twice (counts, notifications): undo import;
+                // existing copy untouched.
                 if already_here(&rpc, account_id).await {
                     discard(&rpc, account_id).await;
                     return Taken::Refused("already-here");
@@ -342,7 +257,7 @@ impl Attempt {
             }
             Err(_) => {
                 self.wanted.store(false, Ordering::SeqCst);
-                // Best effort, as for a signup that timed out.
+                // Best effort, as for signup.
                 rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
                     .await
                     .ok();
@@ -351,10 +266,8 @@ impl Attempt {
         }
     }
 
-    /// The account the profile is built on: an unconfigured one no
-    /// attempt is still holding, else a fresh one. Reuse keeps a failed
-    /// signup from stranding an account per retry; the holding check
-    /// keeps a retry off an account whose configure is still running.
+    /// Unconfigured unheld account, else fresh. Reuse stops stranding one per retry; held check
+    /// avoids one still configuring.
     async fn pick_account(&self, rpc: &RpcClient) -> Result<u32, String> {
         let accounts: Vec<serde_json::Value> = rpc
             .call_unit("get_all_accounts")
@@ -381,23 +294,16 @@ impl Attempt {
     }
 }
 
-/// Whether the account a transport call runs on was made for it.
+/// Whether transport call's account was made for it.
 #[derive(Clone, Copy)]
 enum Made {
-    /// A profile being made: the account is this attempt's, and goes
-    /// with it if nobody wants what it made.
+    /// Being made: removed if nobody wants it.
     Here,
-    /// A relay being added: the account is a profile the reader has,
-    /// and stays whatever becomes of the attempt.
+    /// Relay added: profile is reader's; kept.
     Before,
 }
 
-/// The transport call, and the account's release once it has returned.
-/// A success nobody is waiting for any more is removed here when the
-/// account was made for it: the reader gave up on it, and a profile they
-/// did not ask for must not be what the app opens on next time. A relay
-/// added late to a profile that was there before is kept; see the
-/// module doc.
+/// Transport call, then release. Success nobody awaits is removed if account made for it.
 async fn transport_call(
     rpc: Arc<RpcClient>,
     shared: Arc<Attempts>,
@@ -429,10 +335,7 @@ async fn transport_call(
     result
 }
 
-/// The import call, and the account's release once it has returned. A
-/// profile taken over after the reader gave up is removed here, for the
-/// same reason a late signup's is: nobody asked for it, and left in
-/// place it would be the profile the app opened on next time.
+/// Import call, then release. Taken over after give-up: removed.
 async fn import_call(
     rpc: Arc<RpcClient>,
     shared: Arc<Attempts>,
@@ -455,22 +358,12 @@ async fn import_call(
     result
 }
 
-/// Whether some other configured account is reached at any of the
-/// addresses the profile just taken over is.
+/// Another configured account reaches an address of profile just taken over?
 ///
-/// Compared by transport (`list_transports`), every address of each:
-/// the core's account list carries no address since 2.61, and the
-/// profile's own address (`configured_addr`) need not be the same on two
-/// copies -- one switched to another of its relays names that one --
-/// while both fetch the same mailboxes. Asked of the core rather than
-/// remembered here: a copy added by an earlier run of the app is as much
-/// a duplicate as one added a moment ago, and the core is where both
-/// show up. An account whose relays cannot be read is let through --
-/// refusing a profile on a question that could not be answered is the
-/// worse of the two mistakes.
-///
-/// A call for each configured profile's relays, up to the first that
-/// shares one: this runs once per profile taken over, not per refresh.
+/// By every transport address (`list_transports`): account list lacks address since 2.61;
+/// `configured_addr` can differ between copies. Asked of core, not remembered: earlier runs'
+/// copies count. Unreadable account passes (wrong refusal worse). One call per configured
+/// profile till match; once per takeover.
 async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
     let Ok(accounts) = rpc
         .call_unit::<Vec<serde_json::Value>>("get_all_accounts")
@@ -489,9 +382,7 @@ async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
         if other == account_id || json::str_at(account, "kind") != "Configured" {
             continue;
         }
-        // The same mailbox written two ways is the same mailbox: the
-        // core lowercases what it configures, but a backup written by
-        // another client need not have.
+        // Core lowercases; other clients' backups may not.
         let theirs = transport_addrs(rpc, other).await;
         if theirs
             .iter()
@@ -503,8 +394,7 @@ async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
     false
 }
 
-/// The addresses of an account's transports, empty when the core cannot
-/// say.
+/// Addresses of transports; empty if core cannot say.
 async fn transport_addrs(rpc: &RpcClient, account_id: u32) -> Vec<String> {
     rpc.call::<_, Vec<serde_json::Value>>("list_transports", (account_id,))
         .await
@@ -519,39 +409,34 @@ async fn transport_addrs(rpc: &RpcClient, account_id: u32) -> Vec<String> {
         .unwrap_or_default()
 }
 
-/// Whether the code read is one another device is offering a profile
-/// with. Asked before the transfer is started on it: the core's own
-/// answer to a code that is not one is about protocols, and the reader
-/// is standing there with a camera.
+/// Code from another device's offer? Checked first: core's non-code error talks protocols;
+/// reader holding camera needs "not a backup".
 async fn from_a_device(rpc: &RpcClient, account_id: u32, qr: &str) -> Result<(), &'static str> {
     let checked: serde_json::Value =
         rpc.call("check_qr", (account_id, qr))
             .await
             .map_err(|err| {
-                // The reader is told it is not a code to take a profile from;
-                // why the core could not even check it is for the log.
+                // Reader sees "not-a-backup"; core's reason is logged.
                 eprintln!("piirit: checking a code for a profile: {err}");
                 "not-a-backup"
             })?;
     match json::str_at(&checked, "kind") {
         "backup2" => Ok(()),
-        // The other device runs a newer Delta Chat than this core can
-        // read a backup from, which is worth saying as such.
+        // Newer Delta Chat than this core.
         "backupTooNew" => Err("too-new"),
         _ => Err("not-a-backup"),
     }
 }
 
-/// Remove a profile that was made after the reader gave up on it.
+/// Remove profile made after reader gave up.
 pub(crate) async fn discard(rpc: &RpcClient, account_id: u32) {
-    // Left behind, it is an empty profile in the switcher; nothing the
-    // reader is waiting on, so it is only logged.
+    // Failure leaves empty profile in switcher; logged only.
     if let Err(err) = rpc.call::<_, ()>("remove_account", (account_id,)).await {
         eprintln!("piirit: removing an abandoned profile: {err}");
     }
 }
 
-/// Set the display name.
+/// Set display name.
 async fn set_display_name(
     rpc: &RpcClient,
     account_id: u32,
@@ -588,8 +473,7 @@ mod tests {
         attempts.busy().insert(3);
         assert_eq!(attempts.cancel(), vec![3, 7]);
         assert!(!attempts.is_current(attempt.id()));
-        // Cancelling stops the waiting, not the holding: the core's
-        // process is still running on those accounts.
+        // Cancel stops waiting, not holding.
         assert_eq!(attempts.busy().len(), 2);
         attempts.release(7);
         assert_eq!(attempts.busy().iter().copied().collect::<Vec<_>>(), vec![3]);
@@ -600,7 +484,7 @@ mod tests {
         let attempts = Arc::new(Attempts::default());
         let attempt = attempts.begin(DEADLINE);
         attempt.hold(1);
-        // No task has run yet: the cancel still finds the account.
+        // No task has run yet: cancel still finds account.
         assert_eq!(attempts.cancel(), vec![1]);
     }
 }

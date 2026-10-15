@@ -3,73 +3,41 @@ import Sailfish.Silica 1.0
 import "../js/Media.js" as Media
 
 /*
- * What a chat holds besides words, as a row of tiles on the page that
- * says who the chat is with: pictures and videos, sounds, files, and --
- * where apps are on -- apps; on a contact's page, where a call can be
- * placed, the calls with them too. Each tile is the way into the page that
- * lists that kind (pages/ChatMediaPage.qml), which is where
- * deltachat-android and deltachat-ios keep theirs as well.
- *
- * A row of tiles rather than a list of rows, because these are doors and
- * not settings: four icons with a word under each read at a glance, and
- * the page under them stays short. Each tile is Silica's BackgroundItem,
- * so it lights up under a thumb the way every other tappable thing on
- * the phone does, and its icon is the theme's own for that kind of file
- * -- the ones the platform's file browser draws -- in the theme's own
- * colours. Apps are the exception: the theme has no icon for those, and
- * AppMark says why it draws one.
- *
- * Laid out by bindings rather than a Row, for the reason MessageDelegate
- * is: a positioner sizes itself in a polish pass, which never runs
- * headlessly.
- *
- * The row keeps its own room above and below the tiles. They are a third
- * kind of thing between who the chat is with and what the chat does, and
- * a column's own spacing does not say so; the page that puts them in a
- * column gets the gap without having to know how wide one should be.
- *
- * Nothing is opened here. The page that owns the pageStack pushes the
- * media page, which keeps this loadable, and testable, on its own.
+ * Chat media tiles: gallery, sounds, files, apps (if on), calls (contact chats), each to
+ * pages/ChatMediaPage.qml, as deltachat-android/-ios. Tiles: doors, not settings. AppMark
+ * draws apps' missing theme icon. Bindings, not Row: polish never runs headless. Own room
+ * above/below for page columns. Opens nothing (page pushes), so testable alone.
  */
 Item {
     id: root
 
-    /// Whether webxdc apps are on. Off, there is no Apps tile, the way
-    /// the attach tray has no app entry then.
+    /// Webxdc apps on. Off: no Apps tile.
     property bool appsAvailable: false
 
-    /// Whether there is a Calls tile: the chat is one a call can be
-    /// placed in. A contact's page sets it; a group's never.
+    /// Calls tile: contact chats only.
     property bool callsAvailable: false
 
-    /// The reader tapped a kind: gallery, audio, files, apps or calls.
+    /// Tapped: gallery, audio, files, apps or calls.
     signal kindRequested(string kind)
 
-    /// The kinds on offer, in tile order.
+    /// Kinds on offer, tile order.
     readonly property var kinds: Media.kinds(root.appsAvailable, root.callsAvailable)
-    /// How wide one tile is: the row shared out between them, inside the
-    /// page margins.
+    /// Tile width: row split inside page margins.
     readonly property real tileWidth: root.kinds.length > 0
         ? (root.width - 2 * Theme.horizontalPageMargin) / root.kinds.length
         : 0
 
-    /// The room kept clear above and below the tiles, over and above the
-    /// padding a tile carries inside its own highlight. A little more
-    /// above than below: the combo under the tiles keeps a line's room of
-    /// its own above its label, and the caption over them keeps none, so
-    /// the two gaps come out about even on screen.
+    /// Room around tiles; more above (combo below has line room, caption none).
     readonly property real gapAbove: Theme.paddingLarge + Theme.paddingMedium
     readonly property real gapBelow: Theme.paddingLarge
-    /// How tall one tile is: an icon, a gap, one line of caption, and the
-    /// padding a row keeps above and below.
+    /// Tile height: icon, gap, one caption line, row padding.
     readonly property real tileHeight: Theme.iconSizeMedium + Theme.paddingSmall
                                        + captionMetric.height + 2 * Theme.paddingMedium
 
     width: parent ? parent.width : 0
     height: root.gapAbove + root.tileHeight + root.gapBelow
 
-    // One line of the caption's font, measured once: every tile's word
-    // is one line of it.
+    // One caption line, measured once.
     Label {
         id: captionMetric
         visible: false
@@ -92,8 +60,7 @@ Item {
             readonly property color tint: tile.highlighted ? Theme.highlightColor
                                                             : Theme.primaryColor
 
-            // The theme's icon in the theme's colour, lit while the tile
-            // is pressed, as an IconButton's would be.
+            // Theme icon, lit while pressed (as IconButton).
             Image {
                 id: icon
                 objectName: "tileIcon"
@@ -109,8 +76,7 @@ Item {
                         : "image://theme/" + Media.kindIcon(modelData) + "?" + tile.tint
             }
 
-            // Drawn rather than named; see AppMark. A little smaller than
-            // the icon's box, which is how much of that box an icon fills.
+            // Drawn, not named (see AppMark). 0.6 = icon's fill of its box.
             AppMark {
                 objectName: "tileMark"
                 visible: tile.isApps

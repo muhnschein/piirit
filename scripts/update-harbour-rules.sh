@@ -1,18 +1,17 @@
 #!/bin/sh
 # Refresh ci/harbour/ from sailfishos/sdk-harbour-rpmvalidator.
 #
-# Those .conf files are the authoritative Harbour rules -- the prose docs
-# lag behind them -- so ci/harbour-check.sh reads them rather than a
-# transcription. They are vendored so CI stays deterministic and offline;
-# this script is how they move, and the diff is the review.
+# .conf files are authoritative Harbour rules (prose docs lag); harbour-check.sh
+# reads them, not a transcription. Vendored for deterministic offline CI; this
+# script moves them, the diff is the review.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 dest="$root/ci/harbour"
 repo=https://github.com/sailfishos/sdk-harbour-rpmvalidator.git
 
-# rpmvalidation.conf is not copied: it only names the other files and the
-# paths, which ci/harbour-check.sh has its own copy of.
+# rpmvalidation.conf not copied: only names files and paths, which
+# ci/harbour-check.sh has its own copy of.
 files='allowed_libraries.conf allowed_permissions.conf allowed_qmlimports.conf
        allowed_requires.conf allowed_sailjailkeys.conf deprecated_libraries.conf
        deprecated_qmlimports.conf deprecated_requires.conf disallowed_orgnames.conf

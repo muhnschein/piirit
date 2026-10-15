@@ -1,14 +1,10 @@
-//! The chat list is where a running app sits, so it is where the core's own
-//! failures have to show up.
+//! Chat list is where a running app sits, so where core's own failures must show.
 //!
-//! A core that goes away is the other half of that, and lives in
-//! `qml_core_gone.rs`: it needs a server that keeps dying, which is not an
-//! environment an error banner can be read in.
+//! Core going away lives in `qml_core_gone.rs`: needs a server that keeps dying, no environment to
+//! read an error banner in.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -24,9 +20,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe with the components directory filled in: the page's own
-/// `Settings` singleton is imported by absolute URL, since a probe
-/// loaded from data has no directory to resolve a relative one against.
+/// Probe with components dir filled in: page's `Settings` singleton imported by absolute URL, as
+/// probe loaded from data has no dir to resolve a relative one against.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -85,8 +80,7 @@ fn the_chat_list_shows_what_the_core_reports() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-chat-list-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -134,11 +128,9 @@ fn the_chat_list_shows_what_the_core_reports() {
                 1
             ),
         ));
-        // The profile the next launch opens on, written here because
-        // every way to a profile ends on this page.
+        // Profile next launch opens on, written here: every way to a profile ends on this page.
         (*steps_ptr).push(("after", call!("remembered")));
-        // Nothing has been read yet. An empty model means "no answer"
-        // this early and "no chats" later, and the two are opposite.
+        // Nothing read yet. Empty model means "no answer" this early, "no chats" later: opposites.
         (*steps_ptr).push((
             "placeholder-fresh",
             call!(
@@ -169,8 +161,7 @@ fn the_chat_list_shows_what_the_core_reports() {
         ));
     });
 
-    // The core has answered and there is nothing to show: now the
-    // placeholder is the one thing that should be on the page.
+    // Core answered, nothing to show: placeholder only thing.
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push((
             "placeholder-empty",
@@ -191,7 +182,7 @@ fn the_chat_list_shows_what_the_core_reports() {
     assert_outcome(&steps);
 }
 
-/// The failure is on the page, and it is one the reader can wait out.
+/// Failure on page: reader can wait it out.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

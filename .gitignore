@@ -3,47 +3,41 @@
 **/target/
 Cargo.lock.bak
 
-# Sailfish SDK / mb2 / sfdk build artifacts
+# Sailfish SDK / mb2 / sfdk
 RPMS/
 *.rpm
 build-*/
 *.spec.bak
 
-# Where %build keeps the compiler's temporaries, rather than the shared
-# /tmp a parallel link under scratchbox2 can lose a file in.
+# %build temps; not /tmp (scratchbox2 parallel link loses files)
 /.tmp/
 
-# Compiled translation catalogs: `make translations` and the RPM's %build
-# make them from the .ts files beside them (scripts/release-translations.sh)
+# Compiled from .ts (scripts/release-translations.sh)
 *.qm
 
-# Qt Creator / QML tooling
+# Qt Creator / QML
 *.pro.user
 *.pro.user.*
 .qmake.stash
 
-# Editor / OS cruft
+# Editor / OS
 .vscode/
 .idea/
 *.swp
 .DS_Store
 
-# deltachat-rpc-server binaries fetched by scripts/fetch-rpc-server.sh
-# (or cross-compiled) -- see vendor/deltachat-rpc-server/SOURCE.md
+# scripts/fetch-rpc-server.sh; see vendor/deltachat-rpc-server/SOURCE.md
 /vendor/deltachat-rpc-server/*/
 
-# `cargo vendor` output: offline crate sources for OBS/Chum
-# (`sfdk build -- --with vendor`) and for builds inside the SDK chroot,
-# where scratchbox2 has no reliable network path to crates.io. All of it is
-# regenerated from rust/Cargo.lock by scripts/vendor-crates.sh, whose
-# header says what each file is for.
+# `cargo vendor` for OBS/Chum, SDK chroot (no crates.io). From
+# scripts/vendor-crates.sh; its header says what each file is for.
 /rpm/vendor.tar.xz
 /rpm/vendor.toml
 /rust/vendor/
 /rust/.cargo/
-# Except the one setting every checkout shares: see .cargo/config.toml.
+# Except shared setting: see .cargo/config.toml
 /.cargo/*
 !/.cargo/config.toml
 
-# Python 3 leaves these beside tools/faces/faces.py when it runs.
+# Python 3 leaves beside tools/faces/faces.py
 __pycache__/

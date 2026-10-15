@@ -1,15 +1,9 @@
-//! An event nothing reads never leaves the shim.
+//! Unread event never leaves shim.
 //!
-//! `core_event` reaches every page still on the stack and one chat list per
-//! profile on the cover, and each of them parses the payload again. The core
-//! says a great deal that none of them read -- most of it is its own log --
-//! and a bulk sync is thousands of those, arriving while the screen is off.
-//! So `relay` drops what is not on `HANDLED_EVENT_KINDS` before it is even
-//! serialised.
+//! Each page and cover list re-parses every `core_event`; core sends mostly own log, thousands in
+//! bulk sync, screen off. So `relay` drops kinds not in `HANDLED_EVENT_KINDS` before serialising.
 //!
-//! That the list matches the code that reads it is `event_kinds.rs`. This is
-//! that the gate is really there: the core says four things, two of which
-//! the app reads, and only those two arrive.
+//! List vs reader: `event_kinds.rs`. Here: 4 sent, 2 read, only those arrive.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -47,15 +41,13 @@ fn only_the_kinds_something_reads_are_handed_out() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Two the app reads, and two of the core's own log lines. `Info` is
-        // the one there is most of: the core writes one for every step of
-        // every connection and every message it parses.
+        // Two app reads, two core log lines; `Info` is most (one per step of each
+        // connection/message).
         std::env::set_var(
             "PIIRIT_FAKE_SEED_EVENTS",
             "Info,IncomingMsg,SmtpConnected,MsgsChanged",

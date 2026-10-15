@@ -4,76 +4,48 @@ import "../components"
 import "../js/Relays.js" as Relays
 
 /*
- * One more relay for a profile that has one. Reached from the relays on
- * the profile page (ProfilePage.qml).
- *
- * The core lets a profile be reached through several relays at once, each
- * with an address of its own; adding one is the same call that made the
- * profile in the first place, on the account the profile already is
- * (add_transport_from_qr, docs/PROJECT.md). So this page is the relay
- * half of AddProfileDialog -- the same list, the same custom field -- and
- * then the wait ProfileSetupPage shows, on one page: there is no name to
- * ask for, and nowhere to hand over to, since the profile page under this
- * one is where the relay shows up.
- *
- * A relay is somebody's spare-time server, and one that is down holds
- * the core for minutes. So the page says as much once the wait has gone
- * past four seconds, under the Cancel button that has been there all
- * along; and the shim gives up on the relay for the reader at thirty
- * (signup.rs), which lands here as a time-out with the fields back.
- *
- * Done means gone: the relay is on the profile, and its row is on the
- * page under this one, which re-reads its relays as this page goes.
- *
- * A relay's code scanned on the QR page lands here too, with the relay
- * already chosen (`scannedQr`): the list and the field give way to the
- * relay the code names, under Delta Chat's own question, and nothing is
- * added until the button under it is pressed.
+ * Extra relay for profile (from ProfilePage.qml). Same call that made profile
+ * (add_transport_from_qr, docs/PROJECT.md): AddProfileDialog's relay half plus
+ * ProfileSetupPage's wait. Relays are spare-time servers: a dead one holds
+ * core minutes; page says so past 4 s, shim gives up at 30 s (signup.rs).
+ * Done: page pops, page below re-reads relays. Scanned QR (`scannedQr`)
+ * arrives preselected; added on button press.
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would leave a relay halfway added. See piirit.qml.
+    /// No quick actions: jumping away leaves relay half-added. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
     property int accountId
 
-    /// A relay's code, `dcaccount:` or `dclogin:`, scanned rather than
-    /// picked: what the core is handed as it is. Empty when the reader
-    /// picks.
+    /// Scanned code (`dcaccount:`/`dclogin:`), passed as is; empty if picked.
     property string scannedQr: ""
-    /// The relay that code names, or the address on it, as the core
-    /// read it.
+    /// Code's relay, as core read it.
     property string scannedRelay: ""
     readonly property bool scanned: page.scannedQr.length > 0
 
-    /// The relay chosen: the scanned one, else the custom one if typed,
-    /// else the picked one.
+    /// Relay chosen: scanned, else typed, else picked.
     property string domain: page.scanned ? page.scannedRelay
                             : customField.text.trim().length > 0
                             ? customField.text.trim()
                             : (relayCombo.currentIndex >= 0 && relayCombo.currentIndex < relays.length
                                ? relays[relayCombo.currentIndex].domain : "")
-    /// What the core is handed: `dcaccount:` and a relay, which it takes
-    /// with or without the `https://.../new` around it. Empty until a
-    /// relay is chosen.
+    /// `dcaccount:` + relay; empty until chosen.
     property string providerQr: page.scanned ? page.scannedQr
                                 : (domain.length > 0 ? "dcaccount:" + domain : "")
 
-    // The public relays, as chatmail.at/relays lists them (Relays.js).
+    // Relays.js (chatmail.at/relays).
     readonly property var relays: Relays.list
 
-    /// True while the core is working.
+    /// True while core works.
     property bool busy: false
     property int permille: 0
     property string errorMessage: ""
-    /// Set once the relay has taken longer than four seconds, and kept:
-    /// the reason to try another relay does not go away with the error
-    /// that may follow.
+    /// After 4 s relay wait; kept through following error.
     property bool slowRelay: false
 
-    // The four seconds. Counted only while the core is working.
+    // 4 s, counted only while core works.
     Timer {
         id: patience
         interval: 4000
@@ -81,14 +53,10 @@ Page {
         onTriggered: page.slowRelay = true
     }
 
-    // Cancel is the way back while the core is working: a swipe back
-    // would drop this page, and with it the handler that hears the
-    // answer, leaving the core on the relay with nobody waiting.
+    // Busy: only Cancel goes back; swipe would drop answer handler mid-call.
     backNavigation: !page.busy
 
-    // A move the core asked for, held until this page is the one on
-    // screen: a call's page may be over it, and a move made then would
-    // take that page instead (PendingNavigation.qml).
+    // Core move held until page on screen: else it would take a covering call page.
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -110,8 +78,7 @@ Page {
     Connections {
         target: core
 
-        // Only while this page is waiting: an answer after Cancel is not
-        // this page's to act on, and the shim signals nothing for one.
+        // Answer after Cancel isn't ours.
         onRelay_added: {
             if (!page.busy || account_id !== page.accountId) {
                 return
@@ -128,9 +95,7 @@ Page {
             page.errorMessage = message
         }
 
-        // The shim gave up on the relay. Worded here rather than in the
-        // shim: it is the one failure the app decides on itself, so it
-        // is the one the app can say in the reader's language.
+        // Shim timeout: app's failure, worded here.
         onRelay_timed_out: {
             if (!page.busy) {
                 return
@@ -140,9 +105,7 @@ Page {
                                 .arg(page.domain).arg(seconds)
         }
 
-        // Not gated on `busy`: the core's last progress events can arrive
-        // after the call that started them has already been answered.
-        // Gated on the account: the same signal reports every profile.
+        // Not gated on `busy` (late progress after answer); gated on account (signal is shared).
         onConfigure_progress: {
             if (account_id === page.accountId) {
                 page.permille = permille
@@ -176,7 +139,7 @@ Page {
                       : qsTr("Adds another address for this profile on a second relay.")
             }
 
-            // The relay the scanned code names, in place of the list.
+            // Scanned code's relay, replacing list.
             Label {
                 objectName: "scannedRelay"
                 visible: page.scanned
@@ -185,7 +148,7 @@ Page {
                 wrapMode: Text.WrapAnywhere
                 color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeLarge
-                // The code's own string, pinned to plain.
+                // Code's string, plain.
                 textFormat: Text.PlainText
                 text: page.scannedRelay
             }
@@ -195,14 +158,11 @@ Page {
                 objectName: "relayCombo"
                 visible: !page.scanned
                 width: parent.width
-                // Said as the action it is, as the add-profile dialog
-                // says it.
+                // Worded as action, as in add-profile dialog.
                 label: qsTr("Select a public chatmail relay")
-                // Nothing to begin with: the reader picks, as they did
-                // for the profile itself.
+                // No preselection, as for profile.
                 currentIndex: -1
-                // A typed server is the one that counts, and nothing
-                // changes while the core is on the one that was chosen.
+                // Off when server typed (wins) or core busy.
                 enabled: !page.busy && customField.text.trim().length === 0
 
                 menu: ContextMenu {
@@ -242,9 +202,7 @@ Page {
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 
-            // Dim until a relay is chosen, as the dialog's Create is: a
-            // relay is where an address and a mailbox live for as long
-            // as the profile keeps it.
+            // Dim until chosen, as dialog's Create.
             Button {
                 objectName: "addButton"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -275,9 +233,7 @@ Page {
                 }
             }
 
-            // Under the Cancel button, once the relay has kept the reader
-            // waiting: what a relay is, and what to do about one that does
-            // not answer. Stays through the error that may follow.
+            // Under Cancel once `slowRelay`: what relays are, what to do; stays through error.
             Label {
                 objectName: "slowHint"
                 x: Theme.horizontalPageMargin

@@ -1,27 +1,18 @@
-//! The QR code page: this profile's invite drawn as a code on one side
-//! of the switch, the scanner on the other.
+//! QR code page: this profile's invite as code on one side of the switch, scanner on the other.
 //!
-//! Loaded headlessly against the stub Silica module and the recording
-//! double: once the invite arrives the code has modules and the picture
-//! is shown from a file; the switch brings the scanner up, loaded from
-//! its own file; the button under the viewfinder opens the link panel,
-//! and a link entered there is followed into a chat that replaces this
-//! page above the one that opened it. Nothing is pushed: the scanner is
-//! a side of this page, not a page of its own.
+//! Headless against stub Silica and recording double. Invite arrives: code drawn, picture
+//! from file. Switch brings scanner up from its own file. Link panel link opens a chat
+//! replacing this page above its opener. Nothing pushed: scanner is a side of this page.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters, and the derive transmutes a QVariant field;
-    // see piirit-shim/src/lib.rs.
+    // qt_method! params match dispatcher; derive transmutes a QVariant field.
     clippy::needless_pass_by_value,
     clippy::useless_transmute
 )]
@@ -33,9 +24,9 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
+/// Silica `pageStack`, recorded not performed.
 ///
-/// Method names are camelCase because they stand in for Silica's own API.
+/// `camelCase`: Silica's own API.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -69,8 +60,7 @@ impl PageStackProbe {
         self.note("replaceAbove", &page);
     }
 
-    /// The page below, which this record does not model. `&mut self` is
-    /// what `qt_method!` dispatches to.
+    /// Page below, not modelled here. `&mut self` is what `qt_method!` dispatches to.
     #[allow(clippy::unused_self)]
     fn previousPage(&mut self, _page: QVariant) -> QVariant {
         QVariant::default()
@@ -140,8 +130,7 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -201,35 +190,34 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        // The code side is up first, and the invite has arrived from the
-        // core and is drawn.
+        // Code side up first; invite arrived and drawn.
         record!("mode", call!("pageProperty", QString::from("mode")));
         record!("code-side", get!("codeView", "visible"));
         record!("scan-side", get!("scanArea", "visible"));
-        // Whose code: the profile, in its own colour, above it.
+        // Whose code: profile, own colour, above it.
         record!("profile-row", get!("profileRow", "visible"));
         record!("profile-color", call!("profileColor"));
         record!("invite", get!("myInviteLabel", "text"));
         record!("code-size", get!("qr", "size"));
         record!("code-shown", get!("inviteQr", "visible"));
         record!("code-image", get!("inviteQr", "source"));
-        // Nothing to paste into on this side: the field is the scanner's.
+        // Nothing to paste into here: field is the scanner's.
         record!("field-before", get!("linkField", "visible"));
-        // The switch: the scanner side, loaded from its own file.
+        // Switch: scanner side, from own file.
         record!("switch", call!("click", QString::from("viewOption1")));
         record!("mode-after", call!("pageProperty", QString::from("mode")));
         record!("code-side-after", get!("codeView", "visible"));
         record!("scan-side-after", get!("scanArea", "visible"));
         record!("scanner-loaded", get!("scanLoader", "status"));
         record!("viewfinder", get!("viewfinder", "visible"));
-        // The camera runs on this side, but not in the background.
+        // Camera runs on this side, not in background.
         record!("scan-camera", get!("camera", "running"));
         record!("away", call!("background", true));
         record!("away-camera", get!("camera", "running"));
         record!("away-grabbing", get!("grabber", "running"));
         record!("back", call!("background", false));
         record!("back-camera", get!("camera", "running"));
-        // The link, entered under the viewfinder and followed.
+        // Link entered under viewfinder, followed.
         record!("panel-before", get!("linkPanel", "visible"));
         record!("button", get!("typeLinkButton", "visible"));
         record!("open", call!("click", QString::from("typeLinkButton")));
@@ -253,8 +241,7 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
     assert_page(&steps, &common::methods(&journal));
 }
 
-/// The code is the invite; the switch brings the scanner up; a link
-/// entered there is followed into a chat over this page.
+/// Code is the invite; switch brings scanner up; link entered there opens a chat over this page.
 #[allow(clippy::too_many_lines)]
 fn assert_page(steps: &[(&str, String)], calls: &[String]) {
     let context = format!("steps: {steps:?}\ncalls: {calls:?}");
@@ -394,8 +381,8 @@ fn assert_page(steps: &[(&str, String)], calls: &[String]) {
         calls.iter().any(|name| name == "secure_join"),
         "the entered link was not followed. {context}"
     );
-    // Above the page below this one, and nothing pushed on the way: the
-    // scanner is a side of this page, and the chat replaces the page.
+    // Chat replaces this page, above the page below it; nothing pushed: scanner is a side of
+    // this page.
     assert_eq!(
         value("navigation"),
         "replaceAbove:ConversationPage.qml|",

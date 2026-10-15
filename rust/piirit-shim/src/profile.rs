@@ -1,9 +1,4 @@
-//! The account's own profile: the name others see, the line under it, and
-//! the picture.
-//!
-//! All three are core config keys rather than a record of their own, which
-//! is why this is a small object over `get_config`/`set_config` rather
-//! than a model.
+//! Account's own profile: name, status, picture, via core `get_config`/`set_config`.
 
 use qmetaobject::*;
 
@@ -22,110 +17,85 @@ use crate::media;
 pub struct Profile {
     base: qt_base_class!(trait QObject),
 
-    /// Whose profile this is. Setting it reloads.
+    /// Whose profile; set reloads.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
-    /// Emitted when the account changes.
+    /// Account changed.
     pub account_changed: qt_signal!(),
 
-    /// The name everyone written to sees. `displayname` to the core.
+    /// Name others see (`displayname`).
     pub display_name: qt_property!(QString; NOTIFY loaded_changed),
-    /// The line under it, which the core appends to outgoing mail.
-    /// `selfstatus` to the core.
+    /// Status line in outgoing mail (`selfstatus`).
     pub status: qt_property!(QString; NOTIFY loaded_changed),
-    /// Absolute path to the picture inside the core's blob directory,
-    /// empty when there is none.
+    /// Picture path in core's blob dir; empty if none.
     pub avatar_path: qt_property!(QString; NOTIFY loaded_changed),
-    /// The profile's own address (`configured_addr`), the one its invite
-    /// link and its own contact carry. Not editable: changing it is
-    /// setting up a different transport, not renaming this one.
+    /// Address (`configured_addr`). Read-only: change means new transport.
     pub address: qt_property!(QString; NOTIFY loaded_changed),
-    /// The colour the core gives the reader's own contact, `#rrggbb`, for
-    /// the avatar wherever the profile is drawn beside other people's.
+    /// Reader's own contact colour, `#rrggbb`.
     pub color: qt_property!(QString; NOTIFY loaded_changed),
 
-    /// Whether the other end is told when a message has been read.
-    /// `mdns_enabled` to the core, which defaults it on.
+    /// Read receipts (`mdns_enabled`; default on).
     pub read_receipts: qt_property!(bool; NOTIFY loaded_changed),
-    /// The largest attachment the core recommends, in bytes; 0 until
-    /// read. The core's own constant, the same whichever relay mail
-    /// leaves through. Through f64 because QML has no 64-bit
-    /// integer. See `media.rs`.
+    /// Attachment limit, bytes; 0 until read. See `media.rs`. f64 for QML.
     pub attachment_limit_bytes: qt_property!(f64; NOTIFY loaded_changed),
 
-    /// The core's `get_connectivity` band: 0 until asked, then 1000 not
-    /// connected, 2000 connecting, 3000 connected and working, 4000
-    /// connected and idle, with the core's own finer steps in between.
-    /// The page puts words to it; see `connectivity.rs`.
+    /// `get_connectivity` band: 1000 offline, 2000 connecting, 3000 working, 4000 idle; 0 until
+    /// asked. See `connectivity.rs`.
     pub connectivity: qt_property!(u32; NOTIFY connectivity_changed),
-    /// How full the mailbox on the relay is, in percent. Only meaningful
-    /// while `quota_text` says something: a relay need not report one.
+    /// Mailbox percent; valid while `quota_text` set.
     pub quota_percent: qt_property!(u32; NOTIFY connectivity_changed),
-    /// The core's own sentence about the mailbox -- "1.3 MiB of 2 GiB
-    /// used" -- or empty when the relay has not said.
+    /// Core's mailbox sentence (`1.3 MiB of 2 GiB used`); empty until relay says.
     pub quota_text: qt_property!(QString; NOTIFY connectivity_changed),
-    /// The amounts behind `quota_text`, in bytes, for saying how much is
-    /// left the way parla's dialog does. Both 0 when the relay reported
-    /// none. Through f64 because QML has no 64-bit integer.
+    /// Quota bytes behind `quota_text`, for "left" display as parla; 0 if none. f64: QML lacks
+    /// 64-bit int.
     pub quota_used_bytes: qt_property!(f64; NOTIFY connectivity_changed),
     /// See `quota_used_bytes`.
     pub quota_limit_bytes: qt_property!(f64; NOTIFY connectivity_changed),
-    /// What this profile takes up on the device, in bytes. A real: QML
-    /// has no 64-bit integer.
+    /// Profile's device size, bytes. f64 for QML.
     pub storage_bytes: qt_property!(f64; NOTIFY connectivity_changed),
-    /// Emitted when the connection, the quota or the storage is re-read.
+    /// Connection, quota or storage re-read.
     pub connectivity_changed: qt_signal!(),
-    /// Ask the core again about the connection, the mailbox and the
-    /// space on the device. Asked once with the profile, and again after
-    /// the core's `ConnectivityChanged` event -- at most once a second
-    /// (`ProfilePage.qml`): it is four round trips, one of which sizes
-    /// every file the profile has.
+    /// Re-read connection, mailbox, storage at load and on `ConnectivityChanged`, max 1/s
+    /// (`ProfilePage.qml`): four round trips, one sizing every file.
     pub refresh_connectivity: qt_method!(fn(&mut self)),
 
-    /// True once the profile has been read from the core. Until then the
-    /// fields are empty because nothing has been loaded, not because the
-    /// profile is blank -- and a save then would wipe it.
+    /// Loaded. Before: fields unloaded, not blank; save would wipe.
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
-    /// Emitted when any of the fields, or `loaded`, changes.
+    /// Any field or `loaded` changed.
     pub loaded_changed: qt_signal!(),
 
-    /// Something failed. The message is the core's own.
+    /// Failure; message from core.
     pub error: qt_signal!(message: QString),
-    /// The profile was stored.
+    /// Profile stored.
     pub saved: qt_signal!(),
 
-    /// Read the profile from the core.
+    /// Read the profile.
     pub reload: qt_method!(fn(&mut self)),
-    /// Store the name and the status.
+    /// Store name and status.
     pub save: qt_method!(fn(&mut self, display_name: QString, status: QString)),
-    /// Use the image at `path` as the picture. The core copies it into its
-    /// own blob directory, so the file picked can go away afterwards.
+    /// Use `path` as picture; core copies it to blob dir, picked file may go.
     pub set_picture: qt_method!(fn(&mut self, path: QString)),
     /// Remove the picture.
     pub clear_picture: qt_method!(fn(&mut self)),
     /// Turn read receipts on or off.
     pub set_read_receipts: qt_method!(fn(&mut self, enabled: bool)),
 
-    /// Counts loads, so a slow answer to an older question cannot land on
-    /// top of a newer one -- switching profiles starts one per switch.
+    /// Load counter: stale answers must not win.
     generation: u64,
 }
 
-/// What one load brings back: name, status, picture, address, receipts,
-/// colour, and what the relay takes.
+/// Load result: name, status, picture, address, receipts, colour, limit.
 type Fields = (String, String, String, String, bool, String, u64);
 
-/// What one connectivity check brings back: the band, the mailbox quota
-/// if the relay reports one, and the profile's size on the device.
+/// Connectivity result: band, quota if reported, device size.
 type Connectivity = (u32, Option<Quota>, f64);
 
 impl Profile {
-    /// Set the account and reload if it changed.
+    /// Set account; reload if changed.
     pub fn set_account_id(&mut self, account_id: u32) {
         if self.account_id != account_id {
             self.account_id = account_id;
             self.account_changed();
-            // The fields still hold the previous profile's, and a save
-            // before the load lands would write them onto this one.
+            // Fields hold old profile; save before load would write them onto this one.
             if self.loaded {
                 self.loaded = false;
             }
@@ -134,7 +104,7 @@ impl Profile {
         }
     }
 
-    /// Ask the core about the connection, the mailbox and the storage.
+    /// Ask core about connection, mailbox, storage.
     pub fn refresh_connectivity(&mut self) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -166,7 +136,7 @@ impl Profile {
                             });
                         this_mut.quota_percent = percent;
                         this_mut.quota_text = text.into();
-                        // Exact to 2^53 bytes, which no mailbox holds.
+                        // Exact to 2^53 bytes.
                         #[allow(clippy::cast_precision_loss)]
                         {
                             this_mut.quota_used_bytes = used as f64;
@@ -186,22 +156,18 @@ impl Profile {
                     .call("get_connectivity", (account_id,))
                     .await
                     .map_err(|err| err.to_string())?;
-                // The report is a page written for a web view; the one
-                // fact worth showing is read off it.
+                // Report is web-view page; quota read off it.
                 let report: String = rpc
                     .call("get_connectivity_html", (account_id,))
                     .await
                     .map_err(|err| err.to_string())?;
-                // Nice to have rather than needed: a profile that cannot
-                // be measured still has a connection to report.
+                // Optional: unmeasurable profile still reports connection.
                 let storage: u64 = rpc
                     .call("get_account_file_size", (account_id,))
                     .await
                     .unwrap_or(0);
-                // Which relay's mailbox to read off the report: a profile
-                // can have more than one transport, and the report covers
-                // them all. Asked here rather than taken from `address`,
-                // which the load fills and may not have yet.
+                // Which relay's mailbox (report covers all). Asked, not from `address`: load may
+                // not have filled it.
                 let address: String = rpc
                     .call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
                     .await
@@ -211,8 +177,7 @@ impl Profile {
                 Ok::<_, String>((
                     connectivity,
                     quota_from_report(&report, &address),
-                    // Through f64 because QML has no 64-bit integer. Exact
-                    // to 2^53 bytes, which no phone holds.
+                    // f64 for QML.
                     #[allow(clippy::cast_precision_loss)]
                     {
                         storage as f64
@@ -224,7 +189,7 @@ impl Profile {
         });
     }
 
-    /// Read the profile from the core.
+    /// Read profile from core.
     pub fn reload(&mut self) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -262,7 +227,7 @@ impl Profile {
                         this_mut.address = address.into();
                         this_mut.read_receipts = read_receipts;
                         this_mut.color = color.into();
-                        // Exact to 2^53 bytes, which no relay takes.
+                        // Exact to 2^53 bytes.
                         #[allow(clippy::cast_precision_loss)]
                         {
                             this_mut.attachment_limit_bytes = attachment_limit as f64;
@@ -291,19 +256,14 @@ impl Profile {
                     get("selfstatus").await?,
                     get("selfavatar").await?,
                     get("configured_addr").await?,
-                    // The core stores it as "1"/"0" and defaults it on,
-                    // so an absent value is not "off".
+                    // Core stores "1"/"0", default on: absent isn't off.
                     get("mdns_enabled").await? != "0",
-                    // The reader's own contact is id 1 in every account.
-                    // Nice to have rather than needed: a profile whose
-                    // colour cannot be read still has a name to show.
+                    // Own contact id 1 in every account. Optional: colourless still shows.
                     rpc.call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
                         .await
                         .map(|contact| json::str_at(&contact, "color").to_string())
                         .unwrap_or_default(),
-                    // The relay's ceiling on an attachment, as the core
-                    // recommends it. Nice to have rather than needed: a
-                    // profile whose relay has not said still has a name.
+                    // Recommended attachment ceiling. Optional.
                     media::attachment_limit(&rpc, account_id).await,
                 ))
             }
@@ -312,10 +272,9 @@ impl Profile {
         });
     }
 
-    /// Store the name and the status.
+    /// Store name and status.
     pub fn save(&mut self, display_name: QString, status: QString) {
-        // Saving what was never loaded writes empty strings over a profile
-        // the reader never saw.
+        // Saving before load overwrites unseen profile.
         if !self.loaded {
             return;
         }
@@ -349,13 +308,13 @@ impl Profile {
         });
     }
 
-    /// Use the image at `path` as the picture.
+    /// Set picture from `path`.
     pub fn set_picture(&mut self, path: QString) {
         let account_id = self.account_id;
         if account_id == 0 {
             return;
         }
-        // A picker hands back a URL, the core wants a path.
+        // Picker gives a URL; core wants a path.
         let path = path.to_string();
         let path = path.strip_prefix("file://").unwrap_or(&path).to_string();
         if path.is_empty() {
@@ -368,11 +327,8 @@ impl Profile {
         let done = self.stored_callback();
 
         runtime.spawn(async move {
-            // `selfavatar` is a path to an image the core copies into its
-            // blob directory, not the image itself. Verified against the
-            // pinned binary: an empty string is refused outright with
-            // "Copying new blobfile failed", and null is how it is
-            // cleared.
+            // `selfavatar`: path core copies to blob dir. Pinned binary refuses "" ("Copying new
+            // blobfile failed"); null clears.
             let result = rpc
                 .call::<_, ()>("set_config", (account_id, "selfavatar", Some(path)))
                 .await
@@ -381,7 +337,7 @@ impl Profile {
         });
     }
 
-    /// Remove the picture.
+    /// Remove picture.
     pub fn clear_picture(&mut self) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -408,8 +364,7 @@ impl Profile {
     /// Turn read receipts on or off.
     pub fn set_read_receipts(&mut self, enabled: bool) {
         let account_id = self.account_id;
-        // Same guard as `save`: before the load lands, this object's idea
-        // of the setting is the default rather than the account's.
+        // As `save`: before load, default not account's.
         if account_id == 0 || !self.loaded {
             return;
         }
@@ -429,9 +384,7 @@ impl Profile {
         });
     }
 
-    /// Report a store, and read back what the core actually kept: it
-    /// rewrites a picture into its own blob directory, so the path handed
-    /// to it is not the path it holds afterwards.
+    /// Report store; read back what core kept (picture rewritten into blob dir).
     fn stored_callback(&self) -> impl Fn(Result<(), String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<(), String>| {

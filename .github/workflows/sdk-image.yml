@@ -1,16 +1,13 @@
 # Publishes the Sailfish SDK image `rpm.yml` builds with.
 #
-# Upstream's platform SDK carries three architectures' target rootfs and
-# leaves this package's BuildRequires to be installed into the target on
-# every build that uses it: 5.0 GB to pull and half a minute of zypper,
-# on every single RPM build. `ci/build-sdk-image.sh` derives an image with
-# one architecture and those packages already in place -- about 2 GB, and
-# nothing to install -- and this publishes it to the repository's registry.
+# Upstream SDK: three arches' rootfs; BuildRequires zypper'd into target every
+# build (5.0 GB pull, ~30 s zypper per RPM). `ci/build-sdk-image.sh` makes a
+# one-arch image with packages in place (~2 GB); this publishes it to the
+# registry.
 #
-# Run it when the SDK version changes, when the spec gains a BuildRequires,
-# or never: `rpm.yml` derives and publishes the image itself when it finds
-# none. This exists so that cost can be paid deliberately rather than by
-# whoever happens to build the first package afterwards.
+# Run on SDK version change or new BuildRequires. Or never: rpm.yml derives and
+# publishes it when none exists. Makes the cost deliberate, not paid by whoever
+# builds first.
 name: sdk-image
 
 on:
@@ -26,7 +23,7 @@ on:
 
 permissions:
   contents: read
-  # What this workflow is for.
+  # Why this exists.
   packages: write
 
 jobs:
@@ -39,13 +36,11 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Nothing here pushes with git, so the token is not left behind in
-          # .git/config for a later step to find. Every checkout in this file.
+          # Nothing pushes with git: token not left in .git/config.
           persist-credentials: false
 
-      # The upstream image unpacks to about 20 GB of layers, and the
-      # flattened one is written beside it. A fresh runner has around 25 GB
-      # free, most of it language toolchains nothing here compiles with.
+      # Upstream image unpacks to ~20 GB of layers; flattened copy written
+      # beside it. Fresh runner has ~25 GB free, mostly unused toolchains.
       - name: Make room for two SDK images
         run: |
           df -h / | tail -1
@@ -53,8 +48,8 @@ jobs:
                       /usr/share/dotnet /opt/ghc /usr/local/share/boost
           df -h / | tail -1
 
-      # Through the environment, not spliced into the script: a `${{ }}`
-      # in `run:` is pasted in as shell text before the shell reads it.
+      # Via env, not spliced into `run:`: `${{ }}` becomes shell text before
+      # shell reads it.
       - name: Sign in to the registry
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}

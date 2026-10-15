@@ -1,9 +1,5 @@
-# cargo-deny policy. The licence half is the one that matters here:
-# Piirit is GPL-3.0-or-later and ships alongside an MPL-2.0 core binary,
-# so a dependency arriving under an incompatible licence is a distribution
-# problem rather than a preference: the `License:` tag in
-# rpm/harbour-piirit.spec and vendor/deltachat-rpc-server/SOURCE.md say
-# how the two are conveyed together.
+# cargo-deny. Licence: GPL-3.0-or-later Piirit, MPL-2.0 core. Bad licence = distribution problem.
+# Conveyance: `License:` in rpm/harbour-piirit.spec, vendor/deltachat-rpc-server/SOURCE.md.
 
 [advisories]
 version = 2
@@ -11,14 +7,8 @@ yanked = "deny"
 
 [licenses]
 version = 2
-# Permissive licences, plus the two copyleft ones this tree already lives
-# with: GPL-3.0-or-later is Piirit's own (the workspace crates declare
-# it), and MPL-2.0 is what the Delta Chat core is under. Both directions
-# check out -- permissive and MPL-2.0 code may be conveyed as part of a
-# GPLv3 work. Anything outside this list needs a
-# deliberate review, which is the point of listing them. Note what is
-# deliberately absent: GPL-2.0-only and AGPL-3.0 would each be a real
-# problem, and neither can slip in silently.
+# Permissive, GPL-3.0-or-later (Piirit), MPL-2.0 (core). Others need review.
+# Absent on purpose: GPL-2.0-only, AGPL-3.0 (real problems).
 allow = [
     "MIT",
     "Apache-2.0",
@@ -32,10 +22,8 @@ allow = [
     "Zlib",
 ]
 confidence-threshold = 0.9
-# LAME, which a voice message is encoded with (piirit-shim/src/voice.rs),
-# and its bindings. LGPL code may be conveyed as part of a GPLv3 work; an
-# exception for these two rather than an entry above, so that the next
-# LGPL crate is reviewed on its own. docs/BUILDING.md says why LAME.
+# LAME (src/voice.rs) and bindings. LGPL exception here, not in allow: next LGPL
+# crate gets own review. docs/BUILDING.md: why LAME.
 exceptions = [
     { allow = ["LGPL-3.0"], crate = "mp3lame-sys" },
     { allow = ["LGPL-3.0"], crate = "mp3lame-encoder" },

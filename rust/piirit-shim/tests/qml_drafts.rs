@@ -1,17 +1,9 @@
-//! Unsent text is kept.
+//! Draft kept across leave/reopen. Core stores drafts, not page: survives app close, and chat list
+//! shows which chats hold one without building text here (`summaryText1` "Draft", already shown
+//! before preview). Both halves vs real core: `deltachat-jsonrpc/tests/real_server.rs`.
 //!
-//! What is typed survives going back to the list and opening the chat
-//! again. The core keeps drafts itself, so the draft goes there rather
-//! than being held in the page: it then survives the app being closed,
-//! and the chat list says which chats are holding one
-//! without anything here building that text -- a chat with a draft comes
-//! back with `summaryText1` "Draft", which the row already shows in front
-//! of the preview. `deltachat-jsonrpc/tests/real_server.rs` pins both
-//! halves against the real core.
-//!
-//! What is checked here is the round trip through a page: type, leave,
-//! come back, and find it still there -- and that leaving is enough on its
-//! own, without waiting for the debounce that would otherwise write it.
+//! Here: round trip through a page -- type, leave, reopen, still there; leaving alone suffices,
+//! without waiting for the debounce.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -108,8 +100,7 @@ fn an_unsent_message_is_kept_and_the_chat_list_says_so() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -153,13 +144,11 @@ fn an_unsent_message_is_kept_and_the_chat_list_says_so() {
     });
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("typed", call!("type", QString::from(DRAFT))));
-        // Straight out again, well inside the debounce: leaving has to be
-        // enough on its own.
+        // Leave inside debounce: must suffice.
         (*steps_ptr).push(("left", call!("leave")));
     });
-    // A fresh page onto the same chat, the way reopening it from the list
-    // builds one -- and soon enough that the debounce on the page just
-    // destroyed cannot have been what wrote the draft.
+    // Fresh page, same chat, as reopening from list builds one; soon enough that old page's
+    // debounce cannot have written draft.
     single_shot(Duration::from_millis(2400), move || unsafe {
         (*steps_ptr).push(("reopen", call!("open", QString::from(reopen.clone()), 1, 1)));
     });
@@ -196,9 +185,8 @@ fn an_unsent_message_is_kept_and_the_chat_list_says_so() {
         "what was typed and not sent was lost on the way to the chat list \
          and back. {context}"
     );
-    // The prefix is the core's own word, not one built here: the row
-    // already puts `summaryText1` in front of the preview, which is why
-    // this needed no new field and gets whatever language the core is in.
+    // Prefix is core's `summaryText1`, not built here: row already shows it, so no new field and
+    // whatever language core is in.
     assert_eq!(
         value("row"),
         format!("Draft: {DRAFT}"),

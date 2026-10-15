@@ -1,5 +1,4 @@
-//! Wire types for the JSON-RPC 2.0 messages exchanged with
-//! `deltachat-rpc-server`. The framing is JSON Lines, not `Content-Length`.
+//! Wire types. JSON Lines framing, not `Content-Length`.
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -22,15 +21,14 @@ pub(crate) struct ResponseEnvelope {
     pub error: Option<ErrorObject>,
 }
 
-/// A JSON-RPC 2.0 error object. Reproduced verbatim; the codes and messages
-/// are the core's.
+/// JSON-RPC error. Verbatim from core.
 #[derive(Debug, Deserialize, Clone)]
 pub struct ErrorObject {
-    /// JSON-RPC error code.
+    /// Error code.
     pub code: i64,
-    /// Human-readable message, written by the core.
+    /// Message, from core.
     pub message: String,
-    /// Optional structured payload accompanying the error.
+    /// Optional payload.
     #[serde(default)]
     pub data: Option<Value>,
 }

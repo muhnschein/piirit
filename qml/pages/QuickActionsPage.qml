@@ -4,38 +4,21 @@ import "../components"
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * The cover's quick actions: a line saying what they are, then the choice
- * between one and two, then what each does.
- *
- * The choice is two pictures of the cover side by side
- * (components/QuickActionsPreview.qml), one with room for one action and
- * one with room for two, each with the actions as they are set up now:
- * the reader sees what each would look like before tapping it, and sees
- * it change as the actions under it change. Under them, what the chosen
- * one needs -- the action, or the left one and the right
- * (components/QuickActionSetting.qml). With one, the left action is the
- * one; what was set up on the right is kept for when there are two
- * again.
- *
- * A page of its own, reached from the settings page's Advanced section:
- * a chat's action brings a chat and a row of icons with it, and on the
- * settings page itself the two sides crowded out everything around them.
- *
- * Nothing here needs saving: each control writes its setting on the tap,
- * and the cover (qml/cover/CoverPage.qml) follows the setting.
+ * Cover quick actions: one or two (live pictures, QuickActionsPreview.qml),
+ * each set below (QuickActionSetting.qml). One: left used, right kept. Own
+ * page (crowded settings). Writes on tap; qml/cover/CoverPage.qml follows.
  */
 Page {
     id: page
 
-    /// Whose chats a chat's action is picked from: the profile the
-    /// settings page was pulled down from.
+    /// Profile chat action's chat is picked from (settings page's).
     property int accountId
 
     readonly property int actionCount: QuickActions.count(Settings)
     readonly property var leftAction: QuickActions.read(Settings, "left")
     readonly property var rightAction: QuickActions.read(Settings, "right")
 
-    /// The icon an action wears in the pictures, "" for none yet.
+    /// Icon in pictures; "" for none.
     function iconOf(action) {
         return action.kind === "" ? "" : QuickActions.iconName(action)
     }
@@ -68,9 +51,7 @@ Page {
                 text: qsTr("Piirit's cover on the home screen can show up to two quick actions.")
             }
 
-            // The two pictures, side by side and centred, as big as a
-            // real cover at most. Laid out by bindings rather than a Row,
-            // for the reason ChoiceTiles gives.
+            // Centred, at most real cover size. Bindings, not Row: see ChoiceTiles.
             Item {
                 id: choices
                 objectName: "quickActionCountChoices"

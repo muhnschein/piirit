@@ -1,16 +1,9 @@
-//! The conversation model's name follows a rename.
+//! Conversation name follows rename, from events that can change it.
 //!
-//! The header over the messages is named from the chat list when the
-//! page opens. Left to hear of a rename only from the group page beside
-//! it, a contact given a name -- or a group renamed from another device --
-//! would show the old name until the chat was reopened. The model re-reads
-//! the name on the events that can change
-//! it, and says so only when it did.
+//! Header name comes from chat list at open; a rename heard only from group page would leave
+//! contact- or other-device-renamed chat stale. Says so only when changed.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -57,8 +50,7 @@ fn the_name_over_the_messages_follows_a_rename() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);

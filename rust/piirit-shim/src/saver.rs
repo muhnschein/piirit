@@ -1,15 +1,8 @@
-//! A copy of an attachment where the reader can find it again.
+//! Attachment copy for the reader.
 //!
-//! Everything a chat receives lives in the core's blob directory, which is
-//! the app's own and goes with it, and where the core names a file by its
-//! content rather than by what the sender called it. Saving is one copy
-//! into a folder the reader looks in -- Piirit's own in Downloads, which
-//! `qml/components/AttachmentSaver.qml` names -- under the name the sender
-//! gave the file, or that name and a number when it is taken.
-//!
-//! The copy is made on a thread of its own. A video is easily a few
-//! hundred megabytes, and copied on the Qt thread it froze the app for
-//! as long as the copy took.
+//! Blob dir goes with app; core names by content. Save = copy into Piirit's Downloads folder
+//! (`qml/components/AttachmentSaver.qml`) under sender's name, numbered if taken. Own thread:
+//! big video on Qt thread froze app.
 
 use std::collections::VecDeque;
 use std::sync::{Mutex, PoisonError};
@@ -18,7 +11,7 @@ use qmetaobject::*;
 
 use crate::chat::local_path;
 
-/// Copies a file out of the core's blob directory.
+/// Copy file out of blob dir.
 ///
 /// ```qml
 /// FileSaver { id: saver; onSaved: notice.show(qsTr("Saved")) }
@@ -29,33 +22,26 @@ use crate::chat::local_path;
 pub struct FileSaver {
     base: qt_base_class!(trait QObject),
 
-    /// True from a save until its answer, and the answers of any asked
-    /// for meanwhile, have come.
+    /// True until queued saves answered.
     pub busy: qt_property!(bool; NOTIFY busy_changed),
     /// Emitted when [`Self::busy`] changes.
     pub busy_changed: qt_signal!(),
 
-    /// Copy the file at `file_url` -- a `file://` URL or a plain path --
-    /// into `folder`, which is made if it does not exist, under the name
-    /// the file has where it is. Answers on `saved` or `error`, once the
-    /// copy is made; a save asked for while one is being made is made
-    /// after it, and every save is answered in the order it was asked.
+    /// Copy `file_url` (`file://` or path) to `folder` (made if missing); `saved`/`error` in
+    /// order.
     pub save: qt_method!(fn(&mut self, file_url: QString, folder: QString)),
-    /// [`Self::save`], under `name` rather than the file's own: the name
-    /// the sender gave it, which the core does not keep on the file. An
-    /// empty name, or one that is only a path, falls back to the file's
-    /// own.
+    /// [`Self::save`] under `name` (sender's). Empty or path-only: file's own.
     pub save_as: qt_method!(fn(&mut self, file_url: QString, folder: QString, name: QString)),
     /// The copy is at `path`.
     pub saved: qt_signal!(path: QString),
-    /// The copy could not be made. The message names what went wrong.
+    /// Copy failed; message says why.
     pub error: qt_signal!(message: QString),
 
-    /// Saves asked for while one is being made, oldest first.
+    /// Queued saves, oldest first.
     waiting: VecDeque<Request>,
 }
 
-/// A save asked for and not made yet: [`copy_into`]'s arguments.
+/// Queued save: [`copy_into`] args.
 struct Request {
     source: String,
     folder: String,
@@ -63,21 +49,19 @@ struct Request {
 }
 
 impl FileSaver {
-    /// Copy the file into the folder under its own name.
+    /// Copy under file's own name.
     pub fn save(&mut self, file_url: QString, folder: QString) {
         self.save_as(file_url, folder, QString::default());
     }
 
-    /// Copy the file into the folder under `name`; see the declaration.
+    /// Copy under `name`.
     pub fn save_as(&mut self, file_url: QString, folder: QString, name: QString) {
         self.waiting.push_back(Request {
             source: local_path(&file_url.to_string()),
             folder: folder.to_string(),
             name: name.to_string(),
         });
-        // One copy at a time, so that the answers come in the order the
-        // saves were asked: a page that saves two files knows which one
-        // each answer is about.
+        // One at a time: answers in order.
         if !self.busy {
             self.busy = true;
             self.busy_changed();
@@ -85,14 +69,12 @@ impl FileSaver {
         }
     }
 
-    /// Start the oldest save waiting, or, with none left, stop being
-    /// busy.
+    /// Start oldest queued save; none left: not busy.
     fn next(&mut self) {
         while let Some(request) = self.waiting.pop_front() {
             let ptr: QPointer<Self> = QPointer::from(&*self);
             let done = queued_callback(move |result: Result<String, String>| {
-                // A page closed during the copy has nobody to tell; the
-                // copy is made all the same.
+                // Page closed mid-copy: copy still made.
                 let Some(this) = ptr.as_pinned() else { return };
                 match result {
                     Ok(path) => this.borrow().saved(path.into()),
@@ -115,15 +97,11 @@ impl FileSaver {
     }
 }
 
-/// Held while a name is chosen and the copy made under it. Two savers,
-/// on two pages, saving files of the same name at once would otherwise
-/// both find it free and write over each other.
+/// Held over name pick and copy: else two savers take same free name.
 static COPYING: Mutex<()> = Mutex::new(());
 
-/// Copy `source` into `folder` under `name` -- or, when that is empty or
-/// nothing but separators, under the source's own name -- or under that
-/// name and a number when a different file already has it. Answers with
-/// the path written.
+/// Copy `source` to `folder` as `name` (empty/separators: source's), numbered if taken. Returns
+/// path.
 pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String, String> {
     if source.is_empty() {
         return Err("nothing to save".to_string());
@@ -143,8 +121,7 @@ pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String
     let folder = std::path::Path::new(folder);
     std::fs::create_dir_all(folder)
         .map_err(|err| format!("cannot create {}: {err}", folder.display()))?;
-    // A copy that panicked part-way left nothing this lock guards in a
-    // bad state: the next save just looks for a free name again.
+    // Poisoned: safe, name re-picked.
     let _copying = COPYING.lock().unwrap_or_else(PoisonError::into_inner);
     let target = free_name(folder, &name);
     std::fs::copy(source, &target).map_err(|err| {
@@ -157,10 +134,7 @@ pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String
     Ok(target.to_string_lossy().into_owned())
 }
 
-/// The last component of `name`, so that a name is only ever a name: a
-/// sender's `../x` or `a/b` lands in the folder asked for and nowhere
-/// else. `None` when nothing is left of it, or when it names only the
-/// current or parent directory.
+/// Last part of `name`: `../x` stays in folder. `None` if empty or `.`/`..`.
 fn plain_name(name: &str) -> Option<String> {
     let last = name
         .trim()
@@ -174,16 +148,15 @@ fn plain_name(name: &str) -> Option<String> {
     }
 }
 
-/// `name`, or `name (2)`, `name (3)`... before the extension: the first
-/// that is not already in the folder.
+/// `name (2)`, `name (3)`... before extension: first free.
 fn free_name(folder: &std::path::Path, name: &str) -> std::path::PathBuf {
     let first = folder.join(name);
     if !first.exists() {
         return first;
     }
     let (stem, extension) = match name.rfind('.') {
-        // A leading dot is a hidden file's name, not an extension.
-        // `rfind` answers with a character boundary, so this split is one.
+        // Leading dot: hidden file, not extension.
+        // `rfind` index is char boundary.
         Some(dot) if dot > 0 => name.split_at(dot),
         _ => (name, ""),
     };
@@ -218,7 +191,7 @@ mod tests {
             pictures.join("holiday photo (2).jpg").to_string_lossy()
         );
 
-        // A URL, as the page holds the file, and a name with no extension.
+        // URL as page holds it; no extension.
         let plain = temp.join("notes");
         std::fs::write(&plain, b"n").expect("write plain");
         let url = format!("file://{}", plain.display());
@@ -241,10 +214,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&temp);
     }
 
-    /// The core keeps a received file under a name of its own -- its
-    /// hash, these days -- and the name the sender gave it beside the
-    /// message. A copy is under the sender's name, and a sender's name
-    /// that tries to be a path is only ever its last part.
+    /// Sender's name used; path-y name keeps last part.
     #[test]
     fn a_saved_file_takes_the_name_the_sender_gave_it() {
         let temp = std::env::temp_dir().join(format!("piirit-saver-named-{}", std::process::id()));
@@ -262,12 +232,12 @@ mod tests {
         let again = copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf").expect("copy");
         assert_eq!(again, files.join("minutes (2).pdf").to_string_lossy());
 
-        // A name that is a path stays in the folder asked for.
+        // Path-y name stays in asked folder.
         let escaped =
             copy_into(&blob.to_string_lossy(), &files_str, "../../escaped.pdf").expect("copy");
         assert_eq!(escaped, files.join("escaped.pdf").to_string_lossy());
 
-        // No name, or nothing usable in it: the blob's own.
+        // No usable name: blob's own.
         let unnamed = copy_into(&blob.to_string_lossy(), &files_str, "  ").expect("copy");
         assert_eq!(
             unnamed,

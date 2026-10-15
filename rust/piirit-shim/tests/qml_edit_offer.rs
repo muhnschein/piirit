@@ -1,12 +1,7 @@
-//! When a message's menu offers Edit.
-//!
-//! Only where the core would take the edit, which is the rule
-//! deltachat-android applies before offering it: a message of one's own,
-//! not a notice, not a call, with text to change, and not one the
-//! sending core cut -- and only in a chat that takes messages and is
-//! encrypted, which the page knows and the list is told. The offer
-//! carries the message's text with it, since that is what the field is
-//! filled from.
+//! Edit offered only where core takes it (deltachat-android rule): own message,
+//! has text, not notice or call, not cut by sending core; chat takes messages and is encrypted
+//! (page knows, list is told).
+//! Offer carries text to fill field.
 
 // Qt harness: see qml_attachment_menu.rs.
 #![allow(
@@ -126,7 +121,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn edit_is_offered_on_what_the_core_would_take_an_edit_of() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }

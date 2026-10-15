@@ -1,9 +1,8 @@
 import QtQuick 2.0
 
-// Silica's drop-down: a label, the chosen item's text, and a ContextMenu
-// of MenuItems. Silica sets currentIndex when an item is tapped; the
-// pages here bind it from the core and act on the item's own click, so
-// the stub only carries the properties.
+// Silica drop-down: label, chosen item text, ContextMenu of MenuItems. Silica
+// sets currentIndex on tap; pages bind it from core, so stub holds properties
+// only.
 Item {
     property string label
     property string description

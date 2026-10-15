@@ -3,39 +3,21 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * What Delta Chat is, for somebody who has never heard of it: five
- * facts, one per screen, swiped through the way a phone's own first run
- * is. The facts and their wording follow delta.chat/en/help -- a profile
- * made on the device, no directory to be found in, encryption that is
- * simply always on, groups without an owner, a relay that only carries
- * messages -- with the technical half of each left out. A reader who
- * wants that can read the FAQ; a reader here wants to know whether this
- * app is for them.
- *
- * Swiping past the last fact is the way on, to the setup path, because a
- * reader who has kept swiping is asking for what comes next. The reader
- * who has had enough swipes back instead, and the first screen still
- * offers both directions.
- *
- * The field of faces belongs to the first screen and stays there: here
- * the picture over each fact is the thing to look at, and a field of
- * faces behind it is one pattern too many. The pictures are the same
- * two-channel masks in the ambience's own colours, drawn by
- * components/InkArt.qml and painted by tools/faces/scenes.py.
+ * What Delta Chat is: five facts, one per swiped screen. Wording from
+ * delta.chat/en/help minus tech half (FAQ has it). Swipe past last: setup;
+ * first swipes back too. No faces field: pictures are the look. Masks from
+ * components/InkArt.qml, painted by tools/faces/scenes.py.
  */
 Page {
     id: page
 
-    // Both ways up: a fact is a column either way.
+    // Columns either orientation.
     allowedOrientations: Orientation.All
 
-    // Set once the reader has swiped past the end, so that the drag that
-    // does it cannot ask for the next page twice.
+    // Set past end: one drag cannot ask twice.
     property bool leaving: false
 
-    /// The facts, in order. A plain array rather than a ListModel:
-    /// `ListElement` takes literals only, and every line here is a
-    /// translated one.
+    /// Facts in order. Plain array: ListElement takes literals only; translated.
     readonly property var facts: [
         {
             picture: "../art/intro-profile.png",
@@ -64,13 +46,10 @@ Page {
         }
     ]
 
-    /// How far past the last fact a drag has to carry the view before it
-    /// counts as asking for what comes next.
+    /// How far past last fact a drag must go to ask for next page.
     readonly property real enough: Theme.itemSizeMedium
 
-    // The setup path begins where the facts end. `replace` rather than
-    // `push`: the walk is over, and a reader going back from there wants
-    // the first screen, not the last fact again.
+    // Setup starts after facts. replace: back from setup shows first screen.
     function goOn() {
         if (page.leaving) {
             return
@@ -79,9 +58,7 @@ Page {
         pageStack.replace(Qt.resolvedUrl("ProfileStartPage.qml"), {})
     }
 
-    // Called as the view moves: a reader pulling past the last fact is
-    // already asking, so the page answers on the drag rather than
-    // waiting for the rubber band to settle back.
+    // Asks on move, not after rubber band settles.
     function advanceIfPastEnd() {
         if (slides.width <= 0 || slides.contentWidth <= 0) {
             return
@@ -96,26 +73,21 @@ Page {
         objectName: "slides"
         anchors.fill: parent
         orientation: ListView.Horizontal
-        // One fact at a time, and one is always squarely on screen.
+        // One fact at a time; one always on screen.
         snapMode: ListView.SnapOneItem
         highlightRangeMode: ListView.StrictlyEnforceRange
-        // So that the last fact can be pulled past, which is what asks
-        // for the next page.
+        // Last fact pullable: that asks for next page.
         boundsBehavior: Flickable.DragOverBounds
         model: page.facts
 
-        // Only a drag asks for the next page. Turning the phone changes
-        // the view's width, and the content it has already scrolled is
-        // measured against the old one for an instant: on a device that
-        // read as a pull past the last fact and carried the reader off
-        // the page with no finger on it.
+        // Only drag asks: rotation briefly measured view vs old width, read as pull
+        // past last fact, left page untouched.
         onContentXChanged: {
             if (slides.dragging) {
                 page.advanceIfPastEnd()
             }
         }
-        // And what the turn leaves behind is half of two facts, so the
-        // one being read is put back squarely on screen.
+        // Turn leaves half of two facts: snap back to one.
         onWidthChanged: slides.positionViewAtIndex(slides.currentIndex,
                                                    ListView.Beginning)
 
@@ -127,7 +99,7 @@ Page {
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
-                    // A little above the middle: the dots sit below.
+                    // Slightly above middle: dots below.
                     verticalCenterOffset: -Theme.itemSizeSmall / 2
                 }
                 width: parent.width - 2 * Theme.horizontalPageMargin
@@ -136,8 +108,7 @@ Page {
                 InkArt {
                     objectName: "slideArt" + index
                     anchors.horizontalCenter: parent.horizontalCenter
-                    // Square, and small enough to leave the words room
-                    // on a screen lying on its side.
+                    // Square, small: room for words on sideways screen.
                     width: Math.min(page.width * 0.42, page.height * 0.30)
                     height: width
                     source: modelData.picture
@@ -169,8 +140,7 @@ Page {
         }
     }
 
-    // Where the reader is, and -- on the last fact -- what one more
-    // swipe does. Below the fact, clear of it in both orientations.
+    // Reader position; on last fact, what one more swipe does.
     Column {
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -209,9 +179,7 @@ Page {
             color: Theme.secondaryHighlightColor
             text: qsTr("Keep swiping to set up your profile.")
 
-            // A tap on the line does what it describes. Nothing says so,
-            // and nothing needs to: it is there for the thumb that finds
-            // it rather than pulls once more.
+            // Tap does what line says: for thumb that finds it, not second pull.
             MouseArea {
                 anchors.fill: parent
                 onClicked: page.goOn()

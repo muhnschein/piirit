@@ -1,8 +1,6 @@
-# piirit -- developer targets.
+# piirit developer targets.
 #
-# `make check` is what CI runs, minus what needs the Sailfish SDK or a
-# phone. It is not entirely offline: `msrv` fetches a toolchain the first
-# time it runs, and `deny` wants the advisory database.
+# `make check` = CI minus SDK/phone needs. Not fully offline (msrv, deny).
 #
 # Qt5 packages (Debian/Ubuntu):
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
@@ -10,14 +8,9 @@
 #               qml-module-qtquick-window2 qttools5-dev-tools \
 #               libpulse-dev pulseaudio pulseaudio-utils
 #
-# qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
-# packages omit; qml-module-qtquick-window2 is QtQuick.Window, which a
-# test shows a window through; qttools5-dev-tools is lupdate and
-# lrelease, for the catalogs, and the app's own test compiles one;
-# qtmultimedia5-dev is QAudioRecorder, which the shim's voice recorder
-# is built on; libpulse-dev is the call's microphone watch, and
-# pulseaudio and pulseaudio-utils the sound server and recorder its test
-# runs it against.
+# qml-module-qtquick2: QtQuick runtime (-dev omits it). -window2: QtQuick.Window
+# (tests). qttools5-dev-tools: lupdate/lrelease. Rest: multimedia, pulse (mic,
+# test server).
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
@@ -25,32 +18,22 @@
         cover-icons clean
 
 CARGO ?= cargo
-# The shim's tests drive a real Qt event loop, which needs a platform
-# plugin.
+# Shim tests need a Qt event-loop platform plugin.
 export QT_QPA_PLATFORM = offscreen
 
-## What CI runs, in the same order. Keep in step with ci.yml.
-##
-## `msrv` fetches a toolchain the first time, so this is not quite
-## network-free; `deny` needs the advisory database and is CI's job.
+## CI's steps, same order; keep in step with ci.yml. `msrv` fetches toolchain
+## first time, `deny` needs advisory DB.
 check: fmt lint test doc-lint msrv qml-lint lockfile-lint packaging-lint harbour \
        sonar-report-test apt-install-test vendor-check deny workflow-lint
 
-## Unit, integration, and Qt event-loop tests.
+## Unit, integration, Qt event-loop tests.
 ##
-## Through cargo-nextest when it is installed, which runs each test in its
-## own process rather than one test binary at a time. This suite is over a
-## hundred binaries that mostly sit waiting on Qt timers, so that is the
-## difference between about ten minutes and about two and a half.
-## rust/.config/nextest.toml says the rest.
-##
-## Without it the same tests still run, the slow way. `make check` has to
-## work on a laptop that has not installed anything extra:
+## nextest if installed (one process per test: ~10 min down to ~2.5; see
+## rust/.config/nextest.toml), else `cargo test` (check must work on a bare
+## laptop).
 ##   cargo install --locked cargo-nextest
-##
-## nextest does not run doctests, so `--doc` runs beside it either way.
-## There are none today, so ci/packaging-lint.sh fails a tree that drops it
-## rather than let the first one be added and silently never run.
+## nextest skips doctests, so `--doc` runs beside it; none exist yet, so
+## packaging-lint.sh fails a tree dropping it.
 test:
 	@command -v cargo-nextest >/dev/null 2>&1 || \
 		echo "test: cargo-nextest is not installed; running the slow way \
@@ -62,24 +45,22 @@ test:
 	fi
 	cd rust && $(CARGO) test --workspace --doc
 
-## Clippy at the workspace lint level, over tests and binaries too.
+## Clippy, workspace lints, tests and bins too.
 lint:
 	cd rust && $(CARGO) clippy --workspace --all-targets -- -D warnings
 
 fmt:
 	cd rust && $(CARGO) fmt --all --check
 
-## Parse every .qml file; the Qt 5.6 dialect rules are a Rust test.
+## Parse every .qml; Qt 5.6 rules are a Rust test.
 qml-lint:
 	./ci/qml-lint.sh
 
-## The spec parses, the desktop entry is valid, the shell scripts are
-## clean, every docs/*.md a comment points at exists. A missing tool is a
-## SKIP here and a failure in CI (PACKAGING_LINT_STRICT=1).
+## Spec, desktop entry, shell, docs refs. Missing tool: SKIP here, FAIL in CI.
 packaging-lint:
 	./ci/packaging-lint.sh
 
-## Cargo.lock must stay v3: Sailfish's cargo 1.75 cannot read v4.
+## Cargo.lock must stay v3: Sailfish's cargo 1.75 can't read v4.
 lockfile-lint:
 	./ci/check-lockfile.sh
 
@@ -87,35 +68,29 @@ lockfile-lint:
 doc-lint:
 	cd rust && RUSTDOCFLAGS="-D warnings" $(CARGO) doc --workspace --no-deps
 
-## Compile against the toolchain floor Sailfish ships. Part of `check`:
-## clippy on a modern toolchain does not reliably catch newer std methods or
-## syntax, so only a real 1.75 build proves the device still builds.
+## Build at Sailfish's 1.75 floor; part of `check`. Modern clippy misses newer
+## std methods/syntax: only a real 1.75 build proves device builds.
 msrv:
 	rustup toolchain install 1.75.0 --profile minimal
 	cd rust && $(CARGO) +1.75.0 check --workspace --all-targets
 
-## What Harbour would reject, read off the sources. `sfdk check -s harbour`
-## on a built RPM is the authority (docs/HARBOUR.md); this is what can be
-## answered without the SDK, and CI runs it on every pull request.
+## Harbour rejects, from sources (authority: `sfdk check -s harbour`,
+## docs/HARBOUR.md).
 ##
-## Wants `make fetch-server` and a built binary for its last few checks;
-## without them it says so rather than passing quietly.
+## Last checks need `make fetch-server` and built binary; else says so.
 harbour:
 	./ci/harbour-check.sh
 	./ci/harbour-check-selftest.sh
 
-## third_party/qmetaobject is upstream plus one three-line patch, and this
-## proves it. Needs the network: it fetches the crates.io tarball to compare
-## against.
+## Proves third_party/qmetaobject = upstream + one three-line patch. Needs
+## network (fetches crates.io tarball).
 vendor-check:
 	./ci/vendor-check.sh
 
-## Licences and advisories, as CI's `deny` job runs them. Needs
-## `cargo install cargo-deny`, and the advisory database (network).
+## Licences and advisories (CI `deny`). Needs cargo-deny, advisory DB.
 ##
-## A missing tool is a skip; a finding is a failure. An if rather than
-## one `||`, so a SKIP can never be printed over an advisory -- and one
-## shell line, since an `exit 0` ends only the line it is on.
+## Missing tool = skip; finding = fail. `if`, not `||`: SKIP can't print over
+## advisory. One shell line: `exit 0` ends only its own line.
 deny:
 	@if command -v cargo-deny >/dev/null 2>&1; then \
 		cd rust && $(CARGO) deny check; \
@@ -123,8 +98,8 @@ deny:
 		echo "deny: SKIP (cargo-deny not installed)"; \
 	fi
 
-## The workflows in .github/, through zizmor: template injection, tokens
-## left behind, caches a release trusts. Offline, as CI's gate runs it.
+## zizmor on .github/ workflows (template injection, leftover tokens, caches a
+## release trusts). Offline, as CI gate.
 ##   cargo install --locked zizmor      (or: pipx install zizmor)
 workflow-lint:
 	@if command -v zizmor >/dev/null 2>&1; then \
@@ -133,9 +108,8 @@ workflow-lint:
 		echo "workflow-lint: SKIP (zizmor not installed)"; \
 	fi
 
-## Every test under AddressSanitizer and LeakSanitizer, FFmpeg and the C
-## glue included. Slow, and not part of `check`: scheduled.yml runs it
-## weekly. ci/leak-check.sh says what it needs and what it can see.
+## Every test under ASan and LSan, FFmpeg and C glue included. Slow; not in
+## `check` (weekly in scheduled.yml). Needs/limits: ci/leak-check.sh.
 leak-check:
 	./ci/leak-check.sh
 
@@ -143,63 +117,42 @@ leak-check:
 fetch-server:
 	./scripts/fetch-rpc-server.sh
 
-## Compile the catalogs into translations/*.qm, where a source-tree run
-## of the app finds them. The RPM does the same in %%build.
+## Catalogs to translations/*.qm. RPM does the same in %%build.
 translations:
 	./scripts/release-translations.sh
 
-## Render the quick action icons, icons/cover/*.svg, into the PNGs the
-## cover hands the home screen (qml/art/cover/). Needs rsvg-convert; what
-## it writes is committed, so neither the build nor CI runs it.
+## Cover icons (icons/cover/*.svg) to qml/art/cover/*.png. Needs rsvg-convert.
+## Output committed: build and CI don't run it.
 cover-icons:
 	./scripts/render-cover-icons.sh
 
-## Prove scripts/sonar-report.sh still reports what it claims to, against a
-## stub server. The real service is unreachable from CI's network and from a
-## laptop behind one, which is the reason that script exists at all.
+## sonar-report.sh vs stub server (real service unreachable from CI).
 sonar-report-test:
 	./ci/sonar-report-selftest.sh
 
-## Prove ci/apt-install.sh keeps Ubuntu's apt sources and drops the rest.
-## Getting that backwards deletes the archive every job installs from.
+## ci/apt-install.sh keeps Ubuntu's apt sources; wrong = archive deleted.
 apt-install-test:
 	./ci/apt-install-selftest.sh
 
-# What `sonar-reports` measures, whichever runner it goes through: the
-# workspace, minus third_party/ and vendor/ for the reason given in
-# sonar-project.properties -- upstream's code, not ours to cover.
+# sonar-reports: workspace minus third_party/, vendor/
+# (sonar-project.properties).
 SONAR_COV_ARGS = --workspace \
 	--ignore-filename-regex '(^|/)(third_party|vendor)/' \
 	--lcov --output-path target/sonar/lcov.info
 
-## sonar-reports: the coverage reports SonarQube Cloud imports, written to
-## rust/target/sonar/lcov.info -- and js-lcov.info, for the call page's
-## bridge, which its tests run in Node (tests/js/). The scanner does not measure coverage; it
-## only imports what someone else measured, so without this target the
-## reading is 0.0%.
+## sonar-reports: coverage for SonarQube Cloud (lcov.info, js-lcov.info).
+## Without it coverage reads 0.0%.
 ##
-## Through cargo-nextest when it is installed, for the reason `test` is:
-## cargo-llvm-cov's own runner is `cargo test`, one binary at a time, which
-## costs this suite about ten and a half minutes against roughly two.
-## `cargo llvm-cov nextest` is the same instrumented build under nextest's
-## scheduler, and rust/.config/nextest.toml applies to it as it does to
-## `test`. Without nextest the report is still written, the slow way.
+## nextest if installed, as `test` (cargo-llvm-cov otherwise runs one binary at
+## a time). No `--doc`: cargo-llvm-cov skips doctests. `test` runs them.
 ##
-## No `cargo test --doc` beside it, unlike `test`: cargo-llvm-cov leaves
-## doctests out on either runner (instrumenting them needs nightly), and
-## this target measures rather than gates. `test` is what runs them.
+## Also writes compile DB (piirit-video build.rs) for scanner's C analysis.
 ##
-## Beside the coverage, the compilation database piirit-video's build
-## script writes for its C (rust/piirit-video/build.rs): the scanner
-## reads C only through one.
+## Clippy not handed over: `make lint` already denies warnings, and gathering
+## costs `cargo clean` + full rebuild. Sonar's own clippy off for another
+## reason (sonar-project.properties).
 ##
-## Clippy findings are deliberately NOT handed over: `make lint` denies
-## warnings, so nothing Sonar could report survives to a branch it analyses,
-## and gathering them costs a `cargo clean` and a full recompile in the scan
-## job. Sonar's own clippy pass stays off for a different reason;
-## sonar-project.properties says which.
-##
-## Needs cargo-llvm-cov, so it is opt-in rather than part of `check`:
+## Opt-in (not in `check`):
 ##   rustup component add llvm-tools-preview
 ##   cargo install --locked cargo-llvm-cov
 ##   cargo install --locked cargo-nextest    (optional; serial without it)
@@ -234,7 +187,7 @@ sonar-reports:
 		tests/js/*.test.js
 	@echo "== wrote rust/target/sonar/js-lcov.info =="
 
-## The tests that drive the real core, offline. Needs `make fetch-server`.
+## Real-core tests, offline. Needs `make fetch-server`.
 integration:
 	cd rust && DELTACHAT_RPC_SERVER=vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server \
 		$(CARGO) test -p deltachat-jsonrpc --test real_server -- --nocapture

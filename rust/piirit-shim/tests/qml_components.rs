@@ -1,11 +1,7 @@
-//! The small pieces the conversation page is built from, loaded on their
-//! own: the page itself cannot be, because Silica's `EnterKey` attached
-//! property has no stub.
+//! Small pieces of conversation page, loaded alone (page can't load: no `EnterKey` stub).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -94,8 +90,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Long enough to overflow three lines even at the stub's small font; on a
-/// phone it takes far less.
+/// Long enough to overflow 3 lines even at stub's small font; on a phone far less.
 const LONG_BODY: &str = "a quoted message long enough to need three lines of its own in \
      the bar above the field, and then a good deal more after that, so that what does \
      not fit has to be cut off rather than run off the side of the screen, which is what \
@@ -103,12 +98,11 @@ const LONG_BODY: &str = "a quoted message long enough to need three lines of its
      past the edge and out of sight, taking the rest of the quote with it, and none of \
      that is any use to someone trying to see which message they are about to answer";
 
-// A script of timed steps, in the order they happen; splitting it would
-// hide that order for no gain.
+// Timed steps in order.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -187,9 +181,8 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
             call!("get", QString::from("jumpChevron"), QString::from("width"))
         );
         record!("jump-themed-icons", call!("themedIconCount"));
-        // Item.Left, not Item.TopLeft: about the corner it is the stroke's
-        // top edge that follows the line, and the two halves come out
-        // crooked.
+        // `Item.Left`, not `Item.TopLeft`: about the corner, stroke's top edge follows the line
+        // and the halves come out crooked.
         record!(
             "chevron-origin",
             call!(
@@ -244,9 +237,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
             QString::from("show"),
             QString::from("Copied to clipboard")
         );
-        // Read in the tone it defaults to before it is switched, so the
-        // assertion below compares two colours rather than reading back a
-        // value the test itself wrote.
+        // Default tone read first: assertion compares two colours.
         record!(
             "tone-error-colour",
             call!("get", QString::from("errorLabel"), QString::from("color"))
@@ -265,11 +256,8 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
             call!("get", QString::from("errorLabel"), QString::from("color"))
         );
 
-        // The attach tray: four choices, and the one that sends an app
-        // says so and puts the tray away rather than leaving it over the
-        // picker it opens. The app entry is the one that has to be asked
-        // for -- webxdc is off until the settings page turns it on -- so
-        // it is not there until the page says it is.
+        // Attach tray: four choices; app entry says so and puts tray away, not left over picker it
+        // opens. App entry only when asked for (webxdc off until settings page turns it on).
         record!(
             "tray-load",
             call!(
@@ -282,9 +270,8 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         record!("tray-open", call!("own", QString::from("open")));
     });
 
-    // A tick later, because a child of a tray still fading in reads as
-    // invisible whatever its own binding says: an item's `visible` is the
-    // parent's too, and the tray's follows a 150ms opacity animation.
+    // Tick later: child of tray still fading in reads invisible (`visible` includes parent's; tray
+    // follows 150ms opacity animation).
     single_shot(Duration::from_secs(6), move || unsafe {
         record!(
             "tray-app-hidden",
@@ -306,7 +293,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
     assert_outcome(&steps);
 }
 
-/// Each piece does the one thing it is there for.
+/// Each piece does its one job.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
@@ -343,9 +330,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "ok",
         "the jump button did not load. {context}"
     );
-    // Half, deliberately: the theme's own highlight brings transparency of
-    // its own, and the two together are unreadable. Compared loosely
-    // because a colour's alpha is stored in eight bits.
+    // Half, deliberately: theme highlight brings own transparency; both together unreadable.
+    // Loose compare: alpha stored in 8 bits.
     let alpha: f64 = value("jump-opaque").parse().unwrap_or_default();
     assert!(
         (alpha - 0.5).abs() < 0.01,
@@ -356,15 +342,14 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the jump button has no chevron drawn on it: {}. {context}",
         value("jump-chevron")
     );
-    // A themed icon here is itself a disc, which read as two circles. Asked
-    // as "is there one", not "is there one called jumpIcon": the old form
-    // held whatever was put back, as long as it was named something else.
+    // Themed icon is itself a disc: read as two circles. Asked "is there one", not by name: old
+    // form passed whatever was put back under another name.
     assert_eq!(
         value("jump-themed-icons"),
         "0",
         "the button is back to a themed icon, which brings a second circle. {context}"
     );
-    // `Item.Left` is 3; `Item.TopLeft`, which draws it crooked, is 0.
+    // `Item.Left` is 3; `Item.TopLeft` is 0.
     assert_eq!(
         value("chevron-origin"),
         "3",
@@ -376,8 +361,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("chevron-origin"),
         "the chevron's halves turn about different points. {context}"
     );
-    // Lifted by half a stroke, so the line through the middle -- not the
-    // top edge -- starts where the corner of the chevron is.
+    // Lifted half a stroke: line through middle, not top edge, starts at chevron corner.
     let left_y: f64 = value("chevron-left-y").parse().unwrap_or_default();
     assert!(
         left_y < 0.0 && (left_y - value("chevron-right-y").parse().unwrap_or(0.0)).abs() < 0.01,
@@ -412,9 +396,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "true",
         "a notice with something to say stayed hidden. {context}"
     );
-    // Two colours, not the property read back: `tone` exists to change how
-    // the strip looks, and an assertion that it holds the value just
-    // written to it would pass with the colour binding deleted.
+    // Two colours, not property read back: else passes with binding deleted.
     assert_ne!(
         value("tone-error-colour"),
         value("tone-info-colour"),

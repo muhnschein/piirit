@@ -1,16 +1,10 @@
-//! Enter in the chat list's search field closes the keyboard and keeps the
-//! search.
+//! Enter in chat-list search closes keyboard, keeps search. Field drops focus via
+//! `page.dismissKeyboard()`; query and results stay, as page's `onActiveFocusChanged` closes search
+//! only when field is empty.
 //!
-//! The field drops focus through `page.dismissKeyboard()`, and the query
-//! and the results stay where they were: the page's `onActiveFocusChanged`
-//! only closes the search when the field is left empty.
-//!
-//! The Enter key itself cannot be injected in this harness -- QML key
-//! events are not delivered to items here -- so the wiring is checked
-//! against the source instead: the `chatSearchField` block must hand
-//! both `Keys.onReturnPressed` and `Keys.onEnterPressed` to
-//! `page.dismissKeyboard()`. The function is exercised directly through
-//! the probe.
+//! QML key events not delivered in this harness, so wiring checked against source:
+//! `chatSearchField` must pass `Keys.onReturnPressed` and `Keys.onEnterPressed` to
+//! `page.dismissKeyboard()`. The function itself is exercised via probe.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -95,11 +89,10 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
         std::env::temp_dir().join(format!("piirit-chat-search-enter-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
-        // The probe's window needs a scene graph; the software one needs no
-        // GL context, which a CI runner without a display does not have.
+        // Software scene graph: no GL needed (CI has no display).
         std::env::set_var("QT_QUICK_BACKEND", "software");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
@@ -147,7 +140,7 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
         ));
     });
 
-    // Text in the field, and the field holds the keyboard.
+    // Text in field; field holds keyboard.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push((
             "typed",
@@ -160,8 +153,7 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
         (*steps_ptr).push(("focused", call!("focus", QString::from("chatSearchField"))));
     });
 
-    // Past the 250ms debounce: the query has reached the model. Enter
-    // is then pressed, and the result is read straight after.
+    // Past 250ms debounce; Enter pressed; result read after.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push((
             "focus-before",
@@ -208,7 +200,7 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
     assert_source_wires_enter();
 }
 
-/// Enter closes the keyboard, and the search stays open with its query.
+/// Enter closes keyboard; search stays open.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -267,8 +259,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
     );
 }
 
-/// The field's block in the page hands both Enter keys to
-/// `page.dismissKeyboard()`, and the page defines it.
+/// Field's block passes both Enter keys to `page.dismissKeyboard()`, and page defines it.
 fn assert_source_wires_enter() {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/ChatListPage.qml");
     let source = std::fs::read_to_string(&path).expect("read ChatListPage.qml");

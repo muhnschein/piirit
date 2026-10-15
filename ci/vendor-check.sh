@@ -1,29 +1,24 @@
 #!/bin/sh
-# Prove third_party/qmetaobject is upstream 0.2.10 plus one known patch,
-# vendor/calls-webapp/index.html is upstream's release asset, and the
-# emoji in qml/ are the pinned Twemoji and emojibase-data.
+# Prove third_party/qmetaobject = upstream 0.2.10 + one patch;
+# vendor/calls-webapp/index.html = upstream release asset; qml/ emoji = pinned
+# Twemoji and emojibase-data.
 #
-# Carrying 7,000 lines of someone else's crate is only safe while everyone
-# can see exactly how it differs from the published one. So: fetch the
-# crates.io tarball, apply third_party/qmetaobject.patch to it, and require
-# the result to match the vendored tree byte for byte. An edit made
-# directly to the copy, or a patch that stops describing it, fails here.
-#
-# The .crate tarball is immutable once published, so this is the same
-# comparison every time.
+# Fetch crates.io tarball, apply qmetaobject.patch, require byte-for-byte match
+# with vendored tree. Direct edits or stale patch fail here. Tarball is
+# immutable.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 vendored="$root/third_party/qmetaobject"
 patch_file="$root/third_party/qmetaobject.patch"
 
-# The version to compare against is the one cargo is told to replace.
+# Compare against the version cargo is told to replace.
 version=$(sed -n 's/^version = "\(.*\)"/\1/p' "$vendored/Cargo.toml" | head -1)
 [ -n "$version" ] || { echo "vendor-check: FAIL no version in the vendored Cargo.toml" >&2; exit 1; }
 
 if ! command -v curl >/dev/null 2>&1; then
-    # A gate that passes without its tool is not a gate. Locally that is
-    # a skip; on a runner, where GitHub sets CI, it is a failure.
+    # Skip locally; fail on runner (CI set). A gate without its tool isn't a
+    # gate.
     if [ -n "${CI:-}" ]; then
         echo "vendor-check: FAIL curl not found; this check proved nothing" >&2
         exit 1
@@ -45,14 +40,10 @@ tar -C "$work" -xzf "$work/crate.tar.gz"
 upstream="$work/qmetaobject-$version"
 [ -d "$upstream" ] || { echo "vendor-check: FAIL unexpected tarball layout" >&2; exit 1; }
 
-# cargo drops a .cargo-ok marker into its own extraction; it is not in the
-# tarball and is left out of the comparison below rather than deleted from
-# a tree this script is only meant to read.
+# cargo's .cargo-ok marker is not in tarball; excluded from comparison.
 
-# The crate's own tests are not vendored. Cargo never builds a dependency's
-# tests, so they are 1,200 lines that cannot run -- and CodeQL scanned them
-# and reported seven high-severity findings in code this repository does not
-# compile. Dropped from both sides so the comparison stays exact.
+# Crate's own tests not vendored: never built, 1,200 lines; CodeQL flagged seven
+# highs in code not compiled here. Dropped both sides.
 rm -rf "$upstream/tests"
 
 if ! patch -s -p1 -d "$upstream" < "$patch_file"; then
@@ -62,11 +53,10 @@ fi
 
 if diff -r -q -x .cargo-ok "$upstream" "$vendored" >/dev/null 2>&1; then
     echo "vendor-check: ok (qmetaobject $version + qmetaobject.patch)"
-    # The page a call runs in is the other thing committed from upstream:
-    # fetched again from the release and compared byte for byte.
+    # Upstream page the call runs in: refetched, compared byte for byte.
     "$root/scripts/fetch-calls-webapp.sh" --check
-    # And the emoji pictures and the list of them, regenerated from the
-    # pinned Twemoji tag and emojibase-data release.
+    # Emoji pictures and list: regenerated from pinned Twemoji tag and
+    # emojibase-data.
     "$root/scripts/fetch-emoji.py" --check
     exit 0
 fi

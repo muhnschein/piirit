@@ -3,88 +3,53 @@ import Sailfish.Silica 1.0
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * A round avatar: the subject's own colour with their initial on it, or
- * their picture cut to a circle.
- *
- * The circle is the whole point. An Image does not inherit its parent's
- * corner radius, and `clip` cuts only to the bounding box, so a picture
- * left to itself reads as a square among circles.
- *
- * Shared by the chat list and the contact lists so the two cannot drift.
+ * Round avatar: colour and initial, or picture cut to circle (Image ignores parent
+ * radius, `clip` cuts to box). Chat and contact lists.
  */
 Rectangle {
     id: avatar
 
-    /// Shown when there is no picture.
+    /// Fallback when no picture.
     property string initial
-    /// The core's per-chat or per-contact colour.
+    /// Core's colour.
     property string ownColor
-    /// Path to the picture, empty when there is none.
+    /// Picture path; empty: none.
     property string picturePath
-    /// Drawn without its colour: grey behind the initial, the picture
-    /// desaturated. For the cover's grid of everyone, where nobody is
-    /// drawn in their own colours.
+    /// Grey, desaturated: cover grid.
     property bool monochrome: false
-    /// Drawn in the ambience's own colour instead of the subject's:
-    /// `Theme.highlightColor` behind the initial, the picture through
-    /// the same colour. What the cover does for whoever has written, so
-    /// a face with something new reads as the phone's own highlight --
-    /// the colour the unread badge in the chat list is already drawn in
-    /// -- rather than as one more photograph among grey ones.
+    /// Ambience `Theme.highlightColor` disc, not own; picture tinted with it. Cover marks who wrote
+    /// (badge colour).
     property bool highlight: false
-    /// Where the avatar fades out, as fractions of its height from its
-    /// top: whole above `fadeFrom`, gone by `fadeTo`. The cover's grid
-    /// sinks away into the strip its quick actions are drawn in. Equal,
-    /// as they start, is no fade, and so is one that starts below the
-    /// avatar's foot.
+    /// Top-down fade, height fractions: full above `fadeFrom`, gone by `fadeTo`. Equal, or
+    /// below foot: none.
     property real fadeFrom: 0
     property real fadeTo: 0
     readonly property bool fades: avatar.fadeTo > avatar.fadeFrom && avatar.fadeFrom < 1
 
-    /// The picture is what is on screen: there is one, and it has
-    /// loaded. Everything that draws a picture and everything that
-    /// stands in for one turns on this one fact, so the two never both
-    /// stand down.
-    ///
-    /// A picture is loaded off the main thread, which is what keeps a
-    /// list smooth while it is scrolled -- and what it costs is that a
-    /// row is on screen before its picture is. Reading "there is a path"
-    /// as "there is a picture" left the disc transparent and the initial
-    /// hidden for that time, so a chat list arrived as a column of holes
-    /// that filled in one by one. It arrives as a column of faces now:
-    /// the subject's colour and their initial until their picture is
-    /// ready, and their picture from then on. It is also what a picture
-    /// that never loads -- a blob deleted under the app, a file that is
-    /// not an image -- falls back to, instead of a hole for good.
+    /// Picture exists and loaded; picture and stand-in key off it. Async load (row before picture):
+    /// path alone left disc blank. Unloadable: stand-in.
     readonly property bool showsPicture: avatar.picturePath.length > 0
                                          && picture.status === Image.Ready
 
     width: Theme.itemSizeSmall
     height: width
     radius: width / 2
-    // The disc's own colour only when it is what is seen: behind a
-    // picture it showed as a tinted ring where the mask's edge is
-    // softened, and as a full tinted disc whenever the masked picture
-    // was not drawn for a frame -- a row highlighted under its context
-    // menu was where that was noticed.
+    // Disc colour only when seen: behind picture it tinted mask edge, flashed on skipped frame.
     readonly property color discColor: avatar.showsPicture ? "transparent"
            : avatar.highlight ? Theme.highlightColor
            : avatar.monochrome ? Theme.rgba(Theme.primaryColor, 0.25)
            : ownColor.length > 0 ? ownColor : Theme.highlightColor
     color: avatar.discColor
-    // Fading, the disc goes the way the picture does, in steps close
-    // enough that the eye takes them for the curve.
+    // Fade steps fine enough for a curve.
     gradient: avatar.fades && !avatar.showsPicture ? avatar.fade : null
 
-    /// The disc's colour where it is `at` of the way down.
+    /// Disc colour `at` down the fade.
     function faded(at) {
         var c = avatar.discColor
         return Qt.rgba(c.r, c.g, c.b, c.a * QuickActions.fade(at, avatar.fadeFrom, avatar.fadeTo))
     }
 
-    /// The fading disc's gradient, made the first time the avatar fades
-    /// and null until then. Only the cover fades an avatar, and every
-    /// avatar in every list built eight stops and their bindings for it.
+    /// Fade gradient, made on first fade (cover only), else every avatar built 8 stops.
     property QtObject fade: null
     function makeFade() {
         if (avatar.fades && avatar.fade === null) {
@@ -112,8 +77,7 @@ Rectangle {
         objectName: "avatarInitial"
         anchors.centerIn: parent
         visible: !avatar.showsPicture
-        // A letter is too small to fade across; it takes the fade where
-        // it stands.
+        // Letter fades whole: too small to fade across.
         opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
         color: Theme.primaryColor
         font.pixelSize: Theme.fontSizeLarge
@@ -127,22 +91,12 @@ Rectangle {
         anchors.fill: parent
         visible: avatar.showsPicture
         asynchronous: true
-        // Made at the size it is drawn, so the circle's rim is one pixel
-        // wide on screen as it was in the shader.
+        // Drawn size: one-pixel rim.
         sourceSize.width: Math.round(avatar.width)
         sourceSize.height: Math.round(avatar.height)
-        // The picture as it is seen, made ready before it reaches the
-        // screen (src/pictures.rs): cut to a circle, grey where it is drawn
-        // without its colour, through the ambience's colour where the
-        // cover lights it, and fading where the cover's grid does.
-        //
-        // Not drawn by a shader, and that is the point. A ShaderEffect
-        // made after its window has once been hidden can be drawn on
-        // Sailfish's Qt 5.6 with another ShaderEffect's program -- the
-        // cover's own fade, which turned every new face into a white
-        // square of its whole picture -- and the cover makes faces for
-        // every message. An Image is drawn with Qt's own texture
-        // material, which nothing can mistake for another.
+        // src/pictures.rs cuts, greys, tints, fades. No shader: Sailfish Qt 5.6
+        // ShaderEffect made after window hid can use another's program (cover faces
+        // went white squares).
         source: avatar.picturePath.length > 0 && avatar.width > 0
                 ? "image://piirit/face?file=" + encodeURIComponent(avatar.picturePath)
                   + (avatar.monochrome ? "&grey=1" : "")

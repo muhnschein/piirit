@@ -3,47 +3,28 @@ import Sailfish.Silica 1.0
 import Piirit 1.0
 
 /*
- * A voice message being recorded, where the message field was.
- *
- * Its own component for the reason ReplyBar and AttachmentBar are:
- * ConversationPage cannot be loaded headlessly, so anything whose
- * behaviour matters has to be testable on its own. The recorder is here
- * too, so the page owns nothing but the two answers -- a recording to
- * send, or nothing.
- *
- * Tap to start, tap to send: a hold-to-record gesture is the other
- * clients' choice, and a tap is the one that cannot be let go of by
- * accident and that a reader can put the phone down during. While
- * recording, the strip is a red dot, the time, a cross to throw the
- * recording away, and the send button where it always is. The page
- * hides its field and attach button meanwhile.
- *
- * A recording can be as long as the relay takes and no longer: at the end
- * it stops and is sent, as a tap on send would have done. Nothing here
- * says so. At the relay's size that is over an hour and a half, which
- * nobody records, and a limit on the screen would raise more questions
- * than it answers.
+ * Voice recording in place of message field; own component, headless-testable. Recorder
+ * here; page gets recording or nothing. Tap start, tap send (not hold: no accidental
+ * release). Page hides field and attach button meanwhile. Length capped by relay size
+ * (over 1.5 h), unshown: at cap, recording stops and sends.
  */
 Item {
     id: root
 
-    /// Whether anything can be recorded on this device.
+    /// Recording possible here.
     readonly property bool available: recorder.available
-    /// A recording is running, or being finished.
+    /// Running or finishing.
     readonly property bool recording: recorder.recording
-    /// The largest file the relay takes, in bytes: the core's attachment
-    /// limit, 0 until it has said. A recording stops at the longest that
-    /// fits.
+    /// Relay max bytes (core limit; 0 = unknown). Recording stops at longest fit.
     property real limitBytes: 0
-    /// The reader's outgoing media quality, 0 balanced and 1 less data,
-    /// which the recording's bit rate follows as a picture's size does.
+    /// Quality: 0 balanced, 1 less data. Sets bit rate.
     property int mediaQuality: 0
-    /// The recording is finished and at `path`: send it.
+    /// Done; `path` to send.
     signal recorded(string path)
-    /// Recording failed. The message is the platform's own.
+    /// Failed; platform's message.
     signal failed(string message)
 
-    /// Start recording, into a fresh capture.
+    /// Start into fresh capture.
     function start() {
         if (recorder.recording || !recorder.available) {
             return
@@ -54,17 +35,17 @@ Item {
         }
     }
 
-    /// Stop, and hand the recording over once it is finished.
+    /// Stop; hand over when finished.
     function send() {
         recorder.stop()
     }
 
-    /// Stop, and throw the recording away.
+    /// Stop and discard.
     function cancel() {
         recorder.cancel()
     }
 
-    /// m:ss from milliseconds, which is what the recorder reports.
+    /// m:ss from ms.
     function clock(milliseconds) {
         var total = Math.floor(milliseconds / 1000)
         var seconds = total % 60
@@ -86,8 +67,7 @@ Item {
         onError: root.failed(message)
     }
 
-    // The recorder is polled rather than connected to: one call a few
-    // times a second while recording, and nothing at all otherwise.
+    // Polled, not signalled: cheap while recording, none otherwise.
     Timer {
         id: ticker
         objectName: "ticker"
@@ -97,13 +77,12 @@ Item {
         onTriggered: recorder.poll()
     }
 
-    // Sized by its own reason to be here rather than by `visible`: see
-    // ReplyBar.
+    // Own flag, not `visible` (see ReplyBar).
     readonly property bool shown: recorder.recording
     visible: root.shown
     height: root.shown ? Math.max(timeLabel.height, cancelButton.height) : 0
 
-    // The red dot: recording is under way.
+    // Red dot: recording.
     Rectangle {
         id: dot
         objectName: "recordingDot"
@@ -117,7 +96,7 @@ Item {
         radius: width / 2
         color: Theme.errorColor
 
-        // Blinks, so a strip that has stopped moving reads as stopped.
+        // Blink: stopped strip reads stopped.
         SequentialAnimation on opacity {
             running: recorder.recording
             loops: Animation.Infinite

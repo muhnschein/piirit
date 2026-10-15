@@ -1,46 +1,21 @@
-//! Whether this process has a recording stream open in `PulseAudio`.
+//! Recording stream open in `PulseAudio` for this process.
 //!
-//! A call's audio route cannot be changed while the browser engine's
-//! microphone stream is open. Gecko creates that stream with
-//! `PA_STREAM_DONT_MOVE`, and Sailfish's policy module asserts that every
-//! stream moved when the route does: the sound server aborts, and the
-//! phone has no sound until systemd has restarted it. Gecko runs inside
-//! this process, so its streams carry this process's id, and the app
-//! changes the route only when it knows that no recording stream (a
-//! source output, in `PulseAudio`'s words) carries it.
+//! Call audio route must not change while Gecko's mic stream (`PA_STREAM_DONT_MOVE`) is open:
+//! Sailfish policy module asserts all streams moved, sound server aborts, silent till systemd
+//! restarts it. Gecko runs in-process: its streams carry this pid.
 //!
-//! "Knows" is the point of this module. A wrong "closed" costs the phone
-//! its sound, so the answer has two parts: `known`, and `open`, which
-//! means something only while `known` is true. Known is connected, and
-//! subscribed to source-output events, and a full listing of the source
-//! outputs taken since the last event. Anything else -- not connected
-//! yet, the server gone, a listing under way after a stream came or went
-//! while the answer was "closed" -- is not known, and reads as such.
-//! "Open" going stale is not withdrawn the same way: an open that turns
-//! out to be closed only keeps the route where it is for a moment longer.
+//! Wrong "closed" costs sound, so `known` + `open`. Unknown: not connected, server gone, or
+//! relisting after change while "closed". Stale "open" only delays route change: not withdrawn.
 //!
-//! The work is libpulse's, on a `pa_threaded_mainloop` of its own: the Qt
-//! thread never waits on the sound server, and nothing polls. An event
-//! about any source output -- new, gone, changed -- is answered with a
-//! fresh listing; a listing asked for while one is under way is taken
-//! again once it is done, and only the last is believed. When the server
-//! goes away, which on a phone it does, the answer is withdrawn at once
-//! and a connection tried again after a second, then every two, until
-//! one is made and listed. A daemon is never started from here
-//! (`PA_CONTEXT_NOAUTOSPAWN`): on a phone systemd owns it, and anywhere
-//! else one started by this process would be the wrong one.
+//! libpulse on own `pa_threaded_mainloop`: Qt thread never waits; no polling. Any source-output
+//! event: fresh listing; one asked mid-listing reruns after; only last believed. Server gone:
+//! unknown at once; retry 1 s, then every 2 s. Never autospawn (`PA_CONTEXT_NOAUTOSPAWN`):
+//! systemd owns daemon; elsewhere ours would be wrong one.
 //!
-//! It is C++, in the `cpp!` block below, for the structs: libpulse's are
-//! read through its own headers rather than written out again in Rust,
-//! and the block is kept to plain calls that can be checked by reading,
-//! one small function per thing libpulse can say. The one way
-//! back into Rust is [`MicState`] handed to a callback on the mainloop's
-//! thread, under its lock; [`MicWatch`] is what QML sees, and takes that
-//! over to the Qt thread.
+//! C++ in `cpp!` so libpulse structs come from its headers; one small fn per libpulse callback.
+//! [`MicState`] goes to a callback on mainloop thread, under lock; [`MicWatch`] moves it to Qt.
 
-// `cpp!` expands to a call across the FFI boundary, which is `unsafe` by
-// construction. Scoped to this file: the workspace denies it everywhere
-// else, and docs/BUILDING.md says why this one is allowed.
+// `cpp!` is FFI: `unsafe`. Allowed here only: docs/BUILDING.md.
 #![allow(unsafe_code)]
 
 use std::ffi::{c_void, CString};
@@ -55,37 +30,34 @@ cpp! {{
     #include <string>
     #include <pulse/pulseaudio.h>
 
-    // One watcher. Every field is the mainloop thread's, read and written
-    // under the mainloop's lock: from its own callbacks, which libpulse
-    // runs holding it, and from start and stop, which take it.
+    // Mainloop-thread fields, under its lock.
     struct PiiritMicWatch {
         pa_threaded_mainloop *loop = nullptr;
         pa_mainloop_api *api = nullptr;
         pa_context *context = nullptr;
-        // The next connection attempt, while one is waited for.
+        // Next connection attempt.
         pa_time_event *retry = nullptr;
-        // Empty for libpulse's own lookup.
+        // Empty: libpulse's own lookup.
         std::string server;
         uint32_t pid = 0;
-        // What the Rust callback is handed back.
+        // Passed to the Rust callback.
         void *user = nullptr;
-        // Attempts since the last connection, for the wait before the next.
+        // Failed attempts: sets wait.
         unsigned failures = 0;
-        // The server took the subscription.
+        // Server accepted subscription.
         bool subscribed = false;
-        // A listing is under way, and whether anything changed since it
-        // was asked for, and whether it has seen the pid so far.
+        // Listing under way; changed since asked; pid seen.
         bool listing = false;
         bool again = false;
         bool found = false;
-        // What was last reported.
+        // Last reported.
         bool known = false;
         bool open = false;
     };
 
     static void piirit_mic_list(PiiritMicWatch *w);
 
-    // Hand a state to Rust, when it is not the one last handed over.
+    // Hand state to Rust if changed.
     static void piirit_mic_report(PiiritMicWatch *w, bool known, bool open) {
         open = known && open;
         if (w->known == known && w->open == open) {
@@ -95,20 +67,17 @@ cpp! {{
         w->open = open;
         void *user = w->user;
         rust!(PiiritMicWatch_report [user: *const c_void as "void *", known: bool as "bool", open: bool as "bool"] {
-            // SAFETY: `user` is the `Report` the `MicWatcher` boxed and
-            // keeps until after the mainloop thread -- the only thread
-            // this runs on -- has been stopped and joined.
+            // SAFETY: `user` lives until this mainloop thread is joined.
             let report = unsafe { &*user.cast::<Report>() };
             let state = MicState { known, open };
-            // A panic must not unwind into libpulse.
+            // No unwind into libpulse.
             if std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| report(state))).is_err() {
                 eprintln!("piirit: the microphone watch's callback panicked");
             }
         });
     }
 
-    // Whether a stream's properties name `pid` as its process. libpulse
-    // writes the id in decimal; anything else is not this process.
+    // Pid decimal; else not us.
     static bool piirit_mic_belongs(const pa_proplist *props, uint32_t pid) {
         const char *value = pa_proplist_gets(props, PA_PROP_APPLICATION_PROCESS_ID);
         if (!value || *value < '0' || *value > '9') {
@@ -120,7 +89,7 @@ cpp! {{
         return errno == 0 && *end == '\0' && id == pid;
     }
 
-    // Let go of the context, quietly: none of its callbacks run again.
+    // Drop context quietly: no callbacks.
     static void piirit_mic_drop(PiiritMicWatch *w) {
         pa_context *c = w->context;
         if (!c) {
@@ -146,8 +115,7 @@ cpp! {{
         piirit_mic_connect(w);
     }
 
-    // Try again in a second, or two after that: soon enough after
-    // systemd has restarted the server, and no busy loop when it has not.
+    // Soon after restart, no busy loop.
     static void piirit_mic_retry(PiiritMicWatch *w) {
         if (w->retry) {
             return;
@@ -161,7 +129,7 @@ cpp! {{
         w->retry = w->api->time_new(w->api, &when, piirit_mic_retried, w);
     }
 
-    // The connection is gone, or cannot be trusted: say so, and start over.
+    // Gone or untrusted: report, restart.
     static void piirit_mic_lost(PiiritMicWatch *w) {
         piirit_mic_drop(w);
         piirit_mic_report(w, false, false);
@@ -174,7 +142,7 @@ cpp! {{
             return;
         }
         if (!success) {
-            // No events, so no listing could be believed for long.
+            // No events: no listing trusted for long.
             piirit_mic_lost(w);
             return;
         }
@@ -201,8 +169,7 @@ cpp! {{
             piirit_mic_list(w);
             return;
         }
-        // The server answers in order, so the subscription's answer came
-        // before this one; not having had it is not a state to trust.
+        // Server answers in order; no subscription answer yet: untrusted.
         if (!w->subscribed) {
             piirit_mic_lost(w);
             return;
@@ -210,8 +177,7 @@ cpp! {{
         piirit_mic_report(w, true, w->found);
     }
 
-    // List every source output, or ask for it again once the listing
-    // under way is done.
+    // List every source output; re-ask if one is running.
     static void piirit_mic_list(PiiritMicWatch *w) {
         if (w->listing) {
             w->again = true;
@@ -237,8 +203,7 @@ cpp! {{
         if ((type & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) != PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT) {
             return;
         }
-        // A "closed" is no longer known to be true until the listing says
-        // so again; an "open" can wait for it.
+        // "Closed" unknown until listed; "open" can wait.
         if (!w->open) {
             piirit_mic_report(w, false, false);
         }
@@ -253,8 +218,7 @@ cpp! {{
         switch (pa_context_get_state(c)) {
         case PA_CONTEXT_READY: {
             w->failures = 0;
-            // Subscribed first, so that nothing that changes between the
-            // listing and the subscription goes unheard.
+            // Subscribe first: nothing changing in between is missed.
             pa_operation *op = pa_context_subscribe(c, PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT, piirit_mic_subscribed, w);
             if (!op) {
                 piirit_mic_lost(w);
@@ -283,9 +247,7 @@ cpp! {{
         pa_context_set_state_callback(c, piirit_mic_state, w);
         pa_context_set_subscribe_callback(c, piirit_mic_event, w);
         const char *server = w->server.empty() ? nullptr : w->server.c_str();
-        // A failure here may already have been through the state
-        // callback, which let the context go; only one that did not is
-        // let go here.
+        // State callback may have dropped context already; drop if not.
         if (pa_context_connect(c, server, PA_CONTEXT_NOAUTOSPAWN, nullptr) < 0 && w->context == c) {
             piirit_mic_lost(w);
         }
@@ -307,7 +269,7 @@ cpp! {{
         if (server) {
             w->server = server;
         }
-        // Before the thread exists, so nothing else holds the lock yet.
+        // Thread not started yet: no lock held.
         piirit_mic_connect(w);
         if (pa_threaded_mainloop_start(w->loop) < 0) {
             piirit_mic_drop(w);
@@ -321,7 +283,7 @@ cpp! {{
         return w;
     }
 
-    // Never from the mainloop's own thread, which this joins.
+    // Not from mainloop thread, which this joins.
     static void piirit_mic_stop(PiiritMicWatch *w) {
         pa_threaded_mainloop_lock(w->loop);
         piirit_mic_drop(w);
@@ -336,42 +298,35 @@ cpp! {{
     }
 }}
 
-/// What a watcher knows: whether it knows, and whether a recording stream
-/// of the watched process is open. `open` is false whenever `known` is.
+/// Known, and whether this process records; `open` false while not `known`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct MicState {
-    /// Connected, subscribed, and listed since the last change.
+    /// Connected, subscribed, listed since last change.
     pub known: bool,
-    /// A source output carries the watched process's id.
+    /// A source output carries the watched pid.
     pub open: bool,
 }
 
-/// The callback a watcher reports to, boxed once more so that C++ holds a
-/// thin pointer to it.
+/// Callback; boxed twice for thin C++ pointer.
 type Report = Box<dyn Fn(MicState) + Send>;
 
-/// Watches `PulseAudio` for recording streams of one process, on a thread
-/// of its own, until dropped.
+/// Watches `PulseAudio` for one process's recording streams.
 ///
-/// Every change of [`MicState`] is handed to the callback, on that
-/// thread, in order; the state before the first is unknown. The callback
-/// must not block and must not drop the watcher. Dropping it stops and
-/// joins the thread, after which the callback is not called again.
+/// [`MicState`] changes reach callback on watcher thread, in order, unknown until first.
+/// Callback must not block or drop watcher. Drop joins thread; no callbacks after.
 pub struct MicWatcher {
-    /// The C++ watcher; never null.
+    /// C++ watcher; never null.
     handle: usize,
-    /// What C++ calls back, at the address it was given, and read only
-    /// through that. Dropped after the handle has been stopped.
+    /// Read by C++ at its address; dropped after handle.
     #[allow(dead_code)]
     report: Box<Report>,
 }
 
 impl MicWatcher {
-    /// Start watching for recording streams whose `application.process.id`
-    /// is `pid`, on `server` (a `PulseAudio` server string, such as
-    /// `unix:/run/user/100000/pulse/native`), or wherever libpulse's own
-    /// lookup finds one when `None`. `None` only when the mainloop could
-    /// not be made, or `server` has a nul in it.
+    /// Watch streams whose `application.process.id` is `pid`.
+    ///
+    /// `server`: `PulseAudio` string (`unix:/run/user/100000/pulse/native`); `None`: libpulse
+    /// lookup. `None` if mainloop fails or `server` has nul.
     pub fn start(
         pid: u32,
         server: Option<&str>,
@@ -386,9 +341,7 @@ impl MicWatcher {
             .map_or(std::ptr::null(), |name| name.as_ptr());
         let report: Box<Report> = Box::new(Box::new(report));
         let user = std::ptr::addr_of!(*report).cast::<c_void>();
-        // SAFETY: `server_ptr` is null or a nul-terminated string that
-        // outlives the call, and is copied; `user` points at the `Report`
-        // this watcher keeps for as long as the C++ one lives.
+        // SAFETY: `server_ptr` null or nul-terminated, copied. `user` kept alive.
         let handle = cpp!(unsafe [pid as "uint32_t", server_ptr as "const char *",
                                   user as "void *"] -> *mut c_void as "void *" {
             return piirit_mic_start(pid, server_ptr, user);
@@ -406,68 +359,58 @@ impl MicWatcher {
 impl Drop for MicWatcher {
     fn drop(&mut self) {
         let watch = self.handle as *mut c_void;
-        // SAFETY: the handle came from `piirit_mic_start` and is stopped
-        // exactly once, here, from a thread that is not the mainloop's:
-        // the callback, the only code that runs there, is told not to
-        // drop the watcher. Once this returns the thread is joined, and
-        // `report`, dropped after this body, can go.
+        // SAFETY: stopped once, here, off mainloop thread; joined before `report` drops.
         cpp!(unsafe [watch as "PiiritMicWatch *"] {
             piirit_mic_stop(watch);
         });
     }
 }
 
-/// This process's recording streams, as QML sees them.
+/// This process's recording streams, for QML.
 ///
 /// ```qml
 /// MicWatch { id: mic; active: call.state === "active" }
-/// // The route may change only while it is known that nothing records.
+/// // Route may change only while known that nothing records.
 /// property bool routeFree: mic.known && !mic.open
 /// ```
 #[derive(QObject, Default)]
 pub struct MicWatch {
     base: qt_base_class!(trait QObject),
 
-    /// Watch while true; while false nothing is connected and nothing is
-    /// known.
+    /// Watch while true; false: nothing connected or known.
     pub active: qt_property!(bool; WRITE set_active NOTIFY active_changed),
-    /// Emitted when [`Self::active`] changes.
+    /// [`Self::active`] changed.
     pub active_changed: qt_signal!(),
-    /// Whether [`Self::open`] can be believed: connected to the sound
-    /// server, and listed since the last change. Read-only: qmetaobject
-    /// makes every property writable that is not `CONST`, and a constant
-    /// one is never re-read, so a write from QML is taken and dropped.
+    /// [`Self::open`] believable. Read-only: qmetaobject makes non-`CONST` props writable and
+    /// never re-reads `CONST`, so writes dropped.
     pub known: qt_property!(bool; READ is_known WRITE refuse NOTIFY known_changed),
-    /// Emitted when [`Self::known`] changes.
+    /// [`Self::known`] changed.
     pub known_changed: qt_signal!(),
-    /// Whether this process has a recording stream open. False while not
-    /// known, which does not mean closed. Read-only, as `known` is.
+    /// Recording stream open. False while not known, which isn't closed. Read-only.
     pub open: qt_property!(bool; READ is_open WRITE refuse NOTIFY open_changed),
-    /// Emitted when [`Self::open`] changes.
+    /// [`Self::open`] changed.
     pub open_changed: qt_signal!(),
 
-    /// The watcher, while active.
+    /// Watcher while active.
     watcher: Option<MicWatcher>,
-    /// Counts activations, so that a report from a watcher since stopped
-    /// is not taken for one from the current one.
+    /// Activation count: late reports ignored.
     generation: u64,
 }
 
 impl MicWatch {
-    /// Whether [`Self::open`] can be believed.
+    /// Whether [`Self::open`] is believable.
     #[must_use]
     pub fn is_known(&self) -> bool {
         self.known
     }
 
-    /// Whether a recording stream of this process is open.
+    /// Recording stream open.
     #[must_use]
     pub fn is_open(&self) -> bool {
         self.open
     }
 
-    /// What a write to `known` or `open` comes to: nothing. Only the
-    /// watch says what it knows.
+    /// Ignores writes to `known`/`open`.
     pub fn refuse(&mut self, _value: bool) {}
 
     /// Start or stop watching.
@@ -477,8 +420,7 @@ impl MicWatch {
         }
         self.active = active;
         self.generation = self.generation.wrapping_add(1);
-        // Stopped first, either way: a watcher is joined before the next
-        // one starts, and what it knew goes with it.
+        // Stop first: join old watcher before next.
         self.watcher = None;
         self.take(MicState::default());
         if active {
@@ -499,10 +441,7 @@ impl MicWatch {
         self.active_changed();
     }
 
-    /// Take a state from the watcher. Both properties are set before
-    /// either is announced, so that a binding over the two never sees
-    /// `known` from one state and `open` from the other: known and not
-    /// yet open, on the way to open, is exactly the wrong answer.
+    /// Both set before either announced: bindings never see known-but-not-yet-open.
     fn take(&mut self, state: MicState) {
         let known = state.known;
         let open = state.known && state.open;

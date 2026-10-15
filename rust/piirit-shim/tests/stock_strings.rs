@@ -1,16 +1,13 @@
-//! The core's own words reach it in the reader's language.
+//! Core's own words reach it in the reader's language.
 //!
-//! The core writes text of its own -- "Draft" in front of a chat list
-//! preview, "Member %1$s added by %2$s." in a group, the errors it
-//! reports -- and has only English for it until it is handed the rest.
-//! The window hands over `js/StockStrings.js`, every one of them through
-//! `qsTr()`, before it starts the core, so the first thing a server is
-//! asked is to take them; a table handed over later goes straight to the
-//! server that is running; and a table that is not one is refused before
-//! the core sees it.
+//! Core writes its own text ("Draft" in chat preview, "Member %1$s added by %2$s."
+//! in groups, errors); English until handed the rest. Window hands
+//! `js/StockStrings.js` (all via `qsTr()`) before starting core, so the first
+//! request is the table. Later tables go to running server; non-table refused
+//! before core sees it.
 //!
-//! No catalog is installed here, so the table is the English source.
-//! That the catalogs translate it is `piirit-app`'s translations test.
+//! No catalog here, so table is English source. `piirit-app`'s translations test
+//! checks catalogs.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -29,7 +26,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`; see `network_hint.rs`. Nothing here navigates.
+/// Silica's `pageStack`; see `network_hint.rs`. Navigates nothing.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -53,7 +50,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Every table the core was handed, in order.
+/// Tables core was handed, in order.
 fn tables(journal: &std::path::Path) -> Vec<Value> {
     common::calls(journal)
         .into_iter()
@@ -67,11 +64,10 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
     let temp = std::env::temp_dir().join(format!("piirit-stock-strings-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -114,14 +110,12 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
         }};
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY: fire only while `exec()` runs on this thread; all they point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         assert_eq!(call!("loadWindow", QString::from(window.clone())), "ok");
     });
 
-    // The core is up. What it was asked first, and then a table that is
-    // not one, and one that is.
+    // Core up: first asked, then non-table, then table.
     single_shot(Duration::from_secs(3), move || unsafe {
         let methods = common::methods(&first);
         (*steps_ptr).push(("first", methods.first().cloned().unwrap_or_default()));
@@ -163,7 +157,7 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
     assert_eq!(table["3"], "Draft", "{context}");
     assert_eq!(table["129"], "Member %1$s added by %2$s.", "{context}");
 
-    // The two that are not tables reached nobody; the one that is did.
+    // Non-tables reached nobody; table did.
     assert_eq!(
         handed.len(),
         2,

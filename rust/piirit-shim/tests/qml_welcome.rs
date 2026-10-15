@@ -1,24 +1,17 @@
-//! The first screen: the app's mark over its name, and the ways on.
-//!
-//! The mark is the launcher icon drawn out into a picture (`qml/art/`);
-//! what is checked here is that the picture is there in a shape a phone
-//! can draw, that the page loads it and puts it over the name, and that
-//! none of it is drawn before the core has said whether there is a chat
-//! list to be on instead. What it looks like is a manual check
-//! (docs/HARBOUR.md).
+//! First screen: app mark over name, and ways on.
+//! Mark is launcher icon drawn out (`qml/art/`). Checked: picture present in a shape a phone
+//! draws, page loads it over name, nothing drawn before core says whether a chat list comes
+//! instead. Look: manual check (docs/HARBOUR.md).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // Match dispatcher's by-value params (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
@@ -31,7 +24,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// `BusyIndicatorSize.Large`, which a `.qml` stub cannot provide.
+/// `BusyIndicatorSize.Large`: `.qml` stubs lack it.
 #[derive(QEnum)]
 #[repr(u8)]
 enum BusyIndicatorSize {
@@ -40,9 +33,8 @@ enum BusyIndicatorSize {
     Large = 2,
 }
 
-/// The probe that loads the page at a phone's size and reads it back,
-/// with the components directory filled in. Substituted rather than
-/// formatted, so the QML's own braces need no escaping.
+/// Loads page at phone size, reads it back; components dir substituted, not formatted, so QML
+/// braces need no escaping.
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
@@ -141,14 +133,12 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The smallest the mark may be painted: it is drawn at a large item's
-/// size, which on a phone is short of this, so anything smaller would be
-/// drawn bigger than it was painted.
+/// Smallest mark may be painted: drawn at large item size, on phone short of this; smaller
+/// would be drawn bigger than painted.
 const SMALLEST_LOGO: u32 = 256;
 
-/// The mark is the launcher icon drawn out: an 8-bit PNG with an alpha
-/// channel, since it stands on the ambience rather than on a colour of
-/// its own, square, not interlaced, and not small.
+/// Launcher icon drawn out: 8-bit PNG with alpha (stands on ambience), square, not
+/// interlaced, not small.
 #[test]
 fn the_logo_is_the_launcher_icon_drawn_out() {
     let (width, height, depth, colour, interlace) = common::png_header("logo.png");
@@ -174,16 +164,14 @@ fn the_logo_is_the_launcher_icon_drawn_out() {
 fn the_welcome_page_leads_with_the_mark_and_the_name() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-welcome-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // SAFETY: single-threaded, and set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
 
-    // Never started: the page is what is under test, and it shows its
-    // words only once the core has answered -- so the first screen is
-    // checked with the core in its error state, which the page says
-    // under the tiles as it shows everything else.
+    // Core never started: page shows words only once core answered, so first screen is checked
+    // with core in error state, which page says under tiles.
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let stack_box = QObjectBox::new(NoStack::default());
 
@@ -203,8 +191,7 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
     engine.load_data(QByteArray::from(probe_qml().as_str()));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks fire only in `exec()`; `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -229,21 +216,18 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
 
     let r = record.clone();
     single_shot(Duration::from_secs(1), move || {
-        // dconf outlives the test binary, so what a previous run left
-        // behind would otherwise decide what this page does.
+        // dconf outlives binary: old state would decide.
         r("fresh", call!("rememberProfile", "0"));
         r("load", call!("load", common::page_url("WelcomePage.qml")));
         r("logo-file", call!("logoFile"));
-        // Nothing is drawn until the core has said whether there is a
-        // profile to resume: a phone that has one goes straight to the
-        // chat list, and a first screen on the way reads as the app
-        // opening in the wrong place.
+        // Nothing drawn until core says whether a profile resumes: phone with one goes to chat
+        // list, and first screen flashing on the way reads as opening in wrong place.
         r("probing-words", call!("wordsShown"));
         r("probing-spinner", call!("get", "probeSpinner", "running"));
         r("probed", call!("endProbe"));
     });
 
-    // A second is plenty for the picture to load.
+    // A second is plenty for picture load.
     let r = record.clone();
     single_shot(Duration::from_secs(2), move || {
         r("logo", call!("get", "logo", "status"));
@@ -255,10 +239,8 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
         );
     });
 
-    // 3s: a stack that refuses, which is what the real one does while
-    // the push that puts this page up is still running. The page must
-    // neither record a hand-over that did not happen nor draw itself
-    // because one was refused, and the core's answer has to reach it.
+    // 3s: stack refusing, as real one does mid-push of this page. Page must neither record a
+    // hand-over that didn't happen nor draw itself because refused; core's answer must reach it.
     let r = record.clone();
     single_shot(Duration::from_secs(3), move || {
         r("refuse", call!("refuseNavigation", "true"));
@@ -274,14 +256,10 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
         r("refused-after-core", call!("pageProperty", "probing"));
     });
 
-    // 4s: the long stop has passed. A stack that has refused for that
-    // long is not going to take it, and a reader is better off on a
-    // screen they can use than on a blank one.
+    // 4s: long stop passed: stack refusing that long won't take it; usable screen beats blank.
     //
-    // Then the same page on a phone that remembers being on a profile,
-    // over a stack that takes what it is handed. Nothing has told this
-    // page the core is ready, and it should not wait to be told: what
-    // it knows from dconf is enough to leave on.
+    // Then same page on phone remembering a profile, over accepting stack. Not told core is
+    // ready, and should not wait: dconf is enough to leave on.
     let r = record.clone();
     single_shot(Duration::from_secs(4), move || {
         r("refused-gave-up", call!("pageProperty", "probing"));
@@ -290,10 +268,8 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
         r("reload", call!("load", common::page_url("WelcomePage.qml")));
     });
 
-    // 5s: whether it left. Read a beat later rather than in the same
-    // breath as the load: the offer is made from a timer, so that it can
-    // be made again, and a timer's first turn comes after the one the
-    // page was built in.
+    // 5s: did it leave? Read a beat later: offer made from a timer (so it can repeat), whose
+    // first turn comes after page build.
     let r = record.clone();
     single_shot(Duration::from_secs(5), move || {
         r("left", call!("pageProperty", "leaving"));
@@ -311,16 +287,10 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
     assert_a_refused_hand_over_is_survived(&steps.borrow(), &navigation);
 }
 
-/// A hand-over the stack refuses must leave the page working.
-///
-/// Silica drops a stack operation asked for while a transition is
-/// running, and the first thing this page does is ask, from inside the
-/// push that puts it up. Both ways of reading that one refusal were
-/// wrong and both were shipped: recording it as having left hid the page
-/// for a hand-over that never happened -- a blank screen, for good --
-/// and taking it as the end of the attempt drew the whole first screen,
-/// buttons and all, for the half second before the chat list arrived.
-/// It is neither. It is one refusal, and the offer is made again.
+/// Refused hand-over must leave page working. Silica drops a stack op mid-transition, and
+/// page asks from inside the push putting it up. Both misreadings shipped: as left = page
+/// hidden for good (blank); as end of attempt = whole first screen flashed before chat list.
+/// It is one refusal: offer made again.
 fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
@@ -378,9 +348,8 @@ fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation
     );
 }
 
-/// A phone that remembers a profile leaves for it without waiting to be
-/// told the core is ready: that wait is a process spawn and a round
-/// trip, and it showed as an empty screen before the chat list.
+/// Remembered profile leaves without core-ready wait (process spawn + round trip): that
+/// showed as empty screen before chat list.
 fn assert_remembered_profile_opens(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
@@ -412,8 +381,7 @@ fn assert_remembered_profile_opens(steps: &[(String, String)], navigation: &str)
     );
 }
 
-/// The page draws the mark, loaded, over the name, and the name is the
-/// app's own; and none of it before the core has answered.
+/// Page draws mark over app name once loaded; nothing before core.
 fn assert_first_screen(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
@@ -477,9 +445,7 @@ fn assert_first_screen(steps: &[(String, String)], navigation: &str) {
     );
 }
 
-/// A page stack that records where the page sent the reader, and can
-/// refuse -- which is what Silica's own does while a transition is
-/// running, including the push that puts the first page up.
+/// Stack records reader's destination; can refuse mid-transition.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct NoStack {
@@ -487,8 +453,7 @@ struct NoStack {
     /// `replaceAbove:ChatListPage.qml|`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// Drop what is asked for and hand back nothing, as a busy stack
-    /// does. Every refusal is still counted in `log`.
+    /// Drops request, returns nothing, like busy stack. Every refusal still counted in `log`.
     refusing: qt_property!(bool),
 
     replaceAbove: qt_method!(
@@ -517,7 +482,7 @@ impl NoStack {
         if self.refusing {
             QVariant::default()
         } else {
-            // Any object will do: the page only asks whether it got one.
+            // Any object will do: page only checks it got one.
             QString::from(name).to_qvariant()
         }
     }

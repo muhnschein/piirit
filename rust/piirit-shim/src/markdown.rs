@@ -1,34 +1,16 @@
-//! Markdown in a message, rendered.
+//! Markdown in messages, rendered to `Text.StyledText`.
 //!
-//! Delta Chat messages are plain text by convention and Markdown by
-//! habit: the other clients render `**bold**` and `` `code` `` and turn
-//! links blue, so a message written on one of them arrives here full of
-//! asterisks. Sailfish's Qt 5.6 has no Markdown of its own (`Text` learnt
-//! it in 5.14), so this is a small renderer for the subset people
-//! actually type -- emphasis, strikethrough, code, headings, links -- and
-//! nothing that needs a block model.
+//! Sailfish Qt 5.6 has no Markdown (`Text` got it in 5.14); other clients send it. Typed subset:
+//! emphasis, strikethrough, code, headings, links; no block model.
 //!
-//! What it emits is `Text.StyledText`, and what makes that safe is that
-//! it emits *only* what it chose to: every character of the message goes
-//! out escaped, and the handful of tags are the ones this file writes. A
-//! message body of `<img src="https://tracker/p.gif">` is why every label
-//! in the app is pinned to plain text (`tests/qml_syntax.rs`); here it
-//! stays a string of angle brackets. Links are the one thing
-//! that can reach the network, and only on a tap.
-//!
-//! Rendered or off, and nothing between: a third mode that took the
-//! markers out and kept the words would be a second way to not see the
-//! formatting, so the setting offers the two a reader can tell apart.
+//! Safe: every message char escaped; only tags are ours. `<img src="https://tracker/p.gif">`
+//! stays text (hence plain labels, `tests/qml_syntax.rs`). Links reach network only on tap.
+//! Rendered or off; no marker-stripping mode.
 
 use crate::links::url_spans;
 
-/// The message rendered as `Text.StyledText`: every character escaped,
-/// and the Markdown the reader wrote turned into the few tags Qt draws.
-///
-/// Line by line, because fences and headings are lines. A fence line is
-/// a marker and nothing else -- it opens or closes a block and is never
-/// shown, its language word included -- so it leaves no line behind: the
-/// block's tag goes on the line after it, or the line before.
+/// Message as `Text.StyledText`: escaped, Markdown to Qt tags. Line by line (fences, headings
+/// are lines).
 pub(crate) fn render(text: &str) -> String {
     let mut lines: Vec<String> = Vec::new();
     let mut fence = Fence::default();
@@ -54,32 +36,27 @@ pub(crate) fn render(text: &str) -> String {
     join_styled(&lines)
 }
 
-/// A line that is a fence marker: three backticks or tildes, with or
-/// without a language word after them.
+/// Fence marker: three backticks or tildes, optional language.
 fn is_fence(trimmed: &str) -> bool {
     trimmed.starts_with("```") || trimmed.starts_with("~~~")
 }
 
-/// Where the walk stands with respect to code blocks, between lines.
+/// Code-block state between lines.
 #[derive(Default)]
 struct Fence {
-    /// Inside a block: lines are code, escaped and never styled.
+    /// Inside block: escaped, never styled.
     inside: bool,
-    /// The next line drawn opens a block, and gets the tag in front.
+    /// Next drawn line opens a block.
     opening: bool,
 }
 
 impl Fence {
-    /// A fence line was read: a block opens or closes here.
-    ///
-    /// The closing tag goes on the line before, since the marker leaves
-    /// no line of its own -- unless nothing was drawn since the block
-    /// opened, in which case there is no block.
+    /// Fence line (language word too): never shown, leaves no line; block opens or closes.
+    /// Open tag goes on next line, close on line before. Nothing drawn since open: no block.
     fn cross(&mut self, lines: &mut [String]) {
         if !self.inside {
             self.opening = true;
         } else if self.opening {
-            // A block with nothing in it is no block at all.
             self.opening = false;
         } else {
             close_block(lines);
@@ -87,7 +64,7 @@ impl Fence {
         self.inside = !self.inside;
     }
 
-    /// The text ended: a block that was never closed is still a block.
+    /// Text ended: unclosed block still closes.
     fn finish(&self, lines: &mut [String]) {
         if self.inside && !self.opening {
             close_block(lines);
@@ -95,27 +72,15 @@ impl Fence {
     }
 }
 
-/// End the block on the last line drawn.
+/// End block on last line drawn.
 fn close_block(lines: &mut [String]) {
     if let Some(last) = lines.last_mut() {
         last.push_str("</pre>");
     }
 }
 
-/// The rendered lines, joined so that each one is drawn on a line.
-///
-/// A newline is not a line break in `Text.StyledText`: it is whitespace,
-/// like a space, so a body joined with newlines is drawn as one running
-/// paragraph however it was typed. Every line break in a message went
-/// that way -- a to-do list arrived as a single sentence -- which is
-/// what `<br>` is for.
-///
-/// Except where Qt breaks the line itself. `<pre>` keeps the newlines
-/// inside it *and* starts a line of its own, and `</pre>` ends one, so a
-/// `<br>` at either edge of a code block would leave a blank line
-/// behind. Measured rather than assumed: `qml_message_lines.rs` puts
-/// each of these shapes through a `Text` and counts the lines it comes
-/// out as.
+/// Lines joined with `<br>` (newline is whitespace in `Text.StyledText`), none at `<pre>`: Qt
+/// breaks there, `<br>` adds blank line. Checked by `qml_message_lines.rs`.
 fn join_styled(lines: &[String]) -> String {
     let mut out = String::new();
     let mut in_pre = false;
@@ -132,9 +97,9 @@ fn join_styled(lines: &[String]) -> String {
             continue;
         };
         if closes || next.starts_with("<pre>") {
-            // The tag is the break.
+            // Tag is the break.
         } else if in_pre {
-            // Inside a block, where a newline is a newline.
+            // In block: newline kept.
             out.push('\n');
         } else {
             out.push_str("<br>");
@@ -143,9 +108,9 @@ fn join_styled(lines: &[String]) -> String {
     out
 }
 
-/// One line outside a code block: a heading, or ordinary text.
+/// One line outside code: heading or text.
 fn block(line: &str, trimmed: &str, out: &mut String) {
-    // A heading: one to six hashes, a space, the text.
+    // Heading: 1-6 hashes, space, text.
     let hashes = trimmed.bytes().take_while(|byte| *byte == b'#').count();
     let heading = trimmed
         .get(hashes..)
@@ -161,8 +126,7 @@ fn block(line: &str, trimmed: &str, out: &mut String) {
     inline(line, out);
 }
 
-/// The characters `StyledText` reads as markup, escaped; everything else as
-/// it is.
+/// Chars `StyledText` reads as markup, escaped.
 fn push_escaped(out: &mut String, text: &str) {
     for c in text.chars() {
         match c {
@@ -175,19 +139,15 @@ fn push_escaped(out: &mut String, text: &str) {
     }
 }
 
-/// One line of ordinary text: emphasis, code, links, and everything else
-/// escaped.
+/// One line of text: emphasis, code, links, rest escaped.
 fn inline(line: &str, out: &mut String) {
     let mut links = url_spans(line).into_iter().peekable();
     let mut at = 0;
     let mut searches = Searches::default();
     while let Some(rest) = line.get(at..).filter(|rest| !rest.is_empty()) {
-        // The links are in order and `at` only moves forward, so one that
-        // other markup has already taken in is passed for good, rather
-        // than every link searched again at every character.
+        // Links in order; `at` only grows.
         while links.next_if(|(start, _)| *start < at).is_some() {}
-        // A bare link, as it stands. Its own characters are never markup,
-        // so a `_` in a path is a `_` and not an italic.
+        // Link chars never markup: `_` in path stays.
         if let Some((_, end)) = links.next_if(|(start, _)| *start == at) {
             if let Some(url) = line.get(at..end) {
                 push_link(out, url, url);
@@ -195,7 +155,7 @@ fn inline(line: &str, out: &mut String) {
                 continue;
             }
         }
-        // A backslash escapes the marker after it.
+        // Backslash escapes next marker.
         if let Some(after) = rest.strip_prefix('\\') {
             if let Some(next) = after.chars().next() {
                 if "\\`*_~[]()#".contains(next) {
@@ -212,7 +172,6 @@ fn inline(line: &str, out: &mut String) {
             at = at.saturating_add(consumed);
             continue;
         }
-        // Whatever it is, one character of it, escaped.
         let Some(c) = rest.chars().next() else {
             break;
         };
@@ -221,20 +180,17 @@ fn inline(line: &str, out: &mut String) {
     }
 }
 
-/// `` `code` ``: the contents are shown as typed, markers and all.
+/// `` `code` ``: shown as typed, markers and all.
 fn code_span(rest: &str, out: &mut String) -> Option<usize> {
     let inner = rest.strip_prefix('`')?;
     let (code, _) = inner.split_once('`').filter(|(code, _)| !code.is_empty())?;
     out.push_str("<tt>");
     push_escaped(out, code);
     out.push_str("</tt>");
-    // The code and its two backticks.
     Some(code.len().saturating_add(2))
 }
 
-/// `[text](https://...)`: the text is shown, the link is followed on a
-/// tap. Only web and mail links: a `file:` or `javascript:` one is not
-/// something a message gets to open.
+/// `[text](https://...)`: text shown, link on tap. Web and mail only; no `file:`, `javascript:`.
 fn link_span(line: &str, at: usize, searches: &mut Searches, out: &mut String) -> Option<usize> {
     if !line.get(at..)?.starts_with('[') {
         return None;
@@ -256,8 +212,7 @@ fn link_span(line: &str, at: usize, searches: &mut Searches, out: &mut String) -
     if text.is_empty() {
         return None;
     }
-    // The URL without the spaces in front. Past its end when there is
-    // nothing but spaces, and then there is no URL.
+    // Skip leading spaces; none left: no URL.
     let url_from = searches.url.find(url_start, |from| {
         next_char(line, from, |c| !c.is_whitespace())
     })?;
@@ -265,11 +220,8 @@ fn link_span(line: &str, at: usize, searches: &mut Searches, out: &mut String) -
     if !(url.starts_with("https://") || url.starts_with("http://") || url.starts_with("mailto:")) {
         return None;
     }
-    // A space inside the URL, rather than after it, and it is not one.
-    // Found as the first space with something other than spaces after it
-    // before the `)`, rather than by reading the URL through: a line of
-    // `[x](https://` repeated has a URL that runs on past every one of
-    // them, and reading it once for each would read it over and over.
+    // Word after space inside URL: no link. Remembered: rereading per opener is quadratic on
+    // repeated `[x](https://`.
     let space = searches
         .space
         .find(url_from, |from| next_char(line, from, char::is_whitespace))
@@ -283,7 +235,6 @@ fn link_span(line: &str, at: usize, searches: &mut Searches, out: &mut String) -
         }
     }
     push_link(out, url.trim_end(), text);
-    // The text and the URL as typed, and the `[`, `](` and `)` around them.
     Some(text.len().saturating_add(url_typed.len()).saturating_add(4))
 }
 
@@ -295,8 +246,7 @@ fn push_link(out: &mut String, url: &str, text: &str) {
     out.push_str("</a>");
 }
 
-/// The emphasis markers and the tags they become, doubled ones first, so
-/// that `**` is read as bold before `*` can be read as italic.
+/// Emphasis markers and tags; doubled first, so `**` beats `*`.
 const MARKERS: [(&str, &str); 5] = [
     ("**", "b"),
     ("__", "b"),
@@ -305,9 +255,8 @@ const MARKERS: [(&str, &str); 5] = [
     ("_", "i"),
 ];
 
-/// `**bold**`, `__bold__`, `*italic*`, `_italic_`, `~~struck~~`. The
-/// underscore forms only at word boundaries, so `snake_case_names` stay
-/// as written; the others whenever the marker hugs its text.
+/// `**bold**`, `__bold__`, `*italic*`, `_italic_`, `~~struck~~`. Underscores only at word edges:
+/// `snake_case_names` stays.
 fn emphasis_span(
     line: &str,
     at: usize,
@@ -324,8 +273,7 @@ fn emphasis_span(
         return None;
     }
     let inner = rest.strip_prefix(marker)?;
-    // The text has to start right after the marker, and end right before
-    // the closing one: `a * b * c` is arithmetic, not italics.
+    // Text hugs markers: `a * b * c` is arithmetic.
     if inner.starts_with(char::is_whitespace) || inner.is_empty() {
         return None;
     }
@@ -339,7 +287,6 @@ fn emphasis_span(
     if text.ends_with(char::is_whitespace) {
         return None;
     }
-    // Both markers and the text between them.
     let end = close.saturating_add(marker.len());
     if underscore && is_word(line.get(end..)?.chars().next()) {
         return None;
@@ -354,10 +301,8 @@ fn emphasis_span(
     Some(end.saturating_sub(at))
 }
 
-/// Where `marker` closes text that starts at `start` in `line`, skipping
-/// a marker that would leave the text empty. A one-character marker must
-/// not match the first half of a doubled one, so `*a **b** c*` closes at
-/// the lone star.
+/// Where `marker` closes text at `start`, skipping one leaving text empty. Single never matches
+/// half a doubled one: `*a **b** c*` closes at lone star.
 fn find_closer(line: &[u8], start: usize, marker: &[u8]) -> Option<usize> {
     let single = marker.len() == 1;
     let mut from = start;
@@ -379,65 +324,50 @@ fn find_closer(line: &[u8], start: usize, marker: &[u8]) -> Option<usize> {
     }
 }
 
-/// Whether a character is part of a word, so an underscore beside it is
-/// part of the word too.
+/// Word char: underscore beside it joins the word.
 fn is_word(c: Option<char>) -> bool {
     c.is_some_and(char::is_alphanumeric)
 }
 
-/// Where the next `byte` is in `line`, from `from` on.
+/// Next `byte` in `line` from `from`.
 fn next_byte(line: &[u8], from: usize, byte: u8) -> Option<usize> {
     let offset = line.get(from..)?.iter().position(|b| *b == byte)?;
     Some(from.saturating_add(offset))
 }
 
-/// Where the next character that is `wanted` is in `line`, from `from`
-/// on.
+/// Next char matching `wanted` from `from`.
 fn next_char(line: &str, from: usize, wanted: impl Fn(char) -> bool) -> Option<usize> {
     let (offset, _) = line.get(from..)?.char_indices().find(|(_, c)| wanted(*c))?;
     Some(from.saturating_add(offset))
 }
 
-/// What the walk along one line has looked for so far.
-///
-/// Every opener that turns out not to be one asks where its closer is,
-/// and the answer for one is often the answer for the next: in
-/// `a__a__a__...` each `_` asks where the next lone `_` is, and on a line
-/// of `[` each asks where the next `]` is. Asked afresh each time, that
-/// was a read to the end of the line for every opener on it -- half a
-/// second for twelve kilobytes of `a__`. Remembered, the line is read
-/// about once for each question.
+/// Searches along one line, remembered: repeat openers read once.
 #[derive(Default)]
 struct Searches {
-    /// Where each kind of emphasis closes, in the order of `MARKERS`.
+    /// Closer for each emphasis kind, in `MARKERS` order.
     closers: [Seek; 5],
-    /// The next `]`, the end of a link's text.
+    /// Next `]`: end of link text.
     bracket: Seek,
-    /// The next `)`, the end of its URL.
+    /// Next `)`: end of URL.
     paren: Seek,
-    /// The next character that is not a space, where the URL starts.
+    /// Next non-space: URL start.
     url: Seek,
-    /// The next space from there.
+    /// Next space from there.
     space: Seek,
-    /// The next character after that space that is not one.
+    /// Next non-space after that space.
     after_space: Seek,
 }
 
-/// One search along a line, and the last answer it gave.
-///
-/// The next of something from here is also the next of it from anywhere
-/// between here and where it was found -- or from anywhere at all past
-/// here, if nothing was. The walk only moves forward, so asking again
-/// only reads past the last answer.
+/// One search with last answer: also next match from anywhere up to it (past here, if none).
+/// Walk only forward: re-asking reads only past last answer.
 #[derive(Default)]
 struct Seek {
-    /// Where the last search started, and what it found.
+    /// Where last search started, and its result.
     last: Option<(usize, Option<usize>)>,
 }
 
 impl Seek {
-    /// The first place from `from` on that `search` finds, read again
-    /// only if the last answer does not hold for here.
+    /// First place from `from` that `search` finds; reuses a held answer.
     fn find(&mut self, from: usize, search: impl FnOnce(usize) -> Option<usize>) -> Option<usize> {
         if let Some((start, found)) = self.last {
             if start <= from && !found.is_some_and(|found| found < from) {
@@ -447,7 +377,7 @@ impl Seek {
         self.search(from, search)
     }
 
-    /// The first place from `from` on that `search` finds, read afresh.
+    /// First place from `from` that `search` finds.
     fn search(
         &mut self,
         from: usize,
@@ -458,16 +388,8 @@ impl Seek {
         found
     }
 
-    /// Where `marker` closes text that starts at `start`: `find_closer`,
-    /// remembered.
-    ///
-    /// That is not quite a search for the next of something: it skips a
-    /// marker at `start` itself, and it steps over doubled markers two at
-    /// a time, so from inside a run of them it would pair them up
-    /// differently. From anywhere that is not a marker character, though,
-    /// it passes the same places in the same way as a search from earlier
-    /// on that got that far, and so finds what that one found. From a
-    /// marker character it reads afresh.
+    /// `find_closer`, remembered. Not plain next-of (skips marker at `start`, steps doubled in
+    /// pairs), but from non-marker char matches earlier search; from marker: read afresh.
     fn closer(&mut self, line: &[u8], start: usize, marker: &[u8]) -> Option<usize> {
         let search = |from| find_closer(line, from, marker);
         if line.get(start) == marker.first() {
@@ -490,10 +412,9 @@ mod tests {
         );
         assert_eq!(render("__bold__ _it_"), "<b>bold</b> <i>it</i>");
         assert_eq!(render("say `a < b` here"), "say <tt>a &lt; b</tt> here");
-        // A line break is a `<br>`, not a newline: see `join_styled`.
+        // `<br>`, not newline: see `join_styled`.
         assert_eq!(render("# Title\nbody"), "<b>Title</b><br>body");
-        // And not at the edges of a code block, whose own tags break the
-        // line.
+        // Not at code block edges: its tags break the line.
         assert_eq!(render("```\nx = 1\n```\nafter"), "<pre>x = 1</pre>after");
         assert_eq!(
             render("before\n```rust\nlet x;\n```"),
@@ -501,23 +422,16 @@ mod tests {
         );
         assert_eq!(render("```\n```\nx"), "x");
         assert_eq!(render("```\nopen"), "<pre>open</pre>");
-        // Nested: the inner markers still count.
         assert_eq!(render("**bold *and* more**"), "<b>bold <i>and</i> more</b>");
     }
 
     #[test]
     fn every_line_of_a_message_is_drawn_on_a_line_of_its_own() {
-        // The bug this is for: a newline is whitespace in
-        // `Text.StyledText`, so a body joined with newlines was drawn as
-        // one running paragraph -- a to-do list arrived as a sentence.
+        // Bug: to-do lines ran together.
         assert_eq!(render("one\ntwo\nthree"), "one<br>two<br>three");
-        // A blank line is a blank line: two breaks, not a collapsed one.
         assert_eq!(render("one\n\nthree"), "one<br><br>three");
-        // Inside a code block the newlines stay, because `<pre>` keeps
-        // them; around it there is no `<br>`, because its tags break the
-        // line themselves.
+        // Inside code, newlines stay; `<pre>` tags break outside.
         assert_eq!(render("a\n```\nx\ny\n```\nb"), "a<pre>x\ny</pre>b");
-        // Trailing and leading breaks are breaks too.
         assert_eq!(render("\nx\n"), "<br>x<br>");
     }
 
@@ -534,10 +448,7 @@ mod tests {
 
     #[test]
     fn openers_that_never_close_cost_one_read_of_the_line() {
-        // Every `_` here and every `[` asks where it closes, and nothing
-        // does. Each used to read to the end of the line to find that
-        // out: twenty kilobytes of `a__` took over a second in a release
-        // build, and longer still in a debug one.
+        // Unclosed openers each read to line end: slow.
         let underscores = "a__".repeat(7000);
         assert_eq!(render(&underscores), underscores);
         let brackets = "[".repeat(20_000);
@@ -548,8 +459,7 @@ mod tests {
 
     #[test]
     fn a_closer_found_for_one_opener_is_the_right_one_for_the_next() {
-        // The searches are remembered along the line; these are the
-        // shapes where an earlier answer could be the wrong one later.
+        // Remembered searches: where an old answer would go wrong.
         assert_eq!(render("a__b _c_ d_"), "a__b <i>c</i> d_");
         assert_eq!(render("_a_b _c_"), "_a_b <i>c</i>");
         assert_eq!(render("a __b__ __c d__"), "a <b>b</b> <b>c d</b>");
@@ -578,7 +488,6 @@ mod tests {
             render("[mail](mailto:a@example.org)"),
             "<a href=\"mailto:a@example.org\">mail</a>"
         );
-        // Not followed: anything that is not a web or a mail link.
         assert_eq!(
             render("[x](javascript:alert(1))"),
             "[x](javascript:alert(1))"
@@ -588,20 +497,17 @@ mod tests {
 
     #[test]
     fn markup_in_a_message_stays_text() {
-        // The reason every label in the app is plain text: a tracking
-        // pixel in a body must not fetch anything when its row is drawn.
+        // Labels plain: tracking pixels must not fetch on draw.
         let rendered = render("<img src=\"https://tracker/p.gif\"> & <a href=\"x\">y</a>");
         assert!(!rendered.contains("<img"), "{rendered}");
         assert!(!rendered.contains("<a href=\"x\""), "{rendered}");
-        // The address inside is still a link -- followed on a tap, and
-        // fetched by nothing else.
+        // Address still a link: followed on tap only.
         assert_eq!(
             rendered,
             "&lt;img src=&quot;<a href=\"https://tracker/p.gif\">https://tracker/p.gif</a>&quot;&gt; \
              &amp; &lt;a href=&quot;x&quot;&gt;y&lt;/a&gt;"
         );
         assert_eq!(render("<b>plain</b>"), "&lt;b&gt;plain&lt;/b&gt;");
-        // The same inside code and inside a link's text.
         assert_eq!(render("`<b>`"), "<tt>&lt;b&gt;</tt>");
         assert_eq!(
             render("[<i>](https://example.org/?a=1&b=2)"),
@@ -611,12 +517,11 @@ mod tests {
 
     #[test]
     fn many_links_on_one_line_are_each_found_once() {
-        // Every character used to search every link: seconds for this.
+        // Used to search every link per char: seconds.
         let line = "https://a.example/ ".repeat(20_000);
         let rendered = render(&line);
         assert_eq!(rendered.matches("<a href=").count(), 20_000);
-        // A link inside a code span stays code, and the next one is
-        // still a link.
+        // Link in code span stays code; next still a link.
         assert_eq!(
             render("`https://a.example/` https://b.example/"),
             "<tt>https://a.example/</tt> \

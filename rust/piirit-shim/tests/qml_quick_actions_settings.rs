@@ -1,21 +1,13 @@
-//! The cover's quick actions in the settings: on the settings page, one
-//! row under Advanced, beside the webxdc switch, opening the page they
-//! are set up on; on that page, a short word on what they are, then two
-//! pictures of the cover to choose between -- room for one action, or for
-//! two -- then what each action does.
+//! Cover quick actions in settings: one row under Advanced, opening their page. That page:
+//! what they are, two cover pictures (room for one or two), then what each does.
 //!
-//! Each writes what it does to the settings, and shows what the settings
-//! hold; the pictures show it too, redrawn as it changes. A chat is picked
-//! on the chat picker, and the action becomes a chat's only once one has
-//! been picked; the choice then says which chat by the name the core has
-//! for it now, lets the icon be chosen, and says so when the chat has been
-//! deleted since. The chat can be any profile's: the picker opens on the
-//! one the action's chat is in, and the chat is whichever profile's it
-//! was picked from. Under one of the camera's actions -- a photo or a
-//! video, back or front -- and only there, a switch says whether what it
-//! takes is sent at once; off unless turned on, which asks first, off
-//! again whenever an action is chosen, and each side's own. With
-//! room for one, the right action is hidden and kept.
+//! Each writes its choice and shows what settings hold; pictures redraw. A chat is picked on
+//! the chat picker; the action is a chat's only once picked, named by core's current name,
+//! icon choosable, and says so if deleted since. Chat may be any profile's: picker opens on
+//! the action's chat's profile; chat is whichever profile's it was picked from. Camera
+//! actions only: a switch says whether the item is sent at once; off unless turned on
+//! (asks first), off again whenever an action is chosen; per side. Room for one: right
+//! action hidden and kept.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -33,8 +25,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in; see
-/// `qml_general_settings.rs`.
+/// Probe, components dir filled in; see `qml_general_settings.rs`.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -237,8 +228,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The camera's actions: the kind, what the choice says for it, and the
-/// step it is recorded under.
+/// Camera actions: kind, what the choice says for it, and recording step.
 const CAMERA_KINDS: [(&str, &str, &str); 4] = [
     ("photo", "Photo", "camera-photo"),
     ("video", "Video", "camera-video"),
@@ -253,12 +243,11 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         std::env::temp_dir().join(format!("piirit-qml-quick-settings-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Two profiles, so an action's chat can be the other one's.
+        // Two profiles: an action's chat can be the other one's.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
@@ -308,7 +297,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         };
     }
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("clear", call!("clear"));
         record!(
@@ -316,9 +305,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
 
-        // On the settings page: one row under Advanced, then the webxdc
-        // and calls switches, and nothing after; no heading of their own
-        // any more.
+        // Settings page: one row under Advanced, then webxdc and calls switches; nothing after.
         record!(
             "under-advanced",
             call!("underHeading", QString::from("Advanced"))
@@ -347,8 +334,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             )
         );
 
-        // On their page: the word on what they are, the pictures, then
-        // the actions.
+        // Their page: word on what they are, pictures, then actions.
         record!(
             "after-header",
             call!("after", QString::from("quickActionsHeader"))
@@ -367,8 +353,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
         record!("words", get!("quickActionsExplained", "text"));
 
-        // A phone that has never been asked: room for one, and that one
-        // none.
+        // Never-asked phone: room for one, that one none.
         record!("one-chosen", get!("oneActionPreview", "selected"));
         record!("two-unchosen", get!("twoActionsPreview", "selected"));
         record!("one-label", get!("leftActionChoice", "label"));
@@ -381,8 +366,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("previewIcon", QString::from("oneActionPreview"), 0)
         );
 
-        // The kinds that need nothing more are written on the tap, and the
-        // pictures follow.
+        // Kinds needing nothing more are written on tap; pictures follow.
         record!("pick-search", click!("leftAction-search"));
         record!("left-search", call!("holds", QString::from("left")));
         record!("left-search-says", get!("leftActionChoice", "value"));
@@ -399,7 +383,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("previewIcon", QString::from("twoActionsPreview"), 1)
         );
 
-        // Room for two: the other picture chosen, a left and a right.
+        // Room for two: other picture chosen, left and right.
         record!("choose-two", click!("twoActionsPreview"));
         record!("count-two", call!("count"));
         record!("two-chosen", get!("twoActionsPreview", "selected"));
@@ -418,7 +402,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("pick-none", click!("rightAction-none"));
         record!("right-none-again", call!("holds", QString::from("right")));
         record!("right-none-shown", get!("rightActionChoice", "value"));
-        // The profiles, with their own icon.
+        // Profiles, with own icon.
         record!("pick-profiles", click!("rightAction-profiles"));
         record!("right-profiles", call!("holds", QString::from("right")));
         record!("right-profiles-shown", get!("rightActionChoice", "value"));
@@ -426,10 +410,9 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             "two-right-profiles",
             call!("previewIcon", QString::from("twoActionsPreview"), 1)
         );
-        // No switch to send at once under an action that takes nothing.
+        // No send-at-once switch under an action taking nothing.
         record!("qr-switch", get!("rightActionSendNow", "visible"));
-        // The camera's four, each written on the tap with the switch under
-        // it, off until it is turned on.
+        // Camera's four, each written on tap with its switch, off until turned on.
         for (kind, label) in CAMERA_KINDS.map(|(kind, _, label)| (kind, label)) {
             let item = format!("rightAction-{kind}");
             let held = call!("click", QString::from(item.as_str()));
@@ -443,8 +426,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             );
             record!(label, held);
         }
-        // Turned on for this side only, once the reader has been told
-        // what a chat tapped by mistake gets, and has said go ahead.
+        // On for this side only, once reader is told what a chat tapped by mistake gets and says
+        // go ahead.
         record!("send-now-on", click!("rightActionSendNow"));
         record!(
             "send-now-asked",
@@ -466,7 +449,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             )
         );
         record!("left-switch", get!("leftActionSendNow", "visible"));
-        // Off again at once, with nothing asked.
+        // Off again at once, nothing asked.
         record!("send-now-off", click!("rightActionSendNow"));
         record!(
             "send-now-released",
@@ -477,8 +460,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
                 get!("rightActionSendNow", "checked")
             )
         );
-        // On again, and a camera action chosen anew -- the same one --
-        // starts off again.
+        // On again; camera action chosen anew (same one) starts off again.
         click!("rightActionSendNow");
         call!("accept");
         call!("stackLog");
@@ -492,7 +474,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
                 get!("rightActionSendNow", "checked")
             )
         );
-        // And so does any other action chosen.
+        // So does any other action chosen.
         click!("rightActionSendNow");
         call!("accept");
         call!("stackLog");
@@ -506,9 +488,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             )
         );
 
-        // A chat is asked for -- once the page of choices has gone and
-        // this one is on screen again -- and nothing changes until one is
-        // picked.
+        // Chat asked for once choices page is gone and this one is back on screen;
+        // nothing changes until picked.
         call!("setActive", QString::from("false"));
         record!(
             "pick-chat",
@@ -526,7 +507,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("picked", call!("pick", 2, QString::from("chat 2")));
         record!("left-chat", call!("holds", QString::from("left")));
         record!("picked-on", call!("onKind", QString::from("left")));
-        // Back from the picker, on screen again: not asked a second time.
+        // Back from picker: not asked twice.
         call!("setActive", QString::from("false"));
         call!("setActive", QString::from("true"));
         record!("asked-after-pick", call!("stackLog"));
@@ -537,7 +518,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("previewIcon", QString::from("twoActionsPreview"), 0)
         );
 
-        // Another icon, one of the later ones.
+        // Another icon, a later one.
         record!("pick-dog", click!("leftIcon-dog"));
         record!("left-dog", call!("holds", QString::from("left")));
         record!("dog-lit", get!("leftIcon-dog", "highlighted"));
@@ -548,8 +529,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
     });
 
-    // The chat by the name the core has for it, in the choice itself;
-    // then it goes.
+    // Chat by the name core has for it, in the choice; then it goes.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("chat-says", get!("leftActionChoice", "value"));
         record!("delete", call!("deleteChat", 1));
@@ -572,9 +552,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("gone-says", get!("leftActionChoice", "value"));
         record!("left-gone", call!("holds", QString::from("left")));
 
-        // A chat of the other profile: the picker opens on this one's,
-        // and is turned to the other's. Tapped while the page of choices
-        // is still going, it waits for it.
+        // Other profile's chat: picker opens on this one's, turned to the other's. Tapped while
+        // choices page still going, waits for it.
         call!("setBusy", QString::from("true"));
         record!(
             "pick-elsewhere",
@@ -593,8 +572,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("left-elsewhere", call!("holds", QString::from("left")));
     });
 
-    // By the name the other profile has for it; picked again, the picker
-    // opens on that profile.
+    // By the name other profile has; picked again, picker opens on that profile.
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("elsewhere-says", get!("leftActionChoice", "value"));
         record!(
@@ -606,7 +584,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     single_shot(Duration::from_millis(7500), move || unsafe {
         record!("asked-there", call!("stackLog"));
 
-        // Its profile deleted since: the picker opens on one there is.
+        // Its profile deleted since: picker opens on one there is.
         record!("orphan", call!("orphan", QString::from("left"), 9));
         record!(
             "pick-orphan",
@@ -617,7 +595,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("asked-orphan", call!("stackLog"));
 
-        // Back to room for one: the right hidden, and kept.
+        // Back to room for one: right hidden and kept.
         record!("choose-one", click!("oneActionPreview"));
         record!("count-one", call!("count"));
         record!("right-hidden-again", get!("rightQuickAction", "visible"));
@@ -652,7 +630,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "webxdcSwitch",
         "the webxdc switch is not under Advanced with them. {context}"
     );
-    // Calls had a switch here while they were experimental (#119).
+    // Calls had a switch here while experimental (#119).
     assert_eq!(
         value("after-webxdc"),
         "nothing",

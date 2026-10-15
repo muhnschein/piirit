@@ -1,23 +1,15 @@
-//! A chat's pictures, sounds, files and apps have pages of their own,
-//! reached from tiles on the contact's and the group's page.
+//! Chat pictures, sounds, files, apps: pages of their own, from tiles on contact and group pages.
 //!
-//! Loaded headlessly against the stub Silica module and the recording
-//! double, with the group seeded with one of each kind. What a headless
-//! run can check is the wiring: the gallery draws a tile per picture or
-//! video and a tap opens the page the conversation opens for that kind;
-//! the files list names a file and its size and keeps a copy, under the
-//! sender's name, where the reader saves files; the audio and apps lists draw the
-//! conversation's own rows, and a tap on an app runs it; a kind the chat
-//! has none of says so; and the tiles on both detail pages open the
-//! page for the kind that was tapped, with no Apps tile while apps are
-//! off.
+//! Headless vs stub Silica and recording double, group seeded with one of each kind. Checks wiring:
+//! gallery draws a tile per picture/video, tap opens the page the conversation opens for that kind;
+//! files list names file and size, keeps a copy under sender's name where reader saves files; audio
+//! and apps lists draw conversation's own rows, tap on app runs it; kind with none says so; tiles
+//! on both detail pages open page for tapped kind, no Apps tile while apps off.
 //!
-//! A long press on a tile or a row offers Show in chat and Delete. The
-//! first walks the page stack down to the conversation this page was
-//! opened over, tells it the message and pops to it; the stack here is a
-//! record that hands back a detail page that cannot be asked and then a
-//! conversation that can. The second waits out the platform's countdown
-//! and then asks the core, and the row is gone once the core has agreed.
+//! Long press on tile or row offers Show in chat and Delete. Show in chat walks stack down to the
+//! conversation this page was opened over, tells it the message, pops to it (stack here hands back
+//! a detail page that can't be asked, then a conversation that can). Delete waits out platform's
+//! countdown, then asks core; row gone once core agrees.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -26,8 +18,7 @@
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
@@ -39,13 +30,11 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: which page a
-/// tap opened, and which kind of media it was asked for.
+/// Silica's `pageStack`, recorded not performed: which page a tap opened, for which media kind.
 ///
-/// The pages under the media page are two objects the probe QML made
-/// and handed over -- a `QVariant` carries a QML object -- and
-/// `previousPage` answers with them in turn: first a detail page that
-/// cannot be asked to show a message, then the conversation, which can.
+/// Pages under media page are two objects probe QML made and handed over (a `QVariant` carries a
+/// QML object); `previousPage` answers with them in turn: first a detail page that can't be asked
+/// to show a message, then the conversation, which can.
 #[derive(QObject, Default)]
 #[allow(non_snake_case)]
 struct PageStackProbe {
@@ -53,15 +42,14 @@ struct PageStackProbe {
     /// `push:ChatMediaPage.qml(gallery)|push:PicturePage.qml()|pop|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// The contact's page under the media page, as the stack sees it.
+    /// Contact page under media page.
     detail: qt_property!(QVariant),
-    /// The conversation under that.
+    /// Conversation under that.
     chat: qt_property!(QVariant),
-    /// The dialog Delete leads to, which asks which kind of delete
-    /// this is: `push` hands it back the way Silica hands back the page
-    /// it made, and the test picks on it.
+    /// Delete dialog, asking which kind of delete: `push` hands it back as Silica hands back the
+    /// page it made, and test picks on it.
     chooser: qt_property!(QVariant),
-    /// How many steps down the current walk has taken.
+    /// Steps down so far.
     hops: qt_property!(u32),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap) -> QVariant),
     previousPage: qt_method!(fn(&mut self, page: QVariant) -> QVariant),
@@ -83,9 +71,8 @@ impl PageStackProbe {
             QString::from_qvariant(properties.value(QString::from("kind"), QVariant::default()))
                 .map(|kind| kind.to_string())
                 .unwrap_or_default();
-        // The delete dialog carries no kind; what it is asked with is
-        // whether the core would take a deletion for everyone of this
-        // message, which is all of it worth reading back.
+        // Delete dialog carries no kind; it's asked with whether core would take a deletion for
+        // everyone of this message, all of it worth reading back.
         let everyone = bool::from_qvariant(
             properties.value(QString::from("canDeleteForEveryone"), QVariant::default()),
         )
@@ -98,8 +85,7 @@ impl PageStackProbe {
         QVariant::default()
     }
 
-    /// The page below the one asked about: the detail page first, the
-    /// conversation under it, and nothing under that.
+    /// Page below: detail page first, conversation under it, nothing under that.
     fn previousPage(&mut self, _page: QVariant) -> QVariant {
         self.hops += 1;
         match self.hops {
@@ -214,12 +200,11 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-media-page-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // The file the fake says the group holds, so that a copy of it can
-    // be made.
+    // File fake says group holds, so a copy of it can be made.
     let fake_dir = std::path::Path::new("/tmp/piirit-fake");
     std::fs::create_dir_all(fake_dir).expect("create the fake's file dir");
-    // Under its hash, as the real core keeps a received file: the name
-    // the sender gave it is on the message, and a copy is to carry that.
+    // Under its hash, as real core keeps received file: sender's name is on message; copy carries
+    // it.
     std::fs::write(
         fake_dir.join("6f5902ac237024bdd0c176cb93063dc4.pdf"),
         b"%PDF-1.4 notes",
@@ -227,7 +212,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     .expect("write the fake pdf");
     let downloads = temp.join("Downloads");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -284,7 +269,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let tiles = common::component_url("MediaKinds.qml");
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
 
-    // The group's gallery: a picture and a video.
+    // Group gallery: picture, video.
     let page = media_page.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
@@ -303,7 +288,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("gallery-count", get!("media", "count"));
         record!("gallery-busy", get!("mediaBusy", "running"));
         record!("gallery-placeholder", get!("placeholder", "enabled"));
-        // Newest first: the video above the picture.
+        // Newest first.
         record!("first-tile", get!("mediaTile15", "objectName"));
         record!("second-tile", get!("mediaTile10", "objectName"));
         record!("video-thumb", get!("mediaTile15", "fileUrl"));
@@ -312,8 +297,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("picture-mark", get!("mediaTile10", "isVideo"));
         record!("open-picture", call!("click", QString::from("mediaTile10")));
         record!("open-video", call!("click", QString::from("mediaTile15")));
-        // Show in chat, from the video's tile: the conversation two
-        // pages down is told which message, and popped to.
+        // Show in chat from video tile: conversation two pages down told which message, popped to.
         record!("arm-stack", call!("armStack"));
         record!(
             "show-in-chat",
@@ -324,8 +308,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
             )
         );
         record!("shown-in-chat", call!("shownInChat"));
-        // Delete, from the picture's tile: the platform's countdown goes
-        // up over it, the row stays while it runs, and goes after.
+        // Delete from picture tile: countdown over it, row stays while it runs, goes after.
         record!("hurry", call!("hurry", 200));
         record!(
             "delete-picture",
@@ -335,8 +318,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
                 QString::from("deleteItem")
             )
         );
-        // Nothing is deleted on the tap: the page asks which kind of
-        // delete this is, and the wait starts on the answer.
+        // Delete kind asked before countdown.
         record!("countdown-before-pick", get!("mediaRemorse", "active"));
         record!("pick-delete", call!("pickDelete", false));
         record!("countdown-up", get!("mediaRemorse", "active"));
@@ -347,7 +329,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("count-after-delete", get!("media", "count"));
         record!("video-still-there", get!("mediaTile15", "objectName"));
-        // The files list: a document, named and sized.
+        // Files list: document, named, sized.
         record!(
             "load-files",
             call!(
@@ -370,10 +352,8 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("save", call!("click", QString::from("saveItem")));
     });
 
-    // The copy is made off the Qt thread, and the notice comes once it
-    // is: a turn of the event loop later at the least, so it is read
-    // here rather than straight after the tap. Before the next list is
-    // loaded, which takes down the page that would show it.
+    // Copy made off Qt thread; notice comes at least a loop turn later, so read here, not right
+    // after tap. Before next list loads, which takes down page that would show it.
     let page = media_page.clone();
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("saved-notice", get!("noticeLabel", "text"));
@@ -410,7 +390,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("apps-count", get!("media", "count"));
         record!("app-name", get!("webxdcName", "text"));
         record!("open-app", call!("click", QString::from("mediaRow14")));
-        // A chat with nothing of the kind.
+        // Chat with nothing of kind.
         record!(
             "load-empty",
             call!(
@@ -428,7 +408,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("empty-count", get!("media", "count"));
         record!("empty-placeholder", get!("placeholder", "enabled"));
         record!("empty-text", get!("placeholder", "text"));
-        // The tiles on the contact page, with apps off.
+        // Contact tiles, apps off.
         record!(
             "load-contact",
             call!("loadDetail", QString::from(page.clone()), 1)
@@ -442,14 +422,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("contact-apps", get!("appsTile", "objectName"));
         record!("contact-gallery", get!("galleryTile", "objectName"));
         record!("open-gallery", call!("click", QString::from("galleryTile")));
-        // The tiles on their own, with apps on.
+        // Tiles on own, apps on.
         record!(
             "load-tiles",
             call!("loadTiles", QString::from(tiles_url.clone()))
         );
         record!("tiles-apps", get!("appsTile", "objectName"));
         record!("tiles-apps-mark", get!("tileMark", "visible"));
-        // And on the group page.
+        // Group page too.
         record!(
             "load-group",
             call!("loadDetail", QString::from(page.clone()), 2)
@@ -477,8 +457,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let _ = std::fs::remove_dir_all(&temp);
 }
 
-/// What each page showed, what each tap opened, and what the core was
-/// asked.
+/// What each page showed, opened, asked.
 #[allow(clippy::too_many_lines)]
 fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Value)]) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
@@ -515,8 +494,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
 
-    // The gallery: both rows, newest first, each with its file, the
-    // video marked as one.
+    // Gallery: both rows, newest first, each with its file, video marked as one.
     for (label, expected, complaint) in [
         ("gallery-loaded", "true", "the gallery never loaded"),
         (
@@ -554,10 +532,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "the picture's tile does not show the picture. {context}"
     );
 
-    // Show in chat told the conversation two pages down which message,
-    // and the stack was popped to it; Delete put the platform's
-    // countdown up, kept the row while it ran, and the row went once
-    // the core had agreed, leaving the other tile where it was.
+    // Show in chat popped; Delete kept row until core agreed.
     for (label, expected, complaint) in [
         (
             "shown-in-chat",
@@ -565,9 +540,8 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "Show in chat did not tell the conversation which message",
         ),
         (
-            // Not "false" but nothing at all: the countdown is built the
-            // first time a tile asks for one, and the tap that asks is
-            // the answer from the page, not the menu entry.
+            // Missing, not "false": countdown built first time a tile asks for one, and the asking
+            // tap is page's answer, not menu entry.
             "countdown-before-pick",
             "missing:mediaRemorse",
             "Delete started a countdown before the reader had said which \
@@ -614,8 +588,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
          reader asked for it to go from their own phone. {context}"
     );
 
-    // The files list: the document, its size, its icon, who sent it, and
-    // a copy in Piirit's folder in Downloads.
+    // Files list: document, size, icon, sender, Downloads copy.
     for (label, expected, complaint) in [
         (
             "files-count",
@@ -641,8 +614,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "the row does not say who sent the file and when. {context}"
     );
 
-    // The audio list draws the conversation's own player row, and the
-    // apps list the app by the name the core read out of it.
+    // Audio: player row; apps: name from core.
     for (label, expected, complaint) in [
         (
             "audio-count",
@@ -655,9 +627,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "Voice message",
             "the voice message is not drawn as one",
         ),
-        // The length the message carries, said before anything has
-        // played: the player is not made until play is pressed, so it
-        // has none of its own to say.
+        // Message's length said before play: player not made until play pressed, so has none.
         (
             "audio-time",
             "0:00 / 0:04",
@@ -669,7 +639,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Nothing of a kind: loaded, empty, and said so.
+    // Nothing of kind: said so.
     for (label, expected, complaint) in [
         ("empty-loaded", "true", "an empty gallery never loaded"),
         ("empty-count", "0", "a chat with no pictures has some"),
@@ -687,8 +657,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // The tiles: on both detail pages, no Apps tile while apps are off,
-    // and one on the row that was told apps are on.
+    // Tiles on both detail pages: no Apps tile while apps off; one on row told apps are on.
     for (label, expected, complaint) in [
         (
             "contact-tiles",
@@ -716,10 +685,8 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Every tap opened what it should: a picture on the picture page, a
-    // video on the video page, an app on its own page, a tile the media
-    // page for its kind -- and Delete the dialog that asks which kind
-    // of delete it is, which is where the conversation asks as well.
+    // Each tap opened right page: picture/video/app page, tile's kind page, and Delete the dialog
+    // asking delete kind (as conversation asks too).
     assert_eq!(
         navigation,
         "push:PicturePage.qml()|push:VideoPage.qml()|pop|\
@@ -729,7 +696,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
          back to the conversation. {context}"
     );
 
-    // Each page asked the core for its own kinds of the chat's messages.
+    // Each page asked core for its kinds.
     let asked: Vec<Value> = calls
         .iter()
         .filter(|(name, _)| name == "get_chat_media")

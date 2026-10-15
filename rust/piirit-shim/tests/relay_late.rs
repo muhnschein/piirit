@@ -1,12 +1,8 @@
-//! A relay given up on that answers after all.
+//! Relay answering after Cancel: kept, not announced.
 //!
-//! Cancel stops the core's process on the profile and stops waiting for
-//! the answer. A relay that answers anyway -- the double's `deaf` relay,
-//! which is what a stop that came too late looks like -- has added
-//! itself to the profile, and the profile is the reader's: the relay is
-//! kept, for the profile page to list and its remove to take off again,
-//! rather than the profile being removed for it as a cancelled signup's
-//! is. Nothing is signalled for it either way.
+//! Cancel stops core process and waiting. Late answer (`deaf` double) still adds
+//! the relay. It belongs to the profile: kept for page to list/remove; profile
+//! not removed as for a cancelled signup. Nothing signalled.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The page, and beside it the profile's relays as the shim lists them,
-/// and a count of what the shim signalled.
+/// Page, profile relays, signal count.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
@@ -33,10 +28,8 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
 
-        // Silica's `pageStack`, recorded rather than performed. In QML
-        // rather than as a QObject on the Rust side, since a page loaded
-        // by a Loader reads `pageStack` off the file the Loader was
-        // declared in.
+        // Silica's `pageStack`, recorded not performed. In QML, not a QObject:
+        // a Loader-loaded page reads `pageStack` off the file it was declared in.
         property QtObject pageStack: QtObject {
             property string log: ''
             function pop() { log = log + 'pop|' }
@@ -82,12 +75,12 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function pageProperty(property) { return '' + loader.item[property] }
-        // Made before the core was up, the list has to be asked for.
+        // Made before core was up; the list has to be asked for.
         function refresh() { transports.reload(); return 'ok' }
         function listed() { return transports.count + ':' + transports.primary }
         function signalled() { return added + '/' + errors }
         function navigation() { return probe.pageStack.log }
-        // No profile to add to: refused here, before the core is asked.
+        // No profile to add to: refused here, before core is asked.
         function nowhere() { core.add_relay(0, 'dcaccount:nine.testrun.org'); return 'ok' }
     }
 ";
@@ -99,14 +92,13 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // Three seconds, then an answer whatever was said meanwhile.
+        // 3s, then answers whatever was said meanwhile.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "3000");
     }
 
@@ -158,7 +150,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         record!("refresh", call!("refresh"));
     });
 
-    // 2s: the deaf relay asked, and given up on at once.
+    // 2s: deaf relay asked; given up at once.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("before", call!("listed"));
         record!(
@@ -176,7 +168,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         record!("nowhere", call!("nowhere"));
     });
 
-    // 7s: the relay answered at five, to nobody.
+    // 7s: relay answered at 5s, to nobody.
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(

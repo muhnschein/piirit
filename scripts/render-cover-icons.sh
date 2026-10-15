@@ -1,16 +1,12 @@
 #!/bin/sh
-# Render the quick action icons, icons/cover/*.svg, into the PNGs the cover
-# hands to the home screen: qml/art/cover/<name>-<size>-<ink>.png.
+# Render cover quick action icons/cover/*.svg to
+# qml/art/cover/<name>-<size>-<ink>.png. Home screen draws them from file, so
+# each must come at shown size and colour: one per icon size
+# (Theme.iconSizeSmall, 32 at 1.0 to 64 at 2.0), white for dark ambience, black
+# for light. Cover picks file: qml/js/QuickActions.js.
 #
-# The home screen draws a cover action's icon itself, from a file it reads,
-# so the picture has to arrive at the size and in the colour it is shown
-# in: one per icon size Sailfish scales to (Theme.iconSizeSmall, 32 at
-# 1.0 up to 64 at 2.0), in white for a dark ambience and black for a light
-# one. The cover picks the file; see qml/js/QuickActions.js.
-#
-# The sources draw in white; the black ones are the same file recoloured.
-# Needs rsvg-convert (Debian's librsvg2-bin). What it writes is committed,
-# so neither the build nor CI runs this.
+# Sources white; black = recoloured copy. Needs rsvg-convert (librsvg2-bin).
+# Output committed: build and CI don't run this.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)

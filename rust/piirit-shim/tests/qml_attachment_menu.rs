@@ -1,23 +1,12 @@
 //! Opening a received file, and keeping it.
 //!
-//! A tap on a message opens whatever it carries. The long press has
-//! both in words: Open, and Save -- the copy being the thing a tap
-//! cannot ask for, and the reason a file somebody sent stays theirs
-//! rather than the chat's. What this pins is that both are offered on a
-//! message that carries a file, that neither is offered on one that does
-//! not, and that each says which file it means.
+//! Tap opens what message carries. Long press offers Open and Save; Save keeps a sent file the
+//! reader's. Pinned: both offered on message with file, neither without; each names its file.
 //!
-//! A webxdc app is the one file Open does not mean: where apps are on it
-//! is run rather than handed over, so the offer is not there. Where they
-//! are off there is nothing to run, and the .xdc is offered like the
-//! note. Save is offered either way -- an app somebody sent is still a
-//! file the reader can keep. What a tap does with one is
-//! `qml_row_tap.rs`.
+//! Webxdc app: no Open where apps are on (run, not handed over); off, .xdc offered like a note.
+//! Save always offered. Tap: `qml_row_tap.rs`.
 //!
-//! A picture and a video are the other exception, and to both offers: a
-//! tap opens each on a page of the app's own, whose pull-down carries
-//! Open and Save already, so the menu offering them again was two ways
-//! to the same two things.
+//! Picture and video: no menu offers; their page's pull-down already has Open and Save.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -201,7 +190,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -252,7 +241,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         record!("words-save", call!("offered", 1, QString::from("saveItem")));
         record!("picked-open", call!("pick", 0, QString::from("openItem")));
         record!("picked-save", call!("pick", 0, QString::from("saveItem")));
-        // The .xdc, with apps off: a file, and both offers.
+        // .xdc, apps off: a file, both offers.
         record!(
             "xdc-open-off",
             call!("offered", 2, QString::from("openItem"))
@@ -265,8 +254,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // And with apps on: still the reader's to keep, but not Open --
-        // a tap on the row runs it.
+        // Apps on: still keepable, no Open; tap on row runs it.
         record!(
             "xdc-open-on",
             call!("offered", 2, QString::from("openItem"))
@@ -275,8 +263,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
             "xdc-save-on",
             call!("offered", 2, QString::from("saveItem"))
         );
-        // A picture and a video: neither offer, since the page a tap
-        // opens has both on its pull-down.
+        // Picture and video: neither offer; their page has both.
         record!(
             "picture-open",
             call!("offered", 3, QString::from("openItem"))

@@ -1,17 +1,12 @@
-//! The line that says a video is being made smaller fits a phone in every
-//! language, with its number in sight.
+//! Video-shrinking line fits a phone in every language, number in sight.
 //!
-//! The number at its end is the only part that changes, so a line that
-//! fades out before it says nothing. While the video is made smaller the
-//! bar wraps its line instead of cutting it, and every catalog's wording
-//! has to fit in two lines of the width the bar leaves it.
+//! Number at end is the only changing part; a faded line says nothing. While shrinking,
+//! bar wraps, not cuts. Every catalog's wording must fit two lines.
 //!
-//! The width is measured at the proportions of a Jolla phone at a pixel
-//! ratio of one -- 540 wide, the label at `Theme.fontSizeExtraSmall` (24),
-//! with the page margins, the stop button and the padding between taken
-//! off, as `AttachmentBar.qml` does. Every phone since scales all of those
-//! together. The text is set in `DejaVu Sans`, which is wider than Sailfish's
-//! own face, so what fits here fits there.
+//! Width measured at Jolla proportions, pixel ratio 1: 540 wide, label 24
+//! (`Theme.fontSizeExtraSmall`),
+//! margins, stop button, padding removed (`AttachmentBar.qml`). Other phones scale together.
+//! Text in `DejaVu Sans`, wider than Sailfish face: fits here, fits there.
 
 // Qt harness: see qml_send_file.rs.
 #![allow(
@@ -33,8 +28,7 @@ mod common;
 /// What `AttachmentBar.qml` asks for, as lupdate filed it.
 const SOURCE: &str = "Making video smaller for sending: %1%";
 
-/// 540, less the margin on each side (24), the stop button (64) and the
-/// padding before it (12).
+/// 540 less margin each side (24), stop button (64), padding (12).
 const LABEL_WIDTH: u32 = 540 - 24 - 64 - 24 - 12;
 const FONT_PIXELS: u32 = 24;
 
@@ -80,7 +74,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Each catalog's translation of `SOURCE`, by language.
+/// Each catalog's `SOURCE` translation.
 fn translations() -> Vec<(String, String)> {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../translations");
     let mut found = Vec::new();
@@ -106,8 +100,7 @@ fn translations() -> Vec<(String, String)> {
                 body.find("</translation>")
                     .map(|end| body[..end].to_string())
             })
-            // English has no translation of its own: the source is the
-            // text.
+            // English: no own translation; source is the text.
             .unwrap_or_else(|| SOURCE.to_string());
         found.push((language.to_string(), translated.replace("&amp;", "&")));
     }
@@ -124,7 +117,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
         wanted.len()
     );
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -154,7 +147,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
 
     single_shot(Duration::from_millis(200), move || unsafe {
         for (language, text) in &texts {
-            // The widest the number gets.
+            // Widest the number gets.
             let shown = text.replace("%1", "100");
             let lines = (*engine_ptr).invoke_method(
                 "lines".into(),
@@ -193,8 +186,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
          (language, lines): {too_long:?}. All: {measured:?}"
     );
 
-    // The bar itself: wrapped and whole while the video is made smaller,
-    // and as tall as what it shows ...
+    // Bar: wrapped and whole while shrinking, as tall as what it shows ...
     let preparing = bars.first().cloned().unwrap_or_default();
     let mut fields = preparing.splitn(4, ' ');
     let lines: u32 = fields.next().and_then(|n| n.parse().ok()).unwrap_or(0);
@@ -206,7 +198,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
         preparing.ends_with("42%"),
         "the bar does not end its line with the number: {preparing}"
     );
-    // ... and one faded line for a picked file, whose name may be long.
+    // ... picked file: one faded line; name may be long.
     let picked = bars.get(1).cloned().unwrap_or_default();
     assert!(
         picked.starts_with("1 true true "),

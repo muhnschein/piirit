@@ -1,10 +1,8 @@
-//! A message is one surface: a tap opens whatever it has to open, and a
-//! long press anywhere on it -- the picture included -- opens its menu.
+//! Message is one surface: tap opens whatever it must, long press anywhere (picture
+//! included) opens its menu.
 //!
-//! Nothing in the row takes a press but the few small controls that need
-//! one, and those hand a long press on to the row. A picture taking the
-//! press for itself would keep a long press on it from ever reaching the
-//! row's menu.
+//! Nothing in row takes press but few small controls needing one; those pass long
+//! press to row. A picture taking press itself would block row menu on long press.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -104,7 +102,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -169,8 +167,8 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         show!("Voice", "/tmp/note.ogg", "Done");
     });
     single_shot(Duration::from_secs(5), move || unsafe {
-        // A sound plays where it sits: a tap on the row opens nothing,
-        // and a long press on its play button is still the menu.
+        // Sound plays where it sits: tap on row opens nothing;
+        // long press on its play button is still the menu.
         record!("voice-tap", call!("tapRow"));
         record!(
             "voice-hold",
@@ -179,15 +177,14 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         show!("Text", "", "Available");
     });
     single_shot(Duration::from_secs(6), move || unsafe {
-        // A message the limit held back: the whole row asks for the rest.
+        // Message limit held back: whole row asks for rest.
         record!("held-tap", call!("tapRow"));
         show!("Text", "", "Done");
     });
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("text-tap", call!("tapRow"));
-        // A webxdc app, with apps off: nothing to run, so the row hands
-        // the .xdc on like any other file. Every row the probe makes is
-        // called holiday.png, this one included.
+        // Webxdc app, apps off: nothing to run, so row hands the .xdc on like any file. Every
+        // probe row is called holiday.png, this one too.
         show!("Webxdc", "/tmp/checkers.xdc", "Done");
     });
     single_shot(Duration::from_secs(8), move || unsafe {
@@ -195,8 +192,7 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         record!("apps-on", call!("setApps", true));
     });
     single_shot(Duration::from_secs(9), move || unsafe {
-        // And with apps on: run here, rather than handed to whatever the
-        // system thinks opens a .xdc.
+        // Apps on: run here, not handed to whatever system thinks opens .xdc.
         record!("xdc-tap-on", call!("tapRow"));
         (*engine_ptr).quit();
     });

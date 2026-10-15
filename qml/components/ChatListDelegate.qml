@@ -4,19 +4,15 @@ import "../js/Format.js" as Format
 import "."
 
 /*
- * One chat-list row. The name and the preview are whatever the other end
- * sent, so both are pinned to PlainText -- see MessageDelegate.qml.
- *
- * Its own component so it can be loaded and measured on
- * its own, and laid out with bindings rather than a positioner -- see
- * MessageDelegate.qml.
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml). Own
+ * component, loads and measures alone; bindings, not positioner (ditto).
  */
 Item {
     id: root
 
     property string chatName
     property string preview
-    // Who wrote the last message; worth showing where there are several.
+    // Last sender; shown in group chats.
     property string previewSender
     property int unreadCount: 0
     // Unix seconds.
@@ -25,10 +21,10 @@ Item {
     property bool isPinned: false
     property bool isMuted: false
     property bool isContactRequest: false
-    // The core's per-chat colour, for the avatar.
+    // Core's chat colour.
     property string chatColor
     property string avatarPath
-    // DC_STATE_* of the last message; 20 and up means we sent it.
+    // DC_STATE_* of last message; >= 20 means we sent it.
     property int summaryState: 0
 
     readonly property bool summaryIsOurs: summaryState >= 20
@@ -36,7 +32,7 @@ Item {
     height: Math.max(avatar.height, previewLabel.y + previewLabel.height)
             + 2 * Theme.paddingMedium
 
-    // The chat's picture, or its colour with an initial on it.
+    // Picture, or colour with initial.
     Avatar {
         id: avatar
         objectName: "avatar"
@@ -47,8 +43,7 @@ Item {
         picturePath: root.avatarPath
     }
 
-    // Muted, when it was, and pinned -- all three on the right, so the
-    // name is a name rather than a name with luggage.
+    // Mute mark, time, pin mark on right: name plain.
     Row {
         id: marks
         x: root.width - width - Theme.horizontalPageMargin
@@ -88,9 +83,7 @@ Item {
         width: marks.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
-        // A mail icon marks a chat that cannot be encrypted to. Pinned
-        // and muted are shown on the right instead: they are about where
-        // the chat sits and how it behaves, not about what it is called.
+        // Mail icon: unencryptable. Pin/mute on right: placement, not name.
         text: (root.isEncrypted ? "" : "✉ ") + root.chatName
     }
 
@@ -104,15 +97,14 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
-        // Ours carries its delivery mark; someone else's is named when the
-        // core names them, which it does where it matters.
+        // Ours: delivery mark. Others: sender name, if set.
         text: (root.summaryIsOurs ? Format.stateMark(root.summaryState) + " " : "")
               + (root.previewSender.length > 0 && !root.summaryIsOurs
                  ? root.previewSender + ": " : "")
               + root.preview
     }
 
-    // Unread count. A muted chat still counts, quietly.
+    // Unread count; muted still counted, dimmed.
     Rectangle {
         id: badge
         objectName: "unreadBadge"

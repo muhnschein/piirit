@@ -1,24 +1,17 @@
-//! The page that starts a conversation, driven headlessly.
-//!
-//! Loads the real `NewChatPage` against the stub Silica module and the
-//! recording double, and asserts what a tap produces on the wire and where
-//! it navigates: a known contact opens a chat with them, above the page
-//! that opened the picker. Adding a contact and making a group are not
-//! here any more: both start from the chat list's pull-down.
+//! New-chat page, headless: real `NewChatPage` vs stub Silica. Checks tap's wire output
+//! and navigation: known contact opens chat above picker. Add contact and group live
+//! on chat list pull-down.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe`
+// (edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters, and the derive transmutes a QVariant field;
-    // see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher's by-value ones; derive transmutes a QVariant
+    // field: piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value,
     clippy::useless_transmute
 )]
@@ -31,9 +24,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
-///
-/// Method names are camelCase because they stand in for Silica's own API.
+/// Silica `pageStack`, recorded not performed. Method names camelCase: they stand in
+/// for Silica's API.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -41,7 +33,7 @@ struct PageStackProbe {
     /// `replaceAbove:ConversationPage.qml|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// The chat id handed to the most recent navigation, or 0.
+    /// Chat id of last navigation, or 0.
     chat_id: qt_property!(u32; NOTIFY log_changed),
 
     push: qt_method!(fn(&mut self, page: QString) -> QVariant),
@@ -75,8 +67,7 @@ impl PageStackProbe {
         self.note("replaceAbove", &page);
     }
 
-    /// The page below, which this record does not model. `&mut self` is
-    /// what `qt_method!` dispatches to.
+    /// Page below, not modelled here. `&mut self` is what `qt_method!` dispatches to.
     #[allow(clippy::unused_self)]
     fn previousPage(&mut self, _page: QVariant) -> QVariant {
         QVariant::default()
@@ -141,8 +132,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single thread; pre-Qt, pre-fork.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -192,8 +182,8 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
                 1
             ),
         ));
-        // Nothing has been read yet. An empty model means "no answer"
-        // this early and "no contacts" later, and the two are opposite.
+        // Nothing read yet. Empty model: "no answer" this early, "no contacts" later.
+        // Opposite meanings.
         (*steps_ptr).push((
             "placeholder-fresh",
             call!(
@@ -205,7 +195,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // The first known contact; tapping it opens a chat with them.
+        // First known contact; tap opens chat with them.
         (*steps_ptr).push(("tap-contact", call!("click", QString::from("contactRow"))));
         (*steps_ptr).push(("search", call!("searchForNothing")));
     });
@@ -215,8 +205,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
             "after-contact",
             (*stack_ptr).pinned().borrow().log.to_string(),
         ));
-        // The core has answered and there is nobody to show: now the
-        // placeholder is the one thing that should be on the list.
+        // Core answered, nobody to show: placeholder should be the only item.
         (*steps_ptr).push((
             "placeholder-empty",
             call!(
@@ -225,9 +214,8 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
                 QString::from("enabled")
             ),
         ));
-        // Neither way to something new is here: both moved to the chat
-        // list's pull-down, and an entry here as well would be the same
-        // thing in two places.
+        // No new-contact or new-group entry here: both moved to chat list pull-down; one here too
+        // would be the same thing in two places.
         (*steps_ptr).push((
             "new-contact",
             call!("click", QString::from("newContactButton")),
@@ -246,8 +234,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
     );
 }
 
-/// Tapping a contact ends in a conversation the core made, above the
-/// page that opened the picker, and made exactly one chat.
+/// Tapping contact ends in core-made conversation above picker; exactly one chat made.
 fn assert_outcome(steps: &[(&str, String)], navigation: &str, chat_id: u32, journal: &Path) {
     let context = format!("steps: {steps:?}\nnavigation: {navigation}");
 

@@ -1,25 +1,18 @@
-//! The profile setup page on a relay that keeps the reader waiting.
+//! Profile setup page on a relay that keeps reader waiting.
 //!
-//! `qml_pages.rs` drives the page against a relay that answers at once.
-//! This is the other case, against the double's `slow` relay: the hint
-//! about volunteers' relays appears under Cancel at the fourth second
-//! and not before; at the deadline the page shows the time-out with the
-//! relay's name and the way back, and keeps the hint; and Cancel on a
-//! second attempt -- begun while the core is still on the first --
-//! stops the process and goes back.
+//! `qml_pages.rs` uses instant relay. This is the double's `slow` relay: volunteers'-relays
+//! hint appears under Cancel at 4th second; at deadline, time-out with relay name and way back;
+//! Cancel on a second attempt (begun while core on first) stops and goes back.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -34,7 +27,7 @@ use serde_json::Value;
 
 mod common;
 
-/// `BusyIndicatorSize.Large`, which a `.qml` stub cannot provide.
+/// `BusyIndicatorSize.Large`, which `.qml` stub cannot give.
 #[derive(QEnum)]
 #[repr(u8)]
 enum BusyIndicatorSize {
@@ -43,8 +36,7 @@ enum BusyIndicatorSize {
     Large = 2,
 }
 
-/// Records navigation instead of performing it. Method names are
-/// camelCase because they stand in for Silica's own.
+/// Records navigation, not performed. `camelCase`: Silica's own API.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -85,7 +77,7 @@ impl PageStackProbe {
     }
 }
 
-/// Owns a `Loader` and walks the loaded page's children by `objectName`.
+/// Owns `Loader`; walks page children by `objectName`.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -131,21 +123,19 @@ const PROBE_QML: &str = r"
 const SLOW_PAGE: &str = r#"{"displayName":"Ada","providerQr":"dcaccount:slow.example","status":0}"#;
 
 /// Each step and what it recorded.
-// The engine, the QObject boxes and every step share one scope: all must
-// outlive `exec()`. The assertions are in the helpers below.
+// Engine, QObjects, steps: one scope, must outlive `exec()`.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-setup-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // SAFETY: single-threaded, and set before Qt starts and before the
-    // server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A relay that does not answer while anyone here is watching.
+        // Relay that does not answer while watched.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "20000");
     }
 
@@ -167,8 +157,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
-    // Six seconds rather than the built-in thirty; the page is what is
-    // under test, not the wait.
+    // Six seconds, not thirty: page under test, not the wait.
     core_box.pinned().borrow_mut().profile_timeout = 6;
     core_box
         .pinned()
@@ -178,8 +167,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks run only inside `exec()`; `engine` outlives them.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -192,7 +180,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         }};
     }
 
-    // 1s: the page, on screen, asks the slow relay.
+    // 1s: page on screen asks slow relay.
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
         common::record(
@@ -207,7 +195,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         common::record(&s, "activate", call!("activate"));
     });
 
-    // 2s: waiting, with nothing said yet.
+    // 2s: waiting, nothing said yet.
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
         common::record(&s, "early-busy", call!("pageProperty", "busy"));
@@ -215,14 +203,14 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         common::record(&s, "early-label", call!("get", "progressBar", "label"));
     });
 
-    // 6s: the fourth second has passed.
+    // 6s: fourth second passed.
     let s = steps.clone();
     single_shot(Duration::from_secs(6), move || {
         common::record(&s, "hint", call!("get", "slowHint", "visible"));
         common::record(&s, "still-busy", call!("pageProperty", "busy"));
     });
 
-    // 8s: the deadline passed at seven.
+    // 8s: deadline passed at seven.
     let s = steps.clone();
     single_shot(Duration::from_secs(8), move || {
         common::record(&s, "late-busy", call!("pageProperty", "busy"));
@@ -232,7 +220,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         common::record(&s, "late-cancel", call!("get", "cancelButton", "visible"));
     });
 
-    // 9s: a second attempt, while the core is still on the first.
+    // 9s: second attempt, core still on first.
     let s = steps.clone();
     single_shot(Duration::from_secs(9), move || {
         common::record(
@@ -270,7 +258,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     assert_cancel(&steps, &navigation, &calls, &context);
 }
 
-/// The hint is not there at two seconds and is at six.
+/// Hint absent at two seconds, present at six.
 fn assert_hint_timing(steps: &[(String, String)], context: &str) {
     for step in ["load", "activate"] {
         assert_eq!(
@@ -299,9 +287,7 @@ fn assert_hint_timing(steps: &[(String, String)], context: &str) {
     assert_eq!(common::value_of(steps, "still-busy"), "true", "{context}");
 }
 
-/// At the deadline the page stops waiting, says which relay did not
-/// answer and in how long, and offers the way back with the hint still
-/// in place.
+/// At deadline: stops waiting, names silent relay and wait, offers way back; hint stays.
 fn assert_time_out(steps: &[(String, String)], context: &str) {
     assert_eq!(
         common::value_of(steps, "late-busy"),
@@ -322,8 +308,7 @@ fn assert_time_out(steps: &[(String, String)], context: &str) {
     assert_eq!(common::value_of(steps, "late-cancel"), "false", "{context}");
 }
 
-/// A second attempt takes a fresh account rather than the one the core
-/// is still configuring, and Cancel stops what is held and goes back.
+/// Second attempt takes fresh account; Cancel stops held and goes back.
 fn assert_cancel(
     steps: &[(String, String)],
     navigation: &str,

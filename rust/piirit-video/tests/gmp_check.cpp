@@ -1,18 +1,16 @@
 /*
- * Gecko, as far as the H.264 plugin can tell: loads libpiirit.so the way
- * Gecko's plugin process does, hands it a video host and a callback,
- * feeds it pictures, and prints what comes back, one line per event, for
- * tests/gmp_h264.rs to read.
+ * Gecko stand-in for the H.264 plugin: loads libpiirit.so as Gecko's plugin
+ * process does, hands it a video host and callback, feeds it pictures, prints
+ * each event as a line for tests/gmp_h264.rs.
  *
  *     gmp-check <path to libpiirit.so> <scenario>
  *
- * Each scenario is one call's worth of what Gecko does (see scenario()).
- * Every encoded picture is taken apart into the NAL units Gecko's packetizer
- * would read out of it, by the same rules (WebrtcGmpVideoCodec.cpp,
- * WebrtcGmpVideoEncoder::Encoded): a four-byte size in this machine's byte
- * order, then that many bytes, to the end of the buffer exactly.
+ * Each scenario is one call's worth of Gecko's behavior (see scenario()). Encoded
+ * pictures split into NAL units by Gecko packetizer's rules
+ * (WebrtcGmpVideoCodec.cpp, WebrtcGmpVideoEncoder::Encoded): 4-byte size in machine byte order, then that
+ * many bytes, exactly to buffer end.
  *
- * Built by build.rs for the machine running the tests; never packaged.
+ * Built by build.rs for the test machine; never packaged.
  */
 #include <cstdint>
 #include <cstdio>
@@ -153,8 +151,8 @@ public:
     GMPErr CreatePlane(GMPPlane **) override { return GMPNotImplementedErr; }
 };
 
-/* "7:12,8:4,5:3012", or "malformed" when the sizes do not walk the
- * buffer to its end exactly. An SPS also says its profile and level. */
+/* "7:12,8:4,5:3012", or "malformed" if sizes miss buffer end. SPS gives profile
+ * and level. */
 std::string units(const uint8_t *data, uint32_t size, std::string &sps)
 {
     std::string out;
@@ -201,16 +199,15 @@ public:
                     static_cast<int>(frame->BufferType()), frame->CompleteFrame() ? 1 : 0,
                     static_cast<int>(specific.mCodecType),
                     static_cast<int>(specific.mBufferType), sps.c_str(), nals.c_str());
-        /* As GMPVideoEncoderChild::Encoded does once it has sent it on. */
+        /* As GMPVideoEncoderChild::Encoded does, after sending. */
         frame->Destroy();
     }
 
     void Error(GMPErr error) override { std::printf("error %d\n", static_cast<int>(error)); }
 };
 
-/* A picture with something in it to encode: a gradient that moves, and
- * a band of noise that is new in every picture, so the bit rate asked
- * for is what limits the size and not the picture. */
+/* Picture to encode: moving gradient, plus a noise band new each picture (so
+ * asked-for rate limits size). */
 Picture *picture(int32_t width, int32_t height, int index, uint64_t timestamp)
 {
     auto *frame = new Picture(width, height, timestamp);
@@ -247,8 +244,8 @@ struct Session {
             return false;
         }
         encoder = static_cast<GMPVideoEncoder *>(api);
-        /* As WebrtcGmpVideoEncoder::InitEncode fills it: everything else
-         * zero, the codec type included. */
+        /* As WebrtcGmpVideoEncoder::InitEncode fills it: rest zero, codec type
+         * included. */
         GMPVideoCodec codec;
         std::memset(&codec, 0, sizeof codec);
         codec.mGMPApiVersion = 33;
@@ -263,8 +260,7 @@ struct Session {
         return true;
     }
 
-    /* `count` pictures, `gap` microseconds apart, a keyframe asked for
-     * at `key` (or never, at -1). */
+    /* `count` pictures, `gap` us apart, keyframe asked at `key` (-1: never). */
     void feed(int count, int32_t width, int32_t height, uint64_t gap, int key)
     {
         for (int i = 0; i < count; i++, fed++) {
@@ -289,13 +285,13 @@ constexpr uint64_t FRAME_US = 33333;
 int scenario(const std::string &name, Session &session)
 {
     if (name == "call") {
-        /* A call: a keyframe to start, one asked for halfway. */
+        /* A call: keyframe to start, one asked halfway. */
         if (!session.start(320, 240, 300, 0)) {
             return 1;
         }
         session.feed(60, 320, 240, FRAME_US, 30);
     } else if (name == "rates") {
-        /* Congestion control turns the rate down to a tenth halfway. */
+        /* Congestion control cuts rate to a tenth halfway. */
         if (!session.start(320, 240, 1000, 0)) {
             return 1;
         }
@@ -303,14 +299,14 @@ int scenario(const std::string &name, Session &session)
         session.encoder->SetRates(100, 30);
         session.feed(60, 320, 240, FRAME_US, -1);
     } else if (name == "slow") {
-        /* A dim room: the camera gives half the frame rate the call was
-         * set up for, and a second must still cost what was asked. */
+        /* Dim room: camera gives half the call's fps; second must still cost what
+         * was asked. */
         if (!session.start(320, 240, 600, 0)) {
             return 1;
         }
         session.feed(90, 320, 240, 2 * FRAME_US, -1);
     } else if (name == "resize") {
-        /* The camera's size changes under the same encoder. */
+        /* Camera size changes under same encoder. */
         if (!session.start(320, 240, 300, 0)) {
             return 1;
         }
@@ -322,19 +318,19 @@ int scenario(const std::string &name, Session &session)
         }
         session.feed(5, 321, 241, FRAME_US, -1);
     } else if (name == "slices") {
-        /* Packetization mode 0: every unit has to fit one packet. */
+        /* Packetization mode 0: each unit must fit one packet. */
         if (!session.start(320, 240, 1000, 400)) {
             return 1;
         }
         session.feed(10, 320, 240, FRAME_US, -1);
     } else if (name == "long") {
-        /* A minute of a still picture's pace: one a second. */
+        /* Still picture's pace: one a second, for a minute. */
         if (!session.start(320, 240, 300, 0)) {
             return 1;
         }
         session.feed(62, 320, 240, 1000000, -1);
     } else if (name == "broken") {
-        /* Gecko starting an encoder for a picture of no size. */
+        /* Gecko starts encoder for zero-size picture. */
         if (!session.start(0, 0, 300, 0)) {
             return 1;
         }
@@ -368,7 +364,7 @@ int main(int argc, char **argv)
         std::printf("missing entry points\n");
         return 1;
     }
-    /* x264.h names its functions after its build number. */
+    /* x264.h names functions after build number. */
     std::printf("x264 symbols %s\n",
                 dlsym(library, SYMBOL(x264_encoder_open_, X264_BUILD)) == nullptr
                     ? "hidden"

@@ -1,12 +1,7 @@
-//! The chat list's first load: the rows a screen shows come first.
-//!
-//! The core builds chat-list items one after another, so asking for a
-//! long list at once leaves the page empty until the last one is built.
+//! First load: screen's rows come first. Core builds items one by one; a long list at once
+//! leaves page empty until the last is built.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -44,13 +39,12 @@ fn a_long_list_shows_its_first_screenful_before_the_rest() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // 32 chats in all, and two seconds for each batch of rows.
+        // 32 chats; two seconds per batch of rows.
         std::env::set_var("PIIRIT_FAKE_MANY_CHATS", "30");
         std::env::set_var("PIIRIT_FAKE_CHATLIST_ITEMS_DELAY_MS", "2000");
     }
@@ -78,13 +72,11 @@ fn a_long_list_shows_its_first_screenful_before_the_rest() {
         };
     }
 
-    // SAFETY for every block below: these callbacks fire only while `exec()`
-    // is running on this thread, and `engine` and `steps` outlive it.
+    // SAFETY for every block: fire only inside `exec()`; `engine` and `steps` outlive it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    // The first batch lands about two seconds after the load, the second
-    // two seconds after that.
+    // First batch lands ~2 s after load; second 2 s after that.
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("early-count", call!("count")));
         (*steps_ptr).push(("early-first", call!("first")));

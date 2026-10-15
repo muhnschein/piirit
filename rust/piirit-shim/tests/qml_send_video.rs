@@ -1,18 +1,12 @@
-//! A picked video bigger than it needs to be is made smaller, and that
-//! is what is sent (issue #111).
+//! Picked video bigger than needed is shrunk, and that is sent (issue #111).
 //!
-//! The core recodes a picture on its way out and sends a video as it is,
-//! so the conversation does it: it starts making a smaller file as soon as
-//! the video is picked, says so on the bar while it does, and holds the
-//! send until it is done -- nothing goes out until the reader sends, with
-//! whatever caption they wrote meanwhile. The bar then weighs what was
-//! made, and the core is handed it under the picked file's name. The ✕ on
-//! the bar drops the file and stops the work.
+//! Core recodes pictures but sends video as is, so conversation shrinks it: starts on pick,
+//! bar says so, send held until done; nothing goes until reader sends, with caption written
+//! meanwhile. Bar weighs what was made; core handed it under picked file's name. Bar's ✕
+//! drops file and stops work.
 //!
-//! The clip is made here, as a phone's camera would leave one, by
-//! `piirit_video::synth`. The fake core is told a ceiling between the
-//! clip's size and the size it is planned at, so the bar says nothing
-//! about a file that will fit once it is smaller.
+//! Clip made by `piirit_video::synth`. Fake core ceiling sits between clip size and planned
+//! size, so bar warns nothing about a file that fits once shrunk.
 
 // Qt harness: see qml_send_file.rs.
 #![allow(
@@ -92,13 +86,11 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // Three seconds at 4 Mbit/s, about 1.5 MB; planned to fit under the
-    // ceiling below, which is between the two.
+    // 3s at 4 Mbit/s, ~1.5 MB: over ceiling below; planned size under it.
     let clip = temp.join("lake at dusk.mov");
     piirit_video::synth(&clip, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
     let clip_bytes = std::fs::metadata(&clip).expect("measure the clip").len();
-    // Fifteen seconds, which even at the least balanced rate comes out
-    // past the ceiling.
+    // 15s: over ceiling even shrunk, at least balanced rate.
     let long = temp.join("long walk.mov");
     piirit_video::synth(&long, (640, 360), 15, 4_000_000, 0, true).expect("make a long clip");
     let long = long.to_string_lossy().into_owned();
@@ -108,7 +100,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     );
     let cache = temp.join("cache");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded test; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -160,8 +152,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     let clip_path = clip.to_string_lossy().into_owned();
     let again = clip_path.clone();
     let direct = clip_path.clone();
-    // A second video, so the stopped one's "as it is" does not carry
-    // over to it.
+    // Fresh video: earlier stop not carried over.
     let other = temp.join("pond at noon.mov");
     std::fs::copy(&clip, &other).expect("copy the clip");
     let switched = other.to_string_lossy().into_owned();
@@ -190,20 +181,19 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("attach", call!("attach", QString::from(clip_path.as_str()))));
-        // At once: picking it started making it smaller.
+        // Shrink started on pick.
         probe!("preparing", "messages", "preparing");
         probe!("label-preparing", "pendingAttachmentLabel", "text");
         probe!("large", "largeFileBar", "visible");
         probe!("planned-bytes", "messages", "attachment_bytes");
         probe!("sizes-preparing", "attachmentSizesLabel", "text");
         probe!("send-enabled-preparing", "sendButton", "enabled");
-        // The caption is written meanwhile, and a send asked for now --
-        // the keyboard's, say -- does nothing.
+        // Caption typed meanwhile; send does nothing.
         (*steps_ptr).push(("type", call!("type", QString::from("ice on the lake"))));
         (*steps_ptr).push(("send-early", call!("send")));
     });
 
-    // Made by now: a few seconds of small video is quick even unoptimised.
+    // Shrunk by now: few seconds of small video is quick even unoptimised.
     single_shot(Duration::from_secs(12), move || unsafe {
         probe!("preparing-done", "messages", "preparing");
         probe!("send-enabled-done", "sendButton", "enabled");
@@ -221,20 +211,19 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
             })
             .unwrap_or_default();
         (*steps_ptr).push(("made-on-disk", format!("{made:?}")));
-        // Only now does the reader send it.
+        // Only now does reader send.
         (*steps_ptr).push(("send", call!("send")));
     });
 
     single_shot(Duration::from_secs(18), move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
-        // Again, and dropped straight away with the bar's button.
+        // Picked again; bar's button pressed straight away.
         (*steps_ptr).push((
             "attach-again",
             call!("attach", QString::from(again.as_str())),
         ));
         probe!("preparing-again", "messages", "preparing");
-        // Stopped straight away with the bar's button: the file stays, to
-        // go as it is, and a new quality does not start it again.
+        // Stopped: sends as-is; new quality won't restart.
         (*steps_ptr).push((
             "stop-bar",
             call!("click", QString::from("cancelAttachmentButton")),
@@ -253,8 +242,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
 
     single_shot(Duration::from_secs(24), move || unsafe {
         probe!("bar-sent-kept", "attachmentBar", "visible");
-        // Handed a video that is not on the bar, the model makes it
-        // smaller and sends nothing; stopped, it puts the work away.
+        // Video not on bar: model shrinks it, sends nothing; stopped, puts work away.
         (*steps_ptr).push((
             "send-file",
             call!("sendFile", QString::from(direct.as_str())),
@@ -262,8 +250,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("preparing-direct", "messages", "preparing");
         (*steps_ptr).push(("stop", call!("stopPreparing")));
         probe!("preparing-stopped", "messages", "preparing");
-        // Picked again, and the quality moved under it: what was being
-        // made is put away and made again to the new plan.
+        // Picked again, quality moved under it: work put away, redone to new plan.
         (*steps_ptr).push((
             "attach-switch",
             call!("attach", QString::from(switched.as_str())),
@@ -273,14 +260,14 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     });
 
     single_shot(Duration::from_secs(26), move || unsafe {
-        // Stopped, then dropped: the same button, twice.
+        // Stopped, then dropped: same button, twice.
         for step in ["stop-switched", "drop-switched"] {
             (*steps_ptr).push((
                 step,
                 call!("click", QString::from("cancelAttachmentButton")),
             ));
         }
-        // Too long to fit even made smaller: the warning says so.
+        // Too long even shrunk: warned.
         (*steps_ptr).push(("attach-long", call!("attach", QString::from(long.as_str()))));
         probe!("preparing-long", "messages", "preparing");
         probe!("large-long", "largeFileLabel", "text");
@@ -324,7 +311,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "Making video smaller for sending: 0%",
         "the bar does not say the video is being made smaller. {context}"
     );
-    // Measured as it will be sent, not as it is on the phone.
+    // Measured as sent, not on phone.
     assert_eq!(
         value("large"),
         "false",
@@ -336,10 +323,10 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         planned > 0.0 && planned < 1_000_000.0,
         "the bar does not weigh the video at the size it is planned at. {context}"
     );
-    // A few megabytes, exact as a real.
+    // A few MB, exact as real.
     #[allow(clippy::cast_precision_loss)]
     let picked = std::fs::metadata(&clip).expect("measure the clip").len() as f64;
-    // How much smaller it is planned to go, said beside the progress.
+    // Planned shrink, beside progress.
     assert_eq!(
         value("sizes-preparing"),
         format!("{} → ~{}", readable(picked), readable(planned)),
@@ -458,7 +445,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "false",
         "a video going as it was still says it went smaller. {context}"
     );
-    // Going as it was, it is warned about at the size it is.
+    // Warned at its own size.
     assert_eq!(
         value("large-kept"),
         format!(
@@ -534,7 +521,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     let _ = std::fs::remove_dir_all(&temp);
 }
 
-/// `Format.readableSize`, which the bar's size line is written in.
+/// `Format.readableSize`: bar's size line.
 fn readable(bytes: f64) -> String {
     let units = ["B", "kB", "MB", "GB"];
     let mut size = bytes;

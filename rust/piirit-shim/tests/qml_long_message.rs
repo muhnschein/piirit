@@ -1,50 +1,18 @@
-//! A message too long for the bubble it arrived in.
+//! Message too long for bubble: row shows first few lines, offers rest on own page. Drawn whole it
+//! fills screen, a row nobody can scroll past. Page, not unfold in place: unfold makes that same
+//! row, and re-folding must put reader back by hand; leaving page puts them back.
 //!
-//! A conversation is a column of remarks, and somebody's to-do document
-//! is not one: drawn whole it fills the screen, pushes the rest of the
-//! chat out of it, and makes a row nobody can scroll past. So the row
-//! shows the first few lines and offers the rest on a page of its own.
+//! Pinned where offer appears: not on a short message; always on one the sending core cut (text
+//! ends `[...]`), even if what's here fits, since the rest isn't on the phone. Never on an
+//! attachment with no caption, nor a message core still holds back (an RPM arriving in an open chat
+//! once grew one). Core's `hasHtml` is not "cut": raised for any text not the whole of what arrived
+//! (HTML beside plain, HTML-only mail, stripped quote); read as cut, it offered under two-word
+//! replies.
 //!
-//! A page rather than an unfold in place, which would be a second way to
-//! read the same words and the worse of the two: it makes exactly the row
-//! nobody can scroll past, and folding it again has to put the reader back
-//! by hand. The page shows the whole message and leaving it puts them
-//! back.
-//!
-//! What this pins is where the offer appears and where it does not: a
-//! short message must not grow two words of chrome it has no use for,
-//! and a message the sending core cut must offer the page even when the
-//! little it has fits, because the rest of it is not on this phone at
-//! all.
-//!
-//! And that the offer stays inside the bubble. A bubble is as wide as
-//! its widest line, so a long message of short lines makes a narrow one
-//! -- narrower than the offer under it, until the bubble is sized from
-//! the offer too.
-//!
-//! And what it is *never* about: an attachment. A picture or a document
-//! with no caption has no body to read on a page, and a message the core
-//! is still holding back has none of it yet -- neither was excluded at
-//! first, and an RPM arriving in an open chat grew a View full message
-//! it had no use for.
-//!
-//! Nor is it about a message that merely came from a mail client. The
-//! core raises `hasHtml` on anything whose text is not the whole of what
-//! arrived -- a plain part with an HTML one beside it, a mail written
-//! only in HTML, a reply whose quoted history was stripped -- and taking
-//! that for "cut" put the offer under nearly every message in a mailbox,
-//! two-word replies included. A message the core really cut ends in its
-//! `[...]`, and that is what is asked for here.
-//!
-//! And that the offer's own width cannot reach the width the body is
-//! wrapped at. It could, once, and the circle -- the offer widens the
-//! bubble, the wider bubble fits the body, the fitting body sends the
-//! offer away -- left QML dropping a binding wherever it happened to
-//! notice, so the same message came out one way and then another after
-//! leaving the chat and coming back.
-//!
-//! The delegate and the list are loaded on their own, as the other QML
-//! tests load them.
+//! Offer stays inside bubble: bubble is as wide as widest line, so short lines make a narrow one --
+//! sized from offer too. Offer width must not reach body wrap width: that circle (offer widens
+//! bubble, body fits, offer goes) made QML drop a binding wherever, so a message drew differently
+//! after leaving chat and coming back. Delegate and list loaded alone, as other QML tests.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -156,9 +124,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// The same length in short lines. A bubble is as wide as its widest
-/// line, so this one comes out narrow -- narrower than the offer under
-/// it, which is what the bubble has to be sized from as well.
+/// Same length in short lines: narrow bubble, sized from offer too.
 fn a_narrow_message() -> String {
     use std::fmt::Write as _;
 
@@ -169,7 +135,7 @@ fn a_narrow_message() -> String {
     out
 }
 
-/// A message nobody would want drawn whole in a bubble.
+/// Too long to draw whole.
 fn a_long_message() -> String {
     let mut out = String::new();
     for number in 1..=40 {
@@ -182,7 +148,7 @@ fn a_long_message() -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -225,7 +191,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
                 QString::from(common::component_url("MessageDelegate.qml"))
             )
         );
-        // A remark, which is what nearly every message is.
+        // Remark: nearly every message.
         call!(
             "set",
             QString::from("messageText"),
@@ -282,8 +248,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
             )
         );
         record!("collapsed-height", call!("ask", QString::from("height")));
-        // A message the core cut: what is here is short, and the rest is
-        // not on this phone.
+        // Core-cut: short here, rest not on phone.
         call!(
             "set",
             QString::from("messageText"),
@@ -298,8 +263,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
             call!("get", QString::from("fullButton"), QString::from("visible"))
         );
         record!("cut-height", call!("ask", QString::from("height")));
-        // Forty short lines: the bubble is as wide as its widest line, so
-        // this is the narrow case the offer must not hang out of.
+        // Forty short lines: narrow case.
         call!("set", QString::from("hasHtml"), false);
         call!(
             "set",
@@ -325,8 +289,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         record!("row-full", call!("tapFull"));
         record!("row-raised", call!("raisedSignal"));
 
-        // An attachment: a file, no caption, and the core saying it has
-        // an HTML part -- which is the shape that grew the offer.
+        // Attachment, no caption, HTML part: shape that grew offer.
         call!("set", QString::from("messageText"), QString::from(""));
         call!("set", QString::from("hasHtml"), true);
         call!("set", QString::from("viewType"), QString::from("File"));
@@ -351,8 +314,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
                 QString::from("visible")
             )
         );
-        // And a message the core is holding back: a header and a
-        // download offer, with none of the words here yet.
+        // Core holding back: no words yet.
         call!("set", QString::from("filePath"), QString::from(""));
         call!("set", QString::from("viewType"), QString::from("Text"));
         call!(
@@ -384,9 +346,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
                 QString::from("visible")
             )
         );
-        // A two-word reply written in a mail client: its plain part has
-        // an HTML one beside it, so the core raises `hasHtml` on a
-        // message it never cut and whose every word is in the bubble.
+        // Two-word mail reply: HTML part beside plain; `hasHtml` on uncut message.
         call!("set", QString::from("downloadState"), QString::from("Done"));
         call!(
             "set",
@@ -410,9 +370,8 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
             "mail-offer-width",
             call!("ask", QString::from("actionsWidth"))
         );
-        // One paragraph, still from a mail client, still nothing cut:
-        // wide enough to reach the bubble's limit, which is where the
-        // offer's width used to be left behind after the offer went.
+        // One paragraph, mail, nothing cut: reaches bubble limit, where offer's width used to be
+        // left behind after offer went.
         call!(
             "set",
             QString::from("messageText"),
@@ -482,8 +441,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
          it at. {context}"
     );
 
-    // Inside the bubble at both ends: a negative either way is the offer
-    // hanging out of it.
+    // Inside bubble both ends: negative = offer hanging out.
     let inset = |label: &str| -> (f64, f64) {
         let text = value(label);
         let mut parts = text.split(':').map(|part| part.parse().unwrap_or(-1.0));
@@ -511,12 +469,8 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
          `[...]` is the end of it as far as the reader can tell. {context}"
     );
 
-    // `hasHtml` is not "cut". The core raises it for any message whose
-    // text is not the whole of what arrived -- a plain part with an HTML
-    // one beside it, a mail written only in HTML, a stripped quote, a
-    // forward -- which is very nearly everything written in a mail
-    // client. Read as "cut", it put the offer under two-word replies,
-    // each one opening a page with the words already in the bubble.
+    // `hasHtml` is not "cut": any text not whole (HTML-only mail, forward). Read as cut:
+    // offers under two-word replies.
     assert_eq!(
         value("mail-cut"),
         "false",
@@ -536,17 +490,10 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
          the same paragraph on it. {context}"
     );
 
-    // What the offer asks of the bubble's width, once there is no offer.
-    // The body used to be wrapped at a width the offer had widened, so
-    // the offer's going changed the wrapping that decided it had to go:
-    // a circle, which QML ends by dropping a binding where it stands.
-    // What that left was a bubble held open by an offer that was not
-    // there, and a row whose look came down to the order its properties
-    // arrived in -- the same message drawn one way, and another way
-    // after leaving the chat and coming back.
-    // A range rather than an equality: `number` answers -1 for a step
-    // that was never recorded, which a "not a pixel wide" test has to
-    // fail rather than pass.
+    // What offer asks of bubble width once there's no offer. Body used to wrap at width offer had
+    // widened, so offer going changed the wrap that decided it should go: a circle QML ends by
+    // dropping a binding, leaving look down to property order. Range, not equality: `number` is
+    // -1 for an unrecorded step, which must fail.
     for label in ["mail-offer-width", "paragraph-offer-width"] {
         let asked = number(label);
         assert!(

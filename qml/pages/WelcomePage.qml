@@ -3,76 +3,34 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * The first screen: no address, no password -- a new Delta Chat user has
- * neither (docs/PROJECT.md), so the one thing to do here is add a
- * profile.
- *
- * Also the way back onto a chat list, for a phone the window could not
- * send there itself. The window reads `Settings.lastAccountId` before it
- * puts anything up and opens on the chat list directly when it names a
- * profile (piirit.qml), so this page is not even made on an ordinary
- * launch. What is left to it is the phone whose key was never written --
- * a profile made before the key existed, or one restored into a fresh
- * install -- where the core's own answer (`accounts_refreshed`) is the
- * only thing that knows there is a profile at all.
- *
- * Whichever of the two names a profile, the hand-over is offered until
- * the stack takes it. Silica drops an operation asked for while a
- * transition is running, and the first offer is made from inside the
- * push that puts this page up: giving up after one refusal drew the
- * whole first screen for the half second before the chat list arrived,
- * and recording the refusal as a departure left a blank screen for good.
- *
- * What it looks like: the app's own mark over its name, what it is in
- * one line, and the two ways on, in a column in the middle of an
- * otherwise empty page. Nothing behind them. There is no second chance
- * at a first impression, and a page that is only the ambience and a
- * few words reads as what it is: the start.
- *
- * Two ways on rather than one. A reader who has never heard of Delta
- * Chat is a swipe away from being told (IntroPage.qml); a reader who
- * knows what they came for goes straight to the setup path
- * (ProfileStartPage.qml). Neither is the relay dialog: picking a server
- * is a question for somebody who has already decided.
+ * First screen: no address or password (docs/PROJECT.md), just add a profile.
+ * Window skips it when `Settings.lastAccountId` names a profile (piirit.qml);
+ * left: key never written (profile made before key, or restored into fresh
+ * install), core's `accounts_refreshed` only sign of a profile.
+ * Hand-over offered till stack takes it: Silica drops ops mid-transition, first
+ * offer is inside the push putting this up. One refusal = give up flashed first
+ * screen; refusal as departure left it blank.
+ * Two ways on: IntroPage.qml (new users), ProfileStartPage.qml (setup). No relay
+ * dialog: server picking is for the decided.
  */
 Page {
     id: page
 
-    // Both ways up: a column in the middle is a column either way.
     allowedOrientations: Orientation.All
 
-    /// Nothing is drawn yet, because it is not yet known whether this
-    /// phone has a chat list to be on. Drawing the first screen and
-    /// taking it away again is the thing this page must not do.
+    /// Nothing drawn till chat list known.
     property bool probing: true
-    /// The profile to hand over to, or 0 while none is known of. What
-    /// dconf remembers, until the core says otherwise: its answer is the
-    /// authority, and the only one a phone whose key was never written
-    /// has.
+    /// Profile to hand over to; 0 unknown. dconf till core (authority) answers.
     property int resumeAccountId: Settings.lastAccountId > 0
                                   ? Settings.lastAccountId : 0
-    /// The chat list has actually been opened.
-    ///
-    /// Set from what the stack did, never from having asked it: a page
-    /// that recorded the asking would hide itself for a hand-over that
-    /// never happened and sit there blank.
+    /// Chat list opened: set from stack's result, never asking, else hides blank.
     property bool leaving: false
-    /// The probe has taken long enough to be worth saying so. A phone
-    /// with a profile is gone from here in the time dconf takes, and a
-    /// spinner that appears on the way out is the flash it was put there
-    /// to prevent.
+    /// Probe slow; spinner on way out is the flash avoided.
     property bool slow: false
-    /// How long to go on waiting before drawing this page anyway, in
-    /// milliseconds. A stack that has refused for this long is not going
-    /// to take it and a core that has not answered is not going to, and
-    /// a first screen the reader can use beats a blank one they cannot.
-    /// Nothing sets it; a test turns it down rather than waiting.
+    /// Wait before drawing anyway, ms; tests lower it.
     property int handOverDeadline: 4000
 
-    /// Go to the chat list, if a profile to open it on is known of.
-    ///
-    /// IO is not asked for here: the window asks for it as soon as the
-    /// core is ready, whichever page is up (piirit.qml).
+    /// Go to chat list if profile known. No IO start: window asks once core ready (piirit.qml).
     function resumeRemembered() {
         if (page.leaving || !(page.resumeAccountId > 0)) {
             return
@@ -80,7 +38,7 @@ Page {
         page.leaving = page.openChatList(page.resumeAccountId)
     }
 
-    /// Hand over to the chat list, and say whether the stack took it.
+    /// Hand over to chat list; returns whether stack took it.
     function openChatList(accountId) {
         var opened = pageStack.replaceAbove(null,
                                             Qt.resolvedUrl("ChatListPage.qml"),
@@ -88,11 +46,8 @@ Page {
         return opened ? true : false
     }
 
-    // Offered until the stack takes it, every frame or so. The offer
-    // costs nothing when it is refused, and one refusal says nothing
-    // about the next: the stack is busy putting this very page up.
-    // `triggeredOnStart` makes the first offer the moment a profile is
-    // known of, which on a phone that has one is straight away.
+    // Offered each frame till taken; refusal free, says nothing of next (stack busy putting
+    // this up). `triggeredOnStart`: first offer once profile known.
     Timer {
         id: handOver
         objectName: "handOver"
@@ -111,12 +66,8 @@ Page {
         onTriggered: page.slow = true
     }
 
-    // The long stop, and the end of the offering. Whatever it is that
-    // has not happened by now -- the core has not answered, the stack
-    // will not take the hand-over -- waiting longer for it is worse than
-    // showing the reader a screen they can do something with. It also
-    // stops the timer above, so a reader who has gone on to read about
-    // Delta Chat is not yanked out of it a moment later.
+    // Long stop ends offering (and timer above, so reader on IntroPage isn't yanked): waiting
+    // longer is worse than usable screen.
     Timer {
         id: handOverStop
         objectName: "handOverStop"
@@ -125,7 +76,7 @@ Page {
         onTriggered: page.probing = false
     }
 
-    // The core may be ready before the handler below exists.
+    // Core may be ready before the handler below exists.
     Component.onCompleted: {
         if (core.status === "ready") {
             core.refresh_accounts()
@@ -134,8 +85,7 @@ Page {
         }
     }
 
-    // Qt 5.6 recognises only `onFoo:` bindings, and injects parameters
-    // under the shim's snake_case names. tests/qml_syntax.rs enforces it.
+    // Qt 5.6 recognises only `onFoo:` bindings, snake_case params (tests/qml_syntax.rs).
     Connections {
         target: core
 
@@ -147,21 +97,14 @@ Page {
             }
         }
 
-        // Not gated on `leaving`: a page that had really handed over is
-        // gone and hears nothing, so being here to hear this means the
-        // hand-over did not land, whatever it reported.
+        // Not gated on `leaving`: handed-over page is gone; here means failure.
         onAccounts_refreshed: {
             if (configured_count > 0) {
-                // The profile the app was closed on, which the core
-                // remembers; the chat list tells it which on every open.
-                // Assigned rather than handed to one attempt: the answer
-                // is what the offering runs on from here, and a stack
-                // that is busy this instant will not be next time.
+                // Profile app closed on (core remembers). Assigned: offering runs on it.
                 page.resumeAccountId = resume_account_id
                 page.resumeRemembered()
             } else {
-                // No profile anywhere, so there is nothing to open and
-                // nothing for the next launch to open either.
+                // No profile: nothing to open now or next launch.
                 page.resumeAccountId = 0
                 Settings.lastAccountId = 0
                 page.probing = false
@@ -176,34 +119,25 @@ Page {
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
-            // A little above the middle, where a title sits.
+            // Little above middle, title height.
             verticalCenterOffset: -page.height * 0.04
         }
-        // Narrower than the page, so that the line about what the app
-        // is wraps as a line of reading rather than a line of screen.
+        // Narrower: description wraps as reading line.
         width: Math.min(parent.width - 2 * Theme.horizontalPageMargin,
                         Screen.width - 2 * Theme.horizontalPageMargin)
         spacing: Theme.paddingMedium
-        // Down until it is known there is no chat list to be on. A
-        // first screen drawn for the half second a hand-over takes
-        // reads as the app opening in the wrong place and then
-        // correcting itself.
+        // Hidden till no chat list known: no flash.
         visible: !page.probing
 
-        // The app's own mark over its name: the launcher icon, as it is
-        // (qml/art/logo.png is icons/harbour-piirit.svg drawn out), so
-        // the first screen and the launcher say the same thing. Placed
-        // rather than anchored: a Column lays its children out
-        // vertically and has an opinion about vertical anchors.
+        // Launcher icon (qml/art/logo.png = icons/harbour-piirit.svg rendered). Placed, not
+        // anchored: Column ignores vertical anchors.
         Image {
             id: logo
             objectName: "logo"
             x: (parent.width - width) / 2
             width: Theme.itemSizeLarge
             height: width
-            // Decoded at the size it is drawn at rather than at the
-            // master's: a first screen should not cost a screenful of
-            // texture for one mark.
+            // Decode at drawn size: no screenful of texture.
             sourceSize.width: width
             sourceSize.height: height
             fillMode: Image.PreserveAspectFit
@@ -211,8 +145,7 @@ Page {
             source: "../art/logo.png"
         }
 
-        // The app's own name, and never a translated one (see the
-        // cover): large, in the heading face, in the ambience's colour.
+        // App name, never translated (see cover).
         Label {
             objectName: "title"
             width: parent.width
@@ -224,8 +157,7 @@ Page {
             color: Theme.highlightColor
         }
 
-        // One line under the name, and only one: what the app is, in
-        // the words its own site uses.
+        // What app is, in its site's words.
         Label {
             objectName: "tagline"
             width: parent.width
@@ -239,15 +171,12 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        // The two ways on, side by side under the name: what Delta
-        // Chat is, for a reader who has not heard of it, and the way
-        // into a profile for one who has -- under the mark for an
-        // account, drawn by this app so that it is there on every
-        // phone (components/AccountMark.qml).
+        // What Delta Chat is; profile entry. Own account mark: on every phone
+        // (components/AccountMark.qml).
         ChoiceTiles {
             objectName: "welcomeWays"
             width: parent.width
-            // The column is already inside the page's margins.
+            // Column inside page margins.
             sideMargin: 0
             choices: [
                 {
@@ -271,9 +200,7 @@ Page {
             }
         }
 
-        // The one thing that can go wrong before anything has been
-        // asked for: the core did not start. Said here, where the tile
-        // that it stops is.
+        // Only pre-ask failure, core didn't start: shown where its tile is.
         Label {
             objectName: "coreError"
             width: parent.width

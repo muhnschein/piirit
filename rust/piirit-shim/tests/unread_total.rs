@@ -1,11 +1,7 @@
-//! What the cover counts, and whom it draws.
+//! Cover unread total and people list.
 //!
-//! The total has to include muted chats: muting silences the
-//! announcement, not the arithmetic, and the per-chat badge behaves the
-//! same way. It also has to survive a count that would overflow rather
-//! than wrapping to a small, plausible-looking number. The people are
-//! everyone but the two chats that are nobody: the one with oneself and
-//! the core's own.
+//! Total counts muted chats (mute silences alert, not count). Saturates, never
+//! wraps. People: all chats but self-talk and device chat.
 
 use piirit_shim::{ChatList, ChatListItem};
 use qmetaobject::QString;
@@ -28,7 +24,7 @@ fn the_total_counts_every_chat_including_muted_ones() {
         let mut rows = list.rows.borrow_mut();
         rows.push(chat(1, 3, false));
         rows.push(chat(2, 0, false));
-        // Muted, and still waiting to be read.
+        // Muted, still unread.
         rows.push(chat(3, 4, true));
     }
 

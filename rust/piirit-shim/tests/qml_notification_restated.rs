@@ -1,7 +1,5 @@
-//! A notification follows its chat after it is up: an edited message is
-//! the edited text on it, a deleted one comes off it, and once nothing
-//! there is unread the notification comes down. All of it in place, with
-//! no banner, since nothing arrived.
+//! Notification follows its chat once up: edited message shows edited text, deleted one comes
+//! off, and once nothing there is unread it comes down. All in place, no banner: nothing arrived.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -53,7 +51,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_notification_follows_edits_and_deletions_in_its_chat() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -116,17 +114,16 @@ fn a_notification_follows_edits_and_deletions_in_its_chat() {
         call!("set", QString::from("appActive"), false);
         call!("set", QString::from("detail"), 0);
 
-        // Edited: the new text, in place, no banner.
+        // Edited: new text, in place, no banner.
         arrived!(7, "see you there");
         record!("arrived", call!("state", 7));
         restated!(7, "see you tomorrow", 1);
         record!("edited", call!("state", 7));
-        // Restated again with nothing changed: published no further.
+        // Restated unchanged: no publish.
         restated!(7, "see you tomorrow", 1);
         record!("unchanged", call!("state", 7));
 
-        // Two up, one deleted: the one before is what it says, counting
-        // one; then the other deleted too, and it comes down.
+        // Two up, one deleted: earlier stays, count 1. Other deleted: drops.
         arrived!(9, "first");
         arrived!(9, "second");
         restated!(9, "first", 1);
@@ -134,10 +131,10 @@ fn a_notification_follows_edits_and_deletions_in_its_chat() {
         restated!(9, "older message", 0);
         record!("all-deleted", call!("state", 9));
 
-        // A chat with nothing up says nothing.
+        // Nothing up: silent.
         restated!(11, "edited elsewhere", 1);
         record!("never-up", call!("state", 11));
-        // Nor does one whose notification the reader took down.
+        // Nor if reader dismissed it.
         restated!(9, "edited later", 2);
         record!("after-down", call!("state", 9));
     });

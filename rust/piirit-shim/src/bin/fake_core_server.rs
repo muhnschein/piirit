@@ -1,13 +1,6 @@
-//! A `deltachat-rpc-server` double that records what it was asked.
-//!
-//! Every request is appended as one JSON line to `PIIRIT_FAKE_JOURNAL`,
-//! so tests can assert which calls a UI action makes, in what order, with
-//! what parameters. `get_next_event_batch` is left out: the client polls it
-//! in a loop and would bury the sequence.
-//!
-//! Behaviour is keyed on input rather than an environment switch, so one
-//! process can drive success and failure: a QR payload or address
-//! containing `fail` is rejected.
+//! Fake `deltachat-rpc-server`: journals each request as a JSON line to `PIIRIT_FAKE_JOURNAL`
+//! (tests assert calls, order, params). Keyed on input, not env, so one process serves success
+//! and failure: QR payload or address containing `fail` is rejected.
 
 use std::collections::VecDeque;
 use std::io::Write;
@@ -18,21 +11,15 @@ use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::sync::Mutex;
 
-/// `DC_CONTACT_ID_SELF`: the account's own contact.
+/// `DC_CONTACT_ID_SELF`: own contact.
 const SELF: u32 = 1;
 
-/// The config key the core answers the largest recommended attachment
-/// with, and the real core's own answer to it: `(30 - 1) MiB * 3/4`,
-/// which is 30 MiB of chatmail relay less a megabyte of headers and less
-/// what base64 adds. Computed there and here, never stored.
+/// Max recommended attachment: key, and core's answer `(30 - 1) MiB * 3/4` (30 MiB relay,
+/// less 1 MiB headers, less base64). Computed, not stored.
 const RECOMMENDED_SIZE_KEY: &str = "sys.msgsize_max_recommended";
 const RECOMMENDED_SIZE: u64 = (30 - 1) * 1024 * 1024 / 4 * 3;
 
-/// What to answer `sys.msgsize_max_recommended` with.
-///
-/// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it, so a test about a file bigger
-/// than that can write a file of a few kilobytes rather than twenty-odd
-/// megabytes.
+/// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it: oversize tests write KiB, not ~20 MiB.
 fn recommended_size() -> String {
     std::env::var("PIIRIT_FAKE_MSGSIZE_MAX")
         .ok()
@@ -40,28 +27,27 @@ fn recommended_size() -> String {
         .unwrap_or_else(|| RECOMMENDED_SIZE.to_string())
 }
 
-/// One account, as `get_all_accounts` reports it.
+/// Account, as `get_all_accounts` reports.
 struct Account {
     id: u32,
     configured: bool,
 }
 
-/// One call, as the real core keeps it on the call's message.
+/// Call, as core keeps it on its message.
 struct FakeCall {
-    /// It came in, rather than being placed here.
+    /// Came in, not placed here.
     incoming: bool,
     has_video: bool,
-    /// The caller's SDP, as `call_info` hands it back.
+    /// Caller's SDP.
     offer: String,
-    /// Answered, at either end.
+    /// Answered at either end.
     accepted: bool,
-    /// The core's `CallState` kind, which `call_info` reports.
+    /// Core's `CallState` kind.
     state: &'static str,
 }
 
 impl FakeCall {
-    /// The text the real core writes onto the call's message, in its own
-    /// English: what a row that does not read the state would show.
+    /// Core's text, for rows not reading state.
     fn text(&self) -> &'static str {
         match (self.state, self.incoming, self.has_video) {
             ("Missed", ..) => "Missed call",
@@ -74,8 +60,7 @@ impl FakeCall {
         }
     }
 
-    /// `call_info`, as the real core serialises it: camelCase, the state
-    /// tagged by `kind`, and a duration only on a completed call.
+    /// `call_info` as core: `camelCase`, state tagged `kind`, duration once completed.
     fn info(&self) -> Value {
         let state = if self.state == "Completed" {
             json!({"kind": "Completed", "duration": 185})
@@ -86,8 +71,7 @@ impl FakeCall {
     }
 }
 
-/// What one `send_msg` handed over: the fields of its `MessageData` the
-/// row has to carry back.
+/// `send_msg` `MessageData` fields row must carry back.
 struct Sent {
     file: Value,
     view_type: String,
@@ -98,120 +82,89 @@ struct Sent {
 #[derive(Default)]
 struct State {
     accounts: Vec<Account>,
-    /// The highest account id handed out so far. The real core never
-    /// hands one out twice, even once the account has gone.
+    /// Highest account id given out; never reused.
     last_account: u32,
-    /// The profile the app last said it was showing. The real core keeps
-    /// it on disk, selects a newly added account itself, and falls back
-    /// to the first that is left when the selected one is removed.
+    /// Profile app last said it shows. Core keeps it on disk, selects new account itself, falls
+    /// back to first left on removal.
     selected: Option<u32>,
-    /// Events waiting to be handed out by `get_next_event_batch`.
+    /// Events for `get_next_event_batch`.
     events: VecDeque<Value>,
-    /// Message ids per chat, oldest first. Seeded on first use.
+    /// Message ids per chat, oldest first; seeded on first use.
     chats: std::collections::BTreeMap<u32, Vec<u32>>,
-    /// Chat ids in display order, most recent first.
+    /// Chat ids in display order, newest first.
     chat_order: Vec<u32>,
-    /// The archived list, which is disjoint from `chat_order`.
+    /// Archived chats; disjoint from `chat_order`.
     archived_order: Vec<u32>,
     next_message_id: u32,
-    /// Contact id -> address. Seeded with two known contacts.
+    /// Contact id -> address; two seeded.
     contacts: std::collections::BTreeMap<u32, String>,
     next_chat_id: u32,
-    /// Members of each group, by chat. A chat with an entry here is a
-    /// group; the seeded one has the account itself in it, as the real
-    /// core lists it.
+    /// Group members by chat (entry = group); seeded one includes self, as core.
     group_members: std::collections::BTreeMap<u32, Vec<u32>>,
-    /// Group names given after creation, by chat.
+    /// Group names set after creation.
     group_names: std::collections::BTreeMap<u32, String>,
-    /// Group descriptions, by chat. `PIIRIT_FAKE_DESCRIPTION` gives the
-    /// seeded group one.
+    /// Group descriptions; `PIIRIT_FAKE_DESCRIPTION` sets seeded one.
     descriptions: std::collections::BTreeMap<u32, String>,
-    /// Group pictures, by chat. The real core keeps the path of its own
-    /// copy; this keeps the path it was given.
+    /// Group pictures: given path, not core's copy.
     group_images: std::collections::BTreeMap<u32, String>,
-    /// Groups this account has left. The real core refuses every change
-    /// to one of these.
+    /// Left groups: core refuses all changes.
     left_groups: std::collections::BTreeSet<u32>,
-    /// Chats deleted here. The real core cannot load one any more, and
-    /// says so to whatever asks for it by id.
+    /// Deleted chats: core can't load.
     deleted_chats: std::collections::BTreeSet<u32>,
-    /// Accounts whose transport call has not been answered yet. The
-    /// real core allows one ongoing process per account and refuses a
-    /// second; see `add_transport_from_qr`.
+    /// Accounts with unanswered transport call: core allows one, refuses second.
     configuring: std::collections::BTreeSet<u32>,
-    /// Accounts whose ongoing process was asked to stop.
+    /// Accounts asked to stop ongoing process.
     stopped: std::collections::BTreeSet<u32>,
-    /// IO was stopped for every account, and not started since. The real
-    /// core then says it is not connected and reports no relays.
+    /// IO stopped, not restarted: reports not connected, no relays.
     io_stopped: bool,
-    /// Seconds after which a chat's messages disappear, by chat.
+    /// Seconds until chat messages vanish.
     timers: std::collections::BTreeMap<u32, u32>,
-    /// Config values per account, so a set can be read back.
+    /// Config values per account.
     config: std::collections::BTreeMap<(u32, String), String>,
-    /// The unsent text each chat is holding. The core keeps drafts, so a
-    /// fake standing in for it has to as well.
+    /// Unsent draft text per chat.
     drafts: std::collections::BTreeMap<u32, String>,
-    /// Names given to contacts here, by contact. The real core shows one
-    /// in place of what the contact calls themselves, and an empty name
-    /// puts theirs back.
+    /// Contact nicknames; empty restores theirs.
     contact_names: std::collections::BTreeMap<u32, String>,
-    /// Contacts this account has blocked. The real core keeps them out of
-    /// `get_contacts` whatever the flags say and lists them through
-    /// `get_blocked_contacts` alone; so does this.
+    /// Blocked: out of `get_contacts` whatever flags; only `get_blocked_contacts` lists them.
     blocked: std::collections::BTreeSet<u32>,
-    /// Messages whose remainder was asked for; see `downloadState`.
+    /// Messages whose remainder was requested; see `downloadState`.
     downloaded: std::collections::BTreeSet<u32>,
-    /// Chats with an unread message on them, by account: marked unread
-    /// from the list, and cleared when the chat is noticed. The real
-    /// core counts fresh messages; this counts a chat as having one.
+    /// Chats marked unread from list, per account; cleared when noticed. Flag only, no count.
     fresh: std::collections::BTreeSet<(u32, u32)>,
-    /// Reactions by message, then by the contact who sent them. The real
-    /// core keeps one list per contact, and the list this account sends
-    /// replaces whatever it had there before.
+    /// Reactions by message, then contact (one list each); own send replaces own list.
     reactions: std::collections::BTreeMap<u32, std::collections::BTreeMap<u32, Vec<String>>>,
-    /// What a `send_msg` handed over, by message, so `get_messages` can
-    /// say what was sent.
+    /// What `send_msg` handed over, by message.
     sent_files: std::collections::BTreeMap<u32, Sent>,
-    /// Status updates per webxdc instance, in the order they were sent.
-    /// The real core numbers them from 1 and hands out everything after
-    /// the serial it is asked from; so does this.
+    /// Webxdc updates per instance, send order, serial from 1; all after asked serial, as core.
     webxdc_updates: std::collections::BTreeMap<u32, Vec<Value>>,
-    /// Texts changed after sending, by message: what `send_edit_request`
-    /// leaves behind, and what marks a message edited.
+    /// Text edits by message; marks edited.
     edits: std::collections::BTreeMap<u32, String>,
-    /// Chats muted from the list. The real core keeps a duration; this
-    /// keeps whether.
+    /// Muted chats: flag, not duration.
     muted: std::collections::BTreeSet<u32>,
-    /// The message each sent message quotes, when it quotes one.
+    /// Message each sent message quotes.
     quotes: std::collections::BTreeMap<u32, u32>,
-    /// Messages sent from here, in the order they went. Read as the
-    /// account's own when a test asks for that; see `full_message`.
+    /// Sent here, send order. Own only if test asks; see `full_message`.
     sent: std::collections::BTreeSet<u32>,
-    /// Calls, by their message. Placed here, or rung in under
-    /// `PIIRIT_FAKE_INCOMING_CALL_MS`.
+    /// Calls by message; placed here or via `PIIRIT_FAKE_INCOMING_CALL_MS`.
     calls: std::collections::BTreeMap<u32, FakeCall>,
-    /// Each account's transports, in the order they were added -- the
-    /// real core's `transports` table, which `list_transports` reads
-    /// oldest first. The one with the account's own address on it is
-    /// `configured_addr` in `config`, as it is there.
+    /// Transports per account, add order (core's `transports` table, `list_transports`).
+    /// Own-address one is `configured_addr` in `config`, as core.
     transports: std::collections::BTreeMap<u32, Vec<String>>,
 }
 
 impl State {
-    /// A config value, as the real core would read it back.
+    /// Config value, as core reads back.
     fn config(&self, account: u32, key: &str) -> Option<String> {
         self.config.get(&(account, key.to_string())).cloned()
     }
 
-    /// The account's transports, oldest first.
+    /// Account's transports, oldest first.
     fn transports_for(&self, account: u32) -> Vec<String> {
         self.transports.get(&account).cloned().unwrap_or_default()
     }
 
-    /// Keep a transport the account was just given, as the real core
-    /// does: appended, once, and the account's own address if it had
-    /// none yet -- a second transport is a second address to be reached
-    /// at, not a change of the first.
+    /// Keep new transport once, as core; own address if none yet (second = second address, not
+    /// change of first).
     fn add_transport(&mut self, account: u32, addr: &str) {
         let list = self.transports.entry(account).or_default();
         if !list.iter().any(|known| known == addr) {
@@ -223,15 +176,9 @@ impl State {
         self.transports_modified(account);
     }
 
-    /// Profiles a test wants there from the start, already configured,
-    /// named in `PIIRIT_FAKE_ACCOUNTS`. The onboarding tests leave it
-    /// unset and start from none. Seeded before the first request is
-    /// answered, so that a page asking about a profile before the
-    /// account list has been read finds its transports there.
-    ///
-    /// A profile set up twice has a relay besides the one its own
-    /// address (`configured_addr`) is on: what `PIIRIT_FAKE_OLDER_RELAY`
-    /// seeds, as the first transport the core lists.
+    /// Configured profiles from `PIIRIT_FAKE_ACCOUNTS` (unset in onboarding tests), seeded before
+    /// first request so early profile asks find transports. `PIIRIT_FAKE_OLDER_RELAY` seeds relay
+    /// listed before own address's (profile set up twice).
     fn seed_accounts(&mut self) {
         let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
@@ -253,8 +200,7 @@ impl State {
         }
     }
 
-    /// Queue the event the real core sends when an account's transports
-    /// change.
+    /// Core's event on account transport change.
     fn transports_modified(&mut self, account: u32) {
         self.events.push_back(json!({
             "contextId": account,
@@ -262,10 +208,8 @@ impl State {
         }));
     }
 
-    /// The accounts, shaped as the real core shapes them: a configured
-    /// one carries its profile -- name, picture, colour -- but no
-    /// address, which the real core dropped in 2.61, and an unconfigured
-    /// one is an id and nothing else.
+    /// Accounts as core: configured carries profile (name, picture, colour), no address (dropped
+    /// in 2.61); unconfigured id only.
     fn account_list(&self) -> Value {
         Value::Array(
             self.accounts
@@ -287,13 +231,11 @@ impl State {
         )
     }
 
-    /// Two chats with a couple of messages each, so a test can watch a
-    /// model load them and then take in one more.
+    /// Two seeded chats: paging, adding one more.
     fn seed_chats(&mut self) {
         if self.chats.is_empty() {
-            // A chat long enough to page through, when a test asks for
-            // one. Ids count up from 1, so the newest is the highest and
-            // the seeded quote and picture keep the ids they always had.
+            // Long chat for paging, on request. Ids from 1, newest highest; seeded quote, picture
+            // keep ids.
             let long = std::env::var("PIIRIT_FAKE_LONG_CHAT")
                 .ok()
                 .and_then(|count| count.parse::<u32>().ok())
@@ -303,15 +245,12 @@ impl State {
                 long.map_or_else(|| vec![1, 2], |count| (1..=count).collect()),
             );
             self.chats.insert(2, vec![10]);
-            // The rest of what a chat can hold, in the group, when a test
-            // asks for it: a file, a voice message, an app and a video
-            // beside the picture, one of each kind the media pages list.
+            // Other media kinds on request: file, voice, app, video.
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
             }
             self.chat_order = vec![1, 2];
-            // More chats than a screen shows, when a test asks for them:
-            // empty ones from 201 up, below the two seeded ones.
+            // Extra empty chats from 201, on request.
             let many = std::env::var("PIIRIT_FAKE_MANY_CHATS")
                 .ok()
                 .and_then(|count| count.parse::<u32>().ok())
@@ -320,31 +259,22 @@ impl State {
                 self.chats.insert(chat, Vec::new());
                 self.chat_order.push(chat);
             }
-            // Chat 3 is archived, and appears in no ordinary listing.
-            // Without it, a model asking for the archived list and a model
-            // asking for the ordinary one are indistinguishable, and a
-            // test cannot tell which answer it got.
+            // Chat 3 archived: else both lists alike.
             self.chats.insert(3, vec![30]);
-            // An empty archive is its own case: the page hides its search
-            // field when there is nothing to search, and with a chat
-            // always present no test could see that.
+            // Empty archive: page hides search.
             self.archived_order = if std::env::var("PIIRIT_FAKE_NO_ARCHIVED").is_ok() {
                 Vec::new()
             } else {
                 vec![3]
             };
-            // Above whatever the seeded chat used, so a message added
-            // while a test runs cannot collide with one already in it.
+            // Above seeded ids: no collision.
             self.next_message_id = long.unwrap_or(0).max(100);
             self.contacts.insert(10, "ada@example.org".to_string());
             self.contacts.insert(11, "grace@example.org".to_string());
-            // Chat 2 is the group: the account itself and one contact, so
-            // a test can add the other and remove this one.
+            // Chat 2 group: self + one contact; test adds other, removes this one.
             self.group_members.insert(2, vec![SELF, 10]);
             self.next_chat_id = 500;
-            // Someone else's reaction on the first message, when a test
-            // asks for one: what a chip that is not ours looks like, and
-            // what our own on top of it counts up to.
+            // Others' reaction on first message, on request: non-own chip, ours counts up.
             if std::env::var_os("PIIRIT_FAKE_REACTED").is_some() {
                 self.reactions
                     .entry(1)
@@ -354,10 +284,8 @@ impl State {
         }
     }
 
-    /// A message's reactions as the real core shapes them: counted and
-    /// sorted, most frequent first, beside the per-contact lists -- or
-    /// null when nobody has reacted. Pinned in
-    /// deltachat-jsonrpc/tests/real_server.rs.
+    /// Reactions as core: counted, most frequent first; null if none. Pinned in
+    /// `deltachat-jsonrpc/tests/real_server.rs`.
     fn reactions_object(&self, msg: u32) -> Value {
         let Some(by_contact) = self.reactions.get(&msg) else {
             return Value::Null;
@@ -394,12 +322,12 @@ impl State {
         })
     }
 
-    /// Whether a chat is a group: the created ones, and the seeded one.
+    /// Group if created here or seeded.
     fn is_group(&self, chat: u32) -> bool {
         self.group_members.contains_key(&chat)
     }
 
-    /// A chat's name: what it was renamed to, else the seeded one.
+    /// Chat name: renamed, else seeded.
     fn chat_name(&self, chat: u32) -> String {
         self.group_names
             .get(&chat)
@@ -407,22 +335,10 @@ impl State {
             .unwrap_or_else(|| format!("chat {chat}"))
     }
 
-    /// One contact, shaped as `get_contacts` shapes them. The account's
-    /// own contact is not in the list but can be asked for by id, which
-    /// is how a chat's members come back. Ada has written a line about
-    /// herself, so a contact page has one to show.
-    ///
-    /// The three names are the real core's: `authName` is what the
-    /// contact calls themselves, `name` what was given to them here, and
-    /// `displayName` the second when there is one, else the first.
-    ///
-    /// Every key the 2.62 core sends is here, whether the app reads it or
-    /// not, with the values the real core gives a contact nobody has seen
-    /// (`lastSeen` 0): "Old" freshness, which it reserves for key
-    /// contacts. Its own contact is never highlighted, so "Normal".
-    ///
-    /// Nobody has a picture, unless `PIIRIT_FAKE_CONTACT_PICTURE` gives
-    /// Ada one: the path the core would hand back for it.
+    /// Contact as `get_contacts`: own unlisted, askable by id (members). Ada has bio. Names:
+    /// `authName` theirs, `name` given here, `displayName` `name` else `authName`. Every 2.62 key,
+    /// unseen values (`lastSeen` 0, "Old"; own "Normal"). Picture only via
+    /// `PIIRIT_FAKE_CONTACT_PICTURE` (Ada, core-style path).
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -462,8 +378,7 @@ impl State {
         }))
     }
 
-    /// Announce a change to a chat's name, picture or members, as the real
-    /// core does after each of those calls.
+    /// Announce name, picture, member change, as core.
     fn chat_modified(&mut self, account_id: u32, chat: u32) {
         self.events.push_back(json!({
             "contextId": account_id,
@@ -471,8 +386,7 @@ impl State {
         }));
     }
 
-    /// Which chat a message is in. The real core carries this on the
-    /// message object; a search result is unusable without it.
+    /// Message's chat; search results need it.
     fn chat_of(&self, message_id: u32) -> u32 {
         self.chats
             .iter()
@@ -480,18 +394,9 @@ impl State {
             .map_or(0, |(chat, _)| *chat)
     }
 
-    /// Append a message to a chat and announce it, the way a send or an
-    /// incoming message does.
-    /// One message with everything the fake knows about it laid over the
-    /// seeded shape: which chat it is in, what was sent with it, what its
-    /// text was changed to, what it quotes, and whether the download
-    /// limit is holding it back. What `get_message` and `get_messages`
-    /// both answer with, so the two cannot disagree.
-    ///
-    /// A message sent from here reads as the account's own only under
-    /// `PIIRIT_FAKE_SELF_SENT`: the rest of the suite leans on a sent
-    /// message coming back as somebody else's, which is how a message
-    /// can be made to arrive without a network.
+    /// One message: seeded shape plus chat, sent data, edit, quote, download hold; shared by
+    /// `get_message`/`get_messages` so they agree. Sent-here is own only under
+    /// `PIIRIT_FAKE_SELF_SENT`: suite relies on sends returning as someone else's.
     fn full_message(&self, msg: u64) -> Value {
         let mut message = message_object(msg);
         let id = u32::try_from(msg).unwrap_or_default();
@@ -522,8 +427,7 @@ impl State {
             }
         }
         if let Some(quoted) = self.quotes.get(&id) {
-            // The real core's `WithMessage` quote: the quoted message's
-            // id beside its text and author.
+            // Core's `WithMessage` quote: id, text, author.
             message["quote"] = json!({
                 "kind": "WithMessage",
                 "messageId": quoted,
@@ -531,8 +435,7 @@ impl State {
                 "authorDisplayName": "Ada Lovelace",
             });
         }
-        // One message the download limit held back, when a test names
-        // it, until its remainder is asked for.
+        // Download-limit hold until remainder requested.
         let held_back = std::env::var("PIIRIT_FAKE_HELD_BACK_MSG")
             .ok()
             .and_then(|value| value.parse::<u64>().ok());
@@ -546,7 +449,7 @@ impl State {
         message
     }
 
-    /// Remember what a message sent from here quoted, if anything.
+    /// Remember what a sent message quoted.
     fn note_quote(&mut self, msg: u32, quoted: &Value) {
         self.sent.insert(msg);
         if let Some(quoted) = quoted.as_u64().and_then(|value| u32::try_from(value).ok()) {
@@ -556,26 +459,22 @@ impl State {
         }
     }
 
+    /// Append message to chat, announce (send or arrival).
     fn add_message(&mut self, account_id: u32, chat_id: u32) -> u32 {
         self.seed_chats();
         self.next_message_id += 1;
         let id = self.next_message_id;
         self.chats.entry(chat_id).or_default().push(id);
-        // A message moves its chat to the top, which is what makes a chat
-        // list reorder rather than merely change.
+        // To top: list reorders.
         self.chat_order.retain(|chat| *chat != chat_id);
         self.chat_order.insert(0, chat_id);
         self.events.push_back(json!({
             "contextId": account_id,
             "event": {"kind": "IncomingMsg", "chatId": chat_id, "msgId": id},
         }));
-        // The real core follows a message with this within the same
-        // millisecond (pinned with the vendored server: `MsgDelivered`,
-        // then `ChatlistItemChanged` for the chat), and with a
-        // `ChatlistChanged` besides when the order changed. A model that
-        // announced only on the refresh the first event started never
-        // announced at all, since the one behind it made that answer
-        // stale before it landed.
+        // Core follows in same ms (pinned: `MsgDelivered`, `ChatlistItemChanged`), plus
+        // `ChatlistChanged` if order changed. Model announcing only on first event's refresh never
+        // announced: next event staled it.
         self.events.push_back(json!({
             "contextId": account_id,
             "event": {"kind": "ChatlistItemChanged", "chatId": chat_id},
@@ -583,12 +482,8 @@ impl State {
         id
     }
 
-    /// Put a message into a chat one place before its end, and announce
-    /// it. The real core sorts a received message below the newest *seen*
-    /// message and no further, so one whose Date is earlier than the
-    /// unread messages already at the end lands among them rather than
-    /// after them -- a late message in a busy group, or an older one
-    /// synced from another device.
+    /// Put message one before end, announce. Core sorts arrival below newest *seen*, no further:
+    /// one dated before unread tail lands among it (late group message, sync).
     fn add_late_message(&mut self, account_id: u32, chat_id: u32) -> u32 {
         self.seed_chats();
         self.next_message_id += 1;
@@ -603,9 +498,8 @@ impl State {
         id
     }
 
-    /// Put a call's message into a chat, as the real core does for a call
-    /// placed here and one that comes in: a message like any other, which
-    /// `MsgsChanged` announces -- a ringing call is not an `IncomingMsg`.
+    /// Call's message in chat, as core (placed or incoming). `MsgsChanged`: ringing call is not
+    /// `IncomingMsg`.
     fn add_call(&mut self, account_id: u32, chat_id: u32, call: FakeCall) -> u32 {
         self.seed_chats();
         self.next_message_id += 1;
@@ -619,8 +513,7 @@ impl State {
         id
     }
 
-    /// Announce that a call's state moved, as the real core does with
-    /// every move: `MsgsChanged` for its message.
+    /// Call state move: `MsgsChanged` for its message.
     fn call_changed(&mut self, account_id: u32, message_id: u32) {
         let chat_id = self.chat_of(message_id);
         self.events.push_back(json!({
@@ -629,7 +522,7 @@ impl State {
         }));
     }
 
-    /// One of the four call events, in the real core's own `snake_case`.
+    /// One of four call events, `snake_case`.
     fn call_event(&mut self, account_id: u32, kind: &str, message_id: u32, extra: &Value) {
         let mut event = json!({
             "kind": kind,
@@ -645,8 +538,7 @@ impl State {
             .push_back(json!({"contextId": account_id, "event": event}));
     }
 
-    /// Queue one import/export progress event, as the core does while a
-    /// backup is read or written: 0 is a failure, 1000 is done.
+    /// Queue imex progress: 0 failure, 1000 done.
     fn imex(&mut self, account_id: u32, progress: u32) {
         self.events.push_back(json!({
             "contextId": account_id,
@@ -654,8 +546,7 @@ impl State {
         }));
     }
 
-    /// Configure an account and queue the progress events the core emits:
-    /// permille steps, then 1000 for done.
+    /// Configure account; permille progress, then 1000.
     fn configure(&mut self, account_id: u32) {
         for account in &mut self.accounts {
             if account.id == account_id {
@@ -671,20 +562,18 @@ impl State {
     }
 }
 
-/// When the server came up, for the journal's clock.
+/// Start time, journal clock.
 static STARTED: std::sync::OnceLock<std::time::Instant> = std::sync::OnceLock::new();
 
 fn journal(method: &str, params: &Value) {
     let Ok(path) = std::env::var("PIIRIT_FAKE_JOURNAL") else {
         return;
     };
-    // Polling noise would bury the sequence.
+    // Polling noise would bury sequence.
     if method == "get_next_event_batch" {
         return;
     }
-    // When it arrived, in milliseconds since the server came up: a test
-    // that asks whether two calls overlapped cannot read that off a Qt
-    // timer of its own, which is coarse enough to fire two probes at once.
+    // Ms since start: call-overlap tests can't use Qt timer (too coarse, two probes at once).
     let at = STARTED
         .get_or_init(std::time::Instant::now)
         .elapsed()
@@ -695,24 +584,13 @@ fn journal(method: &str, params: &Value) {
         .append(true)
         .open(path)
     {
-        // One write, not `writeln!`'s two: requests are handled
-        // concurrently, and the newline landing separately tore lines into
-        // each other.
+        // One write, not `writeln!`'s two: concurrent newlines tore lines.
         let _ = file.write_all(line.as_bytes());
     }
 }
 
-/// One message, shaped like the real core's. Seeded message 1 quotes,
-/// 2 is unread, and 10 carries an image, so one fetch covers the cases the
-/// conversation view has to render.
-/// What a message says.
-///
-/// Short by default, because most tests assert on it. `PIIRIT_FAKE_WORDY`
-/// makes it long enough to wrap, which is what a real conversation looks
-/// like to a view: a row's height then depends on how wide it is drawn, and
-/// changes when that changes. Nothing else here can make a laid-out row
-/// change size, and a view that cannot be made to shift cannot be shown to
-/// hold its place.
+/// Message text, short by default (tests assert it). `PIIRIT_FAKE_WORDY` wraps: height then
+/// tracks draw width, only way to resize a laid-out row (view holding place).
 fn wordy(msg: u64) -> String {
     let text = format!("message {msg}");
     if std::env::var_os("PIIRIT_FAKE_WORDY").is_none() {
@@ -721,13 +599,8 @@ fn wordy(msg: u64) -> String {
     format!("{text}, and then a good deal more of it, long enough that where it wraps depends on how wide the row is drawn")
 }
 
-/// When a message was sent.
-///
-/// 2023-11-14T22:13:20Z and a day later, so a day separator has something to
-/// separate. Its own function because the day markers below have to agree
-/// with it: a placeholder row takes its day from the marker and a filled-in
-/// row from the message, and the two disagreeing is the heading changing
-/// under the reader.
+/// Send time: 2023-11-14T22:13:20Z, a day later, for day separator. Own fn: placeholder row
+/// takes day from marker, filled row from message; must agree.
 fn message_timestamp(msg: u64) -> i64 {
     if msg == 1 {
         1_700_000_000
@@ -736,8 +609,7 @@ fn message_timestamp(msg: u64) -> i64 {
     }
 }
 
-/// Local midnight starting the day `timestamp` falls in, which is what the
-/// real core gives as a day marker -- checked against it in three zones.
+/// Local midnight of `timestamp`'s day, as core's markers. Checked in three zones.
 fn day_start(timestamp: i64) -> i64 {
     let Some(when) = Local.timestamp_opt(timestamp, 0).single() else {
         return timestamp.div_euclid(86_400) * 86_400;
@@ -748,13 +620,8 @@ fn day_start(timestamp: i64) -> i64 {
         .map_or(timestamp, |midnight| midnight.timestamp())
 }
 
-/// What the fake archive holds: a page, the script it asks for, and an
-/// icon. Anything else is not in this webxdc.
-///
-/// The page asks for its script the way a bundler writes one -- an
-/// absolute path, into a directory -- because that is what half the
-/// apps in the store do and what a host serving them under a prefix
-/// answers nothing to.
+/// Fake archive: page, script, icon. Script fetched by absolute dir path, as bundlers write
+/// (half the store); host serving under prefix answers nothing.
 fn webxdc_file(path: &str) -> Option<Vec<u8>> {
     match path {
         "index.html" => Some(
@@ -767,8 +634,7 @@ fn webxdc_file(path: &str) -> Option<Vec<u8>> {
     }
 }
 
-/// Standard base64 without padding, which is what the core encodes a
-/// blob as. Written out rather than depended on: this is a test double.
+/// Standard base64, unpadded, as core encodes blobs.
 fn base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = String::new();
@@ -784,6 +650,7 @@ fn base64(bytes: &[u8]) -> String {
     out
 }
 
+/// Message shaped like core's. Seeded 1 quotes, 2 unread, 10 image: one fetch covers view.
 fn message_object(msg: u64) -> Value {
     let timestamp = message_timestamp(msg);
     let info_first = msg == 1 && std::env::var_os("PIIRIT_FAKE_INFO_FIRST").is_some();
@@ -797,12 +664,10 @@ fn message_object(msg: u64) -> Value {
         "fromId": 10,
         "timestamp": timestamp,
         "showPadlock": true,
-        // One seeded message is unread, and so is anything added while
-        // the test runs: an arrival is the case worth covering.
+        // Seeded and test-added messages unread: arrivals worth covering.
         "state": if msg == 2 || msg > 100 { 10 } else { 16 },
-        // The first message of a real chat is the core's own "messages are
-        // end-to-end encrypted" notice, which is the row the day heading
-        // was reported drawn on top of.
+        // Real chat's first message: core's "end-to-end encrypted" notice, which day heading was
+        // reported drawn over.
         "isInfo": info_first,
         "viewType": "Text",
         "sender": {"id": 10, "displayName": "Ada Lovelace", "color": "#00875a"},
@@ -823,15 +688,12 @@ fn message_object(msg: u64) -> Value {
         message["dimensionsWidth"] = json!(640);
         message["dimensionsHeight"] = json!(480);
     }
-    // One of each other kind the media pages list, and a second picture
-    // that is a video: in the group under PIIRIT_FAKE_MEDIA, and by
-    // id always. The sizes and types are what the real core reports for
-    // a file it has copied.
+    // One of each other media kind, plus video second picture: in group under
+    // `PIIRIT_FAKE_MEDIA`, by id always. Sizes/types as core.
     match msg {
         12 => {
             message["viewType"] = json!("File");
-            // Under its hash, as the real core keeps a received file;
-            // the sender's name for it is `fileName` and nowhere else.
+            // Under hash, as core keeps received file; sender's name is `fileName`.
             message["file"] = json!("/tmp/piirit-fake/6f5902ac237024bdd0c176cb93063dc4.pdf");
             message["fileName"] = json!("notes.pdf");
             message["fileMime"] = json!("application/pdf");
@@ -843,8 +705,7 @@ fn message_object(msg: u64) -> Value {
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
-            // In milliseconds, as a sending client writes it in for a
-            // recording: what the row says before anything has played.
+            // Ms, as sender writes: row shows length before play.
             message["duration"] = json!(4_000);
         }
         14 => {
@@ -863,10 +724,8 @@ fn message_object(msg: u64) -> Value {
         }
         _ => {}
     }
-    // A message the sending core had to cut: what is here ends in the
-    // core's own marker, and the whole of it is only behind
-    // `get_message_html`. In no chat -- what reads it asks for it by id,
-    // the way the page that shows one whole does.
+    // Cut by sender's core: ends in marker, whole only via `get_message_html`. In no chat:
+    // whole-message page asks by id.
     if msg == 11 {
         message["text"] = json!(format!("{LONG_MESSAGE_HEAD}\n[...]"));
         message["hasHtml"] = json!(true);
@@ -874,18 +733,12 @@ fn message_object(msg: u64) -> Value {
     message
 }
 
-/// The beginning of the long message, which is all that fits in `text`.
+/// Start of long message: fits in `text`.
 const LONG_MESSAGE_HEAD: &str = "# Groceries";
 
-/// The whole of it, as the core gives it out: an HTML part, written the
-/// way the pinned `deltachat-rpc-server` writes one.
-///
-/// The newlines matter and are why they are here. The core's own
-/// template puts its head on lines of its own, and turns each newline of
-/// the message into `<br/>` *followed by a newline* -- so a reader that
-/// counts both gets a blank line between every line of the message. Written
-/// out on one line here, that double-spacing would reach the phone with
-/// nothing in the suite to notice it.
+/// Whole message HTML as pinned `deltachat-rpc-server` writes. Newlines matter: head on own
+/// lines, newline -> `<br/>` *plus newline*, so counting both double-spaces; one-line fixture
+/// would hide that bug.
 const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      <html><head>\n\
      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\
@@ -894,14 +747,12 @@ const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      Groceries<br/>\nmilk<br/>\nbread<br/>\nand a &amp; sign<br/>\n\
      </body></html>\n";
 
-/// True for the inputs that stand in for "the server cannot be reached".
+/// Inputs standing for unreachable server.
 fn should_fail(value: &str) -> bool {
     value.contains("fail")
 }
 
-/// Chat ids named in `var`, comma-separated. Lets a test mark which of
-/// the seeded chats stand for something -- the chat with oneself, the
-/// device chat -- without a fixture for each.
+/// Chat ids in `var`, comma-separated: test marks seeded chats self/device, no fixture each.
 fn env_ids(var: &str) -> Vec<u64> {
     std::env::var(var)
         .ok()
@@ -914,18 +765,9 @@ fn env_ids(var: &str) -> Vec<u64> {
         .unwrap_or_default()
 }
 
-/// Ask the relay named in `qr` for an account.
-///
-/// Instant, unless the relay is a slow one: a payload containing `slow`
-/// is answered only after `PIIRIT_FAKE_SLOW_MS` (three seconds by
-/// default), the way a relay that is down holds the real core for as
-/// long as its connection attempts take. While it is pending the account
-/// is configuring, and the real core's two rules about that are kept:
-/// a second transport call on the same account is refused, in the real
-/// core's words, and `stop_ongoing_process` makes the pending call end
-/// in failure -- unless the payload also says `deaf`, for a relay that
-/// answers after all, which is what a stop that came too late looks
-/// like.
+/// Ask relay in `qr` for account. Instant unless `slow`: after `PIIRIT_FAKE_SLOW_MS` (3 s
+/// default), as down relay holds core. Pending = configuring: second transport call refused
+/// (core's words); `stop_ongoing_process` fails it unless `deaf` (stop too late).
 async fn add_transport_from_qr(
     state: &Arc<Mutex<State>>,
     id: &Value,
@@ -950,8 +792,7 @@ async fn add_transport_from_qr(
     if stopped {
         return err(id, "Configuration was stopped");
     }
-    // The address the relay minted: this account's name on the relay
-    // the payload names, which is enough for a row to be told apart by.
+    // Account's name on payload's relay: rows tell apart.
     let relay = qr
         .trim_start_matches("dcaccount:")
         .trim_start_matches("https://")
@@ -964,10 +805,8 @@ async fn add_transport_from_qr(
     ok(id, &Value::Null)
 }
 
-/// What `check_qr` makes of a payload: enough to tell an invite from a
-/// relay's code from anything else, which are the distinctions the shim
-/// makes. A relay's code says which relay, as the real core reads it:
-/// the domain of a `dcaccount:`, the address of a `dclogin:`.
+/// `check_qr`: invite, relay code, other (shim's distinctions). Relay as core reads it:
+/// `dcaccount:` domain, `dclogin:` address.
 fn qr_kind(content: &str) -> Value {
     let lower = content.to_ascii_lowercase();
     if let Some(rest) = lower.strip_prefix("dcaccount:") {
@@ -989,9 +828,7 @@ fn qr_kind(content: &str) -> Value {
     let kind = if content.contains("i.delta.chat") || content.starts_with("OPENPGP4FPR:") {
         "askVerifyContact"
     } else if content.starts_with("DCBACKUP2:") {
-        // What a device offering itself as a first device shows;
-        // `toonew` in it stands in for a backup from a newer Delta Chat
-        // than this core.
+        // Device offering itself; `toonew` = newer backup.
         if content.contains("toonew") {
             "backupTooNew"
         } else {
@@ -1003,20 +840,13 @@ fn qr_kind(content: &str) -> Value {
     json!({"kind": kind})
 }
 
-/// The relay `init_transports` lands an account on first. Slow, the way
-/// a payload naming `slow` is, when `PIIRIT_FAKE_AUTO_RELAY` says so: no
-/// payload is handed over to say it with.
+/// Relay `init_transports` lands on. Slow if `PIIRIT_FAKE_AUTO_RELAY` (no payload to say).
 fn automatic_relay() -> String {
     std::env::var("PIIRIT_FAKE_AUTO_RELAY").unwrap_or_else(|_| "first.auto.example".to_string())
 }
 
-/// Take a profile over, from another device or from a file: the import
-/// the real core runs, reported the way it reports one -- `ImexProgress`
-/// events as it goes, then the account configured.
-///
-/// Keyed on what it is handed, like the transport call: `fail` refuses,
-/// `slow` waits (and answers a `stop_ongoing_process` that arrives
-/// meanwhile, unless it is `deaf`).
+/// Take profile from device or file: `ImexProgress`, then configured. `fail` refuses; `slow`
+/// waits (answers `stop_ongoing_process` unless `deaf`).
 async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: &str) -> Value {
     if should_fail(from) {
         return err(id, "backup could not be read");
@@ -1039,10 +869,7 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
         return err(id, "Transfer was stopped");
     }
     state.imex(account, 1000);
-    // A backup carries the profile it was written from, address and
-    // all, so the same backup imported twice is the same address twice.
-    // Keyed on what the import was handed, which is the one thing two
-    // imports of the same profile have in common here.
+    // Backup carries address: same backup twice = same address, keyed on import argument.
     let addr = backup_addr(from);
     state
         .config
@@ -1052,15 +879,12 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     ok(id, &Value::Null)
 }
 
-/// One relay's block of the connectivity report, the shape the real core
-/// writes (pinned in deltachat-jsonrpc/tests/real_server.rs): the domain
-/// in bold, then the mailbox on a bar. Each relay's figure is its own,
-/// so a page that reads another relay's bar can be seen to.
+/// One relay's connectivity block as core writes (pinned in
+/// `deltachat-jsonrpc/tests/real_server.rs`): domain bold, mailbox on bar. Distinct figures
+/// per relay catch page reading wrong bar.
 fn transport_block(addr: &str) -> String {
     let domain = addr.rsplit('@').next().unwrap_or(addr);
-    // The older relay is the one the profile has drifted from: still
-    // reached, but not lately, which the real core draws in yellow with
-    // its own words; the rest are connected.
+    // Older relay: reached, not lately: yellow.
     let (dot, status, words, colour, percent) = match domain {
         "example.org" => ("green", "Connected", "1.34 GiB of 2 GiB used", "grey", 67),
         relay if relay.starts_with("old.") => {
@@ -1076,9 +900,7 @@ fn transport_block(addr: &str) -> String {
     )
 }
 
-/// The address a backup carries, made up from what names it: the file
-/// path or the code the other device showed. Two imports of the same
-/// thing get the same address, which is what a duplicate is.
+/// Backup's address from path or code: same thing, same address.
 fn backup_addr(from: &str) -> String {
     let name: String = from
         .rsplit('/')
@@ -1096,13 +918,8 @@ fn backup_addr(from: &str) -> String {
     format!("{}@example.org", name.trim_matches('-'))
 }
 
-/// Write a profile out, the way the real core's `export_backup` does:
-/// `ImexProgress` events while it runs, and a `.tar` in the folder it was
-/// handed, which the core names itself.
-///
-/// Keyed on the folder, like the import above: `fail` refuses, `slow`
-/// waits (and answers a `stop_ongoing_process` that arrives meanwhile,
-/// unless it is `deaf`).
+/// Export as core's `export_backup`: `ImexProgress`, `.tar` in folder. `fail` refuses;
+/// `slow` waits (answers `stop_ongoing_process` unless `deaf`).
 async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder: &str) -> Value {
     if should_fail(folder) {
         return err(id, "backup could not be written");
@@ -1124,13 +941,9 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
         state.imex(account, 0);
         return err(id, "Export was stopped");
     }
-    // The name the real core builds: the date, a number and the address.
-    // A page finds the file by what appeared in the folder, so what
-    // matters is that exactly one did.
+    // Core's name: date, number, address. Page finds the one new file.
     let written = std::path::Path::new(folder).join(format!("delta-chat-2026-01-01-{account}.tar"));
-    // Off the runtime's threads, as the shim does its own filesystem
-    // work: `std::fs` stops the thread it is called on, and this double
-    // is a server that goes on answering while it writes.
+    // Off runtime threads, as shim: `std::fs` blocks.
     let made = {
         let (folder, target) = (folder.to_string(), written.clone());
         tokio::task::spawn_blocking(move || {
@@ -1152,19 +965,10 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     ok(id, &Value::Null)
 }
 
-/// Offer a profile to a second device, the way the real core's
-/// `provide_backup` does: the call stays open until a device has taken
-/// the profile or the provider is stopped, and reports itself in
-/// `ImexProgress` events -- 1000 once a device has it, 0 when it is
-/// stopped. Only the transfer is reported, so a code sitting on screen
-/// with nobody reading it emits nothing at all.
-///
-/// Keyed on the account rather than on a string, because the call
-/// carries nothing else: `PIIRIT_FAKE_PROVIDE_FAIL` names the accounts
-/// it refuses outright, `PIIRIT_FAKE_TAKEN` the ones a device turns up
-/// for, `PIIRIT_FAKE_SLOW_MS` later, and `PIIRIT_FAKE_STALLED` the ones
-/// a device turns up for and then goes away again. Every other account
-/// waits to be stopped, which is a code left up on a page.
+/// Offer profile to second device, as `provide_backup`: open until taken or stopped.
+/// `ImexProgress` 1000 taken, 0 stopped; unread code emits nothing. By account:
+/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken `PIIRIT_FAKE_SLOW_MS` later,
+/// `PIIRIT_FAKE_STALLED` arrives then leaves; others wait for stop.
 async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
     if env_ids("PIIRIT_FAKE_PROVIDE_FAIL").contains(&u64::from(account)) {
         return err(id, "backup could not be offered");
@@ -1174,10 +978,7 @@ async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> 
     }
     let stalls = env_ids("PIIRIT_FAKE_STALLED").contains(&u64::from(account));
     let taken = if stalls || env_ids("PIIRIT_FAKE_TAKEN").contains(&u64::from(account)) {
-        // A device turns up half a wait in, and the transfer has a
-        // middle: the bar the page draws has to have something to draw
-        // before the 1000 that ends it, and a test reading the page
-        // mid-transfer needs room on both sides of that.
+        // Device arrives half a wait in: transfer has a middle (page bar, mid-transfer test).
         let wait = delay_or("PIIRIT_FAKE_SLOW_MS", 3000);
         tokio::time::sleep(wait / 2).await;
         state.lock().await.imex(account, 300);
@@ -1196,23 +997,14 @@ async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> 
     state.stopped.remove(&account);
     if !taken {
         state.imex(account, 0);
-        // `Ok`, like the real core: a provider that was stopped, and one
-        // whose device went away, both end with the provider having
-        // finished and nothing to say about it. Only the progress above
-        // tells them from the 1000 below.
+        // `Ok` like core, stopped or device left; only progress (0 vs 1000) differs.
         return ok(id, &Value::Null);
     }
     state.imex(account, 1000);
     ok(id, &Value::Null)
 }
 
-/// Wait for a `stop_ongoing_process` on this account.
-///
-/// The real provider holds its call open for as long as the code is up,
-/// so this one does too rather than answering a page that is still
-/// showing a code. Bounded at half a minute so that a test which never
-/// stops it ends by itself instead of holding a request open until the
-/// process is killed.
+/// Wait for `stop_ongoing_process`, as provider holds call. Capped at 30 s.
 async fn wait_for_stop(state: &Arc<Mutex<State>>, account: u32) {
     for _ in 0..600 {
         if state.lock().await.stopped.contains(&account) {
@@ -1222,17 +1014,9 @@ async fn wait_for_stop(state: &Arc<Mutex<State>>, account: u32) {
     }
 }
 
-/// The code a running provider shows, as the real core's
-/// `get_backup_qr` answers it: a `DCBACKUP5:` payload -- the transfer
-/// version the pinned core speaks -- that means nothing to anything but
-/// the core at the other end. Named for the account, so two profiles
-/// offered in turn do not show one code.
-///
-/// The real call blocks until the provider is ready and fails after a
-/// minute rather than deadlocking; this one waits for the provider to
-/// have started, in much less than a minute, and fails the accounts
-/// named in `PIIRIT_FAKE_NO_QR` outright -- which is a provider running
-/// behind a page with nothing on it to read.
+/// Code as `get_backup_qr`: `DCBACKUP5:` (pinned transfer version), opaque but to core; named
+/// for account so profiles differ. Core blocks until ready (fails after 1 min); this waits for
+/// start. `PIIRIT_FAKE_NO_QR` fails (blank page).
 async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
     if env_ids("PIIRIT_FAKE_NO_QR").contains(&u64::from(account)) {
         return err(id, "no backup provider is running");
@@ -1249,7 +1033,7 @@ async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value
     err(id, "no backup provider is running")
 }
 
-/// A reply delay in milliseconds, from `var`, or `default` when unset.
+/// Reply delay in ms from `var`, or `default`.
 fn delay_or(var: &str, default: u64) -> std::time::Duration {
     std::time::Duration::from_millis(
         std::env::var(var)
@@ -1259,15 +1043,13 @@ fn delay_or(var: &str, default: u64) -> std::time::Duration {
     )
 }
 
-/// A reply delay in milliseconds, from `var`. Lets a test fix the order in
-/// which two replies land.
+/// Reply delay in ms from `var`: fixes reply order.
 fn delay(var: &str) -> std::time::Duration {
     delay_or(var, 0)
 }
 
 fn main() {
-    // By hand rather than `#[tokio::main]`, which is the `macros` feature
-    // and a proc-macro crate the app's own build does not need.
+    // Not `#[tokio::main]`: needs `macros` (proc-macro crate app build lacks).
     let runtime = match tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -1283,18 +1065,14 @@ fn main() {
 
 #[allow(clippy::too_many_lines)]
 async fn serve() {
-    // Seeded before the first request: a page asking about a profile
-    // before anything has read the account list finds it there.
+    // Seeded before first request for early profile asks.
     let mut seeded = State::default();
     seeded.seed_accounts();
     let state = Arc::new(Mutex::new(seeded));
     let stdout = Arc::new(Mutex::new(tokio::io::stdout()));
 
-    // Events of whatever kind is asked for, queued before anything else
-    // and with no payload beyond the kind. The real core cannot be made to
-    // say a particular thing on demand, and what an event of an unread kind
-    // costs the app is exactly what `HANDLED_EVENT_KINDS` is about, so a
-    // test names the kinds it wants to see arrive.
+    // Payload-free events of asked kinds, queued first (core can't emit on demand): tests the
+    // unread-kind cost behind `HANDLED_EVENT_KINDS`.
     if let Ok(kinds) = std::env::var("PIIRIT_FAKE_SEED_EVENTS") {
         let mut state = state.lock().await;
         for kind in kinds.split(',').filter(|kind| !kind.is_empty()) {
@@ -1305,7 +1083,7 @@ async fn serve() {
         }
         drop(state);
     }
-    // Stands in for the server dying under the client.
+    // Server dies under client.
     if let Ok(after) = std::env::var("PIIRIT_FAKE_EXIT_AFTER_MS") {
         if let Ok(millis) = after.parse() {
             tokio::spawn(async move {
@@ -1314,10 +1092,7 @@ async fn serve() {
             });
         }
     }
-    // A message that sorts into the middle of the first chat rather than
-    // at its end, this long after the server starts. What a test of the
-    // message model needs to see the core do, and cannot ask for over
-    // the wire: nothing the app calls puts a message anywhere but last.
+    // Mid-chat sort: no app call does it.
     if let Ok(after) = std::env::var("PIIRIT_FAKE_LATE_ARRIVAL_MS") {
         if let Ok(millis) = after.parse() {
             let state = state.clone();
@@ -1327,10 +1102,8 @@ async fn serve() {
             });
         }
     }
-    // A call ringing in, this long after the server starts: from the
-    // first chat's other end, audio only, with an offer the page would
-    // answer. The real core says `IncomingCall` for it, and `MsgsChanged`
-    // for its message.
+    // Call ringing after delay: first chat's peer, audio, offer page would answer. Core sends
+    // `IncomingCall` and `MsgsChanged`.
     if let Ok(after) = std::env::var("PIIRIT_FAKE_INCOMING_CALL_MS") {
         if let Ok(millis) = after.parse() {
             let state = state.clone();
@@ -1398,9 +1171,7 @@ async fn serve() {
                 "get_system_info" => ok(&id, &json!({"name": "fake-core-server"})),
                 "get_all_accounts" => {
                     let mut state = state.lock().await;
-                    // Seeded again when there is nothing left: a test
-                    // that deletes every profile and asks again gets the
-                    // ones it started with, as it always has.
+                    // Reseeded when empty: deleting all restores starting ones.
                     if state.accounts.is_empty() {
                         state.seed_accounts();
                     }
@@ -1412,8 +1183,7 @@ async fn serve() {
                     let gone = positional(0).as_u64().unwrap_or(0);
                     let gone = u32::try_from(gone).unwrap_or(0);
                     state.accounts.retain(|account| account.id != gone);
-                    // The real core deletes the account's directory, and
-                    // its transports and config with it.
+                    // Core deletes account dir with transports, config.
                     state.transports.remove(&gone);
                     state.config.retain(|(account, _), _| *account != gone);
                     if state.selected == Some(gone) {
@@ -1458,17 +1228,12 @@ async fn serve() {
                         .unwrap_or_default();
                     let key = positional(1).as_str().unwrap_or_default().to_string();
                     let mut state = state.lock().await;
-                    // Null clears, as the real core does -- and an empty
-                    // string is a value, not a clear. `selfavatar` refuses
-                    // one outright there, which is why the app has to send
-                    // null rather than "".
+                    // Null clears, as core; "" is a value. Core refuses "" for `selfavatar`: app
+                    // sends null.
                     match positional(2).as_str() {
-                        // The profile's own address. The real core takes
-                        // only an address it has a transport for, in
-                        // these words, and since 2.61 even on an account
-                        // with none: writing one is no longer a way of
-                        // making a transport. Nor does it clear one.
-                        // Both pinned offline against the pinned binary.
+                        // Own address: core takes only one it has transport for (its words); since
+                        // 2.61, with none too, writing neither makes nor clears one. Pinned vs
+                        // binary.
                         Some(value) if key == "configured_addr" => {
                             if state
                                 .transports_for(account)
@@ -1501,9 +1266,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let key = positional(1).as_str().unwrap_or_default().to_string();
                     let state = state.lock().await;
-                    // The `sys.` keys are the core's own answers rather
-                    // than anything stored: it computes this one, and a
-                    // test that wants another number sets it.
+                    // `sys.` keys computed, not stored.
                     let default = (key == RECOMMENDED_SIZE_KEY).then(recommended_size);
                     let value = state
                         .config
@@ -1513,10 +1276,8 @@ async fn serve() {
                         .map_or(Value::Null, Value::String);
                     ok(&id, &value)
                 }
-                // Read and unread, as the list marks them. The real core
-                // announces both, and the announcements are what every
-                // badge follows; `get_fresh_msgs` is what the profiles
-                // page counts.
+                // Read/unread from list. Core announces both (badges follow); profiles page counts
+                // `get_fresh_msgs`.
                 "marknoticed_chat" => {
                     let account = account_id();
                     let chat = positional(1)
@@ -1540,10 +1301,8 @@ async fn serve() {
                     let mut state = state.lock().await;
                     state.seed_chats();
                     state.fresh.insert((account, chat));
-                    // The real core (chat.rs, `markfresh_chat`) puts the
-                    // newest incoming message back to fresh and announces
-                    // the chat changed, with no message named, and its
-                    // list item changed.
+                    // Core (`markfresh_chat`) freshens newest incoming, announces chat changed (no
+                    // message) and list item changed.
                     state.events.push_back(json!({
                         "contextId": account,
                         "event": {"kind": "MsgsChanged", "chatId": chat, "msgId": 0},
@@ -1554,12 +1313,8 @@ async fn serve() {
                     }));
                     ok(&id, &Value::Null)
                 }
-                // Where the reader left off: the last run of messages
-                // that are not seen, as the real core reckons it --
-                // walking back from the newest and stopping at the first
-                // seen one. Read off the same message states
-                // `message_object` gives out, so the fake cannot disagree
-                // with itself.
+                // Read position: last unseen run, newest back to first seen, as core; from
+                // `message_object` states so fake agrees with itself.
                 "get_first_unread_message_of_chat" => {
                     let chat = positional(1)
                         .as_u64()
@@ -1584,7 +1339,7 @@ async fn serve() {
                             Some(16) => break,
                             // InFresh, InNoticed
                             Some(10 | 13) => first = Some(*msg),
-                            // Anything of ours, which is neither.
+                            // Outgoing: neither.
                             _ => {}
                         }
                     }
@@ -1592,8 +1347,7 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
-                    // Held back on request: what lets a test have events
-                    // arrive while a count is still being read.
+                    // Held back on request: events arrive while count read.
                     tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
@@ -1614,7 +1368,7 @@ async fn serve() {
                 | "markseen_msgs"
                 | "set_chat_visibility"
                 | "resend_messages"
-                // Taken and forgotten; the journal is what a test reads.
+                // Forgotten; tests read journal.
                 | "set_stock_strings" => ok(&id, &Value::Null),
                 "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
                     state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
@@ -1624,11 +1378,8 @@ async fn serve() {
                     state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
                 }
-                // The relays the core picks for itself: the first one
-                // that answers, and a second it adds once the profile
-                // is up, which the real core does in the background.
-                // Keyed on the account, as the other transport calls
-                // are on their payload: nothing else is handed over.
+                // Core picks relays: first answering, second once up (background). Keyed on
+                // account.
                 "init_transports" => {
                     let account = account_id();
                     let qr = format!("dcaccount:{}", automatic_relay());
@@ -1645,19 +1396,15 @@ async fn serve() {
                     let qr = positional(1).as_str().unwrap_or_default().to_string();
                     add_transport_from_qr(&state, &id, account_id(), &qr).await
                 }
-                // Both are the core's import, and both are keyed on
-                // what they are handed: the code the other device shows,
-                // or the path of a backup file.
+                // Core's import, keyed on argument: code or file path.
                 "get_backup" | "import_backup" => {
                     let from = positional(1).as_str().unwrap_or_default().to_string();
                     import_into(&state, &id, account_id(), &from).await
                 }
-                // The other end of `get_backup`: this phone holding
-                // the profile and offering it to a device that reads
-                // the code it shows.
+                // `get_backup` other end: this phone serves profile.
                 "provide_backup" => provide_backup(&state, &id, account_id()).await,
                 "get_backup_qr" => backup_qr(&state, &id, account_id()).await,
-                // The other direction: one profile written to a folder.
+                // Other way: written to folder.
                 "export_backup" => {
                     let folder = positional(1).as_str().unwrap_or_default().to_string();
                     export_into(&state, &id, account_id(), &folder).await
@@ -1673,8 +1420,7 @@ async fn serve() {
                         .and_then(Value::as_str)
                         .is_some_and(|password| !password.is_empty());
                     if addr.is_empty() || !has_password {
-                        // Matches the real core: a malformed
-                        // EnteredLoginParam is an invalid-params error.
+                        // Malformed EnteredLoginParam: invalid-params, as core.
                         err(&id, "invalid params: addr and password are required")
                     } else if should_fail(addr) {
                         err(&id, "could not connect to server")
@@ -1685,9 +1431,7 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
-                // The account's transports, oldest first, in the shape
-                // the real core lists them: an `EnteredLoginParam` each,
-                // of which the app reads `addr`.
+                // Oldest first, `EnteredLoginParam` each (app reads `addr`).
                 "list_transports" => {
                     let listed: Vec<Value> = state
                         .lock()
@@ -1698,12 +1442,8 @@ async fn serve() {
                         .collect();
                     ok(&id, &Value::Array(listed))
                 }
-                // One transport fewer. The real core refuses to remove
-                // the last one and one it does not have, in these words,
-                // and answers the removal of the one with the account's
-                // own address on it by electing the newest of the rest
-                // -- upstream's `delete_transport` and
-                // `maybe_update_sending_transport`.
+                // Last or unknown transport refused (core's words). Removing own-address one elects
+                // newest of rest: upstream `maybe_update_sending_transport`.
                 "delete_transport" => {
                     let account = account_id();
                     let addr = positional(1).as_str().unwrap_or_default().to_string();
@@ -1743,9 +1483,7 @@ async fn serve() {
                         })
                         .map(|(contact, _)| *contact)
                         .collect();
-                    // DC_GCL_ADD_SELF puts the account's own contact last,
-                    // and only when nothing is being searched for -- as
-                    // the real core does, pinned in real_server.rs.
+                    // `DC_GCL_ADD_SELF`: self last, only unsearched (pinned in real_server.rs).
                     if flags & 0x02 != 0 && query.is_empty() {
                         ids.push(SELF);
                     }
@@ -1755,18 +1493,13 @@ async fn serve() {
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
-                // A name of the reader's own for a contact; empty puts the
-                // contact's own back. Announced the way the real core
-                // announces any contact change.
-                // A core that will not say who is blocked, for the
-                // accounts a test names.
+                // Core refusing blocked list, accounts test names.
                 "get_blocked_contacts"
                     if env_ids("PIIRIT_FAKE_BLOCKED_FAIL").contains(&u64::from(account_id())) =>
                 {
                     err(&id, "the block list could not be read")
                 }
-                // The other contact list the core keeps: the blocked
-                // ones, which no flag on `get_contacts` brings back.
+                // No `get_contacts` flag brings blocked back.
                 "get_blocked_contacts" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -1777,8 +1510,7 @@ async fn serve() {
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
-                // Blocking and letting back in. Both answer with nothing
-                // and announce the change, as the real core does.
+                // Answer nothing, announce change.
                 "block_contact" | "unblock_contact" => {
                     let account = account_id();
                     let contact = positional(1)
@@ -1818,12 +1550,8 @@ async fn serve() {
                     }));
                     ok(&id, &Value::Null)
                 }
-                // The connection and the mailbox, as the profile page
-                // reads them: a band, and a report written for a web view
-                // with the quota on a bar in it -- the shape the real core
-                // writes, pinned in deltachat-jsonrpc/tests/real_server.rs.
-                // With IO stopped the real core is not connected, and its
-                // report is that and nothing else: no relay is in it.
+                // Profile page connectivity: band, web-view report with quota bar (pinned in
+                // real_server.rs). IO stopped: not connected, no relay.
                 "get_connectivity" => {
                     let band = if state.lock().await.io_stopped {
                         1000
@@ -1836,11 +1564,7 @@ async fn serve() {
                     ok(&id, &json!("<h3>Not connected</h3>"))
                 }
                 "get_connectivity_html" => {
-                    // The core reports every transport, oldest first,
-                    // each with its own quota. A profile set up twice
-                    // has the older relay's bar before its own. Each
-                    // relay's figure is its own, so a page that reads
-                    // the wrong bar can be seen to.
+                    // Every transport, oldest first, own quota: older relay's bar first.
                     let blocks: Vec<String> = state
                         .lock()
                         .await
@@ -1857,19 +1581,14 @@ async fn serve() {
                     )
                 }
                 "get_account_file_size" => ok(&id, &json!(123_456)),
-                // The rest of a message held back by the download limit.
-                // One message, as `get_messages` gives them out. What
-                // the reader page asks for before it asks whether there
-                // is more of it.
+                // As `get_messages`: reader asks before download-limited rest.
                 "get_message" => {
                     let msg = positional(1).as_u64().unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
                     ok(&id, &state.full_message(msg))
                 }
-                // The whole of a message the sending core cut. Only the
-                // one seeded as cut has one; every other message is
-                // already whole, and the core answers null for those.
+                // Only seeded cut message has whole; core: null for whole ones.
                 "get_message_html" => {
                     let msg = positional(1).as_u64().unwrap_or_default();
                     if msg == 11 {
@@ -1878,8 +1597,7 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
-                // The real core fetches it and announces the message
-                // changed; here the fetch is instant.
+                // Core fetches, announces; instant here.
                 "download_full_message" => {
                     let account = account_id();
                     let msg = positional(1)
@@ -1895,11 +1613,8 @@ async fn serve() {
                     }));
                     ok(&id, &Value::Null)
                 }
-                // This account's reactions on a message, the whole list
-                // at once: an empty one takes them off. Announced with the
-                // event the real core sends, and answered with the id of
-                // the hidden message that carries the reaction -- which
-                // is not in any chat's list.
+                // Own reactions, whole list; empty removes. Core's event; answers hidden carrier
+                // message id (no chat list).
                 "send_reaction" => {
                     let account = account_id();
                     let msg = positional(1)
@@ -1934,7 +1649,7 @@ async fn serve() {
                     }));
                     ok(&id, &json!(carrier))
                 }
-                // A join and a one-to-one both end in a fresh chat at the top.
+                // Join and 1:1: fresh chat at top.
                 "create_chat_by_contact_id" | "secure_join" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -1972,9 +1687,8 @@ async fn serve() {
                     state.chat_modified(account, chat);
                     ok(&id, &Value::Null)
                 }
-                // A chat as ChatInfo reads it. Members
-                // are ids; the contacts behind them come from
-                // `get_contacts_by_ids`, keyed by id as strings.
+                // `ChatInfo` shape: member ids; contacts via `get_contacts_by_ids`, keyed by id
+                // string.
                 "get_full_chat_by_id" => {
                     let chat = positional(1)
                         .as_u64()
@@ -1989,7 +1703,7 @@ async fn serve() {
                     } else {
                         vec![10]
                     };
-                    // The real core's words for a chat that is not there.
+                    // Core's words for a missing chat.
                     if state.deleted_chats.contains(&chat) {
                         err(
                             &id,
@@ -2005,12 +1719,10 @@ async fn serve() {
                                 "profileImage": state.group_images.get(&chat),
                                 "color": "#0071c7",
                                 "contactIds": members,
-                                // Both false once the account has left, as
-                                // the real core answers; a one-to-one chat
-                                // is not a group the account is "in" at all.
+                                // Both false once left, as core; 1:1 no group to be "in".
                                 "selfInGroup": is_group && !left,
                                 "canSend": !left,
-                                // Every chat here is a chatmail chat.
+                                // All chats here chatmail.
                                 "isEncrypted": true,
                                 "isSelfTalk": false,
                                 "isDeviceChat": false,
@@ -2019,8 +1731,7 @@ async fn serve() {
                         )
                     }
                 }
-                // Who is in a chat, ids only: what a conversation header
-                // counts. The same members `get_full_chat_by_id` names.
+                // Member ids only: header count. As `get_full_chat_by_id`.
                 "get_chat_contacts" => {
                     let chat = positional(1)
                         .as_u64()
@@ -2065,8 +1776,7 @@ async fn serve() {
                     let name = positional(2).as_str().unwrap_or_default().to_string();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // The real core's two refusals, in its words: an empty
-                    // name, and a chat that is not a group it is in.
+                    // Core refuses empty name, or chat not a group account is in.
                     if name.is_empty() {
                         err(&id, "Invalid name")
                     } else if !state.is_group(chat) || state.left_groups.contains(&chat) {
@@ -2077,8 +1787,7 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
-                // As the real core: trimmed, empty clears, and refused on
-                // a chat that is not a group this account is in.
+                // As core: trimmed; empty clears; refused unless in group.
                 "get_chat_description" => {
                     let chat = positional(1)
                         .as_u64()
@@ -2124,7 +1833,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // Null clears, as the real core does.
+                    // Null clears, as core.
                     let path = positional(2);
                     match path.as_str() {
                         Some(path) if should_fail(path) => err(&id, "Copying new blobfile failed"),
@@ -2154,8 +1863,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // Removing someone who is not in the group is not an
-                    // error to the real core either.
+                    // Removing non-member: no error to core either.
                     if let Some(members) = state.group_members.get_mut(&chat) {
                         members.retain(|member| *member != contact);
                     }
@@ -2165,8 +1873,7 @@ async fn serve() {
                     state.chat_modified(account, chat);
                     ok(&id, &Value::Null)
                 }
-                // Verified against the real core: accepted on any chat,
-                // and announced with its own event carrying the timer.
+                // Checked vs core: any chat; own event carries timer.
                 "set_chat_ephemeral_timer" => {
                     let account = account_id();
                     let chat = positional(1)
@@ -2201,10 +1908,8 @@ async fn serve() {
                     state.chat_modified(account, chat);
                     ok(&id, &Value::Null)
                 }
-                // A fingerprint code with neither of an invite's two
-                // secrets in it has had no kind since 2.61: the core looks
-                // for a contact with that key and refuses the code when
-                // there is none, which here is every time.
+                // Fingerprint code, no invite secrets: no kind since 2.61. Core refuses if no
+                // contact has key: here always.
                 "check_qr"
                     if positional(1).as_str().is_some_and(|content| {
                         content.starts_with("OPENPGP4FPR:")
@@ -2225,11 +1930,8 @@ async fn serve() {
                     &id,
                     &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
                 ),
-                // Both ways a message goes: only here, or here and
-                // at every other end. The second sends a deletion
-                // request out as a message of its own; nothing in
-                // this server delivers anything, so what it does to
-                // the chat is what the first does.
+                // Here, or everywhere (deletion request as own message). No delivery here: same to
+                // chat.
                 "delete_messages" | "delete_messages_for_all" => {
                     let ids: Vec<u32> = positional(1)
                         .as_array()
@@ -2247,7 +1949,7 @@ async fn serve() {
                     for messages in state.chats.values_mut() {
                         messages.retain(|msg| !ids.contains(msg));
                     }
-                    // The core announces a deletion; the model reloads on it.
+                    // Core announces deletion; model reloads.
                     state.events.push_back(json!({
                         "contextId": account,
                         "event": {"kind": "MsgsChanged", "chatId": 0, "msgId": 0},
@@ -2273,7 +1975,6 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // Chat 2 is the group, so a test has both kinds.
                     ok(
                         &id,
                         &json!({
@@ -2285,8 +1986,7 @@ async fn serve() {
                         }),
                     )
                 }
-                // Whether the account can write into a chat: not into a
-                // group it has left, as `get_full_chat_by_id` says too.
+                // Writable: not left group, as `get_full_chat_by_id`.
                 "can_send" => {
                     let chat = positional(1)
                         .as_u64()
@@ -2295,12 +1995,8 @@ async fn serve() {
                     let state = state.lock().await;
                     ok(&id, &json!(!state.left_groups.contains(&chat)))
                 }
-                // Replace the text of a message sent from here. The real
-                // core refuses an empty text and somebody else's message;
-                // the menu offers neither, so only the first is refused
-                // here, and a text asking to fail fails the way a send
-                // does. The change is announced as the real core announces
-                // it, so a model re-reads the row.
+                // Edit own text. Core refuses empty and others' (menu offers neither): only empty
+                // refused, `fail` fails like send. Announced as core: model re-reads row.
                 "send_edit_request" => {
                     let account = account_id();
                     let msg = positional(1)
@@ -2324,9 +2020,7 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
-                // How many messages a deletion period would take now: every
-                // message in every chat older than it, which with the seeded
-                // timestamps is all of them for any period a page offers.
+                // Messages a deletion period would take: older, all chats; seeded: all.
                 "estimate_auto_deletion_count" => {
                     let seconds = positional(2).as_i64().unwrap_or_default();
                     let cutoff = std::time::SystemTime::now()
@@ -2345,9 +2039,7 @@ async fn serve() {
                         .count();
                     ok(&id, &json!(count))
                 }
-                // Mute a chat, or unmute it. The real core keeps a duration
-                // and announces the change as a `ChatModified`; the list
-                // reads `isMuted` back off the row.
+                // Core keeps duration, announces `ChatModified`; list reads `isMuted`.
                 "set_chat_mute_duration" => {
                     let account = account_id();
                     let chat = positional(1)
@@ -2372,8 +2064,7 @@ async fn serve() {
                     }));
                     ok(&id, &Value::Null)
                 }
-                // One contact by id, the account's own included: the
-                // profile page asks for its colour this way.
+                // One contact by id, self too: colour lookup.
                 "get_contact" => {
                     let contact = positional(1)
                         .as_u64()
@@ -2389,33 +2080,24 @@ async fn serve() {
                 "get_chatlist_entries" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // DC_GCL_ARCHIVED_ONLY. The two listings are disjoint,
-                    // so this is which list, not a filter on one.
+                    // `DC_GCL_ARCHIVED_ONLY`: disjoint lists: picks list, not filter.
                     let archived_only = positional(1).as_u64().unwrap_or(0) & 0x01 != 0;
-                    // Verified against the real core: with ARCHIVED_ONLY
-                    // set it never looks at the query, and a plain query
-                    // searches every chat *including* archived ones. A
-                    // fake that filtered the archived list by the query
-                    // would let a one-call implementation pass here and
-                    // fail on a device.
+                    // Checked vs core: `ARCHIVED_ONLY` ignores query; plain query searches all
+                    // incl. archived. Filtering archived here would pass one-call implementation
+                    // that fails on device.
                     let query = positional(2).as_str().unwrap_or("").to_string();
                     let searching = !query.is_empty();
                     let entries = if archived_only {
-                        // The query is deliberately not consulted.
                         state.archived_order.clone()
                     } else if searching {
-                        // A plain query reaches archived chats too.
                         let mut all = state.chat_order.clone();
                         all.extend(state.archived_order.iter().copied());
                         all
                     } else {
                         state.chat_order.clone()
                     };
-                    // Lets a test make the *ordinary* listing the slow one,
-                    // so an answer to a question the model has already
-                    // moved on from arrives last. Requests are handled
-                    // concurrently here, as the real core's are, so this
-                    // delays only its own reply.
+                    // Slow *ordinary* list: stale answer lands last. Concurrent as core; delays own
+                    // reply.
                     if !archived_only {
                         if let Some(delay) = std::env::var("PIIRIT_FAKE_CHATLIST_DELAY_MS")
                             .ok()
@@ -2425,8 +2107,7 @@ async fn serve() {
                             tokio::time::sleep(std::time::Duration::from_millis(delay)).await;
                         }
                     }
-                    // The core matches the query itself; so does this, on
-                    // the same name a chat item reports.
+                    // Matched as core: chat item's name.
                     let entries = if searching && !archived_only {
                         let needle = query.to_lowercase();
                         entries
@@ -2439,9 +2120,7 @@ async fn serve() {
                     ok(&id, &json!(entries))
                 }
                 "get_chatlist_items_by_entries" => {
-                    // A core building rows one after another takes time
-                    // over each batch; a test that wants to see the first
-                    // batch shown before the next one lands slows this.
+                    // Core builds rows slowly per batch; delay shows first.
                     tokio::time::sleep(delay("PIIRIT_FAKE_CHATLIST_ITEMS_DELAY_MS")).await;
                     let account = account_id();
                     let ids: Vec<u64> = positional(1)
@@ -2453,11 +2132,8 @@ async fn serve() {
                     for chat in ids {
                         let fresh = u32::try_from(chat)
                             .is_ok_and(|chat| state.fresh.contains(&(account, chat)));
-                        // A chat holding a draft previews the draft, and
-                        // names it in the prefix the row shows in front:
-                        // "Draft", and DC_STATE_OUT_DRAFT for the state.
-                        // The real core does this itself, which is pinned
-                        // in deltachat-jsonrpc/tests/real_server.rs.
+                        // Draft chat previews draft: "Draft" prefix, DC_STATE_OUT_DRAFT (pinned in
+                        // real_server.rs).
                         let draft = u32::try_from(chat)
                             .ok()
                             .and_then(|chat| state.drafts.get(&chat))
@@ -2477,16 +2153,10 @@ async fn serve() {
                                 "isEncrypted": true,
                                 "isMuted": u32::try_from(chat)
                                     .is_ok_and(|chat| state.muted.contains(&chat)),
-                                // The chat with oneself and the core's
-                                // device chat, when a test names them:
-                                // what the cover leaves out of its grid.
+                                // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
-                                // Chat 1 is pinned, so the ordinary list
-                                // has both kinds in it and a test can see
-                                // the two headings. The archived list
-                                // holds one unpinned chat, which is the
-                                // other case: one kind, no headings.
+                                // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
                             }),
                         );
@@ -2496,9 +2166,7 @@ async fn serve() {
                 "search_messages" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    // Three arguments; the third is a chat to search
-                    // within, and null means every chat. Verified against
-                    // the pinned binary: passing two is rejected.
+                    // Third arg: chat to search (null = all); pinned binary rejects two.
                     let needle = positional(1).as_str().unwrap_or_default().to_lowercase();
                     let within = positional(2)
                         .as_u64()
@@ -2518,9 +2186,7 @@ async fn serve() {
                     ok(&id, &json!(hits))
                 }
                 "get_message_list_items" => {
-                    // Delayed with the same knob as get_messages: a real
-                    // core takes time over both, and a test that wants two
-                    // of these in the air at once needs them to overlap.
+                    // Delayed like get_messages: two in flight.
                     tokio::time::sleep(delay("PIIRIT_FAKE_FETCH_DELAY_MS")).await;
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -2528,9 +2194,8 @@ async fn serve() {
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
-                    // The fourth argument asks for day markers. The real
-                    // core interleaves one before each day's first message,
-                    // and the model reads a placeholder row's day off them.
+                    // Fourth arg: day markers before each day's first message, as core; placeholder
+                    // reads day.
                     let markers = positional(3).as_bool().unwrap_or(false);
                     let mut items: Vec<Value> = Vec::new();
                     let mut day = None;
@@ -2546,10 +2211,8 @@ async fn serve() {
                     }
                     ok(&id, &Value::Array(items))
                 }
-                // The ids of every message of up to three kinds in one
-                // chat -- or, for a null chat, in every chat -- oldest
-                // first, as the real core answers and asks not to have
-                // re-sorted. What the media pages are built on.
+                // Ids of up to three kinds (null chat: all), oldest first, as core (don't re-sort).
+                // Media pages.
                 "get_chat_media" => {
                     let chat = positional(1)
                         .as_u64()
@@ -2578,15 +2241,12 @@ async fn serve() {
                 }
                 "get_messages" => {
                     tokio::time::sleep(delay("PIIRIT_FAKE_FETCH_DELAY_MS")).await;
-                    // One call for many ids: the point of the batch.
                     let ids: Vec<u64> = positional(1)
                         .as_array()
                         .map(|array| array.iter().filter_map(Value::as_u64).collect())
                         .unwrap_or_default();
-                    // A page of a chat, as it opens, and not the one
-                    // message a send reads back: what a phone takes its
-                    // time over, with a long chat of pictures, while a
-                    // send of its own is answered.
+                    // Multi-id page as chat opens, not send readback: slow on phone with long
+                    // picture chat.
                     if ids.len() > 1 {
                         tokio::time::sleep(delay("PIIRIT_FAKE_PAGE_DELAY_MS")).await;
                     }
@@ -2598,8 +2258,7 @@ async fn serve() {
                     }
                     ok(&id, &Value::Object(loaded))
                 }
-                // Drafts, which the core keeps per chat. Enough of them to
-                // drive the page: one text per chat, read back and cleared.
+                // One draft per chat, read back, cleared, as core.
                 "misc_set_draft" => {
                     let chat = positional(1)
                         .as_u64()
@@ -2625,8 +2284,7 @@ async fn serve() {
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
                     let state = state.lock().await;
-                    // Null for none and a whole message object for one, as
-                    // the real core answers.
+                    // Null for none, else message object, as core.
                     match state.drafts.get(&chat) {
                         Some(text) => ok(&id, &json!({"text": text, "state": 19})),
                         None => ok(&id, &Value::Null),
@@ -2639,15 +2297,12 @@ async fn serve() {
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
                     let text = positional(2).as_str().unwrap_or_default().to_string();
-                    // The core takes one file and decides the message's
-                    // view type from it. Echoed back so the row the sender
-                    // sees carries the attachment, as the real one does.
+                    // Core picks view type from file; echoed to sender's row.
                     let file = positional(3);
                     let file_name = positional(4);
                     let quoted = positional(6);
                     if should_fail(&text) {
-                        // The real core reports a failed send as an Error
-                        // event, not only as a failed call.
+                        // Failed send also reports Error event.
                         state.lock().await.events.push_back(json!({
                             "contextId": account,
                             "event": {"kind": "Error", "msg": "could not send"},
@@ -2660,14 +2315,10 @@ async fn serve() {
                             state.note_quote(msg, &quoted);
                             msg
                         };
-                        // The event is queued above, so a delay here puts it
-                        // ahead of this call's own reply -- the ordering the
-                        // real core can produce, and the one that duplicated a
+                        // Queued above: delay puts event before reply (core can); it duplicated a
                         // sent row.
                         tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
-                        // The real core reads the file; this reads the
-                        // extension, which is enough to tell an image row
-                        // from a paperclip one.
+                        // Extension, not content: image vs paperclip.
                         let extension = file.as_str().and_then(|path| {
                             std::path::Path::new(path)
                                 .extension()
@@ -2679,10 +2330,7 @@ async fn serve() {
                             Some("xdc") => "Webxdc",
                             _ => "File",
                         };
-                        // Remembered for the same reason `send_msg` does:
-                        // the row is fetched again after it is sent, and
-                        // a message that arrived as an app has to still
-                        // be one then.
+                        // As `send_msg`: refetched row stays app.
                         if view_type == "Webxdc" {
                             state.lock().await.sent_files.insert(
                                 msg,
@@ -2706,11 +2354,8 @@ async fn serve() {
                         )
                     }
                 }
-                // The other send: a MessageData object, which is how a view
-                // type the core would not pick itself -- a voice message
-                // -- is asked for. Answers with the id alone; the row is
-                // fetched afterwards, and `get_messages` names the type
-                // the send asked for.
+                // MessageData send for type core wouldn't pick (voice). Answers id; `get_messages`
+                // names it.
                 "send_msg" => {
                     let account = account_id();
                     let chat = positional(1)
@@ -2735,8 +2380,7 @@ async fn serve() {
                     if file.is_null() {
                         err(&id, "send_msg without a file is not what the app sends")
                     } else {
-                        // Held back the way the other send is, so a test
-                        // about a send in flight covers both of them.
+                        // Held back like other send: in-flight tests.
                         tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
                         let mut state = state.lock().await;
                         let msg = state.add_message(account, chat);
@@ -2753,8 +2397,7 @@ async fn serve() {
                         ok(&id, &json!(msg))
                     }
                 }
-                // Anything off the web, fetched by the core rather than by
-                // the app: how an app is taken from the store.
+                // Core fetches off web, not app: store install.
                 "get_http_response" => {
                     let url = positional(1).as_str().unwrap_or_default().to_string();
                     if should_fail(&url) {
@@ -2770,9 +2413,7 @@ async fn serve() {
                         )
                     }
                 }
-                // What the app is called and what it says about itself.
-                // The summary counts the updates sent to it, so a test
-                // can watch a row follow the chat.
+                // Name, self-description; summary counts sent updates: row follows.
                 "get_webxdc_info" => {
                     let msg = positional(1)
                         .as_u64()
@@ -2805,9 +2446,7 @@ async fn serve() {
                         }),
                     )
                 }
-                // One file out of the archive, base64 as the real core
-                // encodes it (STANDARD_NO_PAD). Two files exist here: the
-                // page and its icon.
+                // One archive file, base64 STANDARD_NO_PAD as core; page, icon only.
                 "get_webxdc_blob" => {
                     let path = positional(2).as_str().unwrap_or_default().to_string();
                     match webxdc_file(&path) {
@@ -2815,9 +2454,7 @@ async fn serve() {
                         None => err(&id, "no such file in the webxdc"),
                     }
                 }
-                // Everything after the serial asked for, as one JSON
-                // *string*: the real core hands the array over already
-                // encoded.
+                // Updates after serial as one JSON *string* (core sends encoded).
                 "get_webxdc_status_updates" => {
                     let msg = positional(1)
                         .as_u64()
@@ -2851,9 +2488,7 @@ async fn serve() {
                         let mut state = state.lock().await;
                         let kept = state.webxdc_updates.entry(msg).or_default();
                         let serial = kept.len() + 1;
-                        // The core hands an update back with the two
-                        // serials on it, and the app's own send is one of
-                        // the updates it then receives.
+                        // Core returns update with both serials; own send counts received.
                         kept.push(json!({
                             "payload": update.get("payload").cloned().unwrap_or(Value::Null),
                             "serial": serial,
@@ -2870,9 +2505,7 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
-                // The call methods, kept to what the real core does with
-                // each (src/calls.rs upstream): a call is a message, and
-                // every move of its state is announced.
+                // Call methods as core (upstream src/calls.rs): every state move announced.
                 "ice_servers" => ok(
                     &id,
                     &json!(
@@ -2904,8 +2537,7 @@ async fn serve() {
                                 state: "Alerting",
                             },
                         );
-                        // An offer that asks for it is answered at once,
-                        // as the other end's device would.
+                        // Offer asking for it answered at once, as peer would.
                         if answer_me {
                             if let Some(placed) = state.calls.get_mut(&call) {
                                 placed.accepted = true;
@@ -2962,8 +2594,7 @@ async fn serve() {
                             };
                             Some(true)
                         }
-                        // Ended already: the real core says so in its log
-                        // and does nothing.
+                        // Ended already: core logs, no-op.
                         Some(_) => Some(false),
                     };
                     match ended {
@@ -2972,9 +2603,7 @@ async fn serve() {
                             if moved {
                                 state.call_event(account, "CallEnded", msg, &json!({}));
                                 state.call_changed(account, msg);
-                                // The hidden message telling the other
-                                // end, sent: what the app waits for when
-                                // it ends a call on its way out.
+                                // Hidden message to peer; app waits on it to end call.
                                 state.events.push_back(json!({
                                     "contextId": account,
                                     "event": {
@@ -2998,21 +2627,12 @@ async fn serve() {
                     }
                 }
                 "get_next_event_batch" => {
-                    // Blocks when empty, like the real long poll.
+                    // Blocks when empty, like long poll.
                     loop {
                         let queued: Vec<Value> = state.lock().await.events.drain(..).collect();
                         if !queued.is_empty() {
-                            // Held back after the batch is taken, not
-                            // before the wait: a delay ahead of the loop
-                            // would be spent while the queue was still
-                            // empty and buy nothing. This is what lets a
-                            // test say that a call's own reply is dealt
-                            // with before the event the same call
-                            // produced -- otherwise which of the two wins
-                            // is a race between queued callbacks on the
-                            // Qt thread, and a test that quietly depends
-                            // on one of them passes on one machine and
-                            // fails on another.
+                            // Held back after batch taken (before wait buys nothing): call reply
+                            // then precedes its event; else Qt-thread race, machine-dependent.
                             tokio::time::sleep(delay("PIIRIT_FAKE_EVENT_DELAY_MS")).await;
                             break ok(&id, &Value::Array(queued));
                         }

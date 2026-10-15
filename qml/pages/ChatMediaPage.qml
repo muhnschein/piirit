@@ -1,4 +1,4 @@
-// 2.5 rather than 2.0 for Image.autoTransform; see AttachmentPreview.qml.
+// 2.5 not 2.0: Image.autoTransform. See AttachmentPreview.qml.
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Thumbnailer 1.0
@@ -9,45 +9,28 @@ import "../js/Format.js" as Format
 import Piirit 1.0
 
 /*
- * Everything of one kind that a chat holds: its pictures and videos as a
- * grid, its sounds, files or apps as a list. Reached from the tiles on
- * the contact's or the group's page (components/MediaKinds.qml), and
- * the same four pages deltachat-android and deltachat-ios keep behind a
- * profile.
- *
- * The grid is the gallery app's: square cells the platform's thumbnailer
- * fills, a play mark over a video, as many columns as fit. The list is
- * the conversation's own attachment rows without the bubbles -- a voice
- * message plays where it sits, an app runs on a tap, a file is handed
- * to whatever opens it, the three answers a tap gets in the chat --
- * with who sent it and when above each.
- *
- * A long press offers, on every kind, the message's place in the chat
- * and its deletion, and on a file what the chat's row menu offers one:
- * a copy, and another app. Deleting waits out the platform's countdown
- * first, held beside the views rather than on the row (PendingRemoval,
- * the conversation's arrangement); showing a message in the chat is a
- * walk back down the stack to the conversation this was opened over.
- *
- * Nothing here is sorted. The core answers newest last, the model turns
- * that round, and the rows stand in that order (chat_media.rs).
+ * One chat media kind, from contact/group tiles (components/MediaKinds.qml),
+ * as deltachat-android/ios's four pages. Grid (pictures, videos): thumbnailer
+ * cells, video play mark. List (rest): conversation's attachment rows, no
+ * bubbles, sender and time above. Long press: go to message, delete; files
+ * also copy, open with. Delete waits beside views (PendingRemoval). Newest
+ * first: model reverses core (chat_media.rs).
  */
 Page {
     id: page
 
     property int accountId
     property int chatId
-    /// gallery, audio, files or apps; see ChatMedia.kind.
+    /// Gallery, audio, files or apps (ChatMedia.kind).
     property string kind: "gallery"
     property string errorMessage: ""
 
     readonly property bool isGallery: page.kind === "gallery"
 
-    /// How long a message waits before it goes, in milliseconds. Nothing
-    /// sets it; a test turns it down rather than waiting.
+    /// Ms before message goes. Tests set low.
     property alias pendingDelay: doomedMessages.delay
 
-    // A grid of pictures is worth turning the phone for.
+    // Grid of pictures: worth turning the phone.
     allowedOrientations: Orientation.All
 
     ChatMedia {
@@ -61,10 +44,9 @@ Page {
 
     Connections {
         target: core
-        // A picture arriving, a message going: the model reads the
-        // chat's list again and moves nothing that is still there.
+        // Model re-reads on arrival or delete; kept rows don't move.
         onCore_event: media.handle_event(context_id, kind, payload_json)
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 media.reload()
@@ -72,16 +54,11 @@ Page {
         }
     }
 
-    /// The messages the reader has asked to delete, waiting out the
-    /// moment in which they can say they did not mean it.
-    ///
-    /// Beside the views rather than on a row, for the reason the
-    /// conversation keeps its own beside the list: deleting is what
-    /// destroys rows, and every event reloads them. See PendingRemoval.
+    /// Messages awaiting delete. Beside views, not rows: deleting destroys rows,
+    /// every event reloads them. See PendingRemoval.
     PendingRemoval {
         id: doomedMessages
-        // `tag` is which kind of delete was picked on the page the menu
-        // led to: true asks the other ends to delete their copies too.
+        // `tag`: DeleteMessageDialog's kind; true asks other ends too.
         onRemove: {
             if (tag === true) {
                 media.delete_message_for_all(id)
@@ -91,22 +68,15 @@ Page {
         }
     }
 
-    // Leaving inside the wait is still asking for the message to go:
-    // somebody who asked for a thing to go and then left asked for it to
-    // go. The conversation writes its draft at the same moment.
+    // Leaving mid-wait still deletes (conversation writes draft then too).
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             doomedMessages.flush()
         }
     }
 
-    /// Ask which kind of delete this is, in the dialog the conversation
-    /// asks in: a picture here is a message in that chat, and the two
-    /// ways to delete one are the same either way. The wait starts when
-    /// the dialog is accepted, and nothing goes until it is up.
-    ///
-    /// The gate is read now rather than in the answer: the row may be
-    /// gone by the time the reader has chosen.
+    /// Ask delete kind in conversation's dialog; wait starts on accept. Gate read
+    /// now: row may be gone by answer.
     function askDelete(messageId, canDeleteForEveryone) {
         var chooser = pageStack.push(
             Qt.resolvedUrl("DeleteMessageDialog.qml"),
@@ -118,18 +88,10 @@ Page {
         }
     }
 
-    /// Silica's own countdown, drawn over what is going: the bar, the
-    /// seconds, "Tap to cancel", all of it the platform's. Built the
-    /// first time a row asks, in the row's own `loader`, since every row
-    /// would otherwise carry a dozen items for a tap that almost never
-    /// comes. The deletion is not its business -- that belongs to
-    /// `doomedMessages`, which outlives the row -- so it is handed a
-    /// callback that does nothing and asked only to draw and to report
-    /// the tap.
+    /// Silica's countdown over item, built on first ask (row `loader`). Deletion is
+    /// `doomedMessages`'s (outlives row): no-op callback, only draws, reports tap.
     function raiseRemorse(cell, loader, over, messageId) {
-        // Once per wait: the answer that starts one and a rebuild of the
-        // row inside it both come through here, and two `execute` calls
-        // over one item is a countdown restarting under the reader.
+        // Once per wait (start and rebuild both land here): second `execute` restarts.
         if (cell.countingDown) {
             return
         }
@@ -141,18 +103,14 @@ Page {
                             doomedMessages.countdownFor(messageId))
     }
 
-    /// A path the other end named, as a URL the views can load; empty
-    /// for a row that has not been read yet.
+    /// Path as URL views load; empty until row loaded.
     function fileUrlOf(path) {
         return path.length > 0 ? Qt.resolvedUrl(Media.fileUrl(path)) : ""
     }
 
-    /// What a tap opens: the conversation's own answer for each kind
-    /// (ConversationPage.openAttachment), so a picture found here opens
-    /// on the page it opens on in the chat, and a file goes to whatever
-    /// else on the phone handles it.
+    /// Tap opens per kind (ConversationPage.openAttachment); files to other apps.
     function open(fileUrl, fileName, viewType) {
-        // A row not read yet has no file to open.
+        // Row not loaded yet: no file.
         if (String(fileUrl).length === 0) {
             return
         }
@@ -173,7 +131,7 @@ Page {
         }
     }
 
-    /// A webxdc app, run here; see ConversationPage.openApp.
+    /// Webxdc app, run here. See ConversationPage.openApp.
     function openApp(messageId) {
         pageStack.push(Qt.resolvedUrl("WebxdcPage.qml"), {
             accountId: page.accountId,
@@ -181,13 +139,9 @@ Page {
         })
     }
 
-    /// Back to the conversation, at this message: where a search result
-    /// lands, asked for from here. The conversation is under the
-    /// contact's or the group's page that opened this one, so the walk
-    /// down the stack stops at the first page that can be asked. Told
-    /// first and popped to second: the conversation keeps the ask until
-    /// it is the page on screen and acts on it then, over the place it
-    /// puts back on its way in (ConversationPage.showMessage).
+    /// Back to conversation at this message: down stack to first page with
+    /// `showMessage`. Told first, popped to second: acts once on screen, over
+    /// restored place (ConversationPage.showMessage).
     function showInChat(messageId) {
         var below = pageStack.previousPage(page)
         while (below && typeof below.showMessage !== "function") {
@@ -200,9 +154,7 @@ Page {
         pageStack.pop(below)
     }
 
-    // A copy under the name the sender gave it, where every copy goes:
-    // what the conversation's row menu does with a file, and the same
-    // words for it. See AttachmentSaver.
+    // Copy under sender's name, as conversation row menu. See AttachmentSaver.
     AttachmentSaver {
         id: saver
         objectName: "saver"
@@ -210,9 +162,7 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // Two views for four kinds, one of them built: a grid draws
-    // pictures and a list draws everything else, and a view that is not
-    // the one showing would still build a delegate per row.
+    // Loader builds only shown view: hidden one would still build delegates.
     Loader {
         id: view
         anchors {
@@ -224,8 +174,7 @@ Page {
         sourceComponent: page.isGallery ? gallery : listing
     }
 
-    // Only until there is something to look at: a list that is filling
-    // in from the top says so by filling in.
+    // Only while filling: filling list shows it itself.
     BusyIndicator {
         objectName: "mediaBusy"
         anchors.centerIn: view
@@ -243,9 +192,7 @@ Page {
             clip: true
             model: media.rows
 
-            /// As many columns as the platform's largest item fits
-            /// across the width: three on a phone held upright, more on
-            /// its side.
+            /// Columns: platform largest items that fit; three upright.
             readonly property int columns:
                 Math.max(1, Math.floor(width / Theme.itemSizeExtraLarge))
             cellWidth: Math.floor(width / columns)
@@ -255,9 +202,7 @@ Page {
                 title: Media.kindName(page.kind)
             }
 
-            // Silica's grid cell with a menu on it, as its ListItem is
-            // the row with one: a long press opens the menu under the
-            // row of cells, the way the notes app's grid does.
+            // Silica grid cell with menu: long press opens it under row.
             delegate: GridItem {
                 id: tile
                 objectName: "mediaTile" + model.message_id
@@ -266,16 +211,15 @@ Page {
 
                 readonly property bool isVideo: model.view_type === "Video"
                 readonly property bool isAnimated: model.view_type === "Gif"
-                /// The file, once the row has been read.
+                /// The file, once row loaded.
                 readonly property url fileUrl:
                     model.loaded ? page.fileUrlOf(model.file_path) : ""
-                /// Half the gap between two tiles.
+                /// Half the gap between tiles.
                 readonly property real inset: Theme.paddingSmall / 2
-                /// This picture is on its way out.
+                /// Picture on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
-                /// Whether this tile has already put a countdown up over
-                /// the wait it is in; see `page.raiseRemorse`.
+                /// Countdown already up for this wait (`page.raiseRemorse`).
                 property bool countingDown: false
 
                 Loader {
@@ -287,8 +231,7 @@ Page {
                     }
                 }
 
-                // The wait is asked for on a page now, so it starts while
-                // the menu is long gone: the tile hears of it here.
+                // Page starts wait after menu closes: tile hears here.
                 onDoomedChanged: {
                     if (tile.doomed) {
                         page.raiseRemorse(tile, remorse, body, model.message_id)
@@ -297,18 +240,14 @@ Page {
                     }
                 }
 
-                // A tile is rebuilt every time it scrolls back into view,
-                // so one scrolled past mid-wait comes back with no
-                // countdown on it. Put it up again with what is left.
+                // Rebuilt on scroll-back loses countdown: re-show.
                 Component.onCompleted: {
                     if (tile.doomed) {
                         page.raiseRemorse(tile, remorse, body, model.message_id)
                     }
                 }
 
-                // A Component, which Silica builds the first time the menu
-                // is opened, rather than a menu built with every tile the
-                // grid scrolls past; see ConversationList.
+                // Built on first open (ConversationList).
                 menu: Component {
                     ContextMenu {
                         MenuItem {
@@ -320,11 +259,7 @@ Page {
                         MenuItem {
                             objectName: "deleteItem"
                             text: qsTr("Delete")
-                            // The page is told, not this tile: the wait
-                            // before a message goes has to outlive the
-                            // tile it was asked for on; which kind of
-                            // delete this is belongs to a dialog of its
-                            // own. See PendingRemoval and
+                            // Page told, not tile: wait outlives it (PendingRemoval). Kind:
                             // DeleteMessageDialog.
                             onClicked: page.askDelete(
                                            model.message_id,
@@ -334,46 +269,34 @@ Page {
                     }
                 }
 
-                // Everything drawn in the cell, so the countdown can cover
-                // it: faded by the countdown while the picture waits to
-                // go, and out of a tap's reach meanwhile.
+                // In cell, so countdown covers it: faded, untappable.
                 Item {
                     id: body
                     width: tile.contentWidth
                     height: tile.contentHeight
                     enabled: !tile.doomed
 
-                    // What stands in the cell until the thumbnailer has
-                    // drawn into it: a row not read yet, or a file it has
-                    // not got to.
+                    // Until thumbnailer draws: row not loaded, or file not reached.
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: tile.inset
                         color: Theme.rgba(Theme.highlightDimmerColor, 0.4)
                     }
 
-                    // The platform's thumbnailer, for pictures and videos
-                    // alike: it draws to the cell's own size and keeps
-                    // what it drew, which is what the gallery app scrolls
-                    // through -- not a decode of the whole picture per
-                    // tile.
+                    // Platform thumbnailer: cell-sized, cached; no full decode per tile.
                     Thumbnail {
                         objectName: "tileThumbnail"
                         anchors.fill: parent
                         anchors.margins: tile.inset
                         sourceSize.width: width
                         sourceSize.height: height
-                        // Told what the file is, since the thumbnailer
-                        // picks its reader by that; a message the core
-                        // gave no type for is read as the kind of thing
-                        // the tile says it is.
+                        // Type told: thumbnailer picks reader by it. No core type: tile's kind.
                         mimeType: model.file_mime.length > 0 ? model.file_mime
                                   : tile.isVideo ? "video/mp4" : "image/jpeg"
                         source: tile.fileUrl
                     }
 
-                    // The marks the conversation draws on the same two
-                    // kinds.
+                    // Conversation's marks for same two kinds.
                     Rectangle {
                         objectName: "playMark"
                         visible: tile.isVideo || tile.isAnimated
@@ -390,8 +313,7 @@ Page {
                                                          : Theme.fontSizeExtraSmall
                             font.bold: tile.isAnimated
                             textFormat: Text.PlainText
-                            // The play mark and the format's name, neither
-                            // of them a word to translate.
+                            // Play mark, format name: not to translate.
                             text: tile.isVideo ? "▶" : "GIF"
                         }
                     }
@@ -432,18 +354,16 @@ Page {
 
                 readonly property bool isFile: page.kind === "files"
                 readonly property bool isApp: page.kind === "apps"
-                /// The file, once the row has been read.
+                /// The file, once row loaded.
                 readonly property url fileUrl:
                     model.loaded ? page.fileUrlOf(model.file_path) : ""
-                /// This message is on its way out.
+                /// Message on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
-                /// Whether this row has already put a countdown up; see
-                /// the tile.
+                /// Countdown already up; see tile.
                 property bool countingDown: false
 
-                // The wait starts on the page the menu leads to, by which
-                // time the menu is gone; see the tile.
+                // Wait starts on page menu leads to; see tile.
                 onDoomedChanged: {
                     if (row.doomed) {
                         page.raiseRemorse(row, remorse, content, model.message_id)
@@ -461,14 +381,14 @@ Page {
                     }
                 }
 
-                // A row rebuilt mid-wait comes back bare; see the tile.
+                // Rebuilt mid-wait comes back bare; see tile.
                 Component.onCompleted: {
                     if (row.doomed) {
                         page.raiseRemorse(row, remorse, content, model.message_id)
                     }
                 }
 
-                // Built when it is first opened; see the tile.
+                // Built on first open; see tile.
                 menu: Component {
                     ContextMenu {
                         MenuItem {
@@ -492,7 +412,7 @@ Page {
                         MenuItem {
                             objectName: "deleteItem"
                             text: qsTr("Delete")
-                            // The page is told, not this row; see the tile.
+                            // Page told, not row; see tile.
                             onClicked: page.askDelete(
                                            model.message_id,
                                            model.is_outgoing && model.show_padlock
@@ -501,16 +421,14 @@ Page {
                     }
                 }
 
-                // The caption and the row under it, together, so the
-                // countdown can cover both: faded by it while the message
-                // waits to go, and out of a tap's reach meanwhile.
+                // Caption and row together: countdown covers both.
                 Item {
                     id: content
                     width: parent.width
                     height: body.y + body.height + Theme.paddingMedium
                     enabled: !row.doomed
 
-                    // Who sent it and when. The name is theirs to choose.
+                    // Sender and time. Name is theirs.
                     Label {
                         id: caption
                         objectName: "rowCaption"
@@ -528,9 +446,7 @@ Page {
                               : ""
                     }
 
-                    // The two shapes a row takes, each zero-high when it
-                    // is not the one showing, so the row's height is their
-                    // sum.
+                    // Two row shapes, zero-high unless shown; height is sum.
                     Item {
                         id: body
                         x: Theme.horizontalPageMargin
@@ -538,9 +454,7 @@ Page {
                         width: parent.width - 2 * Theme.horizontalPageMargin
                         height: fileRow.height + preview.height
 
-                        // A file: the theme's icon for its kind, its name
-                        // and its size -- the platform's own file
-                        // browser's row.
+                        // File: theme icon, name, size, as platform file browser.
                         Item {
                             id: fileRow
                             readonly property bool shown: row.isFile
@@ -591,10 +505,8 @@ Page {
                             }
                         }
 
-                        // A sound or an app: the conversation's own
-                        // rendering of it, player and all. Given no file
-                        // for a file, which the row above draws, so it
-                        // measures nothing.
+                        // Sound or app: conversation's rendering. No file for a file (row above
+                        // draws it): measures 0.
                         AttachmentPreview {
                             id: preview
                             objectName: "attachment"
@@ -610,16 +522,14 @@ Page {
                             webxdcDocument: model.webxdc_document
                             webxdcSummary: model.webxdc_summary
                             webxdcIcon: model.webxdc_icon
-                            // The apps page is offered only where apps are
-                            // on, so a row here draws as the app it is.
+                            // Apps page only where apps on: row draws as app.
                             appsEnabled: true
                             onMenuRequested: row.openMenu()
                         }
                     }
                 }
 
-                // A file is opened and an app is run, as in the chat; a
-                // sound has its own play button.
+                // Opens and runs as in chat. Sound has own play button.
                 onClicked: {
                     if (row.isApp) {
                         page.openApp(model.message_id)

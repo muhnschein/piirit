@@ -1,44 +1,30 @@
 /*
- * `window.calls` for calls-webapp, served by the call host
- * (call_host.rs) as the page's own `calls.js`.
+ * `window.calls` for calls-webapp, served by call host (call_host.rs) as `calls.js`.
  *
- * The page does the call -- the camera and the microphone, the peer
- * connection, the codecs -- and asks its host for five things: to send
- * its offer, to send its answer, to end the call, the ICE servers, and a
- * picture of the other end. Each of those is the core's to do, and the
- * core is on the other side of the loopback host, so each is a request
- * to it. What comes back the other way -- the other end's answer -- the
- * page takes as a hash command, which this sets once the host has it.
+ * Page does media. Core, behind loopback host, does offer, answer, end, ICE servers, peer
+ * picture: one request each. Peer's answer returns as hash command.
  *
- * Nothing in here is a secret, and nothing is filled in. The key to the
- * host's API is in the page's own address, which the app hands its own
- * WebView and nothing else: a page elsewhere that loads this script into
- * itself -- a browser allows that across origins -- finds no key in its
- * own address, and can reach nothing with it.
+ * No secrets, nothing templated: API key is in page's address, given only to app's own
+ * WebView; another page loading this script (cross-origin allowed) reaches nothing.
  *
- * XMLHttpRequest rather than fetch, as in webxdc.js: Gecko has both, and
- * this one is older than every release this could run on.
+ * XHR, not fetch, as webxdc.js: XHR predates every Gecko this runs on.
  */
 (function () {
     "use strict";
 
-    /* The key, from the page's own query. */
+    /* From page's query. */
     var KEY = (function () {
         var found = /[?&]key=([0-9a-f]+)/.exec(window.location.search);
         return found ? found[1] : "";
     }());
-    /* Where the core is, behind the host. */
+    /* Core path behind host. */
     var API = "/call-api/" + KEY;
-    /* Milliseconds to wait before asking again when the host failed. */
+    /* Retry delay, ms, after host failure. */
     var RETRY = 1000;
 
     /*
-     * Gecko before 126 has no RTCIceCandidate.type. The page reads it to
-     * send its offer as soon as it has a candidate that goes through a
-     * relay; without it that never matches, and the offer waits for
-     * gathering to finish -- every server tried, the slow ones to their
-     * timeouts -- while the other end is not yet ringing. The type is in
-     * the candidate line itself, so it is read from there.
+     * Gecko <126 lacks RTCIceCandidate.type, needed to offer on first relay candidate
+     * (else waits for gathering; slow servers time out). Parsed from candidate.
      */
     if (window.RTCIceCandidate
             && !("type" in window.RTCIceCandidate.prototype)) {
@@ -52,16 +38,9 @@
     }
 
     /*
-     * The offer, with VP8 first among each picture's codecs. Sailfish's
-     * Gecko turns hardware H264 on for WebRTC, and an engine that has it
-     * lists H264 ahead of VP8 in every offer it makes; the other end
-     * answers in the offer's order, so a call this end places would be
-     * sent H264 -- which the engine here does not reliably draw -- where
-     * a call it answers is sent VP8, as the other end's offer puts first.
-     * Only the order changes, and only in what the other end is sent:
-     * each codec is still in the offer this end made, so whichever it is
-     * answered with is one it has. A codec's retransmission stream stays
-     * next to it.
+     * VP8 first per video line. Sailfish Gecko lists hardware H264 first; peer answers in
+     * offer order, and this engine draws H264 unreliably. Reorder only, sent offer only:
+     * every codec stays offered. rtx stream stays beside its codec.
      */
     function preferVp8(sdp) {
         var lines = sdp.split("\r\n");
@@ -94,12 +73,8 @@
     }
 
     /*
-     * What the page says to the host, one at a time and in the order it
-     * was said. Each request reaches the host on a connection of its
-     * own, and two in flight together were seen taken the wrong way
-     * round: the call screen, told where the pictures stand by the last
-     * report to arrive, would be left with the older one. A request the
-     * host never answers holds the rest no longer than WAIT.
+     * One request at a time: on separate connections two arrived swapped, leaving the
+     * screen (last picture report wins) stale. Unanswered holds queue at most WAIT.
      */
     var WAIT = 10000;
     var outbox = [];
@@ -120,38 +95,25 @@
         xhr.open("POST", API + next.path, true);
         xhr.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
         xhr.timeout = WAIT;
-        /* Answered, refused, failed or timed out alike. */
+        /* Any outcome, timeout too. */
         xhr.onloadend = postNext;
         xhr.send(next.body);
     }
 
-    /* Video is its own file's (`call_video.js`, served ahead of this):
-     * it reports on the same route, hears every peer connection the page
-     * makes, and takes the commands that are about the camera. */
+    /* Video (call_video.js, served ahead): hears every peer connection, takes camera commands. */
     piiritVideo.attach(post);
 
     /*
-     * The page says nothing about how the connection is doing -- nothing
-     * when it connects, nothing when it fails. The peer connection does,
-     * so every one the page makes is watched, and what it says is passed
-     * on. That is what the app's own screen says "Connected" from, and
-     * what ends a call whose connection has gone for good.
-     *
-     * Made the way the page makes one, `new` and all: a constructor that
-     * returns an object gives that object to `new`, and sharing the
-     * prototype keeps `instanceof` true.
+     * Page never reports connection state: watch each peer connection for app's
+     * "Connected" and end-on-failure. Constructor returns the native object to `new`;
+     * shared prototype keeps `instanceof`.
      */
     var Native = window.RTCPeerConnection;
 
     /*
-     * Gecko before 115 -- ESR 91, which Sailfish OS 5.0 ships -- has no
-     * setConfiguration. The page makes its connection with no servers and
-     * sets them once getIceServers answers; without the method that
-     * throws, and both placing and answering wait on it, so no call would
-     * ever start. There, the servers go in when the connection is made --
-     * asked for there and then, the host being on the same machine -- and
-     * the page's later setConfiguration does nothing, the connection
-     * already having what it would have set.
+     * Gecko <115 (ESR 91, Sailfish OS 5.0) lacks setConfiguration, which page calls after
+     * getIceServers: throws, no call starts. There servers go in at construction (sync
+     * fetch, local host); page's later call is a no-op.
      */
     var fixedServers = Native && !Native.prototype.setConfiguration;
     function iceServersNow() {
@@ -193,13 +155,9 @@
     }
 
     /*
-     * The microphone, switched from the app's own screen, which is the
-     * one the reader sees: the page runs unseen under it. The page keeps
-     * whether its microphone is on and tells the other end, and it does
-     * both from its own switch -- labelled with what a press would do --
-     * so that switch is pressed, rather than the track turned off behind
-     * the page's back. Before the page has drawn it there is nothing to
-     * press, and it is looked for again until there is.
+     * Mic switched from app screen over unseen page. Page owns mic state and tells peer via
+     * its switch (labelled with press's effect): press it, never kill track behind page.
+     * Not drawn yet: retry.
      */
     var MUTE_LABEL = "Mute microphone";
     var UNMUTE_LABEL = "Unmute microphone";
@@ -228,10 +186,8 @@
     }
 
     /*
-     * What the host has for the page, in order: hash commands, and the
-     * two above for the microphone. A long poll -- the host holds the
-     * request until it has something -- so the other end's answer
-     * arrives as it arrives.
+     * Host's ordered queue: hash commands plus mic commands. Long poll, so answers arrive
+     * promptly.
      */
     var waiting = [];
     function apply() {
@@ -239,8 +195,7 @@
             return;
         }
         window.location.hash = waiting.shift();
-        /* One per turn: the page reads the hash when the change reaches
-         * it, and two set in one turn would both be read as the last. */
+        /* One per turn: two in one turn read as last. */
         window.setTimeout(apply, 0);
     }
     function listen() {
@@ -264,7 +219,7 @@
                     }
                 }
                 apply();
-                /* The last word only: a press each would undo itself. */
+                /* Last word only: presses would undo each other. */
                 if (switched) {
                     applyMute();
                 }
@@ -272,7 +227,7 @@
             } else if (xhr.status !== 404) {
                 window.setTimeout(listen, RETRY);
             }
-            /* A 404 is the call being over: nothing more will come. */
+            /* 404: call over, nothing more. */
         };
         xhr.onerror = function () {
             window.setTimeout(listen, RETRY);
@@ -281,21 +236,19 @@
     }
 
     window.calls = {
-        /* The page's offer, gathered: placing the call is the core's. */
+        /* Gathered offer; core places call. */
         startCall: function (offer) {
             post("/start", preferVp8(offer));
         },
-        /* The page's answer to the call it was opened on. */
+        /* Page's answer to call it was opened on. */
         acceptCall: function (answer) {
             post("/accept", answer);
         },
-        /* The red button, in any state. The app takes the page away. */
+        /* Red button, any state; app removes page. */
         endCall: function () {
             post("/end", "");
         },
-        /* The core's servers, as the JSON string the page parses. Asked
-         * for rather than written in, so that they stay behind the key:
-         * a TURN server's credentials are the account's. */
+        /* JSON string; fetched so TURN credentials stay behind key. */
         getIceServers: function () {
             return new Promise(function (resolve) {
                 var xhr = new XMLHttpRequest();
@@ -309,8 +262,7 @@
                 xhr.send();
             });
         },
-        /* Drawn over the page's own placeholder, which still shows where
-         * the other end has no picture and the host has none to give. */
+        /* Over page's placeholder, shown if host has none. */
         getAvatar: function () {
             return API + "/avatar";
         }

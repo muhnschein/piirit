@@ -1,15 +1,7 @@
-//! What an avatar is drawn *in*: its own colour on a page, the ambience's
-//! where the cover lights up whoever has written.
+//! Avatar's colour on a page: its own; ambience's where cover lights up whoever wrote.
 //!
-//! A file of its own because a Qt event loop is: one `QmlEngine` per test
-//! binary, as every other qml_*.rs here does it.
-//!
-//! The stub's `Theme.highlightColor` is what the assertions read, so this
-//! is about which colour is asked for, not what an ambience makes of it.
-//! A picture's colours are made before it reaches the screen, by the app's
-//! image provider, so what is read here is what the avatar asks it for;
-//! `qml_pictures.rs` checks that a face asked for grey or tinted comes
-//! out that way.
+//! Own file: one `QmlEngine` per test binary. Reads stub's `Theme.highlightColor`: which colour is
+//! asked for, not what ambience makes of it (`qml_pictures.rs` checks picture colours).
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -76,7 +68,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -149,7 +141,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
             )
         );
         record!("lit-face", call!("face"));
-        // Read now: each change below asks for the picture made again.
+        // Read now: each change below asks for picture made again.
         record!(
             "picture-status",
             call!("get", QString::from("avatarImage"), QString::from("status"))
@@ -216,8 +208,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         "0|none|0",
         "a picture on a page is not drawn in its own colours. {context}"
     );
-    // Image.Ready is 1. Without it the lit picture was never there to be
-    // drawn in any colour.
+    // `Image.Ready` is 1. Without it lit picture was never there to colour.
     assert_eq!(
         value("picture-status"),
         "1",

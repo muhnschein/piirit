@@ -1,93 +1,58 @@
 /*
- * Video for calls-webapp: the camera, and what is drawn of it and of
- * the other end, as the app's own call screen has them.
+ * Video for calls-webapp: camera, and drawing both pictures as app's call screen wants.
  *
- * Served ahead of the bridge (`calls.js`), as one script with it: the
- * bridge hands this its way to the host, every peer connection the page
- * makes, and the commands that are this file's -- the camera on or off,
- * which way it faces, whether the app is in front, and the microphone
- * shut while the call's sound moves, and open again. It reports back,
- * on `/video`, whether the camera is live and whether the other end's
- * picture is being drawn: what the call screen decides from whether the
- * page is shown at all.
+ * Served ahead of bridge (`calls.js`), one script. Bridge hands in host post, every peer
+ * connection, and commands: camera on/off, facing, app in front, mic shut/reopen around sound
+ * move. Reports on `/video` camera live / remote drawn: call screen shows page from that.
  *
- * The page asks for the camera once, as the call starts, and keeps it
- * for the whole call. A voice call would then light the camera for
- * nothing, and a camera switched off would stay open behind a disabled
- * track. So the page is handed a stream whose video track is a blank one
- * -- a canvas that draws no frames -- until the camera is wanted, and
- * the camera's own track is put in its place, on the page's stream and
- * on the peer connection's sender, when it is. Switched off, or turned
- * the other way, the camera is let go before anything else is opened:
- * a phone opens one camera at a time.
+ * Page asks camera once, keeps it all call: voice call would light camera, switched-off one
+ * stay open behind disabled track. So page gets blank track (canvas, no frames) until camera
+ * wanted; then camera track replaces it on stream and senders. Off/turn: camera let go before
+ * another opens (phone opens one at a time).
  *
- * The page keeps whether its camera is on, and tells the other end --
- * which hides a picture that has been switched off rather than freezing
- * it -- so its own switch is pressed, found by its label, as the bridge
- * presses the microphone's.
+ * Page keeps camera state, tells other end (hides off picture, not freezes): its switch
+ * pressed, found by label, as bridge does mic's.
  *
- * What is captured is held to what a phone's screen at the other end
- * needs: VGA at 24 frames, at most 700 kbit/s. Encoding is software in
- * the engine, and every pixel and frame not taken is battery kept.
+ * Capture: VGA 24 fps, max 700 kbit/s; software encode, so less = battery kept.
  *
- * The page's own controls are not drawn: the app draws its own over the
- * page, and every element but the pictures is hidden. Where the page
- * would put this end's picture -- a fixed square, mirrored whichever way
- * the camera faces -- it is put where the call screen leaves room for it,
- * the whole screen while there is no picture from the other end.
+ * Page controls hidden (app draws own); own picture (page: square, mirrored either facing)
+ * where call screen leaves room, full screen while no remote picture.
  */
 var piiritVideo = (function () {
     "use strict";
 
-    /* What the camera is asked for: preferences only. A required value
-     * -- a max, a min, an exact -- is one every mode of the camera has to
-     * meet or the engine opens nothing, and Gecko holds a frame rate
-     * against the most a mode can do: a phone camera that runs at 30
-     * fails `max: 24` in every mode. The senders are held to 24 instead
-     * (`cap`). */
+    /* Preferences only: required value (max/min/exact) must suit every mode or nothing
+     * opens; Gecko checks rate vs mode's most, so 30 fps fails `max: 24`. Senders capped (`cap`). */
     var CAPTURE = {
         width: { ideal: 640 },
         height: { ideal: 480 },
         frameRate: { ideal: 24 }
     };
-    /* What one encoding may send. */
+    /* Max send per encoding. */
     var MAX_BITRATE = 700000;
     var MAX_FRAMERATE = 24;
-    /* The page's camera switch, labelled with what a press would do. */
+    /* Page camera switch label. */
     var START_LABEL = "Start camera";
     var STOP_LABEL = "Stop camera";
-    /* Milliseconds between looks for something the page has not drawn
-     * yet, and how many looks before giving up. */
+    /* Ms between unpainted-picture looks; looks before giving up. */
     var AGAIN = 250;
     var LOOKS = 40;
-    /* Milliseconds after the call connects, and after the camera changes
-     * in it, at which what goes each way is logged: a picture the other
-     * end sees black is one that is sent black, or one it cannot decode,
-     * and only the counts tell which. */
+    /* Ms after connect/camera change to log counts: tells black-sent from undecodable. */
     var SAMPLES = [4000, 15000, 45000];
-    /* The most the other end's picture is enlarged past fitting the
-     * screen: enough for a phone's upright picture to fill a taller
-     * screen, as this end's does, and for one held sideways to lose some
-     * of its bars rather than half of itself. */
+    /* Max remote zoom past fit: upright fills taller screen, sideways loses only some bars. */
     var ZOOM_MOST = 1.35;
-    /* Milliseconds between looks at whether the pictures on the screen
-     * are being painted, and how many times in a call one that is not is
-     * put back before it is left as it is. Sooner while one has not shown
-     * a frame yet: the screen is black until it does, and a picture the
-     * engine leaves unpainted is one put back as soon as it is seen to
-     * be. */
+    /* Ms between paint checks; max put-backs per picture per call. FIRST_LOOK until first
+     * frame (screen black till then). */
     var PAINT_LOOK = 2000;
     var FIRST_LOOK = 500;
     var PUT_BACK_MOST = 3;
-    /* This end's picture, while the other end's is drawn: in the top
-     * right corner the call screen leaves free under its top line, 4% in
-     * from its right and 10% down from its top, where it stays, as the
-     * reference clients have it. */
+    /* Own picture with remote drawn: top-right under call screen's top line, 4% from right,
+     * 10% from top (as reference clients). */
     var CORNER = {
         top: "10vh", right: "4vw", bottom: "auto", left: "auto",
         width: "27vw", height: "36vw", borderRadius: "2vw"
     };
-    /* And the whole screen, while it is not. */
+    /* Full screen while no remote picture. */
     var WHOLE = {
         top: "0", right: "0", bottom: "0", left: "0",
         width: "100%", height: "100%", borderRadius: "0"
@@ -96,104 +61,80 @@ var piiritVideo = (function () {
     var media = navigator.mediaDevices;
     var ask = media?.getUserMedia ? media.getUserMedia.bind(media) : null;
 
-    /* How the bridge reaches the host: post(path, body). Nowhere, until
-     * the bridge attaches. */
+    /* Host post(path, body), once bridge attaches. */
     var send = noop;
-    /* Whether the camera is wanted. The page's own query says so for the
-     * start of the call, as the page itself reads it. */
+    /* Camera wanted at start (page query). */
     var wanted = !window.location.search.includes("noOutgoingVideoInitially")
         && !window.location.search.includes("disableVideoCompletely");
-    /* Which way the camera faces: "user" or "environment". */
+    /* Facing: "user" or "environment". */
     var facing = "user";
-    /* Which way the camera whose frames are on the picture faces, which
-     * is what the picture is mirrored by. Through a turn that is still
-     * the camera turned from: its last frame stays on screen until the
-     * other camera's track is in place, and mirrored the other way it
-     * would flip round before the turn. */
+    /* Facing of camera behind picture (sets mirroring). Old camera's until new track in place,
+     * else last frame flips early. */
     var onScreen = "user";
-    /* The last camera asked for would not open, and what the engine said
-     * of it. */
+    /* Last camera failure, engine's message. */
     var failed = false;
     var failure = "";
-    /* The stream handed to the page, once it has asked. */
+    /* Stream given to page. */
     var stream = null;
-    /* The blank track that stands in for the camera. */
+    /* Blank stand-in track. */
     var blank = null;
-    /* The camera's track, while it is open; and a camera on its way. */
+    /* Camera track while open; camera on its way. */
     var camera = null;
     var opening = false;
-    /* The device the open camera is, kept when it is let go: a camera
-     * turned is one that is not this. */
+    /* Open camera's device; kept on let-go (turn = other device). */
     var device = "";
-    /* The cameras, once the engine has named them. A turn asks for one
-     * by its name, and listing them costs the engine a round trip to its
-     * camera service: listed again only while their names are not out,
-     * as they are not before a camera has first been opened. */
+    /* Cameras, kept once named (turn asks by name); listing costs a round trip, so only
+     * repeated before first open. */
     var listed = null;
-    /* Which of the back cameras the engine names to open, by its place
-     * among them: the engine calls every back camera alike, and the
-     * host says which is the main lens, from the platform camera's own
-     * labels. Said of the camera opened, for the log. */
+    /* Back camera index: engine names all alike, host picks main lens from platform labels.
+     * `chosen`: camera opened, for log. */
     var backCamera = 0;
     var chosen = "";
-    /* When the camera was last turned, while the other one is on its way
-     * and drawn: what a turn takes, logged. */
+    /* Turn start, for logging turn duration. */
     var turned = 0;
-    /* Every peer connection the page has made. */
+    /* Every peer connection page made. */
     var connections = [];
-    /* The stream the page's microphone is on, once it has asked -- the
-     * same one as `stream` when it asked for the camera too -- and what
-     * it asked the microphone for. */
+    /* Page's mic stream (`stream` if camera asked too), and mic request. */
     var voice = null;
     var voiceAsked = true;
-    /* The host has the microphone shut, for the call's sound to move:
-     * moved with it open, it brings the phone's sound server down
-     * (CallAudio.qml says why). Meanwhile the page's own asks wait, and
-     * each track stopped for it is kept with the senders that carried
-     * it, until the microphone opens again. */
+    /* Mic shut while call sound moves: open mic crashes sound server (CallAudio.qml). Page
+     * asks wait; stopped tracks kept until reopen. */
     var micShut = false;
     var micWaits = [];
     var micStopped = [];
-    /* How many times a microphone that will not open again is asked
-     * for, a second apart. */
+    /* Mic reopen retries: count, 1 s apart. */
     var MIC_TRIES = 3;
-    /* The other end's stream, and what it last said about its camera. */
+    /* Other end's stream and last camera report. */
     var remote = null;
     var remoteEnabled = null;
     var lastReport = "";
-    /* The other end's picture, once it is watched for a new size. */
+    /* Remote picture watched for size change. */
     var fitting = null;
     var lookingAgain = false;
     var looks = 0;
     var layoutDue = false;
-    /* The call is connected; and which round of samples is the current
-     * one, a later round taking the place of an earlier. */
+    /* Connected; current sample round. */
     var connected = false;
     var round = 0;
-    /* The app is in the background, where nothing is drawn. */
+    /* App backgrounded: nothing drawn. */
     var away = false;
-    /* What each picture had painted when last looked at, while it is on
-     * the screen; how often each has been put back; and when the next
-     * look is, with which round of looks it is, a sooner look taking the
-     * place of a later. */
+    /* Per picture: paint count at last look, put-backs, next look time and round. */
     var paints = { ours: null, theirs: null };
     var putBacks = { ours: 0, theirs: 0 };
     var paintAt = 0;
     var paintRound = 0;
-    /* What each picture had painted when it came on the screen, or was
-     * given its stream; and whether it has painted since -- shown, rather
-     * than black -- or has been given up on. */
+    /* Per picture: painted since arrival (not black), or given up. */
     var firsts = { ours: null, theirs: null };
     var shows = { ours: false, theirs: false };
 
     function noop() {}
 
-    /* A line for the app's log: what only a phone shows, seen there. */
+    /* Phone-only facts for app log. */
     function note(text) {
         send("/log", text);
     }
 
-    /* What a track is, for the log. */
+    /* Track description, for log. */
     function described(track) {
         var settings = track.getSettings ? track.getSettings() : {};
         return (track.label || "camera") + " " + (settings.width || "?") + "x"
@@ -205,9 +146,7 @@ var piiritVideo = (function () {
         return document.querySelector("[aria-label=\"" + label + "\"]");
     }
 
-    /* The page's switch, pressed until it says what is wanted. Nothing
-     * to press before the page has drawn it, nor ever on a stream with
-     * no video track at all, where the page draws no switch. */
+    /* Press page switch until in wanted state (absent without video track). */
     function syncSwitch() {
         var press = labelled(wanted ? START_LABEL : STOP_LABEL);
         if (press) {
@@ -227,8 +166,7 @@ var piiritVideo = (function () {
         }, AGAIN);
     }
 
-    /* A video track that sends nothing: a canvas never asked for a frame.
-     * Null where the engine cannot make one. */
+    /* Frameless canvas video track; null if engine can't. */
     function placeholder() {
         if (blank && blank.readyState !== "ended") {
             blank.enabled = false;
@@ -251,18 +189,14 @@ var piiritVideo = (function () {
         return blank;
     }
 
-    /* Whether a camera's name says it faces `which`. */
+    /* Camera name says it faces `which`. */
     var NAMED = {
         user: /front|user|selfie/i,
         environment: /back|rear|environment|main/i
     };
 
-    /* The camera to open to face `which`, as a device id, or "" to let
-     * the engine pick by facingMode. A facingMode is only a preference,
-     * and Gecko on a phone may weigh it at nothing -- turned, the same
-     * camera came back -- so a camera whose name says which way it faces
-     * is asked for by its id; and turning from one, when no name says,
-     * asks for any camera that is not the one that was open. */
+    /* Device id facing `which`, or "" for engine facingMode pick. Id since Gecko may ignore
+     * facingMode. Turn without names: any other camera. */
     function cameraFor(which, avoid) {
         if (!media.enumerateDevices) {
             return Promise.resolve("");
@@ -291,7 +225,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* The cameras the engine lists: the ones kept, once they are named. */
+    /* Listed cameras, kept once named. */
     function cameraList() {
         if (listed) {
             return Promise.resolve(listed);
@@ -307,8 +241,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Open the camera that faces the way asked for; `avoid` is the one
-     * that was open, when it was turned from. */
+    /* Open camera facing `which`; `avoid` = one open before turn. */
     function capture(avoid) {
         if (!ask) {
             return Promise.reject(new Error("no camera"));
@@ -326,8 +259,7 @@ var piiritVideo = (function () {
             }
             var settings = track.getSettings ? track.getSettings() : {};
             device = settings.deviceId || "";
-            /* What the camera says it faces wins over what was asked:
-             * the picture is mirrored, and the app told, by it. */
+            /* Camera's own facing wins: mirror and app follow. */
             if (settings.facingMode === "user" || settings.facingMode === "environment") {
                 facing = settings.facingMode;
             }
@@ -343,9 +275,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Hold what one sender sends to the caps above. Before negotiation
-     * there is nothing to set, and an engine that will not take a value
-     * keeps its own: neither is worth a call. */
+    /* Hold sender to caps; nothing before negotiation, refusal keeps engine value: no fail. */
     function cap(sender) {
         if (!sender.getParameters || !sender.setParameters) {
             return;
@@ -365,11 +295,11 @@ var piiritVideo = (function () {
                 done.catch(noop);
             }
         } catch (err) {
-            /* Kept as it was. */
+            /* Kept as is. */
         }
     }
 
-    /* The senders that carry video, whether or not they have a track. */
+    /* Video senders, track or not. */
     function videoSenders(connection) {
         var found = [];
         if (connection.getTransceivers) {
@@ -386,7 +316,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Once the microphone is not shut: at once, or when it opens. */
+    /* Run once mic not shut: now, or when it opens. */
     function micFree() {
         if (!micShut) {
             return Promise.resolve();
@@ -396,10 +326,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Shut the microphone: every live track the page has of it stopped,
-     * and taken off every sender that carries it -- stopped, the engine
-     * lets the device go. The tracks stay on the page's stream, so its
-     * own switch still has them to turn on and off. */
+    /* Shut mic: stop tracks, off senders (device released); kept on stream for switch. */
     function micOff() {
         micShut = true;
         if (!voice) {
@@ -427,8 +354,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Open it again: the page's waiting asks go on, and a new track goes
-     * where the stopped ones were, on or off as the page last had them. */
+    /* Reopen mic: asks resume; new track replaces stopped, on/off as page had. */
     function micOn() {
         micShut = false;
         var waits = micWaits;
@@ -446,7 +372,7 @@ var piiritVideo = (function () {
     function reopen(stopped, tries) {
         ask({ audio: voiceAsked }).then(function (given) {
             var track = given.getAudioTracks()[0];
-            /* Shut again while it opened: this one goes too. */
+            /* Shut again while opening: this one goes too. */
             if (micShut || !track) {
                 given.getTracks().forEach(function (one) {
                     one.stop();
@@ -486,7 +412,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* This end's picture element: the one playing the page's stream. */
+    /* Own picture element (page stream). */
     function preview() {
         if (!stream) {
             return null;
@@ -499,9 +425,7 @@ var piiritVideo = (function () {
         return null;
     }
 
-    /* Put `track` where the camera's track goes: on the page's stream,
-     * which is what the page's own picture plays, and on every sender
-     * that carries video. */
+    /* Set `track` on page stream and every video sender. */
     function use(track) {
         for (var old of stream.getVideoTracks()) {
             stream.removeTrack(old);
@@ -518,9 +442,7 @@ var piiritVideo = (function () {
                 cap(sender);
             });
         });
-        /* The picture plays the stream it was given when it was given
-         * it: given it again, it plays what is on it now -- which it has
-         * yet to show. */
+        /* Picture plays stream as when given: give again to show new track. */
         firsts.ours = null;
         var picture = preview();
         if (picture) {
@@ -543,11 +465,8 @@ var piiritVideo = (function () {
         }
     }
 
-    /* Draw this end's picture where it goes: mirrored only from the
-     * camera that faces the reader, the whole screen until the other
-     * end's picture comes, the corner after, and nowhere without a
-     * camera. Before the page has put the stream on its picture there is
-     * nothing to place, and it is looked for again. */
+    /* Place own picture: mirrored if reader-facing; full, corner, or hidden without camera.
+     * Stream not on yet: retry. */
     function layout() {
         var picture = preview();
         if (!picture) {
@@ -564,8 +483,7 @@ var piiritVideo = (function () {
             return;
         }
         box.style.display = "block";
-        /* The page shows its pictures only once the call is up; this
-         * end's is shown from the start, as a phone's call screen does. */
+        /* Own picture from start (page waits for call up). */
         if (box.parentElement) {
             box.parentElement.style.setProperty("display", "block", "important");
         }
@@ -575,7 +493,7 @@ var piiritVideo = (function () {
         start(picture);
     }
 
-    /* The other end's picture: the page's other one. */
+    /* Remote picture element. */
     function theirs() {
         for (var video of document.getElementsByTagName("video")) {
             if (video.srcObject && video.srcObject !== stream) {
@@ -585,12 +503,8 @@ var piiritVideo = (function () {
         return null;
     }
 
-    /* Enlarge the other end's picture towards filling the screen, as
-     * this end's does, by no more than ZOOM_MOST; what goes past the
-     * screen's edge is cut. Laid out larger, around its middle, rather
-     * than scaled: a scaled picture is one more layer for the engine to
-     * put together, and the pictures are what it was seen to leave
-     * unpainted. Again whenever its size or the screen's changes. */
+    /* Fill screen with remote up to ZOOM_MOST, overflow cut. Laid out, not scaled (extra
+     * layer; engine seen leaving pictures unpainted). Redo on resize. */
     function fitTheirs() {
         var picture = theirs();
         var box = picture?.parentElement;
@@ -620,8 +534,7 @@ var piiritVideo = (function () {
         box.style.overflow = "hidden";
     }
 
-    /* Whether the page hides a picture: with an inline display: none, on
-     * it or around it, as it hides what it will not show. */
+    /* Page hides picture (display: none on it or ancestor). */
     function hidden(picture) {
         for (var at = picture; at; at = at.parentElement) {
             if (at.style?.display === "none") {
@@ -631,21 +544,19 @@ var piiritVideo = (function () {
         return false;
     }
 
-    /* How many of a picture's frames the engine has painted -- put on the
-     * screen, not only decoded -- or null where it does not say. */
+    /* Frames painted (not just decoded), or null. */
     function paintedOf(picture) {
         var count = picture.mozPaintedFrames;
         return typeof count === "number" ? count : null;
     }
 
-    /* Whether a picture is meant to be seen: there, not hidden, and the
-     * page in front. */
+    /* Meant to be seen: present, not hidden, page in front. */
     function meant(picture) {
         return Boolean(picture) && !hidden(picture) && !away
             && document.visibilityState !== "hidden";
     }
 
-    /* Ask a picture to play, if it is paused. */
+    /* Ask picture to play if paused. */
     function play(picture) {
         if (!picture.paused || !picture.play) {
             return;
@@ -656,10 +567,8 @@ var piiritVideo = (function () {
         }
     }
 
-    /* Look at what the pictures paint in a moment, while one is meant to
-     * be seen: in FIRST_LOOK while one has yet to show, so that a picture
-     * is said to show, or is put back, before the reader wonders. A look
-     * sooner than the one due takes its place. */
+    /* Schedule paint look while meant to be seen: FIRST_LOOK until first shown. Sooner look
+     * replaces due one. */
     function paintSoon() {
         var ours = preview();
         var other = theirs();
@@ -683,9 +592,7 @@ var piiritVideo = (function () {
         }, wait);
     }
 
-    /* Whether a picture is shown, or not meant to be: one newly on the
-     * screen has what it has painted so far noted, to tell its first
-     * frame by. */
+    /* True if shown or not meant to be; newly seen: paint count noted. */
     function firstSeen(which, picture) {
         if (!meant(picture)) {
             return true;
@@ -709,14 +616,11 @@ var piiritVideo = (function () {
         }
     }
 
-    /* A picture meant to be seen, playing, with frames, that has painted
-     * none since the last look is put back. Where the engine does not
-     * count, each is put back once, a look after it first shows. True
-     * while the picture is worth looking at again. */
+    /* Seen, playing, with frames, nothing painted since last look: put back (once if engine
+     * not counting). True while worth looking again. */
     function lookedAt(which, picture, wait) {
         if (picture && putBacks[which] > 0 && picture.paused) {
-            /* Put back, and not yet playing again: what it plays is the
-             * other end's voice, too. */
+            /* Put back, not playing: it carries other end's voice too. */
             play(picture);
         }
         if (!meant(picture)) {
@@ -726,10 +630,8 @@ var piiritVideo = (function () {
             return false;
         }
         firstSeen(which, picture);
-        /* Paused, with no frame yet, or this end's with a camera on its
-         * way: nothing to paint, and the look's time starts once there
-         * is. A camera that is slow to turn is waited for, not put back
-         * or given up on. */
+        /* Paused, no frame, or camera coming: clock starts once there is. Slow turn waited
+         * for, not put back or given up. */
         var last = paints[which];
         paints[which] = null;
         if (picture.paused || !picture.videoWidth || (which === "ours" && opening)) {
@@ -751,14 +653,12 @@ var piiritVideo = (function () {
             putBacks[which] += 1;
             note((which === "ours" ? "our" : "their") + " picture: still not painted");
         }
-        /* Given up on: not waited for any more. */
+        /* Given up: not waited for. */
         shows[which] = true;
         return true;
     }
 
-    /* A picture playing with a frame shows once it has painted one since
-     * it came on the screen; where the engine does not count, at once. A
-     * count that went down is one the engine started again. */
+    /* Shown once painted since arrival (at once if uncounted); count down = restarted. */
     function showing(which, count) {
         var first = firsts[which];
         if (count !== null && count < first.count) {
@@ -769,10 +669,7 @@ var piiritVideo = (function () {
         }
     }
 
-    /* Put a picture back: its frames taken off its stream and put on it
-     * again, and the stream given to it again -- what turning the camera
-     * does, which was seen to draw this end's picture where nothing had
-     * before. */
+    /* Put back: track off and on, stream given again (as a turn; seen to fix blank picture). */
     function putBack(which, picture, count, wait) {
         var source = picture.srcObject;
         var tracks = source.getVideoTracks();
@@ -789,10 +686,8 @@ var piiritVideo = (function () {
                 : "nothing painted in " + wait / 1000 + " s"));
     }
 
-    /* Look at this end's picture again in a moment. One look at a time,
-     * however often this is asked: each ask starting its own would spend
-     * the looks in a fraction of the time, and a camera slow to open
-     * would find none left. Once they are spent, `why` is logged. */
+    /* Look at own picture soon. One at a time: parallel would spend LOOKS before slow camera.
+     * Once spent, `why` logged. */
     function lookAgain(why) {
         if (!stream || layoutDue) {
             return;
@@ -810,11 +705,8 @@ var piiritVideo = (function () {
         }
     }
 
-    /* The page's picture of this end plays by itself, muted -- when the
-     * engine lets it: given the stream while the call screen still hid
-     * the page, it was seen to sit there paused until something gave it
-     * the stream again. So it is asked to play, and looked at again,
-     * until it does; as the page itself does with the other end's. */
+    /* Own picture autoplays muted, but given stream while page hidden it sat paused: asked to
+     * play and looked at until it does, as page does with remote. */
     function start(picture) {
         if (!picture.paused || !picture.play) {
             return;
@@ -823,7 +715,7 @@ var piiritVideo = (function () {
         lookAgain("it never played");
     }
 
-    /* Say how the pictures stand, when that has changed. */
+    /* Report picture state on change. */
     function report() {
         layout();
         fitTheirs();
@@ -848,8 +740,7 @@ var piiritVideo = (function () {
         send("/video", now);
     }
 
-    /* What an engine's refusal says: its name, which is the reason, and
-     * its message. */
+    /* Engine refusal: name (the reason) and message. */
     function describe(err) {
         if (!err) {
             return "";
@@ -859,8 +750,7 @@ var piiritVideo = (function () {
         return name && message ? name + ": " + message : name || message;
     }
 
-    /* The camera would not open: the page is told it is off, and the app
-     * that it failed, and why. */
+    /* Camera failed: page told off, app told why. */
     function giveUp(err) {
         failed = true;
         failure = describe(err);
@@ -877,8 +767,7 @@ var piiritVideo = (function () {
         report();
     }
 
-    /* Open the camera and put it in place; `otherwise` if it will not.
-     * A camera switched off while it was opening is let go again. */
+    /* Open camera, put in place; `otherwise` on failure. Switched off meanwhile: let go. */
     function open(otherwise, avoid) {
         opening = true;
         capture(avoid).then(function (track) {
@@ -906,8 +795,7 @@ var piiritVideo = (function () {
 
     function cameraOn() {
         wanted = true;
-        /* Asked again after a failure: said, so that a second failure
-         * is a change the app hears too. */
+        /* Retry after failure: second failure is news to app. */
         if (failed) {
             failed = false;
             report();
@@ -932,8 +820,7 @@ var piiritVideo = (function () {
         report();
     }
 
-    /* Turn the camera the other way: the open one is let go first, and
-     * if the other will not open, the one before is opened again. */
+    /* Turn: let go, open other; on failure reopen previous. */
     function face(which) {
         if (facing === which) {
             return;
@@ -947,8 +834,7 @@ var piiritVideo = (function () {
         }
         turned = Date.now();
         camera.stop();
-        /* Black, or the last frame held, until the other camera's first
-         * one is drawn: the spinner says it is on its way. */
+        /* Black/last frame until other camera's first: spinner meanwhile. */
         firsts.ours = null;
         report();
         open(function (err) {
@@ -958,10 +844,7 @@ var piiritVideo = (function () {
         }, was);
     }
 
-    /* After a turn, log when the other camera's first picture is drawn:
-     * given the stream again, the page's picture loads it afresh, and has
-     * its data once a frame has come. The rest of what a turn takes is
-     * the phone's camera starting up, which `camera open` times. */
+    /* Log turned camera's first picture; rest is startup (`camera open`). */
     function timeDrawing() {
         var since = turned;
         turned = 0;
@@ -974,8 +857,7 @@ var piiritVideo = (function () {
         }, { once: true });
     }
 
-    /* Each picture section of a description, for the log: which way it
-     * goes, and its codecs in the order given. */
+    /* Video sections of SDP for log: direction, codecs. */
     function videoSections(description) {
         if (!description?.sdp) {
             return "none";
@@ -1014,7 +896,7 @@ var piiritVideo = (function () {
         }).join("; ") || "none";
     }
 
-    /* Which track a sender sends, for the log. */
+    /* Track a sender sends, for log. */
     function sending(sender) {
         var track = sender.track;
         if (!track) {
@@ -1029,10 +911,8 @@ var piiritVideo = (function () {
         return which + " " + (track.enabled ? "on" : "off") + " " + track.readyState;
     }
 
-    /* One way's counts, from its RTP stats: the codec, the size, how
-     * many frames and how big each is -- a black frame is a few dozen
-     * bytes, a picture thousands -- and how often a keyframe was asked
-     * for, which a receiver that cannot decode does over and over. */
+    /* One way's RTP counts: codec, size, frames, bytes each (black ~dozens, picture thousands),
+     * keyframe requests (undecodable receiver keeps asking). */
     function counts(rtp, codecs, frames, bytes) {
         if (!rtp) {
             return "none";
@@ -1061,10 +941,7 @@ var piiritVideo = (function () {
         return parts.join(" ");
     }
 
-    /* How a picture is drawn, for the log: hidden where it is not -- this
-     * end's without a camera, the other end's while the page holds their
-     * camera off or their picture frameless -- playing or paused, at what
-     * size, and how many of its frames reached the screen. */
+    /* Picture draw state for log: hidden, playing/paused, size, frames on screen. */
     function drawn(picture) {
         if (!picture) {
             return "not drawn";
@@ -1075,7 +952,7 @@ var piiritVideo = (function () {
             + " painted " + (count === null ? "?" : count);
     }
 
-    /* Log what one connection sends and receives of video, now. */
+    /* Log one connection's video send/recv now. */
     function sample(connection) {
         if (!connection.getStats) {
             return;
@@ -1107,9 +984,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Log what goes each way a few times from now, in place of any
-     * round still to come. Only on a connected call: before, nothing
-     * goes. */
+    /* Log send/recv a few times from now; only once connected. */
     function sampleSoon() {
         if (!connected) {
             return;
@@ -1154,7 +1029,7 @@ var piiritVideo = (function () {
             }
             report();
         });
-        /* Negotiated: there are encodings to hold to the caps. */
+        /* Negotiated: encodings to hold to caps. */
         connection.addEventListener("signalingstatechange", function () {
             note("signalling: " + connection.signalingState);
             if (connection.signalingState === "stable") {
@@ -1163,8 +1038,7 @@ var piiritVideo = (function () {
                 videoSenders(connection).forEach(cap);
             }
         });
-        /* What the other end says about its camera, on the channel the
-         * page opens for it. */
+        /* Remote camera report on page's channel. */
         var create = connection.createDataChannel;
         connection.createDataChannel = function (label, options) {
             var channel = create.call(connection, label, options);
@@ -1172,7 +1046,7 @@ var piiritVideo = (function () {
                 channel.addEventListener("message", function (event) {
                     try {
                         var said = JSON.parse(event.data);
-                        /* Only what the page itself takes: both said. */
+                        /* Only what page accepts: both flags. */
                         if (said && typeof said.videoEnabled === "boolean"
                             && typeof said.audioEnabled === "boolean") {
                             note("their camera: " + (said.videoEnabled ? "on" : "off")
@@ -1181,7 +1055,7 @@ var piiritVideo = (function () {
                             report();
                         }
                     } catch (err) {
-                        /* The page says what was wrong with it. */
+                        /* Page says what's wrong. */
                     }
                 });
             }
@@ -1189,7 +1063,7 @@ var piiritVideo = (function () {
         };
     }
 
-    /* One command from the host. False for one that is not this file's. */
+    /* One host command; false if not ours. */
     function take(command) {
         var lens = /^back-camera-(\d+)$/.exec(command);
         if (lens) {
@@ -1216,8 +1090,7 @@ var piiritVideo = (function () {
             face("environment");
             return true;
         case "hidden":
-            /* In the background: the pictures are not drawn, and what
-             * they carry -- the other end's voice -- still plays. */
+            /* Background: pictures not drawn; voice plays. */
             away = true;
             document.documentElement.classList.add("piirit-hidden");
             return true;
@@ -1231,12 +1104,8 @@ var piiritVideo = (function () {
         }
     }
 
-    /* The page asks for the camera and the microphone together, once.
-     * It is given the microphone, and the camera only if it is wanted --
-     * the blank track otherwise, so that its switch is drawn and the
-     * call can be turned into a video call. A camera that will not open
-     * is not a call that cannot start. Asked while the host has the
-     * microphone shut, the page waits for it to open. */
+    /* Page asks camera+mic once. Camera only if wanted, else blank track (switch drawn, call
+     * can become video); failed camera doesn't stop call. Mic shut: waits for reopen. */
     function askFor(asked) {
         if (!asked?.video) {
             return ask(asked).then(function (given) {
@@ -1293,11 +1162,7 @@ var piiritVideo = (function () {
         };
     }
 
-    /* The page puts the stream on its picture when it draws it: placed
-     * then, rather than whenever the next look comes round; and the other
-     * end's on the other picture, fitted then; and either looked at for
-     * its first frame. A stream that is not the one the picture had is
-     * one it has yet to show. */
+    /* Page sets stream on picture: remote fitted, both watched for first frame. */
     var Media = window.HTMLMediaElement;
     var source = Media && Object.getOwnPropertyDescriptor
         ? Object.getOwnPropertyDescriptor(Media.prototype, "srcObject") : null;
@@ -1319,24 +1184,19 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Nothing of the page but its pictures: the app draws the rest. */
+    /* Only page pictures: app draws rest. */
     var sheet = document.createElement("style");
     sheet.textContent = "body * { visibility: hidden !important; }\n"
         + "video { visibility: visible !important; }\n"
         + "html.piirit-hidden video { visibility: hidden !important; }\n";
     (document.head || document.documentElement).appendChild(sheet);
-    /* Turned, the screen is another shape. */
+    /* Rotated: new screen shape. */
     if (window.addEventListener) {
         window.addEventListener("resize", fitTheirs);
     }
 
-    /* What the page says to its console, which nothing on the phone
-     * reads, into the call log: its warnings and errors, and of the rest
-     * only what it says of the other end's picture and camera and of its
-     * own commands -- the rest is candidates and descriptions, addresses
-     * among them. A line said over and over, as the page says while it
-     * asks a paused picture to play, is logged once until another comes;
-     * and a failure nothing caught, which the page would leave unsaid. */
+    /* Page console to call log: warnings, errors, remote picture/camera and command lines
+     * (rest carry addresses); repeats once; uncaught failures too. */
     var PAGE_SAYS = [
         "incStream.videoTracks() muted states:",
         "incoming media ",
@@ -1384,10 +1244,8 @@ var piiritVideo = (function () {
             }
         });
     }
-    /* Whether the engine holds the page in front, and every press of one
-     * of its buttons -- a touch, or the app's own -- in the log too: a
-     * page held hidden paints nothing, and a switch pressed by nobody
-     * knows whom is a microphone off that nobody chose. */
+    /* Log visibility and button presses: hidden page paints nothing; stray press = mic off
+     * nobody chose. */
     if (document.addEventListener) {
         document.addEventListener("visibilitychange", function () {
             note("visibility: " + document.visibilityState);
@@ -1413,7 +1271,7 @@ var piiritVideo = (function () {
     }
 
     return {
-        /* How to reach the host: the bridge's own post(path, body). */
+        /* Bridge's post(path, body). */
         attach: function (post) {
             send = post;
             if (typeof document.visibilityState === "string") {

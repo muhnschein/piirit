@@ -1,22 +1,17 @@
 #!/bin/bash
-# Prove that ci/harbour-check.sh still fails what it claims to fail.
+# Prove ci/harbour-check.sh still fails what it claims to fail.
 #
-# A gate that only ever prints "ok" is indistinguishable from a gate that
-# has stopped looking, and every check in there is a regex over a file
-# format someone will reformat one day. So each case below breaks one
-# Harbour rule in a throwaway copy of the tree and asserts the check names
-# it.
+# A gate printing only "ok" may have stopped looking. Each case breaks one
+# Harbour rule in a throwaway tree copy and asserts the check names it.
 #
-# The binary and the bundled server are not copied: the checks that need
-# them report SKIP, which is not what any case asserts.
+# Binary and bundled server aren't copied: checks needing them SKIP.
 set -u
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-# Straight into place, dotfiles and all: .github/workflows/rpm.yml is one
-# of the things a case breaks.
+# Dotfiles too: rpm.yml is one thing a case breaks.
 pristine="$work/pristine"
 mkdir -p "$pristine"
 tar -C "$root" -cf - \
@@ -65,7 +60,7 @@ break_and_expect() {
 S='rpm/harbour-piirit.spec'
 D='harbour-piirit.desktop'
 Q='qml/cover/CoverPage.qml'
-# The only .qml with relative-path imports, which two cases need.
+# Only .qml with relative imports; two cases need it.
 R='qml/piirit.qml'
 
 break_and_expect 1.1.1 "package name without the harbour- prefix" \
@@ -74,8 +69,7 @@ break_and_expect 1.1.3 "Version with a letter in it" \
     "sed -i 's/^Version:.*/Version:    0.1.0rc1/' $S"
 break_and_expect 1.1.4 "Release with a letter in it" \
     "sed -i 's/^Release:.*/Release:    1.gabc123/' $S"
-# No unescaped $ in a case script: it is run through eval, which would
-# expand a shell variable in the pattern before sed ever saw it.
+# No unescaped $ in case script: eval expands it before sed sees it.
 break_and_expect 1.1.4 "an rpm workflow that stamps a git hash into Release" \
     "sed -i 's|^ *release=.*|          release=\"1.17.gabc1234\"|' .github/workflows/rpm.yml"
 break_and_expect 1.2.1 "a file installed outside the allowed paths" \
@@ -145,11 +139,9 @@ break_and_expect 2.6 "a write into the installed data directory" \
 break_and_expect 1.2.3 "a cargo binary named something other than the package" \
     "sed -i 's|^name = \"harbour-piirit\"\$|name = \"piirit\"|' rust/piirit-app/Cargo.toml"
 
-# ci/harbour-validate-rpm.sh judges the real validator's output against the
-# same waiver file, and its matching is the subtle part: a layout error
-# names the offending path as its subject, while a linking error names the
-# *binary* and puts the library in the message. Fed saved logs rather than
-# a built RPM, which needs the SDK.
+# validate-rpm judges real validator output against the same waivers. Matching
+# is subtle: layout errors name the path; linking errors name the *binary*,
+# library in message. Fed saved logs (built RPM needs SDK).
 validate_rpm() {
     local expect=$1 what=$2 body=$3
     local log="$work/validation.log"
@@ -179,16 +171,14 @@ ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|File must not be executab
 WARNING|/usr/bin/harbour-piirit|file is not stripped!
 !END!FAIL!x
 '
-# The vendored qmetaobject patch is what keeps this out of the binary. If
-# it is ever lost, the RPM check has to say so rather than wave it through.
+# Vendored qmetaobject patch keeps QtWidgets out of the binary; if lost, fail.
 validate_rpm fail "a binary that links QtWidgets again" \
 '!BEGIN!x
 ERROR|/usr/bin/harbour-piirit|Cannot link to shared library: libQt5Widgets.so.5
 !END!FAIL!x
 '
-# The waiver names the path and the two errors it accepts about it; any
-# other error about the same path is news, and a waiver that matched on
-# the path alone would have swallowed it.
+# Waiver = path + accepted errors. Path-only match would swallow other errors
+# there.
 validate_rpm fail "a waived path with an error the waiver does not name" \
 '!BEGIN!x
 ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|setuid, setgid or sticky bit set
@@ -227,11 +217,8 @@ validate_rpm fail "a validation log that was cut off before the verdict" \
 'ERROR|/usr/bin/harbour-piirit|something
 '
 
-# The runner's Node parent ignores SIGPIPE and every child inherits it, so
-# a validator pipeline whose reader stops early reports each write instead
-# of dying: 4945 such lines buried one real run's verdict. The wrapper
-# resets the disposition before running the validator, and hides whatever
-# still gets through -- so a log full of it is still judged on its markers.
+# Node parent ignores SIGPIPE; children inherit it, so broken pipes print per
+# write (4945 lines once). Wrapper resets it and hides leftovers.
 validate_rpm pass "a log buried in broken-pipe noise" \
 "!BEGIN!x
 $(for _ in $(seq 1 50); do
@@ -241,8 +228,7 @@ WARNING|/usr/bin/harbour-piirit|file is not stripped!
 !END!PASS!x
 "
 
-# And the noise does not reach the reader, whichever way it got into the
-# log: the whole point is a verdict someone can find.
+# Noise never echoed, however it got into log: verdict must be findable.
 cases=$((cases + 1))
 noise_log="$work/noisy.log"
 printf '%s\n' \
@@ -256,8 +242,7 @@ else
     echo "selftest: ok   broken-pipe noise -> not echoed"
 fi
 
-# The waiver file has to stay honest in both directions: an entry that
-# stops matching is as much a defect as a missing check.
+# Waiver file honest both ways: stale entry = defect, like missing check.
 cases=$((cases + 1))
 dir="$work/case"
 rm -rf "$dir"

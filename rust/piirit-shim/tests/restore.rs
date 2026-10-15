@@ -1,26 +1,17 @@
-//! Taking a profile over: from a device that has it, or from a file.
+//! Taking profile over: from a device or a file.
 //!
-//! The core's own import, driven the way `src/signup.rs` drives a signup
-//! and checked the same way: one Qt event loop against the recording
-//! double, then its journal. What is pinned here is what the shim does
-//! around the import:
-//!
-//! - the transfer reports itself while it runs, and the profile it
-//!   brings over is announced with IO started on it, since an imported
-//!   account has none;
-//! - a code that is not a device offering a profile is refused before
-//!   anything is transferred, with this app's own reason rather than the
-//!   core's words about protocols;
-//! - a failed import takes its account with it, unlike a refused signup:
-//!   a half-written account is good for nothing, and the next attempt
-//!   reuses whatever unconfigured account it finds;
-//! - a transfer given up on answers nobody, and the core's process is
-//!   stopped on the account it was holding.
+//! Core's own import, driven like `src/signup.rs` drives signup (Qt loop vs
+//! recording double, then journal). Pinned here is the shim's part:
+//! - transfer reports itself; imported profile announced with IO started
+//!   (imported account has none);
+//! - code not from a device offering a profile: refused before transfer, with
+//!   this app's reason, not core's protocol words;
+//! - failed import takes its account (unlike refused signup): half-written
+//!   account is useless, and next attempt would reuse any unconfigured one;
+//! - transfer given up answers nobody; core's process stopped on held account.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `set_var` pre-Qt (`unused_unsafe`: edition 2024 only);
+// `borrow_as_ptr`; whole-second `single_shot`.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -37,8 +28,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Records what the shim signalled, in the Qt 5.6 dialect with the
-/// shim's `snake_case` names.
+/// Records shim signals; Qt 5.6 dialect, `snake_case` names.
 const PROBE_QML: &str = r"
         import QtQuick 2.0
         Item {
@@ -77,15 +67,12 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary, and all of these have to be
-    // set before Qt initialises and before the shim spawns the server
-    // that inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &accounts);
-        // The slow transfer answers between the ticks below, never on
-        // one.
+        // Slow transfer answers between ticks, not on one.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "2500");
     }
 
@@ -100,7 +87,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     // Whole seconds only (clippy.toml); one step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
-    // 1s: the code another device shows while it offers its profile.
+    // 1s: code another device shows while offering profile.
     let device = core_ptr.clone();
     single_shot(Duration::from_secs(1), move || {
         if let Some(this) = device.as_pinned() {
@@ -109,8 +96,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
         }
     });
 
-    // 2s: a code from a device running something newer than this core
-    // can read. Refused before anything is transferred.
+    // 2s: code from newer device than this core reads. Refused before transfer.
     let too_new = core_ptr.clone();
     single_shot(Duration::from_secs(2), move || {
         if let Some(this) = too_new.as_pinned() {
@@ -119,7 +105,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
         }
     });
 
-    // 3s: a file the core cannot read.
+    // 3s: file core cannot read.
     let bad_file = core_ptr.clone();
     single_shot(Duration::from_secs(3), move || {
         if let Some(this) = bad_file.as_pinned() {
@@ -137,8 +123,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
         }
     });
 
-    // 5s: a transfer that takes its time, and 6s: the reader gives up on
-    // it. What it answers afterwards is nobody's.
+    // 5s: slow transfer; 6s: reader gives up. Late answer is nobody's.
     let slow = core_ptr.clone();
     single_shot(Duration::from_secs(5), move || {
         if let Some(this) = slow.as_pinned() {
@@ -155,8 +140,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(10), move || {
-        // SAFETY: see tests/smoke.rs -- the callback only fires while
-        // `exec()` is still running on this thread.
+        // SAFETY: see tests/smoke.rs; fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
@@ -175,16 +159,14 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     assert_nothing_half_kept(&calls, &context);
 }
 
-/// Two profiles arrived, the second on its own account; the transfers
-/// reported themselves, each ending in the core's "done"; the
-/// code from the newer device was refused as such and nothing else was;
-/// the unreadable file failed once, in the core's words.
+/// Two profiles arrived (second on own account); transfers reported, ending in
+/// core's "done"; newer device's code refused; unreadable file failed once.
 fn assert_signals(summary: &str, context: &str) {
     assert!(!summary.is_empty(), "the probe QML never loaded. {context}");
     let parts: Vec<&str> = summary.split('/').collect();
     assert_eq!(parts.len(), 6, "unexpected summary shape. {context}");
     assert_eq!(parts[0], "2", "two profiles should have arrived. {context}");
-    // Account 3: see assert_imports_and_io.
+    // Account 3: see `assert_imports_and_io`.
     assert_eq!(
         parts[1], "3",
         "the second profile is not on its own account. {context}"
@@ -208,9 +190,8 @@ fn assert_signals(summary: &str, context: &str) {
     );
 }
 
-/// The device transfers went to `get_backup` with the code, the files to
-/// `import_backup` with the path, and IO was started on each profile
-/// that arrived -- an imported account has none running.
+/// Device transfers via `get_backup` with code, files via `import_backup` with
+/// path; IO started on each arrived profile (imported account has none).
 fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
     let of = |name: &str| -> Vec<(u64, String)> {
         calls
@@ -228,9 +209,8 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
             })
             .collect()
     };
-    // By account: 1 for the first profile, 2 for the file that failed
-    // and went with it, 3 for the one that arrived, 4 for the transfer
-    // given up on. The core never hands an id out twice.
+    // By account: 1 first profile; 2 failed file; 3 arrived; 4 given up. Core
+    // never reuses ids.
     assert_eq!(
         of("get_backup"),
         vec![
@@ -259,10 +239,8 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
     );
 }
 
-/// The code that was refused cost no transfer at all; the file that
-/// failed took its account with it; and the transfer the reader gave up
-/// on was stopped in the core rather than left running, taking its own
-/// account with it when it answered too late to matter.
+/// Refused code cost no transfer. Failed file took its account. Given-up
+/// transfer stopped in core, with its account if late.
 fn assert_nothing_half_kept(calls: &[(String, Value)], context: &str) {
     assert!(
         calls

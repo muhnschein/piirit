@@ -3,15 +3,8 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Where the setup path begins: reached from the first screen, and from
- * the end of the walk through what Delta Chat is (IntroPage.qml). The
- * field of faces stays on the first screen, where it is the welcome; a
- * page asking a question wants nothing behind the question.
- *
- * Two ways from here, and both are built. Creating a profile goes
- * straight to the relay dialog. Having one already asks where it is --
- * on a device still in reach, or in a backup file -- and takes it over
- * from there (ExistingProfilePage.qml).
+ * Setup path start: from first screen and end of IntroPage walk. Create: relay
+ * dialog. Existing profile: ExistingProfilePage.qml.
  */
 Page {
     id: page
@@ -43,13 +36,11 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        // The two ways on, as tiles: the arrows of a transfer for a
-        // profile that is somewhere else already, the plus for one that
-        // does not exist yet.
+        // Two tiles: transfer arrows (profile exists elsewhere), plus (new).
         ChoiceTiles {
             objectName: "startWays"
             width: parent.width
-            // The column is already inside the page's margins.
+            // Column already inside page margins.
             sideMargin: 0
             choices: [
                 {

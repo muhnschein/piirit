@@ -1,12 +1,9 @@
-//! The profile page reads the connection again once a burst of
-//! `ConnectivityChanged` has gone by, not once per event.
+//! Profile page re-reads connection once a `ConnectivityChanged` burst passes.
 //!
-//! A read is four round trips -- the band, the core's report, the
-//! profile's size on the phone, which sizes every file it has, and its
-//! address -- and the core says the connection changed several times over
-//! in every fetch. The page reads it as it opens, and after that at most
-//! once a second. `get_account_file_size` is the one of the four counted
-//! here: it is the expensive one, and it is only ever asked for by this.
+//! A read is four round trips: band, core report, on-phone profile size (sizes every
+//! file), address. Core reports several changes per fetch. Page reads on open, then at
+//! most once a second. `get_account_file_size` is the one counted: most expensive, and only
+//! this read asks for it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -53,7 +50,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// How many times the profile's size on the phone has been asked for.
+/// Times profile's on-phone size was asked for.
 fn sizings(journal: &std::path::Path) -> usize {
     common::methods(journal)
         .iter()
@@ -70,8 +67,7 @@ fn a_burst_of_connection_changes_is_one_read() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -110,8 +106,7 @@ fn a_burst_of_connection_changes_is_one_read() {
 
     let steps: common::Steps = common::Steps::default();
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY: callbacks run only inside `exec()` on this thread; all they point at outlives it.
     let loading = steps.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         common::record(
@@ -133,8 +128,7 @@ fn a_burst_of_connection_changes_is_one_read() {
         common::record(&bursting, "burst", call!("burst").into());
     });
 
-    // Long enough after the burst for the one read it is owed to have
-    // gone out and come back, and for any more to have.
+    // Long enough after burst for the owed read to return.
     let settled = steps.clone();
     let after = journal.clone();
     single_shot(Duration::from_secs(6), move || unsafe {

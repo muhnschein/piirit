@@ -1,10 +1,9 @@
-//! Speaking to a loopback host the way a page does: the call host's
-//! tests play the page's side of the conversation over a real socket.
+//! Loopback host as a page talks: tests play page's side over a socket.
 
 use std::io::{Read, Write};
 use std::time::Duration;
 
-/// One request, its whole answer. `Err` is nothing listening.
+/// One request, whole answer. `Err`: nothing listening.
 pub fn ask(authority: &str, head: &str, body: &[u8]) -> Result<String, String> {
     let mut stream =
         std::net::TcpStream::connect(authority).map_err(|err| format!("connect: {err}"))?;
@@ -37,7 +36,7 @@ pub fn get(authority: &str, path: &str) -> String {
     get_as(authority, authority, path)
 }
 
-/// A POST the way the bridge sends one: the text as it is.
+/// POST as bridge sends: text as-is.
 pub fn post(authority: &str, path: &str, body: &str) -> String {
     ask(
         authority,
@@ -65,8 +64,7 @@ pub fn authority_of(url: &str) -> String {
     rest.split('/').next().unwrap_or_default().to_string()
 }
 
-/// The API path a page was given: the key in its own address, which is
-/// the only place the key is.
+/// API path from page URL: key lives only in its address.
 pub fn api_of(url: &str) -> String {
     let key = url
         .split(['?', '&', '#'])
@@ -75,8 +73,7 @@ pub fn api_of(url: &str) -> String {
     format!("/call-api/{key}")
 }
 
-/// A hash command's SDP, decoded the way the page decodes it:
-/// `decodeURIComponent`, then `atob`.
+/// Hash command's SDP, decoded as page does: `decodeURIComponent`, then `atob`.
 pub fn payload_of(command: &str, name: &str) -> String {
     let Some(encoded) = command.strip_prefix(&format!("{name}=")) else {
         return format!("not a {name}: {command}");

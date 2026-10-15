@@ -1,54 +1,30 @@
 # How cargo-nextest runs this suite.
 #
-# Why nextest at all: `cargo test` runs one test BINARY at a time, and this
-# workspace has over a hundred of them. Almost every one starts a Qt engine
-# and then waits on real timers -- a countdown, a debounce, a signal that
-# arrives a second later -- so the suite spent ten minutes mostly idle,
-# serialised. nextest runs each test in its own process and schedules them
-# all against the available cores. Same tests, same assertions; 207 of them
-# went from about ten minutes to about two and a half on four cores.
+# `cargo test` runs one binary at a time; 100+, each idle on Qt/timers. nextest runs each
+# test in own process, in parallel: 207 tests, ~10 min to ~2.5 min on 4 cores.
 #
-# Nothing here is shared between tests, which is what makes that safe: the
-# webxdc host binds port 0 and lets the kernel choose (see
-# piirit-shim/src/webxdc_host.rs), the QML probes copy the tree into a
-# directory named for their own pid, and the fixed /tmp paths in the tests
-# are strings handed to a fake server rather than files anyone opens.
+# Tests share nothing (port 0 binding, per-pid QML dirs, fake-server /tmp strings).
 #
-# What nextest does NOT run is doctests. The Makefile and ci.yml run
-# `cargo test --doc` beside it for that reason, and ci/packaging-lint.sh
-# fails a tree where one is there without the other.
+# Doctests: not nextest. Makefile and ci.yml run `cargo test --doc`; packaging-lint checks both.
 
 [profile.default]
-# A Qt test that waits on a signal which never arrives does not fail -- it
-# waits. Under `cargo test` that meant the job's own timeout twenty minutes
-# later, with no clue which test was hung. Warn at 30s (the slowest honest
-# test here is about 12s) and kill at four times that, which nextest reports
-# as a timeout against the test's name.
+# Qt test waiting on a never-arriving signal hangs, not fails. Warn 30s (slowest ~12s), kill at 4x.
 slow-timeout = { period = "30s", terminate-after = 4 }
 
-# No retries, deliberately. A test that passes on the second attempt is a
-# defect this project wants to see, not one to paper over: the run of
-# deletes that failed on a phone looked exactly like a flake in the suite.
+# No retries: a pass-on-retry is a defect to see (phone delete run looked like a flake).
 retries = 0
 
 [profile.ci]
-# One failure should not hide the others. A contributor re-runs locally to
-# iterate; CI is asked once and should say everything it knows.
+# One failure should not hide others.
 fail-fast = false
 
-# Failures printed where they happen and again at the end, because in a
-# 200-line log the summary is what anyone actually reads.
+# Failures printed at once and at end: the summary is what people read.
 failure-output = "immediate-final"
 
 [profile.leak-check]
-# ci/leak-check.sh: every test under AddressSanitizer, which runs them two
-# to three times slower. The same reasoning as `ci`, with the clock moved.
+# ci/leak-check.sh: ASan runs 2-3x slower. Same reasoning as `ci`.
 fail-fast = false
 failure-output = "immediate-final"
 slow-timeout = { period = "60s", terminate-after = 4 }
-# One retry here, unlike every other profile. What this profile judges is
-# leaks, and a leak fails every attempt; what fails once and then passes
-# is a test asserting on a clock that ASan has slowed -- a recode that
-# "never finished", an update that arrived late. A retried pass still had
-# its leaks checked, and nextest still names it FLAKY in the log.
+# One retry: leaks fail every attempt; ASan clock timeouts pass on retry. Still leak-checked; FLAKY.
 retries = 1

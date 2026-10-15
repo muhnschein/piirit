@@ -1,12 +1,4 @@
-//! Searching from the chat list finds three kinds of thing, and says which
-//! is which.
-//!
-//! Before this, typing narrowed the chat list and nothing else: a search
-//! for someone's name found the chat only if a chat with them already
-//! existed, and a search for a word in a message found nothing at all. The
-//! reference clients group the answer -- chats, then contacts, then
-//! messages, each under a counted heading -- and that grouping is what
-//! makes the result readable rather than a pile.
+//! Chat list search: chats, contacts, messages, under counted headings.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -103,7 +95,7 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
     let temp = std::env::temp_dir().join(format!("piirit-search-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -161,8 +153,8 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         );
     });
 
-    // "a" is in every seeded chat name, both contact addresses and the
-    // word "message", so one query reaches all three groups.
+    // "a" is in every seeded chat name, both contact addresses and word "message": one
+    // query reaches all three groups.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("bind", call!("bind"));
         record!(
@@ -225,9 +217,8 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         "the page has no search model. {context}"
     );
 
-    // Grouped, and in the reference clients' order: chats, contacts, then
-    // messages. The order is what makes `section` produce three headings
-    // rather than three headings per row.
+    // Grouped in reference clients' order: chats, contacts, messages. Order is what makes
+    // `section` give three headings, not three per row.
     assert_eq!(
         value("rows"),
         "chat:chat 1,chat:chat 2,chat:chat 3,\
@@ -235,8 +226,8 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
          message:chat 1,message:chat 1,message:chat 2,message:chat 3,",
         "the results are not grouped the way the headings claim. {context}"
     );
-    // A message result names the chat it is in and shows the text that
-    // matched: without the chat name it is a line of text from nowhere.
+    // Message result names its chat and shows matched text: without chat name it is a line
+    // from nowhere.
     assert_eq!(
         value("message-subtitles"),
         "message 1,message 2,message 10,message 30,",
@@ -252,8 +243,7 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         "the total is what the heading says when the list is cut short. {context}"
     );
 
-    // Searching swaps the whole list, rather than leaving the chat list
-    // underneath for the results to be confused with.
+    // Swaps whole list: no mix-up with chat list.
     assert_eq!(
         value("results-shown"),
         "true",
@@ -265,7 +255,7 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         "the chat list stayed up. {context}"
     );
 
-    // And clearing the field puts the chat list back.
+    // Clearing restores chat list.
     assert_eq!(
         value("after-clearing"),
         "",

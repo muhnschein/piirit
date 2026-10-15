@@ -1,32 +1,16 @@
-//! A profile already on this phone is not taken over a second time.
+//! Profile already on phone is not taken over again.
 //!
-//! Two accounts on one address are two copies of one mailbox, each
-//! fetching it: the profiles page counts every unread message once per
-//! copy, a notification arrives once per copy, and a reply is sent from
-//! whichever copy the reader happened to open. Nothing in the core stops
-//! it -- `import_backup` is happy to write the same backup into as many
-//! accounts as it is given -- so the shim reads the relays the import
-//! brought over (`list_transports`) and refuses a profile any of whose
-//! relays another profile already has.
+//! Two accounts on one address = two copies of one mailbox (unread counted twice,
+//! notifications twice, replies from whichever copy). Core lets `import_backup` write
+//! same backup again, so shim reads imported relays (`list_transports`) and refuses a
+//! profile any of whose relays another has; every relay, not own address (`configured_addr`
+//! may differ per copy; no address in account list since 2.61). Refused reason is
+//! `restore_refused`; page localizes it. Refused import's account is removed, as
+//! on failure.
 //!
-//! Every relay, not the profile's own address alone. The core's account
-//! list carries no address since 2.61, and the profile's own address
-//! (`configured_addr`) need not be the same on two copies: a backup made
-//! where the profile had been switched to another of its relays names
-//! that one, and still fetches the same mailboxes.
-//!
-//! The refusal is a `restore_refused` reason rather than the core's
-//! words, as `not-a-backup` and `too-new` are: the page puts it into the
-//! reader's language. And the account a refused import wrote is
-//! removed, the way a failed import's is -- a second copy is good for
-//! nothing, and the copy already here is untouched.
-//!
-//! The other half of this file is the list every other page reads. A
-//! profile that arrives is on the phone whether or not the page that
-//! asked for it is still up, so the account list is repopulated by the
-//! shim rather than by that page. It was not, and a reader whose import
-//! finished while the file browser was still animating away found the
-//! profiles page missing the profile until the app was next started.
+//! Other half: account list repopulated by shim, not by asking page, so arrived profile
+//! shows even if page gone. It was not: import finishing while file browser animated away
+//! left profiles page missing it until restart.
 
 // Qt harness: see restore.rs.
 #![allow(
@@ -45,10 +29,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Records what the shim signalled, and mirrors the account list so the
-/// test can count what is in it. A `Repeater` rather than a property:
-/// the list is a model, and a model is counted by something built from
-/// it.
+/// Records shim signals; mirrors account list (`Repeater`: list is a model).
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -65,7 +46,7 @@ const PROBE_QML: &str = r"
         function summary() {
             return restored + '/' + refusals + '/' + failures
         }
-        // What the profiles page would draw, without having asked for it.
+        // What the profiles page would draw, unasked.
         function profiles() { return '' + mirror.count }
     }
 ";
@@ -77,17 +58,13 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and
-    // before the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A profile here from the start, on two relays: the one its own
-        // address is on, and one it was set up on first. The fake core
-        // makes a backup's address from its file name, so the one named
-        // for that first relay below is a copy of this profile, written
-        // in capitals the way another client might have.
+        // Profile on two relays: own address's, and first set-up. Fake core takes
+        // the backup's address from file name, so capitalized name below is a copy.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "summer-backup-tar@example.org");
     }
@@ -116,12 +93,9 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         }};
     }
 
-    // 1s: a backup of a profile the phone does not have is read in. 3s:
-    // the list knows about it without anything here having asked, and
-    // the copy of the profile already here is offered. 5s: the first
-    // backup again. 7s: what came of both.
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and both boxes outlive it.
+    // 1s: unknown backup read in. 3s: list knows unasked; copy offered.
+    // 5s: first backup again. 7s: outcome.
+    // SAFETY: fire only while `exec()` runs on this thread; boxes outlive it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*core_ptr)
             .pinned()
@@ -168,9 +142,8 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
          backup a second time. {context}"
     );
 
-    // The import ran every time -- there are no relays to compare until
-    // it has -- each into an account of its own, never the profile here,
-    // and each refused account went with it.
+    // Import ran each time (no relays to compare until then), into own account,
+    // never this profile; refused accounts removed.
     let imported: Vec<u64> = calls
         .iter()
         .filter(|(method, _)| method == "import_backup")
@@ -193,9 +166,8 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
          of went instead. {context}"
     );
 
-    // The list the profiles page draws, neither asked for by this test
-    // nor by any page: the profile here and the one that arrived after
-    // the import, and still those two after both copies were refused.
+    // Account list, unasked: profile here plus arrived one; still two after both copies
+    // refused.
     assert_eq!(
         value("listed"),
         "2",

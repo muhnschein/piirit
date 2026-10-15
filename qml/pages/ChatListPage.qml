@@ -8,28 +8,20 @@ Page {
     id: page
 
     property int accountId
-    /// Shows the archived chats instead of the ordinary ones. The two
-    /// lists are disjoint, so this is a mode rather than a filter.
+    /// Archived chats, not ordinary: a mode, not filter.
     property bool archived: false
-    /// Attached to the right of a page that has finished -- a backup
-    /// written, a profile handed over -- as the swipe on from it. The
-    /// list at the bottom of the stack is still the window's.
+    /// Attached right of a finished page (backup, handover); stack bottom stays window's.
     property bool attached: false
-    /// How many configured accounts there are, from the core. Decides
-    /// whether switching is worth offering at all.
+    /// Configured account count; switching offered if >1.
     property int accountCount: 0
 
-    // Not bound straight to the field: a round trip per keystroke asks the
-    // core four times to type "anna", and only the last answer is wanted.
-    // Same interval as the contact search, for the same reason.
+    // Not bound to field: core round trip per keystroke; only last answer wanted. Interval as
+    // contact search.
     Timer {
         id: searchDebounce
         interval: 250
         onTriggered: {
-            // The archived list is a mode over one kind of thing, so it
-            // filters itself. The ordinary list searches everything and
-            // shows the three kinds grouped, the way the reference
-            // clients do.
+            // Archived list filters itself; ordinary searches all three kinds, grouped.
             if (page.archived) {
                 chats.query = searchField.text
             } else {
@@ -38,9 +30,7 @@ Page {
         }
     }
 
-    /// The search field is out in place of the Search and Unread pills.
-    /// Only the ordinary list has the pills; the archived one always shows
-    /// its field.
+    /// Field replaces Search and Unread pills; archived list always has it.
     property bool searchOpen: false
 
     function openSearch() {
@@ -54,21 +44,16 @@ Page {
         searchField.focus = false
     }
 
-    /// Enter on the keyboard hands the keyboard back and leaves the search
-    /// as it is: the query and the results stay on screen.
+    /// Enter hides keyboard, keeps search.
     function dismissKeyboard() {
         searchField.focus = false
     }
 
-    /// Results are showing instead of the chat list. Read from the field
-    /// rather than from the model, so the swap happens on the keystroke
-    /// and not a debounce later.
+    /// Results replace chat list. Read from field: swap on keystroke.
     readonly property bool searching:
         !page.archived && searchField.text.trim().length > 0
 
-    // Loads a chat before the page that shows it exists, so the
-    // transition starts with the messages already in hand instead of
-    // arriving empty and filling in behind itself.
+    // Chat loaded before its page: no empty flash.
     ChatPrefetch {
         id: prefetch
         objectName: "prefetch"
@@ -76,28 +61,21 @@ Page {
         onReady: page.openLoadedChat(chat_id)
     }
 
-    /// Where a tap is going, held while the prefetch runs: the answer
-    /// carries only an id, and the name and the found message would
-    /// otherwise be lost between the tap and the push.
+    /// Tap target during prefetch: answer carries only id.
     property string pendingChatName: ""
     property int pendingMessageId: 0
 
     function openChat(chatId, chatName, messageId) {
         page.pendingChatName = chatName
         page.pendingMessageId = messageId
-        // Told before the push, so a message arriving during the
-        // transition is not announced into the reader's face.
+        // Before push: arrivals mid-transition not announced.
         notifier.viewingChatId = chatId
-        // The message a search found goes in too: the page it opens on is
-        // the one that message is in, rather than the newest page and a
-        // jump away from it a moment later.
+        // Search hit too: page opens on it, not newest.
         prefetch.start(chatId, messageId ? messageId : 0)
     }
 
     function openLoadedChat(chatId) {
-        // Only while this is the page on screen. The pulley menu stays
-        // open while a chat loads, and a reader who used it to go to
-        // Profiles in the meantime did not ask for a conversation on top.
+        // Only on screen: Profiles visit during load cancels chat.
         if (page.status !== PageStatus.Active) {
             return
         }
@@ -114,7 +92,7 @@ Page {
         objectName: "search"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // A contact result has no chat until it is tapped.
+        // Contact result has no chat until tapped.
         onChat_ready: page.openChat(chat_id, page.pendingChatName, 0)
     }
 
@@ -123,63 +101,37 @@ Page {
         objectName: "chats"
         account_id: page.accountId
         archived: page.archived
-        // A reply to one of the reader's own messages gets through a
-        // muted group, when they want it to. `=== true` because dconf
-        // hands back `undefined` before it has read the key.
+        // Reply to own message passes muted group, if wanted. `=== true`: dconf undefined till read.
         notify_mentions: Settings.mentionNotifications === true
         onError: page.errorMessage = message
     }
 
-    // Sits here rather than in the root window because this is where the
-    // chat list already lives: the model decides what counts as an
-    // arrival, and the page knows which chat the reader walked into.
+    // List owns arrival logic; page knows which chat is open.
     Notifier {
         id: notifier
         objectName: "notifier"
-        // Off, nothing is announced and what was is taken down; the
-        // model still says what arrived, for the list's own sake.
+        // Off: nothing announced, shown ones withdrawn; model still reports arrivals.
         enabled: Settings.notificationsEnabled === true
         detail: Settings.notificationDetail
-        // A tap on a notification: back to the list, then into the chat,
-        // in front of whatever the reader was doing.
+        // Notification tap: back to list, then into chat.
         onOpenRequested: page.showChat(chatId)
     }
 
-    /// The core has said what is in this profile, whatever that was.
-    ///
-    /// An empty model means one of two things and they are opposite: no
-    /// chats, or no answer yet. On a phone that resumes onto this page
-    /// the second is what is true for the first moment, and saying "No
-    /// chats yet" over a list that is about to fill is the app telling
-    /// the reader something it does not know.
+    /// Core answered. Empty = no chats or no answer yet (on resume): no "No chats yet" till set.
     property bool chatsLoaded: false
 
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
         onMessage_restated: notifier.restated(chat_id, chat_name, sender, preview, unread)
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
+        // Emitted once rows set.
         onRows_changed: page.chatsLoaded = true
     }
 
-    /// Bring this list to the front of whatever the reader was doing, the
-    /// way a tap from outside the app arrives: the window raised, as
-    /// lipstick only calls the app and does not bring it up, and every
-    /// page above this one gone. A page loaded on its own in a test has
-    /// no window.
-    ///
-    /// Not during a call. Its page is one of those above, and popping it
-    /// would take the call's sound with it: the app comes forward onto the
-    /// call, and whatever was tapped waits until it is over. False then,
-    /// so the caller goes no further.
-    ///
-    /// Nor over a page in the middle of something the core is doing -- a
-    /// backup being written or read back, a profile being made or handed
-    /// to another device -- which is what the cover's own quick actions
-    /// are hidden for (`quickActionsPaused`): popping it would leave the
-    /// core carrying on with nothing to report to. The app comes forward
-    /// onto it instead.
+    /// Bring list to front as outside tap does: raise window (lipstick only calls app), pop
+    /// pages above. Test pages: no window. During call or core-busy work (backup, profile move;
+    /// `quickActionsPaused`): app comes forward onto it, returns false; popping would drop call
+    /// sound or leave core nothing to report to.
     function comeForward() {
         if (typeof appWindow !== "undefined") {
             appWindow.activate()
@@ -197,7 +149,7 @@ Page {
         return true
     }
 
-    /// Open a chat from outside the app: a notification was tapped.
+    /// Open chat from notification tap.
     function showChat(chatId) {
         if (!page.comeForward()) {
             return
@@ -205,22 +157,14 @@ Page {
         page.openChat(chatId, notifier.nameOf(chatId), 0)
     }
 
-    /// A quick action from the cover (piirit.qml): `kind` is what it does,
-    /// and for a chat, `accountId` and `chatId` say which one. For the
-    /// camera's, `sendNow` says whether what is taken goes as soon as its
-    /// chat is picked.
-    ///
-    /// Everything starts from this list, brought forward over whatever
-    /// was open, the way a tapped notification comes in. A chat is looked
-    /// up before it is opened, so one deleted since the action was set up
-    /// is said to be gone rather than opened empty; with the core away
-    /// there is no asking, and the list is where the action ends.
+    /// Cover quick action (piirit.qml). Chat kinds need `accountId`, `chatId`; `sendNow`: capture
+    /// sent once chat picked. Comes forward over open pages. Chat looked up first: deleted one
+    /// reported gone. Core away: ends at list.
     function quickAction(kind, accountId, chatId, sendNow) {
         if (!page.comeForward()) {
             return
         }
-        // A chat still being looked up for an earlier tap is not wanted
-        // any more.
+        // Earlier lookup no longer wanted.
         page.quickChatPending = false
         if (QuickActions.isCapture(kind)) {
             page.capture(QuickActions.captures[kind], sendNow === true)
@@ -234,50 +178,40 @@ Page {
                 mode: kind === "scan" ? 1 : 0
             })
         } else if (kind === "profiles") {
-            // As the pull-down's own Profiles opens it.
+            // As pull-down's Profiles does.
             pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
                                 { currentAccountId: page.accountId })
         } else if (kind === "chat" && core.status === "ready") {
             page.quickChatPending = true
-            // Through 0, so asking for the chat asked for last time asks
-            // again rather than being taken for no change.
+            // Through 0: same chat twice still a change.
             quickChat.chat_id = 0
             quickChat.account_id = accountId
             quickChat.chat_id = chatId
         }
     }
 
-    /// A quick action's chat is being looked up.
+    /// Quick action's chat being looked up.
     property bool quickChatPending: false
 
-    /// A camera quick action: the camera, opened as `how` says (a still
-    /// or a video, the back camera or the front), then the chat to send
-    /// what it took to, then that chat with it on the attachment bar --
-    /// sent at once when `sendNow`, and otherwise waiting there for a
-    /// caption and the send button, as a share does (piirit.qml).
-    ///
-    /// Each page takes the place of the one before rather than going over
-    /// it, so the way back from the chat is to this list. Pushed rather
-    /// than through `pulleyHost`: the camera's answer is connected to, and
-    /// Silica's animated push hands back no page to connect to.
+    /// Camera quick action: capture, pick chat, open it with capture on bar. `sendNow` sends at
+    /// once; else waits for caption and send, as share (piirit.qml). Pages replace, not stack:
+    /// back from chat returns here. Pushed, not `pulleyHost`: camera's answer is connected to;
+    /// animated push returns no page.
     function capture(how, sendNow) {
-        // One still waiting from an earlier tap is not going anywhere now.
+        // Earlier capture is dead now.
         page.dropCapture()
         var camera = pageStack.push(Qt.resolvedUrl("CapturePage.qml"), {
             mode: how.mode,
             front: how.front,
             closeOnPick: false
         })
-        // Null when the page could not be loaded: a phone without
-        // QtMultimedia costs this action and nothing else.
+        // Null without QtMultimedia: costs this action only.
         if (!camera) {
             return
         }
         camera.picked.connect(function (path) {
-            // A video finished, or a picture written, after the reader
-            // left the camera -- backed out while it was being finished,
-            // or a call came in over it -- is not asked about: the page in
-            // the camera's place is not the camera's to replace.
+            // Finished after camera left (backed out, call over it): discard; page in its place
+            // isn't camera's to replace.
             if (pageStack.currentPage !== camera || pageStack.busy) {
                 captures.discard(path)
                 return
@@ -286,7 +220,7 @@ Page {
         })
     }
 
-    /// Ask which chat a capture is for, in the camera's place.
+    /// Ask which chat a capture goes to, in the camera's place.
     function pickChatFor(path, sendNow) {
         page.unsentCapture = path
         var picker = pageStack.replace(Qt.resolvedUrl("ChatPickerPage.qml"), {
@@ -302,7 +236,7 @@ Page {
             return
         }
         picker.chatPicked.connect(function (chatId, chatName) {
-            // The chat has it now, and throws it away once it is sent.
+            // Chat owns capture; discarded once sent.
             page.unsentCapture = ""
             pageStack.replace(Qt.resolvedUrl("ConversationPage.qml"), {
                 accountId: page.accountId,
@@ -314,9 +248,7 @@ Page {
         })
     }
 
-    /// A capture taken for a quick action that no chat has been picked
-    /// for yet, "" for none. The reader backing out of the picker comes
-    /// back here, and it is thrown away then: nothing else will send it.
+    /// Capture awaiting chat pick, "" none. Back out discards.
     property string unsentCapture: ""
 
     function dropCapture() {
@@ -332,10 +264,7 @@ Page {
         objectName: "captures"
     }
 
-    // The chat a quick action asked for, looked up before it is opened. A
-    // failed lookup answers `loaded` and then `error`, one straight after
-    // the other, so the chat is opened a turn of the event loop after
-    // `loaded`, by which time a failure has had its say.
+    // Lookup failure emits loaded then error: open a turn later.
     ChatInfo {
         id: quickChat
         objectName: "quickChat"
@@ -362,10 +291,7 @@ Page {
                 return
             }
             page.quickChatPending = false
-            // Only while this is the page on screen: a call that came in
-            // while the chat was looked up has its page over this one, and
-            // the replace below would take it. The tap is dropped, as a
-            // tapped chat is (`openLoadedChat`).
+            // Only on screen: call page over this would be replaced.
             if (page.status !== PageStatus.Active) {
                 return
             }
@@ -373,9 +299,8 @@ Page {
                 page.openChat(quickChat.chat_id, quickChat.name, 0)
                 return
             }
-            // Another profile's chat: that profile's list, in place of
-            // the whole stack the way the profiles page switches, and the
-            // chat opened from it once it is on screen.
+            // Other profile's chat: its list replaces stack (as profiles page); chat opens once
+            // list on screen.
             pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"), {
                 accountId: quickChat.account_id,
                 arrivingChatId: quickChat.chat_id,
@@ -384,22 +309,16 @@ Page {
         }
     }
 
-    /// A chat to open once this list is on screen, and its name: a quick
-    /// action for another profile's chat put this list here for it. 0 for
-    /// none.
+    /// Chat to open once on screen (other-profile quick action); 0 none.
     property int arrivingChatId: 0
     property string arrivingChatName: ""
 
-    /// The search field is to take the keyboard as soon as this list is on
-    /// screen with the app in front: a quick action asked for it, and the
-    /// window may still be on its way up.
+    /// Search field takes keyboard once on screen (quick action).
     property bool searchWanted: false
     readonly property bool appActive: Qt.application.state === Qt.ApplicationActive
     onAppActiveChanged: {
         page.takeSearch()
-        // The chats read while the unread filter was on go once the app
-        // has been away: they stayed only so that coming back from one of
-        // them did not move the list.
+        // Chats read under unread filter drop once app was away; kept so return didn't move list.
         if (page.appActive) {
             chats.forget_read()
         }
@@ -413,10 +332,7 @@ Page {
         page.openSearch()
     }
 
-    // Back on the list means no chat is being read. Going the other way,
-    // any chat still waiting to be deleted goes now: leaving is exactly
-    // when a timer has not fired yet, and somebody who asked for a chat
-    // to go and then opened another one asked for it to go.
+    // Back on list: no chat open. Leaving: pending deletes go now (still wanted gone).
     onStatusChanged: {
         if (status === PageStatus.Active) {
             notifier.viewingChatId = 0
@@ -432,27 +348,18 @@ Page {
         }
     }
 
-    /// How long a chat waits before it goes, in milliseconds. Nothing
-    /// sets it; a test turns it down rather than waiting.
+    /// Delete wait, ms; tests set low.
     property alias pendingDelay: doomedChats.delay
 
-    /// The chats the reader has asked to delete, waiting out the moment
-    /// in which they can say they did not mean it.
-    ///
-    /// Not Silica's `remorseAction`, which would put the wait on the row:
-    /// a message arriving moves a chat up this list, which is a remove
-    /// and an insert, so the row -- and the wait on it -- can go at any
-    /// moment and for a reason that has nothing to do with the reader.
-    /// See PendingRemoval.
+    /// Chats in undo wait. Not `remorseAction`: arrival moves chat (remove + insert), destroying
+    /// row and wait. See PendingRemoval.
     PendingRemoval {
         id: doomedChats
         onRemove: chats.delete_chat(id)
     }
 
     property string errorMessage: ""
-    // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Piirit"
-    // while Piirit is already fixing it is worse than none.
+    // Core going away handled: no "restart Piirit" banner.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
         ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
@@ -462,34 +369,24 @@ Page {
 
     Connections {
         target: core
-        // Qt 5.6 handler syntax; see WelcomePage.qml. The model ignores
-        // events for other accounts itself.
+        // Qt 5.6 handler syntax (WelcomePage.qml). Model ignores other accounts' events.
         onCore_event: chats.handle_event(context_id, kind, payload_json)
         onStatus_changed: {
             if (core.status === "ready") {
-                // On a phone that resumes onto its chat list, this page
-                // is the first one made and the core was not up when it
-                // was: what it asked for then reached nobody, so it is
-                // asked again here. Idempotent, which is what makes it
-                // safe on a later reconnection too.
+                // Resume: first page predates core, request lost. Ask again; idempotent.
                 core.refresh_accounts()
                 if (!page.archived) {
                     core.select_account(page.accountId)
                 }
                 chats.reload()
-                // A search typed before the core was up found nothing and
-                // had nothing to answer with; this is when it can.
+                // Answer search typed before core up.
                 searchModel.reload()
             }
         }
-        // How many profiles there are, which is what decides whether
-        // this page offers switching at all. An account list with none
-        // left in it is the window's business rather than this page's:
-        // it comes in while this page is being replaced or the one above
-        // it popped, and a page in the middle of a transition is the one
-        // thing on the phone that cannot move the stack. piirit.qml.
+        // Empty account list is window's (piirit.qml): lands mid-transition, when page can't
+        // move stack.
         onAccounts_refreshed: page.accountCount = configured_count
-        // Failures that would otherwise reach no one.
+        // Failures that would reach no one.
         onCore_error: page.errorMessage = message
         onIo_started: {
             if (!success) {
@@ -500,25 +397,17 @@ Page {
 
     Component.onCompleted: {
         core.refresh_accounts()
-        // Whichever profile this list shows is the one the app comes
-        // back to next time: the core keeps the choice on disk. Said
-        // here rather than where the switch is made, because every way
-        // to a profile -- resuming, switching, adding one -- ends on
-        // this page. The archived list is the same profile's.
+        // Shown profile is next launch's (core keeps it on disk); every route to a profile ends
+        // here. Archived list: same profile.
         if (!page.archived) {
             core.select_account(page.accountId)
-            // And on this side of the core, where the next launch can
-            // read it without waiting for the core to start.
+            // Next launch reads it without waiting for core.
             Settings.lastAccountId = page.accountId
-            // And the window, which is where a share arrives: it has no
-            // page of its own to read the profile off. Behind the check
-            // this page already needs for `appWindow`, which a page
-            // loaded on its own in a test does not have.
+            // Window too: shares arrive there, no page to read profile off. Test pages: no
+            // `appWindow`.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
-                // And where the cover's quick actions land -- not on a
-                // list attached beside a finished backup, which goes with
-                // a swipe back and would leave the window with none.
+                // Quick actions land here, not on list beside backup (gone on swipe back).
                 if (!page.attached) {
                     appWindow.chatList = page
                 }
@@ -526,32 +415,18 @@ Page {
         }
     }
 
-    // One flickable for the whole page, owning the pulley.
-    //
-    // A PullDownMenu draws at the top of the flickable that owns
-    // it, and the list starts below the search field -- so a pulley
-    // on the list opened below the field, or inside it. It does not
-    // scroll: the field has to stay out of a view whose contents
-    // change on every keystroke, which is what took the keyboard
-    // away mid-search.
+    // One flickable owns pulley: PullDownMenu draws at top of its flickable; on list (below
+    // field) it opened below field. Doesn't scroll: field kept out of view changing every
+    // keystroke (lost keyboard mid-search).
     SilicaFlickable {
         id: pulleyHost
         anchors.fill: parent
-        // Both, and stated rather than relied on: a Flickable's content
-        // is 0 by 0 until told otherwise, and anything anchored to
-        // `parent` in here is anchored to that content.
+        // Flickable content 0x0 until told; parent anchors go to content.
         contentWidth: width
         contentHeight: height
 
-        // Silica builds a pushed page before it starts the transition
-        // to it, so the tap sits on a still screen for however long the
-        // page and everything it imports take to compile -- which on the
-        // group page, with its avatar, its field and its rows, is long
-        // enough to read as the app having missed the tap. `animatorPush`
-        // is Silica's own answer: the transition starts first and the
-        // page is built behind it. Asked for rather than assumed, with
-        // the plain push as the fallback, so a Silica without it still
-        // opens the page.
+        // Silica builds pushed page before transition: slow ones (group page) read as missed
+        // tap. animatorPush transitions first, builds behind; plain push fallback.
         function openPage(url, properties) {
             if (pageStack.animatorPush) {
                 pageStack.animatorPush(url, properties)
@@ -565,33 +440,26 @@ Page {
             visible: !page.archived
             enabled: !page.archived
 
-            // Every way to something starts here, nearest the list
-            // last: the three that make something new are at the bottom,
-            // where a short pull reaches them. Settings is the app's own
-            // -- a profile's settings are on its row on the profiles page.
+            // Nearest list last: create items at bottom, short pull. Settings: app's; profile
+            // settings on profiles page rows.
             MenuItem {
                 objectName: "settingsMenuItem"
                 visible: !page.archived
                 text: qsTr("Settings")
-                // The profile goes in for the one row there that is a
-                // profile's: the block list the core keeps per account.
+                // Profile passed: block list per account.
                 onClicked: pulleyHost.openPage(Qt.resolvedUrl("SettingsPage.qml"),
                                           { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "profilesMenuItem"
-                // Not gated on there being more than one: adding a second
-                // is itself a reason to open this, and hiding it until
-                // there are two leaves no way to make one.
+                // Not gated on >1 profile: adding one is a reason to open.
                 visible: !page.archived
                 text: qsTr("Profiles")
                 onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
                                           { currentAccountId: page.accountId })
             }
             MenuItem {
-                // The archived list is a mode, not a filter, so it is its
-                // own page rather than a toggle on this one -- and it does
-                // not offer a way further in.
+                // Archived list: mode with own page; no further way in.
                 objectName: "archivedMenuItem"
                 visible: !page.archived
                 text: qsTr("Archived chats")
@@ -601,10 +469,7 @@ Page {
                 })
             }
             MenuItem {
-                // Both directions of an invite: this profile's code to
-                // show, and someone else's to scan -- which is how a
-                // Delta Chat contact is added, since an address alone
-                // produces a chat that cannot be encrypted.
+                // Both directions: show own code, scan theirs (address alone can't encrypt).
                 objectName: "qrMenuItem"
                 visible: !page.archived
                 text: qsTr("QR code")
@@ -627,13 +492,8 @@ Page {
             }
         }
 
-        // Outside the list, not in its `header`. A header item lives inside
-        // the view's flickable, and both plausible explanations for the
-        // reported focus loss run through that: Silica hides the input panel
-        // when a flickable's content moves, and the narrowing list moves it on
-        // every keystroke pause; and a view is a focus scope, which can hand
-        // focus to a delegate as rows come and go. Anchored out here the field
-        // is in neither story, and it no longer scrolls away mid-search.
+        // Outside list, not header: in view's flickable Silica hides keyboard when content moves
+        // (every keystroke), and focus scope can pass focus to delegate: lost mid-search.
         Column {
             id: heading
             anchors {
@@ -645,17 +505,12 @@ Page {
             PageHeader {
                 objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
-                // Nothing under the title while the filter is on: the lit
-                // pill already says so, and a description appearing
-                // would push the search row down under the finger that
-                // tapped it.
+                // Nothing under title while filter on: lit pill says so; text would push search
+                // row under finger.
             }
 
-            // The ordinary list shows a Search pill and the Unread filter
-            // here, and the field only once Search is tapped: the pills
-            // fade out as it fades in, and back when it is closed or left
-            // empty. The archived list is a mode over chats alone, with no
-            // filter, so it has the field and nothing else.
+            // Ordinary: Search, Unread pills; field fades in on Search, out when closed or left
+            // empty. Archived: field only.
             Item {
                 width: parent.width
                 height: searchField.height
@@ -664,35 +519,26 @@ Page {
                     id: searchField
                     objectName: "chatSearchField"
                     width: parent.width
-                    // Nothing to search in an empty archive. It comes back
-                    // the moment something has been typed, or there would be
-                    // no way to clear the field and get the list back.
+                    // Empty archive: nothing to search. Returns on typing, to be cleared.
                     visible: page.archived
                              ? chats.count > 0 || searchField.text.length > 0
                              : page.searchOpen || opacity > 0
                     opacity: page.archived || page.searchOpen ? 1 : 0
                     enabled: page.archived || page.searchOpen
                     Behavior on opacity { NumberAnimation { duration: 200 } }
-                    // The pill's word and magnifier at the pill's size and
-                    // place, so the one fades into the other without either
-                    // moving: Silica's own are a size larger and further
-                    // left. The text starts where the pill's word does.
+                    // Pill's word, magnifier at pill size, place: one fades into other.
                     font.pixelSize: Theme.fontSizeMedium
                     textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
                                     + Theme.iconSizeSmallPlus + Theme.paddingSmall
-                    // Silica's own magnifier gives way to the one drawn
-                    // beside the field below; the slot it held stays empty.
+                    // Own magnifier beside field; Silica's slot empty.
                     leftItem: Item {}
-                    // Empty, it offers to go away instead of to clear.
+                    // Empty field offers to go away, not clear.
                     canHide: !page.archived
                     onHideClicked: page.closeSearch()
-                    // Enter closes the keyboard and keeps the search. Silica's
-                    // EnterKey attached property would do the same, but the
-                    // test stubs cannot load it.
+                    // EnterKey attached prop breaks test stubs.
                     Keys.onReturnPressed: page.dismissKeyboard()
                     Keys.onEnterPressed: page.dismissKeyboard()
-                    // The one word every search field in the app says; what
-                    // each searches is what the page it is on shows.
+                    // Word every search field uses.
                     placeholderText: qsTr("Search")
                     onTextChanged: {
                         searchDebounce.restart()
@@ -702,7 +548,7 @@ Page {
                             page.searchOpen = false
                         }
                     }
-                    // Left empty, the field gives the row back to the pills.
+                    // Left empty: row goes back to pills.
                     onActiveFocusChanged: {
                         if (!searchField.activeFocus
                                 && searchField.text.trim().length === 0) {
@@ -711,12 +557,7 @@ Page {
                     }
                 }
 
-                // The field's magnifier, drawn over it rather than in its
-                // `leftItem`: Silica places that item itself, further right
-                // and higher than the pill draws its own. Here it takes the
-                // pill's exact place -- the row's margin, the pill's inset,
-                // centred on the row as the pill is -- and fades with the
-                // field.
+                // Magnifier over field, not leftItem (Silica puts that off-pill).
                 Image {
                     x: Theme.horizontalPageMargin + Theme.paddingMedium
                     anchors.verticalCenter: parent.verticalCenter
@@ -748,11 +589,8 @@ Page {
                         onClicked: page.openSearch()
                     }
 
-                    // Beside the search rather than in the pulley: a switch
-                    // flipped as often as this one wants to be one tap away,
-                    // and it sits where the reference clients put theirs.
-                    // While a search is open it goes with the Search pill:
-                    // a search covers every chat whatever it says.
+                    // Beside search, as reference clients. Hidden with Search pill while open:
+                    // search covers every chat.
                     PillButton {
                         id: unreadFilter
                         objectName: "unreadFilterButton"
@@ -776,23 +614,14 @@ Page {
                 right: parent.right
                 bottom: banner.top
             }
-            // Delegates draw outside the list's own box otherwise, and the
-            // banner below is translucent.
+            // Else delegates draw outside list box; banner translucent.
             clip: true
             model: chats.rows
 
-            // Pinned chats already sort to the top; this says why they
-            // are there. Both headings disappear when one group is
-            // empty: a single heading over the whole list says nothing,
-            // and "Pinned" over a list with nothing pinned is a lie.
+            // Pinned sort top; headings only when both groups non-empty.
             section {
                 property: "is_pinned"
-                // Wrapped rather than hidden in place. Silica's
-                // SectionHeader keeps its own size and its label is a
-                // child of it, so collapsing the header itself left the
-                // text drawn over the first row. This collapses a plain
-                // Item instead, and clips, so there is nothing left to
-                // draw whatever the header does internally.
+                // Wrapped, not hidden: SectionHeader keeps size; collapsed, text sat on first row.
                 delegate: Item {
                     objectName: "chatSectionSlot"
                     width: listView.width
@@ -802,15 +631,8 @@ Page {
                     SectionHeader {
                         id: header
                         objectName: "chatSection"
-                        // No width here. Silica's own is the page width
-                        // less a margin at each side, with the text
-                        // right-aligned in it -- and its x is that left
-                        // margin. Assigning the full parent width kept
-                        // the x and pushed the right edge, and the text
-                        // on it, a whole margin off the screen.
-                        // Both headings or neither: one heading over the
-                        // whole list says nothing, and "Pinned" over a
-                        // list with nothing pinned is a lie.
+                        // No width: Silica's is page less margins at left margin; full width
+                        // pushed text off-screen.
                         readonly property bool worthSaying:
                             chats.pinned_count > 0 && chats.unpinned_count > 0
                         visible: worthSaying
@@ -820,23 +642,17 @@ Page {
                 }
             }
 
-            // Nothing in here applies to the archived list -- no profile
-            // switch, no way further in, no new chat -- so the pulley itself
-            // goes rather than opening onto an empty menu.
+            // Nothing for archived list: no pulley, not empty menu.
 
             delegate: ListItem {
                 id: delegateRoot
                 contentHeight: body.height
 
-                /// This chat is on its way out.
+                /// Chat on its way out.
                 readonly property bool doomed: doomedChats.pending(model.chat_id)
 
-                /// Silica's own countdown, drawn over the chat. The
-                /// deletion is not its business -- that belongs to
-                /// `doomedChats`, because a remorse item lives in the
-                /// row it covers and this list reorders under its rows
-                /// whenever a message arrives. So it draws, and reports
-                /// the tap.
+                /// Silica countdown over chat; draws, reports tap. Deletion is `doomedChats`':
+                /// list reorders rows on arrivals.
                 function raiseRemorse() {
                     remorse.active = true
                     //: What Silica's countdown says it is doing, over
@@ -846,10 +662,7 @@ Page {
                         doomedChats.countdownFor(model.chat_id))
                 }
 
-                // Built the first time a delete is asked for, not with
-                // the row: the platform's countdown is a dozen items of
-                // its own, and every chat carried one for a tap that
-                // almost never comes. ConversationList does the same.
+                // Built on first delete: dozen items per row for rare tap.
                 Loader {
                     id: remorse
                     active: false
@@ -859,9 +672,7 @@ Page {
                     }
                 }
 
-                // A row rebuilt mid-wait -- scrolled past, or moved by a
-                // message arriving -- comes back with no countdown on
-                // it. Put it up again with what is left of the wait.
+                // Row rebuilt mid-wait: restore countdown with time left.
                 Component.onCompleted: {
                     if (delegateRoot.doomed) {
                         delegateRoot.raiseRemorse()
@@ -870,12 +681,8 @@ Page {
 
                 ChatListDelegate {
                     id: body
-                    // The remorse covering this does the fading, with
-                    // its own `opacity: 0.0` on what it was handed.
-                    // Hiding it here would be wrong: that takes the
-                    // children's `visible` with it, and a row whose
-                    // height reads `visible` collapses under the
-                    // countdown drawn over it.
+                    // Remorse fades. Hiding would hide children, and row height reads `visible`:
+                    // collapses.
                     enabled: !delegateRoot.doomed
                     width: parent.width
                     chatName: model.name
@@ -892,11 +699,7 @@ Page {
                     summaryState: model.summary_state
                 }
 
-                // A Component rather than a menu built with the row, for
-                // the reason ConversationList gives: Silica builds it the
-                // first time the menu is opened, and nine items on every
-                // chat the list scrolls past were built for a long press
-                // most of them never get.
+                // Built on first open: nine items per chat is waste.
                 menu: Component {
                     ContextMenu {
                         MenuItem {
@@ -905,11 +708,8 @@ Page {
                             text: qsTr("Mark as read")
                             onClicked: chats.mark_read(model.chat_id)
                         }
-                        // The other way: one unread message back on a chat
-                        // already read, so it stands out until it is opened.
-                        // The core puts its last incoming message back to
-                        // unread, so a chat with only the reader's own
-                        // messages in it stays as it is.
+                        // Read chat gets one unread back till opened. Core re-marks last
+                        // incoming: chat with only own messages unchanged.
                         MenuItem {
                             objectName: "markUnreadItem"
                             visible: !page.archived && model.unread_count === 0
@@ -928,9 +728,7 @@ Page {
                             text: model.is_muted ? qsTr("Unmute") : qsTr("Mute")
                             onClicked: chats.set_muted(model.chat_id, !model.is_muted)
                         }
-                        // A request is not an ordinary chat: until it is
-                        // accepted the sender cannot be replied to, and the
-                        // only useful answers are yes and no.
+                        // Request: no reply till accepted, so yes or no.
                         MenuItem {
                             objectName: "acceptItem"
                             visible: !page.archived && model.is_contact_request
@@ -949,8 +747,7 @@ Page {
                             text: qsTr("Archive")
                             onClicked: chats.archive(model.chat_id)
                         }
-                        // The way back out. Without it an archived chat could
-                        // only be recovered by someone sending a message to it.
+                        // Way out of archive; else only a message brings it back.
                         MenuItem {
                             objectName: "unarchiveItem"
                             visible: page.archived
@@ -960,11 +757,7 @@ Page {
                         MenuItem {
                             objectName: "deleteItem"
                             text: qsTr("Delete")
-                            // The page is told, not this row: a message
-                            // arriving moves this chat up the list, which
-                            // is a remove and an insert, and the row this
-                            // menu belongs to is destroyed. A wait living
-                            // on it would go too.
+                            // Page told, not row: arrivals recreate rows, killing waits.
                             onClicked: {
                                 doomedChats.ask(model.chat_id)
                                 delegateRoot.raiseRemorse()
@@ -973,23 +766,20 @@ Page {
                     }
                 }
 
-                // A tap opens the chat. One waiting to go is covered by
-                // the remorse, which takes the tap itself and calls the
-                // deletion off.
+                // Opens chat; on pending delete, remorse takes tap (cancels).
                 onClicked: page.openChat(model.chat_id, model.name, 0)
             }
 
             ViewPlaceholder {
                 objectName: "chatListPlaceholder"
-                // Not until the core has answered: see `chatsLoaded`.
+                // Not until core answered: see `chatsLoaded`.
                 enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
                                     //: The unread filter is on and every
                                     //: chat has been read.
                                     : chats.unread_only ? qsTr("No unread chats")
                                                         : qsTr("No chats yet")
-                // Nothing here makes an archived chat: a chat is archived
-                // from the ordinary list, not started in this one.
+                // Archiving happens in ordinary list.
                 hintText: page.archived ? ""
                                         //: %1 is the label of the unread
                                         //: filter, a button at the right of
@@ -1011,16 +801,14 @@ Page {
                 bottom: banner.top
             }
             onChatActivated: page.openChat(chatId, chatName, messageId)
-            // No chat exists yet; the model answers on chat_ready. The name
-            // is kept here because that answer carries only an id.
+            // No chat yet; name kept: answer carries only id.
             onContactActivated: {
                 page.pendingChatName = contactName
                 searchModel.open_chat_with(contactId)
             }
         }
 
-        // The tap has to show something while the chat loads, or a slow
-        // one reads as a tap that missed.
+        // Feedback while chat loads, else slow load reads as missed tap.
         BusyIndicator {
             objectName: "openingChat"
             anchors.centerIn: parent
@@ -1036,13 +824,10 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // The core's own state outranks whatever failed before it, and a
-            // page opened after it went away never saw the transition -- so
-            // read the status rather than waiting for it to change.
+            // Core state outranks earlier failure. Read status: later page missed transition.
             text: page.coreStatusMessage.length > 0
                   ? page.coreStatusMessage : page.errorMessage
-            // Neither clears itself: reconnecting ends when the status says so,
-            // and stopped does not end at all.
+            // Reconnecting ends with status; stopped never.
             timeout: page.coreStatusMessage.length > 0 ? 0 : 8
             onDismissed: page.errorMessage = ""
         }

@@ -1,18 +1,9 @@
-//! A call coming in: ringing, and every way a ringing call can end.
+//! Incoming call: ringing, and each way it ends.
 //!
-//! The core says a call is ringing with `IncomingCall`, and that it is
-//! over with `CallEnded` -- whoever ended it -- or that another of this
-//! account's devices took it with `IncomingCallAccepted`. Those four
-//! events are the one part of the core's stream written in `snake_case`,
-//! and a reader that asks them for `msgId` gets nothing and says nothing;
-//! so they are fed here in the core's own shape, from the fake core where
-//! it can say them and by hand where the fake has no way to.
-//!
-//! Answering is played on the page's side over a real socket, as in
-//! `call_outgoing.rs`: the offer the page opens on, and the answer it
-//! hands back for the core to send. So is a call answered here and taken
-//! on another device before this one's answer reached the core: the call
-//! is that device's, and nothing here may end it.
+//! `IncomingCall`, `CallEnded`, `IncomingCallAccepted` etc.: core's only `snake_case` events; a
+//! reader asking for `msgId` gets nothing silently. Fed in core's shape: from fake where it can,
+//! by hand otherwise.
+//! Answer played page-side over real socket. Call taken on another device first: not ended here.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -103,12 +94,12 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A call rings in from the first chat, once the probe is up.
+        // Call rings from first chat once probe up.
         std::env::set_var("PIIRIT_FAKE_INCOMING_CALL_MS", "1500");
     }
 
@@ -145,14 +136,12 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("ringing", call!("state"));
-        // A second call while one rings rings nowhere.
+        // Second call while one rings: rings nowhere.
         record!("second", call!("ring", 9000));
-        // Taken up from its row by an object that heard nothing: the
-        // core still has it ringing, and has its offer.
+        // Taken up by object that heard nothing: core still rings it.
         let first: u32 = call!("state")
             .split('|')
             .nth(4)
@@ -189,35 +178,33 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
             .and_then(|id| id.parse().ok())
             .unwrap_or_default();
         record!("other-profile", call!("otherProfile", first));
-        // The other end hangs up.
+        // Other end hangs up.
         record!("ended-there", call!("endedThere", first));
         record!("after-first", call!("state"));
         record!("reset-first", call!("reset"));
 
-        // Rings, and another of this account's devices answers it.
+        // Another device answers.
         record!("ring-2", call!("ring", 9002));
         record!("elsewhere", call!("takenElsewhere", 9002));
         call!("reset");
 
-        // Rings, and is declined here.
+        // Declined here.
         record!("ring-3", call!("ring", 9003));
         record!("decline", call!("hangUp"));
         call!("reset");
 
-        // Rings, and the caller gives up -- or nobody answered in time.
+        // Caller gives up, or nobody answers in time.
         record!("ring-4", call!("ring", 9004));
         record!("gone", call!("endedThere", 9004));
     });
 
-    // The reason for a call that rang out waits on the core.
+    // Reason for rang-out call waits on core.
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("missed", call!("state"));
         record!("said", call!("said"));
         call!("reset");
 
-        // Answered here, and taken on another device while this one's
-        // page is still coming up: the core turns this device's accept
-        // into nothing, so the call is the other device's.
+        // Taken elsewhere while page comes up: core drops this accept.
         record!("ring-5", call!("ring", 9005));
         record!("answer-5", call!("answer"));
     });
@@ -226,13 +213,13 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         record!("elsewhere-5", call!("takenElsewhere", 9005));
         call!("reset");
 
-        // The same before the page has come up at all.
+        // Same before page up.
         call!("ring", 9006);
         call!("answer");
         record!("elsewhere-6", call!("takenElsewhere", 9006));
     });
 
-    // Long enough for the host still coming up to have come and gone.
+    // Long enough for host still coming up to come and go.
     single_shot(Duration::from_secs(9), move || unsafe {
         (*engine_ptr).quit();
     });
@@ -367,11 +354,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         vec![json!([1, first, "v=0 test-answer"])],
         "the core was not handed the page's answer to the call. {context}"
     );
-    // Declining is the one end told to the core from here: the other end
-    // hanging up is the core's news, and so is another device answering
-    // -- whether or not this device had answered too, and whether or not
-    // its page was up yet. Ending either would end the call on the device
-    // that took it.
+    // Only declining is told to core from here. Hangup and other-device answer are core's news.
     assert_eq!(
         named("end_call"),
         vec![json!([1, 9003])],

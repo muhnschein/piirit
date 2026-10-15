@@ -1,8 +1,7 @@
 pragma Singleton
 import QtQuick 2.0
 
-// The constants the pages read. Values are arbitrary; only that a binding
-// resolves is being checked.
+// Constants pages read. Values arbitrary: checks only that binding resolves.
 QtObject {
     property int paddingSmall: 4
     property int paddingMedium: 8

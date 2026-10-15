@@ -1,20 +1,8 @@
-//! Pictures and video open in Piirit.
-//!
-//! Reported from a device: tapping either handed the file to the system,
-//! which took the reader out of the app to something that then failed to
-//! show it. Voice messages already played where they sat; these had nowhere
-//! to go.
-//!
-//! So there are two pages, and the conversation decides which kinds reach
-//! them. Everything else still goes to whatever else on the phone handles
-//! it -- a page here that could only say "cannot show this" would be worse
-//! than the handover it replaced.
-//!
-//! What a headless run can check is the wiring: which kind gets which page,
-//! that a picture page draws a picture and has somewhere to pan to once it
-//! is zoomed, that the video page's seek bar follows the player without
-//! fighting the reader for it, and that Save to device puts a copy in
-//! Piirit's folder in Downloads, where every copy goes.
+//! Pictures and video open in Piirit (system handover failed to show them). Conversation
+//! picks kinds for the two pages; others still go to system (a page only saying "cannot show this"
+//! would be worse than the handover). Checks wiring: which kind gets which page, picture page draws
+//! and pans once zoomed, seek bar follows player without fighting reader, Save to device copies
+//! into Piirit's folder in Downloads.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -32,11 +20,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed. A context
-/// property, as in the app: an object declared in the probe below would not
-/// be visible inside a separately loaded page. Its own, as in every other
-/// test that needs one -- each records only what it asks about, and this
-/// one asks only which page a tap opened.
+/// Silica `pageStack`, recorded not performed. Context property: probe-declared object
+/// invisible to separate page. Test records only what it asks: which page a tap opened.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -48,11 +33,10 @@ struct PageStackProbe {
 }
 
 impl PageStackProbe {
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher's by-value ones: piirit-shim/src/lib.rs.
     #[allow(clippy::needless_pass_by_value)]
     fn push(&mut self, page: QString, _properties: QVariantMap) {
-        // Only the file name matters; the rest is a checkout path.
+        // Only file name matters.
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page);
         let current = self.log.to_string();
@@ -61,7 +45,7 @@ impl PageStackProbe {
     }
 }
 
-/// A 1x1 PNG, which is a picture as far as any of this is concerned.
+/// 1x1 PNG: a picture here.
 const ONE_PIXEL_PNG: &[u8] = &[
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
     0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
@@ -177,7 +161,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     let png_url = format!("file://{}", png.display());
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -216,9 +200,9 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         }};
     }
 
-    // Which kind reaches which page.
+    // Kind to page.
     let conversation = common::page_url_in(&tree, "ConversationPage.qml");
-    // Resolved once: each closure below takes what it needs by value.
+    // Closures take what they need by value.
     let picture_page = common::page_url_in(&tree, "PicturePage.qml");
     let gif_page = picture_page.clone();
     let row_page = picture_page.clone();
@@ -233,7 +217,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         }
     });
 
-    // The picture page, on a still.
+    // Picture page, on a still.
     let still = png_url.clone();
     single_shot(Duration::from_secs(2), move || unsafe {
         let mut properties = QVariantMap::default();
@@ -256,12 +240,10 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("visible")
             ),
         ));
-        // A copy the reader keeps, into Piirit's folder in the one the
-        // platform names for downloads.
+        // Copy kept by reader, in Piirit's Downloads folder.
         call!("setDownloads", QString::from(downloads_for_probe.clone()));
         (*steps_ptr).push(("save", call!("click", QString::from("saveToDevice"))));
-        // The copy is made off the Qt thread: while it is, the entry
-        // waits, and the notice comes once it is done (read below).
+        // Copy off Qt thread: entry waits, notice after.
         (*steps_ptr).push((
             "saving",
             call!(
@@ -282,7 +264,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
             "full-decode-box",
             call!("decodeBoxOf", QString::from("fullPicture")),
         ));
-        // Fitted: nothing to pan, because the whole picture is on screen.
+        // Fitted: nothing to pan.
         (*steps_ptr).push((
             "fitted-content",
             call!(
@@ -291,8 +273,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("contentWidth")
             ),
         ));
-        // Zoomed in on the bottom right of the picture, which is where
-        // the reader put their fingers.
+        // Zoomed bottom right, where fingers went.
         (*steps_ptr).push(("zoomed", call!("zoomAt", 480, 700)));
         (*steps_ptr).push((
             "zoomed-content",
@@ -304,12 +285,10 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         ));
     });
 
-    // The same page on a GIF, which is the one kind that has an animation
-    // over the still.
+    // GIF: only kind with animation over still.
     let animated = png_url.clone();
     single_shot(Duration::from_secs(5), move || unsafe {
-        // The save asked for a second ago, answered by now: read before
-        // the page goes, and its notice with it.
+        // Save answered by now: read before page goes, notice with it.
         (*steps_ptr).push((
             "saved-notice",
             call!(
@@ -351,9 +330,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         ));
     });
 
-    // Opened from a row, still transitioning in: the row's own decode is
-    // asked for at the row's width, and the full picture waits for the
-    // page to be in place.
+    // Opened from row mid-transition: row decodes at row width; full picture waits for page.
     let from_row = png_url;
     single_shot(Duration::from_millis(5500), move || unsafe {
         let mut properties = QVariantMap::default();
@@ -385,7 +362,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("source")
             ),
         ));
-        // The transition ends.
+        // Transition ends.
         (*steps_ptr).push(("arrived", call!("set", QString::from("status"), 2)));
         (*steps_ptr).push((
             "arrived-full-source",
@@ -397,7 +374,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         ));
     });
 
-    // The video page.
+    // Video page.
     single_shot(Duration::from_secs(6), move || unsafe {
         let mut properties = QVariantMap::default();
         properties.insert(
@@ -428,7 +405,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("playbackState")
             ),
         ));
-        // The seek bar follows the video...
+        // Seek bar follows video...
         (*steps_ptr).push((
             "position",
             call!(
@@ -442,7 +419,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
             "followed",
             call!("of", QString::from("seek"), QString::from("value")),
         ));
-        // ...and stops following it while the reader has hold of it.
+        // ...stops following while reader holds it.
         (*steps_ptr).push((
             "held",
             call!("setOn", QString::from("seek"), QString::from("down"), true),
@@ -479,7 +456,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     let _ = std::fs::remove_dir_all(&temp);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run must show.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     let value = |label: &str| {
@@ -497,10 +474,8 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "ok",
         "the conversation page did not load. {context}"
     );
-    // Image, Gif and Sticker to the picture page, Video to the video
-    // page -- and nothing for File or Vcard, which are the system's to
-    // open. No page here for a file: what an attachment needs and a tap
-    // cannot give is a copy, and that is on the row's menu.
+    // Image, Gif, Sticker: picture page; Video: video page; File, Vcard: system. No page for a
+    // file: what it needs and a tap can't give is a copy, which is on row menu.
     assert_eq!(
         navigation,
         "push:PicturePage.qml|push:PicturePage.qml|push:PicturePage.qml|\
@@ -545,16 +520,13 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "a still image was given the animation layer as well, which decodes \
          a movie that is not there. {context}"
     );
-    // 540 is the stub page's width, and a picture that fits is a picture
-    // with nothing to pan to.
+    // 540 = stub page width; fitting picture has nothing to pan to.
     assert_eq!(
         number("fitted-content"),
         540,
         "the picture did not open fitted to the page. {context}"
     );
-    // Toward what was tapped, not toward the corner. Zooming about the
-    // picture's own top left is what takes a reader who tapped a face in
-    // the bottom right somewhere else entirely.
+    // Zoom toward tap, not corner: corner zoom takes bottom-right tap elsewhere.
     let corner = value("zoomed");
     let (across, down) = corner.split_once(',').unwrap_or(("0", "0"));
     assert!(
@@ -588,9 +560,8 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "the picture page keeps every frame of a GIF at full size for as \
          long as it is open. {context}"
     );
-    // Twice the stub page's 540x960, which Qt fits the picture inside:
-    // twice what it is drawn at fitted, and no more. A bound of twice the
-    // long edge on both sides let a landscape photo through whole.
+    // Twice stub page's 540x960, which Qt fits picture inside: twice fitted size, no more. A
+    // bound of twice long edge on both sides let a landscape photo through whole.
     assert_eq!(
         value("full-decode-box"),
         "1080x1920",
@@ -637,7 +608,7 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "the video page has a player and a picture and did not connect \
          them. {context}"
     );
-    // MediaPlayer's own values: 1 playing, 2 paused.
+    // MediaPlayer values: 1 playing, 2 paused.
     assert_eq!(
         value("playing"),
         "1",

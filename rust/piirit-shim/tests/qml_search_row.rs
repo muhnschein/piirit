@@ -1,18 +1,6 @@
-//! A search result stays inside the screen, and has a height at all.
-//!
-//! The title's width is the row minus the time label's; the time label
-//! was anchored back to the title. Neither width resolved, so the title
-//! never learned how wide it was and a long one ran off the right-hand
-//! edge instead of fading out. A binding loop is not a load error and
-//! nothing else here would have caught it.
-//!
-//! Then a later patch deleted the row's `Avatar` and left the three
-//! references to it behind. The row's height and the title's x are both
-//! measured off it, so both bindings threw, the height stayed at its
-//! default 0, and a search showed "Chats (1)" with nothing under it. An
-//! unresolved id is a runtime warning, not a load error, so that was not
-//! a load failure either -- and the checks above all pass on a row of no
-//! height. Hence the geometry at the end.
+//! Search row stays on screen and has height.
+//! Width loop (title/time label) ran long names off edge. Deleted `Avatar` left height 0.
+//! Unresolved ids only warn; zero-height row passes other checks. Hence geometry test.
 
 // Qt harness: see qml_conversation.rs.
 #![allow(
@@ -117,8 +105,7 @@ fn a_long_result_stays_inside_the_screen() {
         };
     }
 
-    // Long enough that nothing fits, and a time label present -- which is
-    // what the title's width has to make room for.
+    // Too long to fit, with a time label: title must make room.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -189,8 +176,7 @@ fn a_long_result_stays_inside_the_screen() {
 
     assert_eq!(value("load"), "ok", "the row did not load. {context}");
 
-    // The bug: with the widths unresolved the title kept its natural width
-    // and reached hundreds of pixels past the row.
+    // Bug: unresolved widths left title past row.
     assert!(
         number("title-overhang") <= 0,
         "the title is drawn wider than the space it was given, so it runs \
@@ -201,29 +187,20 @@ fn a_long_result_stays_inside_the_screen() {
         "the message text is drawn wider than the space it was given, so it \
          runs off the right-hand edge. {context}"
     );
-    // And it did not resolve to nothing either, which would hide the row
-    // rather than fix it.
+    // Nor resolve to nothing: hides row, not fixes it.
     assert!(
         number("title-width") > ROW_WIDTH / 4,
         "the title resolved to almost no width, so the row shows nothing. \
          {context}"
     );
-    // The subtitle wraps rather than truncating at one line: a single line
-    // of a matched sentence says too little to tell two hits apart.
+    // Subtitle wraps: one line can't tell hits apart.
     assert!(
         number("subtitle-height") > 12,
         "the message text did not wrap to a second line. {context}"
     );
 
-    // The avatar is not decoration here: the row's height and the title's
-    // x are both measured off it. A patch dropped the element and left
-    // those three references behind, so both bindings threw, the height
-    // stayed at its default 0, and every search result collapsed to
-    // nothing under headings that still counted them -- "Chats (1)" with
-    // no chat under it. Nothing above catches that: a row of no height
-    // still has a title of the right width.
-    // Checked by name first: `number` reads a missing item as i32::MAX,
-    // which would sail through every bound below.
+    // Avatar: height and title x measured off it; delete collapsed rows.
+    // `number` reads missing item as i32::MAX: checked by name first.
     for label in ["avatar-x", "avatar-width", "title-x"] {
         assert!(
             !value(label).starts_with("missing"),

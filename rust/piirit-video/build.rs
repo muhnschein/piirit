@@ -1,40 +1,30 @@
-//! Build FFmpeg and x264 from the submodules under `third_party/`, and the
-//! C between them and Rust (`csrc/`), into static libraries this crate
-//! links.
+//! Builds FFmpeg and x264 (`third_party/` submodules) plus C glue (`csrc/`)
+//! into static libs.
 //!
-//! Static, because Harbour allows a package one executable and a list of
-//! system libraries, and neither codec is on that list
-//! (`ci/harbour/allowed_libraries.conf`). Built into the binary, they are
-//! code like any other: the validator sees libc, libm and libpthread,
-//! which it allows. LAME reaches the binary the same way, through
-//! mp3lame-sys. See docs/BUILDING.md, "Making a video smaller".
+//! Static: Harbour allows one executable plus listed system libs; neither codec
+//! is listed (`ci/harbour/allowed_libraries.conf`). Built in, they are plain
+//! code; validator sees libc, libm, libpthread, which it allows. LAME same way
+//! (mp3lame-sys). See docs/BUILDING.md, "Making a video smaller".
 //!
-//! Both are trimmed to what making a video smaller needs. FFmpeg reads an
-//! MP4 or a QuickTime file, decodes H.264, HEVC and AAC, scales and
-//! resamples, encodes AAC, and writes an MP4; x264 encodes 8-bit 4:2:0
-//! H.264. Nothing else is configured in, which is what keeps the binary
-//! a few megabytes heavier rather than a few dozen.
+//! Trimmed: FFmpeg reads MP4/`QuickTime`, decodes H.264/HEVC/AAC, scales and
+//! resamples, encodes AAC, writes MP4; x264 does 8-bit 4:2:0 H.264. Nothing
+//! else, so binary grows a few MB, not a few dozen.
 //!
-//! The compiler is the one cargo would use for this target, from the `cc`
-//! crate, so both configure scripts build for what the rest of the binary
-//! is built for. Under the Sailfish SDK's scratchbox2 that is the target's
-//! own compiler, and the configure scripts see a native build, which is
-//! how LAME's configure runs there too.
+//! Compiler is cargo's for this target (`cc` crate), so configure builds for
+//! what rest of binary targets. Under Sailfish SDK's scratchbox2 that is the
+//! target compiler; configure sees a native build (as
+//! LAME's does).
 //!
-//! Hand-written assembly is used where it is free: on ARM, where the
-//! compiler that builds everything else assembles it. On x86 it would
-//! need nasm, which neither CI's runners nor the SDK's emulator target
-//! need otherwise, and x86 is only ever the host the tests run on.
+//! Hand-written asm only on ARM, where the same compiler assembles it. x86 would
+//! need nasm, which CI runners and SDK emulator target need for nothing else;
+//! x86 only hosts tests.
 //!
-//! The same x264 is also linked into a library of its own: the H.264
-//! encoder video calls send through, which Gecko loads as a media plugin
-//! (`csrc/gmp_h264.cpp`). Gecko cannot call into the app's binary, only
-//! into a plugin it finds on disk, so this one is laid out as Gecko looks
-//! for one -- `gmp-piirit/<version>/libpiirit.so` beside `piirit.info` --
-//! in `OUT_DIR` and again beside the binary, where the package's spec
-//! installs it from. Harbour allows a package's own libraries under
-//! `/usr/share/<name>/lib/`, linked against the same list of system
-//! libraries; x264 is inside it, and its symbols are hidden there.
+//! x264 also in own lib: H.264 encoder for calls, loaded by Gecko as media plugin
+//! (`csrc/gmp_h264.cpp`). Gecko can't call into app binary, only a plugin on
+//! disk, so laid out as Gecko looks: `gmp-piirit/<version>/libpiirit.so` beside
+//! `piirit.info`, in `OUT_DIR` and beside binary (spec installs from there).
+//! Harbour allows package libs under `/usr/share/<name>/lib/`, linked against
+//! same system-lib list; x264 inside, symbols hidden.
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -85,7 +75,7 @@ fn main() {
     database.extend(plugin.build(&out, &target));
     write_compile_commands(&database, &manifest, &out);
 
-    // In dependency order, each after what uses it.
+    // Dependency order: each lib after its users.
     println!(
         "cargo:rustc-link-search=native={}",
         ffmpeg.join("lib").display()
@@ -104,39 +94,32 @@ fn main() {
     ] {
         println!("cargo:rustc-link-lib=static={lib}");
     }
-    // What FFmpeg's and x264's own pkg-config files ask for, less
-    // libatomic: Harbour does not allow it, and neither library calls
-    // into it on the architectures this is built for -- the atomics
-    // they use are compiled inline there. A target that did need it
-    // would fail to link here rather than at intake.
+    // FFmpeg's and x264's pkg-config libs, minus libatomic (Harbour forbids):
+    // on built arches both inline their atomics. A target needing it fails at
+    // link, not intake.
     for lib in ["m", "pthread"] {
         println!("cargo:rustc-link-lib={lib}");
     }
 }
 
-/// The C between FFmpeg, x264 and Rust.
+/// C glue between FFmpeg, x264 and Rust.
 const GLUE: [&str; 2] = ["csrc/recode.c", "csrc/synth.c"];
 
-/// The media plugin's one source file, and the stand-in for Gecko the
-/// tests drive it with.
+/// Media plugin source; Gecko stand-in drives it in tests.
 const GMP_SOURCE: &str = "csrc/gmp_h264.cpp";
 const GMP_CHECK: &str = "tests/gmp_check.cpp";
-/// The plugin's directory under a directory Gecko is pointed at: Gecko
-/// takes its name from this, less `gmp-`, and looks for `lib<name>.so`
-/// and `<name>.info` in the version directory below it.
+/// Plugin dir name under Gecko's search dir, less `gmp-`. Gecko looks for
+/// `lib<name>.so` and `<name>.info` in the version dir below it.
 const GMP_NAME: &str = "piirit";
 const GMP_VERSION: &str = "1.0";
-/// What Gecko reads to know the plugin. It encodes H.264 and nothing
-/// else: decoding stays with the phone's own decoder, which Gecko
-/// prefers to any plugin.
+/// What Gecko reads. H.264 encode only; decode stays with phone's decoder,
+/// which Gecko prefers to any plugin.
 const GMP_INFO: &str = "Name: piirit\n\
                         Description: H.264 encoder for Piirit's video calls, built on x264\n\
                         Version: 1.0\n\
                         APIs: encode-video[h264]\n";
 
-/// How the media plugin and its test harness are built: by the C++
-/// compiler cargo would use for this target, against the Gecko headers
-/// in `third_party/gmp-api` and the x264 built above.
+/// Plugin and test harness: cargo's C++ compiler, `third_party/gmp-api`, x264.
 struct Plugin {
     compiler: cc::Tool,
     flags: Vec<String>,
@@ -167,9 +150,8 @@ impl Plugin {
         }
     }
 
-    /// The plugin under `OUT_DIR`, copied beside the binary, and the
-    /// harness when the tests can run what this builds. Returns how each
-    /// file was compiled, for the compilation database.
+    /// Builds plugin in `OUT_DIR`, copies beside binary, builds harness if tests
+    /// can run it. Returns compile commands.
     fn build(&self, out: &Path, target: &Target) -> Vec<(PathBuf, Vec<String>)> {
         let dir = out.join(format!("gmp-{GMP_NAME}")).join(GMP_VERSION);
         std::fs::create_dir_all(&dir)
@@ -179,9 +161,8 @@ impl Plugin {
         link.args([
             "-shared",
             "-fPIC",
-            // The three entry points and nothing else: not this file's
-            // own classes, and not x264, which another library in Gecko's
-            // plugin process could have under the same names.
+            // Export three entry points only: not this file's classes, nor x264,
+            // whose names another lib in Gecko's plugin process may share.
             "-fvisibility=hidden",
             "-Wl,--exclude-libs,ALL",
             "-Wl,-z,defs",
@@ -212,8 +193,7 @@ impl Plugin {
             self.source.clone(),
             compile_command(&self.compiler, &self.flags, &self.source),
         )];
-        // Run by the tests, so built only where they run: not for a
-        // phone, from a machine that is not one.
+        // Tests run it: build only where they run (not cross-building for phone).
         if target.cross.is_none() {
             let check = out.join("gmp-check");
             let mut build = self.command();
@@ -239,9 +219,8 @@ impl Plugin {
     }
 }
 
-/// The directory cargo builds this profile into -- `target/<triple>/
-/// release` -- which `OUT_DIR` is three below. The package's spec
-/// installs the binary from there, and the plugin with it.
+/// Cargo profile dir (`target/<triple>/release`), three above `OUT_DIR`; spec
+/// installs binary and plugin from there.
 fn profile_dir(out: &Path) -> Option<&Path> {
     let build = out.parent()?.parent()?;
     if build.file_name()? == "build" {
@@ -251,8 +230,8 @@ fn profile_dir(out: &Path) -> Option<&Path> {
     }
 }
 
-/// Copy the plugin's files to `to`, each through a temporary name, so a
-/// build running beside this one never finds half a library there.
+/// Copies plugin files via temp name: a build running alongside never sees
+/// half a library.
 fn install(from: &Path, to: &Path) {
     std::fs::create_dir_all(to).unwrap_or_else(|err| panic!("mkdir {}: {err}", to.display()));
     let files =
@@ -272,8 +251,7 @@ fn install(from: &Path, to: &Path) {
     }
 }
 
-/// One entry's arguments: the compiler, its flags for this target less
-/// none, `extra`, and the file.
+/// One entry's args: compiler, target flags, `extra`, file.
 fn compile_command(compiler: &cc::Tool, extra: &[String], file: &Path) -> Vec<String> {
     let mut arguments = vec![compiler.path().to_string_lossy().into_owned()];
     arguments.extend(
@@ -288,10 +266,8 @@ fn compile_command(compiler: &cc::Tool, extra: &[String], file: &Path) -> Vec<St
     arguments
 }
 
-/// How each C and C++ file is compiled, as a compilation database at
-/// `OUT_DIR/compile_commands.json`. Sonar analyses C and C++ only from
-/// one -- it has to know the include paths to read a file at all -- and
-/// `make sonar-reports` hands it this. Nothing in the build reads it.
+/// Writes `OUT_DIR/compile_commands.json` for Sonar (`make sonar-reports`),
+/// which needs it (include paths) to analyse C/C++ at all. Build never reads it.
 fn write_compile_commands(entries: &[(PathBuf, Vec<String>)], manifest: &Path, out: &Path) {
     let quote = |text: &str| {
         let mut quoted = String::from("\"");
@@ -327,26 +303,25 @@ fn write_compile_commands(entries: &[(PathBuf, Vec<String>)], manifest: &Path, o
         .unwrap_or_else(|err| panic!("write {}: {err}", database.display()));
 }
 
-/// An environment variable cargo always sets for a build script.
+/// Env var cargo always sets for build scripts.
 fn env(name: &str) -> String {
     std::env::var(name).unwrap_or_else(|_| panic!("cargo did not set {name}"))
 }
 
-/// What the configure scripts are told about the machine they build for.
+/// Target settings for configure scripts.
 struct Target {
-    /// The C compiler, as cargo would run it for this target.
+    /// C compiler, as cargo runs it for target.
     cc: PathBuf,
-    /// Its flags, less the optimisation and debug levels: both libraries
-    /// pick their own, and FFmpeg does not build below -O1, since it
-    /// relies on the optimiser to drop code for what is configured out.
+    /// Flags minus optimisation/debug levels: libs pick their own; FFmpeg won't
+    /// build below -O1 (relies on optimiser to drop configured-out code).
     cflags: Vec<String>,
     ar: PathBuf,
     ranlib: PathBuf,
     /// `CARGO_CFG_TARGET_ARCH`: `aarch64`, `arm`, `x86_64`, `x86`.
     arch: String,
-    /// The target triple, when it is not the machine running the build.
+    /// Target triple, if not build machine.
     cross: Option<String>,
-    /// How many jobs cargo allows this build script.
+    /// Jobs cargo allows this build script.
     jobs: String,
 }
 
@@ -373,19 +348,19 @@ impl Target {
         }
     }
 
-    /// Whether the hand-written assembly is left out; see the module doc.
+    /// Whether asm is left out; see module doc.
     fn without_asm(&self) -> bool {
         self.arch == "x86" || self.arch == "x86_64"
     }
 
-    /// The flags as one argument, for `--extra-cflags`.
+    /// Flags as one argument, for `--extra-cflags`.
     fn cflags(&self) -> String {
         self.cflags.join(" ")
     }
 }
 
-/// Configure and build x264 out of its tree, and install it under
-/// `OUT_DIR/x264`. Returns that prefix.
+/// Configures and builds x264 out of tree, installs under `OUT_DIR/x264`;
+/// returns prefix.
 fn build_x264(src: &Path, out: &Path, target: &Target) -> PathBuf {
     let build = out.join("x264-build");
     let prefix = out.join("x264");
@@ -436,8 +411,8 @@ fn build_x264(src: &Path, out: &Path, target: &Target) -> PathBuf {
     prefix
 }
 
-/// Configure and build FFmpeg out of its tree, and install it under
-/// `OUT_DIR/ffmpeg`. Returns that prefix.
+/// Configures and builds FFmpeg out of tree, installs under `OUT_DIR/ffmpeg`;
+/// returns prefix.
 fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
     let build = out.join("ffmpeg-build");
     let prefix = out.join("ffmpeg");
@@ -453,24 +428,22 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
         .arg(format!("--ranlib={}", target.ranlib.display()))
         .arg(format!("--extra-cflags={}", target.cflags()))
         .args([
-            // A static library of position-independent code, and nothing
-            // that is a program or a document.
+            // Static PIC library; no programs or docs.
             "--enable-static",
             "--disable-shared",
             "--enable-pic",
             "--disable-programs",
             "--disable-doc",
             "--disable-debug",
-            // Nothing found on the build machine and used because it was
-            // there: what this needs is named below, and nothing else.
+            // Nothing used just because the build machine has it: only what's
+            // named below.
             "--disable-autodetect",
             "--enable-pthreads",
             "--disable-network",
             "--disable-avdevice",
             "--disable-avfilter",
             "--disable-everything",
-            // Read an MP4 or a QuickTime file, which is what a phone
-            // records; decode what is in one; write an MP4 back.
+            // Read MP4/QuickTime (phone recordings), decode, write MP4.
             "--enable-protocol=file",
             "--enable-demuxer=mov",
             "--enable-muxer=mp4",
@@ -504,7 +477,7 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
     prefix
 }
 
-/// Run one step, and on failure say which and where its log is.
+/// Runs a step; on failure, names it and its log.
 fn run(command: &mut Command, what: &str, log: &Path) {
     let status = command
         .status()

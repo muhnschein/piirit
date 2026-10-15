@@ -1,18 +1,11 @@
-//! Blocking a contact, and the list the core keeps of the blocked ones.
+//! Blocking a contact; core's blocked-contacts list.
 //!
-//! Two lists rather than one: the core keeps a blocked contact out of
-//! `get_contacts` whatever flags it is given, and hands them out through
-//! `get_blocked_contacts` alone. So a block is not a row moving inside a
-//! model -- it is one list losing a row and the other gaining it, and the
-//! two are different objects on different pages. What this drives is that
-//! both ends of it happen: the calls the core takes, and the other list
-//! hearing about it through the event the core announces, which is all a
-//! page that is already open is told.
+//! Core hides blocked contact from `get_contacts`, returns it via
+//! `get_blocked_contacts` only. Block = row moves between lists.
+//! Checks both calls and other list hearing via core event.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr,
+// single_shot with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -28,10 +21,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Two lists over the same account: the contacts that can be written to,
-/// and the blocked ones. Only the first is ever told to reload by hand;
-/// the second hears about the block the way an open page does, through
-/// the core's own event.
+/// Writable contacts and blocked lists.
+/// Only first reloaded by hand; second hears via core event.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -104,8 +95,7 @@ fn blocking_moves_a_contact_between_the_two_lists() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -147,7 +137,7 @@ fn blocking_moves_a_contact_between_the_two_lists() {
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    // The block has been made by now, off the first list arriving.
+    // Block done by now.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("ordinary-after-block", call!("ordinaryIds"));
         record!("blocked-after-block", call!("blockedIds"));
@@ -180,8 +170,7 @@ fn blocking_moves_a_contact_between_the_two_lists() {
             .collect()
     };
 
-    // The core's own two calls, with the account first, as
-    // deltachat-android's generated client sends them.
+    // Core's two calls, account first, as deltachat-android sends.
     assert_eq!(
         params_of("block_contact"),
         vec![serde_json::json!([1, 10])],
@@ -192,8 +181,7 @@ fn blocking_moves_a_contact_between_the_two_lists() {
         vec![serde_json::json!([1, 10])],
         "unblocking did not reach the core as unblock_contact(account, contact). {context}"
     );
-    // The blocked list is asked for by its own method, which takes the
-    // account and nothing else -- no flags, no query.
+    // Blocked list: own method, account only.
     assert!(
         params_of("get_blocked_contacts").contains(&serde_json::json!([1])),
         "the blocked list was never read with get_blocked_contacts(account). {context}"
@@ -214,7 +202,7 @@ fn blocking_moves_a_contact_between_the_two_lists() {
         ("10,11,".to_string(), String::new()),
         "unblocking did not put the contact back. {context}"
     );
-    // Each way round said once, on the list the call was made on.
+    // Each way said once, on list call made on.
     assert_eq!(
         value("report"),
         "10:true,10:false,#",

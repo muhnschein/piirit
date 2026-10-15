@@ -1,10 +1,7 @@
-//! Where a conversation sits when you come back to it, and when a new
-//! message is allowed to move it.
+//! Where conversation sits on return; when new message may move it.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -19,7 +16,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list, over a plain `ListModel` carrying the roles the real one has.
+/// List over plain `ListModel` with real roles.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -214,12 +211,11 @@ const PROBE_QML: &str = r"
     }
 ";
 
-// A script of timed steps, in the order they happen; splitting it would
-// hide that order for no gain.
+// Timed steps in order.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -252,7 +248,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     }
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // A history longer than the view, as when reopening a chat.
+        // History longer than view, as on reopen.
         record!("filled", call!("append", 40));
         record!(
             "load",
@@ -269,14 +265,14 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
             "opened-sticky",
             call!("get", QString::from("stickToBottom"))
         );
-        // One more message arrives while the reader is at the bottom.
+        // New message while reader at bottom.
         call!("append", 1);
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("followed", call!("ended"));
 
-        // The reader scrolls up into the history and stops there.
+        // Reader scrolls up, stops there.
         call!("toTop");
         call!("settle");
         record!(
@@ -289,7 +285,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("stayed-put", call!("ended"));
 
-        // The reader scrolls back down to the newest message.
+        // Reader scrolls back to newest.
         call!("toBottom");
         call!("settle");
         record!(
@@ -302,7 +298,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("resumed", call!("ended"));
 
-        // The menu raises what the page then acts on.
+        // Menu raises what page then acts on.
         record!(
             "reply-picked",
             call!("pickMenu", QString::from("replyItem"))
@@ -312,15 +308,13 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         record!("copy", call!("raisedSignal"));
         call!("pickMenu", QString::from("resendItem"));
         record!("resend", call!("raisedSignal"));
-        // Delete asks which kind of delete it is rather than deleting:
-        // the menu raises the ask, and the page behind it answers.
+        // Delete asks kind; page answers.
         call!("pickMenu", QString::from("deleteItem"));
         record!("delete-ask", call!("raisedSignal"));
-        // And the list waits after the answer, so the delete itself is
-        // read on the next step rather than this one.
+        // List waits after answer: delete itself read next step.
         call!("confirm", 1, false);
 
-        // Scrolled away again, so an arrival is counted rather than shown.
+        // Scrolled away: arrival counted.
         call!("toTop");
         call!("settle");
         call!("append", 2);
@@ -330,7 +324,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         record!("delete", call!("raisedSignal"));
         record!("missed", call!("get", QString::from("missedCount")));
 
-        // The reader's own message is not one they missed.
+        // Reader's own message not missed.
         call!("appendOwn");
         record!(
             "missed-after-own",
@@ -345,22 +339,19 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         record!("missed-cleared", call!("get", QString::from("missedCount")));
         record!("arrived", call!("arrivedCount"));
 
-        // Following the newest message, as after opening a chat. The
-        // reader takes hold and drags up into the history.
+        // Following newest; reader drags up.
         call!("beginDrag");
         record!("held-follows", call!("get", QString::from("following")));
         call!("toTop");
-        // A row measured mid-drag, or a message arriving: either moves
-        // `contentHeight`, which is what hauled the reader back down.
+        // Mid-drag row or arrival moves `contentHeight`, hauls reader down.
         call!("append", 1);
     });
 
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("held-stayed", call!("ended"));
 
-        // Away from the newest message, then a flick still gliding when
-        // the jump button is tapped. The button is not part of the list,
-        // so nothing else stops that flick.
+        // Away from newest, flick still gliding when jump tapped. Button isn't part of list, so
+        // nothing else stops the flick.
         call!("toTop");
         call!("settle");
         call!("beginDrag");
@@ -370,12 +361,9 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(9), move || unsafe {
         record!("jumped-mid-flick", call!("ended"));
 
-        // Picked, then the row destroyed before the countdown ends --
-        // which is what a reload or a reorder does to it, and what the
-        // delete before it in a run does. The countdown belongs to the
-        // list rather than to the row, so the row going takes nothing
-        // with it. Cleared first: a stale value would otherwise read as
-        // a fresh one and the assertion would hold either way.
+        // Picked, then row destroyed before countdown ends (as reload, reorder, or earlier delete
+        // do). Countdown belongs to list, not row, so row going takes nothing. Cleared first: stale
+        // value would read as fresh and assertion hold either way.
         call!("clearRaised");
         call!("pickMenu", QString::from("deleteItem"));
         call!("confirm", 1, false);
@@ -385,14 +373,13 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(10), move || unsafe {
         record!("delete-after-removal", call!("raisedSignal"));
 
-        // Last, because it replaces the model's contents.
+        // Last: replaces model contents.
         call!("resetToState", 24);
     });
 
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("resend-when-failed", call!("resendVisible"));
-        // The same row is one of this account's own, and encrypted, so
-        // the ask says the core would take a deletion for everyone of it.
+        // Same row is account's own and encrypted: ask says core would take delete for everyone.
         call!("clearRaised");
         call!("pickMenu", QString::from("deleteItem"));
         record!("delete-ask-own", call!("raisedSignal"));
@@ -401,9 +388,8 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
 
     single_shot(Duration::from_secs(12), move || unsafe {
         record!("resend-when-delivered", call!("resendVisible"));
-        // Refill: resetToState left a handful of rows, and a list too
-        // short to scroll is near the bottom by definition -- there would
-        // be nothing to scroll away from.
+        // Refill: `resetToState` left a handful of rows; list too short to scroll is near bottom by
+        // definition, nothing to scroll away from.
         call!("append", 40);
         call!("beginDrag");
         call!("toTop");
@@ -420,8 +406,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
 
     single_shot(Duration::from_secs(14), move || unsafe {
         record!("short-sticks", call!("get", QString::from("stickToBottom")));
-        // Empty the list and put it back to not-yet-loaded, which is what
-        // opening a chat looks like before its messages arrive.
+        // Empty, not-yet-loaded: as before messages arrive.
         call!("emptyModel");
         call!("setLoaded", false);
     });
@@ -433,14 +418,13 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
 
     single_shot(Duration::from_secs(16), move || unsafe {
         record!("placeholder-when-empty", call!("placeholderOn"));
-        // Refilled for the jumps below.
+        // Refilled for jumps below.
         call!("append", 40);
     });
 
     single_shot(Duration::from_secs(17), move || unsafe {
-        // Back from a picture, held on a row up in the history, and the
-        // jump button tapped before the hold has run out. A row measured
-        // after the jump would put the reader straight back.
+        // Back from a picture, held on a row up in history; jump tapped before hold runs out. Row
+        // measured after jump would put reader straight back.
         call!("holdAt", 20);
         call!("jump");
         call!("append", 1);
@@ -453,9 +437,8 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
             call!("get", QString::from("stickToBottom"))
         );
 
-        // Up in the history, the button tapped, and the view moved down a
-        // little on its own before the jump lands. Moving down is never
-        // the reader leaving.
+        // Up in history, jump tapped, view moves down a little on its own before jump lands.
+        // Moving down is never reader leaving.
         call!("toTop");
         call!("settle");
         call!("jump");
@@ -469,9 +452,8 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
             call!("get", QString::from("stickToBottom"))
         );
 
-        // At the newest message, which then grows -- a picture decoding,
-        // a placeholder filled in. The reader should still be looking at
-        // the bottom of it.
+        // At newest, which then grows (picture decoding, placeholder filled): reader still at
+        // bottom of it.
         call!("growLast");
     });
 
@@ -488,7 +470,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     assert_jumps_land(&steps);
 }
 
-/// A jump goes all the way, whatever else is moving the view.
+/// Jump goes all the way, whatever else moves the view.
 fn assert_jumps_land(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -536,12 +518,9 @@ fn assert_jumps_land(steps: &[(&str, String)]) {
     );
 }
 
-/// Opening lands on the newest message; an arrival moves the view only
-/// when the reader is already there.
-///
-/// And stopping a line short of the newest message counts as arriving:
-/// the jump-to-newest button could not otherwise be dismissed.
-// One assertion per thing checked, in the order the steps ran.
+/// Opening lands on newest; arrival moves view only if reader there. Stop just short counts as
+/// arrival, else jump-to-newest button can't be dismissed.
+// One assertion per thing, in step order.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
@@ -596,7 +575,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "ok",
         "the row has no context menu. {context}"
     );
-    // The reply carries what the page needs to show what is being answered.
+    // Reply carries what page needs.
     assert_eq!(
         value("reply"),
         "reply:1:message number 0, long enough to take a line of its own in the list:Ada",
@@ -642,9 +621,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
          message above it. {context}"
     );
 
-    // DC_STATE_OUT_FAILED is the only state worth offering it in. Clicking
-    // the item proves it is wired; whether a reader can ever reach it is a
-    // separate question, and was not being asked.
+    // `DC_STATE_OUT_FAILED`: only state worth offering resend. Click proves wiring; whether reader
+    // can reach it is not asked.
     assert_eq!(
         value("resend-when-failed"),
         "true",
@@ -674,10 +652,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the view still follows while the reader has hold of it, which hauls \
          them back down the moment they scroll up. {context}"
     );
-    // The jump has to move the view even when the reader tapped it during
-    // a flick: it clears the missed badge and tells the page the newest
-    // message has been reached, and doing that without scrolling marks
-    // messages read that are still out of sight.
+    // Jump must move view even if tapped mid-flick: it clears missed badge and tells page newest
+    // was reached; doing that without scrolling marks read messages still out of sight.
     assert_eq!(
         value("jumped-mid-flick"),
         "true",
@@ -708,8 +684,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
     );
 }
 
-/// A reader who stops just short of the end has arrived, so the
-/// jump-to-newest button goes away.
+/// Stopping just short: arrived; jump button goes.
 fn assert_near_bottom(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -726,9 +701,7 @@ fn assert_near_bottom(steps: &[(&str, String)]) {
         "scrolling up did not clear stickToBottom, so nothing below is under \
          test. {context}"
     );
-    // The arrangement: genuinely short of the end by the view's own
-    // reckoning. Without this the case being tested is not the one that
-    // was reported.
+    // Arrangement: genuinely short of end by view's reckoning, else not the reported case.
     assert_eq!(
         value("short-atyend"),
         "false",

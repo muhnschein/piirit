@@ -1,13 +1,9 @@
-//! Where account state lives, and what happens to a profile written
-//! under the app's old name.
+//! Old-name profile moved into account dir.
 //!
-//! Sailjail grants write access to `~/.local/share/<Org>/<App>` only,
-//! and the app was Postivene before it was Piirit, so a profile from
-//! then sits under `postivene/postivene/accounts`, outside the grant;
-//! this pins the move, and pins that it never overwrites a profile
-//! already in the new place.
+//! Sailjail grants `~/.local/share/<Org>/<App>` only. App was Postivene; old
+//! `postivene/postivene/accounts` is outside. Never overwrites new profile.
 
-// `set_var` in a single-test binary; only unsafe from edition 2024 on.
+// `set_var`: unsafe from edition 2024 only.
 #![allow(unsafe_code, unused_unsafe, clippy::expect_used)]
 
 use std::fs;
@@ -32,7 +28,7 @@ fn a_profile_from_the_old_name_is_adopted_but_never_overwrites_one() {
         std::env::set_var("XDG_DATA_HOME", &data);
     }
 
-    // A profile written by a build under the old name.
+    // Old-name build profile.
     let legacy = data.join("postivene/postivene/accounts");
     marker(&legacy, "old.db");
 
@@ -51,9 +47,8 @@ fn a_profile_from_the_old_name_is_adopted_but_never_overwrites_one() {
         !legacy.exists(),
         "the old directory is still there, so the profile now exists twice"
     );
-    // The directory holds the keys, the mail password and every message.
-    // The adopted one arrived with the umask default, which is the case
-    // that has to be tightened rather than merely created right.
+    // Dir holds keys, mail password, all messages. Adopted dir came with umask default: must be
+    // tightened, not just created right.
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
@@ -68,7 +63,7 @@ fn a_profile_from_the_old_name_is_adopted_but_never_overwrites_one() {
         );
     }
 
-    // Asking again is a no-op, not a second move.
+    // Repeat: no-op.
     let again = DeltaChatCore::accounts_dir().expect("accounts dir");
     assert_eq!(
         Path::new(&again),
@@ -80,8 +75,7 @@ fn a_profile_from_the_old_name_is_adopted_but_never_overwrites_one() {
         "the second ask lost the profile"
     );
 
-    // A legacy directory reappearing next to a live profile must not
-    // replace it: the live one wins and nothing is destroyed.
+    // Legacy dir beside live profile never replaces it.
     marker(&legacy, "stale.db");
     let third = DeltaChatCore::accounts_dir().expect("accounts dir");
     assert_eq!(Path::new(&third), wanted);

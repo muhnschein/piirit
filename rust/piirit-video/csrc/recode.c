@@ -1,17 +1,10 @@
 /*
- * Make a video smaller: FFmpeg reads and decodes it, scales the picture,
- * x264 encodes it again at the bit rate asked for, and FFmpeg writes the
- * result as an MP4. The sound is encoded again as AAC at its own rate
- * when it is AAC to begin with, and copied as it is otherwise.
+ * Shrinks a video: FFmpeg decodes, scales, writes MP4; x264 encodes at asked
+ * bit rate. Sound: AAC re-encoded at its rate, else copied.
  *
- * x264 is driven directly rather than through FFmpeg's libx264 wrapper:
- * that wrapper would tie FFmpeg's configure to finding x264 through
- * pkg-config inside the SDK's scratchbox, and what it does here is a
- * dozen lines below.
- *
- * The picture is scaled as it is stored and not turned: a phone writes
- * its turn into the file as a display matrix, and that matrix is copied
- * to the new file, so it plays the way the old one did.
+ * x264 direct, not FFmpeg's libx264 wrapper: that ties FFmpeg's configure to
+ * pkg-config finding x264 in SDK scratchbox. Picture scaled as stored; display
+ * matrix copied.
  */
 #include "recode.h"
 
@@ -31,9 +24,7 @@
 #include <libswscale/swscale.h>
 #include <x264.h>
 
-/* How x264 trades speed for quality. "veryfast" is the fastest preset
- * that keeps CABAC and the deblocking filter, which are most of what
- * the faster two give up in picture for their speed. */
+/* x264 "veryfast": fastest preset keeping CABAC and deblocking. */
 #define PRESET "veryfast"
 
 static void say(char *error, size_t error_len, const char *what)
@@ -43,7 +34,7 @@ static void say(char *error, size_t error_len, const char *what)
     }
 }
 
-/* `what`, and then what about it. */
+/* `what`: detail. */
 static void say_with(char *error, size_t error_len, const char *what,
                      const char *detail)
 {
@@ -59,8 +50,7 @@ static void say_av(char *error, size_t error_len, const char *what, int code)
     say_with(error, error_len, what, reason);
 }
 
-/* FFmpeg and x264 report on stderr, where nobody on a phone reads it;
- * what went wrong comes back through the error buffer instead. */
+/* No one reads stderr on phone: errors to error buffer. */
 static void quiet(void)
 {
     av_log_set_level(AV_LOG_QUIET);
@@ -80,7 +70,7 @@ static int32_t codec_of(enum AVCodecID id)
     }
 }
 
-/* The display matrix's turn, clockwise, to the nearest quarter. */
+/* Display matrix turn, clockwise, to nearest quarter. */
 static int32_t rotation_of(const AVCodecParameters *par)
 {
     const AVPacketSideData *matrix = av_packet_side_data_get(
@@ -115,10 +105,8 @@ int piirit_video_probe(const char *path, struct piirit_probe *out,
         say_av(error, error_len, "open", ret);
         return PIIRIT_FAILED;
     }
-    /* The header says all of this; nothing is decoded, so asking is
-     * cheap enough to do as a file is picked. The file's own duration is
-     * only worked out by reading into it, so it is the longest of the
-     * streams' instead, which an MP4 header carries. */
+    /* Header only (cheap at pick): longest stream's duration, file's needs
+ * reading. */
     if (format->duration > 0) {
         out->duration_ms = format->duration / (AV_TIME_BASE / 1000);
     }
@@ -148,7 +136,7 @@ int piirit_video_probe(const char *path, struct piirit_probe *out,
         out->rotation = rotation_of(par);
         out->video_bit_rate = par->bit_rate;
         if (out->video_bit_rate <= 0 && out->duration_ms > 0) {
-            /* What the file costs per second, less the sound. */
+            /* File's bits per second, less sound. */
             size = avio_size(format->pb);
             if (size > 0) {
                 out->video_bit_rate =
@@ -160,7 +148,7 @@ int piirit_video_probe(const char *path, struct piirit_probe *out,
     return PIIRIT_OK;
 }
 
-/* The sound's side of a recoding. */
+/* Sound side of a recode. */
 struct sound {
     int in;
     AVStream *out;
@@ -173,7 +161,7 @@ struct sound {
     int started;
 };
 
-/* Who is told how far along it is, and how it went. */
+/* Progress and outcome listeners. */
 struct report {
     int64_t start;
     int64_t length;
@@ -185,7 +173,7 @@ struct report {
     size_t error_len;
 };
 
-/* Everything one recoding holds, so that one function can let it go. */
+/* Everything a recode holds; one function frees it. */
 struct job {
     AVFormatContext *in;
     AVFormatContext *out;
@@ -197,10 +185,8 @@ struct job {
     x264_picture_t picture;
     int picture_allocated;
     AVFrame *frame;
-    /* What is read off the input. Held by `run` while `take` passes it
-     * on, which is why what the encoders hand back goes in `encoded`:
-     * writing into this one in the middle of that would drop the read
-     * packet's buffer without freeing it. */
+    /* Input packet, held by `run` while `take` passes it on. Encoder output to
+     * `encoded`: writing here mid-pass leaks read packet's buffer. */
     AVPacket *packet;
     AVPacket *encoded;
     const struct piirit_target *target;
@@ -239,12 +225,9 @@ static void job_free(struct job *job)
 }
 
 /*
- * How many threads the decoder and x264 are each given: half the phone's
- * cores, and never more than four. Left to choose, both take every core:
- * 9 decoding and 12 encoding threads on an 8-core phone. Measured with
- * those counts, a 4K HEVC clip peaked at 588 MB and a 1080p H.264 one at
- * 342 MB; with two and three threads, 299 MB and 185 MB, in about the
- * same time. All of it runs while the reader types a caption.
+ * Decoder and x264 threads: half the cores, max four. Unset, both take every
+ * core (9 decode, 12 encode on 8-core phone): 4K HEVC peaked 588 MB, 1080p
+ * H.264 342 MB; with 2 and 3 threads 299 MB and 185 MB, about same time.
  */
 static int worker_threads(void)
 {
@@ -273,7 +256,7 @@ static int open_decoder(struct job *job, int index, AVCodecContext **out)
     ret = avcodec_parameters_to_context(*out, par);
     if (ret >= 0) {
         (*out)->pkt_timebase = job->in->streams[index]->time_base;
-        /* Decoding is most of the work, but see worker_threads. */
+        /* Decoding is most of the work; see worker_threads. */
         (*out)->thread_count = worker_threads();
         (*out)->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
         ret = avcodec_open2(*out, codec, NULL);
@@ -285,7 +268,7 @@ static int open_decoder(struct job *job, int index, AVCodecContext **out)
     return PIIRIT_OK;
 }
 
-/* x264, set up for the picture asked for, and the stream it writes to. */
+/* x264 set for asked-for picture, and stream it writes to. */
 static int open_video(struct job *job)
 {
     const AVStream *in = job->in->streams[job->video_in];
@@ -316,20 +299,18 @@ static int open_video(struct job *job)
     param.i_height = job->target->height;
     param.vui.i_sar_width = in->codecpar->sample_aspect_ratio.num;
     param.vui.i_sar_height = in->codecpar->sample_aspect_ratio.den;
-    /* The input's own clock, so a phone's variable frame rate survives:
-     * x264 is handed each frame's timestamp rather than a frame count. */
+    /* Input's clock: variable frame rate survives. */
     param.b_vfr_input = 1;
     param.i_timebase_num = in->time_base.num;
     param.i_timebase_den = in->time_base.den;
     param.i_fps_num = rate.num;
     param.i_fps_den = rate.den;
-    /* An average, held to it closely enough that the file comes out the
-     * size it was planned at: what decides whether a relay takes it. */
+    /* Average held close: planned size decides whether relay takes it. */
     param.rc.i_rc_method = X264_RC_ABR;
     param.rc.i_bitrate = kbps;
     param.rc.i_vbv_max_bitrate = kbps * 3 / 2;
     param.rc.i_vbv_buffer_size = kbps * 2;
-    /* Headers once, in the file's header, as MP4 has them. */
+    /* Headers once, in MP4 header. */
     param.b_repeat_headers = 0;
     param.b_annexb = 1;
     if (x264_param_apply_profile(&param, "high") < 0) {
@@ -364,8 +345,7 @@ static int open_video(struct job *job)
     job->video_out->codecpar->sample_aspect_ratio =
         in->codecpar->sample_aspect_ratio;
 
-    /* The parameter sets, which MP4 keeps in the header rather than in
-     * the stream; the muxer turns them into the form it stores. */
+    /* Parameter sets in MP4 header; muxer converts. */
     if (x264_encoder_headers(job->x264, &nals, &count) < 0) {
         say(job->report.error, job->report.error_len, "x264 wrote no headers");
         return PIIRIT_FAILED;
@@ -389,7 +369,7 @@ static int open_video(struct job *job)
         }
     }
 
-    /* The phone's turn, as the old file had it. */
+    /* Phone's turn, as old file. */
     matrix = av_packet_side_data_get(in->codecpar->coded_side_data,
                                      in->codecpar->nb_coded_side_data,
                                      AV_PKT_DATA_DISPLAYMATRIX);
@@ -407,7 +387,7 @@ static int open_video(struct job *job)
     return open_decoder(job, job->video_in, &job->video_dec);
 }
 
-/* The sound: AAC again at the rate asked for, or copied. */
+/* Sound: AAC at asked rate, or copied. */
 static int open_audio(struct job *job)
 {
     const AVStream *in = job->in->streams[job->audio.in];
@@ -443,8 +423,7 @@ static int open_audio(struct job *job)
     job->audio.enc->sample_fmt = AV_SAMPLE_FMT_FLTP;
     job->audio.enc->sample_rate =
         job->audio.dec->sample_rate > 0 ? job->audio.dec->sample_rate : 48000;
-    /* Stereo at most: a phone's surround track is not what a chat
-     * message is for, and every channel costs. */
+    /* Stereo at most: surround wasted on chat message. */
     if (job->audio.dec->ch_layout.nb_channels == 1) {
         av_channel_layout_default(&job->audio.enc->ch_layout, 1);
     } else {
@@ -490,7 +469,7 @@ static int write_packet(struct job *job, AVPacket *packet, AVRational from,
     return PIIRIT_OK;
 }
 
-/* Hand x264 a picture, or nothing to drain it, and write what comes out. */
+/* Send a picture to x264, or NULL to drain, and write what comes out. */
 static int encode_video(struct job *job, x264_picture_t *picture)
 {
     x264_picture_t encoded;
@@ -508,7 +487,7 @@ static int encode_video(struct job *job, x264_picture_t *picture)
         say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
-    /* x264 lays a frame's units out one after another. */
+    /* x264 lays a frame's units out back to back. */
     memcpy(job->encoded->data, nals[0].p_payload, size);
     job->encoded->pts = encoded.i_pts;
     job->encoded->dts = encoded.i_dts;
@@ -522,7 +501,7 @@ static int encode_video(struct job *job, x264_picture_t *picture)
     return size;
 }
 
-/* Say how far along this is, and hear whether to stop. */
+/* Report progress; stop if asked. */
 static void report(struct job *job, int64_t pts)
 {
     int64_t done;
@@ -543,7 +522,7 @@ static void report(struct job *job, int64_t pts)
 static int scale_and_encode(struct job *job, const AVFrame *frame)
 {
     int64_t pts = frame->best_effort_timestamp;
-    /* x264 wants every timestamp later than the last. */
+    /* x264 needs timestamps increasing. */
     if (pts == AV_NOPTS_VALUE || pts <= job->last_pts) {
         pts = job->last_pts == INT64_MIN ? 0 : job->last_pts + 1;
     }
@@ -566,7 +545,7 @@ static int scale_and_encode(struct job *job, const AVFrame *frame)
     return encode_video(job, &job->picture);
 }
 
-/* Everything the video decoder has ready. */
+/* Drain ready video decoder output. */
 static int drain_video(struct job *job)
 {
     int ret;
@@ -602,8 +581,7 @@ static int write_audio_packets(struct job *job)
     return PIIRIT_OK;
 }
 
-/* Hand the encoder whole frames from the queue: all of them when
- * `everything`, which the end of the file asks for. */
+/* Encode whole frames from queue; all when `everything` (end of file). */
 static int encode_audio(struct job *job, int everything)
 {
     int frame_size = job->audio.enc->frame_size;
@@ -643,8 +621,7 @@ static int encode_audio(struct job *job, int everything)
     return PIIRIT_OK;
 }
 
-/* Resample whatever came in to what the encoder takes, queue it, and
- * encode what fills a frame. `frame` NULL drains the resampler. */
+/* Resample to encoder's format, queue, encode full frames. NULL `frame` drains. */
 static int queue_audio(struct job *job, const AVFrame *frame)
 {
     uint8_t **buffer = NULL;
@@ -669,7 +646,7 @@ static int queue_audio(struct job *job, const AVFrame *frame)
         return PIIRIT_OK;
     }
     if (frame && !job->audio.started) {
-        /* The sound starts where the old file had it start. */
+        /* Sound starts where old file did. */
         job->audio.started = 1;
         if (frame->best_effort_timestamp != AV_NOPTS_VALUE) {
             job->audio.pts = av_rescale_q(
@@ -726,7 +703,7 @@ static int drain_audio(struct job *job)
     return PIIRIT_OK;
 }
 
-/* One packet off the file, to wherever it goes. */
+/* One packet off file, to its destination. */
 static int take(struct job *job, AVPacket *packet)
 {
     int ret;
@@ -754,7 +731,7 @@ static int take(struct job *job, AVPacket *packet)
     return PIIRIT_OK;
 }
 
-/* The end of the file: everything still held, out. */
+/* End of file: flush everything held. */
 static int finish(struct job *job)
 {
     if (avcodec_send_packet(job->video_dec, NULL) < 0
@@ -861,10 +838,8 @@ int piirit_video_recode(const char *input, const char *output,
     int result;
 
     quiet();
-    /* Behind the page the reader is typing on. On Linux the nice value is
-     * the calling thread's alone -- the recode thread's, which exists for
-     * this -- and every thread FFmpeg and x264 start from it inherits it.
-     * Failing to is no reason not to recode. */
+    /* Nice 10: runs behind page reader types on. Linux nice is per thread (this
+     * one made for recode); FFmpeg/x264 threads inherit. Failure: recode anyway. */
     (void)setpriority(PRIO_PROCESS, 0, 10);
     memset(&job, 0, sizeof job);
     job.target = target;

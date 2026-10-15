@@ -1,17 +1,10 @@
-//! The conversation model counts who is in the group.
+//! Conversation model counts group members.
 //!
-//! What the header over the messages says under the name. It arrives with
-//! the chat's shape, so a group opens with the count already on it rather
-//! than filling in a moment later, and it follows someone joining or
-//! leaving -- from this device or another -- on the same events the name
-//! does. A one-to-one chat has no count: the number would say "2" about a
-//! conversation with one other person, and the header would carry a line
-//! that tells the reader nothing.
+//! Count arrives with chat shape: group opens with count set, no flicker. Follows join/leave
+//! (this or other device) on same events as name. One-to-one has no count: "2" would be wrong.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr, single_shot whole-second
+// Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -68,8 +61,7 @@ fn the_header_over_a_group_counts_its_members_and_follows_a_joiner() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -160,9 +152,7 @@ fn the_header_over_a_group_counts_its_members_and_follows_a_joiner() {
         "3",
         "somebody joined and the header did not follow. {context}"
     );
-    // Once on the load and once on the joiner. The property is announced
-    // only when it changed, so a count re-read and found the same must
-    // not redraw the header.
+    // Announced only when changed: re-read with same count must not redraw header.
     assert_eq!(
         value("announced"),
         "2",

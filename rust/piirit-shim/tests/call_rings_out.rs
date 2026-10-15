@@ -1,15 +1,8 @@
-//! A call that rings here with nothing more from the core rings out.
+//! Ringing call with nothing more from core rings out.
 //!
-//! The core ends a ringing call after 120 seconds with one `CallEnded`,
-//! from a timer that lives only in the server that heard the call. An
-//! event channel that overflows, or a server that dies and is started
-//! again, loses it -- and a call that waited for it would ring until
-//! somebody declined it. So a call keeps a count of its own, a little
-//! longer than the core's, and ends as one that rang out when that is up.
-//!
-//! Shortened here from minutes to a second and a half, and fed by hand:
-//! the fake core never says anything about these calls at all, which is
-//! the case being guarded against.
+//! Core ends ringing call after 120 s with one `CallEnded` from a timer in its server; lost
+//! on overflow or restart. So call keeps own count, a bit longer than core's. Here: 1.5 s, fed by
+//! hand; fake never ends these calls, the case guarded against.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -89,7 +82,7 @@ fn a_call_the_core_never_ends_stops_ringing_by_itself() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -129,14 +122,12 @@ fn a_call_the_core_never_ends_stops_ringing_by_itself() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("start", call!("start"));
     });
 
-    // Past the first calls' count, which was due at 3.5 s; the call that
-    // rings now is due at 4.5 s.
+    // Past first call's count (due 3.5 s); call ringing now is due 4.5 s.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("next", call!("next"));
     });
@@ -200,8 +191,7 @@ fn a_call_the_core_never_ends_stops_ringing_by_itself() {
         "{said}. {context}"
     );
 
-    // Nothing is said to the core about a call that rang out: it counts
-    // it as over itself.
+    // Nothing said to core about rang-out call: core counts it over itself.
     let calls = common::calls(&journal);
     assert!(
         !calls

@@ -1,15 +1,12 @@
 //! Every language catalog carries every string, translated.
 //!
-//! A scan of the `.ts` files rather than anything Qt: `lupdate` keeps the
-//! catalogs in step with the source and `ci/packaging-lint.sh` proves
-//! that, but neither says whether a string in one of them has been
-//! translated. A string left `unfinished` is one the reader of that
-//! language meets in English, and with forty catalogs nobody notices
-//! from the diff.
+//! Scans `.ts` files, not Qt: `lupdate` keeps catalogs in step with source
+//! (`ci/packaging-lint.sh` proves it), not whether strings are translated. An
+//! `unfinished` string shows English to that reader; with forty catalogs, nobody
+//! notices in the diff.
 //!
-//! `piirit.ts` is the untranslated source catalog, and `piirit-en.ts`
-//! exists only for its plural forms, so those two are held to different
-//! rules.
+//! `piirit.ts` is untranslated source; `piirit-en.ts` exists only for plural
+//! forms: both held to different rules.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -19,8 +16,7 @@ fn translations_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../translations")
 }
 
-/// The `(context, source)` pairs a catalog carries, and how many of
-/// them are still unfinished.
+/// `(context, source)` pairs a catalog carries; how many are still unfinished.
 fn read_catalog(text: &str) -> (BTreeSet<(String, String)>, Vec<String>) {
     let mut context = String::new();
     let mut sources = BTreeSet::new();
@@ -81,8 +77,7 @@ fn every_language_catalog_is_complete() {
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_default();
         let text = fs::read_to_string(path).unwrap_or_else(|err| panic!("read {name}: {err}"));
-        // The language attribute is what lupdate counts the plural forms
-        // from, and what says which reader the file is for.
+        // Language attribute: lupdate counts plural forms from it; names reader.
         let language = name.trim_start_matches("piirit-").trim_end_matches(".ts");
         if !text.contains(&format!("<TS version=\"2.1\" language=\"{language}\"")) {
             problems.push(format!("{name}: its language attribute is not {language}"));
@@ -96,8 +91,7 @@ fn every_language_catalog_is_complete() {
                  run scripts/update-translations.sh"
             ));
         }
-        // English needs only its plurals: everything else falls back to
-        // the source text, which is English already.
+        // English needs only plurals; rest falls back to source, already English.
         if language == "en" {
             let plurals_untranslated: Vec<_> = unfinished
                 .iter()
@@ -123,9 +117,8 @@ fn every_language_catalog_is_complete() {
     );
 }
 
-/// The `%1`, `%2$s` and so on in a string, in order of first appearance:
-/// Qt's `arg()` markers and the core's printf-style ones. `%n` is a
-/// plural's count and is left to lupdate.
+/// `%1`, `%2$s` etc. in a string, in first-appearance order: Qt `arg()` markers
+/// and core's printf ones. `%n` is a plural count, left to lupdate.
 fn placeholders(text: &str) -> BTreeSet<String> {
     let mut found = BTreeSet::new();
     let mut rest = text;
@@ -144,9 +137,8 @@ fn placeholders(text: &str) -> BTreeSet<String> {
     found
 }
 
-/// Every `<message>`'s source and translation, as written in the file:
-/// what `read_catalog` reads line by line, here across lines too, since
-/// a source that holds a newline is split over several.
+/// Each `<message>`'s source and translation as written. `read_catalog` reads by
+/// line; here across lines too, since a multi-line source is split.
 fn messages(text: &str) -> Vec<(String, String)> {
     let between = |chunk: &str, open: &str, close: &str| -> String {
         chunk
@@ -188,7 +180,7 @@ fn every_translation_keeps_its_placeholders() {
         }
         let text = fs::read_to_string(&path).unwrap_or_else(|err| panic!("read {name}: {err}"));
         for (source, translation) in messages(&text) {
-            // Unfinished, or a plural's forms: nothing here to compare.
+            // Unfinished, or plural forms: nothing to compare.
             if translation.is_empty() || translation.contains("<numerusform>") {
                 continue;
             }

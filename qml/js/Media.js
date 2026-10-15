@@ -1,22 +1,14 @@
-// What a chat holds besides words, in the kinds the media pages list
-// them by -- gallery, audio, files, apps, and a contact's calls -- named
-// and drawn in one place, so the tile on a contact's or a group's page
-// and the page behind it say the same word for the same thing.
-//
-// No `.pragma library`, for the reason Format.js gives: qsTr() translates
-// in the context of the file it is written in, and a shared library has
-// none.
+// Chat's non-text kinds (gallery, audio, files, apps, calls): names, icons.
+// No `.pragma library`: qsTr() needs importing file's context.
 
-/// The kinds, in the order the tiles stand in: apps first, as the sketch
-/// this was built from has them, and only where apps are on; calls last,
-/// and only where calls are on and the chat is one a call can be in.
+/// Kinds in tile order. Apps first if on; calls last, if chat can hold one.
 function kinds(appsAvailable, callsAvailable) {
     return (appsAvailable ? ["apps", "gallery", "audio", "files"]
                           : ["gallery", "audio", "files"])
         .concat(callsAvailable ? ["calls"] : [])
 }
 
-/// What a kind is called: the tile's word, and the page's heading.
+/// Kind's name: tile word and page heading.
 function kindName(kind) {
     if (kind === "gallery") {
         //: The pictures and videos of a chat: a tile, and a page heading.
@@ -41,7 +33,7 @@ function kindName(kind) {
     return ""
 }
 
-/// What the page says when the chat has none of a kind.
+/// Page text when chat has none of a kind.
 function emptyText(kind) {
     if (kind === "gallery") {
         return qsTr("No pictures or videos yet")
@@ -61,8 +53,7 @@ function emptyText(kind) {
     return ""
 }
 
-/// The theme icon a kind is drawn with. Empty for apps: the theme has
-/// none for those, and AppMark draws one.
+/// Theme icon per kind. Empty for apps: AppMark draws one.
 function kindIcon(kind) {
     if (kind === "gallery") {
         return "icon-m-file-image"
@@ -79,10 +70,8 @@ function kindIcon(kind) {
     return ""
 }
 
-/// The theme's icon for a file of this MIME type, the way the platform's
-/// own file browser picks one: by the family of the type, and by name
-/// for the few the theme draws specially. `icon-m-file-other` for
-/// whatever is left, which is the paperclip's job in the conversation.
+/// Theme icon for MIME type, as file browser: by family, a few by name; else
+/// `icon-m-file-other`.
 function fileIcon(mime) {
     if (mime.indexOf("image/") === 0) {
         return "icon-m-file-image"
@@ -124,8 +113,7 @@ function fileIcon(mime) {
     return "icon-m-file-other"
 }
 
-/// A path the other end named, as a URL: encoded one segment at a time,
-/// for the reason AttachmentPreview.fileUrl gives.
+/// Peer's path as URL, encoded per segment (see AttachmentPreview.fileUrl).
 function fileUrl(path) {
     return "file://" + path.split("/").map(encodeURIComponent).join("/")
 }

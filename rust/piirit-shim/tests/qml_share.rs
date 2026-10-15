@@ -1,16 +1,8 @@
-//! Something shared to the app from somewhere else on the phone.
-//!
-//! The platform offers this app in its share sheet because the desktop
-//! file says so, and hands what was shared to a `ShareProvider` running
-//! inside it (`qml/share/ShareTarget.qml`). What this pins is the part
-//! that is ours: that a file and a piece of text are taken out of what
-//! arrives, that they reach the window, that the window asks which chat
-//! they are for -- and only when there is a profile to ask about -- and
-//! that the chosen chat is opened carrying them.
-//!
-//! The provider is a stub, so nothing here says the phone really offers
-//! the app. That is a device question; `docs/HARBOUR.md` says how to try
-//! it.
+//! Shared from elsewhere on phone. Desktop file puts app in share sheet; platform hands share
+//! to a `ShareProvider` in app (`qml/share/ShareTarget.qml`). Pinned (our part): file and text
+//! taken out, reach window, window asks which chat (only when a profile exists), chosen chat
+//! opens carrying them. Provider is a stub: whether phone offers app is a device question
+//! (`docs/HARBOUR.md`).
 
 // Qt harness: see qml_startup.rs.
 #![allow(
@@ -29,9 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed, with the
-/// properties each page was given: what a share hands over travels as
-/// those.
+/// Silica's `pageStack`, recorded: shared props are page props.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -43,10 +33,7 @@ struct StackProbe {
 }
 
 impl StackProbe {
-    /// The page and the properties it was given, in one line.
-    ///
-    /// Read by name and by the type each one is: a `QVariantMap` has no
-    /// iteration here, and these are the properties a share travels as.
+    /// One line: page and its props. Read by name and type: `QVariantMap` has no iteration here.
     fn note(&mut self, what: &str, page: &QString, properties: &QVariantMap) {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
@@ -89,10 +76,8 @@ impl StackProbe {
     }
 }
 
-/// The root stands in for the window while the share target is loaded on
-/// its own: a component a `Loader` builds reads ids from the file that
-/// loaded it, which is how `ShareTarget.qml` reaches `appWindow` inside
-/// the real one.
+/// Root stands in for window while `ShareTarget.qml` loads alone: a `Loader`-built component
+/// reads ids from file that loaded it, which is how it reaches `appWindow` in the real one.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -166,10 +151,10 @@ const PROBE_QML: &str = r"
 fn what_is_shared_reaches_the_chat_the_reader_picks() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-share-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -229,7 +214,7 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
         record!("file-said", call!("said"));
         record!("text", call!("shareText", QString::from("hello there")));
         record!("text-said", call!("said"));
-        // Nothing in it: nothing to open a chat for.
+        // Nothing shared: no chat to open.
         record!("empty", call!("shareNothing"));
         record!("empty-said", call!("said"));
 
@@ -240,8 +225,7 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // No profile yet -- the app is still on its way in -- so there is
-        // no chat to ask about.
+        // No profile yet: no chat to ask about.
         record!(
             "no-profile",
             call!(

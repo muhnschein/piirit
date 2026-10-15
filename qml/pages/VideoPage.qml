@@ -4,32 +4,23 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * One video, played here.
- *
- * Played here rather than handed to whatever the system thinks plays
- * video, which leaves Piirit and fails on a device. QtMultimedia is
- * already how a voice message plays in its own row; this is the same
- * player with a picture. The way out to another app stays in the pull-down,
- * and so does a copy into Piirit's folder in Downloads, where every copy
- * goes (AttachmentSaver).
+ * One video, played in-app (system player leaves Piirit, fails on device). Voice messages'
+ * player. Share-out in pull-down; copy via AttachmentSaver.
  */
 Page {
     id: page
 
-    /// The file, already encoded: see AttachmentPreview.fileUrl.
+    /// File, encoded (AttachmentPreview.fileUrl).
     property url fileUrl
     property string fileName
 
-    /// `MediaPlayer.PlayingState`, written as its value.
-    ///
-    /// The enum lives on the type, and the headless stub that stands in for
-    /// QtMultimedia is a QML component, which cannot declare one on Qt 5.6.
-    /// See AttachmentPreview for the same problem and the same answer.
+    /// `MediaPlayer.PlayingState` value: enum lives on type; headless QtMultimedia stub can't
+    /// declare one on Qt 5.6. See AttachmentPreview.
     readonly property int playingState: 1
 
     readonly property bool playing: player.playbackState === page.playingState
 
-    /// m:ss from milliseconds, which is what QtMultimedia reports.
+    /// m:ss from ms.
     function clock(milliseconds) {
         var total = Math.floor(milliseconds / 1000)
         var seconds = total % 60
@@ -56,8 +47,7 @@ Page {
         autoPlay: true
     }
 
-    // A copy the reader keeps, where every copy goes: see
-    // AttachmentSaver.
+    // Reader's copy: see AttachmentSaver.
     AttachmentSaver {
         id: saver
         objectName: "saver"
@@ -71,20 +61,11 @@ Page {
         }
     }
 
-    // Stopped on the way out. A page that is gone is not a reason for a
-    // decoder to keep running, and on a phone it is a reason it should not.
+    // Stop on way out: no decoder for gone page.
     Component.onDestruction: player.stop()
 
-    // Everything is inside the flickable because the pull-down has to be,
-    // and `contentHeight` is set because a flickable leaves it at 0: a
-    // child anchored to `parent` inside one is anchored to a content item
-    // with no height, and the video would be laid out into nothing.
-    // Nothing scrolls -- the content is exactly the view.
-    //
-    // Not covered by a test: the headless stub does not size its content
-    // item the way a real Flickable does, so it lays this out correctly
-    // either way. This is Silica's own idiom for a page that wants a
-    // pull-down and no scrolling.
+    // In flickable (pull-down). `contentHeight` set, else `parent`-anchored children vanish.
+    // Nothing scrolls. Stub can't test layout.
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: height
@@ -100,9 +81,7 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                // Not again while the copy is being made, which for a
-                // long video is a while: a second pull would only make a
-                // second copy.
+                // Off while copying (long for video): second pull = second copy.
                 enabled: !saver.busy
                 onClicked: saver.keep(page.fileUrl, page.fileName)
             }
@@ -116,12 +95,9 @@ Page {
                 top: notice.bottom
                 bottom: controls.top
             }
-            // fillMode left at its default, which is PreserveAspectFit.
-            // Naming it would mean naming an enum on the type, which the
-            // headless stub cannot carry.
+            // fillMode default; naming it needs enum stub lacks.
             source: player
-            // A video taken upright is stored on its side with the turn
-            // written in; this turns it back, as the gallery does.
+            // Upright video stored sideways with turn in metadata; turned back, as gallery.
             autoOrientation: true
 
             MouseArea {
@@ -130,8 +106,7 @@ Page {
             }
         }
 
-        // Where the copy went, or why there is none. Above the video,
-        // which is laid out below it.
+        // Where copy went, or why not.
         Banner {
             id: notice
             objectName: "notice"
@@ -190,17 +165,13 @@ Page {
                     verticalCenter: parent.verticalCenter
                 }
                 minimumValue: 0
-                // Never zero: a slider whose ends are the same place has
-                // nowhere to put its handle, and duration is 0 until the
-                // media has loaded.
+                // Never zero: equal ends leave no handle room; duration 0 until loaded.
                 maximumValue: Math.max(1, player.duration)
                 onReleased: player.seek(seek.value)
             }
 
-            // Not a binding on `value` itself: dragging the slider writes
-            // to that property, which would break a binding and never
-            // restore it -- the position would stop following the video
-            // after the first seek. `when` puts it back.
+            // Not bound to `value`: drag breaks binding for good (stops following after first
+            // seek). `when` restores.
             Binding {
                 target: seek
                 property: "value"

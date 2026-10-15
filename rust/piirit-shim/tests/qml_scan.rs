@@ -1,34 +1,26 @@
-//! Scanning a QR code: the view runs the camera only while it is the one
-//! on screen, a frame with a code in it comes back as the code's text,
-//! and the view then stays for its host to take down.
+//! Scanning a QR code: view runs camera only while on screen; frame with a code comes
+//! back as its text; view then stays for host to take down.
 //!
-//! The frame is made here rather than by a camera: the test's own
-//! `QrCode` encodes an invite, the test draws those modules into the PGM
-//! Qt would have written, and the view's `QrScanner` reads it back
-//! through the same call the viewfinder timer makes. That is the whole
-//! shim path under the Qt event loop, less the optics.
+//! Frame made here, not by a camera: test's `QrCode` encodes an invite, test draws
+//! its modules into the PGM Qt would write; view's `QrScanner` reads it back via the
+//! same call as viewfinder timer. Whole shim path under Qt event loop, less optics.
 //!
-//! The other way in is typed: the button under the viewfinder opens a
-//! panel over it, with the clipboard's contents in it when they look
-//! like an invite, and what is entered there is handed back the way a
-//! scanned code is.
+//! Other way in: typed. Button under viewfinder opens panel over it, with clipboard
+//! in it when it looks like an invite; entered text handed back as a scanned code.
 //!
-//! Focus is left to the camera's continuous autofocus, with no search
-//! asked for until the viewfinder is tapped: in continuous video focus a
-//! search locks the lens where it is (issue #122). A tap focuses on its
-//! point in plain autofocus, and lets go again once the hold is over.
+//! Focus left to continuous autofocus; no search until viewfinder tapped: in
+//! continuous video focus a search locks lens where it is (issue #122). Tap focuses
+//! on its point in plain autofocus, released after hold.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot`.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, and `single_shot`.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // qt_method! params must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -159,11 +151,9 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Run `then` once `idle` says so, asking every 100 ms, and at
-/// `deadline` whatever it says. A step that reads what an asynchronous
-/// call left behind waits on the call, not on a guess of how long it
-/// takes: two seconds was such a guess, and under coverage
-/// instrumentation the decoder outran it.
+/// Run `then` once `idle` says so, polling every 100 ms; at `deadline`, runs it whatever
+/// `idle` says. Step reading what an async call left waits on the call, not a time guess: 2s
+/// was one, and under coverage the decoder outran it.
 fn when_idle<I, T>(idle: I, deadline: Instant, then: T)
 where
     I: Fn() -> bool + 'static,
@@ -181,9 +171,8 @@ where
     });
 }
 
-/// The modules as the page's `QrCode` reports them, drawn into a P5 PGM
-/// with a quiet zone, each module four pixels: what Qt writes for a
-/// `.pgm` path, less the camera.
+/// Modules as page's `QrCode` reports, drawn into P5 PGM with quiet zone, four pixels
+/// per module: what Qt writes for `.pgm`, less camera.
 fn write_frame(encoded: &str, path: &Path) -> Result<(), String> {
     let (size, modules) = encoded
         .split_once(':')
@@ -219,7 +208,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
     std::fs::create_dir_all(&temp).expect("create temp dir");
     let frame = temp.join("frame.pgm");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("XDG_CACHE_HOME", &temp);
@@ -261,7 +250,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
 
     let frame_path = frame;
     single_shot(Duration::from_secs(1), move || unsafe {
-        // The picture: the page's own encoder, drawn into a file.
+        // The picture: page's own encoder, drawn into a file.
         let encoded = call!("encode", QString::from(INVITE));
         record!(
             "frame",
@@ -271,17 +260,16 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
             "load",
             call!("load", QString::from(common::component_url("ScanView.qml")))
         );
-        // Not yet on screen: the camera is not running and nothing is
-        // grabbed.
+        // Not on screen yet: camera not running, nothing grabbed.
         record!("camera-before", get!("camera", "running"));
         record!("grabbing-before", get!("grabber", "running"));
         call!("setActive", true);
         record!("camera-active", get!("camera", "running"));
         record!("grabbing-active", get!("grabber", "running"));
-        // Continuous focus, left to run: the camera is not told to search.
+        // Continuous focus, left running: camera not told to search.
         record!("focus-idle", call!("focusState"));
         record!("acting-before", get!("acting", "running"));
-        // The viewfinder timer's own call, with the frame made above.
+        // Viewfinder timer's own call, with frame made above.
         record!(
             "decode",
             call!(
@@ -292,7 +280,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         record!("busy", get!("scanner", "busy"));
     });
 
-    // Once the decode is over: read while it runs, `heard` is empty.
+    // Decode over: read while running, `heard` is empty.
     single_shot(Duration::from_secs(3), move || {
         when_idle(
             move || unsafe { get!("scanner", "busy") } != "true",
@@ -302,18 +290,17 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
                 record!("camera-after", get!("camera", "running"));
                 record!("grabbing-after", get!("grabber", "running"));
                 record!("acting-after", get!("acting", "running"));
-                // Seconds on screen and no search was asked for: in continuous
-                // video focus a search locks the lens where it is.
+                // Seconds on screen, no search asked: continuous video focus
+                // search would lock lens.
                 record!("searches", get!("camera", "searches"));
-                // The other way in, on a fresh view: a link typed rather than
-                // scanned, with the clipboard offering it first.
+                // Other way in, fresh view: link typed not scanned, clipboard offering it first.
                 record!(
                     "reload",
                     call!("load", QString::from(common::component_url("ScanView.qml")))
                 );
                 call!("setActive", true);
-                // A tap: plain autofocus on the point under the finger for
-                // a while, then the lock off and continuous focus back.
+                // Tap: plain autofocus on point under finger for a while,
+                // then lock off, continuous back.
                 record!(
                     "tap",
                     call!("tapAt", QString::from("0.25"), QString::from("0.75"))
@@ -344,17 +331,16 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
                 record!("typed-heard", call!("heardText"));
                 record!("typed-camera", get!("camera", "running"));
                 record!("typed-acting", get!("acting", "running"));
-                // A frame is grabbed in the viewfinder's own shape, with its
-                // long side capped, and a viewfinder smaller than the cap is
-                // taken as it is rather than blown up.
+                // Frame grabbed in viewfinder's shape, long side capped;
+                // viewfinder smaller than cap taken as is, not blown up.
                 call!("sizeView", QString::from("1080"), QString::from("1920"));
                 record!("grab-tall", call!("grabShape"));
                 call!("sizeView", QString::from("1920"), QString::from("1080"));
                 record!("grab-wide", call!("grabShape"));
                 call!("sizeView", QString::from("540"), QString::from("800"));
                 record!("grab-small", call!("grabShape"));
-                // The camera was asked for a viewfinder big enough to read a
-                // dense code out of, and is left alone when it offers nothing.
+                // Camera asked for viewfinder big enough to read a dense code;
+                // left alone when it offers nothing.
                 record!("asked", call!("askedResolution"));
                 record!("offer-nothing", call!("offerNothing"));
                 record!("asked-after", call!("askedResolution"));
@@ -369,11 +355,11 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
     assert_typed(&steps);
 }
 
-/// An invite the reader types, or copied and lets the panel paste.
+/// Invite the reader types, or copies and lets panel paste.
 const TYPED: &str = "https://i.delta.chat/#FEDCBA9876543210&a=typed%40example.org&n=Typed";
 
-/// The panel opens from the button, takes the clipboard only when it
-/// looks like an invite, and hands the link back the way a code is.
+/// Panel opens from button, takes clipboard only if it looks like an invite, hands link
+/// back as a code is.
 fn assert_typed(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -394,16 +380,14 @@ fn assert_typed(steps: &[(&str, String)]) {
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
-    // A tap searches once, in plain autofocus on the point under the
-    // finger: in continuous video focus the search would lock the lens
-    // without looking.
+    // Tap searches once, plain autofocus on point under finger: in continuous video focus a
+    // search locks lens without looking.
     assert_eq!(
         value("focus-tapped"),
         "capture:2 focus:8 point:3 at:0.25,0.75 searches:1 unlocks:1",
         "a tap did not focus on the point under the finger. {context}"
     );
-    // And once the hold is over the lock comes off and continuous focus
-    // takes the lens back, rather than it staying fixed for good.
+    // Hold over: lock comes off, continuous focus takes lens back; not fixed for good.
     assert_eq!(
         value("focus-released"),
         "capture:2 focus:16 point:0 at:0.25,0.75 searches:1 unlocks:2",
@@ -434,10 +418,8 @@ fn assert_typed(steps: &[(&str, String)]) {
         TYPED,
         "the typed link was not handed back the way a scanned code is. {context}"
     );
-    // 1280 on the long side, the short one in proportion. A square grab
-    // of an oblong viewfinder stretches the modules, and a decoder
-    // reading a square symbol as an oblong one has that much less to
-    // work with.
+    // 1280 on long side, short in proportion. Square grab of oblong viewfinder stretches
+    // modules; decoder reading square symbol as oblong has less to work with.
     assert_eq!(
         value("grab-tall"),
         "720x1280",
@@ -455,9 +437,8 @@ fn assert_typed(steps: &[(&str, String)]) {
          no detail. {context}"
     );
 
-    // The smallest the camera offers that is still big enough. 640x480
-    // is the kind of default a platform hands out and is too coarse for
-    // a dense code; 1920x1440 is more frames than are needed.
+    // Smallest camera offers that is big enough. 640x480 is platform default, too coarse for
+    // dense code; 1920x1440 is more frames than needed.
     assert_eq!(
         value("asked"),
         "1280x960",
@@ -487,8 +468,7 @@ fn assert_typed(steps: &[(&str, String)]) {
     );
 }
 
-/// The camera follows the page's status, the frame decodes to the invite,
-/// and the page hands it on and waits.
+/// Camera follows page status, frame decodes to invite, page hands it on and waits.
 fn assert_scan(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {

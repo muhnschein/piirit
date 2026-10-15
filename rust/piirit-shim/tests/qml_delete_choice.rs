@@ -1,17 +1,8 @@
-//! Which kind of delete, asked before anything goes.
-//!
-//! Deleting a message took it off this account's devices alone; the core
-//! will also ask the other ends to delete their copies
-//! (`delete_messages_for_all`). The two are different enough -- one of
-//! them cannot be taken back by anybody -- that the row menu asks rather
-//! than offering both as entries, and this is the dialog it asks in.
-//!
-//! What it pins is the shape of that question: nothing picked when it
-//! opens, one of the two at a time, the second offered only where the
-//! core would take it, no forward swipe until something is picked, and
-//! an answer that says which was. What it never does is delete
-//! anything: accepting starts the wait (`qml_delete_run`), and a dialog
-//! left by the back edge says nothing at all.
+//! Delete kind asked before anything goes. Local-only vs for everyone
+//! (`delete_messages_for_all`, irreversible). Row menu asks, not two entries.
+//! Pinned: nothing picked on open, one at a time, second only where core allows,
+//! no forward swipe until picked, answer says which. Never deletes: accept starts wait
+//! (`qml_delete_run`); dialog left by back edge says nothing.
 
 // Qt harness: see qml_conversation.rs.
 #![allow(
@@ -91,7 +82,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -130,22 +121,19 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         };
     }
 
-    // This account's own encrypted message: both ways are open.
+    // Own encrypted message: both ways open.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("load-own", call!("load", QString::from(own.clone()), true));
         record!("picked-on-open", call!("switches"));
         record!("accept-on-open", call!("canAccept"));
-        // Neither the message nor a Cancel button: the chat is one swipe
-        // back, and the reader has just come from the message itself.
+        // Neither message nor Cancel: chat is one swipe back, and reader just came from message.
         record!(
             "shows-message",
             call!("has", QString::from("deletePreview"))
         );
         record!("shows-cancel", call!("has", QString::from("deleteCancel")));
-        // Silica's own switch flips itself unless told not to, which
-        // would fight the binding that makes these two one answer.
-        // The question: the switches are three words each, and neither
-        // says that there is no way back.
+        // Silica switch self-flips unless stopped: fights the binding making them one answer.
+        // The question: switches are three words each, neither says there's no way back.
         record!("heading", get!("deleteHeader", "title"));
         record!("question", call!("has", QString::from("deleteQuestion")));
         record!("me-manual", get!("forMeSwitch", "automaticCheck"));
@@ -159,10 +147,10 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("tap-me", call!("tap", QString::from("forMeSwitch")));
         record!("picked-me", call!("switches"));
         record!("accept-after-me", call!("canAccept"));
-        // The other way instead: one answer, not two settings.
+        // The other way: one answer, not two settings.
         call!("tap", QString::from("forEveryoneSwitch"));
         record!("picked-everyone", call!("switches"));
-        // And off again, which puts it back where it opened.
+        // Off again restores opening state.
         call!("tap", QString::from("forEveryoneSwitch"));
         record!("picked-none", call!("switches"));
         record!("accept-after-none", call!("canAccept"));
@@ -175,8 +163,7 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("answer-everyone", call!("answered"));
     });
 
-    // Somebody else's message, or an unencrypted one: the core deletes
-    // it here and nowhere else, so only one way is open.
+    // Other's message, or unencrypted: core deletes here only, one way open.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!(
             "load-theirs",

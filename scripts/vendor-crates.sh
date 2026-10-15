@@ -1,17 +1,12 @@
 #!/bin/sh
-# Generate the offline crate sources the `--with vendor` build mode of
-# rpm/harbour-piirit.spec expects:
+# Offline crate sources for `--with vendor` build of rpm/harbour-piirit.spec:
+# rpm/vendor.tar.xz (`cargo vendor`, packed as rust/vendor/) and rpm/vendor.toml
+# ([source] replacement stanza).
 #
-#     rpm/vendor.tar.xz   -- `cargo vendor` output, packed as rust/vendor/
-#     rpm/vendor.toml     -- the [source] replacement stanza cargo prints
+# OBS (so Chum) builds lack network: crates can't fetch in %build. Plain
+# `sfdk build` in SDK has network, doesn't need these.
 #
-# OBS (and therefore Chum) builds run without network access, so crates
-# cannot be fetched during %build there; these two extra sources are what
-# make an offline build possible. A plain `sfdk build` inside the SDK does
-# have network and does not need them.
-#
-# Neither file is committed (see .gitignore): they are regenerated from
-# rust/Cargo.lock, which is committed and is the actual pin.
+# Not committed (.gitignore): regenerated from rust/Cargo.lock, the pin.
 
 set -eu
 

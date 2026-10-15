@@ -1,12 +1,8 @@
-//! Transport for a `deltachat-rpc-server` subprocess over its JSON-RPC 2.0
-//! stdio interface.
+//! Transport for `deltachat-rpc-server` JSON-RPC 2.0 over stdio.
 //!
-//! Knows nothing of Delta Chat's protocol, accounts, chats or messages: it
-//! spawns the server, frames and correlates requests, and drains the event
-//! stream. See `docs/PROJECT.md` for why that boundary is strict.
+//! No Delta Chat logic: spawn, frame, correlate, drain events. See `docs/PROJECT.md`.
 
-// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
-// says the rest.
+// Shipped code: stricter lints than tests (piirit-shim/src/lib.rs).
 #![cfg_attr(
     not(test),
     deny(

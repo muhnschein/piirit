@@ -3,24 +3,13 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * The reader has a profile already, somewhere else. Where it is decides
- * how it gets here, and there are two answers -- the same two the other
- * Delta Chat apps offer:
- *
- * - It is on a device they still have, which can offer it over the local
- *   network. Both devices end up with it; nothing is moved.
- * - It is in a backup file that device wrote, copied onto this phone.
- *
- * Both go to RestoreProfilePage, which does the transfer; this page is
- * the question, because the two need different first steps -- a camera
- * for one, the file browser for the other -- and a reader who has to
- * find that out by trying is a reader who gave up.
+ * Existing profile: other device (local network, both keep it) or backup
+ * file. Asks which (camera vs file browser), then RestoreProfilePage.
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: it is the first
-    /// step of bringing a profile over. See piirit.qml.
+    /// No quick actions: profile transfer step. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
     allowedOrientations: Orientation.All
@@ -54,14 +43,11 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        // Both answers side by side, each with the thing it is about
-        // over it: the other phone, and the file it wrote. What was a
-        // line of small print under each button is the tile's own second
-        // line now, which is where a reader looks for it anyway.
+        // Each answer pictured: phone, file.
         ChoiceTiles {
             objectName: "whereWays"
             width: parent.width
-            // The column is already inside the page's margins.
+            // Already inside margins.
             sideMargin: 0
             choices: [
                 {

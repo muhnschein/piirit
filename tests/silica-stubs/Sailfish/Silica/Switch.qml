@@ -1,9 +1,8 @@
 import QtQuick 2.0
 
-// Silica's switch: an icon under a light that is lit while it is on.
-// `icon` is an alias for the reason IconButton's is. A tap the harness
-// raises with clicked() turns it over, as Silica's own does, unless the
-// page has taken that over (`automaticCheck: false`).
+// Silica switch: icon under light, lit while on. `icon` alias (as IconButton).
+// Harness clicked() flips it, as Silica, unless page takes over
+// (`automaticCheck: false`).
 Item {
     property alias icon: iconImage
     Image { id: iconImage; visible: false }

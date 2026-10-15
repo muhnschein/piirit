@@ -3,48 +3,35 @@ import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
 
 /*
- * The file the next message will carry, above the field.
- *
- * Its own component for the same reason ReplyBar is: ConversationPage
- * cannot be loaded headlessly, so anything whose measurement matters has to
- * be testable on its own. It also deliberately looks like ReplyBar -- both
- * say "the next message will have this in it", and one idiom for that is
- * easier to read than two.
+ * File next message carries, above field. Own component (ConversationPage can't
+ * load headless, so tested alone); looks like ReplyBar on purpose.
  */
 Item {
     id: root
 
-    /// The picked file, empty for none. This is what makes the bar appear.
+    /// Picked file; empty for none. Makes bar appear.
     property string filePath
-    /// What to call it. Falls back to the path when a picker gave no name.
+    /// Display name; path if picker gave none.
     property string fileName
-    /// The file is a video being made smaller before it is sent, and
-    /// how far along that is, from 0 to 1. See ChatMessages.preparing.
+    /// Video shrinking before send; progress 0-1 (ChatMessages.preparing).
     property bool preparing: false
     property real progress: 0
-    /// What the picked file weighs, while what is sent is a smaller video
-    /// made from it; 0 otherwise, and then no sizes are shown. See
-    /// ChatMessages.original_bytes.
+    /// Picked size for shrunk video, else 0 (ChatMessages.original_bytes).
     property real originalBytes: 0
-    /// What is sent: while it is still being made, what it is planned to
-    /// come out at. See ChatMessages.attachment_bytes.
+    /// Size sent, or planned while shrinking (ChatMessages.attachment_bytes).
     property real bytes: 0
-    /// The file is put away.
+    /// File removed.
     signal cancelled()
-    /// Making the video smaller is stopped; the file stays, to be sent as
-    /// it is. What the same button means while that runs.
+    /// Shrinking stopped, file sent as is (same button while shrinking).
     signal stopped()
 
     readonly property string shownName:
         root.fileName.length > 0 ? root.fileName : root.filePath
 
-    // Sized by its own reason to be here rather than by `visible`: see
-    // ReplyBar.
+    // Sized by `shown`, not `visible`: see ReplyBar.
     readonly property bool shown: root.filePath.length > 0
     visible: root.shown
-    // Both, not just the label: the cancel button is an icon's worth tall.
-    // Same reasoning as ReplyBar, where a one-line quote measured short and
-    // the bar overlapped the field below it.
+    // Both heights: button is icon-tall (else overlaps field, as in ReplyBar).
     height: root.shown ? Math.max(lines.height, cancel.height) + 2 * Theme.paddingSmall : 0
 
     Column {
@@ -57,9 +44,7 @@ Item {
             id: attached
             objectName: "pendingAttachmentLabel"
             width: parent.width
-            // A file name is cut rather than let grow the bar. While the video
-            // is made smaller there is no name, and the line wraps instead:
-            // in a long language the number at its end is what matters.
+            // Name elided; shrink text wraps (number at end must show).
             truncationMode: root.preparing ? TruncationMode.None : TruncationMode.Fade
             wrapMode: root.preparing ? Text.Wrap : Text.NoWrap
             font.pixelSize: Theme.fontSizeExtraSmall
@@ -78,7 +63,7 @@ Item {
                   : qsTr("Sending %1").arg(root.shownName)
         }
 
-        // How much smaller the video goes: what was picked, and what is sent.
+        // Picked vs sent size.
         Label {
             objectName: "attachmentSizesLabel"
             visible: root.originalBytes > 0
@@ -104,8 +89,7 @@ Item {
         }
     }
 
-    // How far along making the video smaller is: a line along the bottom
-    // of the bar, filling as it goes.
+    // Shrink progress line along bottom.
     Rectangle {
         objectName: "preparingProgress"
         anchors {

@@ -1,31 +1,24 @@
-//! The pages a reader with a profile already meets.
+//! Pages a reader with a profile already meets.
 //!
-//! Two of them: the question of where that profile is
-//! (`ExistingProfilePage.qml`), and the page that brings it over
-//! (`RestoreProfilePage.qml`), which serves both answers. What is
-//! checked here is what the pages do -- which way each button leads,
-//! what the file half offers and the device half does not, that a
-//! transfer takes the reader to the profile it brought over, and that a
-//! code the shim refuses is put into words rather than shown as a
-//! protocol complaint. The transfer itself is `restore.rs`.
+//! Two: where that profile is (`ExistingProfilePage.qml`), and the page bringing it
+//! over (`RestoreProfilePage.qml`), serving both answers. Checked: which way each
+//! button leads; file half offers file, device half does not; transfer takes reader
+//! to the profile brought over; a code the shim refuses is put into words, not shown
+//! as a protocol complaint. Transfer itself: `restore.rs`.
 //!
-//! The device half also has to hand the camera the page down to its
-//! foot, and say what it is looking for. A code is read out of the
-//! pixels it lands in, and a viewfinder sharing the page with a
-//! paragraph gave too few of them to read one reliably.
+//! Device half must give camera the page down to its foot and say what it looks for.
+//! Code is read from pixels it lands in; a viewfinder sharing the page with a
+//! paragraph gave too few to read reliably.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // qt_method! params must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -38,8 +31,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Records navigation instead of performing it, with the one property
-/// that matters here: which way the take-over page was opened.
+/// Records navigation, not performed. Property that matters: which way take-over page opened.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -68,7 +60,7 @@ impl PageStackProbe {
     }
 
     fn push(&mut self, page: QString, properties: QVariantMap) {
-        // `QVariantMap` in qttypes 0.2 can be queried but not iterated.
+        // `QVariantMap` in qttypes 0.2: queried, not iterated.
         let from =
             QString::from_qvariant(properties.value(QString::from("from"), QVariant::default()))
                 .map(|value| value.to_string())
@@ -90,7 +82,7 @@ impl PageStackProbe {
     }
 }
 
-/// Owns a `Loader` and works the loaded page by `objectName`.
+/// Owns a `Loader`; works loaded page by `objectName`.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -174,26 +166,24 @@ const PROBE_QML: &str = r"
     }
 ";
 
-// The engine, the QObject boxes and every step share one scope: all of
-// them have to outlive `exec()`. The assertions are in the helper below.
+// Engine, QObject boxes, steps: one scope, must outlive `exec()`. Asserts in helper below.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-restore-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // SAFETY: single-threaded, and set before Qt starts and before the
-    // server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Where the view writes the frames it grabs.
+        // Where view writes grabbed frames.
         std::env::set_var("XDG_CACHE_HOME", &temp);
     }
 
-    // The scanner is a `Piirit` type: without this the view fails to
-    // load and the device half is a page with a message about cameras.
+    // Scanner is a `Piirit` type: without this view fails to load and
+    // device half shows camera error.
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
@@ -213,8 +203,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks fire only while `exec()` runs on this thread; `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -229,7 +218,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
 
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
 
-    // 1s: the question, and both answers.
+    // 1s: question, and both answers.
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
         common::record(
@@ -243,9 +232,8 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         );
         common::record(&s, "ask-device", call!("click", "secondDeviceTile"));
         common::record(&s, "ask-file", call!("click", "backupFileTile"));
-        // And the same question asked of a reader who already has a
-        // profile, from the plus under the profiles list: three ways
-        // rather than two, because making one is the third.
+        // Same question asked of reader with a profile, from plus under profiles list: three
+        // ways, not two (making one is the third).
         common::record(
             &s,
             "add-load",
@@ -261,8 +249,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         common::record(&s, "add-device", call!("click", "secondDeviceTile"));
     });
 
-    // 2s: the file half. The browser is offered, the camera is not, and
-    // choosing opens the browser.
+    // 2s: file half. Browser offered, camera not; choosing opens browser.
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
         common::record(
@@ -281,20 +268,18 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         );
         common::record(&s, "file-scanner", call!("get", "scanArea", "visible"));
         common::record(&s, "file-choose", call!("click", "chooseFileButton"));
-        // And what the browser reports back: the import starts.
+        // Browser reports back: import starts.
         common::record(&s, "file-begin", call!("begin", "/tmp/holiday-backup.tar"));
         common::record(&s, "file-busy", call!("pageProperty", "busy"));
     });
 
-    // 4s: the core has answered, and the page is on the profile it
-    // brought over.
+    // 4s: core answered; page on the profile brought over.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(&s, "file-done", call!("pageProperty", "busy"));
     });
 
-    // 5s: the device half, handed a code from a newer Delta Chat than
-    // this core can read.
+    // 5s: device half, handed code from newer Delta Chat than this core reads.
     let s = steps.clone();
     single_shot(Duration::from_secs(5), move || {
         common::record(
@@ -313,8 +298,8 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         );
     });
 
-    // 6s: what the camera was given, and what the view was told, before
-    // a code is handed over -- a transfer takes the viewfinder down.
+    // 6s: what camera was given and view was told, read before code handed over:
+    // transfer takes viewfinder down.
     let s = steps.clone();
     single_shot(Duration::from_secs(6), move || {
         common::record(&s, "device-foot", call!("bottomOf", "scanArea"));
@@ -340,22 +325,19 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     single_shot(Duration::from_secs(8), move || {
         common::record(&s, "device-busy", call!("pageProperty", "busy"));
         common::record(&s, "device-said", call!("pageProperty", "errorMessage"));
-        // A failure is the page, not a strip along the bottom of a
-        // viewfinder that has carried on without it.
+        // Failure is the page, not a strip along a viewfinder that carried on without it.
         common::record(&s, "failed-block", call!("get", "failureBlock", "visible"));
         common::record(&s, "failed-scanner", call!("get", "scanArea", "visible"));
         common::record(&s, "failed-retry", call!("click", "retryButton"));
     });
 
-    // 9s: after the retry the camera is back, and reading again rather
-    // than still holding the code it stopped itself on.
+    // 9s: after retry camera back, reading again, not holding code it stopped on.
     let s = steps.clone();
     single_shot(Duration::from_secs(9), move || {
         common::record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
         common::record(&s, "retried-holding", call!("viewProperty", "done"));
         common::record(&s, "retried-camera", call!("get", "camera", "running"));
-        // In the background the camera stops, and frames stop being
-        // grabbed. The camera comes back with the app.
+        // In background camera stops, frames stop grabbing; comes back with app.
         common::record(&s, "away", call!("background", "true"));
         common::record(&s, "away-camera", call!("get", "camera", "running"));
         common::record(&s, "away-grabbing", call!("get", "grabber", "running"));
@@ -373,10 +355,8 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     assert_pages(&steps.borrow(), &navigation);
 }
 
-/// The question leads both ways; the file half offers the browser and
-/// not the camera, and what it chooses is imported; the profile that
-/// arrives is what the app lands on; and a code the shim refuses is
-/// shown as a sentence rather than left to the core's words.
+/// Question leads both ways; file half offers browser not camera, chosen file imported;
+/// arriving profile is what app lands on; refused code shown as sentence.
 fn assert_pages(steps: &[(String, String)], navigation: &str) {
     let context = format!("steps: {steps:?}\nnavigation: {navigation}");
 
@@ -419,17 +399,14 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
              ways in: {label}. {context}"
         );
     }
-    // Three of them, so they stand one under another: side by side each
-    // would get a third of the screen, which is not room for a line of
-    // words with a second line under it.
+    // Three, one under another: side by side each gets a third of screen, not room for a
+    // line plus second line.
     assert_eq!(
         common::value_of(steps, "add-stacked"),
         "true",
         "the three ways in are crowded into one row. {context}"
     );
-    // And the stack starts under the header rather than sitting in the
-    // middle of the page: a list is read from the top, which is where
-    // every other list on the phone starts.
+    // Stack starts under header, not mid-page: lists read from top, as every phone list does.
     let measure =
         |label: &str| -> f64 { common::value_of(steps, label).parse().unwrap_or_default() };
     let above = measure("add-ways-y") - measure("add-header");
@@ -474,8 +451,7 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     assert_scanner_turns(steps, &context);
 }
 
-/// In the background the camera stops, and frames stop being grabbed;
-/// the camera comes back with the app.
+/// In background camera stops, frames stop grabbing; comes back with app.
 fn assert_scanner_sleeps(steps: &[(String, String)], context: &str) {
     assert_eq!(common::value_of(steps, "away"), "ok", "{context}");
     assert_eq!(
@@ -494,16 +470,11 @@ fn assert_scanner_sleeps(steps: &[(String, String)], context: &str) {
     );
 }
 
-/// The half that reads a code: the camera has the page down to its
-/// foot, the view is worded for what it is actually looking for, the
-/// same string can be typed when a camera will not read it, and a code
-/// the shim refuses comes back as a sentence.
+/// Device half reads codes: camera has page down to foot, view worded for what it looks
+/// for, same string typeable if camera will not read, refused code comes back as sentence.
 fn assert_device_half(steps: &[(String, String)], context: &str) {
-    // The camera runs to the foot of the page, as it does on the QR
-    // page. Asked of where the viewfinder ends rather than of how tall
-    // it is: a page laid out on a phone puts a header and a line of
-    // instructions above it, and what matters is that everything left
-    // after those is the camera's.
+    // Camera runs to foot of page, as on QR page. Measured at viewfinder's end, not height:
+    // header and instructions sit above; all left after them is camera's.
     let foot: f64 = common::value_of(steps, "device-foot")
         .parse()
         .unwrap_or(0.0);
@@ -518,8 +489,8 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
         page - foot
     );
 
-    // A camera that will not read is a dead end without this, and the
-    // other device shows the same string as text beside its code.
+    // Camera that will not read is dead end without this; other device shows same string as
+    // text beside its code.
     assert_eq!(
         common::value_of(steps, "device-link"),
         "true",
@@ -540,9 +511,8 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
          this app's own second-device page shows a code from -- speaks \
          5. {context}"
     );
-    // What decides whether the clipboard is worth pasting in. Naming a
-    // version there is how a code this app's own provider shows
-    // (`DCBACKUP5:`) came to be refused by the paste it is meant for.
+    // Decides whether clipboard is worth pasting. Naming a version here is how `DCBACKUP5:`
+    // (this app's own provider) got refused by the paste it is meant for.
     assert_eq!(
         common::value_of(steps, "device-prefixes"),
         "dcbackup",
@@ -608,8 +578,7 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
     );
 }
 
-/// The page turns with the phone; the scanner it loaded is told, so the
-/// camera's picture is turned back rather than turned with the page.
+/// Page turns with phone; scanner it loaded is told, so camera picture turns back, not with page.
 fn assert_scanner_turns(steps: &[(String, String)], context: &str) {
     assert_eq!(
         common::value_of(steps, "device-turned"),

@@ -1,15 +1,11 @@
-//! The camera page's controls, the platform camera's set: the back
-//! cameras' rings and the switch to the front, pinch zoom held inside what
-//! the camera can do, the flash offered per mode and side, the settings
-//! panel's white balance, grid and self-timer, the exposure slider, and a
-//! tap's focus ring -- and while a video records, all of it out of the
-//! way but the shutter. The rings wear the platform's lens labels, and
-//! the page turns with the phone into the platform camera's landscape
-//! layout, with the picture turned back.
+//! Camera page controls, platform camera's set: back-camera rings (platform's lens labels) and
+//! front switch, pinch zoom held inside what camera can do, flash per mode and side, settings
+//! panel's white balance, grid and self-timer, exposure slider, tap focus ring. While recording,
+//! all out of the way but shutter. Page turns with phone into platform camera's landscape layout,
+//! picture turned back.
 //!
-//! Driven through the `QtMultimedia` stubs: a phone with two cameras on the
-//! back and one on the front unless a step says otherwise, which zooms
-//! four times. What the page asked of the camera is read back off it.
+//! Via `QtMultimedia` stubs: two back cameras, one front unless a step says otherwise; zooms 4x.
+//! What page asked of camera is read back off it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -18,8 +14,7 @@
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
@@ -30,8 +25,7 @@ use serde_json::{json, Value};
 
 mod common;
 
-/// Silica's `pageStack`, counted rather than performed: the page pops
-/// itself once it has a capture to report.
+/// Silica's `pageStack`, counted not performed: page pops itself once it has a capture.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -311,7 +305,7 @@ fn the_camera_page_has_the_platform_cameras_controls() {
     let temp = std::env::temp_dir().join(format!("piirit-capture-controls-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("XDG_CACHE_HOME", &temp);

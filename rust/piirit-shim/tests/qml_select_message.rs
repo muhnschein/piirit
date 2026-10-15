@@ -1,13 +1,8 @@
-//! Part of a message, copied from the page that shows it whole.
-//!
-//! The page draws the message in a Label, which is what carries the
-//! Markdown and the links, and a Label cannot be selected in. "Select
-//! text" in the pull-down swaps it for a read-only field holding the
-//! message as written, all of it selected so the handles are up, and each
-//! selection is copied as it is made. Copy still copies the whole of it.
-//!
-//! The stub field has no handles, so a selection is made the way the
-//! page makes its first one: by asking the field to select.
+//! Part of a message, copied from the page showing it whole.
+//! Page draws it in a Label (carries Markdown and links), which can't be selected in.
+//! "Select text" swaps in read-only field holding message as written, all selected so
+//! handles are up; each selection copied as made. Copy still copies whole.
+//! Stub has no handles: select by asking field.
 
 // Qt harness: see chat_actions.rs.
 #![allow(
@@ -25,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// What the fake core holds for the message it seeds as one the sending
-/// core cut: the page asks for the rest, and this is the whole of it.
+/// Full text fake core holds for the message it seeds as cut by sender: page asks for rest.
 const WHOLE: &str = "Groceries\nmilk\nbread\nand a & sign";
 
 const PROBE_QML: &str = r"
@@ -83,7 +77,7 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -138,9 +132,7 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
         record!("page", call!("openPage", QString::from(page.clone()), 11));
     });
 
-    // The whole text is in by now. The label shows it, and the field
-    // waits until it is asked for -- empty, so that it is not laid out
-    // a second time while nobody can see it.
+    // Text in: label shows it; field waits empty until asked, so not laid out again unseen.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("label-before", shown!("bodyLabel", "visible"));
         record!("field-before", shown!("selectableBody", "visible"));
@@ -161,20 +153,20 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
         record!("notice", shown!("noticeLabel", "text"));
         record!("offered-after", shown!("selectItem", "visible"));
 
-        // One word out of the middle, as the handles would leave it.
+        // One word mid-message, as handles leave it.
         record!(
             "select-part",
             call!("select", QString::from("selectableBody"), 10, 14)
         );
         record!("clipboard-part", call!("clipboard"));
-        // Letting go of the selection does not empty the clipboard.
+        // Letting go of selection keeps clipboard.
         record!(
             "select-none",
             call!("select", QString::from("selectableBody"), 0, 0)
         );
         record!("clipboard-kept", call!("clipboard"));
 
-        // Copy is still the whole message, selection or not.
+        // Copy is still whole message.
         record!("copy", call!("click", QString::from("copyItem")));
         record!("clipboard-copy", call!("clipboard"));
         (*engine_ptr).quit();

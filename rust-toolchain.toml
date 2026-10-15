@@ -1,14 +1,8 @@
-# Pinned so lint results are reproducible: a new lint in a later stable
-# cannot fail CI out from under a green local run. Bump deliberately.
-#
-# This file is a rustup mechanism and is read only by the rustup proxies.
-# The Sailfish SDK builds with the cargo from its own `rust` package, which
-# is not rustup-managed and ignores this file entirely -- the toolchain
-# floor that matters for the device is `rust-version = "1.75"` in
-# rust/Cargo.toml, enforced by CI's `msrv` job. See docs/BUILDING.md.
+# Pinned: new stable lint must not break CI. Bump deliberately.
+# rustup-only. Sailfish SDK's own cargo ignores this file.
+# Device floor: rust-version 1.75 (rust/Cargo.toml), CI msrv. See docs/BUILDING.md.
 [toolchain]
 channel = "1.94.1"
-# Only what the lints need; the default profile pulls documentation and
-# more onto every uncached CI runner.
+# Lint components only. Default profile bloats CI.
 profile = "minimal"
 components = ["clippy", "rustfmt"]

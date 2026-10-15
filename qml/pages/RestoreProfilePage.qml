@@ -3,91 +3,57 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * A profile that exists already, brought onto this phone. Both ways the
- * other Delta Chat apps offer, on one page because everything after the
- * first step is the same:
+ * Bring existing profile here, two ways (as other apps):
  *
- * - `from: "device"` is their "add second device". The device holding
- *   the profile offers it over the local network and shows a code; this
- *   one reads the code and the two transfer the profile between them
- *   (`get_backup`). Both devices end up with it, which is the point.
- * - `from: "file"` is their "restore from backup": a file the other
- *   device wrote, copied here and read back (`import_backup`).
+ * - `from: "device"`: other device offers over LAN, shows code; read here,
+ *   transfer via `get_backup`. Both keep profile.
+ * - `from: "file"`: backup via `import_backup`.
  *
- * The transfer is the core's, and it reports itself in progress events
- * the shim passes on, so this page is a bar and a way to stop. What it
- * cannot do is take a profile over twice at once: the shim counts a
- * transfer as an attempt, the same as making a profile, so Cancel is
- * `cancel_ongoing` and a second attempt makes the first one nobody's.
+ * Core transfers; page is bar + stop. One at a time (shim attempt, like making
+ * a profile): Cancel is `cancel_ongoing`; second orphans first. App words
+ * refusals (core's are protocol talk). Profile already here refused: two
+ * accounts on one address fetch mailbox twice.
  *
- * A code that is not a device offering a profile is this app's own
- * finding rather than the core's, so the shim names the reason and this
- * page puts it into the reader's language -- the core's own words for it
- * are about protocols, and the reader is holding a camera. A profile
- * this phone already has is refused the same way: two accounts on one
- * address are two copies of one mailbox, each fetching it.
- *
- * Handing over to the profile that arrived goes through
- * PendingNavigation rather than straight to the stack. A file browser
- * that has just chosen a backup is still animating away while the import
- * runs, and a small backup is imported before it has finished -- so the
- * move was asked for mid-transition, refused, and the reader was left
- * looking at "Restore from a backup" with the profile already on the
- * phone behind it.
+ * Hand-over via PendingNavigation: file browser still animates during small
+ * import; mid-transition move was refused, stranding reader here.
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would leave a profile halfway through being brought over. See
-    /// piirit.qml.
+    /// No quick actions while up: jump leaves profile half over. piirit.qml.
     readonly property bool pausesQuickActions: true
 
     allowedOrientations: Orientation.All
 
-    /// Where the profile is coming from: `device` or `file`.
+    /// Source: `device` or `file`.
     property string from: "device"
     readonly property bool fromDevice: page.from !== "file"
 
-    /// True while the core is transferring.
+    /// True while core transfers.
     property bool busy: false
-    /// How far it has got, in permille, as the core counts it.
+    /// Progress, permille.
     property int permille: 0
     property string errorMessage: ""
-    /// Something went wrong and the reader has not put it away yet.
-    ///
-    /// A state of the page rather than a strip along the bottom of it: a
-    /// transfer that fails after a minute of a progress bar is the thing
-    /// the reader most needs to read, and dropping them straight back to
-    /// a live viewfinder reads as the app having simply carried on.
+    /// Undismissed failure. Page state, not strip: live viewfinder reads as carrying on.
     readonly property bool failed: page.errorMessage.length > 0
-    /// The app is the one in front. Not read-only: a test, which has no
-    /// app in front, says it is.
+    /// App in front. Writable: tests set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
-    // Nothing to go back to mid-transfer: leaving would drop the page
-    // that is listening for the answer, and the core would carry on.
-    // Nor with the hand-over to the new profile still waiting on the
-    // stack: swiping away would take this page, and the move with it.
+    // No back mid-transfer (drops listener, core goes on) or while hand-over waits (swipe takes
+    // page and move).
     backNavigation: !page.busy && !navigation.pending
 
-    /// The hand-over to the profile that arrives, held until the stack
-    /// can make it.
+    /// Hand-over to arrived profile, held until stack can make it.
     PendingNavigation {
         id: navigation
         stack: pageStack
-        // A page with the file browser over it, or one still animating,
-        // is not a page Silica will move from.
+        // Silica won't move from covered or animating page.
         ready: page.status === PageStatus.Active
     }
 
-    /// Start the transfer with whatever the first step produced: a code
-    /// from the camera, or a path from the file browser.
+    /// Start transfer from camera code or browser path.
     function begin(text) {
-        // The file browser reports what was chosen by property change,
-        // which it can do more than once for one choice -- and a second
-        // import started over the first is a second account holding a
-        // second copy of the same profile.
+        // Browser may report choice twice; second import = second account.
         if (page.busy) {
             return
         }
@@ -101,14 +67,8 @@ Page {
         }
     }
 
-    /// Put the scanner back on its feet after a failure.
-    ///
-    /// The view stops itself on the code it read and stays stopped, so
-    /// that a second frame already in flight cannot report the same code
-    /// twice. Clearing the failure alone would bring back a viewfinder
-    /// with the camera off behind it, so this goes first and the failure
-    /// is cleared after: the view starts its camera when it is made
-    /// active, and only if it is not still holding a code.
+    /// Scanner reset after failure. View stops on code (no duplicates); reset it before clearing
+    /// failure: activation starts camera only if holding no code.
     function rescan() {
         if (scanLoader.item) {
             scanLoader.item.framesTried = 0
@@ -116,8 +76,7 @@ Page {
         }
     }
 
-    /// The file browser, pushed by URL and connected to, the way the
-    /// conversation pushes its own pickers.
+    /// File browser, pushed by URL and connected, as conversation's pickers.
     function chooseFile() {
         var picker = pageStack.push(Qt.resolvedUrl("BackupFilePage.qml"), {})
         if (picker) {
@@ -125,7 +84,7 @@ Page {
         }
     }
 
-    /// What the shim's reason for refusing means, in words for a reader.
+    /// Refusal reason in words.
     function reasonText(reason) {
         if (reason === "too-new") {
             return qsTr("The profile is from a newer Delta Chat version than this app can read.")
@@ -149,9 +108,7 @@ Page {
             }
         }
 
-        // The profile is here, with IO started on it: the app opens on
-        // it, above nothing, because there is no earlier screen worth
-        // going back to once a profile exists.
+        // Profile here, IO started: open on it, nothing below (nothing worth going back to).
         onProfile_restored: {
             if (!page.busy) {
                 return
@@ -178,18 +135,14 @@ Page {
         }
     }
 
-    // The device half is a camera and nothing else: a code is read out
-    // of the pixels it lands in, so the picture gets the page and the
-    // words go over it. The file half has nothing to look at and keeps
-    // an ordinary page, below.
+    // Device half: camera, picture gets page. File half: ordinary page.
     Item {
         id: scanArea
         objectName: "scanArea"
         anchors.fill: parent
         visible: page.fromDevice && !page.busy && !page.failed
 
-        // Loaded by URL, as the QR page loads it: a phone without a
-        // camera should lose the scanner rather than the page.
+        // By URL as QR page: no camera costs scanner, not page.
         Loader {
             id: scanLoader
             objectName: "scanLoader"
@@ -199,18 +152,12 @@ Page {
             onLoaded: {
                 scanLoader.item.hintText =
                     qsTr("Hold your camera over the QR code")
-                // The same string the code carries, for a reader whose
-                // camera will not read it -- the other device shows it
-                // as text beside the code, and it can be sent over.
+                // Code string typed or pasted, for camera that won't read it.
                 scanLoader.item.linkButtonText = qsTr("Enter the code instead")
                 scanLoader.item.linkLabel = qsTr("Code from the other device")
                 scanLoader.item.linkPlaceholder = "DCBACKUP5:..."
                 scanLoader.item.linkActionText = qsTr("Copy the profile")
-                // The digit is the core's transfer version -- the
-                // pinned core shows 5 -- so the prefix that decides
-                // whether the clipboard is worth pasting in does not
-                // name one. What the payload means is the core's call
-                // either way (`check_qr`).
+                // Digit: core transfer version (pinned 5); meaning is core's (`check_qr`).
                 scanLoader.item.linkPrefixes = ["dcbackup"]
                 scanLoader.item.scanned.connect(page.begin)
                 scanLoader.item.failed.connect(function(message) {
@@ -219,11 +166,7 @@ Page {
             }
         }
 
-        // The camera runs while this page is on screen and there is
-        // nothing to read any more once a transfer is under way. Not
-        // while the app is in the background or the screen is off:
-        // Silica keeps the page active then, with nobody to hold a code
-        // up to it.
+        // Camera on screen while idle; not background or screen-off (page stays active).
         Binding {
             target: scanLoader.item
             property: "active"
@@ -231,16 +174,14 @@ Page {
                    && !page.busy && !page.failed
         }
 
-        // The view puts its own line at the top; this is what it has to
-        // clear to sit under the words rather than behind them.
+        // Clear view's own top line; words sit under.
         Binding {
             target: scanLoader.item
             property: "hintTopMargin"
             value: deviceChrome.height
         }
 
-        // This page turns with the phone; the camera's picture is turned
-        // back, so it stays upright.
+        // Page turns with phone; picture turned back.
         Binding {
             target: scanLoader.item
             property: "pageOrientation"
@@ -258,10 +199,7 @@ Page {
             text: qsTr("No camera on this device. You can restore from a backup file instead.")
         }
 
-        // Over the picture rather than above it. A reader still has to
-        // be told what to do on the other device, and this is the only
-        // thing worth taking room from the code for -- so it is a strip
-        // the video runs behind, not a block the video starts under.
+        // Over picture: video runs behind strip, not starts under block.
         Rectangle {
             id: deviceChrome
             objectName: "deviceChrome"
@@ -307,7 +245,7 @@ Page {
         }
     }
 
-    // The file half, and the transfer both halves end in.
+    // File half and transfer: both end here.
     SilicaFlickable {
         id: flickable
         anchors.fill: parent
@@ -367,8 +305,7 @@ Page {
                 }
             }
 
-            // Where the progress bar was, and at its size: what went
-            // wrong, and the way to have another go.
+            // In progress bar's place: what failed, retry.
             Column {
                 objectName: "failureBlock"
                 visible: page.failed

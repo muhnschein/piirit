@@ -1,18 +1,13 @@
-# Moves the commit-pinned actions in .github/workflows along, with the
-# version in the trailing comment kept in step. Cargo is deliberately not
-# here: a dependency bump has to respect the 1.75 floor (rust/Cargo.toml),
-# which Dependabot does not know about, and CI's msrv job is what judges
-# one.
+# Bumps commit-pinned actions, keeping version comment in step. No cargo:
+# Dependabot doesn't know 1.75 floor (rust/Cargo.toml). CI msrv judges.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
-  # FFmpeg and x264 (third_party/, built into the binary by piirit-video).
-  # Each submodule tracks a branch that only takes fixes -- FFmpeg's
-  # release/7.1, x264's stable -- so a bump here is the security and bug
-  # fixes for the code that reads every video a reader picks.
+  # FFmpeg, x264 (third_party/, built in by piirit-video): fix-only branches
+  # (release/7.1, stable), so bumps = security/bug fixes for the video reader.
   - package-ecosystem: gitsubmodule
     directory: /
     schedule:

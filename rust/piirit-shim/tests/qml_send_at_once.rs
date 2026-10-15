@@ -1,20 +1,11 @@
-//! A chat opened by a camera quick action set to send at once sends what
-//! was taken without waiting for the send button (`sendShared`).
+//! Chat opened by camera quick action set to send at once sends capture without send button
+//! (`sendShared`). Not before core says its recommended attachment size, nor while video is
+//! still shrinking to it (else it goes as taken, however large). File goes alone: field text
+//! is reader's, not a caption, and field keeps it. Once sent, capture thrown away, as from bar.
+//! Without send-at-once, chat waits for reader as a share does; likewise for a file put on bar
+//! in place of the capture, one a reply is begun under, and a video whose shrink is stopped.
 //!
-//! Not before the core has said how large an attachment it recommends,
-//! and not while a video is still being made smaller to fit that: a
-//! video sent earlier would go as it was taken, however large. The file
-//! goes alone -- whatever is in the field is the reader's, not a caption
-//! they chose for it -- and the field keeps it. Once sent, the capture is
-//! thrown away, as one sent from the bar is. Opened without being told to
-//! send at once, the chat waits for the reader as a share does, and so it
-//! does for a file the reader puts on the bar in place of the one taken,
-//! for one a reply is begun under before it goes, and for a video whose
-//! making smaller the reader stops.
-//!
-//! The video is made here, as the camera would leave one, by
-//! `piirit_video::synth`, and the fake core is told a ceiling it comes
-//! near, so it is made smaller first.
+//! Video made by `piirit_video::synth`; fake core given a ceiling it nears, so it shrinks first.
 
 // Qt harness: see qml_send_file.rs.
 #![allow(
@@ -95,30 +86,27 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     let captures = cache.join("piirit/piirit/captures");
     std::fs::create_dir_all(&captures).expect("create the captures directory");
 
-    // Two pictures and a video, where the camera leaves them.
+    // Pictures and video, as camera leaves them.
     let photo = captures.join("photo-20261012-101010.png");
     std::fs::copy(common::a_real_picture(), &photo).expect("copy a picture");
     let waiting = captures.join("photo-20261012-101011.png");
     std::fs::copy(common::a_real_picture(), &waiting).expect("copy a picture");
-    // A picture set to send at once that the reader swaps for another
-    // before it has gone, and the one they swap it for.
+    // Picture swapped before it goes.
     let swapped = captures.join("photo-20261012-101013.png");
     std::fs::copy(common::a_real_picture(), &swapped).expect("copy a picture");
     let instead = temp.join("from the gallery.png");
     std::fs::copy(common::a_real_picture(), &instead).expect("copy a picture");
-    // A picture a reply is begun under before it can go.
+    // Picture with reply begun under it.
     let replied = captures.join("photo-20261012-101014.png");
     std::fs::copy(common::a_real_picture(), &replied).expect("copy a picture");
-    // Ten seconds of video, long enough to be stopped while it is being
-    // made smaller.
+    // 10s video: long enough to stop mid-shrink.
     let stopped = captures.join("video-20261012-101015.mp4");
     piirit_video::synth(&stopped, (640, 360), 10, 4_000_000, 0, true).expect("make a long clip");
-    // Three seconds at 4 Mbit/s, about 1.5 MB: past the ceiling below
-    // until it is made smaller.
+    // 3s at 4 Mbit/s: over ceiling until shrunk.
     let video = captures.join("video-20261012-101012.mp4");
     piirit_video::synth(&video, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -198,8 +186,7 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     let video_path = video.to_string_lossy().into_owned();
     let (journal_b, journal_c) = (journal.clone(), journal.clone());
 
-    // A picture, set to send at once, with the reader's own words for
-    // this chat already in the field.
+    // Picture at once, reader's words in field.
     let page_a = page.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         open!("photo-load", page_a, photo_path, true);
@@ -212,14 +199,14 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         probe!("photo-field", "messageField", "text");
     });
 
-    // A picture, not set to send at once: it waits for the reader.
+    // Not at once: waits for reader.
     let page_b = page.clone();
     single_shot(Duration::from_secs(4), move || unsafe {
         open!("waiting-load", page_b, waiting_path, false);
     });
 
-    // Asked while the page is open: the page that replaces it next
-    // discards what was left on its bar, as a closed chat does.
+    // Asked while page open: page replacing it discards what was left on its bar, as a closed
+    // chat does.
     let waiting_c = waiting;
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("waiting-sends", sends_in(&journal_c).len().to_string()));
@@ -228,8 +215,8 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         (*steps_ptr).push(("waiting-kept", waiting_c.exists().to_string()));
     });
 
-    // Swapped for another file before it could go: only what was taken
-    // was to go on its own, and the other waits for the reader.
+    // Swapped for another file before it went: only the capture was to go alone; replacement
+    // waits for reader.
     let page_d = page.clone();
     let swapped_path = swapped.to_string_lossy().into_owned();
     let instead_path = instead.to_string_lossy().into_owned();
@@ -247,8 +234,7 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         probe!("swapped-bar", "attachmentBar", "visible");
     });
 
-    // A reply begun before it could go: the reader is writing, and the
-    // picture waits for them rather than going as their reply.
+    // Reply begun first: picture waits for reader, not sent as their reply.
     let page_e = page.clone();
     let replied_path = replied.to_string_lossy().into_owned();
     let journal_f = journal.clone();
@@ -262,10 +248,8 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         probe!("replied-bar", "attachmentBar", "visible");
     });
 
-    // A video stopped while it is made smaller goes as it is -- when the
-    // reader sends it, not on its own. Stopped once it is being made
-    // smaller, asked four times a second for up to three seconds: a
-    // machine measuring coverage takes its time to start.
+    // Stopped mid-shrink: goes as-is when reader sends it, not alone. Polled 4x/s up to 3s
+    // for shrink to start: coverage-instrumented machine starts slowly.
     let page_f = page.clone();
     let stopped_path = stopped.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(13), move || unsafe {
@@ -301,17 +285,14 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         probe!("stopped-bar", "attachmentBar", "visible");
     });
 
-    // A video, set to send at once: made smaller first, then sent. What
-    // the core is handed says which: how long the making smaller takes
-    // is the machine's.
+    // Video at once: shrunk then sent. Judged by what core is handed; shrink time is machine's.
     let page_c = page;
     single_shot(Duration::from_secs(19), move || unsafe {
         open!("video-load", page_c, video_path, true);
     });
 
-    // Made, and sent: asked once a second until it has gone, or for as
-    // long as a slow machine could need to make three seconds of video,
-    // and well inside the two minutes nextest gives a test.
+    // Asked 1x/s until sent, or as long as slow machine needs for 3s video; within nextest's
+    // 2 min.
     let done = std::rc::Rc::new(std::cell::Cell::new(false));
     for second in 20..=75 {
         let (done, journal) = (done.clone(), journal.clone());
@@ -359,8 +340,7 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         "1",
         "a picture set to send at once was not sent on its own. {sends_context}"
     );
-    // A picture goes as a message of its own, `send_msg`'s third
-    // parameter, so the core recodes it.
+    // Own message (`send_msg` 3rd param): core recodes.
     let message = &sends[0].1[2];
     assert_eq!(
         message.get("file").and_then(serde_json::Value::as_str),

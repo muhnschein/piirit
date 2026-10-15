@@ -1,13 +1,8 @@
-//! The whole of a message, for the page that shows it.
+//! Whole message, for the page showing it.
 //!
-//! A long message does not arrive whole: the sending core cuts the body
-//! and puts the rest in an HTML part, so the words the reader is missing
-//! are behind `get_message_html` and nowhere else. That is pinned
-//! against the real core in `deltachat-jsonrpc/tests/real_server.rs`;
-//! what is pinned here is what the app does with it -- that the whole
-//! text comes back as words rather than markup, that a message which was
-//! never cut costs no second call, and that the page built on it shows
-//! what came back.
+//! Long message arrives cut: rest in HTML part, behind `get_message_html`. Real core pinned in
+//! `deltachat-jsonrpc/tests/real_server.rs`. Here: whole text as words; uncut message costs no
+//! second call.
 
 // Qt harness: see chat_actions.rs.
 #![allow(
@@ -70,7 +65,7 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -125,7 +120,7 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         record!("cut", call!("text"));
         record!("cut-styled", call!("styled"));
         record!("cut-done", call!("done"));
-        // A message that was never cut: its own text is the whole of it.
+        // Never-cut message: its own text is the whole.
         record!("ask-short", call!("read", 1));
     });
 
@@ -195,14 +190,9 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         "true",
         "the model never finished. {context}"
     );
-    // Rendered for the Markdown setting, so the page draws it without
-    // going back to the shim -- and with its line breaks as `<br>`,
-    // which is the only thing `Text.StyledText` reads as one. The
-    // message's four lines arrived as one paragraph until they were:
-    // see `qml_message_lines.rs`.
-    // No bold in it: the HTML part's heading came back as a plain line
-    // of words, so there is no `#` left for the renderer to make one of
-    // -- what it renders is the text, not the markup it came from.
+    // Markdown setting: rendered for page, no shim trip. Line breaks as `<br>`: only form
+    // `Text.StyledText` reads (see `qml_message_lines.rs`).
+    // No bold: heading came back as plain words, no `#` to render.
     let styled = value("cut-styled");
     assert!(
         styled.contains("Groceries") && !styled.contains("&lt;"),
@@ -252,10 +242,8 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
          {context}"
     );
 
-    // A message the core did not cut has no HTML part, and asking for
-    // one is a round trip for a string the core has already said is
-    // empty. So `hasHtml` decides, and only the cut message is ever
-    // asked about -- however many readers there are of it.
+    // Uncut message has no HTML part; asking is a round trip for "". `hasHtml` decides: only the cut
+    // message is asked about, however many readers.
     let calls = common::calls(&journal);
     let asked: Vec<&serde_json::Value> = calls
         .iter()

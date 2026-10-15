@@ -1,38 +1,16 @@
-//! A voice message, recorded through the platform's own audio stack.
+//! Voice message recorder, platform audio stack.
 //!
-//! QML on Qt 5.6 has no audio recorder: `QAudioRecorder` is C++ only, and
-//! qmetaobject does not bind it. So this is the tree's second `cpp!`
-//! block, after the translator (`piirit-app/src/translations.rs`), and
-//! the reason the shim has a C++ build step: the recorder is made, driven
-//! and asked about from the few lines of C++ below, and everything else
-//! is Rust. The exception is kept to this module, and to blocks short
-//! enough to be checked by reading.
+//! Qt 5.6 QML lacks recorder (`QAudioRecorder` C++ only, not in qmetaobject): hence second
+//! `cpp!` use (after `piirit-app/src/translations.rs`) and shim's C++ build step.
 //!
-//! What is recorded goes through `GStreamer` on a device, as plain
-//! samples in WAV, and is encoded to MP3 as it lands (`voice.rs`): the
-//! recorder offers nothing on the phone that every other client plays as
-//! a voice message, and that module says why MP3 is. The WAV is scratch
-//! beside the MP3 in the captures directory (`capture.rs`); the MP3 is
-//! sent as a voice message -- the core's `Voice` view type, which is what
-//! draws it as one at the other end rather than as a music file.
+//! `GStreamer` WAV (scratch in captures dir, `capture.rs`) encoded to MP3 as it lands (why MP3:
+//! `voice.rs`); sent as core `Voice` viewtype, drawn as voice not music.
 //!
-//! A recording stops itself at the longest the relay takes. The page
-//! hands over the core's attachment limit, the recorder says how long a
-//! recording that fits is (`limit_ms`), and it stops there the way a tap
-//! on send stops it, so that what was said goes out rather than a file
-//! the relay refuses.
-//!
-//! Nothing is connected to the recorder's signals: the page polls, on a
-//! timer it runs only while recording, which is one call rather than a
-//! signal bridge, and each poll encodes what was written since the last.
-//! Stopping is asynchronous in the `GStreamer` backend -- the file is
-//! finished a moment after `stop()` returns -- so the recording is
-//! reported once the recorder says it is no longer finalising, from that
-//! same poll.
+//! Stops at relay limit (core attachment limit sets `limit_ms`) as send tap would. Page polls on
+//! timer (no signal bridge); each poll encodes new data. `GStreamer` stop is async: reported once
+//! poll sees recorder done finalising.
 
-// `cpp!` expands to a call across the FFI boundary, which is `unsafe` by
-// construction. Scoped to this file: the workspace denies it everywhere
-// else, and docs/BUILDING.md says why this one is allowed.
+// `cpp!` is unsafe FFI. Allowed here only; docs/BUILDING.md says why.
 #![allow(unsafe_code)]
 
 use std::ffi::c_void;
@@ -53,7 +31,7 @@ cpp! {{
     #include <QtMultimedia/QMediaRecorder>
 }}
 
-/// The codec and container to record in, as the recorder names them.
+/// Codec and container to record in.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Format {
     /// Plain samples.
@@ -62,18 +40,10 @@ struct Format {
     container: String,
 }
 
-/// Pick plain samples in WAV out of what the recorder offers.
+/// Pick plain-sample WAV from what recorder offers.
 ///
-/// What the recorder calls them varies: Qt's capture plugin on Sailfish
-/// names them `audio/PCM` and `wav`, and a build that reads `GStreamer`'s
-/// own names says `audio/x-raw` and `audio/x-wav`. So a name is matched
-/// on whether it contains the word, in lower case.
-///
-/// Nothing else is taken instead: the recorder's own encoders are what
-/// made voice messages FLAC, and Ogg is a file rather than a voice
-/// message on iOS. Neither offered -- the headless test runner, or a
-/// phone with no `GStreamer` at all -- is `None`, which the page shows as
-/// no microphone button.
+/// Lowercase substring match: Sailfish plugin `audio/PCM`, `wav`; `GStreamer` `audio/x-raw`,
+/// `audio/x-wav`. No fallback: encoders made FLAC; Ogg is a file on iOS. None: no mic button.
 fn choose_format(codecs: &[String], containers: &[String]) -> Option<Format> {
     let named = |name: &&String, words: &[&str]| {
         let name = name.to_ascii_lowercase();
@@ -87,12 +57,12 @@ fn choose_format(codecs: &[String], containers: &[String]) -> Option<Format> {
     })
 }
 
-/// `QMediaRecorder::Status`, as the C++ reports it.
+/// `QMediaRecorder::Status`, as C++ reports.
 const FINALIZING_STATUS: i32 = 7;
 /// `QMediaRecorder::State::RecordingState`.
 const RECORDING_STATE: i32 = 1;
 
-/// Records a voice message.
+/// Records voice message.
 ///
 /// ```qml
 /// VoiceRecorder { id: recorder; limit_bytes: messages.attachment_limit
@@ -101,107 +71,80 @@ const RECORDING_STATE: i32 = 1;
 /// Timer { running: recorder.recording; onTriggered: recorder.poll() }
 /// ```
 #[derive(QObject, Default)]
-// `available` and `recording` are two facts QML binds to on their own;
-// `finishing` is the recorder's own bookkeeping. They are not states of
-// one thing, and a state machine over them would hide the two bindings
-// behind it.
+// `available`, `recording` bind separately in QML: no state machine.
 #[allow(clippy::struct_excessive_bools)]
 pub struct VoiceRecorder {
     base: qt_base_class!(trait QObject),
 
-    /// Whether anything can be recorded at all: an audio input and an
-    /// encoder to write it with. False headlessly, and on a phone with
-    /// no encoders, and then the page offers no microphone.
+    /// Audio input and encoder present; false: no mic button.
     pub available: qt_property!(bool; READ is_available),
-    /// The extension a recording will have: `mp3`, or empty when nothing
-    /// can be recorded.
+    /// `mp3`, or empty if nothing recordable.
     pub extension: qt_property!(QString; READ extension_name),
 
-    /// The largest file the relay takes, in bytes, from the core's
-    /// attachment limit; 0 while it is not known, and then a recording
-    /// has no end but the reader's. A real because QML has no 64-bit
-    /// integer.
+    /// Relay limit bytes (core attachment limit); 0 unknown. `f64`: QML lacks 64-bit int.
     pub limit_bytes: qt_property!(f64; WRITE set_limit_bytes NOTIFY limit_changed),
-    /// The reader's outgoing media quality, the core's `media_quality`: 0
-    /// balanced, 1 less data. What the MP3's bit rate follows.
+    /// Core's `media_quality` (0 balanced, 1 less data): sets MP3 bit rate.
     pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY limit_changed),
-    /// The longest a recording can be, in milliseconds, for its MP3 to
-    /// fit in [`Self::limit_bytes`]; 0 when there is no limit. While
-    /// recording, that of the recording under way.
+    /// Longest ms whose MP3 fits `limit_bytes` (current recording's while on); 0 no limit.
     pub limit_ms: qt_property!(u32; READ longest NOTIFY limit_changed),
-    /// Emitted when [`Self::limit_ms`] may have changed.
+    /// Emitted when [`Self::limit_ms`] may change.
     pub limit_changed: qt_signal!(),
 
-    /// True from `start` until the recording is reported or dropped.
+    /// True from `start` until reported or dropped.
     pub recording: qt_property!(bool; NOTIFY recording_changed),
     /// Emitted when [`Self::recording`] changes.
     pub recording_changed: qt_signal!(),
-    /// Milliseconds recorded so far, as of the last `poll`.
+    /// Ms recorded as of last `poll`.
     pub duration_ms: qt_property!(u32; NOTIFY duration_changed),
-    /// Emitted when [`Self::duration_ms`] changes.
+    /// Emitted on [`Self::duration_ms`] change.
     pub duration_changed: qt_signal!(),
 
-    /// Start recording into `path`, an MP3. Answers on `recorded` once
-    /// `stop` has been called, or the limit reached, and the file is
-    /// finished; or on `error`.
+    /// Record MP3 into `path`; `recorded` once stopped and finished, else `error`.
     pub start: qt_method!(fn(&mut self, path: QString)),
-    /// Stop, and report the file once it is finished.
+    /// Stop; report once finished.
     pub stop: qt_method!(fn(&mut self)),
-    /// Stop, and throw the file away.
+    /// Stop; discard file.
     pub cancel: qt_method!(fn(&mut self)),
-    /// Encode what has been recorded since the last call, stop at the
-    /// limit, and finish a stop that is under way. The page calls this on
-    /// a timer while recording.
+    /// Encode new data, stop at limit, finish pending stop. Page timer calls.
     pub poll: qt_method!(fn(&mut self)),
 
-    /// The recording is finished and at `path`.
+    /// Recording finished, at `path`.
     pub recorded: qt_signal!(path: QString),
-    /// Recording could not start, or failed on the way.
+    /// Failed starting or recording.
     pub error: qt_signal!(message: QString),
 
-    /// The `QAudioRecorder`, made on first use: it needs the application
-    /// object, which does not exist when QML builds this. First use is
-    /// the first recording, except on the recorder that asks what the
-    /// platform can record for the whole process ([`Probe`]), which
-    /// keeps the one it asked.
+    /// Made on first use (needs app object).
     handle: usize,
-    /// Where the MP3 is going.
+    /// MP3 destination.
     path: String,
-    /// The WAV being made into it, while recording.
+    /// WAV being encoded, while recording.
     transcoder: Option<Transcoder>,
-    /// `stop` has been called and the file is still being finished.
+    /// `stop` called; file still finishing.
     finishing: bool,
 }
 
-/// What the platform's recorder can do, found out once for the process.
+/// Platform recorder capabilities, once per process.
 ///
-/// Asking is not cheap: a `QAudioRecorder` loads `GStreamer`'s capture
-/// service, lists the sound devices and looks up a score of element
-/// factories, all on the Qt thread, and `available` is asked as a
-/// conversation page is built. Kept on each recorder, every chat opened
-/// paid for that again between the tap and the page sliding in. None of
-/// it changes while the app runs, so the first recorder to ask answers
-/// for every one after it, and those make a `QAudioRecorder` only once
-/// they record.
+/// Probing slow (loads `GStreamer` capture service, devices, factories on Qt thread per chat
+/// page); never changes, so first recorder answers for all.
 #[derive(Debug)]
 struct Probe {
-    /// What to record in; `None` when nothing can be recorded.
+    /// Format to record in; `None` if nothing recordable.
     chosen: Option<Format>,
-    /// The input to record from (`choose_input`); `None` leaves the
-    /// recorder's own.
+    /// Input to record from; `None` leaves recorder's own.
     input: Option<String>,
 }
 
-/// The process's [`Probe`], once a recorder has made it.
+/// Process's [`Probe`], once made.
 static PROBE: std::sync::OnceLock<Probe> = std::sync::OnceLock::new();
 
 impl VoiceRecorder {
-    /// Whether anything can be recorded at all.
+    /// Anything recordable.
     pub fn is_available(&mut self) -> bool {
         self.chosen().is_some()
     }
 
-    /// The extension a recording will have.
+    /// Recording extension.
     pub fn extension_name(&mut self) -> QString {
         if self.chosen().is_some() {
             QString::from("mp3")
@@ -210,7 +153,7 @@ impl VoiceRecorder {
         }
     }
 
-    /// Take the relay's limit, and hold a recording under way to it too.
+    /// Take relay limit, also for recording under way.
     pub fn set_limit_bytes(&mut self, bytes: f64) {
         if self.limit_bytes.to_bits() == bytes.to_bits() {
             return;
@@ -223,7 +166,7 @@ impl VoiceRecorder {
         self.limit_changed();
     }
 
-    /// Take the reader's outgoing media quality, for the next recording.
+    /// Take media quality, for next recording.
     pub fn set_media_quality(&mut self, quality: u32) {
         if self.media_quality == quality {
             return;
@@ -232,16 +175,16 @@ impl VoiceRecorder {
         self.limit_changed();
     }
 
-    /// The limit as bytes; 0 while the core has not said.
+    /// Limit in bytes; 0 while core has not said.
     fn limit(&self) -> u64 {
-        // Exact to 2^53 bytes, which no relay takes.
+        // Exact to 2^53 bytes.
         #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         {
             self.limit_bytes.max(0.0) as u64
         }
     }
 
-    /// The longest a recording can be, in milliseconds; 0 for no limit.
+    /// Longest recording in ms; 0 for no limit.
     #[must_use]
     pub fn longest(&self) -> u32 {
         match &self.transcoder {
@@ -250,13 +193,7 @@ impl VoiceRecorder {
         }
     }
 
-    /// What to record in, `None` when nothing can be: the process's
-    /// answer ([`Probe`]), found out here with this recorder when no
-    /// recorder has asked yet.
-    ///
-    /// Nothing is kept when there is no application object to ask with:
-    /// nothing can be recorded then, and a recorder made once there is
-    /// one asks again.
+    /// Format to record in ([`Probe`]); not cached without app object.
     fn chosen(&mut self) -> Option<Format> {
         if let Some(probe) = PROBE.get() {
             return probe.chosen.clone();
@@ -266,23 +203,17 @@ impl VoiceRecorder {
             return None;
         }
         let probe = PROBE.get_or_init(|| read_probe(handle));
-        // Made before there was an answer, so `recorder` could not set
-        // its input: set here, now that there is one.
+        // Made before probe: set input now.
         if let Some(input) = &probe.input {
             set_input(handle, input);
         }
         probe.chosen.clone()
     }
 
-    /// The `QAudioRecorder`, made on first use and set to the input the
-    /// process records from. 0 when there is no application object to
-    /// hang it off, which is when nothing can be recorded either.
+    /// `QAudioRecorder` on first use, with process's input. 0 without app object.
     fn recorder(&mut self) -> usize {
         if self.handle == 0 {
-            // SAFETY: nothing is passed in, and the recorder made here is
-            // owned by this object, which deletes it in `Drop`. It is
-            // only ever used from the Qt thread, which is where every
-            // method of this object runs.
+            // SAFETY: owned by this object, deleted in `Drop`. Qt thread only.
             let handle = cpp!(unsafe [] -> *mut c_void as "void*" {
                 if (!QCoreApplication::instance()) {
                     return nullptr;
@@ -318,8 +249,7 @@ impl VoiceRecorder {
             self.error(QString::from("nothing here can record sound"));
             return;
         }
-        // Beside the MP3, under a name of its own whatever the MP3 is
-        // called.
+        // Beside MP3, own name.
         let wav = format!("{path}.wav");
         let transcoder = match Transcoder::new(
             PathBuf::from(&wav),
@@ -338,15 +268,13 @@ impl VoiceRecorder {
         let sample_rate = i32::try_from(voice::SAMPLE_RATE).unwrap_or(0);
         let location = QString::from(wav);
         let recorder = handle as *mut c_void;
-        // SAFETY: `recorder` is the QAudioRecorder this object made and
-        // still owns; the three QStrings are owned by this frame and read
-        // by value.
+        // SAFETY: `recorder` owned here; QStrings owned by frame.
         let started = cpp!(unsafe [recorder as "QAudioRecorder*", codec as "QString",
                                    container as "QString", sample_rate as "int",
                                    location as "QString"] -> bool as "bool" {
             QAudioEncoderSettings settings;
             settings.setCodec(codec);
-            // One channel: a voice, and half the bytes of two.
+            // Mono: half the bytes.
             settings.setChannelCount(1);
             if (sample_rate > 0) {
                 settings.setSampleRate(sample_rate);
@@ -373,7 +301,7 @@ impl VoiceRecorder {
         self.limit_changed();
     }
 
-    /// Stop, and report the file once it is finished.
+    /// Stop; report once finished.
     pub fn stop(&mut self) {
         if !self.recording || self.finishing {
             return;
@@ -381,11 +309,11 @@ impl VoiceRecorder {
         let handle = self.recorder();
         stop_recording(handle);
         self.finishing = true;
-        // The backend may already be done; a poll now saves a tick.
+        // Backend may be done already: poll now.
         self.poll();
     }
 
-    /// Stop, and throw the file away.
+    /// Stop; discard.
     pub fn cancel(&mut self) {
         if !self.recording {
             return;
@@ -395,8 +323,7 @@ impl VoiceRecorder {
         self.drop_recording(handle);
     }
 
-    /// Re-read the duration, encode what has been written since the last
-    /// poll, stop at the limit, and finish a stop that is under way.
+    /// Re-read duration; encode; stop at limit.
     pub fn poll(&mut self) {
         if !self.recording {
             return;
@@ -424,22 +351,19 @@ impl VoiceRecorder {
             self.error(message.into());
             return;
         }
-        // At the longest the relay takes: stop, and send what there is,
-        // as a tap on send would. The MP3 keeps to the limit whatever the
-        // recorder writes after this.
+        // At limit: stop and send as tap would; MP3 holds limit whatever comes after.
         let limit = self.longest();
         if limit > 0 && duration >= limit {
             self.stop();
         }
     }
 
-    /// The recorder is done: finish the MP3 and report it.
+    /// Recorder done: finish MP3, report.
     fn finish(&mut self, handle: usize) {
         let path = std::mem::take(&mut self.path);
         let result = match self.transcoder.take() {
             Some(mut transcoder) => {
-                // Where the backend put the WAV, which is where it was
-                // asked to unless the backend had its own idea about it.
+                // Backend's own WAV path, if it chose one.
                 let actual = read_actual_location(handle);
                 if !actual.is_empty() {
                     transcoder.follow(PathBuf::from(actual));
@@ -459,7 +383,7 @@ impl VoiceRecorder {
         }
     }
 
-    /// Forget the recording under way, and remove what it wrote.
+    /// Forget recording; remove what it wrote.
     fn drop_recording(&mut self, handle: usize) {
         if let Some(transcoder) = self.transcoder.take() {
             transcoder.discard();
@@ -480,7 +404,7 @@ impl VoiceRecorder {
 
 impl Drop for VoiceRecorder {
     fn drop(&mut self) {
-        // A recording the page was closed on is not going anywhere.
+        // Page closed mid-recording: discard.
         if let Some(transcoder) = self.transcoder.take() {
             transcoder.discard();
         }
@@ -488,9 +412,7 @@ impl Drop for VoiceRecorder {
             return;
         }
         let recorder = self.handle as *mut c_void;
-        // SAFETY: the recorder was made by `recorder()` and is deleted
-        // exactly once, here; the handle is zeroed so nothing can reach
-        // it afterwards.
+        // SAFETY: made by `recorder()`, deleted once here.
         cpp!(unsafe [recorder as "QAudioRecorder*"] {
             recorder->stop();
             delete recorder;
@@ -499,8 +421,7 @@ impl Drop for VoiceRecorder {
     }
 }
 
-/// Ask the recorder at `handle` what it can write and what it can read
-/// from, and choose.
+/// Probe recorder, choose.
 fn read_probe(handle: usize) -> Probe {
     let codecs = read_list(handle, ListKind::Codecs);
     let containers = read_list(handle, ListKind::Containers);
@@ -512,7 +433,7 @@ fn read_probe(handle: usize) -> Probe {
     }
 }
 
-/// The lists a recorder has: what it can write, and what it can read.
+/// Recorder lists: codecs, containers, inputs.
 #[derive(Clone, Copy)]
 enum ListKind {
     Codecs,
@@ -520,12 +441,11 @@ enum ListKind {
     Inputs,
 }
 
-/// One of the recorder's lists, by name.
+/// One list by name.
 fn read_list(handle: usize, kind: ListKind) -> Vec<String> {
     let recorder = handle as *mut c_void;
     let kind = kind as i32;
-    // SAFETY: `recorder` is a live QAudioRecorder owned by the caller's
-    // object; the answer is joined into one QString owned by this frame.
+    // SAFETY: live QAudioRecorder; answer joined into owned QString.
     let joined = cpp!(unsafe [recorder as "QAudioRecorder*", kind as "int"] -> QString as "QString" {
         QStringList names;
         switch (kind) {
@@ -543,7 +463,7 @@ fn read_list(handle: usize, kind: ListKind) -> Vec<String> {
         .collect()
 }
 
-/// The input the recorder would use left to itself.
+/// Input recorder uses by itself.
 fn read_default_input(handle: usize) -> String {
     let recorder = handle as *mut c_void;
     // SAFETY: as `read_list`.
@@ -553,26 +473,20 @@ fn read_default_input(handle: usize) -> String {
     name.to_string()
 }
 
-/// Tell the recorder which input to record from.
+/// Tell recorder which input to record from.
 fn set_input(handle: usize, input: &str) {
     let recorder = handle as *mut c_void;
     let input = QString::from(input);
-    // SAFETY: as `read_list`; the QString is owned by this frame and
-    // read by value.
+    // SAFETY: as `read_list`; QString owned by frame.
     cpp!(unsafe [recorder as "QAudioRecorder*", input as "QString"] {
         recorder->setAudioInput(input);
     });
 }
 
-/// Pick the audio input from what the recorder offers.
+/// Pick input from what recorder offers.
 ///
-/// The sound server by name where it is offered: on a device that is
-/// `PulseAudio`, which is what the microphone is reached through. The
-/// backend's own default is a `GStreamer` element that picks a source
-/// for itself, and a recording made through it came out silent on a
-/// phone. Failing that, the backend's default, and failing that the
-/// first thing on the list. Nothing offered is `None`, and the recorder
-/// is left alone.
+/// `PulseAudio` if offered (backend default was silent on phone), else default, else first;
+/// none: left alone.
 fn choose_input(inputs: &[String], default: &str) -> Option<String> {
     inputs
         .iter()
@@ -582,7 +496,7 @@ fn choose_input(inputs: &[String], default: &str) -> Option<String> {
         .cloned()
 }
 
-/// Ask the recorder to stop. The file is finished a moment later.
+/// Ask recorder to stop; file finishes a moment later.
 fn stop_recording(handle: usize) {
     let recorder = handle as *mut c_void;
     // SAFETY: as `read_list`.
@@ -591,8 +505,7 @@ fn stop_recording(handle: usize) {
     });
 }
 
-/// Milliseconds recorded, the status, the state, and the error message
-/// when there is one.
+/// Ms recorded, status, state, error if any.
 fn read_progress(handle: usize) -> (u32, i32, i32, String) {
     let recorder = handle as *mut c_void;
     // SAFETY: as `read_list`.
@@ -609,7 +522,7 @@ fn read_progress(handle: usize) -> (u32, i32, i32, String) {
     (duration, status, state, read_error(handle))
 }
 
-/// The recorder's error message, empty when it has none.
+/// Recorder error message; empty if none.
 fn read_error(handle: usize) -> String {
     let recorder = handle as *mut c_void;
     // SAFETY: as `read_list`.
@@ -623,7 +536,7 @@ fn read_error(handle: usize) -> String {
     message.to_string()
 }
 
-/// Where the recorder wrote, once it has: the local path, or empty.
+/// Where recorder wrote: local path or empty.
 fn read_actual_location(handle: usize) -> String {
     let recorder = handle as *mut c_void;
     // SAFETY: as `read_list`.
@@ -650,60 +563,55 @@ mod tests {
 
     #[test]
     fn plain_samples_in_wav_are_what_is_recorded() {
-        // What Qt's capture plugin lists on a Sailfish phone: its own
-        // names, FLAC and Ogg among them, and no AAC.
+        // Sailfish plugin: own names, no AAC.
         let codecs = names(&["audio/vorbis", "audio/PCM", "audio/FLAC", "audio/opus"]);
         let containers = names(&["matroska", "ogg", "wav", "raw"]);
         assert_eq!(
             choose_format(&codecs, &containers),
             Some(format("audio/PCM", "wav"))
         );
-        // MP3 offered too, where lamemp3enc is installed: still plain
-        // samples, which are made into MP3 at a bit rate of this app's
-        // choosing.
+        // MP3 offered too: still plain samples.
         let with_mp3 = names(&["audio/mpeg", "audio/PCM", "audio/FLAC"]);
         assert_eq!(
             choose_format(&with_mp3, &containers),
             Some(format("audio/PCM", "wav"))
         );
-        // A build that reads GStreamer's own names.
+        // GStreamer's own names.
         let gst = names(&["audio/x-flac", "audio/x-raw", "audio/x-opus"]);
         let gst_containers = names(&["application/ogg", "audio/x-wav"]);
         assert_eq!(
             choose_format(&gst, &gst_containers),
             Some(format("audio/x-raw", "audio/x-wav"))
         );
-        // Encoders but no plain samples, or no WAV to put them in: nothing,
-        // rather than a voice message iOS shows as a file.
+        // Encoders, no plain samples: nothing, not a file iOS shows.
         let encoders_only = names(&["audio/FLAC", "audio/opus", "audio/vorbis"]);
         assert_eq!(choose_format(&encoders_only, &containers), None);
         assert_eq!(choose_format(&codecs, &names(&["ogg", "raw"])), None);
-        // Nothing offered, as headlessly: nothing chosen.
+        // Nothing offered: nothing chosen.
         assert_eq!(choose_format(&[], &containers), None);
         assert_eq!(choose_format(&codecs, &[]), None);
     }
 
     #[test]
     fn the_sound_server_is_the_input_where_it_is_offered() {
-        // What Qt's GStreamer backend lists on a device: its own
-        // automatic source first, then the sound server, then ALSA.
+        // GStreamer on device: auto source, sound server, ALSA.
         let inputs = names(&["default:", "pulseaudio:", "alsa:hw:0,0"]);
         assert_eq!(
             choose_input(&inputs, "default:"),
             Some("pulseaudio:".to_string())
         );
-        // No sound server: the backend's default, where it is listed.
+        // No sound server: backend default, if listed.
         let without = names(&["alsa:hw:0,0", "default:"]);
         assert_eq!(
             choose_input(&without, "default:"),
             Some("default:".to_string())
         );
-        // A default that is not on the list: the first thing that is.
+        // Default not listed: first thing.
         assert_eq!(
             choose_input(&without, "oss:"),
             Some("alsa:hw:0,0".to_string())
         );
-        // Nothing at all, as headlessly: nothing chosen.
+        // Nothing offered: nothing chosen.
         assert_eq!(choose_input(&[], "default:"), None);
     }
 }
