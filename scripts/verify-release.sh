@@ -153,7 +153,10 @@ built=$(find "$src/RPMS" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name 
 [ -n "$built" ] || fail "the build made no device RPM"
 cp "$built" "$work/cmp/rebuilt.rpm"
 
-sum() { sha256sum < "$work/cmp/$1.rpm" | cut -d' ' -f1; }
+sum() {
+    f=$1
+    sha256sum < "$work/cmp/$f.rpm" | cut -d' ' -f1
+}
 ours=$(sum rebuilt)
 echo
 for c in github local; do
@@ -175,11 +178,12 @@ chmod 644 "$work/cmp"/*.rpm
 
 # One copy against the rebuild: 0 same file, 1 same files inside, 2 differ.
 check() {
-    [ "$(sum "$1")" != "$ours" ] || {
-        echo "$1: VERIFIED, same file as the rebuild, byte for byte."
+    copy=$1
+    [ "$(sum "$copy")" != "$ours" ] || {
+        echo "$copy: VERIFIED, same file as the rebuild, byte for byte."
         return 0
     }
-    echo ">> $1: file differs; comparing what's inside"
+    echo ">> $copy: file differs; comparing what's inside"
     rc=0
     # shellcheck disable=SC2016 # expanded by the container's shell.
     ctr_run --user 0 -v "$work/cmp:/cmp:ro" "$image" sh -c '
@@ -198,14 +202,14 @@ check() {
             echo "differing (< $1, > rebuilt):"
             cat /tmp/d1 /tmp/d2 | grep "^[<>]" | head -50
             exit 10
-        fi' sh "$1" || rc=$?
+        fi' sh "$copy" || rc=$?
     case "$rc" in
-        0) echo "$1: SAME FILES: every file, mode and owner inside matches the rebuild;"
+        0) echo "$copy: SAME FILES: every file, mode and owner inside matches the rebuild;"
            echo "   packaging differs (build time, file dates, host or signature)."
            return 1 ;;
-        10) echo "$1: DIFFERENT: not what $ref rebuilds to. Please report it."
+        10) echo "$copy: DIFFERENT: not what $ref rebuilds to. Please report it."
             return 2 ;;
-        *) fail "couldn't unpack $1 and the rebuild to compare them" ;;
+        *) fail "couldn't unpack $copy and the rebuild to compare them" ;;
     esac
 }
 
