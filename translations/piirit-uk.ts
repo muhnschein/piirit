@@ -1807,10 +1807,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Це не код другого пристрою. Використайте код, який показує інший пристрій.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Наведіть камеру на QR-код</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Скопіювати профіль</translation>
     </message>
@@ -1840,14 +1836,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Під&apos;єднатися</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Або наведіть камеру на код</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Наведіть камеру на чийсь код запрошення</translation>
     </message>
 </context>
 <context>

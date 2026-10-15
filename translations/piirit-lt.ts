@@ -1803,10 +1803,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tai ne antrojo įrenginio kodas. Naudok kodą, kurį rodo kitas įrenginys.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Laikykite kamerą virš QR kodo</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Kopijuoti profilį</translation>
     </message>
@@ -1836,14 +1832,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Prisijungti</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Arba nukreipkite kamerą į kodą</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Nukreipkite kamerą į kieno nors kvietimo kodą</translation>
     </message>
 </context>
 <context>

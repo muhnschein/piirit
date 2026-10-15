@@ -1793,10 +1793,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>这不是第二设备的代码。请使用另一台设备显示的代码。</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>将摄像头对准二维码。</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>复制资料</translation>
     </message>
@@ -1826,14 +1822,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>连接</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>或将相机对准二维码</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>将相机对准对方的邀请码</translation>
     </message>
 </context>
 <context>

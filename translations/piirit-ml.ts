@@ -1800,10 +1800,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഇത് രണ്ടാമത്തെ ഉപകരണത്തിന്റെ കോഡല്ല. മറ്റേ ഉപകരണം കാണിക്കുന്ന കോഡ് ഉപയോഗിക്കുക.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>നിങ്ങളുടെ ക്യാമറ QR കോഡിനു മുകളിൽ പിടിക്കുക</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>പ്രൊഫൈൽ പകർത്തുക</translation>
     </message>
@@ -1833,14 +1829,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>കണക്റ്റ് ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>അല്ലെങ്കിൽ ക്യാമറ കോഡിലേക്ക് തിരിക്കുക</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>ക്യാമറ ഒരാളുടെ ക്ഷണ കോഡിലേക്ക് തിരിക്കുക</translation>
     </message>
 </context>
 <context>

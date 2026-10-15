@@ -1803,10 +1803,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Acesta nu este un cod pentru un al doilea dispozitiv. Folosește codul afișat de celălalt dispozitiv.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Ține camera deasupra codului QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Copiază profilul</translation>
     </message>
@@ -1836,14 +1832,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Conectează</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Sau îndreaptă camera spre cod</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Îndreaptă camera spre codul de invitație al cuiva</translation>
     </message>
 </context>
 <context>

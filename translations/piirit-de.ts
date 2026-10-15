@@ -1800,10 +1800,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Das ist kein Code für ein Zweitgerät. Nutze den Code, den das andere Gerät anzeigt.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Kamera über den QR-Code halten</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Profil kopieren</translation>
     </message>
@@ -1833,14 +1829,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Connect</source>
         <translation>Verbinden</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Oder richte die Kamera auf den Code</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Richte die Kamera auf den Einladungscode von jemandem</translation>
     </message>
 </context>
 <context>

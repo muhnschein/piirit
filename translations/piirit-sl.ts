@@ -1814,10 +1814,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>To ni koda za drugo napravo. Uporabi kodo, ki jo prikazuje druga naprava.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Kamero drži nad kodo QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Kopiraj profil</translation>
     </message>
@@ -1847,14 +1843,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Connect</source>
         <translation>Poveži</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Ali pa usmerite kamero v kodo</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Usmerite kamero v kodo povabila nekoga</translation>
     </message>
 </context>
 <context>

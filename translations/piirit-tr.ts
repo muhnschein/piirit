@@ -1793,10 +1793,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Bu bir ikinci cihaz kodu değil. Diğer cihazın gösterdiği kodu kullan.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Kameranızı QR kodunun üzerinde tutun</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Profili kopyala</translation>
     </message>
@@ -1826,14 +1822,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Connect</source>
         <translation>Bağlan</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Ya da kamerayı koda doğrultun</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Kamerayı birinin davet koduna doğrultun</translation>
     </message>
 </context>
 <context>

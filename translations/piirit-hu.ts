@@ -1789,10 +1789,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ez nem második eszközhöz tartozó kód. Használd a másik eszköz által mutatott kódot.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Tartsa a kamerát a QR-kód fölé</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Profil másolása</translation>
     </message>
@@ -1822,14 +1818,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Csatlakozás</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Vagy irányítsa a kamerát a kódra</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Irányítsa a kamerát valaki meghívókódjára</translation>
     </message>
 </context>
 <context>

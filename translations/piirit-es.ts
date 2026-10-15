@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Este no es un código de segundo dispositivo. Usa el código que muestra el otro dispositivo.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Coloque su cámara sobre el código QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Copiar el perfil</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Conectar</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>O apunta la cámara al código</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Apunta la cámara al código de invitación de alguien</translation>
     </message>
 </context>
 <context>

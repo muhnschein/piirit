@@ -305,7 +305,6 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         common::record(&s, "device-foot", call!("bottomOf", "scanArea"));
         common::record(&s, "device-page", call!("pageProperty", "height"));
         common::record(&s, "device-link", call!("viewProperty", "offerLink"));
-        common::record(&s, "device-hint", call!("get", "hint", "text"));
         common::record(&s, "device-typed", call!("get", "typeLinkButton", "text"));
         common::record(
             &s,
@@ -554,12 +553,6 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
          it. {context}"
     );
 
-    let hint = common::value_of(steps, "device-hint");
-    assert!(
-        hint.contains("QR code"),
-        "the view still says it is looking for an invite: {hint:?}. \
-         {context}"
-    );
     assert_eq!(
         common::value_of(steps, "device-begin"),
         "ok",

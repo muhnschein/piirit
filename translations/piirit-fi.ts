@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tämä ei ole toisen laitteen koodi. Käytä koodia, jonka toinen laite näyttää.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Näytä QR-koodia kameraan</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Kopioi profiili</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Yhdistä</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Tai osoita kameralla koodia</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Osoita kameralla jonkun kutsukoodia</translation>
     </message>
 </context>
 <context>

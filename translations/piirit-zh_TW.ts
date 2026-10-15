@@ -1789,10 +1789,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>這不是第二裝置的代碼。請使用另一台裝置顯示的代碼。</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>請將相機對準 QR碼</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>複製設定檔</translation>
     </message>
@@ -1822,14 +1818,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>連線</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>或將相機對準代碼</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>將相機對準對方的邀請碼</translation>
     </message>
 </context>
 <context>
