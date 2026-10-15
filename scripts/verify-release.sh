@@ -59,7 +59,7 @@ pick_engine
 fail() { echo "$prog: $*" >&2; exit 3; }
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/piirit-verify.XXXXXX")
-# shellcheck disable=SC2329 # run by the trap.
+# shellcheck disable=SC2317,SC2329 # run by the trap.
 cleanup() {
     if [ "${PIIRIT_KEEP:-0}" = 1 ]; then
         echo "kept: $work"
