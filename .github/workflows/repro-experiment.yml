@@ -1,6 +1,5 @@
-# Throwaway experiment for issue #166: does a build under rootless Podman
-# produce the same payload as the Docker build of the same commit (run
-# 38560773614, variant a)? Not for merging.
+# Throwaway experiment for issue #166: which files in the SDK image are
+# owned by ids above the default 65536-wide rootless range? Not for merging.
 name: repro-experiment
 
 on:
@@ -11,96 +10,19 @@ permissions:
   contents: read
 
 jobs:
-  podman:
+  ids:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-          submodules: true
-
-      - name: Make room
-        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
-
-      - name: Podman facts
-        run: |
-          podman version
-          podman info --format 'rootless={{.Host.Security.Rootless}} driver={{.Store.GraphDriverName}}'
-          id; grep "^$(id -un):" /etc/subuid /etc/subgid || echo "no subuid entry"
-
-      # Run 1 failed here with the runner's default 65536 subuids: the
-      # image owns /home/appsupport-root as 500000. Widen it to see whether
-      # anything else stands in the way, and list what needs the range.
-      - name: Widen the subuid range
+      - name: List high-id files
         run: |
           sudo sed -i 's/^runner:.*/runner:165536:1000000/' /etc/subuid /etc/subgid
           podman system migrate
-
-      - name: Fetch the rpc server
-        run: sh scripts/fetch-rpc-server.sh
-
-      - name: Build under rootless Podman
-        run: |
-          set -eu
           img=ghcr.io/muhnschein/piirit-sdk:5.2.0.15-aarch64
           podman pull -q "$img"
-          echo "== files owned by ids above 65535:"
-          podman run --rm --user 0 "$img" sh -c 'find / -xdev \( -uid +65535 -o -gid +65535 \) 2>/dev/null | head -20; echo "count: $(find / -xdev \( -uid +65535 -o -gid +65535 \) 2>/dev/null | wc -l)"'
-          uid=$(podman run --rm "$img" id -u)
-          gid=$(podman run --rm "$img" id -g)
-          home=$(podman run --rm "$img" sh -c 'echo $HOME')
-          target=$(podman run --rm "$img" sb2-config -l | grep -- '-aarch64$' | tail -1)
-          echo "uid=$uid gid=$gid home=$home target=$target"
-          # keep-id maps the host user onto the image's SDK user, so the
-          # mounted tree is already theirs: no chown in either direction.
-          podman run --rm --privileged --userns=keep-id:uid="$uid",gid="$gid" \
-            -v "$PWD:$home/harbour-piirit" -w "$home/harbour-piirit" \
-            -e TARGET="$target" "$img" bash -c 'set -e
-              id
-              mb2 -t "$TARGET" -X build-init
-              mb2 -t "$TARGET" -X build --no-check --define "jobs 1"'
-          ls -l RPMS
-          echo "host owner of RPMS: $(stat -c %U RPMS)"
-
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: rpm-podman
-          path: RPMS/**/*.rpm
-          if-no-files-found: error
-          retention-days: 3
-
-  compare:
-    needs: podman
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      actions: read
-    env:
-      GH_TOKEN: ${{ github.token }}
-      GH_REPO: ${{ github.repository }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - run: ./ci/apt-install.sh rpm rpm2cpio cpio
-
-      - name: Fetch both RPMs
-        run: |
-          gh run download 38560773614 -n rpm-a --dir rpms/a
-          gh run download "$GITHUB_RUN_ID" -n rpm-podman --dir rpms/podman
-
-      - name: Compare payloads
-        run: |
-          pick() { find "rpms/$1" -name 'harbour-piirit-*.rpm' ! -name '*debug*' | head -1; }
-          for v in a podman; do
-            f=$(pick $v); mkdir -p "x/$v"
-            echo "== $v: $(sha256sum < "$f" | cut -c1-16) $(basename "$f")"
-            (cd "x/$v" && rpm2cpio "../../$f" | cpio -idm --quiet)
-            (cd "x/$v" && find . -type f -exec sha256sum {} + | sort -k2) > "$v.sums"
-          done
-          diff a.sums podman.sums | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u > differ.txt || true
-          cat differ.txt
-          echo "($(wc -l < differ.txt) of $(wc -l < a.sums) files differ)"
+          podman run --rm --user 0 "$img" sh -c '
+            find / -xdev \( -uid +65535 -o -gid +65535 \) -printf "%u:%g %U:%G %p\n" 2>/dev/null > /tmp/hi
+            echo "count: $(wc -l < /tmp/hi)"
+            echo "== by owner"; cut -d" " -f1,2 /tmp/hi | sort | uniq -c
+            echo "== by top directories"; cut -d" " -f3 /tmp/hi | cut -d/ -f1-5 | sort | uniq -c | sort -rn | head -30
+            echo "== passwd entries above 65535"; awk -F: "\$3>65535||\$4>65535" /etc/passwd /etc/group'
