@@ -5,4 +5,4 @@
 # delete a published version: older releases verify against it.
 #
 # <sfos-version> <image@digest>
-5.2.0.15 ghcr.io/muhnschein/piirit-sdk@sha256:842ff7b9ffefb95eabbd31fe1e64cf08e3cfddc4c39ab9cce2184d66653579e8
+5.2.0.15 ghcr.io/muhnschein/piirit-sdk@sha256:da17772bad90e867a94ea254631bac610f01aeb41d13a98882e8922723792874
