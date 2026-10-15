@@ -138,15 +138,19 @@ echo ">> putting the rustlib where the linker looks, and dropping the rest"
             { echo "uid 1000 is taken" >&2; exit 1; }
         ! awk -F: "\$3 == 1000 { found = 1 } END { exit !found }" /etc/group ||
             { echo "gid 1000 is taken" >&2; exit 1; }
-        sed -i "s/^mersdk:\([^:]*\):$old_uid:$old_gid:/mersdk:\1:1000:1000:/" /etc/passwd
-        sed -i "s/^mersdk:\([^:]*\):$old_gid:/mersdk:\1:1000:/" /etc/group
         find / -xdev -uid "$old_uid" -exec chown -h 1000 {} +
         find / -xdev -gid "$old_gid" -exec chgrp -h 1000 {} +
     fi
-    for f in /etc/passwd /etc/group /etc/shadow /etc/gshadow; do
-        [ -f "$f" ] && sed -i "/^appsupport-/d" "$f"
+    # Every rootfs (SDK, tooling, targets) has its own passwd.
+    for fs in / /srv/mer/toolings/*/ /srv/mer/targets/*/; do
+        [ -f "$fs/etc/passwd" ] || continue
+        sed -i "s/^mersdk:\([^:]*\):$old_uid:$old_gid:/mersdk:\1:1000:1000:/" "$fs/etc/passwd"
+        sed -i "s/^mersdk:\([^:]*\):$old_gid:/mersdk:\1:1000:/" "$fs/etc/group"
+        for f in passwd group shadow gshadow; do
+            [ ! -f "$fs/etc/$f" ] || sed -i "/^appsupport-/d" "$fs/etc/$f"
+        done
+        rm -rf "$fs/home/appsupport-root" "$fs/var/spool/mail/appsupport-root"
     done
-    rm -rf /home/appsupport-root /var/spool/mail/appsupport-root
     high=$(find / -xdev \( -uid +65535 -o -gid +65535 \) | head -5)
     [ -z "$high" ] || { echo "still owned by ids above 65535:" >&2; echo "$high" >&2; exit 1; }
 '
