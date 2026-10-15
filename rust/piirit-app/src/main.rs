@@ -65,8 +65,8 @@ fn main() {
     // `ApplicationWindow`.
     let mut view = QQuickView::new();
 
-    // After view (app object), before QML (translated at build). No catalog: English, for
-    // plurals.
+    // After view (app object), before QML (translated at build). No catalog: none
+    // loaded, source text (English, plurals as "%n message(s)").
     translations::install(&translations_dir().to_string_lossy(), "");
 
     // Before QML sourced, or bindings see undefined.

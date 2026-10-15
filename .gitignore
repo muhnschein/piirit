@@ -30,8 +30,7 @@ build-*/
 /vendor/deltachat-rpc-server/*/
 
 # `cargo vendor` for OBS/Chum, SDK chroot (no crates.io). From
-# scripts/vendor-crates.sh; see docs/BUILDING.md "Building without network
-# access"
+# scripts/vendor-crates.sh; its header says what each file is for.
 /rpm/vendor.tar.xz
 /rpm/vendor.toml
 /rust/vendor/
