@@ -412,7 +412,9 @@ Item {
                 width: quoteAuthorLabel.width
                 maximumLineCount: 2
                 wrapMode: Text.Wrap
-                truncationMode: TruncationMode.Elide
+                // Elided only without pictures: see body.
+                truncationMode: root.emojiQuote.length > 0 ? TruncationMode.None
+                                                           : TruncationMode.Elide
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
                 // Plain unless emoji: see top.
@@ -543,7 +545,11 @@ Item {
             // Long body cut to a few lines; rest on page (row taller than view can't be scrolled
             // past). Line cap, not text cut: slicing a rendering could leave tag open.
             maximumLineCount: root.collapsedLines
-            truncationMode: TruncationMode.Elide
+            // Cut, not elided, with pictures: Qt lays elided last line out on its own, puts there
+            // every picture whose place in whole text falls inside that line's length (one at
+            // start drew over last line, its gap left on first). Offer below says it's cut.
+            truncationMode: root.emojiBody.length > 0 ? TruncationMode.None
+                                                      : TruncationMode.Elide
             color: Theme.primaryColor
             linkColor: Theme.highlightColor
             // Plain unless shim rendered: see top.
