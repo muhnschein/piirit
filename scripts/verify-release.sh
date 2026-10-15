@@ -1,25 +1,32 @@
 #!/bin/sh
 # Rebuilds a release from its source and checks it against the published RPM.
 #
-#     scripts/verify-release.sh [--upstream-sdk] [--rpm <file>] [--ref <ref>] [<version>]
+#     scripts/verify-release.sh [--podman | --docker] [--upstream-sdk] [--rpm <file>]
+#                               [--no-download] [--ref <ref>] [<version>]
 #
 #   <version>       release to check, e.g. 2.2.0; default: latest
-#   --rpm <file>    check this file, not the download (e.g. one copied off a
-#                   phone); version from its name unless given
+#   --rpm <file>    check this file too (e.g. one copied off a phone); version
+#                   from its name unless given
+#   --no-download   don't check GitHub's copy; only --rpm's
 #   --ref <ref>     build this tag, branch or commit, not v<version> (rpm.yml
 #                   checks a release before it is tagged)
 #   --upstream-sdk  derive the SDK image from upstream's, don't pull ours
 #                   (scripts/build-in-container.sh)
+#   --podman, --docker  engine to use; default: Docker if running, else Podman
 #
 # Needs git, curl, sha256sum, Podman or Docker. First run: ~2.3 GB pull, ~30
-# min build. Builds in a fresh clone under $TMPDIR, never in this tree.
+# min build. Builds in a fresh clone under PIIRIT_WORKDIR, never in this tree;
+# needs ~1 GB free there (checks for 2).
 #
-# Exit: 0 same file, byte for byte; 1 same files inside, different packaging
-# (releases before reproducible builds); 2 files differ; 3 couldn't check.
+# Exit, worst of the copies checked: 0 same file, byte for byte; 1 same files
+# inside, different packaging (releases before reproducible builds); 2 files
+# differ; 3 couldn't check.
 #
 # Environment, all optional:
-#   PIIRIT_REPO  where to clone from; default GitHub
-#   PIIRIT_KEEP  1: keep the clone and build
+#   PIIRIT_REPO     where to clone from; default GitHub
+#   PIIRIT_KEEP     1: keep the clone and build
+#   PIIRIT_WORKDIR  where to clone and build; default ~/.cache/piirit-verify
+#                   (not $TMPDIR: /tmp often a RAM disk, small and shared)
 #   build-in-container.sh's PIIRIT_* pass through.
 
 set -eu
@@ -31,18 +38,21 @@ repo=${PIIRIT_REPO:-https://github.com/$github.git}
 legacy_image=ghcr.io/muhnschein/piirit-sdk@sha256:842ff7b9ffefb95eabbd31fe1e64cf08e3cfddc4c39ab9cce2184d66653579e8
 
 usage() {
-    sed -n '4,13p' "$0" | sed 's/^# \{0,1\}//' >&2
+    sed -n '4,16p' "$0" | sed 's/^# \{0,1\}//' >&2
     exit 3
 }
 
 upstream_sdk=""
 rpm=""
+download=1
 ref=""
 version=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --upstream-sdk) upstream_sdk=--upstream-sdk ;;
+        --podman | --docker) PIIRIT_ENGINE=${1#--}; export PIIRIT_ENGINE ;;
         --rpm) [ $# -ge 2 ] || usage; rpm=$2; shift ;;
+        --no-download) download=0 ;;
         --ref) [ $# -ge 2 ] || usage; ref=$2; shift ;;
         -h | --help) usage ;;
         -*) echo "$prog: unknown option $1" >&2; usage ;;
@@ -58,7 +68,14 @@ pick_engine
 
 fail() { echo "$prog: $*" >&2; exit 3; }
 
-work=$(mktemp -d "${TMPDIR:-/tmp}/piirit-verify.XXXXXX")
+# Before 30 min of build, not during.
+need_gb=2
+parent=${PIIRIT_WORKDIR:-${XDG_CACHE_HOME:-$HOME/.cache}/piirit-verify}
+mkdir -p "$parent" || fail "can't create $parent"
+free_gb=$(df -Pk "$parent" | awk 'NR == 2 { print int($4 / 1048576) }')
+[ "${free_gb:-0}" -ge "$need_gb" ] ||
+    fail "$parent: ${free_gb:-?} GB free, build needs $need_gb GB; set PIIRIT_WORKDIR to a roomier disk"
+work=$(mktemp -d "$parent/run.XXXXXX")
 # shellcheck disable=SC2317,SC2329 # run by the trap.
 cleanup() {
     if [ "${PIIRIT_KEEP:-0}" = 1 ]; then
@@ -70,17 +87,18 @@ cleanup() {
 trap cleanup EXIT
 mkdir -p "$work/cmp"
 
-# What to check against.
+# What to check against: GitHub's copy, --rpm's, or both.
+[ "$download" = 1 ] || [ -n "$rpm" ] || fail "--no-download: nothing to check; give --rpm"
 if [ -n "$rpm" ]; then
     [ -f "$rpm" ] || fail "no such file: $rpm"
-    cp "$rpm" "$work/cmp/published.rpm"
+    cp "$rpm" "$work/cmp/local.rpm"
     if [ -z "$version" ]; then
         version=$(basename "$rpm" | sed -n 's/^harbour-piirit-\(.*\)-[^-]*\.aarch64\.rpm$/\1/p')
         [ -n "$version" ] || [ -n "$ref" ] ||
             fail "can't read a version from '$(basename "$rpm")'; give one"
     fi
-    echo ">> checking $rpm"
-else
+fi
+if [ "$download" = 1 ]; then
     # https only, redirects too.
     get() { curl -sSfL --proto '=https' --proto-redir '=https' "$@"; }
     if [ -z "$version" ]; then
@@ -97,7 +115,7 @@ else
     get -o "$work/$name" "$url/$name" || fail "can't download $name"
     (cd "$work" && grep " \*\{0,1\}$name\$" SHA256SUMS | sha256sum -c -) >/dev/null ||
         fail "$name doesn't match the release's SHA256SUMS; download damaged?"
-    cp "$work/$name" "$work/cmp/published.rpm"
+    cp "$work/$name" "$work/cmp/github.rpm"
 fi
 ref=${ref:-v$version}
 
@@ -135,16 +153,14 @@ built=$(find "$src/RPMS" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name 
 [ -n "$built" ] || fail "the build made no device RPM"
 cp "$built" "$work/cmp/rebuilt.rpm"
 
-theirs=$(sha256sum < "$work/cmp/published.rpm" | cut -d' ' -f1)
-ours=$(sha256sum < "$work/cmp/rebuilt.rpm" | cut -d' ' -f1)
+sum() { sha256sum < "$work/cmp/$1.rpm" | cut -d' ' -f1; }
+ours=$(sum rebuilt)
 echo
-echo "published  $theirs"
-echo "rebuilt    $ours"
-if [ "$theirs" = "$ours" ]; then
-    echo
-    echo "VERIFIED: $ref rebuilds to the same file, byte for byte."
-    exit 0
-fi
+for c in github local; do
+    [ -f "$work/cmp/$c.rpm" ] && printf '%-8s %s\n' "$c" "$(sum "$c")"
+done
+printf '%-8s %s\n' rebuilt "$ours"
+[ -z "$rpm" ] || echo "local    = $rpm"
 
 # Unpacked in the SDK image (rpm2cpio, cpio there, maybe not here). As root:
 # rootless, that's us; reads our files whatever the image's user.
@@ -156,34 +172,56 @@ else
 fi
 chmod 755 "$work/cmp"
 chmod 644 "$work/cmp"/*.rpm
+
+# One copy against the rebuild: 0 same file, 1 same files inside, 2 differ.
+check() {
+    [ "$(sum "$1")" != "$ours" ] || {
+        echo "$1: VERIFIED, same file as the rebuild, byte for byte."
+        return 0
+    }
+    echo ">> $1: file differs; comparing what's inside"
+    rc=0
+    # shellcheck disable=SC2016 # expanded by the container's shell.
+    ctr_run --user 0 -v "$work/cmp:/cmp:ro" "$image" sh -c '
+        set -e
+        for s in "$1" rebuilt; do
+            mkdir -p "/tmp/$s"
+            (cd "/tmp/$s" && rpm2cpio "/cmp/$s.rpm" | cpio -idm --quiet)
+            (cd "/tmp/$s" && find . -type f -exec sha256sum {} + | sort -k2) > "/tmp/$s.sums"
+            rpm -qp --qf "[%{FILEMODES:perms} %{FILEUSERNAME}:%{FILEGROUPNAME} %{FILENAMES} %{FILELINKTOS}\n]" \
+                "/cmp/$s.rpm" | sort -k3 > "/tmp/$s.meta"
+        done
+        echo "$(wc -l < "/tmp/$1.sums") files"
+        diff "/tmp/$1.sums" /tmp/rebuilt.sums > /tmp/d1 || true
+        diff "/tmp/$1.meta" /tmp/rebuilt.meta > /tmp/d2 || true
+        if [ -s /tmp/d1 ] || [ -s /tmp/d2 ]; then
+            echo "differing (< $1, > rebuilt):"
+            cat /tmp/d1 /tmp/d2 | grep "^[<>]" | head -50
+            exit 10
+        fi' sh "$1" || rc=$?
+    case "$rc" in
+        0) echo "$1: SAME FILES: every file, mode and owner inside matches the rebuild;"
+           echo "   packaging differs (build time, file dates, host or signature)."
+           return 1 ;;
+        10) echo "$1: DIFFERENT: not what $ref rebuilds to. Please report it."
+            return 2 ;;
+        *) fail "couldn't unpack $1 and the rebuild to compare them" ;;
+    esac
+}
+
+worst=0
+for c in github local; do
+    [ -f "$work/cmp/$c.rpm" ] || continue
+    echo
+    rc=0
+    check "$c" || rc=$?
+    [ "$rc" -le "$worst" ] || worst=$rc
+done
 echo
-echo ">> files differ; comparing what's inside"
-rc=0
-# shellcheck disable=SC2016 # expanded by the container's shell.
-ctr_run --user 0 -v "$work/cmp:/cmp:ro" "$image" sh -c '
-    set -e
-    for s in published rebuilt; do
-        mkdir -p "/tmp/$s"
-        (cd "/tmp/$s" && rpm2cpio "/cmp/$s.rpm" | cpio -idm --quiet)
-        (cd "/tmp/$s" && find . -type f -exec sha256sum {} + | sort -k2) > "/tmp/$s.sums"
-        rpm -qp --qf "[%{FILEMODES:perms} %{FILEUSERNAME}:%{FILEGROUPNAME} %{FILENAMES} %{FILELINKTOS}\n]" \
-            "/cmp/$s.rpm" | sort -k3 > "/tmp/$s.meta"
-    done
-    echo "$(wc -l < /tmp/published.sums) files"
-    diff /tmp/published.sums /tmp/rebuilt.sums > /tmp/d1 || true
-    diff /tmp/published.meta /tmp/rebuilt.meta > /tmp/d2 || true
-    if [ -s /tmp/d1 ] || [ -s /tmp/d2 ]; then
-        echo "differing (< published, > rebuilt):"
-        cat /tmp/d1 /tmp/d2 | grep "^[<>]" | head -50
-        exit 10
-    fi' || rc=$?
-case "$rc" in
-    0) ;;
-    10) echo; echo "DIFFERENT: $ref does not rebuild to what was checked. Please report it."; exit 2 ;;
-    *) fail "couldn't unpack the two RPMs to compare them" ;;
+case "$worst" in
+    0) echo "VERIFIED: $ref rebuilds to every copy checked, byte for byte." ;;
+    1) echo "SAME FILES: expected for releases before reproducible builds;" \
+            "for a later one, a bug: please report." ;;
+    *) echo "DIFFERENT: see above." ;;
 esac
-echo
-echo "SAME FILES: every file, mode and owner inside matches; packaging"
-echo "differs (build time, file dates, host or signature). Expected for"
-echo "releases before reproducible builds; for a later one, a bug: please report."
-exit 1
+exit "$worst"

@@ -255,7 +255,7 @@ jobs:
                      ! -name '*.src.rpm' | head -1)
           [ -n "$rpm" ] || { echo "::error::no device RPM to check"; exit 1; }
           PIIRIT_REPO="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
-            ./scripts/verify-release.sh --rpm "$rpm" --ref "$GITHUB_SHA"
+            ./scripts/verify-release.sh --no-download --rpm "$rpm" --ref "$GITHUB_SHA"
 
   # Release: package to GitHub release `v<version>`, CHANGELOG.md section as
   # notes. Own job so `contents: write` is held only here, never by the

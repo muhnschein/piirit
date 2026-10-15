@@ -28,7 +28,7 @@ pick_engine() {
         *) echo "$prog: PIIRIT_ENGINE is '$engine', not docker or podman" >&2; exit 2 ;;
     esac
     command -v "$engine" >/dev/null 2>&1 || {
-        echo "$prog: PIIRIT_ENGINE=$engine, but $engine is not installed" >&2
+        echo "$prog: $engine asked for, not installed" >&2
         exit 1
     }
 

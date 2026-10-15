@@ -154,7 +154,7 @@ jobs:
           SDK: ${{ matrix.sdk }}
         run: |
           rpm=$(find rpms -name 'harbour-piirit-*.rpm' ! -name '*debug*' | head -1)
-          set -- --rpm "$rpm" --ref "$GITHUB_SHA"
+          set -- --no-download --rpm "$rpm" --ref "$GITHUB_SHA"
           [ "$SDK" = upstream ] && set -- --upstream-sdk "$@"
           PIIRIT_REPO="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
             ./scripts/verify-release.sh "$@"
