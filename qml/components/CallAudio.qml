@@ -34,7 +34,6 @@ import Nemo.DBus 2.0
  * call). Names no streams (ngfd plays ringtone; policy knows its streams) and
  * asks only sound, so moves nothing of the app's. Released when ringing stops;
  * answered call acquires own set first, so held-off music stays off.
- * docs/CALLS.md, "Earpiece and loudspeaker".
  */
 Item {
     id: audio

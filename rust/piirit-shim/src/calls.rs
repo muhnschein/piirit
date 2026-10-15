@@ -784,7 +784,7 @@ impl Call {
         }
         let payload: serde_json::Value =
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
-        // Call events only snake_case part of core stream: `msg_id`, not `msgId` (docs/CALLS.md).
+        // Call events only snake_case part of core stream: `msg_id`, not `msgId`.
         let Some(message_id) = json::u32_opt(&payload, "msg_id") else {
             return;
         };

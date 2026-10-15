@@ -541,7 +541,7 @@ static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
 /// media volume, while in-call volume keys set call volume: call was as quiet as media
 /// volume, keys did nothing. Role in `PULSE_PROP` goes on every stream of connection opened
 /// while set; engine opens its one connection at first sound (call page, if session played
-/// none before). See docs/CALLS.md.
+/// none before).
 ///
 /// Written while other threads run; env reads from them generally unsafe, safe here: var
 /// made before threads (`prepare_media_plugins`), so write replaces its string in place,

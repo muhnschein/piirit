@@ -47,7 +47,7 @@ Check IDs = Jolla's.
 
 ## The media plugin
 
-- `libpiirit.so` = H.264 encoder for video calls (docs/CALLS.md), at `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside `piirit.info` Gecko finds it by. `/usr/share/<name>/lib/` = only ELF place besides binary; links only libc, libm, libstdc++, libgcc_s; x264 built in. No waiver.
+- `libpiirit.so` = H.264 encoder for video calls, at `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside `piirit.info` Gecko finds it by. `/usr/share/<name>/lib/` = only ELF place besides binary; links only libc, libm, libstdc++, libgcc_s; x264 built in. No waiver.
 - Validator warns "...then the rpath must be set accordingly": binary doesn't link it, no rpath. Gecko loads full path in own `plugin-container` (in app sandbox), dir from `MOZ_GMP_PATH` set before Gecko starts (`prepare_media_plugins`, `rust/piirit-shim/src/call_host.rs`). Env vars: Harbour silent.
 
 ## Waivers

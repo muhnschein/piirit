@@ -10,7 +10,7 @@ import "."
  * CallPage.qml is pushed over whatever is there.
  *
  * Phone call handling as far as a non-phone app can have it. System call
- * screen and history are closed (docs/CALLS.md).
+ * screen and history are closed.
  *
  * - Rings via ngfd (phone's VoIP ringtone): reader's tone, volume, silent
  *   profile; stops when told or app goes. Other apps' music pauses

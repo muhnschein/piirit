@@ -110,7 +110,7 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 - **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1`. `--disable-everything` plus: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. No network, devices, filters, autodetected libs: picked-file attack surface = few demuxers/decoders.
 - **x264** (GPL-2.0-or-later), `third_party/x264`, `stable`, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders wrap external libs; openh264 lacks B-frames, looked worse at same rate.
 - Both GPL-3.0-or-later compatible, built from source into one executable (not bundled binary like core). `build.rs` runs each `configure` with cargo's target compiler (under scratchbox2 = target's own: native, like LAME). ARM asm on; x86 off (needs nasm; x86 only test host).
-- Same x264 linked again into call H.264 encoder: Gecko encodes H.264 only via on-disk media plugin (docs/CALLS.md, `HARBOUR.md`).
+- Same x264 linked again into call H.264 encoder: Gecko encodes H.264 only via on-disk media plugin (`HARBOUR.md`).
   - `build.rs` builds `csrc/gmp_h264.cpp` → `libpiirit.so`, target C++ compiler, vs Gecko plugin headers `third_party/gmp-api` (BSD, Apache-2.0; `SOURCE.md` there).
   - Laid out as Gecko looks: `gmp-piirit/1.0/libpiirit.so` beside `piirit.info`, in `OUT_DIR` and beside binary (spec installs from there).
   - Only three entry points exported; x264 hidden. `gmp-check` (`tests/gmp_check.cpp`) = Gecko stand-in, run by `tests/gmp_h264.rs`.
