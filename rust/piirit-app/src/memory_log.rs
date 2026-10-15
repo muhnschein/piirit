@@ -1,6 +1,6 @@
 //! `PIIRIT_MEMORY_LOG=<seconds>`: stderr line, resident size of app and core.
 //!
-//! Phone has no heaptrack/valgrind. Shows which grows: app (images) or core (DB cache).
+//! No heaptrack/valgrind on phone: shows which grows, app (images) or core (DB cache).
 
 use std::time::Duration;
 

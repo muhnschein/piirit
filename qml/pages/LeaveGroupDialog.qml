@@ -2,9 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Leave-group confirm. Own page: no way back in unless someone adds you, and
- * pull-down countdown easy to miss.
- * Group page connects to `accepted`.
+ * Leave-group confirm. Own page: no way back unless re-added, countdown easy
+ * to miss. Group page handles `accepted`.
  */
 Dialog {
     id: dialog

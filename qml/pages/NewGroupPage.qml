@@ -4,16 +4,15 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Name group, picture, members. Laid out as GroupPage.qml. Sent to core in one
- * go at create. Encrypted, like "New Group". Members by id
- * (`ContactList.picked_rows`): a Repeater per contact cost scaled with address
- * book.
+ * Name group, picture, members; laid out as GroupPage.qml. Sent to core in
+ * one go at create, encrypted ("New Group"). Members by id
+ * (`ContactList.picked_rows`): Repeater per contact scaled with address book.
  */
 Page {
     id: page
 
-    // Core move held until on screen: call page may cover it, and move then
-    // would take that page (PendingNavigation.qml).
+    // Core move held until on screen: else may take covering call page
+    // (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -22,8 +21,7 @@ Page {
 
     property int accountId
     property string errorMessage: ""
-    // True from create tap until core answers: second tap can't make a second
-    // group.
+    // Create tap until core answers: no second group from second tap.
     property bool creating: false
     /// Picked contact ids, besides own.
     property var members: []
@@ -109,7 +107,7 @@ Page {
         })
     }
 
-    // Gallery via AttachPhotoPage, as GroupPage: picker pages alone import
+    // Gallery via AttachPhotoPage, as GroupPage: only picker pages import
     // Sailfish.Pickers.
     function pickPicture() {
         var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
@@ -186,8 +184,8 @@ Page {
                 title: qsTr("New group")
             }
 
-            // Picture is the control: tap opens gallery, badge says so. Shows
-            // name's initial until chosen, as group will.
+            // Picture is the control: tap opens gallery, badge says so. Name's initial
+            // until chosen.
             Item {
                 width: parent.width
                 height: bigAvatar.height + 2 * Theme.paddingLarge

@@ -8,16 +8,15 @@ import Piirit 1.0
 /*
  * Calls with one contact, behind Calls tile (components/MediaKinds.qml).
  *
- * Calls are chat messages (chat_media.rs, kind `calls`), newest first; row
- * wording from Calls.js. Tap calls back; one ringing here is answered. Calling
- * row first.
+ * Call messages (chat_media.rs, kind `calls`), newest first, wording from
+ * Calls.js. Tap calls back (ringing: answers). Call row first.
  */
 Page {
     id: page
 
     property int accountId
     property int chatId
-    /// Calls' contact, as contact page names them. Plain text: name is theirs.
+    /// Contact name as contact page; plain text (theirs).
     property string contactName
     property string errorMessage: ""
 
@@ -46,7 +45,7 @@ Page {
             media.handle_event(context_id, kind, payload_json)
             chat.handle_event(context_id, kind, payload_json)
         }
-        // Model made before core up: nothing to load.
+        // No core yet: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 media.reload()
@@ -55,10 +54,10 @@ Page {
         }
     }
 
-    /// A call can be placed from here now.
+    /// Can place call now.
     readonly property bool canCall: chat.can_call
 
-    /// Call back; camera on for video; or open the live call.
+    /// Call back (video: camera on), or open live call.
     function call(video) {
         if (typeof appWindow === "undefined") {
             return
@@ -68,7 +67,7 @@ Page {
         }
     }
 
-    /// Tap: answer ringing one here, else call back.
+    /// Tap: answer ringing, else call back.
     function callFromRow(messageId, outgoing, callState, hasVideo) {
         if (typeof appWindow === "undefined") {
             return
@@ -82,7 +81,7 @@ Page {
         }
     }
 
-    /// Row line 1: direction, or what became of a failed call.
+    /// Row line 1: direction, or failed call's fate.
     function rowTitle(callState, outgoing) {
         if (Calls.failed(callState)) {
             return Calls.title(callState, false)
@@ -107,7 +106,7 @@ Page {
 
         header: Item {
             width: list.width
-            // Gap: call row must not read as first call.
+            // Gap: call row isn't a call.
             height: header.height + callAction.height + videoAction.height
                     + 3 * Theme.paddingLarge
 
@@ -138,7 +137,7 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     width: Theme.iconSizeMedium
                     height: width
-                    // Theme icons take their colour after the `?`.
+                    // Theme icon colour after `?`.
                     source: "image://theme/icon-m-call?" + callAction.tint
                 }
 
@@ -153,7 +152,7 @@ Page {
                     }
                     truncationMode: TruncationMode.Fade
                     color: callAction.tint
-                    // Their name, in a line of ours.
+                    // Their name in our line.
                     textFormat: Text.PlainText
                     //: Places a call. %1 is the name of whoever is called.
                     text: qsTr("Call %1").arg(page.contactName)

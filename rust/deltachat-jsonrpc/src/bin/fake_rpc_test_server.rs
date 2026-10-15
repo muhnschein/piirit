@@ -1,5 +1,4 @@
-//! Stand-in for `deltachat-rpc-server` in tests.
-//! Same wire format: correlation, out-of-order replies, errors, long poll.
+//! Test stand-in for `deltachat-rpc-server`: correlation, out-of-order replies, errors, long poll.
 
 use std::sync::Arc;
 
@@ -79,8 +78,7 @@ async fn serve() {
                 "get_next_event_batch" => {
                     let mut count = batch_counter.lock().await;
                     *count += 1;
-                    // Unusable answers, like core changing event shape across versions.
-                    // Six in a row: stream must survive.
+                    // Six unusable answers (core changing event shape): stream must survive.
                     if (2..=7).contains(&*count) {
                         err(id, -32000, "no events for you")
                     } else if *count <= 8 {

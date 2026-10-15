@@ -1,9 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-/// Pill: word, optional icon. Button or on/off filter.
-///
-/// Tint shows tappable. Checked fills with highlight.
+/// Pill: word, optional icon; button or filter. Tint = tappable, checked = filled.
 Item {
     id: root
 
@@ -11,7 +9,7 @@ Item {
     property alias text: label.text
     /// Theme icon, `image://theme/icon-m-…`.
     property string icon: ""
-    /// Filter on. Button stays off.
+    /// Filter on.
     property bool checked: false
     /// Pressed.
     readonly property bool down: mouse.pressed && mouse.containsMouse
@@ -40,7 +38,7 @@ Item {
         id: content
         x: root.icon !== "" ? Theme.paddingMedium : Theme.paddingLarge
         anchors.verticalCenter: parent.verticalCenter
-        // Icon's clear space alone crowds word.
+        // Icon margin alone crowds word.
         spacing: root.icon !== "" ? Theme.paddingSmall : 0
 
         Image {

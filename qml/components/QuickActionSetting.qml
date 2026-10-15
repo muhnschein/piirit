@@ -1,35 +1,30 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
-// Qt 5.6: Settings singleton needs import naming this dir. Without it, reads
-// throw and bindings keep defaults (phone showed chat controls with no chat
-// action, saved nothing).
+// Qt 5.6: Settings singleton needs this dir imported, else reads throw and
+// bindings keep defaults (phone saved nothing).
 import "."
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * Cover quick action (QuickActionsPage). Chat action adds chat and icon.
+ * Cover quick action (QuickActionsPage). "Chat" opens picker (any profile);
+ * set only once picked, back out keeps old. Shows "Chat: <name>", looked up
+ * so renames and deletion show; re-choosing re-picks. Icons under chat only.
  *
- * One choice. "Chat" opens picker; action becomes a chat's only once one is
- * picked (back out keeps old). Any profile's chat. Choice then says "Chat:
- * <name>"; list still says "Chat", choosing it again re-picks. Name looked up,
- * not stored: renames show, deletion says so. Icons only under chat action.
- *
- * Camera actions ask chat after capture. Only under those: send at once vs wait
- * in chat for caption. Wait is default (as share) and is reset on re-choosing;
- * send-at-once only after a warning about mis-tapped chats. Choice is Silica
- * ComboBox (lists kinds on own page).
+ * Camera actions ask chat after capture; only they get send-at-once vs wait
+ * for caption. Wait is default (as share), reset on re-choosing; send-at-once
+ * only after a mis-tap warning.
  */
 Column {
     id: setting
 
     /// "left" or "right".
     property string side: "left"
-    /// Picker's first profile: settings' one, unless chat's is another.
+    /// Picker's default profile, unless chat's differs.
     property int accountId
     /// Choice label.
     property string label
-    /// Page owning picker; picker waits for it on screen.
+    /// Picker waits for this page on screen.
     property Item hostPage
 
     readonly property string prefix: setting.side === "right" ? "quickActionRight"
@@ -39,7 +34,7 @@ Column {
     /// Chat deleted since pick.
     property bool chatGone: false
 
-    /// The kinds, in the order the choice lists them; "" is none.
+    /// Kinds in listed order; "" none.
     readonly property var kinds: ["", "chat", "search", "qr", "scan", "profiles",
                                   "photo", "video", "selfie", "selfie-video"]
 
@@ -47,7 +42,7 @@ Column {
     readonly property string shown: setting.valueText()
     onShownChanged: choice.value = setting.shown
 
-    /// "Chat" chosen. Picker waits for Silica's choice page to close.
+    /// "Chat" chosen; picker waits for Silica's choice page to close.
     property bool chatWanted: false
 
     width: parent ? parent.width : 0
@@ -101,18 +96,18 @@ Column {
 
     function choose(kind) {
         if (kind === "chat") {
-            // Silica moves choice to tapped item; keep value until pick.
+            // Silica moved choice to tapped item; keep old until pick.
             setting.refresh()
             setting.chatWanted = true
             setting.openWantedPicker()
             return
         }
-        // Send-at-once stays off until user re-enables it knowingly.
+        // Send-at-once off until knowingly re-enabled.
         Settings[setting.prefix + "SendNow"] = false
         Settings[setting.prefix] = kind
     }
 
-    /// Off at once. On after user warned about mis-tapped chat and says go.
+    /// Off at once; on only after mis-tap warning accepted.
     function toggleSendNow() {
         if (setting.action.sendNow) {
             Settings[setting.prefix + "SendNow"] = false
@@ -131,7 +126,7 @@ Column {
         }
     }
 
-    /// Reset to setting's value; Silica's tap detaches currentIndex binding.
+    /// Silica's tap detaches currentIndex binding: reset to setting.
     function refresh() {
         choice.currentIndex = Math.max(0, setting.kinds.indexOf(setting.action.kind))
     }
@@ -140,11 +135,11 @@ Column {
     onKindChanged: setting.refresh()
     Component.onCompleted: setting.refresh()
 
-    /// Ask chat. Shows old choice until picked.
-    /// Picker opens on action's chat profile, else settings'; user may switch.
+    /// Ask chat; old choice shown until picked. Opens on action chat's profile, else
+    /// settings'; switchable.
     function pickChat() {
         var picker = pageStack.push(Qt.resolvedUrl("../pages/ChatPickerPage.qml"), {
-            // Missing profile lists only "account not found" (piirit.qml).
+            // Missing profile would list only "account not found" (piirit.qml).
             accountId: setting.action.kind === "chat" && setting.action.accountId > 0
                        && core.is_configured_account(setting.action.accountId)
                        ? setting.action.accountId : setting.accountId,
@@ -167,8 +162,8 @@ Column {
         })
     }
 
-    /// Ask once page on screen, nothing moving. Choice tap may leave Silica's
-    /// page on stack; picker pushed now would be dropped with it.
+    /// Ask once page active, stack idle: Silica's choice page may still be up and
+    /// would take an early picker with it.
     function openWantedPicker() {
         if (!setting.chatWanted || !setting.hostPage
                 || setting.hostPage.status !== PageStatus.Active || pageStack.busy) {
@@ -197,15 +192,14 @@ Column {
         onError: setting.chatGone = true
     }
 
-    // Stock Silica ComboBox (lists kinds on own page). Text is setting's, not
-    // tapped item's, so chat action names chat.
+    // Silica ComboBox (kinds on own page). Text is setting's, so chat action names chat.
     ComboBox {
         id: choice
         objectName: setting.side + "ActionChoice"
         width: parent.width
         label: setting.label
         value: setting.shown
-        // Silica writes tapped text here ("Chat" if unpicked): put back.
+        // Silica writes tapped text ("Chat" if unpicked): put back.
         onValueChanged: {
             if (choice.value !== setting.shown) {
                 choice.value = setting.shown
@@ -225,7 +219,7 @@ Column {
         }
     }
 
-    // Camera action: send at once on pick. Only these send anything.
+    // Camera actions only: send at once on pick.
     TextSwitch {
         id: sendNow
         objectName: setting.side + "ActionSendNow"
@@ -241,8 +235,8 @@ Column {
         onClicked: setting.toggleSendNow()
     }
 
-    // Icons chat action can wear; lit = current. Bindings-laid rows, not Grid
-    // (see ChoiceTiles). Same files as cover, so picked = shown.
+    // Chat action icons, current lit; laid by bindings, not Grid (see ChoiceTiles).
+    // Same files as cover.
     Item {
         id: icons
         objectName: setting.side + "ActionIcons"

@@ -1,12 +1,10 @@
 //! Relays a profile is reached through.
 //!
-//! Mail arrives on any transport (`list_transports`); core picks outgoing one per connect (newest
+//! Mail arrives on any transport (`list_transports`); core picks outgoing per connect (newest
 //! answering since 2.61), unnamed over JSON-RPC. Own-address relay (`configured_addr`) listed
 //! first. `delete_transport`: core refuses last; removing own-address relay makes core pick
-//! another. So rows read back after removal: own address is core's answer, not a guess here.
-//!
-//! Rows also carry connectivity report dot, status, mailbox (`connectivity.rs`): one parse fills
-//! every row.
+//! another, so rows read back: own address is core's answer, not a guess. Rows also carry
+//! report dot, status, mailbox (`connectivity.rs`), one parse for all.
 
 use std::cell::RefCell;
 
@@ -29,36 +27,34 @@ pub struct Transports {
 
     /// Account whose relays these are; setting reloads.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
-    /// Emitted when the account changes.
+    /// Account changed.
     pub account_changed: qt_signal!(),
 
-    /// Own-address relay first, rest in core (add) order.
-    /// Reset whole per load: few rows, and removal countdown lives beside list, not on row
-    /// (`PendingRemoval.qml`), so rebuild costs nothing.
+    /// Own-address relay first, rest in core (add) order. Reset whole per load: few rows, and
+    /// removal countdown lives beside list (`PendingRemoval.qml`), not on row.
     pub rows: qt_property!(RefCell<TransportListModel>; CONST),
 
-    /// Row count; gates removing last (core refuses).
-    /// Field, not `rows.len()`: bindings read it mid-rebuild.
+    /// Row count; gates removing last (core refuses). Field, not `rows.len()`: read mid-rebuild.
     pub count: qt_property!(u32; NOTIFY rows_changed),
     /// Own address (`configured_addr`); empty until loaded.
     pub primary: qt_property!(QString; NOTIFY rows_changed),
-    /// Emitted after any change to `rows`.
+    /// `rows` changed.
     pub rows_changed: qt_signal!(),
 
-    /// Core's words, e.g. "Cannot remove the last transport".
+    /// Core's words ("Cannot remove the last transport").
     pub error: qt_signal!(message: QString),
     /// Relay removed, rows read back; page re-reads profile.
     pub changed: qt_signal!(),
 
-    /// Read the relays from the core.
+    /// Read relays from core.
     pub reload: qt_method!(fn(&mut self)),
     /// Remove relay `addr` is on. Core refuses last; picks another own address if needed.
     pub remove: qt_method!(fn(&mut self, addr: QString)),
-    /// Feed a `core_event` in. Events for other accounts are ignored.
+    /// Feed `core_event`; other accounts' ignored.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Stale loads dropped: removal reloads, and core's `TransportsModified` for it reloads again.
+    /// Stale loads dropped: removal reloads, and its `TransportsModified` reloads again.
     generation: u64,
 }
 
@@ -69,7 +65,7 @@ type Listed = (Vec<serde_json::Value>, String, String, u32);
 const CONNECTING: u32 = 2000;
 
 impl Transports {
-    /// Set the account and reload if it changed.
+    /// Set account; reload if changed.
     pub fn set_account_id(&mut self, account_id: u32) {
         if self.account_id != account_id {
             self.account_id = account_id;
@@ -78,7 +74,7 @@ impl Transports {
         }
     }
 
-    /// Read the relays from the core.
+    /// Read relays from core.
     pub fn reload(&mut self) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -123,7 +119,7 @@ impl Transports {
                     .await
                     .map(Option::unwrap_or_default)
                     .map_err(|err| err.to_string())?;
-                // Nice to have: relay listed even if report unreadable.
+                // Optional: relay listed even if report unreadable.
                 let report: String = rpc
                     .call("get_connectivity_html", (account_id,))
                     .await
@@ -140,7 +136,7 @@ impl Transports {
         });
     }
 
-    /// Remove the relay `addr` is on.
+    /// Remove relay `addr` is on.
     pub fn remove(&mut self, addr: QString) {
         let account_id = self.account_id;
         let addr = addr.to_string();
@@ -161,7 +157,7 @@ impl Transports {
         });
     }
 
-    /// Core event: transports changed here or on other device, or overflow.
+    /// Core event: transports changed here or elsewhere, or overflow.
     pub fn handle_event(&mut self, context_id: u32, kind: QString, _payload_json: QString) {
         if context_id != self.account_id || self.account_id == 0 {
             return;
@@ -190,8 +186,7 @@ impl Transports {
     }
 }
 
-/// Rows: own-address relay first, mailbox from report.
-/// Not connected (`band`): relays shown so.
+/// Rows: own-address relay first, mailbox from report; shown not connected below `band`.
 fn rows_from(
     transports: &[serde_json::Value],
     primary: &str,
@@ -234,12 +229,12 @@ fn rows_from(
             }
         })
         .collect();
-    // Stable, so the rest keep the core's order.
+    // Stable: rest keep core's order.
     rows.sort_by_key(|row| !row.is_primary);
     rows
 }
 
-/// Stable number per address: FNV-1a, top bit dropped for QML `int`. Keys removal countdown.
+/// Stable number per address: FNV-1a, top bit dropped for QML `int`; keys removal countdown.
 /// Collision: one countdown on wrong row.
 fn row_id(addr: &str) -> u32 {
     let hash = addr.bytes().fold(0x811c_9dc5_u32, |hash, byte| {
@@ -284,7 +279,7 @@ mod tests {
             .collect()
     }
 
-    /// Own-address relay first; each row has its own mailbox.
+    /// Own-address relay first; own mailbox per row.
     #[test]
     fn the_profiles_own_relay_is_first_and_each_has_its_own_mailbox() {
         let rows = rows_from(
@@ -341,7 +336,7 @@ mod tests {
         assert!(rows_from(&[], "ada@nine.testrun.org", REPORT, 4000).is_empty());
     }
 
-    /// Not connected at all: each relay shown not connected.
+    /// Not connected: each relay shown so.
     #[test]
     fn a_profile_not_connected_at_all_has_relays_not_connected() {
         let relays = listed(&["ada@old.example.net", "ada@nine.testrun.org"]);

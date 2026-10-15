@@ -4,41 +4,33 @@ import "../components"
 
 /*
  * First screen: no address or password (docs/PROJECT.md), just add a profile.
- * Window opens chat list directly when `Settings.lastAccountId` names a
- * profile (piirit.qml), so this page isn't made on ordinary launch. Left to
- * it: phones whose key was never written (profile made before key, or
- * restored into fresh install), where core's `accounts_refreshed` is the only
- * sign of a profile.
- * Hand-over offered until stack takes it: Silica drops ops during transitions,
- * and first offer is made inside the push putting this page up. Giving up
- * after one refusal flashed first screen; recording refusal as departure left
- * it blank for good.
- * Look: app mark, name, one line, two ways on (IntroPage.qml for new users,
- * ProfileStartPage.qml for setup). No relay dialog: picking a server is for
- * those already decided.
+ * Window skips it when `Settings.lastAccountId` names a profile (piirit.qml);
+ * left: key never written (profile made before key, or restored into fresh
+ * install), core's `accounts_refreshed` only sign of a profile.
+ * Hand-over offered till stack takes it: Silica drops ops mid-transition, first
+ * offer is inside the push putting this up. One refusal = give up flashed first
+ * screen; refusal as departure left it blank.
+ * Two ways on: IntroPage.qml (new users), ProfileStartPage.qml (setup). No relay
+ * dialog: server picking is for the decided.
  */
 Page {
     id: page
 
-    // Both ways up, in a column.
     allowedOrientations: Orientation.All
 
-    /// Nothing drawn until known whether phone has a chat list.
+    /// Nothing drawn till chat list known.
     property bool probing: true
-    /// Profile to hand over to, or 0 if unknown. dconf until core answers; core is authority.
+    /// Profile to hand over to; 0 unknown. dconf till core (authority) answers.
     property int resumeAccountId: Settings.lastAccountId > 0
                                   ? Settings.lastAccountId : 0
-    /// Chat list actually opened. Set from stack's result, never from asking:
-    /// else page hides for a hand-over that never happened, blank.
+    /// Chat list opened: set from stack's result, never asking, else hides blank.
     property bool leaving: false
-    /// Probe is slow. Spinner on the way out is the flash it prevents.
+    /// Probe slow; spinner on way out is the flash avoided.
     property bool slow: false
-    /// Wait before drawing anyway, ms. Tests turn it down, never wait.
+    /// Wait before drawing anyway, ms; tests lower it.
     property int handOverDeadline: 4000
 
-    /// Go to chat list if a profile to open on is known.
-    ///
-    /// No IO start here: window asks once core is ready (piirit.qml).
+    /// Go to chat list if profile known. No IO start: window asks once core ready (piirit.qml).
     function resumeRemembered() {
         if (page.leaving || !(page.resumeAccountId > 0)) {
             return
@@ -54,9 +46,8 @@ Page {
         return opened ? true : false
     }
 
-    // Offered every frame until taken. Refusal is free and says nothing about
-    // the next (stack busy putting this page up).
-    // `triggeredOnStart`: first offer as soon as a profile is known.
+    // Offered each frame till taken; refusal free, says nothing of next (stack busy putting
+    // this up). `triggeredOnStart`: first offer once profile known.
     Timer {
         id: handOver
         objectName: "handOver"
@@ -75,9 +66,8 @@ Page {
         onTriggered: page.slow = true
     }
 
-    // Long stop: ends offering. Waiting longer is worse than a usable screen.
-    // Also stops the timer above, so reader gone on to IntroPage isn't yanked
-    // away.
+    // Long stop ends offering (and timer above, so reader on IntroPage isn't yanked): waiting
+    // longer is worse than usable screen.
     Timer {
         id: handOverStop
         objectName: "handOverStop"
@@ -95,8 +85,7 @@ Page {
         }
     }
 
-    // Qt 5.6 only recognises `onFoo:` bindings, with snake_case params. Enforced
-    // by tests/qml_syntax.rs.
+    // Qt 5.6 recognises only `onFoo:` bindings, snake_case params (tests/qml_syntax.rs).
     Connections {
         target: core
 
@@ -108,15 +97,14 @@ Page {
             }
         }
 
-        // Not gated on `leaving`: a page that handed over is gone, so being here means failure.
+        // Not gated on `leaving`: handed-over page is gone; here means failure.
         onAccounts_refreshed: {
             if (configured_count > 0) {
-                // Profile app closed on (core remembers). Assigned, not one
-                // attempt: offering runs on it; busy stack may take it later.
+                // Profile app closed on (core remembers). Assigned: offering runs on it.
                 page.resumeAccountId = resume_account_id
                 page.resumeRemembered()
             } else {
-                // No profile anywhere: nothing to open, nothing for next launch either.
+                // No profile: nothing to open now or next launch.
                 page.resumeAccountId = 0
                 Settings.lastAccountId = 0
                 page.probing = false
@@ -131,27 +119,25 @@ Page {
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
-            // Little above middle, where a title sits.
+            // Little above middle, title height.
             verticalCenterOffset: -page.height * 0.04
         }
-        // Narrower than page: description wraps as reading line.
+        // Narrower: description wraps as reading line.
         width: Math.min(parent.width - 2 * Theme.horizontalPageMargin,
                         Screen.width - 2 * Theme.horizontalPageMargin)
         spacing: Theme.paddingMedium
-        // Down until known there is no chat list. Avoids a flash in the wrong place.
+        // Hidden till no chat list known: no flash.
         visible: !page.probing
 
-        // App mark over name: launcher icon (qml/art/logo.png is
-        // icons/harbour-piirit.svg rendered), so first screen and launcher
-        // match.
-        // Placed, not anchored: Column ignores vertical anchors.
+        // Launcher icon (qml/art/logo.png = icons/harbour-piirit.svg rendered). Placed, not
+        // anchored: Column ignores vertical anchors.
         Image {
             id: logo
             objectName: "logo"
             x: (parent.width - width) / 2
             width: Theme.itemSizeLarge
             height: width
-            // Decoded at drawn size: first screen should not cost a screenful of texture.
+            // Decode at drawn size: no screenful of texture.
             sourceSize.width: width
             sourceSize.height: height
             fillMode: Image.PreserveAspectFit
@@ -159,7 +145,7 @@ Page {
             source: "../art/logo.png"
         }
 
-        // App name, never translated (see cover): large heading face.
+        // App name, never translated (see cover).
         Label {
             objectName: "title"
             width: parent.width
@@ -171,7 +157,7 @@ Page {
             color: Theme.highlightColor
         }
 
-        // One line under name: what app is, in its own site's words.
+        // What app is, in its site's words.
         Label {
             objectName: "tagline"
             width: parent.width
@@ -185,12 +171,12 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        // Two ways on under name: what Delta Chat is, and profile entry.
-        // Account mark drawn by this app so it's on every phone (components/AccountMark.qml).
+        // What Delta Chat is; profile entry. Own account mark: on every phone
+        // (components/AccountMark.qml).
         ChoiceTiles {
             objectName: "welcomeWays"
             width: parent.width
-            // Column already inside page margins.
+            // Column inside page margins.
             sideMargin: 0
             choices: [
                 {
@@ -214,7 +200,7 @@ Page {
             }
         }
 
-        // The one pre-ask failure: core didn't start. Said where the tile it stops is.
+        // Only pre-ask failure, core didn't start: shown where its tile is.
         Label {
             objectName: "coreError"
             width: parent.width

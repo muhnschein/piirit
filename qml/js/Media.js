@@ -1,5 +1,4 @@
-// Chat's non-text kinds (gallery, audio, files, apps, calls): names and icons.
-//
+// Chat's non-text kinds (gallery, audio, files, apps, calls): names, icons.
 // No `.pragma library`: qsTr() needs importing file's context.
 
 /// Kinds in tile order. Apps first if on; calls last, if chat can hold one.
@@ -71,8 +70,8 @@ function kindIcon(kind) {
     return ""
 }
 
-/// Theme icon for a file's MIME type, as file browser picks it: by type
-/// family, by name for a few; else `icon-m-file-other`.
+/// Theme icon for MIME type, as file browser: by family, a few by name; else
+/// `icon-m-file-other`.
 function fileIcon(mime) {
     if (mime.indexOf("image/") === 0) {
         return "icon-m-file-image"

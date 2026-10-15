@@ -2,8 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Tap focus ring: white while searching, lit when locked. Stays while the tap's
- * focus is held, goes with it.
+ * Tap focus ring: white searching, lit locked; lasts while tap's focus held.
  */
 Rectangle {
     id: reticle

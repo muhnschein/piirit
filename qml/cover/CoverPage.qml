@@ -8,32 +8,27 @@ import "../js/Media.js" as Media
 /*
  * Cover while minimised: who is there, who wrote new.
  *
- * Staggered circle grid: everyone's avatar in grey once, empty circles for spare
- * cells; starts above top edge. Writers in ambience highlight in whole cells
- * nearest the top; then count pill (two cells wide, middle of second row). More
- * people than cells: pictures before initials.
+ * Staggered circle grid from above top edge: everyone once in grey, empty circles
+ * spare. Writers in highlight, whole cells nearest top; count pill two cells wide,
+ * mid second row. Overflow: pictures before initials.
  *
- * Every profile counts: one ChatList each; grid = everyone. Own lists: cover
- * outlives pages (minimise from anywhere, onboarding included). People come as
+ * One ChatList per profile, own (cover outlives pages, onboarding too); people as
  * one JSON list per profile (`cover_people`), laid out in one pass.
  *
- * Foot: up to two quick actions (home screen draws them); grid fades into the
- * bottom strip, nothing over faces. Tap handling is the window's (piirit.qml).
+ * Foot: up to two quick actions (home screen draws); grid fades into strip. Taps:
+ * window's (piirit.qml).
  *
- * Call up: cover is the call's. Picture faint, shaded darkest at name and foot;
- * no picture: avatar over name. Name, time/status, mic/camera pills, one mic
- * toggle. No hang-up (mis-tap), no camera (stays let go while cover shows).
- * Ringing: no action, no pills. All inside side margins, above strip; smaller
- * covers scale down.
+ * Call up: cover is call's. Faint picture, darkest at name and foot; no picture:
+ * avatar over name. Name, time/status, mic/camera pills, mic toggle. No hang-up
+ * (mis-tap), no camera (let go while cover shows). Ringing: no action, no pills.
+ * Inside side margins, above strip; small covers scale down.
  *
- * Picture is the plain file: blurred face is no face on a cover. No shaders
- * anywhere on the cover (Avatar.qml).
+ * Plain picture file (blur = no face); no shaders on cover (Avatar.qml).
  */
 CoverBackground {
     id: cover
 
-    // One list per profile. Repeater delegates must be Items: each list in an
-    // empty one.
+    // One list per profile, each in an empty Item (Repeater delegate).
     Repeater {
         id: lists
         model: core.account_list
@@ -69,31 +64,30 @@ CoverBackground {
         cover.gather()
     }
 
-    /// Everyone across profiles, in each list's order.
+    /// Everyone, list order.
     property var people: []
     /// Unread across profiles.
     property int unreadTotal: 0
-    /// Can take quick action now (window says). Not before chat list, nor over a
-    /// page that must not be left.
+    /// Quick action takeable now (window says): not before chat list or over
+    /// unleavable page.
     property bool quickActionsAllowed: true
 
-    /// Quick action tapped: `side` is "left" or "right" (as Settings).
+    /// Quick action tapped: `side` "left"/"right" (as Settings).
     signal quickAction(string side)
 
     readonly property var leftAction: QuickActions.shown(Settings, "left")
     readonly property var rightAction: QuickActions.shown(Settings, "right")
-    /// Home screen draws an action: one set, app can take it, no call up (call
-    /// has own).
+    /// Actions drawn: one set, allowed, no call up.
     readonly property bool actionsShown: cover.quickActionsAllowed && !cover.callUp
         && (cover.leftAction.kind !== "" || cover.rightAction.kind !== "")
 
-    /// Icon picture as whole URL: home screen reads the file from outside app.
+    /// Icon as whole URL: home screen reads it from outside app.
     function iconUrl(name) {
         return Qt.resolvedUrl("../" + QuickActions.iconFile(
             name, Theme.iconSizeSmall, QuickActions.isLight(Theme.primaryColor)))
     }
 
-    /// Picture for an action; none for no action.
+    /// Action icon; "" for none.
     function actionIcon(action) {
         if (action.kind === "") {
             return ""
@@ -101,30 +95,28 @@ CoverBackground {
         return cover.iconUrl(QuickActions.iconName(action))
     }
 
-    /// Window's call (CallCenter.qml), so cover can show it; null for none.
+    /// Window's call (CallCenter.qml); null for none.
     property QtObject call: null
 
-    /// Call up (ringing, placed, in progress) while call page on stack.
+    /// Call up (ringing, placed, in progress), page on stack.
     readonly property bool callUp: cover.call !== null && cover.call.state !== ""
                                    && cover.call.state !== "ended"
-    /// Past ringing: mic to switch, camera maybe let go. Placed calls: from
-    /// start.
+    /// Past ringing (placed: from start): mic switchable.
     readonly property bool callUnderWay: cover.callUp && cover.call.state !== "ringing"
 
     /// Other end's picture file; empty for none.
     readonly property string callPicturePath: cover.callUp ? "" + cover.call.peer_avatar : ""
-    /// Picture drawn under call once loaded. Until then, or if never loads:
-    /// plain cover.
+    /// Picture under call once loaded; else plain.
     readonly property bool callPictured: cover.callUp && callPicture.status === Image.Ready
 
-    /// Under shade, behind pills: black in dark ambience, white in light.
+    /// Shade ground: black in dark ambience, white in light.
     readonly property color callGround: QuickActions.isLight(Theme.primaryColor)
                                         ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1)
 
-    /// Now, ticked once a second while call clock is seen.
+    /// Now, ticked each second while call clock seen.
     property real now: Date.now()
 
-    /// Connected time as call page counts it (CallPage.qml): two digits each.
+    /// Connected time as CallPage.qml: two digits each.
     function callElapsed() {
         if (!cover.callUp || cover.call.connected_at <= 0) {
             return ""
@@ -134,8 +126,8 @@ CoverBackground {
         return parts.map(function (part) { return (part < 10 ? "0" : "") + part }).join(":")
     }
 
-    /// Under name: connected time, or state until connected. Call page's words,
-    /// in its translation context, so translated wherever it is.
+    /// Under name: connected time, or state. Call page's words and context, so
+    /// translated wherever it is.
     function callStatus() {
         if (!cover.callUp) {
             return ""
@@ -157,7 +149,7 @@ CoverBackground {
         return cover.callElapsed()
     }
 
-    // Call clock only while seen: a timer would wake phone each second.
+    // Clock only while seen: timer wakes phone each second.
     Timer {
         id: callClock
         objectName: "callClock"
@@ -165,8 +157,7 @@ CoverBackground {
         repeat: true
         running: cover.looking && cover.callUp && cover.call.state === "connected"
         onTriggered: cover.now = Date.now()
-        // Set now, not on first tick: cover looked at again must not show time
-        // it went away.
+        // Set now: else shows time cover went away.
         onRunningChanged: {
             if (callClock.running) {
                 cover.now = Date.now()
@@ -174,28 +165,26 @@ CoverBackground {
         }
     }
 
-    /// Strip height home screen draws actions in. Measured, as vuo did: icon
-    /// tops ~18% up.
+    /// Action strip height, measured (as vuo): icon tops ~18% up.
     readonly property real actionStrip: Theme.itemSizeSmall
-    /// Faces stop being seen whole: above strip if actions, else bottom edge.
+    /// Where faces stop being whole: strip top if actions, else bottom.
     readonly property real floor: cover.actionsShown
                                   ? cover.height - cover.actionStrip
                                   : cover.height
-    /// Band faces fade over with actions: twice strip height above bottom edge,
-    /// to edge.
+    /// Fade band with actions: twice strip height.
     readonly property real fadeFrom: cover.height - 2 * cover.actionStrip
     readonly property real fadeTo: cover.height
     /// Grid cells `{person, row, col, loud}`; `person` null for empty circle.
     property var cells: []
 
-    /// Three across; every other row shifted half a cell and one more. Shifted
-    /// row under first holds the pill (two middle cells).
+    /// Three across; alternate rows shifted half a cell, one more. First shifted
+    /// row holds pill.
     readonly property int columns: 3
     readonly property int cellSize: Math.floor(cover.width / cover.columns)
     /// Gap between circles, and circle and pill.
     readonly property int gap: Theme.paddingMedium
     readonly property int rowStep: Math.max(1, Math.round(cover.cellSize * 0.95))
-    /// Grid starts this far above top edge: first row seen from waist down.
+    /// Grid offset above top: first row seen from waist down.
     readonly property int topCut: Math.round(cover.cellSize * 0.6)
     readonly property int rows: cover.cellSize > 0
                                 ? Math.ceil((cover.height + cover.topCut) / cover.rowStep)
@@ -234,8 +223,8 @@ CoverBackground {
                && (col === cover.pillFirstCol || col === cover.pillFirstCol + 1)
     }
 
-    /// Visibility rank, smaller better. Excluded: half-cut, top-cut, fading.
-    /// Rest: higher first, then centre out.
+    /// Visibility rank, smaller better; half-, top-cut, fading excluded. Then
+    /// higher first, centre out.
     function prominence(row, col) {
         var size = cover.cellSize
         var x = cover.cellX(row, col)
@@ -246,21 +235,19 @@ CoverBackground {
         return (whole ? 0 : 100) + row * 2 + fromMiddle
     }
 
-    /// Cover is what is looked at: minimised, home screen showing, display on.
+    /// Cover seen: minimised, home screen up, display on.
     readonly property bool looking: cover.status === Cover.Active
 
-    /// Grid is what is looked at: cover is, and no call. Laid out again once
-    /// seen.
+    /// Grid seen: cover seen, no call. Re-laid once seen.
     readonly property bool gridSeen: cover.looking && !cover.callUp
 
-    /// Changed while unseen: cells stale. True at start: nothing read yet.
+    /// Changed while unseen; true at start.
     property bool stale: true
 
-    /// Cover built. Size and status arrive one at a time; each would re-lay
-    /// grid, so wait.
+    /// Cover built: size and status come one by one, each would re-lay grid.
     property bool ready: false
 
-    /// Re-read lists if anyone to read for, else mark stale.
+    /// Re-read if seen, else mark stale.
     function gather() {
         if (!cover.ready || !cover.gridSeen) {
             cover.stale = true
@@ -270,14 +257,14 @@ CoverBackground {
         cover.rebuild()
     }
 
-    // Missed while away or in a call: done once on return, not per arrival.
+    // Missed while away/in call: once on return.
     onGridSeenChanged: {
         if (cover.gridSeen && cover.stale) {
             cover.gather()
         }
     }
 
-    /// Cell order: new first, then with picture, then rest; each in list order.
+    /// Cell order: new, then with picture, then rest; list order within.
     function rank(person) {
         if (person.unread_count > 0) {
             return 0
@@ -285,7 +272,7 @@ CoverBackground {
         return ("" + person.avatar_path).length > 0 ? 1 : 2
     }
 
-    /// Who is there, how much unread, and what fills grid.
+    /// People, unread, grid.
     function rebuild() {
         var everyone = []
         var total = 0
@@ -305,7 +292,7 @@ CoverBackground {
             }
         }
 
-        // Cells in drawn order, less the two the pill sits on.
+        // Cells in drawn order, less pill's two.
         var slots = []
         for (var row = 0; row < cover.rows; row++) {
             for (var col = 0; col < cover.across(row); col++) {
@@ -316,8 +303,7 @@ CoverBackground {
             }
         }
 
-        // Everyone once, in rank order. Chat id twice in one profile is one
-        // person.
+        // Everyone once, rank order; same chat id in a profile = one person.
         var placed = []
         var seen = {}
         for (var wanted = 0; wanted <= 2; wanted++) {
@@ -331,7 +317,7 @@ CoverBackground {
             }
         }
 
-        // Best cells first; sorted apart from `slots` so grid keeps its order.
+        // Best cells first; separate from `slots`, which keeps grid order.
         var best = slots.slice()
         best.sort(function (one, other) {
             return cover.prominence(one.row, one.col)
@@ -358,8 +344,7 @@ CoverBackground {
     // Cells worth having move with strip.
     onFloorChanged: cover.gather()
 
-    // Grid fills cover past every edge: half a cell at sides, most of one at
-    // top.
+    // Grid past edges: half a cell at sides, most of one at top.
     Item {
         id: grid
         objectName: "avatarGrid"
@@ -367,42 +352,36 @@ CoverBackground {
         clip: true
         visible: !cover.callUp
 
-        // Count, not array: new array remakes every face (~20 Avatars); count
-        // keeps them.
+        // Count, not array: new array remakes ~20 Avatars.
         Repeater {
             model: cover.cells.length
 
             Avatar {
                 objectName: "gridCell"
-                /// This face's cell. Empty while array shrinks before Repeater
-                /// follows.
+                /// Face's cell; empty while array shrinks before Repeater.
                 readonly property var cell: cover.cells[index]
                                             || { person: null, row: 0, col: 0, loud: false }
                 x: cover.cellX(cell.row, cell.col) + cover.gap / 2
                 y: cover.cellY(cell.row) + cover.gap / 2
                 width: cover.cellSize - cover.gap
-                /// Whether anyone drawn here, or only the circle.
+                /// Someone drawn here, not just circle.
                 readonly property bool filled: cell.person !== null
                 initial: filled ? cell.person.name : ""
                 ownColor: filled ? cell.person.color : ""
                 picturePath: filled ? cell.person.avatar_path : ""
-                // Phone's colours: writers in ambience highlight (unread badge
-                // colour), others grey.
+                // Writers in highlight (unread badge colour), others grey.
                 monochrome: !cell.loud
                 highlight: cell.loud
                 opacity: cell.loud ? 1.0 : filled ? 0.6 : 0.35
                 z: cell.loud ? 1 : 0
-                // Action room: faces fade over band twice strip height
-                // (QuickActions.fade). Each face fades itself: grid-level fade
-                // layer drew later faces with the fade program (white squares).
-                // See Avatar.qml.
+                // Faces fade over band (QuickActions.fade), each itself: grid
+                // layer drew later faces as white squares. See Avatar.qml.
                 fadeFrom: cover.actionsShown ? (cover.fadeFrom - y) / Math.max(1, height) : 0
                 fadeTo: cover.actionsShown ? (cover.fadeTo - y) / Math.max(1, height) : 0
             }
         }
 
-        // Count in own cell, two wide: stretched circle sits among faces. Only
-        // when something new. Outline, not disc: number on a highlight disc read
+        // Count, two cells wide, only when new. Outline: number on disc read
         // worse.
         Rectangle {
             id: pill
@@ -429,8 +408,7 @@ CoverBackground {
                 verticalAlignment: Text.AlignVCenter
                 color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeLarge
-                // Shrunk to fit, not cut: "99+ new" in long-word languages must
-                // read whole.
+                // Shrunk, not cut: long-word "99+ new" reads whole.
                 fontSizeMode: Text.HorizontalFit
                 minimumPixelSize: Theme.fontSizeTiny
                 //: On the cover, in a pill among the avatars: how many
@@ -449,8 +427,7 @@ CoverBackground {
         clip: true
         visible: cover.callUp
 
-        // Their face: larger than cover, faint, lightest shade. Read off main
-        // thread.
+        // Their face: larger than cover, faint; loaded off main thread.
         Image {
             id: callPicture
             objectName: "callPicture"
@@ -467,8 +444,7 @@ CoverBackground {
             source: cover.callPicturePath.length > 0 ? Media.fileUrl(cover.callPicturePath) : ""
         }
 
-        // Shade: dark top and foot, near clear between: name and action read
-        // over faces.
+        // Shade: dark top and foot so name and action read over face.
         Rectangle {
             objectName: "callShade"
             anchors.fill: parent
@@ -481,8 +457,8 @@ CoverBackground {
             }
         }
 
-        // Call text: inset, clear of strip (also while ringing, so nothing jumps).
-        // Overflow drops avatar, then name's second line, then scales all down.
+        // Call text clear of strip (also ringing: no jump). Overflow drops avatar,
+        // name's second line, then scales down.
         Item {
             id: callBody
             objectName: "callBody"
@@ -492,8 +468,7 @@ CoverBackground {
             height: Math.max(0, cover.height - cover.actionStrip
                                 - callBody.sized(Theme.paddingSmall) - y)
 
-            /// Theme sizes are for large cover. Smaller cover: all smaller, but
-            /// side margins stay.
+            /// Theme sizes fit large cover; smaller cover scales, margins stay.
             readonly property real ratio: cover.width > 0 && cover.height > 0
                 ? Math.min(1, cover.width / Theme.coverSizeLarge.width,
                            cover.height / Theme.coverSizeLarge.height)
@@ -503,17 +478,15 @@ CoverBackground {
                 return Math.round(size * callBody.ratio)
             }
 
-            /// Name size and smallest it shrinks to for one line. Still largest
-            /// words on cover.
+            /// Name size and one-line minimum (still largest text).
             readonly property real nameSize: callBody.sized(Theme.fontSizeMedium)
             readonly property real nameLeast: callBody.sized(Theme.fontSizeSmall)
             /// Name width on one line at own size.
             readonly property real nameNatural: Math.max(1, nameRuler.implicitWidth)
-            /// Name fits one line somewhere between the two sizes.
+            /// One line fits between the two sizes.
             readonly property bool nameOnOneLine: callBody.nameNatural * callBody.nameLeast
                                                   / callBody.nameSize <= callBody.width
-            /// Drawn size: largest one line allows; least for two lines if one
-            /// won't do.
+            /// Drawn size: largest one-line; else minimum, two lines.
             readonly property real nameFont: callBody.nameOnOneLine
                 ? Math.max(callBody.nameLeast,
                            Math.min(callBody.nameSize,
@@ -524,19 +497,18 @@ CoverBackground {
             readonly property real nameLine: nameRuler.implicitHeight * callBody.nameFont
                                              / Math.max(1, callBody.nameSize)
 
-            /// Room under name, pills inside it; nothing if none.
+            /// Pill room under name; none if no pills.
             readonly property real gap: callBody.sized(Theme.paddingMedium)
             readonly property real notesNeed: callNotes.implicitHeight > 0
                                               ? callBody.gap + callNotes.implicitHeight : 0
-            /// Must fit whatever else is given up: one name line, time, pills.
+            /// Always kept: one name line, time, pills.
             readonly property real least: callBody.nameLine + callHead.spacing
                                           + callTime.implicitHeight + callBody.notesNeed
             /// Name over two lines, when wanted and fits.
             readonly property int nameLines: !callBody.nameOnOneLine
                                              && callBody.height >= callBody.least + callBody.nameLine
                                              ? 2 : 1
-            /// Avatar without picture: well short of cover width, only if fits
-            /// over the rest.
+            /// Avatar without picture, well under cover width, if room.
             readonly property real avatarSize: Math.min(callBody.sized(Theme.iconSizeMedium),
                                                         Math.round(callBody.width * 0.3))
             readonly property real avatarGap: callBody.sized(Theme.paddingMedium)
@@ -545,14 +517,13 @@ CoverBackground {
                                       + (callBody.nameLines - 1) * callBody.nameLine
                                       + callBody.avatarSize + callBody.avatarGap
 
-            /// Height at own size, and how much smaller drawn if no room.
+            /// Height at own size; shrink factor if no room.
             readonly property real needed: callHead.height + callBody.notesNeed
             scale: callBody.needed > callBody.height && callBody.needed > 0
                    ? callBody.height / callBody.needed : 1
             transformOrigin: Item.Top
 
-            // Name on one line at own size, never shown: its width gives the
-            // size.
+            // Hidden one-line name: width sets size.
             Label {
                 id: nameRuler
                 visible: false
@@ -561,8 +532,7 @@ CoverBackground {
                 text: cover.callUp ? cover.call.peer_name : ""
             }
 
-            // Who, at top: what cover is for during call. Avatar over name when
-            // no picture.
+            // Who, at top; avatar over name when no picture.
             Column {
                 id: callHead
                 objectName: "callHead"
@@ -578,8 +548,7 @@ CoverBackground {
                     ownColor: cover.callUp ? cover.call.peer_color : ""
                 }
 
-                // More room avatar-to-name than name-to-time: those belong
-                // together.
+                // More gap avatar-name than name-time (those belong together).
                 Item {
                     visible: callBody.avatarShown
                     width: 1
@@ -596,7 +565,7 @@ CoverBackground {
                     truncationMode: TruncationMode.Elide
                     font.pixelSize: callBody.nameFont
                     color: Theme.primaryColor
-                    // Other end's own name for themselves.
+                    // Their self-chosen name.
                     textFormat: Text.PlainText
                     text: cover.callUp ? cover.call.peer_name : ""
                 }
@@ -614,12 +583,12 @@ CoverBackground {
                 }
             }
 
-            // Call facts, a pill each, middle of room between name and action.
+            // Call facts as pills, centred between name and action.
             Column {
                 id: callNotes
                 objectName: "callNotes"
                 readonly property real roomTop: callHead.height + callBody.gap
-                // Body's own measure: all it needs when drawn smaller.
+                // Natural size, before scale.
                 readonly property real roomBottom: Math.max(callBody.height, callBody.needed)
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: Math.round(callNotes.roomTop
@@ -641,8 +610,8 @@ CoverBackground {
                     text: qsTr("Microphone off")
                 }
 
-                // Wanted, and let go in background (cover seen, so it is). Back by
-                // itself in front, so only said, no action.
+                // Wanted, let go in background (cover seen); back by itself: no
+                // action.
                 CallNote {
                     objectName: "cameraNote"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -666,7 +635,7 @@ CoverBackground {
         return Qt.rgba(ground.r, ground.g, ground.b, strength)
     }
 
-    // Call's one action, mic: off or on. Icon shows what tap does.
+    // Call action: mic toggle; icon shows tap's effect.
     CoverActionList {
         objectName: "callActions"
         enabled: cover.callUnderWay
@@ -682,8 +651,8 @@ CoverBackground {
         }
     }
 
-    // Quick actions: one or two as set; none if app can't take them. A cover may
-    // hold several lists with only one enabled.
+    // Quick actions, one or two; none if not allowed. Cover may hold several
+    // lists, one enabled.
     CoverActionList {
         objectName: "twoActions"
         enabled: cover.actionsShown && cover.leftAction.kind !== ""

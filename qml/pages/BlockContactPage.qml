@@ -4,10 +4,8 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick someone to block: profile's contacts, with search. Reached from plus
- * on blocked contacts page, where reader lands after picking.
- *
- * Core lists unblocked contacts only. Tap asks first: blocking is deliberate.
+ * Pick someone to block: profile's contacts, searchable. From plus on blocked contacts
+ * page, where reader lands after. Core lists unblocked only. Tap asks first: deliberate.
  */
 Page {
     id: page
@@ -46,10 +44,8 @@ Page {
         }
     }
 
-    /// Ask to block, and block if reader agrees.
-    ///
-    /// Page stays for next block; core hides blocked, so row goes. List behind
-    /// updates from core event.
+    /// Ask, block if reader agrees. Page stays for next; core hides blocked, so row goes; list
+    /// behind updates from core event.
     function block(contactId, contactName) {
         var dialog = pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
             contactName: contactName,
@@ -105,7 +101,7 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // Rows otherwise draw outside the box: see NewChatPage.
+            // Else rows draw outside box: see NewChatPage.
             clip: true
             model: contacts.rows
 

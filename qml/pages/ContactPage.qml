@@ -6,16 +6,14 @@ import Piirit 1.0
 
 /*
  * One-to-one chat: picture, name, status, encryption. Swipe left from
- * conversation, as group page. Tap picture: larger.
+ * conversation, as group page; tap picture to enlarge. No address: core's
+ * contact words only.
  *
- * No address shown: core's contact words only.
+ * Name overridable (edit badge, field); blank reverts to theirs (core's
+ * rule). Saved after pause and on leave, as group renames.
  *
- * Name overridable (edit badge -> field); blank reverts to theirs (core's
- * rule). Saved after pause and on leave, as group page renames.
- *
- * Same ChatInfo as group page: one-to-one has one member, the contact. Row
- * read into properties: reloads on save must not rebuild the field under the
- * thumb.
+ * Same ChatInfo as group page; one member, the contact. Row read into
+ * properties: save's reload must not rebuild field under thumb.
  */
 Page {
     id: page
@@ -99,8 +97,7 @@ Page {
         }
     }
 
-    // Leaving saves too: back-swipe inside pause would drop text. Cursor
-    // leaves first.
+    // Leaving saves too: back-swipe in pause would drop text. Cursor leaves first.
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
@@ -136,8 +133,8 @@ Page {
         })
     }
 
-    // One row, the contact, read into page. Repeater is how QML reads rows.
-    // Draws nothing, so reload after save rebuilds nothing on screen.
+    // The contact's one row, read into page (Repeater is how QML reads rows).
+    // Draws nothing: reload after save rebuilds nothing on screen.
     Repeater {
         model: chat.members
 
@@ -193,8 +190,8 @@ Page {
                 }
             }
 
-            // Name to call them here. Field holds only given name; theirs
-            // shows in empty field and is what blank goes back to.
+            // Name to call them here. Field holds given name only; theirs shows when
+            // empty, and blank goes back to it.
             EditableName {
                 id: nameField
                 objectName: "contactNameControl"
@@ -219,8 +216,8 @@ Page {
                 text: page.statusLine
             }
 
-            // Core asks: long-unseen contact may not read soon. Delta Chat's
-            // words, for translations.
+            // Core asks: long-unseen contact may not read soon. Delta Chat's words, for
+            // translations.
             Label {
                 objectName: "seenLabel"
                 visible: page.seenLongAgo
@@ -244,8 +241,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                // Translated literals, pinned: binding reads page to choose
-                // one.
+                // Translated literals pinned: binding reads page to pick one.
                 textFormat: Text.PlainText
                 text: page.isKeyContact
                       ? qsTr("End-to-end encrypted")

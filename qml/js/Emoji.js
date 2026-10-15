@@ -1,27 +1,19 @@
 // Emoji picture lookup, and emoji scan of messages.
 //
 // Qt 5.6 has no colour fonts: emoji with a shipped Twemoji picture draw as one,
-// else text (components/EmojiGlyph.qml). List generated:
-// scripts/fetch-emoji.py.
+// else text (components/EmojiGlyph.qml). Generated: scripts/fetch-emoji.py.
 //
-// Shared library: nothing translates; tables read once, not per row. Drawing
-// uses only EmojiPictures.js, built ahead by the script: Qt 5.6 keeps no
-// compiled scripts, and building tables from the full list (~3x size) cost the
-// first chat opened each launch. Full list is EmojiPicker.js's alone.
+// Library: tables read once. Drawing uses only prebuilt EmojiPictures.js: Qt
+// 5.6 keeps no compiled scripts, full list (~3x) slowed first chat each launch.
 //
-// Tables:
-// - `byKey`: picture per `key`.
-// - `bmpStarts`: first char of each BMP emoji: scan stops only there and at
-//   astral chars.
-// - `textStyle`: text-default symbols (heart, (c), arrow), emoji only with
-//   U+FE0F (as Unicode and other clients). BMP only: above it, data spells even
-//   thumbs-up with the selector.
-// - `mayHold`: text needs an emoji key char to be worth scanning.
+// Tables: `byKey` picture per `key`; `bmpStarts` first char of BMP emoji (scan
+// stops only there and at astral chars); `textStyle` text-default symbols
+// (heart, (c), arrow), emoji only with U+FE0F, BMP only (data spells astral
+// with selector); `mayHold` key chars worth scanning for.
 .pragma library
 .import "EmojiPictures.js" as Pictures
 
-/// Emoji with variation selectors (U+FE0F) removed: same emoji comes with or
-/// without.
+/// Emoji without variation selectors (U+FE0F): comes with or without.
 function key(emoji) {
     return emoji.replace(/️/g, "")
 }
@@ -31,8 +23,8 @@ function untoned(emoji) {
     return key(emoji).replace(/\uD83C[\uDFFB-\uDFFF]/g, "")
 }
 
-/// Picture file name under qml/art/emoji/ (no extension), or "" if none. Skin
-/// tones not shipped: toned emoji drawn untoned.
+/// Picture name under qml/art/emoji/ (no extension), or "". Skin tones not
+/// shipped: drawn untoned.
 function pictureFor(emoji) {
     if (!emoji) {
         return ""
@@ -108,16 +100,12 @@ function escaped(text, lineStart) {
     return out.replace(/\n/g, "<br>")
 }
 
-/// `text` with each shipped emoji as `<img>`, as StyledText; "" if none to
-/// draw.
-///
-/// `styled`: text already StyledText (shim's Markdown, sender chars escaped, so
-/// "<" only opens shim tags; tags left untouched). Else escaped here. Only tag
-/// added: `<img>` under qml/art/emoji/, so a message can load nothing.
-///
-/// `size`: font pixel size; pictures drawn a bit taller, as font emoji are.
+/// `text` with each shipped emoji as `<img>`, as StyledText; "" if none.
+/// `styled`: already StyledText (shim's Markdown, sender chars escaped, tags
+/// untouched); else escaped here. Only added tag: `<img>` under qml/art/emoji/,
+/// so a message can load nothing. `size`: font px; pictures a bit taller.
 function inText(text, styled, size) {
-    // Most messages have no emoji; per-char scan is costly on long bodies.
+    // Most messages have none; per-char scan costly on long bodies.
     if (!text || !Pictures.mayHold.test(text)) {
         return ""
     }
@@ -166,15 +154,14 @@ function inText(text, styled, size) {
     return out + (styled ? rest : escaped(rest, from === 0))
 }
 
-/// Pictures' path for `<img>`. art/ is a sibling of js/, components/ and pages/,
-/// so it resolves the same whichever file Qt resolves against.
+/// Pictures' path for `<img>`. art/ is sibling of js/, components/, pages/:
+/// same from any.
 var artBase = Qt.resolvedUrl("../art/emoji/")
 
 /// Recent-emoji cap.
 var recentLimit = 40
 
-/// `recent` with `emoji` first, cut to `recentLimit`. New array: dconf needs a
-/// new value.
+/// `recent` with `emoji` first, cut to `recentLimit`. New array: dconf needs it.
 function remember(recent, emoji) {
     var out = [emoji]
     var count = recent ? recent.length : 0

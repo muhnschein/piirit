@@ -5,11 +5,8 @@
 //! Words kept, markup dropped (like parla). Not a parser: four substitutions;
 //! unstripped `<` shows as text.
 
-/// Message HTML part, tags removed.
-///
-/// Block ends become line breaks. `head`, `script`, `style` go whole: nothing reader wrote.
-///
-/// No tags: newlines kept. Else markup newlines are whitespace (`replace_tags`).
+/// Message HTML part, tags removed. Block ends become line breaks; `head`, `script`, `style`
+/// go whole. No tags: newlines kept; else markup newlines are whitespace (`replace_tags`).
 pub(crate) fn to_text(html: &str) -> String {
     if !html.contains('<') {
         return collapse_blank_lines(decode_entities(html).trim());
@@ -60,13 +57,11 @@ fn opens(after_bracket: &str, name: &str) -> bool {
     after.starts_with('>') || after.starts_with(|c: char| c.is_ascii_whitespace())
 }
 
-/// Tags out; line-ending tags leave one line break.
+/// Tags out; line-ending tags leave one line break each (`</p>` too; two stay two).
 ///
-/// Markup newlines are whitespace: the tag is the break. Core writes `<br/>` then newline;
-/// counting both double-spaces cut messages. Whitespace collapsed like browser: one space
+/// Markup newlines are whitespace, the tag is the break: core writes `<br/>` then newline,
+/// counting both double-spaced cut messages. Whitespace collapsed as browser: one space
 /// mid-line, none at line ends.
-///
-/// Each break is one line break, `</p>` included. Two in a row stay two.
 fn replace_tags(html: &str) -> String {
     // `br` breaks; blocks break at close tag.
     const BREAKS: [&str; 2] = ["br", "hr"];

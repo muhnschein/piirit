@@ -1,11 +1,9 @@
 //! Picked video, recoded smaller before send.
 //!
-//! Core recodes pictures but sends video as is (`media.rs`); gallery video often exceeds
-//! recommended size and some relays (issue #111). On pick: `piirit-video` reads it, plans a
-//! smaller one at media quality's rates, recodes on own thread while caption is written; sent
-//! only on send. Output in cache beside captures, removed once core copies it or reader drops it;
-//! one whose chat closed mid-send swept a day later (`capture.rs`). Shown as picked name with new
-//! suffix.
+//! Core sends video as is (`media.rs`); gallery video often exceeds recommended size and some
+//! relays (issue #111). On pick: plan at media quality's rates, recode on own thread while
+//! caption is written. Output in cache beside captures, removed once core copies it or reader
+//! drops it; orphans swept a day later (`capture.rs`).
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -30,10 +28,8 @@ pub(crate) fn is_video(path: &str) -> bool {
     VIDEOS.contains(&suffix.as_str())
 }
 
-/// Smaller encode plan for `path`, or `None` to send as is: not a readable video, already
-/// small, or unreadable (left to core, as before).
-///
-/// Header only, cheap enough to ask on pick.
+/// Smaller encode plan for `path`, or `None` to send as is (not video, small, unreadable).
+/// Header only: cheap on pick.
 pub(crate) fn plan(path: &str, media_quality: u32, limit: u64) -> Option<Target> {
     if !is_video(path) {
         return None;
@@ -58,7 +54,7 @@ pub(crate) fn recoded_name(name: &str) -> String {
     format!("{stem}.mp4")
 }
 
-/// Numbers recoded files, process-wide: two chats can each make one.
+/// Numbers recoded files, process-wide (two chats may each make one).
 static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 
 /// Fresh cache path for a recoded video.
@@ -94,10 +90,8 @@ pub(crate) enum Prepared {
     Failed(String),
 }
 
-/// Start recoding `input` smaller on own thread.
-///
-/// `progress` gets whole percents (UI not woken per frame), `done` the outcome; both run on
-/// that thread, so pass `queued_callback`s. `cancel` stops it.
+/// Start recoding `input` smaller on own thread. `progress` gets whole percents, `done` the
+/// outcome, both on that thread (pass `queued_callback`s). `cancel` stops it.
 ///
 /// # Errors
 ///

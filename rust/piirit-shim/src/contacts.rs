@@ -9,9 +9,7 @@ use crate::core::{connection, reconcile_rows};
 use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
-/// Known unblocked contacts; calls that start chats.
-///
-/// `blocked`: blocked list instead.
+/// Known unblocked contacts (or blocked, per `blocked`); calls that start chats.
 ///
 /// ```qml
 /// ContactList { id: contacts; account_id: page.accountId }
@@ -31,13 +29,13 @@ pub struct ContactList {
     /// Query changed.
     pub query_changed: qt_signal!(),
 
-    /// Include own contact, last. Off: pickers skip it.
+    /// Include own contact, last; pickers leave off.
     pub include_self: qt_property!(bool; WRITE set_include_self NOTIFY include_self_changed),
     /// `include_self` changed.
     pub include_self_changed: qt_signal!(),
 
-    /// Blocked contacts: separate core list (blocked ones are in neither `get_contacts` nor
-    /// pickers), not a filter. `query`, `include_self` ignored: core call takes neither.
+    /// Blocked contacts: separate core list, not a filter (absent from `get_contacts` and
+    /// pickers). Ignores `query`, `include_self`: core call takes neither.
     pub blocked: qt_property!(bool; WRITE set_blocked NOTIFY blocked_changed),
     /// `blocked` changed.
     pub blocked_changed: qt_signal!(),
@@ -59,27 +57,23 @@ pub struct ContactList {
     /// One-to-one chat, created if needed. Answers `chat_ready`.
     pub open_chat_with: qt_method!(fn(&mut self, contact_id: u32)),
 
-    /// Create group, open it. Picture set after: core takes one only on existing chat. Answers
-    /// `chat_ready`.
+    /// Create and open group; picture after (core needs existing chat). Answers `chat_ready`.
     pub create_group:
         qt_method!(fn(&mut self, name: QString, member_ids: QVariantList, picture_path: QString)),
 
-    /// Follow invite (QR or `https://i.delta.chat/...`) and open chat: normal way to add contact,
-    /// as address alone can't be encrypted to (docs/PROJECT.md). Answers `chat_ready`, or
+    /// Follow invite (QR or `https://i.delta.chat/...`), open chat: how contacts are added, as
+    /// bare address can't be encrypted to (docs/PROJECT.md). Answers `chat_ready`, or
     /// `relay_offered` for relay code.
     pub join_by_invite: qt_method!(fn(&mut self, qr_content: QString)),
-    /// `join_by_invite` got relay code (`dcaccount:`, `dclogin:`): add to this profile, not new
-    /// profile, as reference clients since 2.61. `relay`: relay name or address, per core.
+    /// `join_by_invite` got relay code (`dcaccount:`, `dclogin:`): add to this profile, as
+    /// reference clients since 2.61. `relay`: core's relay name or address.
     pub relay_offered: qt_signal!(qr_content: QString, relay: QString),
 
-    /// Group rows: own contact first (if list holds it), then `contact_ids` in pick order. Ids
-    /// not in list skipped.
-    ///
-    /// List of maps, not model filter: hiding non-members still built row and avatar per contact,
-    /// on every pick.
+    /// Group rows: own contact first (if listed), then `contact_ids` in pick order; unlisted
+    /// skipped. Maps, not model filter: hiding built a row and avatar per contact every pick.
     pub picked_rows: qt_method!(fn(&self, contact_ids: QVariantList) -> QVariantList),
 
-    /// Stop hearing from contact: nothing they send arrives; no picker offers them. Per account.
+    /// Per account: nothing they send arrives, no picker offers them.
     pub block: qt_method!(fn(&mut self, contact_id: u32)),
 
     /// Hear from contact again.
@@ -88,8 +82,8 @@ pub struct ContactList {
     /// Block applied; list re-asked. `blocked`: which way.
     pub blocking_applied: qt_signal!(contact_id: u32, blocked: bool),
 
-    /// Feed `core_event`; other accounts ignored. Blocks (other device, or core's answer to one
-    /// here) arrive as `ContactsChanged`.
+    /// Feed `core_event`; other accounts ignored. Blocks (any device) arrive as
+    /// `ContactsChanged`.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
@@ -101,7 +95,7 @@ pub struct ContactList {
     /// Chat ready to show.
     pub chat_ready: qt_signal!(chat_id: u32),
 
-    /// Counts loads: stale answer must not land on newer. Answers arrive out of order.
+    /// Counts loads: out-of-order stale answer must not land.
     generation: u64,
 }
 
@@ -110,7 +104,7 @@ pub struct ContactList {
 enum Fill {
     /// New list: rows replaced, view to top.
     Replace,
-    /// Same list re-read: changed rows only; view keeps scroll.
+    /// Same list re-read: changed rows only, scroll kept.
     InPlace,
 }
 
@@ -232,7 +226,7 @@ impl ContactList {
         self.set_blocking(contact_id, false);
     }
 
-    /// Block or unblock, re-read list. Core decides where contact lands.
+    /// Block or unblock, re-read list.
     fn set_blocking(&mut self, contact_id: u32, blocked: bool) {
         let account_id = self.account_id;
         if account_id == 0 || contact_id == 0 {
@@ -336,7 +330,7 @@ impl ContactList {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
                 Ok((chat_id, refused)) => {
-                    // Said first, then opened: group is real; picker error strands reader.
+                    // Report, then open: group exists; error on picker strands reader.
                     if !refused.is_empty() {
                         this.borrow().error(
                             format!(
@@ -366,13 +360,13 @@ impl ContactList {
         };
         runtime.spawn(async move {
             let result = async {
-                // Encrypted key-contacts, as reference "New Group"; method decides that.
-                // Third arg: deprecated, unread `protect`; upstream says pass `false`.
+                // Encrypted key-contact group, as reference "New Group". Third arg: deprecated
+                // unread `protect`, upstream says `false`.
                 let chat_id: u32 = rpc
                     .call("create_group_chat", (account_id, name, false))
                     .await
                     .map_err(|err| err.to_string())?;
-                // Every member attempted; chat returned anyway, no half-built group.
+                // Try every member; chat returned anyway.
                 let mut refused = Vec::new();
                 for member in members {
                     if let Err(err) = rpc
@@ -420,10 +414,9 @@ impl ContactList {
         let qr_content = qr_content.to_string();
         runtime.spawn(async move {
             let result = async {
-                // Core decides payload kind: guessing is protocol work (docs/PROJECT.md).
-                //
-                // Unreadable payload: not an invite, same words. Since 2.61 that covers
-                // fingerprint code without invite and unknown key. Lost connection passed on.
+                // Core decides payload kind; guessing is protocol work (docs/PROJECT.md).
+                // Unreadable: "not an invite" (since 2.61 incl. fingerprint without invite,
+                // unknown key). Lost connection passed on.
                 let qr: serde_json::Value = rpc
                     .call("check_qr", (account_id, qr_content.clone()))
                     .await
@@ -484,7 +477,7 @@ impl ContactList {
         });
     }
 
-    /// Shared completion of the three chat-opening methods.
+    /// Completion shared by the three chat-opening methods.
     fn chat_callback(&self) -> impl Fn(Result<u32, String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<u32, String>| {
@@ -513,7 +506,7 @@ fn not_an_invite(what: &str) -> String {
 /// `DC_CONTACT_ID_SELF`: own contact. Not in `get_contacts`, in every group.
 pub(crate) const SELF_CONTACT_ID: u32 = 1;
 
-/// One contact as map for QML, keys = model role names, so both rows read alike.
+/// Contact as QML map keyed by role names, so both row kinds read alike.
 fn row_map(item: &ContactItem) -> QVariantMap {
     let mut row = QVariantMap::default();
     row.insert("contact_id".into(), QVariant::from(item.contact_id));
@@ -543,7 +536,7 @@ pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
         is_key_contact: json::flag(contact, "isKeyContact"),
         is_self: contact_id == SELF_CONTACT_ID,
         status: json::text(contact, "status"),
-        // `color` pinned by integration test. Picture key unpinned: rename falls back to initial.
+        // `color` pinned by integration test; picture key isn't (rename -> initial).
         color: json::text(contact, "color"),
         avatar_path: json::text(contact, "profileImage"),
         // Since 2.61, in place of `wasSeenRecently`.

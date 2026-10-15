@@ -6,14 +6,10 @@ import Nemo.Thumbnailer 1.0
 import "../js/Format.js" as Format
 
 /*
- * Renderer per attachment kind, from core's `viewType`. Nothing here inspects
- * files. Falls back to naming the file.
- *
- * Own component (MessageDelegate too long); testable per kind.
- * Bindings, not Column: positioner sizes in polish pass, never runs headless.
- * Every renderer at y 0; height is the loaded one. Each kind behind own Loader,
- * so a scrolled row builds only what it shows; sound player built only on first
- * play press. Nothing here starts on its own.
+ * Renderer per core `viewType`; never inspects files; fallback names file. Own component
+ * (MessageDelegate too long), testable per kind. Bindings, not Column: positioner sizes in
+ * polish pass, never headless. Renderers at y 0; height is loaded one's. Each kind behind own
+ * Loader: scrolled row builds only what it shows. Nothing starts on its own.
  */
 Item {
     id: root
@@ -26,17 +22,15 @@ Item {
     property string fileMime: ""
     /// Bytes; 0 unknown. `real`: QML has no 64-bit int; large file overflows.
     property real fileBytes: 0
-    /// Core kind enum: Text, Image, Gif, Sticker, Audio, Voice, Video, File,
-    /// Call, Webxdc, Vcard.
+    /// Core kind: Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc, Vcard.
     property string viewType: "Text"
-    /// Pixel size; often 0 (core gave 0x0 for valid GIF): check before dividing.
+    /// Pixel size; often 0 (core 0x0 for valid GIF): check before dividing.
     property int imageWidth: 0
     property int imageHeight: 0
-    /// Reader has not seen it: arrived while chat open, or unread at open. Only
-    /// such GIFs autoplay.
+    /// Unseen: arrived while open, or unread at open. Only such GIFs autoplay.
     property bool isNew: false
-    /// Sound length ms when core knows (sender writes it for recordings; core
-    /// reads none from a handed file), often 0. Shown until first play builds player.
+    /// Sound ms if core knows (sender writes it for recordings, none for handed file), often 0.
+    /// Shown till first play builds player.
     property int durationMs: 0
     /// List moving: GIF holds frame instead of decoding on scroll thread.
     property bool scrolling: false
@@ -49,7 +43,7 @@ Item {
     property string webxdcDocument: ""
     property string webxdcSummary: ""
     property string webxdcIcon: ""
-    /// webxdc apps on. Off: `.xdc` drawn as file, opens to system. Page binds it.
+    /// webxdc apps on; off: `.xdc` drawn as file, opened by system. Page binds it.
     property bool appsEnabled: false
     /// Bubble max width.
     property real contentWidth: 0
@@ -58,8 +52,7 @@ Item {
     signal menuRequested()
 
     readonly property bool hasFile: root.filePath.length > 0
-    // Sender-named file: `#` or `%` breaks plain file:// + path. Encode per
-    // segment (encodeURI keeps `#`, `?`).
+    // Sender names: `#`/`%` break file:// + path. Encode per segment (encodeURI keeps `#`, `?`).
     readonly property url fileUrl: root.hasFile
         ? Qt.resolvedUrl("file://" + root.filePath.split("/")
                                          .map(encodeURIComponent).join("/"))
@@ -87,19 +80,17 @@ Item {
                                            || app.shown
     /// Fallback row text; bubble measures it.
     readonly property string genericText: generic.text
-    /// Tap opens picture, video, or file. Sound plays in place; contact drawn.
-    /// Press passes to row, so long press reaches menu.
+    /// Tap opens picture, video, file; sound plays in place. Press passes to row: long press
+    /// reaches menu.
     readonly property bool openable: root.hasFile
                                      && (root.isPicture || root.isVideo || generic.shown)
 
-    /// `Audio.PlayingState` written as its value. Enum lives on the type; the
-    /// headless QtMultimedia stub is a QML component, which can't declare enums on
-    /// Qt 5.6. `Audio.PlayingState` reads `undefined` under test, never matches:
-    /// play button silently never turns to pause.
+    /// `Audio.PlayingState` as value: headless QtMultimedia stub is QML, can't declare enums on
+    /// Qt 5.6; name reads `undefined` under test, button never turns to pause.
     readonly property int playingState: 1
 
-    // One renderer built; read loaded item, not Loader (empty = zero). Animation
-    // sits in still image, not summed.
+    // One renderer built; read loaded item, not Loader (empty = 0). Animation inside still,
+    // not summed.
     height: (still.item ? still.item.height : 0)
             + (video.item ? video.item.height : 0)
             + (sound.item ? sound.item.height : 0)
@@ -119,13 +110,10 @@ Item {
         return Math.floor(total / 60) + ":" + (seconds < 10 ? "0" : "") + seconds
     }
 
-    /// Picture height for `width`.
-    ///
-    /// From row's given dimensions (core reads PNG/JPEG headers, model GIF's):
-    /// right height from start, so rows below don't jump as pictures decode.
-    /// Decoded size wins only where shape disagrees (header is pre-orientation:
-    /// portrait photo stored landscape); same shape within rounding stays put.
-    /// Square when neither known: height 0 hides it, PreserveAspectFit shows all.
+    /// Picture height for `width`, from row's dimensions (core reads PNG/JPEG headers, model
+    /// GIF's): right from start, rows below don't jump on decode. Decoded size wins only if
+    /// shape disagrees (header pre-orientation: portrait stored landscape). Neither known:
+    /// square (0 hides; PreserveAspectFit shows all).
     function pictureHeight(width, item) {
         var stored = root.imageWidth > 0 && root.imageHeight > 0
                      ? root.imageHeight / root.imageWidth : 0
@@ -140,30 +128,28 @@ Item {
         return width
     }
 
-    /// Animation runs left; run = one pass. Unseen GIF: 3. Older GIF: no autoplay.
+    /// Passes left: unseen GIF 3, older 0.
     property int runsLeft: 0
     readonly property int runsPerPlay: 3
 
-    /// Play animation, 3 runs.
+    /// Play 3 passes.
     function replay() {
         root.runsLeft = root.runsPerPlay
     }
 
-    /// Animation here at all.
+    /// Animated at all.
     readonly property bool animatable: root.isAnimated && root.hasFile
 
-    // Row learns type in either order: placeholder, or message before file.
+    // Type may arrive before or after file.
     onAnimatableChanged: if (root.animatable && root.isNew) root.replay()
     onIsNewChanged: if (root.animatable && root.isNew) root.replay()
 
-    // Every picture: GIF = image with animation over it. AnimatedImage has no
-    // implicit size until decoded, and draws nothing on decode failure. Image
-    // reads first frame always.
+    // GIF = image with animation over it: AnimatedImage has no size till decoded, draws nothing
+    // on failure; Image always reads frame 1.
     Loader {
         id: still
-        // Built by own `shown`, not `visible`: effective visibility drops while
-        // another page covers this one, so every return reloaded it mid-slide-in.
-        // See MessageDelegate, qml_hidden_rows.rs.
+        // Own `shown`, not `visible`: visibility drops while covered, so each return reloaded
+        // mid-slide-in. See MessageDelegate, qml_hidden_rows.rs.
         readonly property bool shown: root.isPicture && root.hasFile
         active: still.shown
         sourceComponent: Component {
@@ -174,17 +160,14 @@ Item {
                 height: root.pictureHeight(width, picture)
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
-                // Decoded at drawn width: texture 4 bytes/px, photos many screen
-                // widths. Bounds memory and crafted-file alloc. Width only, so
-                // height keeps picture's shape.
+                // Decode at drawn width (4 bytes/px; photos many screens wide): bounds memory,
+                // crafted-file alloc. Width only: keeps shape.
                 sourceSize.width: root.contentWidth
-                // Camera writes orientation to EXIF; other clients honour it, Image
-                // only with autoTransform: own sent photo lay sideways here.
+                // EXIF orientation honoured only with autoTransform: own photo lay sideways.
                 autoTransform: true
                 source: root.fileUrl
 
-                // Movie only while runs left: stopped movie holds decoded frames
-                // (memory). Else still shows frame 1.
+                // Movie only while passes left: stopped one holds decoded frames. Else still.
                 AnimatedImage {
                     id: animated
                     objectName: "attachmentAnimation"
@@ -192,16 +175,15 @@ Item {
                     readonly property bool shown: root.animatable && root.runsLeft > 0
                     visible: animated.shown
                     fillMode: Image.PreserveAspectFit
-                    // Frame decoded on demand: Qt default caches whole movie.
+                    // Decode per frame: Qt default caches whole movie.
                     cache: false
-                    // Runs only while on screen; file kept so return is no reload.
+                    // Runs on screen only; file kept: no reload on return.
                     playing: animated.visible
-                    // Held on frame while list moves under finger.
+                    // Held while list moves.
                     paused: root.scrolling
                     source: animated.shown ? root.fileUrl : ""
 
-                    // Frame smaller than last = movie wrapped. Counted, not clocked
-                    // (frames have own delay).
+                    // Lower frame = wrapped. Counted, not clocked (per-frame delays).
                     property int lastFrame: 0
                     onSourceChanged: animated.lastFrame = 0
                     onFrameChanged: {
@@ -210,9 +192,8 @@ Item {
                         }
                         animated.lastFrame = animated.currentFrame
                     }
-                    // Not running when meant to: run done (or unstartable). Checked a pass
-                    // later: movie reports from inside its own `source` load, and
-                    // changing `runsLeft` there changes `visible`.
+                    // Stopped when meant to run: pass done (or unstartable). Checked a pass later:
+                    // movie reports inside own `source` load; `runsLeft` there changes `visible`.
                     onPlayingChanged: if (!animated.playing) stopped.restart()
 
                     Timer {
@@ -227,7 +208,7 @@ Item {
                     }
                 }
 
-                // Mark on stopped GIF: own tap plays here; long press to menu.
+                // Stopped GIF mark: tap plays here; long press to menu.
                 Rectangle {
                     id: gifMark
                     objectName: "gifMark"
@@ -244,7 +225,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.bold: true
                         textFormat: Text.PlainText
-                        // Format name, same in every language.
+                        // Format name: untranslated.
                         text: "GIF"
                     }
 
@@ -258,7 +239,7 @@ Item {
         }
     }
 
-    // Video: poster with play mark. Tap opens video page; nothing takes press.
+    // Video: poster with play mark; tap opens video page.
     Loader {
         id: video
         readonly property bool shown: root.isVideo && root.hasFile
@@ -267,8 +248,7 @@ Item {
             Item {
                 objectName: "attachmentVideo"
                 width: root.contentWidth
-                // Video's own shape (sender's or track header), else 16:9.
-                // Thumbnailer crops to size.
+                // Own shape (sender's or track header), else 16:9; thumbnailer crops.
                 height: Math.round(width * root.videoAspect)
 
                 Rectangle {
@@ -283,12 +263,12 @@ Item {
                     anchors.fill: parent
                     sourceSize.width: width
                     sourceSize.height: height
-                    // fillMode default crops; naming enum breaks headless stub.
+                    // Default fillMode crops; naming enum breaks headless stub.
                     mimeType: root.fileMime
                     source: root.fileUrl
                 }
 
-                // Over frame: frame is the control.
+                // Frame is the control.
                 Rectangle {
                     anchors.centerIn: parent
                     width: Theme.itemSizeSmall
@@ -308,7 +288,7 @@ Item {
         }
     }
 
-    // Voice or music, played in place. Length: core's if present, else player's.
+    // Sound played in place. Length: core's, else player's.
     Loader {
         id: sound
         readonly property bool shown: root.isSound && root.hasFile
@@ -318,14 +298,13 @@ Item {
                 id: soundRow
                 objectName: "attachmentAudio"
                 width: root.contentWidth
-                // Measured: labels and track fit beside theme-sized button.
+                // Labels, track fit beside theme-sized button.
                 height: Math.max(playButton.height,
                                  soundName.height + soundTime.height
                                  + track.height + 2 * Theme.paddingSmall)
 
-                /// Player made on first play press. On Sailfish a player is a
-                /// GStreamer pipeline, paused on the file at once (default
-                /// `autoLoad`): streaming threads per scrolled-past sound otherwise.
+                /// Player made on first play: on Sailfish each is a GStreamer pipeline paused on
+                /// file at once (`autoLoad`), threads per scrolled-past sound otherwise.
                 property bool wanted: false
                 /// Player; null until then.
                 readonly property QtObject player: playerLoader.item
@@ -343,7 +322,7 @@ Item {
                     id: playerLoader
                     active: soundRow.wanted
                     sourceComponent: Component {
-                        // In an Item: Qt 5.6 Loader loads only Items.
+                        // Item: Qt 5.6 Loader loads only Items.
                         Item {
                             objectName: "audioPlayer"
                             property alias player: audio
@@ -351,9 +330,9 @@ Item {
                             Audio {
                                 id: audio
                                 source: root.fileUrl
-                                // Loaded by the play press, not creation.
+                                // Loaded by play press.
                                 autoLoad: false
-                                // No autoplay: talking on scroll bad in pocket.
+                                // No autoplay: talking in pocket.
                                 autoPlay: false
                             }
                         }
@@ -368,7 +347,7 @@ Item {
                                  ? "image://theme/icon-m-pause"
                                  : "image://theme/icon-m-play"
                     onClicked: {
-                        // Made on first use; non-async Loader builds on switch.
+                        // First use; sync Loader builds on switch.
                         soundRow.wanted = true
                         var player = soundRow.player
                         if (!player) {
@@ -403,7 +382,7 @@ Item {
                           : root.fileName
                 }
 
-                // Position / duration once known. Blank, not 0:00.
+                // Position / duration once known; blank, not 0:00.
                 Label {
                     id: soundTime
                     objectName: "audioTime"
@@ -444,7 +423,7 @@ Item {
         }
     }
 
-    // Shared contact: core parses card (name, address, colour). No vCard here.
+    // Shared contact: core parses card (name, address, colour).
     Loader {
         id: card
         readonly property bool shown: root.isCard
@@ -494,14 +473,14 @@ Item {
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
                     textFormat: Text.PlainText
-                    // Name often equals address; saying twice reads as bug.
+                    // Name often = address; twice reads as bug.
                     text: root.vcardAddr === root.vcardName ? "" : root.vcardAddr
                 }
             }
         }
     }
 
-    // webxdc app: icon, name, status line ("3 votes"), core-read. Tap runs it.
+    // webxdc app: core-read icon, name, status ("3 votes"). Tap runs it.
     Loader {
         id: app
         readonly property bool shown: root.isApp && root.webxdcName.length > 0
@@ -524,7 +503,7 @@ Item {
                     color: Theme.rgba(Theme.highlightBackgroundColor,
                                       Theme.highlightBackgroundOpacity)
 
-                    // App icon; mark when none, never blank square.
+                    // No icon: mark, not blank square.
                     AppMark {
                         anchors.centerIn: parent
                         visible: root.webxdcIcon.length === 0
@@ -537,7 +516,7 @@ Item {
                         anchors.margins: Theme.paddingSmall
                         fillMode: Image.PreserveAspectFit
                         asynchronous: true
-                        // Segment-encoded, like every file URL here.
+                        // Segment-encoded, as all file URLs here.
                         source: root.webxdcIcon.length > 0
                                 ? Qt.resolvedUrl("file://" + root.webxdcIcon.split("/")
                                                      .map(encodeURIComponent).join("/"))
@@ -570,7 +549,7 @@ Item {
                         right: parent.right
                         top: appName.bottom
                     }
-                    // No status line when app says nothing.
+                    // None when app says nothing.
                     readonly property bool shown: text.length > 0
                     visible: appState.shown
                     height: appState.shown ? implicitHeight : 0
@@ -594,8 +573,7 @@ Item {
         }
     }
 
-    // Everything else with a file: named, sized, system on tap. Undrawable webxdc
-    // lands here.
+    // Any other file, undrawable webxdc too: named, sized, system on tap.
     Label {
         id: generic
         objectName: "attachmentLabel"
@@ -611,9 +589,8 @@ Item {
         color: Theme.highlightColor
         textFormat: Text.PlainText
         text: {
-            // .vcf core won't class Vcard (no email, or >1 contact; phone-only
-            // contacts are common, unchattable): still marked as a card, not a
-            // mystery blob. .xdc core won't open: drawn as the file it is.
+            // .vcf core won't class Vcard (no email, or >1 contact; phone-only common): still
+            // marked as card. Unopenable .xdc: drawn as file.
             var mark = root.fileMime === "text/vcard" ? "📇" : "📎"
             var name = root.fileName.length > 0 ? root.fileName : root.filePath
             var size = root.readableSize(root.fileBytes)

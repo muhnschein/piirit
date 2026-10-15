@@ -4,17 +4,13 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Who this profile hears nothing from. Reached from settings page; reference
- * clients keep it there too (deltachat-android BlockedContactsActivity).
+ * Who this profile hears nothing from. From settings page, as reference clients
+ * (deltachat-android BlockedContactsActivity). Per profile (core's list per account):
+ * `accountId` handed in.
  *
- * Per profile: core keeps block list per account. `accountId` handed in.
- *
- * Tap lets someone back in, asked first.
- * Blocking new = plus under last row (BlockContactPage.qml). Blocked contacts
- * are in no other list, so this is the only way back to them.
- *
- * Words are reference clients' (deltachat-android/ios), so their
- * translations apply.
+ * Tap lets someone back in, asked first. Blocking new: plus under last row
+ * (BlockContactPage.qml). Blocked contacts in no other list: only way back to them.
+ * Words reference clients' (deltachat-android/ios): their translations apply.
  */
 Page {
     id: page
@@ -22,9 +18,9 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    // Empty list before core answers: unknown. See NewChatPage.
+    // Empty before core answers: unknown. See NewChatPage.
     property bool blockListLoaded: false
-    // Failed answer: list blank, blocking still allowed.
+    // Failed answer: list blank, blocking allowed.
     property bool blockListFailed: false
 
     ContactList {
@@ -54,14 +50,14 @@ Page {
         }
     }
 
-    // Back from picker: core announces blocks; this is an extra call.
+    // Back from picker: core announces blocks; extra call.
     onStatusChanged: {
         if (status === PageStatus.Active) {
             blockList.reload()
         }
     }
 
-    /// Ask to let someone back in, if reader agrees.
+    /// Ask to let someone back in.
     function unblock(contactId, contactName) {
         var dialog = pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
             contactName: contactName,
@@ -99,8 +95,8 @@ Page {
             onClicked: page.unblock(model.contact_id, model.display_name)
         }
 
-        // Wait for core: early plus drops under rows, tap hits first row.
-        // Failed answer counts: only way to block here.
+        // Wait for core: early plus drops under rows, tap hits first row. Failed answer counts:
+        // only way to block here.
         footer: PlusRow {
             objectName: "blockSomeone"
             width: listView.width
@@ -116,7 +112,7 @@ Page {
             objectName: "nobodyBlocked"
             // Not until core answered: see `blockListLoaded`.
             enabled: page.blockListLoaded && blockList.count === 0
-            // deltachat-android `blocked_empty_hint` (words are theirs).
+            // deltachat-android `blocked_empty_hint` (their words).
             text: qsTr("Blocked contacts will appear here.")
         }
     }

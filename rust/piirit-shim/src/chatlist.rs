@@ -1,7 +1,7 @@
 //! Chat list QML type.
 //!
-//! Reorders constantly: any message moves its chat to top. Rebuilding loses scroll position
-//! and redraws every row, so this reconciles: moves moved row, refetches changed chats only.
+//! Any message moves its chat to top. Rebuild loses scroll and redraws all, so this
+//! reconciles: moves moved row, refetches changed chats only.
 
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
@@ -22,7 +22,7 @@ use crate::models::{ChatListItem, ChatListModel};
 /// SilicaListView { model: chats.rows }
 /// ```
 #[derive(QObject, Default)]
-// Four QML-set properties, each a question to the list. Folding them hides them from QML.
+// Four QML-set properties; folding them hides them from QML.
 #[allow(clippy::struct_excessive_bools)]
 pub struct ChatList {
     base: qt_base_class!(trait QObject),
@@ -32,9 +32,7 @@ pub struct ChatList {
     /// Account changed.
     pub account_changed: qt_signal!(),
 
-    /// Search filter. Empty: all.
-    ///
-    /// Core matches, so finds unloaded chats.
+    /// Search filter; empty: all.
     pub query: qt_property!(QString; WRITE set_query NOTIFY query_changed),
     /// Query changed.
     pub query_changed: qt_signal!(),
@@ -44,23 +42,21 @@ pub struct ChatList {
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
 
-    /// Forwardable chats only. Core drops ones that would fail or make no sense (device
-    /// chat), so picker can't offer a destination forward would refuse.
+    /// Forwardable chats only. Core drops ones forward would refuse (device chat).
     pub for_forwarding: qt_property!(bool; WRITE set_for_forwarding NOTIFY for_forwarding_changed),
     /// Forwarding flag changed.
     pub for_forwarding_changed: qt_signal!(),
 
-    /// Show only unread chats. Filtered here: `get_chatlist_entries` has no flag, unread
-    /// counts in hand. Chat read while on stays (see `kept`): row doesn't vanish under thumb.
+    /// Unread only, filtered here (`get_chatlist_entries` has no flag). Read while on stays
+    /// (`kept`): no vanishing under thumb.
     pub unread_only: qt_property!(bool; WRITE set_unread_only NOTIFY unread_only_changed),
     /// Unread filter changed.
     pub unread_only_changed: qt_signal!(),
-    /// Release chats read since filter on, as re-enabling would. For app resume.
+    /// Release chats read since filter on (app resume).
     pub forget_read: qt_method!(fn(&mut self)),
 
-    /// Reader setting: announce muted-group message replying to reader's own (reference
-    /// clients' mention notifications). Groups only: muted 1:1 was muted for that person,
-    /// and all of it is to reader anyway.
+    /// Reader setting: announce muted-group reply to own message (reference clients' mentions).
+    /// Groups only: muted 1:1 was muted for that person.
     pub notify_mentions: qt_property!(bool; NOTIFY notify_mentions_changed),
     /// Setting changed.
     pub notify_mentions_changed: qt_signal!(),
@@ -70,33 +66,26 @@ pub struct ChatList {
 
     /// Row count.
     pub count: qt_property!(u32; READ count NOTIFY rows_changed),
-    // Stored, not counted from model: section headings read these inside the model reset
-    // setting rows; borrowing row list there finds it mutably borrowed and panics.
-    /// Pinned count, to decide whether to head the two groups (one heading over all says
-    /// nothing).
+    // Stored, not counted: headings read these inside model reset, where row list is
+    // mutably borrowed (panic).
+    /// Pinned count: whether to head the two groups.
     pub pinned_count: qt_property!(u32; NOTIFY rows_changed),
-    /// Unpinned count, same decision from other side.
+    /// Unpinned count, same decision.
     pub unpinned_count: qt_property!(u32; NOTIFY rows_changed),
-    /// Unread across all chats, for cover. Muted included: mute silences announcement, not
-    /// arithmetic (same as muted chat's badge).
+    /// Unread across all chats, muted too, for cover.
     pub unread_total: qt_property!(u32; READ unread_total NOTIFY rows_changed),
     /// Cover people: JSON array of `{"chat_id", "name", "color", "avatar_path", "unread_count"}`
-    /// in list order; self and device chat excluded. String, not model: cover lays grid out
-    /// in one pass, repeating few to fill it, which a view over rows can't.
+    /// in list order, no self or device chat. String: cover lays grid in one pass, repeating few.
     pub cover_people: qt_property!(QString; READ cover_people NOTIFY rows_changed),
     /// Emitted after `rows` change.
     pub rows_changed: qt_signal!(),
 
-    /// Message arrived: row has sender, text.
-    ///
-    /// Only `IncomingMsg`, once its refetch landed: on event itself preview predates message.
-    /// Muted: never announced, still badge-counted. `sender` as row summary names them: name
-    /// in group, empty in 1:1 (chat already named after them).
+    /// Message arrived. `IncomingMsg` only, once refetch landed (event's preview is older).
+    /// Muted: not announced. `sender`: name in group, empty in 1:1.
     pub message_arrived: qt_signal!(chat_id: u32, chat_name: QString, sender: QString, preview: QString),
 
-    /// Chat's messages changed without arrival (edit, delete), row read back: what its
-    /// notification says now, unread count. Every such chat, muted or not; listener knows
-    /// whether a notification is up.
+    /// Messages changed without arrival (edit, delete), row read back; listener knows if a
+    /// notification is up.
     pub message_restated: qt_signal!(
         chat_id: u32,
         chat_name: QString,
@@ -134,39 +123,28 @@ pub struct ChatList {
     /// Delete chat and messages on device.
     pub delete_chat: qt_method!(fn(&mut self, chat_id: u32)),
 
-    /// Arrivals not yet announced; preview not read back.
-    ///
-    /// Kept apart from refresh started for it, which rarely lands: core follows every
-    /// `IncomingMsg` with `ChatlistItemChanged` and `ChatlistChanged` same millisecond, each
-    /// starting newer refresh, staling older (see `generation`). Current answer announces.
+    /// Arrivals unannounced. Apart from own refresh, rarely landing: core follows `IncomingMsg`
+    /// with `ChatlistItemChanged`, `ChatlistChanged` same ms, staling it (`generation`).
     pending_announcements: HashSet<u32>,
 
-    /// Muted chats with reader's mention, awaiting announce. See `check_mention`.
+    /// Muted chats with reader's mention, unannounced. See `check_mention`.
     mentioned: HashSet<u32>,
 
-    /// Edited or deleted chats awaiting row read back. As `pending_announcements`.
+    /// Edited/deleted chats awaiting read back. As `pending_announcements`.
     pending_restatements: HashSet<u32>,
 
-    /// Counts refreshes; stale answer must not land on newer.
-    ///
-    /// Archived page sets `account_id` and `archived` in any order, each fetching; without
-    /// this slower wins, archived page shows ordinary chats. Search: fetch per keystroke.
+    /// Counts refreshes: stale answer must not land on newer (archived page sets `account_id`,
+    /// `archived`, each fetching; search per keystroke).
     generation: u64,
 
-    /// Asked, unanswered; includes stale-dropped answers.
-    ///
-    /// Refresh reuses unrefetched rows from model, only as current as last kept answer.
-    /// E.g. mark chat read, message in other chat: second refresh carries pre-read row,
-    /// first dropped as older, badge returns for good. So owed chats refetched by each next
-    /// refresh until one lands.
+    /// Asked, unanswered (stale-dropped too). Reused rows are as old as last kept answer (mark
+    /// read, message elsewhere: badge back for good): owed chats refetched until one lands.
     awaiting: Awaiting,
 
-    /// Every chat core listed, filter ignored. Refresh reuses rows and announcements read
-    /// here: filtered-out chat can still get message. Cover counts read `rows` (never filtered).
+    /// Every chat core listed, unfiltered: refresh, announcements read here. Cover reads `rows`.
     all_rows: Vec<ChatListItem>,
 
-    /// Chats unread filter passes: any unread since filter on. Cleared on filter on and by
-    /// `forget_read`.
+    /// Unread since filter on. Cleared on filter on and by `forget_read`.
     kept: HashSet<u32>,
 }
 
@@ -239,16 +217,15 @@ impl ChatList {
                 | "ChatDeleted"
                 | "ChatlistChanged"
                 | "ChatlistItemChanged"
-                // Core dropped events; nothing held is trusted.
+                // Core dropped events: trust nothing held.
                 | "EventChannelOverflow"
         ) {
             return;
         }
         let payload: serde_json::Value =
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
-        // Chat id names the one changed row. None (absent, null, 0): core can't tell which,
-        // re-read all visible (upstream on `ChatlistItemChanged`: "all currently visible chats
-        // need to be rerendered"). Overflow has no id, could hide anything.
+        // No chat id (absent, null, 0): re-read all visible (upstream says so). Overflow has
+        // no id, could hide anything.
         if kind == "EventChannelOverflow" {
             self.refresh(Refresh::All);
             return;
@@ -256,16 +233,14 @@ impl ChatList {
         let chat_id = json::u32_opt(&payload, "chatId").filter(|id| *id != 0);
         let scope = match chat_id {
             Some(chat_id) => Refresh::One(chat_id),
-            // Never a chat id, never a row content change: upstream "set of chats or order
-            // changed". Sent with every message, send, draft save, beside `ChatlistItemChanged`
-            // naming changed chat. As `All`: whole list per message, seconds on long list.
+            // No id, no row change ("set of chats or order changed"), with every message,
+            // send, draft beside `ChatlistItemChanged`. As `All`: seconds on long list.
             None if kind == "ChatlistChanged" => Refresh::Order,
             None => Refresh::All,
         };
-        // Announce only real new messages: MsgsChanged also fires for own sends, receipts, pins.
+        // Announce real arrivals only: MsgsChanged fires for sends, receipts, pins.
         let announce = if kind == "IncomingMsg" { chat_id } else { None };
-        // Edit (MsgsChanged) or delete (MsgDeleted) restates notification. Every other
-        // MsgsChanged on a chat too, though mostly nothing changes.
+        // Edit (MsgsChanged), delete (MsgDeleted) restate notification; any MsgsChanged too.
         if matches!(kind.as_str(), "MsgsChanged" | "MsgDeleted") {
             if let Some(chat_id) = chat_id {
                 self.pending_restatements.insert(chat_id);
@@ -282,7 +257,7 @@ impl ChatList {
         self.refresh_announcing(scope, announce);
     }
 
-    /// Chat muted? Unlisted chat is new, so none.
+    /// Chat muted? Unlisted is new: no.
     fn is_muted(&self, chat_id: u32) -> bool {
         self.all_rows
             .iter()
@@ -291,8 +266,7 @@ impl ChatList {
 
     /// Announce if muted-chat arrival answers reader's message.
     ///
-    /// Answer usually comes after event's refresh landed (chat unannounced, muted), so
-    /// mention starts own refresh, chat let past mute once: announcement carries row preview.
+    /// Answer comes after event's refresh, so mention starts own, chat let past mute once.
     fn check_mention(&mut self, chat_id: u32, message_id: u32) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -313,8 +287,8 @@ impl ChatList {
         });
     }
 
-    /// Set query, reload if changed. Only order: row same whatever searched, so held rows
-    /// reused, only new ones read (else clearing search re-reads whole list).
+    /// Set query, reload if changed. Only order: held rows reused, only new ones read (else
+    /// clearing search re-reads whole list).
     pub fn set_query(&mut self, query: QString) {
         if self.query.to_string() != query.to_string() {
             self.query = query;
@@ -360,10 +334,8 @@ impl ChatList {
         }
     }
 
-    /// [`Self::show`], from event loop, not here.
-    ///
-    /// Callers are QML property writes/method calls, holding object borrowed; rows changing
-    /// builds delegates whose headings read `pinned_count`: second borrow.
+    /// [`Self::show`], from event loop: callers (QML writes/calls) hold object borrowed, and
+    /// new delegates' headings read `pinned_count` (second borrow).
     fn show_later(&mut self) {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let show = queued_callback(move |(): ()| {
@@ -399,7 +371,7 @@ impl ChatList {
         let target = {
             let mut this_mut = this.borrow_mut();
             let target = this_mut.shown();
-            // Count from list about to be rows, before setting: setting makes QML read counts.
+            // Count before setting rows: setting makes QML read counts.
             let pinned = target.iter().filter(|row| row.is_pinned).count();
             this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
             this_mut.unpinned_count =
@@ -429,8 +401,8 @@ impl ChatList {
         self.act(chat_id, "marknoticed_chat", serde_json::Value::Null);
     }
 
-    /// Mark chat unread: core's `markfresh_chat` sets last incoming message fresh, so chat
-    /// counts one unread until opened. No incoming message: left alone.
+    /// Mark chat unread: `markfresh_chat` sets last incoming fresh (one unread until opened).
+    /// No incoming message: left alone.
     pub fn mark_unread(&mut self, chat_id: u32) {
         self.act(chat_id, "markfresh_chat", serde_json::Value::Null);
     }
@@ -462,8 +434,8 @@ impl ChatList {
         self.act(chat_id, "delete_chat", serde_json::Value::Null);
     }
 
-    /// Call `method` on `(account, chat)` plus `extra`, then refresh row: core doesn't
-    /// announce all of these.
+    /// Call `method` on `(account, chat)` plus `extra`, then refresh row (core doesn't
+    /// announce all).
     fn act(&mut self, chat_id: u32, method: &'static str, extra: serde_json::Value) {
         let account_id = self.account_id;
         if account_id == 0 || chat_id == 0 {
@@ -497,9 +469,8 @@ impl ChatList {
         });
     }
 
-    /// Waiting announcements now rows current: name and preview, chats mute doesn't silence.
-    /// All waiting, not only this refresh's (see `pending_announcements`). Mute pass spent
-    /// here whether or not row still muted.
+    /// Waiting announcements, rows current, unmuted chats; all waiting (`pending_announcements`).
+    /// Mute pass spent either way.
     fn settled_announcements(&mut self) -> Vec<(u32, QString, QString, QString)> {
         let waiting: Vec<u32> = self.pending_announcements.drain().collect();
         let mut announcements = Vec::new();
@@ -539,17 +510,13 @@ impl ChatList {
             .collect()
     }
 
-    /// Bring model in line with core.
-    ///
-    /// [`Refresh::One`]: refetch its chat, unlisted chats, and `awaiting`; reuse rest (one
-    /// listing + one fetch per message, not rebuild). [`Refresh::Order`]: same, no own chat.
-    /// [`Refresh::All`]: refetch all, for change core can't attribute.
+    /// Bring model in line with core: refetch per [`Refresh`] plus `awaiting`, reuse rest.
     fn refresh(&mut self, scope: Refresh) {
         self.refresh_announcing(scope, None);
     }
 
     /// First screenful of first load shown early, unless newer asked since `generation`.
-    /// Settles nothing: owed answers and announcements wait for whole list.
+    /// Settles nothing (owed answers, announcements wait for whole list).
     fn show_early(&self, generation: u64) -> impl Fn(Vec<ChatListItem>) + Send + Sync + Clone {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |rows: Vec<ChatListItem>| {
@@ -562,7 +529,7 @@ impl ChatList {
         })
     }
 
-    /// [`Self::refresh`], then announce arrival in `announce` once its row holds new preview.
+    /// [`Self::refresh`], announcing `announce` once row holds new preview.
     fn refresh_announcing(&mut self, scope: Refresh, announce: Option<u32>) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -577,7 +544,7 @@ impl ChatList {
         let cached: Vec<ChatListItem> = self.all_rows.clone();
         // Nothing held: app start, profile switch, archived page.
         let first_load = cached.is_empty();
-        // Set, not list: scan per entry would be quadratic.
+        // Set: list scan per entry is quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
         if let Some(chat_id) = announce {
             self.pending_announcements.insert(chat_id);
@@ -597,7 +564,7 @@ impl ChatList {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<ChatListItem>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Superseded question: describes nothing on screen.
+            // Superseded.
             if this.borrow().generation != generation {
                 return;
             }
@@ -606,7 +573,7 @@ impl ChatList {
                     {
                         let mut this_mut = this.borrow_mut();
                         this_mut.all_rows = target;
-                        // All waiting re-read here. Failed one waits again.
+                        // All waiting re-read; failed one waits again.
                         this_mut.awaiting = Awaiting::Nothing;
                     }
                     Self::show(this);
@@ -636,8 +603,8 @@ impl ChatList {
                     .copied()
                     .filter(|id| refetch_all || awaiting.contains(id) || !known.contains(id))
                     .collect();
-                // Core builds rows serially: all at once leaves page blank till last (1.9 s for
-                // 200 chats on desktop CPU, several times on phone). Screenful first.
+                // Core builds rows serially (1.9 s for 200 chats on desktop CPU, several times
+                // on phone): screenful first.
                 let (first, rest) = if first_load {
                     wanted.split_at(wanted.len().min(FIRST_SCREENFUL))
                 } else {
@@ -657,7 +624,7 @@ impl ChatList {
                     );
                     fresh.extend(chat_items(&rpc, account_id, rest).await?);
                 }
-                // Target order from core; contents from fetch, else model.
+                // Order from core; contents from fetch, else model.
                 Ok::<_, String>(
                     entries
                         .into_iter()
@@ -675,8 +642,8 @@ impl ChatList {
     }
 }
 
-/// Arrival quotes account's own message in group: `deltachat-android` mention shape. Quote
-/// names message only, so extra reads. Text-only quote could be anyone's: not counted.
+/// Arrival quotes account's own message in group (`deltachat-android` mention). Text-only
+/// quote could be anyone's: not counted.
 async fn is_mention(rpc: &RpcClient, account_id: u32, chat_id: u32, message_id: u32) -> bool {
     if !chat_is_group(rpc, account_id, chat_id).await {
         return false;
@@ -708,8 +675,7 @@ enum Awaiting {
     Nothing,
     /// These chats asked about.
     Chats(HashSet<u32>),
-    /// Whole list asked, covering every chat. One row re-read won't do: answer carrying
-    /// rest can still be dropped as stale.
+    /// Whole list asked. One row re-read won't do: answer carrying rest may be dropped stale.
     Everything,
 }
 
@@ -718,7 +684,7 @@ impl Awaiting {
     fn add(&mut self, scope: Refresh) {
         match (&mut *self, scope) {
             (Awaiting::Everything, _) | (_, Refresh::All) => *self = Awaiting::Everything,
-            // Nothing beyond what listing turns up new.
+            // Only what listing turns up new.
             (_, Refresh::Order) => {}
             (Awaiting::Chats(chats), Refresh::One(chat_id)) => {
                 chats.insert(chat_id);
@@ -733,7 +699,7 @@ impl Awaiting {
 /// How much of list refresh re-reads.
 #[derive(Clone, Copy)]
 enum Refresh {
-    /// Every visible row: core's unattributed change, and what `reload` must do.
+    /// Every visible row (unattributed change, `reload`).
     All,
     /// Order and unlisted chats; held rows still right.
     Order,
@@ -743,13 +709,13 @@ enum Refresh {
 
 /// Move, insert, remove rows until model matches `target`.
 ///
-/// One-chat-to-top: one remove, one insert. Other rows keep identity, view keeps place.
+/// Chat to top: one remove, one insert; other rows keep identity, view keeps place.
 fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
-    // Ids kept in step: per-row rebuild or `nth` makes no-op refresh quadratic.
+    // Ids kept in step: rebuild or `nth` makes no-op refresh quadratic.
     let mut current: Vec<u32> = rows.iter().map(|row| row.chat_id).collect();
     let keep: HashSet<u32> = target.iter().map(|row| row.chat_id).collect();
 
-    // Gone from core: dropped first, so rest only moves staying rows.
+    // Gone chats dropped first: rest only moves.
     let mut index = 0;
     while let Some(id) = current.get(index) {
         if keep.contains(id) {
@@ -761,7 +727,7 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     }
 
     for (index, wanted) in target.iter().enumerate() {
-        // Before `index` already right: scan tail only.
+        // Before `index` right: scan tail.
         let found = current
             .iter()
             .skip(index)
@@ -787,8 +753,8 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     }
 }
 
-/// Account's chat ids, core display order. `DC_GCL_ARCHIVED_ONLY`: archived, not ordinary.
-/// Disjoint: mode, not filter.
+/// Account's chat ids, core display order. `DC_GCL_ARCHIVED_ONLY`: archived only (mode, not
+/// filter).
 const ARCHIVED_ONLY: u32 = 0x01;
 
 /// `DC_GCL_FOR_FORWARDING`: forwardable only.
@@ -801,9 +767,7 @@ async fn chat_entries(
     archived: bool,
     for_forwarding: bool,
 ) -> Result<Vec<u32>, String> {
-    // Core matches; filtering loaded rows finds only on-screen chats.
-    //
-    // Spaces-only query: core rejects; trim, treat as none.
+    // Core matches (loaded rows hold only on-screen chats). Spaces-only: core rejects, trim.
     let query = query.trim();
     let mut flags = 0;
     if for_forwarding {
@@ -811,9 +775,8 @@ async fn chat_entries(
     }
 
     if archived && !query.is_empty() {
-        // Two calls, no single "archived matching". Verified on pinned binary: with
-        // ARCHIVED_ONLY query ignored ("Beta" returns archived "Alpha group"); plain query
-        // searches all, archived included. Intersection is exactly this page.
+        // Two calls, no "archived matching": on pinned binary ARCHIVED_ONLY ignores query
+        // ("Beta" returns "Alpha group"); plain query searches all. Intersection is this page.
         let archived_only: Vec<u32> = rpc
             .call(
                 "get_chatlist_entries",
@@ -838,7 +801,7 @@ async fn chat_entries(
             )
             .await
             .map_err(|err| err.to_string())?;
-        // Keep archived order; search must not reshuffle.
+        // Archived order: search mustn't reshuffle.
         let hits: HashSet<u32> = matching.into_iter().collect();
         return Ok(archived_only
             .into_iter()
@@ -863,7 +826,7 @@ async fn chat_entries(
     .map_err(|err| err.to_string())
 }
 
-/// Rows first load reads: more than phone screen.
+/// Rows first load reads: over a phone screen.
 const FIRST_SCREENFUL: usize = 20;
 
 /// Rows for given chats, one call.
@@ -888,7 +851,7 @@ pub(crate) async fn chat_items(
                     preview: json::text(&item, "summaryText2"),
                     preview_sender: json::text(&item, "summaryText1"),
                     unread_count: json::u32_at(&item, "freshMessageCounter"),
-                    // Core: ms here, s on message; UI wants one unit.
+                    // Core: ms here, s on message; UI one unit.
                     last_updated: json::i64_at(&item, "lastUpdated") / 1000,
                     summary_state: json::u32_at(&item, "summaryStatus"),
                     is_encrypted: json::flag(&item, "isEncrypted"),

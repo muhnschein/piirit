@@ -7,22 +7,11 @@ import "../components"
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Camera for picture or video to send. Own page like pickers (no-camera device
- * costs one button). Reports on `picked`.
- * Captures go to captures dir (Captures, capture.rs); core copies on send,
- * sending page then discards capture.
- *
- * As jolla-camera. Portrait: frame on black, full width, below notch; controls
- * over and under. Landscape: frame at left, controls column at right.
- * Recording: only shutter and zoom left.
- *
- * Frame is phone-landscape; turn written into file (EXIF, rotation), as
- * jolla-camera does; page turns with phone, picture turned back. Page holds
- * still while recording (turn written at start).
- * Still written where asked; video where recorder puts it, reported only after
- * finalise. UI follows recorder's state (refused record leaves nothing
- * half-armed); ignored stop -> stop camera, which finishes file.
- * Camera runs only while page shown; page pops itself once it reports.
+ * Camera for picture or video to send; own page like pickers (no camera costs
+ * one button). Reports on `picked`; file in captures dir (capture.rs), sending
+ * page discards it. Layout and file turn (EXIF, rotation) as jolla-camera;
+ * page holds still while recording. UI follows recorder's state (refused
+ * record leaves nothing half-armed).
  */
 Page {
     id: page
@@ -33,25 +22,23 @@ Page {
     /// Path of picture or video made.
     signal picked(string path)
 
-    /// 0 still, 1 video. Opening mode; then mode stack's value.
+    /// 0 still, 1 video: opening mode, then mode stack's.
     property int mode: 0
-    /// Opens on front (selfie quick action, QuickActions.js). Read once at
-    /// creation; switch moves it after.
+    /// Opens on front (selfie quick action, QuickActions.js). Read at creation.
     property bool front: false
-    /// Closes after reporting, as a picker. False if caller puts its page in
-    /// this one's place: popping first would take that page too (see
-    /// ChatPickerPage `closeOnPick`).
+    /// Closes after reporting. False if caller replaces this page: pop would take
+    /// that too (see ChatPickerPage `closeOnPick`).
     property bool closeOnPick: true
-    /// Cover quick action would pop recording. Fine once reported.
+    /// Cover quick action would pop recording; fine once reported.
     readonly property bool pausesQuickActions: (page.recording || page.stopping) && !page.done
     /// Video being recorded: recorder's word.
     readonly property bool recording:
         camera.videoRecorder.recorderState === page.recordingState
-    /// Video recording or finished: keeps camera running in background.
+    /// Video recording or finishing: camera runs in background.
     readonly property bool filming: page.recording || page.stopping
-    /// App in front. Not read-only: tests (no app in front) set it.
+    /// App in front. Writable: tests set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
-    /// Page on screen (Silica keeps it active in background too).
+    /// Page on screen (Silica keeps it active in background).
     readonly property bool shown: page.status === PageStatus.Active && page.appActive
     /// Recording asked for; no file reported yet.
     property bool videoWanted: false
@@ -59,12 +46,12 @@ Page {
     property bool stopping: false
     /// Made and reported; nothing more taken.
     property bool done: false
-    /// Seconds recorded here: recorder's own duration reads 0 on device.
+    /// Seconds counted here: recorder's duration reads 0 on device.
     property int seconds: 0
     property string errorMessage: ""
 
-    /// Recorder enums as values: type-level enums missing in headless stub on
-    /// Qt 5.6. See AttachmentPreview.
+    /// Recorder enums as values: missing in Qt 5.6 headless stub. See
+    /// AttachmentPreview.
     readonly property int recordingState: 1
     readonly property int recordingStatus: 5
     readonly property int finalizingStatus: 7
@@ -77,19 +64,19 @@ Page {
     /// Side the camera in use faces.
     readonly property int facing: page.frontCameras.indexOf(camera.deviceId) >= 0
                                   ? Viewfinder.frontFace : Viewfinder.backFace
-    /// Last back camera used; way back from front.
+    /// Last back camera, for return from front.
     property string lastBackCamera: ""
     /// Switch-button target; empty on one-sided phone.
     readonly property string otherCamera:
         Viewfinder.otherSide(QtMultimedia.availableCameras, page.facing, page.lastBackCamera)
 
-    /// Torch in video. Not kept: a light left on is a surprise.
+    /// Torch in video. Not kept: light left on surprises.
     property bool torch: false
     /// White balance and exposure compensation, this page only.
     property int whiteBalance: Viewfinder.whiteBalanceAuto
     property real exposure: 0
 
-    /// Flash panel options and setting: picture setting, or torch for video.
+    /// Flash panel options and setting: picture's, or torch for video.
     readonly property var flashModes: Viewfinder.flashModes(page.mode === 1, page.facing)
     readonly property int flash: page.mode === 1
                                  ? (page.torch ? Viewfinder.flashTorch : Viewfinder.flashOff)
@@ -99,13 +86,13 @@ Page {
     property real countdown: 0
     readonly property bool counting: selfTimer.running
 
-    /// Shutter face: ring for picture; red dot to start video, square to stop.
+    /// Shutter: ring for picture; red dot starts video, square stops.
     readonly property string shutterIcon:
         page.mode === 0 ? "image://theme/icon-camera-shutter"
                         : page.recording ? "image://theme/icon-camera-video-shutter-off"
                                          : "image://theme/icon-camera-video-shutter-on"
 
-    /// Phone turn, clockwise from upright: 0/90/180/270. Page stays put.
+    /// Phone turn clockwise: 0/90/180/270. Page stays put.
     property int pictureRotation: 0
 
     OrientationSensor {
@@ -117,7 +104,7 @@ Page {
     }
 
     /// `OrientationReading` values: TopUp 1, TopDown 2, LeftUp 3, RightUp 4.
-    /// Face up/down/unknown keep last turn, as platform camera.
+    /// Face up/down/unknown keep last turn.
     function turnWith(orientation) {
         switch (orientation) {
         case 1: page.pictureRotation = 0; break
@@ -137,14 +124,14 @@ Page {
     Camera {
         id: camera
         objectName: "camera"
-        // Set by `setMode` while stopped, not bound: pipeline rebuilds per mode,
-        // and recording asked for mid-rebuild was taken but never reported.
+        // Set by `setMode` while stopped: recording asked mid-rebuild never
+        // reported.
         captureMode: Camera.CaptureStillImage
         // File's turn: sensor mounting + phone's (front reversed).
         metaData.orientation: page.facing === Viewfinder.frontFace
                               ? (720 + camera.orientation - page.pictureRotation) % 360
                               : (720 + camera.orientation + page.pictureRotation) % 360
-        // Continuous, but autofocus on tap for a few seconds.
+        // Continuous; tap focus for a few seconds.
         focus {
             focusMode: focusHold.running ? Camera.FocusAuto : Camera.FocusContinuous
             focusPointMode: focusHold.running ? Camera.FocusPointCustom : Camera.FocusPointAuto
@@ -159,22 +146,22 @@ Page {
         }
 
         videoRecorder {
-            // Bitrate sets file size; not resolution (encoder may refuse).
-            // Rates: deltachat-android recode ceiling, ~deltachat-ios low preset.
-            // No recode later: one chance to fit relay limit.
+            // Bitrate sets size, not resolution (encoder may refuse). Rates:
+            // deltachat-android recode ceiling, ~deltachat-ios low preset. No
+            // recode later: one chance to fit relay limit.
             videoBitRate: Settings.mediaQuality === 1 ? 500000 : 1500000
             audioBitRate: Settings.mediaQuality === 1 ? 24000 : 64000
-            // Recording, Finalizing, Loaded: first Loaded after stop = file.
-            // Location set at record start by platform backend: alone says nothing.
+            // First Loaded after stop = file. Location set at record start by
+            // backend: says nothing alone.
             onRecorderStatusChanged: page.checkVideo()
             onRecorderStateChanged: page.checkVideo()
             onActualLocationChanged: page.checkVideo()
-            // Pipeline refusal reason shown here only: state stays stopped.
+            // Pipeline refusal shown only here: state stays stopped.
             onError: page.errorMessage = errorString
         }
     }
 
-    /// Still <-> video switch. Done with camera stopped, as platform camera.
+    /// Still <-> video switch, camera stopped (as platform camera).
     function setMode(index) {
         if (index === page.mode || page.recording || page.stopping || page.done) {
             return
@@ -189,7 +176,7 @@ Page {
         }
     }
 
-    /// Other side or back lens. Zoom and tap focus reset, as platform camera.
+    /// Other side or back lens; zoom and tap focus reset.
     function useCamera(deviceId) {
         if (deviceId.length === 0 || deviceId === camera.deviceId
                 || page.recording || page.stopping || page.done) {
@@ -215,7 +202,7 @@ Page {
 
     /// Tap focus at `x`, `y` in viewfinder; ring at finger.
     function focusAt(x, y) {
-        // Tap in picture terms: viewfinder turned, so point is elsewhere.
+        // Tap in picture terms: viewfinder is turned.
         var local = viewfinder.mapFromItem(frame, x, y)
         var mapped = typeof viewfinder.mapPointToSourceNormalized === "function"
                 ? viewfinder.mapPointToSourceNormalized(Qt.point(local.x, local.y)) : null
@@ -231,7 +218,7 @@ Page {
         camera.searchAndLock()
     }
 
-    // Tap focus kept 5 s (platform's), then lock off, continuous focus back.
+    // Tap focus kept 5 s (platform's), then continuous.
     Timer {
         id: focusHold
         objectName: "focusHold"
@@ -239,8 +226,8 @@ Page {
         onTriggered: camera.unlock()
     }
 
-    /// Shutter: picture, or video start/end. After self-timer if set; tap while
-    /// counting cancels.
+    /// Shutter: picture, or video start/end. After self-timer; tap while counting
+    /// cancels.
     function shutter() {
         if (page.done) {
             return
@@ -297,8 +284,8 @@ Page {
     function stopRecording() {
         page.stopping = true
         camera.videoRecorder.stop()
-        // Stop ignored by recorder: stopping camera finishes file.
-        // Leaving the page did that, and it worked where button didn't.
+        // Stop ignored by recorder: stopping camera finishes file (leaving page
+        // worked where button didn't).
         stopFallback.restart()
     }
 
@@ -314,7 +301,7 @@ Page {
         }
     }
 
-    // Nothing came of that: say so; reader retries with camera running.
+    // Nothing came: say so; reader retries, camera running.
     Timer {
         id: giveUp
         interval: 3000
@@ -330,7 +317,7 @@ Page {
         }
     }
 
-    /// Recorder moved: video finished writing after stop = answer.
+    /// Recorder state: finished writing after stop = answer.
     function checkVideo() {
         if (!page.videoWanted || !page.stopping || page.done) {
             return
@@ -358,15 +345,14 @@ Page {
         giveUp.stop()
         camera.stop()
         page.picked(decodeURIComponent(path))
-        // Answer given, page goes (Silica's pickers do same). Else sits under
-        // conversation with camera off, unless caller already replaced it.
+        // Answered: page goes (as Silica pickers), else sits under conversation.
         if (page.closeOnPick) {
             pageStack.pop()
         }
     }
 
-    // Camera runs only while page on screen. From status, not `shown`: change
-    // handler can run before binding.
+    // Camera only while page on screen. From status, not `shown`: handler can
+    // run before binding.
     onStatusChanged: {
         if (page.status === PageStatus.Active && page.appActive && !page.done) {
             camera.start()
@@ -379,7 +365,7 @@ Page {
         }
     }
     Component.onCompleted: {
-        // Opening mode before camera starts: setMode would stop and rebuild.
+        // Opening mode before start: setMode would rebuild.
         if (page.mode === 1) {
             camera.captureMode = Camera.CaptureVideo
         }
@@ -391,10 +377,9 @@ Page {
         }
     }
 
-    // Not in background or screen off, except a video recording or finishing:
-    // losing it to a glance elsewhere costs more.
+    // Off in background or screen off, except video recording or finishing.
     onAppActiveChanged: page.followApp()
-    // Recording ending in background lets camera go then.
+    // Recording ends in background: camera goes then.
     onFilmingChanged: {
         if (!page.filming && !page.appActive) {
             page.followApp()
@@ -427,8 +412,7 @@ Page {
         return Math.floor(seconds / 60) + ":" + (rest < 10 ? "0" : "") + rest
     }
 
-    // Black behind all, also over strip Silica leaves beside notch in
-    // landscape, either side.
+    // Black behind all, also strip Silica leaves beside landscape notch.
     Rectangle {
         objectName: "backdrop"
         anchors {
@@ -445,15 +429,15 @@ Page {
     readonly property int turn: Viewfinder.pageTurn(page.orientation)
 
     /// Frame height for width once camera says; default 4:3. Long over short:
-    /// frame drawn upright however source reports.
+    /// upright however source reports.
     readonly property real frameRatio: Viewfinder.frameRatio(viewfinder.sourceRect.width,
                                                              viewfinder.sourceRect.height)
-    /// Notch: top in portrait, side in landscape (outside page; Silica clears it).
+    /// Notch: top or side (outside page; Silica clears it).
     readonly property real topInset: page.landscape ? 0 : Screen.topCutout.height
     readonly property real sideInset: page.landscape ? Screen.topCutout.height : 0
 
-    // Sensor frame, full width; tall phones: pushed below notch and settings row.
-    // Landscape: full height, left.
+    // Frame full width, tall phones below notch and settings row; landscape:
+    // full height.
     Item {
         id: frame
         objectName: "frame"
@@ -470,8 +454,8 @@ Page {
                                   parent.height / Math.max(1, parent.width) >= 2
                                   ? page.topInset + Theme.itemSizeLarge : 0))
 
-        // Turned against page: stays put in portrait. Item's own turn, not
-        // VideoOutput `orientation` (Qt 5.6 keeps pre-turn shape, squeezes).
+        // Turned against page. Item's own turn, not VideoOutput `orientation`
+        // (Qt 5.6 keeps pre-turn shape, squeezes).
         VideoOutput {
             id: viewfinder
             objectName: "viewfinder"
@@ -533,7 +517,7 @@ Page {
         maximumZoom: camera.maximumDigitalZoom
     }
 
-    // Video time at top, below notch, as platform camera.
+    // Video time at top, below notch.
     Rectangle {
         objectName: "recordingIndicator"
         anchors.horizontalCenter: frame.horizontalCenter
@@ -567,12 +551,10 @@ Page {
         }
     }
 
-    // Exposure at right edge; landscape: left, opposite shutter, as platform.
-    // Not while recording.
+    // Exposure at right edge (landscape: left, opposite shutter). Not recording.
     ExposureSlider {
         objectName: "exposureSlider"
-        // Placed by x, not swapped anchors: both set briefly mid-turn stretched
-        // slider across frame, and its width never recovered.
+        // By x, not swapped anchors: both set mid-turn stretched slider for good.
         x: page.landscape ? frame.x + Theme.paddingLarge : frame.x + frame.width - width
         anchors.verticalCenter: frame.verticalCenter
         labelOnLeft: !page.landscape
@@ -592,8 +574,7 @@ Page {
         text: Viewfinder.countdownText(page.countdown)
     }
 
-    // Controls at foot: in black under picture if room, else over bottom edge.
-    // Landscape: right column.
+    // Controls under picture if room, else over bottom edge; landscape: right.
     Item {
         id: controls
         objectName: "controls"
@@ -607,8 +588,8 @@ Page {
         width: page.landscape ? depth : parent.width
         height: page.landscape ? parent.height : depth
 
-        // Two modes stacked, current lit. Not while video runs: would switch the
-        // recording pipeline.
+        // Two modes stacked, current lit. Not while recording (would switch
+        // pipeline).
         Column {
             id: modes
             objectName: "modeColumn"
@@ -643,10 +624,10 @@ Page {
             }
         }
 
-        // Back-camera rings above shutter. Not front, not while recording.
+        // Back-lens rings above shutter; not front or recording.
         CameraLensToggle {
             objectName: "lensToggle"
-            // Two paddings clear of shutter in landscape, as platform camera.
+            // Two paddings clear of shutter in landscape.
             x: page.landscape ? shutter.x - width - 2 * Theme.paddingLarge
                               : (parent.width - width) / 2
             y: page.landscape ? (parent.height - height) / 2
@@ -660,7 +641,7 @@ Page {
             onSelected: page.useCamera(deviceId)
         }
 
-        // Shutter in platform's drawing; seconds left on it during self-timer.
+        // Platform shutter; self-timer seconds on it.
         IconButton {
             id: shutter
             objectName: "shutter"
@@ -678,7 +659,7 @@ Page {
             }
         }
 
-        // Other side's camera. Not while recording.
+        // Other side. Not recording.
         IconButton {
             objectName: "flipButton"
             x: page.landscape ? (parent.width - width) / 2
@@ -701,7 +682,7 @@ Page {
         size: BusyIndicatorSize.Large
     }
 
-    // Last so it lies over all; tap outside puts it away.
+    // Last: over all; tap outside closes.
     CameraSettingsPanel {
         objectName: "settingsPanel"
         anchors.fill: parent

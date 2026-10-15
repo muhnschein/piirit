@@ -1,9 +1,7 @@
 //! QR codes: invite drawn out; camera codes read back.
 //!
-//! No protocol here: code carries core's invite link; read text goes to `check_qr` first, as
-//! pasted links do. Frames are files: `grabToImage` is Qt 5.6 QML's only viewfinder pixel route;
-//! `.pgm` path makes Qt write plain PGM, so no image crate. Both crates pure Rust, under the 1.75
-//! floor.
+//! No protocol: core's invite link; read text to `check_qr`. Frames via file (`grabToImage`,
+//! Qt 5.6 only route); `.pgm` makes Qt write PGM: no image crate. Crates pure Rust, 1.75 floor.
 
 use std::cell::RefCell;
 
@@ -27,7 +25,7 @@ pub(crate) fn encode_modules(text: &str) -> Result<(usize, String), String> {
     Ok((size, rows))
 }
 
-/// Greyscale: w, h, one byte per pixel, 0 black.
+/// Greyscale: w, h, byte per pixel, 0 black.
 pub(crate) struct Grey {
     pub width: usize,
     pub height: usize,
@@ -67,8 +65,8 @@ pub(crate) fn parse_pnm(bytes: &[u8]) -> Option<Grey> {
     })
 }
 
-/// Header tokens (magic, width, height, max) and data offset. Whitespace-separated, `#` comments
-/// allowed; exactly one whitespace byte between max and data.
+/// Header tokens (magic, width, height, max) and data offset. `#` comments allowed; one
+/// whitespace byte between max and data.
 fn pnm_header(bytes: &[u8]) -> Option<(Vec<String>, usize)> {
     let mut at = 0;
     let mut tokens: Vec<String> = Vec::new();
@@ -120,8 +118,8 @@ pub(crate) fn decode_grey(grey: &Grey) -> Option<String> {
         .find_map(|grid| grid.decode().ok().map(|(_, content)| content))
 }
 
-/// File in app cache dir (inside sandbox grant): viewfinder frames, shown codes, captures
-/// (`capture.rs`). `name` may have a directory, created too.
+/// File in app cache dir (sandbox grant): frames, shown codes, captures (`capture.rs`). `name`
+/// may have a directory, created too.
 pub(crate) fn cache_file(name: &str) -> Result<std::path::PathBuf, String> {
     let base = std::env::var("XDG_CACHE_HOME")
         .map(std::path::PathBuf::from)
@@ -138,11 +136,11 @@ pub(crate) fn cache_file(name: &str) -> Result<std::path::PathBuf, String> {
 
 /// Pixels per module: square modules at any scale.
 const MODULE_PIXELS: usize = 8;
-/// Quiet-zone modules, as the standard asks.
+/// Quiet-zone modules, per standard.
 const QUIET_ZONE: usize = 4;
 
-/// Binary PGM with quiet zone, dark modules black on white. Qt reads PGM, so `Image` shows it
-/// and reloads from file when textures are lost (app backgrounded).
+/// Binary PGM with quiet zone, black on white. `Image` reloads it when textures are lost
+/// (app backgrounded).
 pub(crate) fn write_pgm(size: usize, modules: &str, path: &std::path::Path) -> Result<(), String> {
     let too_large = || format!("a code of {size} modules is too large to draw");
     let edge = size
@@ -152,7 +150,7 @@ pub(crate) fn write_pgm(size: usize, modules: &str, path: &std::path::Path) -> R
     // Row of modules: `MODULE_PIXELS` lines.
     let band = edge.checked_mul(MODULE_PIXELS).ok_or_else(too_large)?;
     let mut pixels = vec![u8::MAX; edge.checked_mul(edge).ok_or_else(too_large)?];
-    // Bands and cells skip quiet zone top/left: no arithmetic placement, nothing lands outside.
+    // Bands and cells skip quiet zone top/left: no placement arithmetic, nothing outside.
     let bands = pixels.chunks_exact_mut(band).skip(QUIET_ZONE);
     for (band, row) in bands.zip(modules.lines()) {
         for line in band.chunks_exact_mut(edge) {
@@ -205,13 +203,11 @@ pub struct QrCode {
     shown: Option<std::path::PathBuf>,
 }
 
-/// Code files shown, one entry per showing [`QrCode`]: two pages may share one file.
-///
-/// Second-device code is new per offer, so cache would keep every code. Shown files stay
-/// (`Image` reloads on texture loss); other code files go as next is written.
+/// Shown code files, one entry per [`QrCode`] (pages may share one). Second-device code new per
+/// offer: unshown ones go as next is written.
 static SHOWN: std::sync::Mutex<Vec<std::path::PathBuf>> = std::sync::Mutex::new(Vec::new());
 
-/// [`SHOWN`], even after a panic: at worst a file kept.
+/// [`SHOWN`], even after panic (at worst a file kept).
 fn shown_codes() -> std::sync::MutexGuard<'static, Vec<std::path::PathBuf>> {
     SHOWN
         .lock()
@@ -278,7 +274,7 @@ impl Drop for QrCode {
     }
 }
 
-/// Is `name` a code file ([`file_stem`])? Not the frame.
+/// `name` is a code file ([`file_stem`]), not frame.
 fn is_code_file(name: &str) -> bool {
     name.strip_prefix("qr-")
         .and_then(|rest| rest.strip_suffix(".pgm"))
@@ -315,7 +311,7 @@ fn remove_codes_not_shown(dir: &std::path::Path, keep: &[std::path::PathBuf]) {
 pub struct QrScanner {
     base: qt_base_class!(trait QObject),
 
-    /// True from `decode` until answered; page grabs next frame only after, so none queue.
+    /// True from `decode` until answered; page grabs next only after.
     pub busy: qt_property!(bool; NOTIFY busy_changed),
     /// Emitted when `busy` changes.
     pub busy_changed: qt_signal!(),
@@ -372,7 +368,7 @@ impl QrScanner {
             }
         });
         let path = path.to_string();
-        // Own thread, not core runtime: decoding needs no core; frames arrive without one.
+        // Own thread, not core runtime: frames arrive without core.
         std::thread::spawn(move || {
             let result = std::fs::read(&path)
                 .ok()

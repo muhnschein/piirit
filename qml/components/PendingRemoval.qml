@@ -1,36 +1,35 @@
 import QtQuick 2.0
 
 /*
- * Removal wait, owned by list: rows die on delete/reload/reorder (an arrival
- * reorders the chat list). Silica's `ListItem.remorseAction` lives in row, so
- * runs of deletes lost items on phone. Drawn is still Silica's `RemorseItem`,
- * raised by the row with a no-op callback; this is what acts.
+ * Removal wait owned by list: rows die on delete/reload/reorder (arrival
+ * reorders chat list), and Silica's `ListItem.remorseAction` lives in row, so
+ * delete runs lost items on phone. Drawn: Silica's `RemorseItem`, raised by
+ * row with no-op callback; this acts.
  *
- * Each id has own deadline, timer armed for soonest. One shared countdown
- * restarts per delete: first drawn countdown ends, platform restores that
- * item, all go at the last one's end. `qml_delete_clocks` pins this.
+ * Own deadline per id, timer for soonest. One shared countdown restarted per
+ * delete: first drawn one ends, platform restores item, all go at last end.
+ * Pinned by `qml_delete_clocks`.
  *
- * Holder: `pending(id)`, `remaining(id)` for rows rebuilt mid-wait. Page
- * leaving calls `flush()` (timers unfired at exit; user asked for it to go).
+ * `pending(id)`, `remaining(id)` for rows rebuilt mid-wait. Leaving page
+ * calls `flush()`: timers unfired at exit, user asked for removal.
  *
- * QtObject, not Item: draws nothing, and an Item in a Column takes a layout slot.
+ * QtObject: draws nothing; Item in Column takes layout slot.
  */
 QtObject {
     id: root
 
-    /// Action per id once wait is up. `tag` is what `ask` got (e.g. delete for
-    /// me vs everyone; must survive tap to wait end); `undefined` if none.
+    /// Action per id once wait up. `tag`: what `ask` got (e.g. delete for me vs
+    /// everyone, kept to wait end); `undefined` if none.
     signal remove(int id, var tag)
 
-    /// Wait length, ms: 4 s, matching rows' `RemorseItem` (Silica default 5 s).
-    /// Tests shorten it.
+    /// Wait, ms: 4 s, as rows' `RemorseItem` (Silica default 5 s). Tests shorten.
     property int delay: 4000
 
     /// Tag per waiting id. Apart from `ids` so row bindings read only `ids`.
     property var tags: ({})
 
-    /// Waiting id to deadline (clock ms). Replaced, not mutated: bindings
-    /// re-run only on assignment, so `pending()` works in row bindings.
+    /// Waiting id to deadline (clock ms). Replaced, not mutated: bindings re-run
+    /// on assignment only, so `pending()` works in rows.
     property var ids: ({})
 
     /// Whether id is on its way out.
@@ -46,16 +45,16 @@ QtObject {
         return Math.max(1, root.ids[id] - Date.now())
     }
 
-    /// Countdown ms for `RemorseItem.execute`: time left, or whole `delay`.
-    /// Only number rows may pass, so drawn countdown and deletion end together.
-    /// `qml_syntax.rs` makes every row ask here.
+    /// Countdown ms for `RemorseItem.execute`: time left, or `delay`. Only number
+    /// rows may pass (`qml_syntax.rs` checks), so countdown and deletion end
+    /// together.
     function countdownFor(id) {
         var left = root.remaining(id)
         return left > 0 ? left : root.delay
     }
 
-    /// Queue id after `delay`. `tag` goes to `remove`; omit if only one kind.
-    /// Other ids keep their deadlines.
+    /// Queue id after `delay`; `tag` goes to `remove` (omit if one kind). Others
+    /// keep deadlines.
     function ask(id, tag) {
         var next = root.copied()
         next[id] = Date.now() + root.delay
@@ -100,8 +99,7 @@ QtObject {
             root.countdown.stop()
             return
         }
-        // At least 1 ms: interval 0 never fires on some Qt; past deadline acts
-        // now.
+        // At least 1 ms: interval 0 never fires on some Qt; past deadline acts now.
         root.countdown.interval = Math.max(1, soonest - Date.now())
         root.countdown.restart()
     }

@@ -1,11 +1,9 @@
-// Time and delivery-mark helpers: shared, so every list shows chats alike.
-//
-// No `.pragma library`: qsTr() needs importing component's context.
+// Time and delivery-mark helpers, shared so lists agree. No `.pragma library`:
+// qsTr() needs importing component's context.
 
-/// Elapsed time, fewest characters: "10 min" beats "14:32" for recent.
-///
-/// Past a week: date. `now` comes from `Clock.now`, not `Date.now()` (bindings
-/// never re-run on that). Later of `now` and real clock: clock lags a tick.
+/// Elapsed time, fewest chars ("10 min" over "14:32"); past a week: date. `now`
+/// from `Clock.now` (bindings never re-run on `Date.now()`); later of it and
+/// real clock, which lags a tick.
 function timeLabel(seconds, now) {
     if (seconds <= 0) {
         return ""
@@ -22,8 +20,8 @@ function timeLabel(seconds, now) {
         return qsTr("%1 h").arg(Math.floor(elapsed / 3600000))
     }
     if (elapsed < 7 * 86400000) {
-        // %n: all plural forms. English catalog turns "day(s)" into a word, so
-        // app falls back to it for languages without one (else raw source text).
+        // %n: plural forms. English catalog words "day(s)"; fallback for
+        // untranslated languages (else raw source).
         //: How long ago a chat's last message was. %n is a count of days.
         return qsTr("%n day(s)", "", Math.floor(elapsed / 86400000))
     }

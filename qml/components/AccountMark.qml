@@ -2,11 +2,9 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Account mark: head and shoulders in a ring, as phones draw where a picture goes before one exists.
- *
- * Drawn, not named (see AppMark): theme icon may be missing, and this tile starts the app. Rings scale with size, take host colour.
- *
- * Shoulders: top of a ring with bottom cut off by `clip` (cut is straight line).
+ * Account mark: head and shoulders in ring, as phones draw before a picture exists. Drawn,
+ * not named (see AppMark): theme icon may be missing, and this tile starts app. Rings scale
+ * with size, take host colour. Shoulders: ring top, bottom cut straight by `clip`.
  */
 Item {
     id: root
@@ -45,8 +43,7 @@ Item {
         border.color: root.color
     }
 
-    // Shoulders: upper part of wider circle, cut at ring's inner edge so figure
-    // sits in ring.
+    // Shoulders: top of wider circle, cut at ring's inner edge: figure sits in ring.
     Item {
         objectName: "accountShoulders"
         clip: true

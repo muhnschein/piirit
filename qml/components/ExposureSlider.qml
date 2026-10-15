@@ -3,10 +3,9 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Exposure slider beside viewfinder. Brighter up. Shows value while moved
- * and 2 s after; double tap resets.
- *
- * Half-stop steps, -2..+2 EV; less camera range clamps.
+ * Exposure slider beside viewfinder, brighter up. Value shown while moved and
+ * 2 s after; double tap resets. Half-stop steps, -2..+2 EV; smaller camera
+ * range clamps.
  */
 Item {
     id: slider

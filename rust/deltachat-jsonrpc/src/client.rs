@@ -17,7 +17,7 @@ use crate::protocol::{RequestEnvelope, ResponseEnvelope};
 
 type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Result<serde_json::Value, RpcError>>>>>;
 
-/// Lock, ignoring poison. Plain collections survive a panic intact.
+/// Lock ignoring poison: plain collections survive panic.
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
     mutex
         .lock()
@@ -26,8 +26,7 @@ fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 
 /// Running `deltachat-rpc-server` over stdio.
 ///
-/// Transport only: correlation, framing, process lifecycle. Methods and payloads pass through
-/// uninterpreted.
+/// Transport only (correlation, framing, process); payloads uninterpreted.
 pub struct RpcClient {
     stdin_tx: mpsc::UnboundedSender<String>,
     pending: PendingMap,
@@ -41,8 +40,8 @@ pub struct RpcClient {
 
 const STDERR_TAIL_CAPACITY: usize = 200;
 
-/// Call timeout: generous; core does real work, slow phone isn't broken. Unbounded, an accepted,
-/// never-answered request (task panic, process and stdout still up) hangs caller forever.
+/// Call timeout, generous (slow phone, real work). Bounded: unanswered request (task panic,
+/// process still up) would hang caller forever.
 const CALL_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// Write request lines to stdin until closed or failed.
@@ -63,7 +62,7 @@ async fn write_line(stdin: &mut ChildStdin, line: &str) -> std::io::Result<()> {
 
 /// Match stdout answers to waiters; wake them at end.
 ///
-/// EOF or read error: server gone. Bad UTF-8 line: skip, its call times out.
+/// EOF/read error: server gone. Bad UTF-8 line skipped (its call times out).
 async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
     let mut lines = BufReader::new(stdout).lines();
     loop {
@@ -78,7 +77,7 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
         // Remove first: no lock while sending.
         let waiting = lock(pending).remove(&id);
         if let Some(sender) = waiting {
-            // Closed receiver: caller timed out; nobody to tell.
+            // Closed receiver: caller timed out.
             sender.send(outcome).ok();
         }
     }
@@ -94,7 +93,7 @@ fn parse_response(line: &str) -> Option<(u64, Result<serde_json::Value, RpcError
         return None;
     }
     let envelope = serde_json::from_str::<ResponseEnvelope>(line).ok()?;
-    // Id-less answer unexpected: events come by polling.
+    // Id-less answer unexpected (events are polled).
     let id = envelope.id?;
     let outcome = match (envelope.result, envelope.error) {
         (_, Some(err)) => Err(RpcError::Remote(err)),
@@ -130,15 +129,14 @@ impl RpcClient {
         Self::spawn_with_env(program, args, std::iter::empty::<(&OsStr, &OsStr)>()).await
     }
 
-    /// Like [`RpcClient::spawn`], plus child env. `DC_ACCOUNTS_PATH` matters: without it server
-    /// stores accounts in `./accounts`, relative to its cwd.
+    /// [`RpcClient::spawn`] plus child env. Set `DC_ACCOUNTS_PATH`, else server uses cwd's
+    /// `./accounts`.
     ///
     /// # Errors
     ///
     /// Same as [`RpcClient::spawn`].
-    // Stays async though nothing awaits: `Command::spawn` needs active reactor, which an async fn
-    // guarantees. Clippy 1.99 repeats it as `unused_async_trait_impl`; `unknown_lints` because
-    // pinned 1.94.1 lacks that lint.
+    // Async with no await: `Command::spawn` needs active reactor. Clippy 1.99 also flags
+    // `unused_async_trait_impl`; `unknown_lints` for pinned 1.94.1, which lacks it.
     #[allow(unknown_lints, clippy::unused_async, clippy::unused_async_trait_impl)]
     pub async fn spawn_with_env<S, I, A, E, K, V>(
         program: S,
@@ -301,13 +299,13 @@ impl RpcClient {
     pub async fn shutdown(&self) -> std::io::Result<()> {
         let child = lock(&self.child).take();
         if let Some(mut child) = child {
-            // Fails only if child already exited: expected.
+            // Fails only if child exited: fine.
             child.start_kill().ok();
             child.wait().await?;
         }
         let reader_task = lock(&self.reader_task).take();
         if let Some(task) = reader_task {
-            // Panicked or cancelled; either way stopped.
+            // Panicked or cancelled: stopped.
             task.await.ok();
         }
         let writer_task = lock(&self.writer_task).take();

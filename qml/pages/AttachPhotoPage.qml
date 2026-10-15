@@ -2,8 +2,7 @@ import QtQuick 2.0
 import Sailfish.Pickers 1.0
 
 /*
- * Gallery picker. Own page: `Sailfish.Pickers` types resolve at load, so a
- * missing type costs one button, not the conversation.
+ * Gallery picker. Own page: missing `Sailfish.Pickers` types cost one button, not the chat.
  */
 ImagePickerPage {
     id: picker

@@ -1,23 +1,20 @@
 /*
- * Tap on app link before engine downloads it.
- *
- * Frame script in engine world (loaded by `WebxdcStorePage.qml`), beside store page.
- * Engine would save .xdc download where app can't reach. deltachat-android decides in
- * `shouldOverrideUrlLoading`; Sailfish WebView has no hook. So: stop click on app link
- * here, send over message channel; page fetches via core (`WebxdcStore`).
- *
- * Only .xdc links. Store pages, search, other links: engine as usual.
+ * Catches .xdc link tap before engine downloads it (to where app can't reach).
+ * Frame script loaded by `WebxdcStorePage.qml`. Sailfish WebView has no
+ * `shouldOverrideUrlLoading` (deltachat-android's hook), so click stopped here,
+ * sent over message channel; page fetches via core (`WebxdcStore`). Other
+ * links: engine as usual.
  */
 (function () {
     "use strict";
 
     /*
-     * App's message name: engine messages all start with "embed:", so no clash.
+     * Message name; engine's start "embed:", no clash.
      */
     var MESSAGE = "piirit:app";
 
     /*
-     * Link address under click, or "" if none. Walks up from target (click may hit a child).
+     * Link under click, or "". Walks up from target (may hit a child).
      */
     function linkFrom(node) {
         while (node) {
@@ -31,7 +28,7 @@
     }
 
     /*
-     * Address is app if path ends .xdc. Query and fragment ignored (store links carry version).
+     * App if path ends .xdc; query, fragment ignored (store links carry version).
      */
     function isApp(address) {
         var path = address.split("#")[0].split("?")[0];
@@ -46,7 +43,7 @@
         if (!address || !isApp(address)) {
             return;
         }
-        // Engine does nothing with click: keeps file out of downloads. App fetches via core.
+        // Engine ignores click: file stays out of downloads.
         event.preventDefault();
         sendAsyncMessage(MESSAGE, { uri: address });
     }, true);

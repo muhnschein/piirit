@@ -1,7 +1,7 @@
 //! Search results: chats, contacts, messages, each counted.
 //!
-//! Three core calls, one flat model: QML `section` groups a flat model and a view takes one.
-//! Alternative, three lists in a flickable, nests flickables that fight for drag on Silica.
+//! Three core calls, one flat model: `section` groups it in one view. Three lists in a flickable
+//! nest flickables fighting for drag on Silica.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -15,10 +15,8 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{SearchItem, SearchListModel};
 
-/// Max message rows.
-///
-/// Common words match thousands. `message_total` keeps true count.
-/// Private: rustdoc bars public links to it.
+/// Max message rows: common words match thousands; `message_total` keeps true count. Private:
+/// rustdoc bars public links to it.
 const MESSAGE_LIMIT: usize = 50;
 
 /// One query's results.
@@ -31,12 +29,12 @@ const MESSAGE_LIMIT: usize = 50;
 pub struct SearchResults {
     base: qt_base_class!(trait QObject),
 
-    /// Account to search; setting re-runs query.
+    /// Account to search.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
     /// Emitted on account change.
     pub account_changed: qt_signal!(),
 
-    /// Query text. Empty clears model (not "list everything").
+    /// Query; empty clears model (not "list all").
     pub query: qt_property!(QString; WRITE set_query NOTIFY query_changed),
     /// Emitted on query change.
     pub query_changed: qt_signal!(),
@@ -44,8 +42,8 @@ pub struct SearchResults {
     /// Rows for `SilicaListView` `model`.
     pub rows: qt_property!(RefCell<SearchListModel>; CONST),
 
-    // Stored, not counted from model: heading bindings read them inside the reset that sets
-    // rows, where borrowing rows finds them mutably borrowed and aborts the process.
+    // Counts stored, not counted: heading bindings read them inside the reset setting rows,
+    // where borrowing rows aborts (already mutably borrowed).
     /// Rows, all kinds.
     pub count: qt_property!(u32; NOTIFY rows_changed),
     /// Chats found.
@@ -59,25 +57,23 @@ pub struct SearchResults {
     /// Emitted after `rows` change.
     pub rows_changed: qt_signal!(),
 
-    /// True once current query answered.
-    ///
-    /// Else empty list looks like no match: "Nothing found" flashes.
+    /// Current query answered; else empty list flashes "Nothing found".
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted on `loaded` change.
     pub loaded_changed: qt_signal!(),
 
-    /// Failure; message from core.
+    /// Failure, core's message.
     pub error: qt_signal!(message: QString),
 
     /// Run query again.
     pub reload: qt_method!(fn(&mut self)),
 
-    /// Open 1:1 chat with contact, creating it. Answers `chat_ready`.
+    /// Open 1:1 chat with contact, creating it; answers `chat_ready`.
     pub open_chat_with: qt_method!(fn(&mut self, contact_id: u32)),
     /// Chat ready to show.
     pub chat_ready: qt_signal!(chat_id: u32),
 
-    /// Drops stale answers: answers arrive out of order.
+    /// Drops stale out-of-order answers.
     generation: u64,
 }
 
@@ -131,7 +127,7 @@ impl SearchResults {
     /// Run query.
     pub fn reload(&mut self) {
         let account_id = self.account_id;
-        // Spaces-only: core rejects; treat as no query.
+        // Spaces-only: core rejects; no query.
         let query = self.query.to_string().trim().to_string();
         if account_id == 0 || query.is_empty() {
             // Late answer must not land after clear.
@@ -139,8 +135,7 @@ impl SearchResults {
             self.clear();
             return;
         }
-        // Silent: core not up yet; banner per keystroke is noise.
-        // Page reruns on core ready.
+        // Silent before core up (banner per keystroke); page reruns on ready.
         let Some((rpc, runtime)) = connection() else {
             return;
         };
@@ -151,7 +146,7 @@ impl SearchResults {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<(Vec<SearchItem>, u32), String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Answer for a query already typed past.
+            // Query already typed past.
             if this.borrow().generation != generation {
                 return;
             }
@@ -292,7 +287,7 @@ async fn matching_messages(
     account_id: u32,
     query: &str,
 ) -> Result<(Vec<SearchItem>, u32), String> {
-    // Three args, last is chat to search in; null: every chat. Two args rejected.
+    // Three args, last chat to search (null: all); two rejected.
     let hits: Vec<u32> = rpc
         .call(
             "search_messages",
@@ -311,7 +306,7 @@ async fn matching_messages(
         .await
         .map_err(|err| err.to_string())?;
 
-    // Chats of all hits named in one call: one per message is fifty round trips before first row.
+    // Hits' chats in one call: one per message is fifty round trips before first row.
     let mut chat_ids: Vec<u32> = Vec::new();
     for message_id in &shown {
         let Some(chat_id) = chat_of(messages.get(message_id)) else {
@@ -331,7 +326,7 @@ async fn matching_messages(
         .into_iter()
         .filter_map(|message_id| {
             let message = messages.get(&message_id)?;
-            // Core load failure: skip, not blank row.
+            // Load failure: skip, no blank row.
             if json::str_at(message, "kind") == "loadingError" {
                 return None;
             }

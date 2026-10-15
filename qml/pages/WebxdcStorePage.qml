@@ -5,15 +5,13 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Webxdc app store, as a page, as deltachat-android does; a .xdc file browser
- * fails the common case (no .xdc yet).
- * Engine would download an app link into its own world (out of app's reach),
- * and a download is no navigation, so watching the view never sees it. No
- * `shouldOverrideUrlLoading` hook here: frame script (qml/webxdc/catch.js)
- * catches clicks on app links and sends the address back; core fetches the
- * .xdc (`WebxdcStore`). Rest browses as a normal site.
- * Three ways in (frame script, `linkClicked`, committed navigation); app taken once.
- * Pushed by URL: `Sailfish.WebView` resolves only where engine installed.
+ * Webxdc app store as page, as deltachat-android; .xdc file browser fails common case (none
+ * yet). Engine would download app link into its own world, out of app's reach, and download
+ * isn't navigation, so view never sees it. No `shouldOverrideUrlLoading` here: frame script
+ * (qml/webxdc/catch.js) catches app-link clicks, sends address back; core fetches .xdc
+ * (`WebxdcStore`). Rest browses normally. Three ways in (frame script, `linkClicked`,
+ * committed navigation); app taken once. Pushed by URL: `Sailfish.WebView` resolves only
+ * where engine installed.
  */
 Page {
     id: page
@@ -23,12 +21,12 @@ Page {
     /// App chosen, at this path.
     signal picked(string path)
 
-    /// Store URL: Delta Chat default. Not a setting yet.
+    /// Store URL: Delta Chat default; no setting yet.
     readonly property string storeUrl: "https://webxdc.org/apps/"
 
     property string errorMessage: ""
 
-    /// App taken; page leaving. Second arrival of same tap is no second app.
+    /// App taken; page leaving. Same tap arriving twice is one app.
     property bool taken: false
 
     WebxdcStore {
@@ -46,9 +44,8 @@ Page {
         }
     }
 
-    /// Take app at `where` instead of engine download.
-    ///
-    /// Called for every address heard; decides which is an app.
+    /// Take app at `where` instead of engine download. Called for every address heard; decides
+    /// which is an app.
     function catchApp(where) {
         var here = "" + where
         var path = here.split("#")[0].split("?")[0]
@@ -57,16 +54,15 @@ Page {
             return
         }
         page.taken = true
-        // Stops a navigation that did start (a click frame script caught never
-        // began one).
+        // Stops navigation that did start (click caught by frame script never began one).
         view.stop()
         store.fetch(here)
     }
 
-    /// App already on phone. Store is not the only source.
+    /// App already on phone: store not only source.
     function pickFromPhone() {
-        // Pass `{}`: a stack declaring both args takes two; one-arg form
-        // doesn't reach it (ProfilesPage hit same with replaceAbove).
+        // Pass `{}`: stack declaring both args takes two; one-arg form misses it (ProfilesPage
+        // hit same with replaceAbove).
         var picker = pageStack.push(Qt.resolvedUrl("AttachAppPage.qml"), {})
         if (picker) {
             picker.picked.connect(function (path) {
@@ -76,8 +72,7 @@ Page {
         }
     }
 
-    // Not a PageHeader: title is store's own. Empty until page names itself,
-    // hence own fallback name.
+    // Not PageHeader: title is store's own; empty until page names itself, so fallback.
     ConversationHeader {
         id: header
         objectName: "storeHeader"
@@ -97,12 +92,11 @@ Page {
         url: page.storeUrl
         // Committed navigation: downloads don't land here, redirects to .xdc do.
         onUrlChanged: page.catchApp(view.url)
-        // View's tapped link, before engine decides. `url` is the signal's.
+        // Tapped link, before engine decides. `url` is signal's.
         onLinkClicked: page.catchApp(url)
     }
 
-    // Frame script and reply. Registered here: view's `Component.onCompleted` would replace
-    // WebView.qml's.
+    // Frame script, reply. Here: view's `Component.onCompleted` would replace WebView.qml's.
     Component.onCompleted: {
         view.addMessageListener("piirit:app")
         view.loadFrameScript(Qt.resolvedUrl("../webxdc/catch.js"))
@@ -118,8 +112,8 @@ Page {
         }
     }
 
-    // Below store: pulley wants SilicaFlickable, which takes the page's drags.
-    // Also the way out when store is unreachable.
+    // Below store: pulley wants SilicaFlickable, taking page's drags. Also way out when store
+    // unreachable.
     Button {
         id: fromPhone
         objectName: "fromPhoneButton"

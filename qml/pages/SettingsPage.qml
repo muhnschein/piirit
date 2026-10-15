@@ -3,22 +3,18 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * No-profile settings: message look, link cleaning, media quality, auto
- * download, retention, notifications, quick actions (QuickActionsPage.qml),
- * webxdc. Opened from chat list. Profile settings on profile page.
- * Exception: block list row under Privacy (core keeps it per account, but both
- * reference clients and readers look here). `accountId` = chat list's profile.
+ * Per-phone settings, from chat list; profile's on profile page, except block
+ * list (per account, but reference clients and readers look here).
  *
- * Values in dconf via `Settings` singleton (qml/components/Settings.qml);
- * changes reach open pages unannounced. Not a system Settings app page: its
- * entry is outside Harbour-allowed paths, and needed more than that to show.
- * Controls write on tap. Deletion period asks first (deletes at once, with
- * count).
+ * dconf via `Settings` singleton (qml/components/Settings.qml); changes reach
+ * open pages unannounced. Not a system Settings page: entry outside
+ * Harbour-allowed paths, needs more besides. Controls write on tap; deletion
+ * period asks first (deletes at once, with count).
  */
 Page {
     id: page
 
-    /// Profile for the block list row. Rest is per phone.
+    /// Profile for block list row (chat list's).
     property int accountId
 
     /// Outgoing media quality: balanced, or smaller and worse.
@@ -33,13 +29,13 @@ Page {
         return qsTr("Balanced")
     }
 
-    /// Choice index. Unknown values are balanced, as core does.
+    /// Choice index; unknown is balanced, as core.
     function qualityIndex(quality) {
         return quality === 1 ? 1 : 0
     }
 
-    /// Download limits in bytes, as parla offers. First: smallest core takes
-    /// (near never). Last: no limit.
+    /// Download limits in bytes, as parla. First: smallest core takes (near
+    /// never). Last: no limit.
     readonly property var limits: [32768, 262144, 524288, 1048576, 2097152, 5242880, 0]
 
     function limitLabel(index) {
@@ -77,8 +73,7 @@ Page {
         }
     }
 
-    /// Period index, or -1 if off-list: blank, not "Never" over messages that
-    /// are going.
+    /// Period index, or -1 off-list: blank, not a false "Never".
     function periodIndex(seconds) {
         for (var i = 0; i < periods.length; i++) {
             if (periods[i] === seconds) {
@@ -98,8 +93,8 @@ Page {
         })
     }
 
-    /// Reset choice to stored setting on change. Silica writes currentIndex on tap,
-    /// detaching the binding (same as DisappearingMessages).
+    /// Reset choice to stored setting: Silica tap writes currentIndex, detaching
+    /// binding (as DisappearingMessages).
     function refresh() {
         qualityCombo.currentIndex = page.qualityIndex(Settings.mediaQuality)
         downloadCombo.currentIndex = page.limitIndex(Settings.downloadLimit)
@@ -118,17 +113,14 @@ Page {
 
     Component.onCompleted: page.refresh()
 
-    /// Reader picked a deletion period.
-    ///
-    /// Off: set outright (deletes nothing). Else deletes older messages in all
-    /// chats at once: core counts them, reader confirms on own page first.
-    /// Choice shows stored value until confirmed; cancel leaves it.
+    /// Deletion period picked. Off: set outright. Else deletes at once in all
+    /// chats: core counts, reader confirms on own page; stored value till then.
     function choosePeriod(seconds) {
         if (seconds === 0) {
             Settings.deleteDeviceAfter = 0
             return
         }
-        // Silica already moved choice to tap.
+        // Silica moved choice already.
         page.refresh()
         if (seconds === Settings.deleteDeviceAfter) {
             return
@@ -137,7 +129,7 @@ Page {
         core.estimate_auto_deletion(seconds)
     }
 
-    /// Experimental switch: off at once; on only after reader accepts the risk.
+    /// Experimental switch: off at once; on after reader accepts risk.
     function toggleExperimental(toggle, setting) {
         if (toggle.checked) {
             Settings[setting] = false
@@ -153,8 +145,7 @@ Page {
         }
     }
 
-    /// Period awaiting reader's answer, 0 for none. Estimate comes by signal;
-    /// answer to an earlier ask is ignored.
+    /// Period awaiting answer, 0 none. Estimate by signal; earlier ask's ignored.
     property int pendingPeriod: 0
 
     property string errorMessage: ""
@@ -178,7 +169,7 @@ Page {
                 })
             }
         }
-        // Setting core refused, or count it could not give: shown here.
+        // Core refused setting or count: shown here.
         onCore_error: page.errorMessage = message
     }
 
@@ -199,9 +190,8 @@ Page {
                 text: qsTr("Messages")
             }
 
-            // Outgoing media: core recodes pictures on send, camera records
-            // video, at chosen quality. Same two choices, same names as
-            // reference clients.
+            // Core recodes pictures, camera records video at chosen quality.
+            // Choices and names as reference clients.
             ComboBox {
                 id: qualityCombo
                 objectName: "qualityCombo"
@@ -242,8 +232,8 @@ Page {
                 }
             }
 
-            // Core's `delete_device_after`: all chats, whatever their own timer
-            // (that is per chat, agreed by members; this is this phone's only).
+            // Core's `delete_device_after`: all chats, this phone only (chat
+            // timer is per chat, agreed by members).
             ComboBox {
                 id: deletionCombo
                 objectName: "deletionCombo"
@@ -266,11 +256,11 @@ Page {
                 }
             }
 
-            // Last under Messages: above three are core's; this only draws the message.
+            // Last under Messages: above are core's; this only draws.
             TextSwitch {
                 objectName: "markdownSwitch"
                 text: qsTr("Use Markdown formatting")
-                // Checked follows setting: tap writes it, setting moves switch.
+                // Tap writes setting; setting moves switch.
                 automaticCheck: false
                 checked: Settings.markdownMode === 0
                 onClicked: Settings.markdownMode = checked ? 1 : 0
@@ -280,7 +270,7 @@ Page {
                 text: qsTr("Notifications")
             }
 
-            // First: decides if the two below mean anything. Off: greyed, not hidden.
+            // First: gates the two below (off: greyed, not hidden).
             TextSwitch {
                 objectName: "notificationsSwitch"
                 text: qsTr("Show notifications")
@@ -289,7 +279,7 @@ Page {
                 onClicked: Settings.notificationsEnabled = !checked
             }
 
-            // Lock screen shows notification text, so reader chooses how much.
+            // Lock screen shows notification text: reader picks how much.
             ComboBox {
                 id: notificationCombo
                 objectName: "notificationCombo"
@@ -316,9 +306,8 @@ Page {
                 }
             }
 
-            // Only thing that gets through a muted group, when reader wants it.
-            // Reference clients' name and default.
-            // Calls from a contact: reference clients' setting, words, default.
+            // Mentions: only thing through a muted group. Calls: from a contact.
+            // Both reference clients' name, words, default.
             TextSwitch {
                 objectName: "callsRingSwitch"
                 //: Whether calls ring. A plural noun, not a verb.
@@ -350,14 +339,14 @@ Page {
                 objectName: "cleanLinksSwitch"
                 text: qsTr("Remove tracking from links")
                 description: qsTr("Removes click IDs and campaign tags from links you send.")
-                // Bound to setting, not held here: switch can't drift from app.
+                // Bound to setting: switch can't drift.
                 automaticCheck: false
                 checked: Settings.cleanLinks === true
                 onClicked: Settings.cleanLinks = !checked
             }
 
-            // Only row opening a page, so under switches. Block list is per account:
-            // profile's own (BlockedContactsPage.qml), kept here like reference clients.
+            // Only page-opening row, so under switches. Per account
+            // (BlockedContactsPage.qml), here like reference clients.
             BackgroundItem {
                 id: blockedEntry
                 objectName: "blockedContactsEntry"
@@ -406,8 +395,8 @@ Page {
                 onClicked: page.openQuickActions()
             }
 
-            // Off until asked, so only place "webxdc" shows on a fresh phone.
-            // Turns on tray entry, store, and running apps; each reads the setting.
+            // Off until asked: only place "webxdc" shows on fresh phone. Gates
+            // tray entry, store, running apps; each reads setting.
             TextSwitch {
                 id: webxdcSwitch
                 objectName: "webxdcSwitch"
@@ -424,7 +413,7 @@ Page {
         }
     }
 
-    // Core refusing a setting, or unable to count deletion, shown here.
+    // Core refusal or failed deletion count.
     Banner {
         objectName: "errorBanner"
         anchors {

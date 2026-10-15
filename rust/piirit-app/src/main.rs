@@ -50,8 +50,7 @@ fn translations_dir() -> PathBuf {
 }
 
 fn main() {
-    // First, while single-threaded: sets env the browser engine reads at call start and passes
-    // to the H.264 encoder (calls to iPhones).
+    // First, single-threaded: env for engine and H.264 encoder (iPhone calls).
     piirit_shim::prepare_media_plugins();
 
     // `PIIRIT_MEMORY_LOG=<seconds>`: RSS to stderr. See docs/BUILDING.md.
@@ -62,20 +61,19 @@ fn main() {
 
     let core = QObjectBox::new(DeltaChatCore::default());
 
-    // QQuickView, not bare engine: Silica `ApplicationWindow` must be hosted and shown, as
-    // `SailfishApp::createView()` does; engine alone never makes a window.
+    // QQuickView, as `SailfishApp::createView()`: bare engine never shows Silica
+    // `ApplicationWindow`.
     let mut view = QQuickView::new();
 
-    // After view (makes app object translator hangs off), before QML (translated once, at
-    // build). Language without catalog gets English one, for plural forms.
+    // After view (app object), before QML (translated at build). No catalog: English, for
+    // plurals.
     translations::install(&translations_dir().to_string_lossy(), "");
 
     // Before QML sourced, or bindings see undefined.
     view.engine()
         .set_object_property("core".into(), core.pinned());
-    // `--rpc-server <path>`, then `PIIRIT_RPC_SERVER`, then bundled binary; never PATH.
-    // Resolved here, not desktop entry: Sailfish invoker execs binary itself, so `Exec=env`
-    // wrappers aren't reliably honoured. See `piirit_shim::server_path`.
+    // `--rpc-server <path>`, `PIIRIT_RPC_SERVER`, bundled; never PATH. Here, not desktop entry:
+    // Sailfish invoker ignores `Exec=env` wrappers. See `piirit_shim::server_path`.
     let server = piirit_shim::server_path(
         std::env::args().skip(1),
         std::env::var("PIIRIT_RPC_SERVER").ok(),
@@ -91,6 +89,6 @@ fn main() {
     view.show();
     view.engine().exec();
 
-    // Stop server by our hand, not on closed pipe.
+    // Stop server explicitly, not via closed pipe.
     piirit_shim::shutdown();
 }

@@ -1,7 +1,5 @@
-//! Whole text of a too-long message. Messages only, not files.
-//!
-//! Message cut in two by sender: rest only via `get_message_html`; uncut ones can still outgrow
-//! a bubble. Markdown rendered here as message list does, so page needs no shim round trip.
+//! Whole text of a too-long message (not files). Sender-cut: rest only via `get_message_html`;
+//! uncut can still outgrow a bubble. Markdown rendered here, as message list does.
 
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
@@ -14,7 +12,7 @@ use crate::{html, markdown};
 #[derive(Default)]
 struct Loaded {
     text: String,
-    /// Rendered where fetched, not on Qt thread: HTML part unbounded; page would stall.
+    /// Rendered off Qt thread: HTML part unbounded.
     styled: String,
 }
 
@@ -49,7 +47,7 @@ pub struct FullText {
 
     /// Text as written.
     pub text: qt_property!(QString; NOTIFY loaded_changed),
-    /// Same as `Text.StyledText`, for Markdown display; rendered once here, not per scroll.
+    /// As `Text.StyledText` for Markdown; rendered once.
     pub styled_text: qt_property!(QString; NOTIFY loaded_changed),
     /// Load running; page shows spinner.
     pub loading: qt_property!(bool; NOTIFY loaded_changed),
@@ -143,10 +141,8 @@ impl FullText {
     }
 }
 
-/// Whole text of one message.
-///
-/// `hasHtml`: rest only in HTML part; else text is whole, no fetch.
-/// Rows: see `wasCut` in `MessageDelegate.qml`.
+/// Whole text of one message: HTML part fetched only if `hasHtml` (rows: `wasCut` in
+/// `MessageDelegate.qml`).
 async fn fetch(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result<Loaded, String> {
     let message: serde_json::Value = rpc
         .call("get_message", (account_id, message_id))

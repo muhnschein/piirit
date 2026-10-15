@@ -2,22 +2,20 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * "+" beside message field; opens tray of choices above it.
- *
- * Shape from Whisperfish (qml/components/ChatTextInput.qml). Choices appear under the thumb that opened them.
- *
- * Choices, nearest thumb first: camera (take now); paper clip (platform picker over all indexed media and documents, not one entry per kind); mic (voice message, only where recording works); apps grid (send webxdc, only if reader enabled).
- *
- * Nothing opened here: owning page pushes pickers and starts recording, as ConversationPage does for forwarding. Keeps this loadable and testable alone. Page also closes tray on tap elsewhere.
+ * "+" beside message field: tray above it, under the thumb (shape: Whisperfish
+ * qml/components/ChatTextInput.qml). Nearest first: camera; paper clip (platform
+ * picker over all indexed media and documents, not per kind); mic (where recording
+ * works); apps grid (webxdc, if enabled). Opens nothing: page pushes pickers,
+ * records, closes tray on outside tap, so this loads and tests alone.
  */
 Item {
     id: root
 
     /// Tray showing.
     property bool open: false
-    /// Mic offered at all, else hidden.
+    /// Mic offered.
     property bool voiceAvailable: false
-    /// Apps grid offered at all. Page binds from reader setting.
+    /// Apps grid offered; page binds setting.
     property bool appsAvailable: false
     /// Take picture or video now.
     signal cameraRequested()
@@ -25,7 +23,7 @@ Item {
     signal libraryRequested()
     /// Record voice message now.
     signal voiceRequested()
-    /// .xdc app file off phone, to play in chat.
+    /// .xdc file off phone, for chat.
     signal appRequested()
 
     function close() {
@@ -40,16 +38,14 @@ Item {
         objectName: "attachToggle"
         anchors.bottom: parent.bottom
         icon.source: "image://theme/icon-m-add"
-        // Animated via plain property: Behavior can't attach to a grouped
-        // property member like `icon.rotation`.
+        // Plain property: Behavior can't attach to grouped member `icon.rotation`.
         property real turn: root.open ? 45 : 0
         Behavior on turn { NumberAnimation { duration: 150 } }
         icon.rotation: toggle.turn
         onClicked: root.open = !root.open
     }
 
-    // Drawn outside bounds, above button. Nothing in input row clips; row
-    // declared after message list, paints over conversation.
+    // Above button, outside bounds: input row doesn't clip, paints after message list.
     Rectangle {
         id: tray
         objectName: "attachTray"
@@ -62,8 +58,7 @@ Item {
         radius: width / 4
         color: Theme.rgba(Theme.highlightDimmerColor, 0.9)
 
-        // `enabled` follows button, not fade: tray on way out stops taking taps
-        // at once. `visible` follows fade: gone, not transparent.
+        // `enabled` follows button: fading tray stops taps at once. `visible` follows fade.
         opacity: root.open ? 1.0 : 0.0
         visible: opacity > 0.0
         enabled: root.open

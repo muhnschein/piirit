@@ -2,16 +2,16 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Contact row, same look as chat-list row: avatar, colour, spacing.
- * Peer-supplied name and address: PlainText, see MessageDelegate.qml.
+ * Contact row, looks as chat-list row. Peer-supplied name, address:
+ * PlainText, see MessageDelegate.qml.
  */
 Item {
     id: root
 
     property string displayName
     property string address
-    /// Address under name. Off by default (means nothing to chatmail reader);
-    /// profiles page shows it: reader's own, tells accounts apart.
+    /// Address under name. Off by default (means nothing on chatmail); profiles
+    /// page shows it to tell accounts apart.
     property bool showAddress: false
     property string ownColor
     property string picturePath

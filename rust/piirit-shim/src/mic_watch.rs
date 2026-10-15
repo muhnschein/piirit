@@ -1,22 +1,19 @@
 //! Recording stream open in `PulseAudio` for this process.
 //!
-//! Call audio route must not change while Gecko's mic stream is open (`PA_STREAM_DONT_MOVE`):
-//! Sailfish policy module asserts all streams moved, sound server aborts, no sound until systemd
-//! restarts it. Gecko runs in this process, so its streams carry this pid.
+//! Call audio route must not change while Gecko's mic stream (`PA_STREAM_DONT_MOVE`) is open:
+//! Sailfish policy module asserts all streams moved, sound server aborts, silent till systemd
+//! restarts it. Gecko runs in-process: its streams carry this pid.
 //!
-//! Wrong "closed" costs sound, so `known` + `open` (`open` meaningful only while `known`). Known:
-//! connected, subscribed to source-output events, full listing since last event. Not connected,
-//! server gone, or relisting after a change while "closed": unknown. Stale "open" only delays
-//! a route change, so not withdrawn.
+//! Wrong "closed" costs sound, so `known` + `open`. Unknown: not connected, server gone, or
+//! relisting after change while "closed". Stale "open" only delays route change: not withdrawn.
 //!
 //! libpulse on own `pa_threaded_mainloop`: Qt thread never waits; no polling. Any source-output
 //! event: fresh listing; one asked mid-listing reruns after; only last believed. Server gone:
 //! unknown at once; retry 1 s, then every 2 s. Never autospawn (`PA_CONTEXT_NOAUTOSPAWN`):
-//! systemd owns the daemon; elsewhere ours would be wrong one.
+//! systemd owns daemon; elsewhere ours would be wrong one.
 //!
-//! C++ in `cpp!` so libpulse structs come from its headers: plain calls, one small fn per thing
-//! libpulse says. Back to Rust: [`MicState`] to a callback on mainloop thread, under lock;
-//! [`MicWatch`] moves it to the Qt thread.
+//! C++ in `cpp!` so libpulse structs come from its headers; one small fn per libpulse callback.
+//! [`MicState`] goes to a callback on mainloop thread, under lock; [`MicWatch`] moves it to Qt.
 
 // `cpp!` is FFI: `unsafe`. Allowed here only: docs/BUILDING.md.
 #![allow(unsafe_code)]
@@ -33,7 +30,7 @@ cpp! {{
     #include <string>
     #include <pulse/pulseaudio.h>
 
-    // One watcher. Mainloop-thread fields, under its lock.
+    // Mainloop-thread fields, under its lock.
     struct PiiritMicWatch {
         pa_threaded_mainloop *loop = nullptr;
         pa_mainloop_api *api = nullptr;
@@ -45,7 +42,7 @@ cpp! {{
         uint32_t pid = 0;
         // Passed to the Rust callback.
         void *user = nullptr;
-        // Failed attempts: sets the wait.
+        // Failed attempts: sets wait.
         unsigned failures = 0;
         // Server accepted subscription.
         bool subscribed = false;
@@ -80,7 +77,7 @@ cpp! {{
         });
     }
 
-    // Pid is decimal; anything else is not us.
+    // Pid decimal; else not us.
     static bool piirit_mic_belongs(const pa_proplist *props, uint32_t pid) {
         const char *value = pa_proplist_gets(props, PA_PROP_APPLICATION_PROCESS_ID);
         if (!value || *value < '0' || *value > '9') {
@@ -118,7 +115,7 @@ cpp! {{
         piirit_mic_connect(w);
     }
 
-    // 1 s, then 2 s: soon after restart, no busy loop.
+    // Soon after restart, no busy loop.
     static void piirit_mic_retry(PiiritMicWatch *w) {
         if (w->retry) {
             return;
@@ -250,7 +247,7 @@ cpp! {{
         pa_context_set_state_callback(c, piirit_mic_state, w);
         pa_context_set_subscribe_callback(c, piirit_mic_event, w);
         const char *server = w->server.empty() ? nullptr : w->server.c_str();
-        // Failure may already have gone via state callback, which dropped context; drop if not.
+        // State callback may have dropped context already; drop if not.
         if (pa_context_connect(c, server, PA_CONTEXT_NOAUTOSPAWN, nullptr) < 0 && w->context == c) {
             piirit_mic_lost(w);
         }
@@ -301,8 +298,7 @@ cpp! {{
     }
 }}
 
-/// Known; and whether this process has a recording stream open.
-/// `open` is false whenever `known` is false.
+/// Known, and whether this process records; `open` false while not `known`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct MicState {
     /// Connected, subscribed, listed since last change.
@@ -311,17 +307,17 @@ pub struct MicState {
     pub open: bool,
 }
 
-/// Callback type; boxed twice for a thin C++ pointer.
+/// Callback; boxed twice for thin C++ pointer.
 type Report = Box<dyn Fn(MicState) + Send>;
 
 /// Watches `PulseAudio` for one process's recording streams.
 ///
-/// [`MicState`] changes reach callback on watcher thread, in order; state before first unknown.
+/// [`MicState`] changes reach callback on watcher thread, in order, unknown until first.
 /// Callback must not block or drop watcher. Drop joins thread; no callbacks after.
 pub struct MicWatcher {
     /// C++ watcher; never null.
     handle: usize,
-    /// Read only by C++ at its address; dropped after the handle.
+    /// Read by C++ at its address; dropped after handle.
     #[allow(dead_code)]
     report: Box<Report>,
 }
@@ -329,8 +325,8 @@ pub struct MicWatcher {
 impl MicWatcher {
     /// Watch streams whose `application.process.id` is `pid`.
     ///
-    /// `server`: `PulseAudio` string (`unix:/run/user/100000/pulse/native`); `None`: libpulse's
-    /// own lookup. Returns `None` if mainloop can't be made or `server` contains nul.
+    /// `server`: `PulseAudio` string (`unix:/run/user/100000/pulse/native`); `None`: libpulse
+    /// lookup. `None` if mainloop fails or `server` has nul.
     pub fn start(
         pid: u32,
         server: Option<&str>,
@@ -363,8 +359,7 @@ impl MicWatcher {
 impl Drop for MicWatcher {
     fn drop(&mut self) {
         let watch = self.handle as *mut c_void;
-        // SAFETY: stopped once, here, off the mainloop thread.
-        // Thread joined before `report` drops.
+        // SAFETY: stopped once, here, off mainloop thread; joined before `report` drops.
         cpp!(unsafe [watch as "PiiritMicWatch *"] {
             piirit_mic_stop(watch);
         });
@@ -375,7 +370,7 @@ impl Drop for MicWatcher {
 ///
 /// ```qml
 /// MicWatch { id: mic; active: call.state === "active" }
-/// // The route may change only while it is known that nothing records.
+/// // Route may change only while known that nothing records.
 /// property bool routeFree: mic.known && !mic.open
 /// ```
 #[derive(QObject, Default)]
@@ -386,20 +381,19 @@ pub struct MicWatch {
     pub active: qt_property!(bool; WRITE set_active NOTIFY active_changed),
     /// [`Self::active`] changed.
     pub active_changed: qt_signal!(),
-    /// [`Self::open`] believable: connected, listed since last change. Read-only: qmetaobject
-    /// makes non-`CONST` props writable, and `CONST` is never re-read, so writes are dropped.
+    /// [`Self::open`] believable. Read-only: qmetaobject makes non-`CONST` props writable and
+    /// never re-reads `CONST`, so writes dropped.
     pub known: qt_property!(bool; READ is_known WRITE refuse NOTIFY known_changed),
     /// [`Self::known`] changed.
     pub known_changed: qt_signal!(),
-    /// This process has recording stream open. False while not known, which does not mean
-    /// closed. Read-only, as `known`.
+    /// Recording stream open. False while not known, which isn't closed. Read-only.
     pub open: qt_property!(bool; READ is_open WRITE refuse NOTIFY open_changed),
     /// [`Self::open`] changed.
     pub open_changed: qt_signal!(),
 
     /// Watcher while active.
     watcher: Option<MicWatcher>,
-    /// Counts activations: late reports are ignored.
+    /// Activation count: late reports ignored.
     generation: u64,
 }
 
@@ -410,13 +404,13 @@ impl MicWatch {
         self.known
     }
 
-    /// Whether a recording stream is open.
+    /// Recording stream open.
     #[must_use]
     pub fn is_open(&self) -> bool {
         self.open
     }
 
-    /// Writes to `known`/`open` ignored: only the watch sets them.
+    /// Ignores writes to `known`/`open`.
     pub fn refuse(&mut self, _value: bool) {}
 
     /// Start or stop watching.
@@ -447,8 +441,7 @@ impl MicWatch {
         self.active_changed();
     }
 
-    /// Take a state: both set before either is announced, so bindings never mix states (known
-    /// but not yet open is the wrong answer).
+    /// Both set before either announced: bindings never see known-but-not-yet-open.
     fn take(&mut self, state: MicState) {
         let known = state.known;
         let open = state.known && state.open;

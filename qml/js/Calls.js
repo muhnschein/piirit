@@ -2,9 +2,8 @@
 //
 // No `.pragma library`: qsTr() needs importing file's context.
 
-/// Call row first line: kind or outcome, in Delta Chat's words (its translations
-/// apply). `state`: Alerting, Active, Completed,
-/// Missed, Declined or Canceled.
+/// Call row first line: kind or outcome, Delta Chat's words (its translations). `state`:
+/// Alerting, Active, Completed, Missed, Declined, Canceled.
 function title(state, hasVideo) {
     if (state === "Missed") {
         return qsTr("Missed call")
@@ -18,7 +17,7 @@ function title(state, hasVideo) {
     return hasVideo ? qsTr("Video call") : qsTr("Audio call")
 }
 
-/// Line under: call length, or ringing. None if never connected.
+/// Second line: length, or ringing; none if never connected.
 function detail(state, duration, outgoing) {
     if (state === "Completed") {
         if (duration < 60) {
@@ -34,7 +33,7 @@ function detail(state, duration, outgoing) {
     return ""
 }
 
-/// Call that did not happen, warning colour.
+/// Call that didn't happen: warning colour.
 function failed(state) {
     return state === "Missed" || state === "Declined" || state === "Canceled"
 }

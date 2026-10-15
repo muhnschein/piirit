@@ -1,19 +1,17 @@
 //! Loopback host for one webxdc app, while open.
 //!
-//! `WebView` needs the zip as a website. Files come from core (`get_webxdc_blob`): served, not
-//! unpacked; no archive parsed here. HTTP also gives the way back: `webxdc.js` POSTs updates and
-//! long-polls, held until core pokes (`Host::poke`). Needs nothing of `WebView` but the URL; quiet
-//! app costs one request per [`UPDATE_WAIT`]. Alternative, Gecko frame script, is chrome-privileged
-//! ground this app can't test.
+//! `WebView` needs the zip as a website: files served from core (`get_webxdc_blob`), never
+//! unpacked here. Way back is HTTP too: `webxdc.js` POSTs updates and long-polls until core pokes
+//! (`Host::poke`); needs only the URL, quiet app costs a request per [`UPDATE_WAIT`]. Gecko frame
+//! script alternative is chrome-privileged, untestable here.
 //!
 //! Served from root, as other clients: bundler-default apps ask `/assets/index-1a2b.js`; a
-//! prefixed host blanks half the store.
+//! prefix blanks half the store.
 //!
 //! Guards:
 //! - 127.0.0.1 on kernel port: unreachable off device;
 //! - `Host:` must match: no DNS trick;
-//! - chat API under unguessable `/webxdc-api/<token>/`: a page finding the port gets only the
-//!   app's files, never chat read/write;
+//! - chat API under unguessable `/webxdc-api/<token>/`: port finder gets app files, not chat;
 //! - exists only while app open;
 //! - CSP: this origin only, no network.
 
@@ -29,11 +27,10 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
-/// API JS, compiled in: served, not engine-loaded; a packaged file could go missing on phone only.
+/// API JS, compiled in: packaged file could go missing on phone only.
 const BRIDGE: &str = include_str!("webxdc.js");
 
-/// `'self'`: this host only. `unsafe-inline`/`unsafe-eval`: app's inline script; origin has
-/// nowhere to go.
+/// `'self'`: this host only. `unsafe-inline`/`unsafe-eval` for app scripts: origin can't reach out.
 const POLICY: &str = "default-src 'self'; \
      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; \
      style-src 'self' 'unsafe-inline' blob:; \
@@ -47,18 +44,17 @@ const POLICY: &str = "default-src 'self'; \
 /// Ms before re-asking after failed update request.
 const RETRY_INTERVAL: u32 = 300;
 
-/// Max wait for update before empty answer; bridge re-asks at once, so sets how often quiet app
-/// asks. Same as call page's command wait (`call_host.rs`).
+/// Max update wait before empty answer: quiet app's ask rate. As `call_host.rs` command wait.
 const UPDATE_WAIT: Duration = Duration::from_secs(20);
 
-/// Max request head: webxdc's own are short; longer is not one of them.
+/// Max request head; webxdc's own are short.
 const MAX_HEAD: usize = 16 * 1024;
 
 /// Max `POST`ed update. Core soft limit 100 KiB; larger body unread.
 const MAX_BODY: usize = 512 * 1024;
 
-/// Max refused body read before answering. Closing while client writes resets connection, and
-/// app sees unreachable host, not an answer.
+/// Max refused body drained before answering: closing on a writing client resets it, app
+/// sees unreachable host.
 const MAX_DRAIN: usize = 256 * 1024 * 1024;
 
 /// Served app and what it is told.
@@ -67,8 +63,7 @@ pub(crate) struct Instance {
     pub(crate) account_id: u32,
     /// Message webxdc arrived as; status-update key.
     pub(crate) message_id: u32,
-    /// `window.webxdc.selfAddr`: what other members see updates from; core's answer, not
-    /// account address.
+    /// `window.webxdc.selfAddr`: core's answer, not account address.
     pub(crate) self_addr: String,
     /// `window.webxdc.selfName`: profile name.
     pub(crate) self_name: String,
@@ -78,10 +73,8 @@ pub(crate) struct Instance {
     pub(crate) send_update_max_size: u64,
 }
 
-/// Passes handed-over file to page, which asks reader. Callback, not core call: API says
-/// `sendToChat`, but destination is reader's (a download means the phone).
-///
-/// Page is on Qt thread; `queued_callback` puts it there.
+/// Hands file to page, which asks reader: API says `sendToChat`, but reader picks destination.
+/// Page is on Qt thread (`queued_callback`).
 pub(crate) type HandedOver = Arc<dyn Fn(String, String) + Send + Sync>;
 
 /// Shared by all connections.
@@ -100,9 +93,7 @@ struct Shared {
     changed: Arc<Notify>,
 }
 
-/// Served app: URL for `WebView`, serving task.
-///
-/// Drop stops host (closing page does).
+/// Served app: URL for `WebView`, serving task. Drop (closing page) stops host.
 pub(crate) struct Host {
     /// App URL, for `WebxdcApp.url`.
     url: String,
@@ -137,7 +128,7 @@ impl Drop for Host {
 ///
 /// # Errors
 ///
-/// Fails if port can't bind.
+/// Port can't bind.
 pub(crate) async fn start(
     rpc: Arc<RpcClient>,
     instance: Instance,
@@ -175,8 +166,7 @@ pub(crate) async fn start(
     })
 }
 
-/// Concurrent: one connection at a time is too few. Page loads script, style, pictures at once;
-/// a blob core is still reading would hold up the rest.
+/// Concurrent: page loads script, style, pictures at once; a slow blob would hold up the rest.
 async fn accept(listener: TcpListener, shared: Arc<Shared>) {
     while shared.running.load(Ordering::SeqCst) {
         // Listener can't accept: socket gone.
@@ -195,7 +185,7 @@ async fn accept(listener: TcpListener, shared: Arc<Shared>) {
 async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<()> {
     let mut response = match read_head(&mut stream).await? {
         None => Response::empty("400 Bad Request"),
-        // Handover streams to disk: held whole = room needed twice.
+        // Handover streams to disk; held whole needs room twice.
         Some(head) if handover_asked(&shared, &head) => {
             take_handover(&shared, &mut stream, head).await?
         }
@@ -222,9 +212,7 @@ async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<(
     };
     let after = response.after.take();
     let written = write_response(&mut stream, &response).await;
-    // Answer first: a picker opened over app hangs it if request still out.
-    //
-    // Only if answer arrived: failed write means page gone.
+    // After answer: picker over app hangs it if request open. Skipped if write failed (page gone).
     if let (Ok(()), Some(after)) = (&written, after) {
         after();
     }
@@ -305,9 +293,7 @@ pub(crate) struct Head {
     pub(crate) started: Vec<u8>,
 }
 
-/// Read head; `None` if unparseable.
-///
-/// Body left on socket: handover streams it, rest kept.
+/// Read head; `None` if unparseable. Body left on socket for caller.
 pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<Head>> {
     let mut head = Vec::new();
     let mut chunk = [0_u8; 2048];
@@ -361,9 +347,7 @@ pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<
     }))
 }
 
-/// Rest of kept body; `None` past cap.
-///
-/// Past cap: body still read and dropped (closing on a writing client resets it).
+/// Rest of kept body; `None` past cap (still drained: closing on a writer resets it).
 pub(crate) async fn read_body(
     stream: &mut TcpStream,
     head: Head,
@@ -401,7 +385,7 @@ fn find(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 
 /// Pick answer: unhandled paths are archive files.
 async fn route(shared: &Shared, request: &Request) -> Response {
-    // Browser reaches 127.0.0.1 too: only given address served.
+    // Browser reaches 127.0.0.1 too: given address only.
     if !shared.running.load(Ordering::SeqCst) || request.host != shared.authority {
         return Response::empty("404 Not Found");
     }
@@ -409,7 +393,7 @@ async fn route(shared: &Shared, request: &Request) -> Response {
         Some((path, query)) => (path, query),
         None => (request.target.as_str(), ""),
     };
-    // Chat behind token: checked first; missing token refused, not searched.
+    // Chat behind token, checked first; missing token refused, not searched.
     if path.starts_with("/webxdc-api") {
         let Some(rest) = path.strip_prefix(&shared.api) else {
             return Response::empty("404 Not Found");
@@ -456,10 +440,8 @@ async fn blob(shared: &Shared, path: &str) -> Response {
     }
 }
 
-/// Chat updates since `serial`: core JSON, unread.
-///
-/// `wait=1`: long poll; nothing new holds until core pokes or [`UPDATE_WAIT`], then re-asks.
-/// Without it: core's first answer (bridge catching up; app waits on it to draw). 404 once closed.
+/// Chat updates since `serial`, core JSON unread. `wait=1`: long poll until poke or
+/// [`UPDATE_WAIT`]; else core's first answer (bridge catching up, app waits to draw). 404 closed.
 async fn updates(shared: &Shared, query: &str) -> Response {
     let serial = query
         .split('&')
@@ -475,8 +457,7 @@ async fn updates(shared: &Shared, query: &str) -> Response {
     changed.as_mut().enable();
     let mut answer = status_updates(shared, serial).await;
     if wait && answer.as_deref().is_some_and(nothing_new) {
-        // Woken or timed out: ask core either way. Wake may not be an update (overflow wakes all
-        // apps); quiet stretch gets answered too.
+        // Ask core either way: wake may not be ours (overflow wakes all apps).
         tokio::time::timeout_at(deadline, changed).await.ok();
         if !shared.running.load(Ordering::SeqCst) {
             return Response::empty("404 Not Found");
@@ -505,8 +486,7 @@ async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
     answer.ok()
 }
 
-/// No update in answer: no brace (`[]`, or anything unusable). Waited on, not answered: bridge
-/// re-asks at once and would loop.
+/// No brace in answer (`[]` or junk): wait, don't answer, else bridge re-asks in a loop.
 fn nothing_new(updates: &str) -> bool {
     !updates.contains('{')
 }
@@ -538,7 +518,7 @@ async fn send(shared: &Shared, body: &[u8]) -> Response {
     }
 }
 
-/// Handover request, decided from head: this route never reads body whole.
+/// Handover request? Decided from head: body never read whole.
 fn handover_asked(shared: &Shared, head: &Head) -> bool {
     if !shared.running.load(Ordering::SeqCst) || head.host != shared.authority {
         return false;
@@ -547,15 +527,10 @@ fn handover_asked(shared: &Shared, head: &Head) -> bool {
     head.method == "POST" && path == format!("{}/to-chat", shared.api)
 }
 
-/// File, text, or both, leaving app. File is raw body (no base64/JSON): streamed to cache, never
-/// held. Name and text ride in query.
-///
-/// No size limit: streaming keeps it off heap; copy removed once saved, outbox emptied at start.
-/// Full disk: `500`, an answer app can show.
-///
-/// Path handed on, not bytes: page takes files by path, as pickers do. Nothing opened here.
-///
-/// Name: last component only (`../../../etc/passwd` becomes `passwd` in cache).
+/// File and/or text leaving app. File is raw body, streamed to cache; name and text in query.
+/// No size limit (off heap; copy removed once saved, outbox emptied at start); full disk:
+/// `500`. Path handed on, as pickers do. Name: last component (`../../../etc/passwd` ->
+/// `passwd`).
 async fn take_handover(
     shared: &Shared,
     stream: &mut TcpStream,
@@ -603,7 +578,7 @@ async fn write_streamed(
     path: &std::path::Path,
     head: &Head,
 ) -> std::io::Result<Written> {
-    // tokio file: JSON-RPC runtime must not block on slow disk.
+    // tokio file: RPC runtime must not block on slow disk.
     let Ok(mut file) = tokio::fs::File::create(path).await else {
         drain(stream, head.started.len(), head.length).await?;
         return Ok(Written::Failed);
@@ -635,9 +610,7 @@ async fn write_streamed(
     Ok(Written::Done)
 }
 
-/// Read rest of body and drop: closing on a writing client resets it, app sees no answer.
-///
-/// `taken`: bytes already off socket, so they aren't awaited again.
+/// Read rest of body and drop (closing on a writer resets it). `taken`: bytes already read.
 async fn drain(stream: &mut TcpStream, taken: usize, length: usize) -> std::io::Result<()> {
     let mut dropped = taken;
     let mut chunk = [0_u8; 8192];
@@ -669,9 +642,7 @@ fn field(query: &str, name: &str) -> String {
         .unwrap_or_default()
 }
 
-/// Handover file location in cache: app's name, cache-only.
-///
-/// Caller writes.
+/// Handover file path in cache, app's name; caller writes.
 fn outgoing_path(shared: &Shared, name: &str) -> Result<std::path::PathBuf, String> {
     let name = std::path::Path::new(name)
         .file_name()
@@ -694,11 +665,7 @@ fn outbox_dir(message_id: u32) -> Result<std::path::PathBuf, String> {
         .ok_or_else(|| "the outbox has no directory of its own".to_string())
 }
 
-/// Delete handed-over file once saved.
-///
-/// Saved copy duplicates bytes; this removes the cache one.
-///
-/// Path from page: checked; must be directly in own outbox.
+/// Delete cached handover once saved. Path from page: must be directly in own outbox.
 pub(crate) fn discard_outgoing(message_id: u32, path: &str) -> bool {
     let Ok(dir) = outbox_dir(message_id) else {
         return false;
@@ -710,14 +677,12 @@ pub(crate) fn discard_outgoing(message_id: u32, path: &str) -> bool {
     std::fs::remove_file(path).is_ok()
 }
 
-/// Whether `path` is directly in outbox. Guards `remove_file`; compares, doesn't search.
+/// `path` directly in outbox? Guards `remove_file`.
 fn in_outbox(dir: &std::path::Path, path: &std::path::Path) -> bool {
     !dir.as_os_str().is_empty() && path.parent() == Some(dir)
 }
 
-/// Empty outbox.
-///
-/// Leftovers from closed or failed handovers. Cleared at start: none in flight then.
+/// Empty outbox of closed or failed handovers. Called at start: none in flight.
 pub(crate) fn empty_outbox(message_id: u32) {
     if let Ok(dir) = outbox_dir(message_id) {
         drop(std::fs::remove_dir_all(dir));
@@ -760,9 +725,7 @@ fn fill(script: &str, shared: &Shared) -> String {
         .replace("__RETRY__", &RETRY_INTERVAL.to_string())
 }
 
-/// index.html with API loaded before its code.
-///
-/// Inside `<head>`; no head = front.
+/// index.html with API script first in `<head>`, or at front.
 fn inject(html: &str) -> String {
     const TAG: &str = "<script src=\"webxdc.js\"></script>";
     // ASCII only: offsets must match `html`; full lowercase changes length.
@@ -905,7 +868,7 @@ pub(crate) fn token() -> String {
     }
     let mut out = String::with_capacity(bytes.len().saturating_mul(2));
     for byte in bytes {
-        // Hex by hand: `format!` per byte is needless allocation.
+        // Hex by hand: no `format!` per byte.
         for nibble in [byte >> 4, byte & 0x0f] {
             if let Some(&digit) = HEX.get(usize::from(nibble)) {
                 out.push(char::from(digit));

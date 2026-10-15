@@ -1,7 +1,6 @@
 /*
- * Test clip from nothing: moving pattern under noise (costs real bits), plus
- * tone. Encoded as a phone camera leaves it: H.264 with B-frames, AAC, MP4 with
- * display-matrix turn. Recoder meets what it meets on device, no binary fixture.
+ * Test clip: moving pattern under noise (costs real bits), tone. As phone
+ * camera: H.264 with B-frames, AAC, MP4 with display-matrix turn. No fixture.
  */
 #include "recode.h"
 
@@ -171,7 +170,7 @@ static int open_streams(struct clip *clip, const struct piirit_clip *made)
         clip->aac->sample_fmt = AV_SAMPLE_FMT_FLTP;
         clip->aac->sample_rate = SAMPLE_RATE;
         av_channel_layout_default(&clip->aac->ch_layout, 2);
-        /* Bit rate phone cameras record sound at. */
+        /* Phone cameras' sound bit rate. */
         clip->aac->bit_rate = 192000;
         clip->aac->time_base = (AVRational){1, SAMPLE_RATE};
         clip->aac->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;

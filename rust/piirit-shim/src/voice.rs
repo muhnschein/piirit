@@ -1,12 +1,11 @@
 //! Voice message as MP3, encoded as recorded.
 //!
-//! Android/iOS record AAC at 32 kbit/s (24 at lower media quality); desktop encodes MP3 itself
-//! with LAME. Not Opus: iOS shows `audio/ogg` as file. Sailfish recorder has no AAC, MP3 only
-//! with `lamemp3enc` (absent on phone). So as desktop: recorder writes WAV, built-in LAME encodes
-//! it as it lands at the other clients' rates. WAV is scratch, removed after.
+//! Android/iOS record AAC at 32 kbit/s (24 at lower quality); desktop encodes MP3 with LAME. Not
+//! Opus: iOS shows `audio/ogg` as file. Sailfish recorder lacks AAC, and MP3 needs `lamemp3enc`
+//! (absent on phone): so recorder writes scratch WAV, built-in LAME encodes it as it lands.
 //!
-//! CBR: size follows length, so recorder stops at [`longest_ms`], not past relay limit; encoding
-//! keeps to that length whatever recorder hands over after.
+//! CBR: size follows length, so recorder stops at [`longest_ms`] under relay limit; encoding
+//! keeps to that length whatever comes after.
 
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
@@ -15,13 +14,13 @@ use std::path::{Path, PathBuf};
 
 use mp3lame_encoder::{Bitrate, Builder, Encoder, FlushGap, Mode, MonoPcm, Quality, VbrMode};
 
-/// Recorder and MP3 rate: voice band, MPEG-2's own rate, so no resample.
+/// Recorder and MP3 rate: voice band, native MPEG-2, no resample.
 pub(crate) const SAMPLE_RATE: u32 = 16_000;
 
 /// Headroom for LAME delay and padding.
 const HEADROOM_BYTES: u64 = 16 * 1024;
 
-/// Header search limit: header is tens of bytes; this much without samples is no recording.
+/// Header search limit; header is tens of bytes.
 const HEADER_SEARCH: u64 = 64 * 1024;
 
 /// Read size.
@@ -30,7 +29,7 @@ const READ_CHUNK: usize = 64 * 1024;
 /// Samples per LAME call; bounds output buffer.
 const ENCODE_CHUNK: usize = 8192;
 
-/// bit/s at `media_quality` (0 balanced, 1 less data): other clients' pair.
+/// bit/s at `media_quality` (0 balanced, 1 less data), as other clients.
 pub(crate) fn bit_rate(media_quality: u32) -> u32 {
     if media_quality == 1 {
         24_000
@@ -48,10 +47,8 @@ fn lame_bit_rate(bits_per_second: u32) -> Bitrate {
     }
 }
 
-/// Longest recording in ms whose MP3 fits `limit_bytes`; 0 for no limit (limit 0 = core hasn't
-/// said).
-///
-/// Never 0 for a real limit: tiny limit stops almost at once, not never.
+/// Longest recording ms whose MP3 fits `limit_bytes`; 0 = no limit (limit 0: core unsaid).
+/// Never 0 for a real limit: tiny limit stops almost at once.
 pub(crate) fn longest_ms(limit_bytes: u64, bits_per_second: u32) -> u32 {
     if limit_bytes == 0 || bits_per_second == 0 {
         return 0;
@@ -64,21 +61,21 @@ pub(crate) fn longest_ms(limit_bytes: u64, bits_per_second: u32) -> u32 {
     u32::try_from(ms).unwrap_or(u32::MAX).max(1)
 }
 
-/// Whether the samples are whole numbers or floating point.
+/// Integer or float samples.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Encoding {
     Int,
     Float,
 }
 
-/// What a WAV header says about the samples after it.
+/// WAV header's sample description.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct WavFormat {
     encoding: Encoding,
     channels: u16,
     sample_rate: u32,
     bits: u16,
-    /// Where in the file the samples start.
+    /// Sample start offset.
     data_start: u64,
     /// Sample bytes per header; trusted only once finished.
     data_len: u64,
@@ -91,9 +88,7 @@ impl WavFormat {
     }
 }
 
-/// Read WAV header off front of `bytes`.
-///
-/// `Ok(None)`: not written enough yet. `Err`: not a WAV.
+/// Read WAV header off `bytes`. `Ok(None)`: too little yet; `Err`: not WAV.
 fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
     let not_wav = || "the recording is not a WAV file".to_string();
     if bytes.len() < 12 {
@@ -166,13 +161,13 @@ fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
     }
 }
 
-/// A little-endian `u16` at `at`, if the bytes reach that far.
+/// Little-endian `u16` at `at`, if in range.
 fn u16_at(bytes: &[u8], at: usize) -> Option<u16> {
     let two = bytes.get(at..at.checked_add(2)?)?;
     Some(u16::from_le_bytes(two.try_into().ok()?))
 }
 
-/// A little-endian `u32` at `at`, if the bytes reach that far.
+/// Little-endian `u32` at `at`, if in range.
 fn u32_at(bytes: &[u8], at: usize) -> Option<u32> {
     let four = bytes.get(at..at.checked_add(4)?)?;
     Some(u32::from_le_bytes(four.try_into().ok()?))
@@ -201,7 +196,7 @@ fn to_mono(bytes: &[u8], format: &WavFormat, out: &mut Vec<i16>) {
     }
 }
 
-/// One sample, on the scale of a 16-bit one.
+/// One sample, 16-bit scale.
 fn sample_value(bytes: &[u8], encoding: Encoding) -> i32 {
     match (encoding, bytes) {
         // 8-bit unsigned: flip top bit.
@@ -274,7 +269,7 @@ impl Stream {
     fn feed(&mut self, bytes: &[u8], max_samples: u64, mp3: &mut File) -> Result<(), String> {
         self.partial.extend_from_slice(bytes);
         let frame = self.format.frame_bytes();
-        // `frame` is never 0 for a header `parse_header` read.
+        // `frame` never 0 after `parse_header`.
         let whole = self
             .partial
             .len()
@@ -304,7 +299,7 @@ impl Stream {
         Ok(())
     }
 
-    /// Finish the last frame.
+    /// Finish last frame.
     fn flush(&mut self, mp3: &mut File) -> Result<(), String> {
         self.out.clear();
         // LAME flush buffer.
@@ -327,9 +322,8 @@ fn read_failed(err: std::io::Error) -> String {
     format!("the recording could not be read: {err}")
 }
 
-/// WAV being written, to MP3 that is sent.
-///
-/// `pump`ed while recording; `finish`ed or `discard`ed. WAV removed either way.
+/// WAV being written -> sent MP3. `pump`ed while recording, then `finish`ed or `discard`ed;
+/// WAV removed either way.
 pub(crate) struct Transcoder {
     wav_path: PathBuf,
     mp3_path: PathBuf,
@@ -346,8 +340,7 @@ pub(crate) struct Transcoder {
 }
 
 impl Transcoder {
-    /// MP3 at `mp3_path` from WAV to be written at `wav_path`, at `bits_per_second`, at most
-    /// `limit_bytes` (0: no limit).
+    /// MP3 at `mp3_path` from WAV at `wav_path`, `bits_per_second`, max `limit_bytes` (0 none).
     pub(crate) fn new(
         wav_path: PathBuf,
         mp3_path: PathBuf,
@@ -372,13 +365,12 @@ impl Transcoder {
         longest_ms(self.limit_bytes, self.bits_per_second)
     }
 
-    /// Limit from here on, for one learnt after start: what's encoded is already under any
-    /// limit recorder hasn't stopped at.
+    /// Limit learnt after start; already-encoded is under any limit recorder hasn't hit.
     pub(crate) fn set_limit_bytes(&mut self, limit_bytes: u64) {
         self.limit_bytes = limit_bytes;
     }
 
-    /// Read WAV from `path` if recorder wrote elsewhere, before samples read.
+    /// Read WAV from `path` if recorder wrote elsewhere (before samples read).
     pub(crate) fn follow(&mut self, path: PathBuf) {
         if self.stream.is_none() && path != self.wav_path {
             remove_scratch(&self.wav_path);
@@ -424,9 +416,7 @@ impl Transcoder {
         Ok(self.stream.as_ref().map(|stream| stream.format.sample_rate))
     }
 
-    /// Encode what recorder wrote since last call.
-    ///
-    /// Nothing until WAV and header exist.
+    /// Encode what recorder wrote since last call; nothing until WAV and header exist.
     pub(crate) fn pump(&mut self) -> Result<(), String> {
         self.pump_to(None)
     }
@@ -468,10 +458,8 @@ impl Transcoder {
         Ok(())
     }
 
-    /// Encode rest, finish MP3, once WAV finished.
-    ///
-    /// Returns MP3 sample count at WAV rate; `None` if nothing recorded (MP3 removed). WAV
-    /// removed either way.
+    /// Encode rest and finish MP3, WAV done. Returns sample count at WAV rate; `None` if
+    /// nothing recorded (MP3 removed). WAV removed either way.
     pub(crate) fn finish(mut self) -> Result<Option<u64>, String> {
         let result = self.finish_mp3();
         remove_scratch(&self.wav_path);
@@ -530,8 +518,7 @@ fn read_header(wav: &mut File) -> Result<Option<WavFormat>, String> {
     }
 }
 
-/// Sample bytes of finished WAV, if header believable: placeholder while recording, real length
-/// on close.
+/// Sample bytes of finished WAV if believable (placeholder while recording, real on close).
 fn final_data_len(wav: &mut File, format: &WavFormat) -> Result<Option<u64>, String> {
     let Some(header) = read_header(wav)? else {
         return Ok(None);
@@ -891,7 +878,7 @@ mod tests {
         assert_eq!(transcoder.finish().unwrap(), Some(u64::from(SAMPLE_RATE)));
         assert!(mp3.exists() && !actual.exists() && !asked.exists());
 
-        // Read from asked path: that is the recording.
+        // Asked path is the recording.
         let mut transcoder = Transcoder::new(asked.clone(), mp3, 32_000, 0).unwrap();
         append(&asked, &header(1, SAMPLE_RATE, 16, 1, 0));
         append(&asked, &tone(SAMPLE_RATE, 500));
@@ -927,7 +914,7 @@ mod tests {
         let wav = dir.join("voice.wav");
         let mp3 = dir.join("voice.mp3");
 
-        // The recorder never made the file.
+        // Recorder never made file.
         let transcoder = Transcoder::new(wav.clone(), mp3.clone(), 32_000, 0).unwrap();
         assert!(mp3.exists());
         assert_eq!(transcoder.finish().unwrap(), None);

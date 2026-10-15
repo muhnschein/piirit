@@ -4,11 +4,8 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick members to add; already-in or core-refused contacts greyed.
- *
- * Group handed in by opener, not reloaded; adding done on it, so its usual
- * reload shows the change. NewGroupPage passes a stand-in for a group not
- * yet made.
+ * Pick members; already-in or core-refused greyed. Adds on opener's group
+ * (its own reload shows change); NewGroupPage passes a stand-in.
  */
 Page {
     id: page
@@ -139,8 +136,7 @@ Page {
             delegate: ListItem {
                 objectName: "memberRow" + model.contact_id
                 contentHeight: body.height
-                // Greyed: already in, or address (non-key) contact core refuses in
-                // encrypted group.
+                // Already in, or address contact refused in encrypted group.
                 readonly property bool addable:
                     model.is_key_contact && !page.chat.is_member(model.contact_id)
                 enabled: addable

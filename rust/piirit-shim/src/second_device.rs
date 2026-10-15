@@ -1,27 +1,21 @@
 //! Offer one profile to a second device.
 //!
-//! Other half of profile takeover (`signup.rs`): core's backup transfer over LAN.
-//! This device offers; other reads the code.
+//! Other half of takeover (`signup.rs`): core backup transfer over LAN; this device offers.
 //!
-//! `provide_backup` runs until device takes profile or provider stopped. `get_backup_qr`
-//! gives code text, blocks until provider ready, gives up after a minute. Two calls on
-//! one account is fine: transport correlates by id.
+//! `provide_backup` runs until taken or stopped. `get_backup_qr` blocks until provider ready,
+//! gives up after a minute; two calls on one account fine (correlated by id). Page-owned, as
+//! `backup.rs`.
 //!
-//! Owned by a page, like `backup.rs`: provider takes account id.
+//! Core pauses account IO while offer up, resumes after; not restarted here (races core);
+//! page says so.
 //!
-//! Core pauses IO for account while offer is up, resumes when provider ends. Nothing
-//! here restarts it (races core); page says so.
+//! `ImexProgress` only proof of success (none until device connects: code until first event,
+//! bar after; heard via `handle_event` as `backup.rs`). 1000 taken, 0 failed. Provider `Ok` is
+//! no proof (bundled core says `Ok` after stop too): `taken` fires on 1000. Offer ending otherwise,
+//! unstopped by reader = `stalled` (app's word). Reader stop ends at once; late answer ignored.
 //!
-//! `ImexProgress` (transfer's, not offer's) is the only proof of success: none until device
-//! connects, so page shows code until first event, bar after; listens only while it asked
-//! (`handle_event`), as `backup.rs`. Last progress: 1000 taken, 0 failed. Provider `Ok` alone
-//! is not enough: bundled core answers `Ok` after stop too.
-//! So `taken` fires on 1000 as it arrives. Offer ending otherwise, unstopped by reader,
-//! is `stalled` (app's own word). Reader stop ends offer at once; late answer ignored.
-//!
-//! Race: progress is polled on its own call (event loop), may land after `Ok`. So `Ok` waits
-//! [`SETTLE`] before read: finished transfer has reported by then; else stall. Wait only spent
-//! on an offer that went nowhere. Hand-over announced at once; core refusals passed as they come.
+//! Race: progress polled separately, may land after `Ok`, so `Ok` waits [`SETTLE`], then
+//! stall. Wait only on offers that went nowhere; refusals passed at once.
 
 use std::time::Duration;
 
@@ -33,8 +27,7 @@ use crate::json;
 /// Permille counted up to when done.
 const DONE: u32 = 1000;
 
-/// Grace for progress after provider `Ok`: long enough for an event behind a poll on a loaded
-/// phone; short enough to report unclaimed offer while reader still on page.
+/// Grace for progress after `Ok`: event behind poll on loaded phone, reader still on page.
 const SETTLE: Duration = Duration::from_secs(1);
 
 /// One profile offered to a device.
@@ -56,9 +49,8 @@ pub struct SecondDevice {
     /// Emitted when [`Self::running`] changes.
     pub running_changed: qt_signal!(),
 
-    /// Code text for other device; empty outside an offer. `DCBACKUP` payload for other core
-    /// (digit after is core's transfer version); nothing here reads it. Shown as text too, for
-    /// cameras that will not read the QR.
+    /// Code for other device; empty outside offer. `DCBACKUP` payload (digit = transfer
+    /// version), opaque here. Also shown as text for cameras that won't read QR.
     pub code: qt_property!(QString; NOTIFY code_changed),
     /// Emitted when [`Self::code`] changes.
     pub code_changed: qt_signal!(),
@@ -71,32 +63,31 @@ pub struct SecondDevice {
     /// Offer profile. Answers `taken`, `stalled` or `error`; code goes on [`Self::code`].
     pub offer: qt_method!(fn(&mut self)),
 
-    /// Stop running offer. Provider's answer after is the reader's doing: no outcome.
+    /// Stop running offer; provider's later answer: no outcome.
     pub cancel: qt_method!(fn(&mut self)),
 
-    /// Feed `core_event` in. Other accounts and kinds ignored, so page needs no filter.
+    /// Feed `core_event`; others ignored, no page filter needed.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
     /// A device read the code and has the profile now.
     pub taken: qt_signal!(),
 
-    /// Ended with nobody taking profile, reader not stopping. App's own reason.
+    /// Ended untaken, unstopped. App's own reason.
     pub stalled: qt_signal!(),
 
     /// Nothing offered, core's words.
     pub error: qt_signal!(message: QString),
 
-    /// Offer counter. Once an offer is over for the page, late answers from its provider
-    /// land nowhere. Per offer, not a flag: stopped provider answers `SETTLE` later, maybe after
-    /// a new offer; it once ended the new offer on page with its provider running, unstoppable.
+    /// Offer counter: late provider answers land nowhere. Not a flag: stopped provider answers
+    /// `SETTLE` later, maybe after new offer, and once ended it with provider unstoppable.
     generation: u64,
 }
 
 impl SecondDevice {
     /// Offer this profile to a device that reads the code.
     pub fn offer(&mut self) {
-        // Core refuses a second provider per account; refusal would show as this offer's failure.
+        // Core refuses second provider per account: would read as this offer failing.
         if self.running {
             return;
         }
@@ -118,13 +109,13 @@ impl SecondDevice {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let ended = queued_callback(move |result: Result<(), String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Offer already over (done, or stopped). Late provider answer is not news.
+            // Offer already over: late answer not news.
             if this.borrow().generation != generation {
                 return;
             }
             this.borrow_mut().end();
             match result {
-                // Provider finished without transfer: nobody came, or they left.
+                // Finished without transfer: nobody came, or left.
                 Ok(()) => this.borrow().stalled(),
                 Err(err) => this.borrow().error(err.into()),
             }
@@ -133,14 +124,13 @@ impl SecondDevice {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let showing = queued_callback(move |result: Result<String, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Provider can be over before code arrives (refused, or stopped while preparing).
-            // Late code belongs to nothing.
+            // Provider may end before code (refused, stopped): late code dropped.
             if this.borrow().generation != generation {
                 return;
             }
             match result {
                 Ok(code) => this.borrow_mut().set_code(code.into()),
-                // No code, no offer: stop provider; don't report its refusal on top.
+                // No code: stop provider, don't also report its refusal.
                 Err(err) => {
                     this.borrow_mut().stop();
                     this.borrow().error(err.into());
@@ -154,8 +144,7 @@ impl SecondDevice {
                 .call::<_, ()>("provide_backup", (account_id,))
                 .await
                 .map_err(|err| err.to_string());
-            // `Ok` = provider finished (see module doc); give progress a moment.
-            // Refusal passed at once.
+            // `Ok`: wait for progress (module doc); refusal at once.
             if result.is_ok() {
                 tokio::time::sleep(SETTLE).await;
             }
@@ -191,15 +180,14 @@ impl SecondDevice {
         let Some(permille) = json::u32_opt(&payload, "progress") else {
             return;
         };
-        // 1000 = device has profile. Provider's `Ok` says nothing either way.
+        // 1000 = device has profile.
         if permille >= DONE {
             self.set_permille(DONE);
             self.end();
             self.taken();
             return;
         }
-        // Failure is progress 0; provider's call answers after, with core's words.
-        // Do not show a drop to 0 first.
+        // 0 = failure; core's words follow from provider, so bar not dropped.
         if permille > 0 {
             self.set_permille(permille);
         }
@@ -213,8 +201,7 @@ impl SecondDevice {
         self.set_code(QString::default());
     }
 
-    /// End offer here, stop provider. Page is done at once: waiting on an answer it
-    /// will discard would hold bar and Cancel.
+    /// End offer here, stop provider; page done at once (no bar, Cancel waiting).
     fn stop(&mut self) {
         self.end();
         let account_id = self.account_id;
@@ -222,7 +209,7 @@ impl SecondDevice {
             return;
         };
         runtime.spawn(async move {
-            // Fire and forget: page already ended above; provider's answer lands nowhere.
+            // Fire and forget: answer lands nowhere.
             rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
                 .await
                 .ok();

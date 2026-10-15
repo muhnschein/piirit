@@ -1,6 +1,5 @@
-// Reaction picker: emoji in Unicode groups, and search. Not in Emoji.js: needs
-// all of EmojiData.js (names, keywords), drawing doesn't, chats open far more
-// than the picker, and Qt 5.6 reparses a script each launch. Picker-only import.
+// Reaction picker: Unicode groups, search. Apart from Emoji.js: needs all of
+// EmojiData.js, which Qt 5.6 reparses each launch; chats open far more often.
 .pragma library
 .import "EmojiData.js" as Data
 
@@ -12,8 +11,8 @@ function all() {
     return Data.list
 }
 
-/// Emoji with each word of `query` at a name or keyword start ("hot": hot
-/// pepper, not screenshot). Lowercased. [] for a query with no words.
+/// Emoji with each `query` word at name/keyword start ("hot": hot pepper, not
+/// screenshot); lowercased; no words: [].
 function search(query) {
     var words = query.toLowerCase().split(/\s+/).filter(function(word) {
         return word.length > 0
@@ -35,8 +34,7 @@ function search(query) {
     return found
 }
 
-/// `list` cut into `columns`-wide rows. Group start gets a heading row if
-/// `headings`.
+/// `list` in `columns`-wide rows; heading row per group if `headings`.
 ///
 /// Row: {heading: "", group, cells: [[emoji, picture], ...]} or
 /// {heading: title, group, cells: []}.

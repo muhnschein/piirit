@@ -2,9 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Cover note about a call (mic off, camera paused): icon and words on own
- * ground. Actionable items loud (highlight, thin outline); plain facts primary
- * colour.
+ * Cover call note (mic off, camera paused): icon, words on own ground.
+ * Actionable loud (highlight, outline); facts primary colour.
  */
 Rectangle {
     id: note
@@ -19,7 +18,7 @@ Rectangle {
     property color ground: Qt.rgba(0, 0, 0, 1)
     /// Max width; words shrink, then cut.
     property real maximumWidth: Screen.width
-    /// Sizes as theme share: < 1 on covers smaller than the large one.
+    /// Theme size share: < 1 on smaller covers.
     property real ratio: 1
 
     readonly property color ink: note.loud ? Theme.highlightColor : Theme.primaryColor

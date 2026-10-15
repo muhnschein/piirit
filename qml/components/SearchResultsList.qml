@@ -2,9 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Search answer: chats, contacts, messages, each under count heading. Flat
- * `kind` model: sections need it, nested flickables fight drag. Own file:
- * delegates checked against their model (tests/qml_syntax.rs).
+ * Chats, contacts, messages under count headings. Flat `kind` model for
+ * sections (nested flickables fight drag). Own file for tests/qml_syntax.rs.
  */
 SilicaListView {
     id: root
@@ -12,9 +11,9 @@ SilicaListView {
     /// Source SearchResults object.
     property QtObject search
 
-    /// Chat or message tapped. `messageId` 0 = chat; else open at that message.
+    /// `messageId` 0 = chat; else open at that message.
     signal chatActivated(int chatId, string chatName, int messageId)
-    /// Contact tapped. Maybe no chat yet: carries name.
+    /// Contact tapped; carries name as chat may not exist.
     signal contactActivated(int contactId, string contactName)
 
     // Else delegates draw outside box.
@@ -29,7 +28,7 @@ SilicaListView {
                   ? qsTr("Chats (%1)").arg(root.search.chat_count)
                   : section === "contact"
                     ? qsTr("Contacts (%1)").arg(root.search.contact_count)
-                    // Only first of a big pile listed: show listed of matched.
+                    // Big piles listed in part: show listed of matched.
                     : root.search.message_total > root.search.message_count
                       ? qsTr("Messages (%1 of %2)").arg(root.search.message_count)
                                                    .arg(root.search.message_total)

@@ -10,7 +10,7 @@ Item {
     property string text: ""
     // "error" or "info": severity.
     property string tone: "error"
-    // objectName for tests; 2 per page would clash.
+    // Test objectName; two per page clash.
     property string labelObjectName: "errorLabel"
     // Auto-clear seconds; 0 keeps.
     property int timeout: 8
@@ -22,7 +22,7 @@ Item {
     /// Show briefly. For cases lacking page state.
     function show(message) {
         root.text = message
-        // Restart here: onTextChanged skips repeats; else they vanish at once.
+        // Restart: onTextChanged skips repeats, which then vanish.
         if (root.text.length > 0 && root.timeout > 0) {
             fade.restart()
         }

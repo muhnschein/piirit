@@ -2,7 +2,7 @@
 //!
 //! No Delta Chat logic: spawn, frame, correlate, drain events. See `docs/PROJECT.md`.
 
-// Shipped code: stricter lints than tests. See piirit-shim/src/lib.rs.
+// Shipped code: stricter lints than tests (piirit-shim/src/lib.rs).
 #![cfg_attr(
     not(test),
     deny(

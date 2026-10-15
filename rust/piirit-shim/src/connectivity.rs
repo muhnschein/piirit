@@ -1,12 +1,11 @@
 //! Mailbox quota and relay status, from the core's report.
 //!
-//! `get_connectivity_html` is a page for a web view; Silica has none this app may use. Read it as
-//! parla does (github.com/trufae/parla, `storage_quota.vala`): core's own percent and sentence,
-//! in core's language; nothing computed here. Own relay: `quota_from_report`; every relay (profile
-//! page rows): `transport_reports`.
+//! `get_connectivity_html` wants a web view (none allowed on Silica): parsed as parla does
+//! (github.com/trufae/parla, `storage_quota.vala`), core's own percent and sentence. Own relay:
+//! `quota_from_report`; all relays (profile rows): `transport_reports`.
 
-// `get_connectivity` bands: 1000 not connected, 2000 connecting, 3000 working, 4000 idle. At or
-// above a band is in it; values between are core's finer steps.
+// `get_connectivity` bands (at or above): 1000 not connected, 2000 connecting, 3000 working,
+// 4000 idle.
 
 /// Quota as reported: percent, core's words, used/limit bytes. Bytes 0 if not core's shape.
 #[derive(Debug, PartialEq, Eq)]
@@ -17,18 +16,16 @@ pub(crate) struct Quota {
     pub limit_bytes: u64,
 }
 
-/// Quota bar for `address`'s relay, if any. None if relay reports no quota, or before first
-/// connection.
+/// Quota bar for `address`'s relay; None if none reported (or before first connection).
 ///
-/// One `<li class="transport">` per transport, in add order: first bar is first relay ever set
-/// up, so match block by address. One block: that relay, whatever heading. No blocks (older
-/// core): whole report.
+/// One `<li class="transport">` per transport in add order, so matched by address. One block:
+/// that relay, any heading. No blocks (older core): whole report.
 pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
     let blocks = transport_blocks(html);
     match blocks.as_slice() {
         [] => quota_in(html),
         [only] => quota_in(only),
-        // Several relays, none with profile's address: no quota, not another relay's.
+        // None with profile's address: no quota, not another's.
         _ => quota_in(block_for(&blocks, address)?),
     }
 }
@@ -46,8 +43,8 @@ pub(crate) struct TransportReport {
     pub quota: Option<Quota>,
 }
 
-/// Every relay in report, in add order. Blocks with no domain skipped; no blocks (older core,
-/// not yet connected): empty. One parse, not a core call per row.
+/// Every relay in report, add order; domainless blocks skipped; none (older core, unconnected):
+/// empty. One parse, not a call per row.
 pub(crate) fn transport_reports(html: &str) -> Vec<TransportReport> {
     transport_blocks(html)
         .into_iter()
@@ -63,8 +60,7 @@ pub(crate) fn transport_reports(html: &str) -> Vec<TransportReport> {
         .collect()
 }
 
-/// Colour of first `dot` in block (`<span class="green dot">`, colour first). Empty if none.
-/// Block and bar have own classes, so first class list naming `dot` counts.
+/// Colour of first `dot` class in block (`<span class="green dot">`); empty if none.
 fn dot_in(block: &str) -> &str {
     block
         .split("class=\"")
@@ -120,15 +116,13 @@ fn block_domain(block: &str) -> Option<&str> {
 
 /// First quota bar in fragment, if any.
 fn quota_in(html: &str) -> Option<Quota> {
-    // Bar: `<div class="progress grey" style="width:12%">12%</div>`. Number is real percent;
-    // width capped at 100.
+    // `<div class="progress grey" style="width:12%">12%</div>`: number real, width capped.
     let bar = html.find("class=\"progress")?;
     let before_bar = html.get(..bar)?;
     let (_, after_open) = html.get(bar..)?.split_once('>')?;
     let (inner, _) = after_open.split_once('<')?;
     let percent: u32 = inner.trim().trim_end_matches('%').parse().ok()?;
-    // Sentence: from bar back to its `<li>`, tags dropped. Last `<div` before that `<li>`: not
-    // core's shape, so no words; percent still read.
+    // Sentence: bar back to its `<li>`, untagged. `<div` before `<li>`: no words, percent read.
     let item_start = before_bar.rfind("<li>")?.saturating_add("<li>".len());
     let bar_div = before_bar.rfind("<div")?;
     let text = strip_tags(before_bar.get(item_start..bar_div).unwrap_or_default());
@@ -156,8 +150,7 @@ fn amounts(text: &str) -> Option<(u64, u64)> {
     Some((used, limit))
 }
 
-/// Number and unit as bytes: binary (`KiB`) powers of 1024, decimal (`kB`, `MB`) of 1000, bare
-/// `B` bytes. Decimal comma counts as point.
+/// Number and unit as bytes: `KiB` 1024s, `kB`/`MB` 1000s, `B` bytes; decimal comma ok.
 fn bytes(number: &str, unit: &str) -> Option<u64> {
     let number: f64 = number.replace(',', ".").parse().ok()?;
     if !number.is_finite() || number < 0.0 {
@@ -177,7 +170,7 @@ fn bytes(number: &str, unit: &str) -> Option<u64> {
         _ => return None,
     };
     let base: f64 = if binary { 1024.0 } else { 1000.0 };
-    // Rounded to byte. Sentence has 2 decimals max, so truncation loses nothing.
+    // Max 2 decimals: truncation loses nothing.
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     Some((number * base.powi(power)).round() as u64)
 }
@@ -272,7 +265,7 @@ mod tests {
         );
     }
 
-    /// Bug: first bar with two transports was first relay ever set up, not own.
+    /// Two transports: own bar, not first relay's.
     #[test]
     fn the_quota_is_the_one_on_the_profiles_own_relay() {
         assert_eq!(

@@ -2,9 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Asked each time an experimental feature turns on. Settings connects to
- * `accepted`; off asks nothing. Other switches set own `text`
- * (QuickActionSetting).
+ * Asked each time an experimental feature turns on; off asks nothing.
+ * Settings connects `accepted`; other switches set `text` (QuickActionSetting).
  */
 Dialog {
     id: dialog

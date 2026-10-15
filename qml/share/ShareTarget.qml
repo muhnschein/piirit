@@ -2,20 +2,20 @@ import QtQuick 2.0
 import Sailfish.Share 1.0
 
 /*
- * What the platform hands the app when something is shared: picture, link, or file.
- * Share-sheet entry: `X-Share-Methods` plus a group per method in the desktop file, and a
- * `ShareProvider` of the same name. Nothing installed outside the app (transfer-engine
- * plugin dir is closed to Harbour). Loaded, not declared (from piirit.qml): a failed
- * `Sailfish.Share` import must cost this file, not the window. Shares go to the window.
+ * What platform hands app on share: picture, link, or file. Share-sheet entry:
+ * `X-Share-Methods`, a group per method in desktop file, same-named
+ * `ShareProvider`. Nothing installed outside app (transfer-engine plugin dir
+ * closed to Harbour). Loaded from piirit.qml, not declared: failed
+ * `Sailfish.Share` import costs this file, not window. Shares go to window.
  */
 Item {
     id: root
 
     /*
-     * Share sheet words. Sheet reads the desktop file (own translations, no catalogue);
-     * here so `lupdate` collects them and desktop file is filled from catalogues (as
+     * Share sheet words. Sheet reads desktop file (own translations); here so
+     * `lupdate` collects them and desktop file fills from catalogues (as
      * harbour-maelstrom). Must match `Description=` of same-named group in
-     * harbour-piirit.desktop (checked by tests/qml_syntax.rs).
+     * harbour-piirit.desktop (tests/qml_syntax.rs).
      */
     //: Shown in the phone's share sheet, for a file shared to this app.
     readonly property string filesDescription: qsTr("Send in a chat")
@@ -38,12 +38,9 @@ Item {
         onTriggered: root.take(resources)
     }
 
-    /// Shared item to the window, which knows what to do with it.
-    ///
-    /// First file or text: desktop file allows one each.
-    ///
-    /// Told apart by resource contents, not `ShareResource.FilePathType`.
-    /// QML refuses capitalised property names, so stubs can't offer that.
+    /// Shared item to window, which handles it. First file or text: desktop file
+    /// allows one each. Told apart by contents, not `ShareResource.FilePathType`:
+    /// QML refuses capitalised property names, so stubs can't offer it.
     function take(resources) {
         var filePath = ""
         var text = ""

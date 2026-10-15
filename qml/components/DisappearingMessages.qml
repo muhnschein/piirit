@@ -2,12 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Message lifetime: nine reference-client values, off to a year.
- *
- * Core decides; tap asks core. Silica ComboBox detaches binding on tap,
- * so page restores it on every load.
- *
- * Off-list duration: largest unit that fits.
+ * Message lifetime: nine reference-client values, off to a year. Tap asks
+ * core; ComboBox detaches binding on tap, so page restores it each load.
  */
 Column {
     id: root
@@ -23,8 +19,7 @@ Column {
     // Reference clients' order.
     readonly property var choices: [0, 60, 300, 1800, 3600, 86400, 604800, 3024000, 31536000]
 
-    /// Duration as words, largest unit it fits.
-    /// Hand forms: untranslated qsTr %n shows raw "(s)".
+    /// Duration in largest fitting unit. Hand forms: untranslated %n shows "(s)".
     function words(value) {
         if (value <= 0) {
             return qsTr("Off")

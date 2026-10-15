@@ -2,14 +2,11 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Block or unblock, asked once. One dialog both ways: each the other's undo.
- *
- * Words from deltachat-android (`menu_block_contact`, `menu_unblock_contact`,
- * `ask_block_contact`, `ask_unblock_contact`), incl. note on groups.
- * Name on own line: names aren't translated.
- *
- * Own page, not a row countdown: row vanishes once block applies. Pusher
- * connects to `accepted` and blocks.
+ * Block or unblock confirm, one dialog both ways (each other's undo). Words
+ * from deltachat-android (`menu_block_contact`, `menu_unblock_contact`,
+ * `ask_block_contact`, `ask_unblock_contact`), incl. groups note; name on own
+ * line (untranslated). Own page: row vanishes once blocked. Pusher handles
+ * `accepted`.
  */
 Dialog {
     id: dialog
@@ -39,7 +36,7 @@ Dialog {
             wrapMode: Text.Wrap
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.highlightColor
-            // Contact's own name, or the name given here.
+            // Contact's own name, or given one.
             textFormat: Text.PlainText
             text: dialog.contactName
         }

@@ -1,11 +1,9 @@
 //! Webxdc app: core's info on one, and running it.
 //!
-//! Webxdc: sent zip with index.html; each chat member runs own copy, synced by status updates.
-//! Core does detection, updates, archive. Here: show and run.
-//!
-//! [`extras`] fills message row (name, summary, icon); icon cached once (QML loads by path).
-//! [`WebxdcApp`] runs loopback host (`webxdc_host.rs`) for `WebView`; page close drops it, stops
-//! host.
+//! Webxdc: sent zip with index.html; each member runs own copy, synced by status updates. Core
+//! does detection, updates, archive; here: show and run. [`extras`] fills message row; icon
+//! cached once (QML loads by path). [`WebxdcApp`] runs loopback host (`webxdc_host.rs`) for
+//! `WebView`; page close drops it.
 
 use std::sync::Arc;
 
@@ -31,11 +29,11 @@ pub(crate) struct Info {
     pub(crate) icon: String,
     /// Document app edits.
     pub(crate) document: String,
-    /// Line under app name ("3 votes"), changes as played.
+    /// Line under name ("3 votes"); changes as played.
     pub(crate) summary: String,
     /// Source location, if manifest says.
     pub(crate) source_code_url: String,
-    /// Name updates show from; core's answer, not account address.
+    /// Name updates show from; core's answer, not address.
     pub(crate) self_addr: String,
     /// Ms between updates.
     pub(crate) send_update_interval: u64,
@@ -56,7 +54,7 @@ pub(crate) struct Extras {
     pub(crate) icon_path: String,
 }
 
-/// What core says about a webxdc message.
+/// Core's webxdc message info.
 async fn fetch_info(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result<Info, String> {
     let answer: serde_json::Value = rpc
         .call("get_webxdc_info", (account_id, message_id))
@@ -69,7 +67,7 @@ async fn fetch_info(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result
         summary: json::str_at(&answer, "summary").to_string(),
         source_code_url: json::str_at(&answer, "sourceCodeUrl").to_string(),
         self_addr: json::str_at(&answer, "selfAddr").to_string(),
-        // Absent from older core; 0 reads as "no limit".
+        // Absent in older core; 0 = no limit.
         send_update_interval: json::i64_at(&answer, "sendUpdateInterval")
             .try_into()
             .unwrap_or(0),
@@ -79,15 +77,13 @@ async fn fetch_info(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result
     })
 }
 
-/// Icon as file in cache, written on first ask. Empty if none.
-///
-/// Written once per message.
+/// Icon as cache file, written once per message on first ask. Empty if none.
 async fn fetch_icon(rpc: &RpcClient, account_id: u32, message_id: u32, icon: &str) -> String {
     if icon.is_empty() {
         return String::new();
     }
-    // Name: two numbers, one of five literals. Archive name never reaches path.
-    // Qt picks image by content: extension only needs plausible.
+    // Name: two numbers, one of five literals; archive name never reaches path. Qt picks
+    // image by content: extension need only be plausible.
     let extension = match icon
         .rsplit_once('.')
         .map(|(_, tail)| tail.to_ascii_lowercase())
@@ -118,8 +114,7 @@ async fn fetch_icon(rpc: &RpcClient, account_id: u32, message_id: u32, icon: &st
     }
 }
 
-/// Message row for webxdc: name, state, icon. Empty if core refuses: drawn as plain file row,
-/// not broken app.
+/// Row for webxdc: name, state, icon. Empty if core refuses: plain file row, not broken app.
 pub(crate) async fn extras(rpc: &RpcClient, account_id: u32, message_id: u32) -> Extras {
     let Ok(info) = fetch_info(rpc, account_id, message_id).await else {
         return Extras::default();
@@ -140,8 +135,7 @@ pub(crate) async fn extras(rpc: &RpcClient, account_id: u32, message_id: u32) ->
 /// WebView { url: app.url }
 /// ```
 ///
-/// `start` serves on own loopback address; answers on `url`. Drop stops serving, so closing
-/// page needs nothing else.
+/// `start` serves on own loopback address, answers on `url`. Drop stops serving.
 #[derive(QObject, Default)]
 pub struct WebxdcApp {
     base: qt_base_class!(trait QObject),
@@ -163,13 +157,12 @@ pub struct WebxdcApp {
     pub summary: qt_property!(QString; NOTIFY loaded_changed),
     /// Source location, empty if none.
     pub source_code_url: qt_property!(QString; NOTIFY loaded_changed),
-    /// True once load finished.
+    /// Load finished.
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted after every load.
     pub loaded_changed: qt_signal!(),
 
-    /// Serving URL, empty until `start` answers.
-    /// What `WebView` points at.
+    /// Serving URL for `WebView`; empty until `start` answers.
     pub url: qt_property!(QString; NOTIFY url_changed),
     /// Emitted when serving starts or stops.
     pub url_changed: qt_signal!(),
@@ -178,10 +171,9 @@ pub struct WebxdcApp {
     pub error: qt_signal!(message: QString),
     /// Message gone: page should leave.
     pub gone: qt_signal!(),
-    /// App handed over: file, text, or both.
-    ///
-    /// Named for what happened, not the call: webxdc `sendToChat` can only name a chat, but app's
-    /// button is a download meaning the phone. Page asks reader. See `webxdc_host::HandedOver`.
+    /// App handed over file, text, or both. Named for what happened: `sendToChat` can only name a
+    /// chat, but app's download button means phone; page asks reader. See
+    /// `webxdc_host::HandedOver`.
     pub handed_over: qt_signal!(file_path: QString, text: QString),
 
     /// Reload core's info.
@@ -192,18 +184,18 @@ pub struct WebxdcApp {
     pub stop: qt_method!(fn(&mut self)),
     /// Delete handed-over file once page saved it.
     pub discard: qt_method!(fn(&mut self, file_path: QString)),
-    /// Apply core event. Only what changes this app.
+    /// Apply core event touching this app.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
     /// Loopback host, while running.
     host: Option<Host>,
-    /// True between `start` and `stop`. Host ready after page closed is dropped.
+    /// Between `start` and `stop`; host ready after page closed is dropped.
     wanted: bool,
     /// `start` in flight: second would lose first host.
     starting: bool,
-    /// Counts loads: stale answer can't land on newer one; see `ChatInfo`. Loads only: `start`
-    /// isn't one; they must not cancel each other.
+    /// Load counter: stale answer can't land on newer; see `ChatInfo`. `start` not counted:
+    /// must not cancel loads.
     generation: u64,
 }
 
@@ -296,7 +288,7 @@ impl WebxdcApp {
         self.starting = true;
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
-        // Queued: request on host's thread is raised on Qt thread.
+        // Queued: host-thread request raised on Qt thread.
         let to_page: QPointer<Self> = QPointer::from(&*self);
         let raise = queued_callback(move |(path, text): (String, String)| {
             if let Some(this) = to_page.as_pinned() {
@@ -310,7 +302,7 @@ impl WebxdcApp {
             let Some(this) = ptr.as_pinned() else { return };
             this.borrow_mut().starting = false;
             match result {
-                // Page closed mid-start: dropping stops it.
+                // Page closed mid-start: drop stops it.
                 Ok(_) if !this.borrow().wanted => {}
                 Ok(host) => {
                     {
@@ -329,9 +321,7 @@ impl WebxdcApp {
         });
     }
 
-    /// Forget handed-over file once kept.
-    ///
-    /// Page saved a copy; this deletes cache original. This app's outbox only; see
+    /// Delete cache original once page saved copy. Own outbox only; see
     /// `webxdc_host::discard_outgoing`.
     pub fn discard(&mut self, file_path: QString) {
         crate::webxdc_host::discard_outgoing(self.message_id, &file_path.to_string());
@@ -364,12 +354,12 @@ impl WebxdcApp {
             return;
         }
         match kind.as_str() {
-            // Deleted here or on other device: nothing to serve; core has no blob.
+            // Deleted here or elsewhere: nothing to serve; core has no blob.
             "WebxdcInstanceDeleted" => {
                 self.stop();
                 self.gone();
             }
-            // New update from chat: wake app's waiting request. No reload: name unchanged.
+            // New update: wake app's waiting request. Name unchanged: no reload.
             "WebxdcStatusUpdate" => self.poke(),
             _ => {}
         }
@@ -383,8 +373,8 @@ impl WebxdcApp {
     }
 }
 
-/// Picking app from store (a website; page is `WebView`'s): downloads tapped .xdc via core, not
-/// engine, so it lands as a file to send. As deltachat-android does.
+/// Store picking (website in `WebView`): tapped .xdc fetched via core, not engine, landing
+/// as file to send, as deltachat-android.
 /// ```qml
 /// WebxdcStore { id: store; account_id: page.accountId }
 /// // store.fetch(url) -> onPicked: attach(path)
@@ -401,7 +391,7 @@ pub struct WebxdcStore {
     /// Emitted when download starts or ends.
     pub fetching_changed: qt_signal!(),
 
-    /// Fetch .xdc at `url` onto phone. Answers on `picked`.
+    /// Fetch .xdc at `url`; answers on `picked`.
     pub fetch: qt_method!(fn(&mut self, url: QString)),
 
     /// App file path, ready to send.
@@ -442,7 +432,7 @@ impl WebxdcStore {
     }
 }
 
-/// One app off store: via core, onto phone.
+/// One store app via core onto phone.
 async fn download(rpc: &RpcClient, account_id: u32, url: &str) -> Result<String, String> {
     let answer: serde_json::Value = rpc
         .call("get_http_response", (account_id, url))
@@ -460,9 +450,8 @@ async fn download(rpc: &RpcClient, account_id: u32, url: &str) -> Result<String,
     Ok(path.to_string_lossy().into_owned())
 }
 
-/// File name for downloaded app: URL's last part, filtered, always .xdc.
-///
-/// Filtered: web page's name never reaches a path raw.
+/// Downloaded app file name: URL's last part, filtered (page names never reach path raw),
+/// always .xdc.
 fn app_file_name(url: &str) -> String {
     let name: String = url
         .split(['?', '#'])
@@ -483,7 +472,7 @@ fn app_file_name(url: &str) -> String {
     }
 }
 
-/// Everything host needs for one app, started.
+/// All host needs for one started app.
 async fn host_for(
     rpc: &Arc<RpcClient>,
     account_id: u32,
@@ -491,7 +480,7 @@ async fn host_for(
     to_chat: crate::webxdc_host::HandedOver,
 ) -> Result<Host, String> {
     let info = fetch_info(rpc, account_id, message_id).await?;
-    // Name app shows beside its updates: profile name, else address.
+    // Name beside app's updates: profile name, else address.
     let display_name: String = rpc
         .call::<_, Option<String>>("get_config", (account_id, "displayname"))
         .await

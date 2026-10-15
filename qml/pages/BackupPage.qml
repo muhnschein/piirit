@@ -4,46 +4,36 @@ import "../components"
 import Piirit 1.0
 
 /*
- * One profile written to a file: other half of taking a profile over
- * (RestoreProfilePage.qml).
- *
- * Export is per profile: takes an account, writes its messages, contacts and
- * key into one .tar. Reached from the profile's own row; three profiles, three
- * backups.
- *
- * File goes to Documents under core's name; readers don't type paths. Path
- * shown in full after: next step is copying it off phone.
- *
- * Write is core's, progress via shim (`backup.rs`): bar and stop. Error = strip
- * at bottom; retry is the button still there.
- *
- * Once written: button goes; chats attach right (the app's current profile,
- * not necessarily this one).
+ * One profile to file; other half of takeover (RestoreProfilePage.qml). Per
+ * profile: messages, contacts, key into one .tar; reached from profile's row.
+ * To Documents under core's name (readers don't type paths); full path shown
+ * after, for copying off phone. Core writes, shim reports (`backup.rs`): bar,
+ * stop. Error: bottom strip, button retries. Done: button goes, chats attach
+ * right (app's current profile, maybe not this).
  */
 Page {
     id: page
 
-    /// No quick actions, tapped notification waits, while writing: jump away
-    /// leaves it half-written. See piirit.qml.
+    /// While writing no quick actions, tapped notification waits: jump leaves it half-written.
+    /// piirit.qml.
     readonly property bool pausesQuickActions: backup.running
 
-    /// Account backed up: export takes one.
+    /// Account backed up.
     property int accountId
 
-    /// Chat list's profile, where forward swipe goes. Not [[accountId]]:
-    /// any profile backs up without leaving its chats.
+    /// Chat list's profile, forward swipe target. Not [[accountId]]: backing up any profile
+    /// doesn't leave current chats.
     property int currentAccountId: 0
 
     /// Where file went, once written.
     property string writtenPath: ""
     property string errorMessage: ""
-    /// Chats on the right: a swipe to offer.
+    /// Chats attached right.
     property bool chatsAttached: false
 
-    // No going back mid-write: would drop answer listener; core keeps writing.
+    // No back mid-write: drops listener; core keeps writing.
     backNavigation: !backup.running
 
-    // Row at top: name, picture, address, as profiles page draws them.
     Profile {
         id: profile
         objectName: "profile"
@@ -62,8 +52,7 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // Export reports like import, event doesn't say which; object listens only
-    // while it asked. See backup.rs.
+    // Export reports like import, event doesn't say which: listens only while asked (backup.rs).
     Connections {
         target: core
         onCore_event: backup.handle_event(context_id, kind, payload_json)
@@ -75,9 +64,7 @@ Page {
         backup.write(StandardPaths.documents)
     }
 
-    /// Chats to the right of this page, so a swipe leaves it.
-    ///
-    /// Attached, not pushed: reader is done here; page indicator is the offer.
+    /// Attach chats right, not pushed: reader done; page indicator is the offer.
     function offerTheChats() {
         if (page.currentAccountId <= 0 || page.chatsAttached) {
             return
@@ -101,7 +88,7 @@ Page {
                 title: qsTr("Back up profile")
             }
 
-            // Row like profiles page: picture, name, address.
+            // As profiles page row: picture, name, address.
             ContactRow {
                 objectName: "profileRow"
                 width: parent.width
@@ -129,7 +116,7 @@ Page {
             Button {
                 objectName: "writeButton"
                 anchors.horizontalCenter: parent.horizontalCenter
-                // Gone once written: a second backup is pointless.
+                // Gone once written: second is pointless.
                 visible: !backup.running && page.writtenPath.length === 0
                 text: qsTr("Start backup")
                 onClicked: page.begin()
@@ -156,14 +143,14 @@ Page {
                 }
             }
 
-            // Whole path: reader goes looking with file manager or cable.
+            // Whole path, for file manager or cable.
             Label {
                 objectName: "writtenLabel"
                 visible: page.writtenPath.length > 0
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WrapAnywhere
-                // Path from filesystem: plain text, like all text app didn't write.
+                // Filesystem path: plain text, as all foreign text.
                 textFormat: Text.PlainText
                 color: Theme.highlightColor
                 //: Said once the backup is written. %1 is the full path
@@ -171,7 +158,7 @@ Page {
                 text: qsTr("Saved to %1").arg(page.writtenPath)
             }
 
-            // The way on, in words: only when a page is really there.
+            // Way on, in words: only when page really there.
             Label {
                 objectName: "onwardHint"
                 visible: page.writtenPath.length > 0 && page.chatsAttached
@@ -186,7 +173,7 @@ Page {
         }
     }
 
-    // Error: export refused, or folder unwritable. Strip: button stays.
+    // Export refused or folder unwritable. Strip: button stays.
     Banner {
         objectName: "errorBanner"
         anchors {

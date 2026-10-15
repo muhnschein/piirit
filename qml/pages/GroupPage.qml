@@ -5,10 +5,10 @@ import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
- * Group page: picture, name, members. Swipe left from conversation or tap
- * header. Core owns data (ChatInfo over get_full_chat_by_id); edits sent at
- * once: name after typing pause and on leave, rest on tap.
- * Left group or non-group: core refuses edits, controls hidden.
+ * Group page: picture, name, members; swipe left from conversation or tap
+ * header. Core owns data (ChatInfo, get_full_chat_by_id); edits go at once:
+ * name after typing pause and on leave, rest on tap. Not joined or not group:
+ * core refuses edits, controls hidden.
  */
 Page {
     id: page
@@ -49,8 +49,7 @@ Page {
             page.renamed(name)
         }
         // Left group still a chat: back goes to it, not list.
-        // Confirm pop may still run; Silica drops stack ops mid-transition, so
-        // finish it first.
+        // Confirm pop may still run; Silica drops stack ops mid-transition: finish it.
         onLeft: {
             if (pageStack.completeAnimation) {
                 pageStack.completeAnimation()
@@ -79,7 +78,7 @@ Page {
     property bool descriptionEdited: false
     property string errorMessage: ""
 
-    // Pause, not keystroke: round trip per letter too costly.
+    // Pause, not keystroke: round trip per letter.
     Timer {
         id: autosave
         objectName: "autosave"
@@ -109,7 +108,7 @@ Page {
         page.descriptionEdited = false
     }
 
-    // Not on pause: each change messages all members. Saves on blur and leave.
+    // Not on pause: each change messages all members. Saved on blur and leave.
     function applyDescription() {
         if (!chat.loaded || !page.descriptionEdited) {
             return
@@ -125,8 +124,7 @@ Page {
         }
     }
 
-    // Leave saves too: back-swipe in pause drops typing. Pending removals go
-    // now.
+    // Leave saves too (back-swipe in pause drops typing); pending removals go now.
     onStatusChanged: {
         page.showMembersOnceShown()
         if (status === PageStatus.Deactivating) {
@@ -137,8 +135,8 @@ Page {
         }
     }
 
-    /// Builds member rows on first page-in, see `memberSection`. On way in
-    /// (Activating), so rows are there as page slides across.
+    /// Builds member rows on first page-in (`memberSection`), while Activating, so
+    /// they're there as page slides in.
     function showMembersOnceShown() {
         if (page.status === PageStatus.Activating
                 || page.status === PageStatus.Active) {
@@ -152,16 +150,14 @@ Page {
     /// Removal wait, ms. Tests lower it.
     property alias pendingDelay: doomedMembers.delay
 
-    /// Members asked to remove, in undo window.
-    ///
-    /// Not Silica `remorseAction`: its row dies on reload. See PendingRemoval.
+    /// Members asked to remove, in undo window. Not Silica `remorseAction`: its row
+    /// dies on reload. See PendingRemoval.
     PendingRemoval {
         id: doomedMembers
         onRemove: chat.remove_member(id)
     }
 
-    // Picture large, on page chat pictures open on. None if no picture:
-    // initial disc isn't one.
+    // Picture large, on chat picture page. None if no picture (initial disc).
     function showPicture() {
         if (chat.avatar_path.length === 0) {
             return
@@ -172,8 +168,8 @@ Page {
         })
     }
 
-    // Gallery by URL. Only Attach*Page files name `Sailfish.Pickers`: missing
-    // type costs button, not page.
+    // Gallery by URL. Only Attach*Page files name `Sailfish.Pickers`: missing type
+    // costs button, not page.
     function pickPicture() {
         var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
         if (picker) {
@@ -184,7 +180,7 @@ Page {
         }
     }
 
-    // All chat content kinds, own page; tile says kind.
+    // All chat content kinds; tile says kind.
     function openMedia(kind) {
         pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
             accountId: page.accountId,
@@ -200,8 +196,8 @@ Page {
         })
     }
 
-    // Own page with platform accept, not countdown: no way back in unless
-    // someone adds you, and pull-down countdown easy to miss.
+    // Own page with platform accept, not countdown: no way back unless re-added,
+    // and pull-down countdown easy to miss.
     function confirmLeave() {
         var dialog = pageStack.push(Qt.resolvedUrl("LeaveGroupDialog.qml"),
                                     { groupName: chat.name })
@@ -216,8 +212,7 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Both entries are for members: hidden for left/removed reader, else
-        // empty pull-down.
+        // Both entries for members: hidden for left/removed reader (empty pull-down).
         PullDownMenu {
             objectName: "groupMenu"
             visible: chat.can_edit
@@ -235,7 +230,7 @@ Page {
                 text: qsTr("Remove picture")
                 onClicked: chat.clear_picture()
             }
-            // Here, not on picture (tap enlarges), like contact page.
+            // Here, not on picture (tap enlarges), as contact page.
             MenuItem {
                 objectName: "changePicture"
                 visible: chat.can_edit
@@ -255,7 +250,7 @@ Page {
                 title: qsTr("Group")
             }
 
-            // Tap enlarges picture; change via pull-down.
+            // Tap enlarges; change via pull-down.
             Item {
                 width: parent.width
                 height: bigAvatar.height + 2 * Theme.paddingLarge
@@ -290,8 +285,8 @@ Page {
                 onTextChanged: page.noteEdit()
             }
 
-            // Description: shown to all, editable where core allows, keeps line
-            // breaks. Hidden if empty and not editable.
+            // Description: shown to all, editable where core allows, keeps line breaks.
+            // Hidden if empty and not editable.
             TextArea {
                 id: descriptionField
                 objectName: "descriptionField"
@@ -335,9 +330,8 @@ Page {
                 text: qsTr("%n member(s)", "", chat.member_count)
             }
 
-            // Rows built on first page-in, not at creation: page is attached
-            // once chat loads, so rows were built for readers who never swipe
-            // over. Kept once built.
+            // Rows built on first page-in: page attaches once chat loads, so rows were
+            // built for readers who never swipe over. Kept once built.
             Loader {
                 id: memberSection
                 objectName: "memberSection"
@@ -346,7 +340,7 @@ Page {
 
                 sourceComponent: Column {
                     width: column.width
-                    // Gap between rows, as when rows in page column.
+                    // Row gap, as in page column.
                     spacing: column.spacing
 
                     // Repeater, not ListView: page scrolls as one; group small.
@@ -364,8 +358,8 @@ Page {
                             readonly property bool doomed:
                                 doomedMembers.pending(model.contact_id)
 
-                            /// Silica countdown on member; reports tap.
-                            /// Removal in `doomedMembers` (rows die on change).
+                            /// Silica countdown on member; reports tap. Removal in
+                            /// `doomedMembers` (rows die on change).
                             function raiseRemorse() {
                                 remorse.active = true
                                 //: What Silica's countdown says it is doing,
@@ -393,17 +387,15 @@ Page {
                                 }
                             }
 
-                            // Self-removal is leaving: own pulley entry and
-                            // dialog. Component: built on first open (see
-                            // ConversationList).
+                            // Self-removal is leaving: own pulley entry and dialog.
+                            // Component built on first open (see ConversationList).
                             menu: Component {
                                 ContextMenu {
                                     MenuItem {
                                         objectName: "removeItem"
                                         visible: chat.can_edit && !model.is_self
                                         text: qsTr("Remove from group")
-                                        // Page told, not row: list change would
-                                        // kill wait on row.
+                                        // Page told, not row: list change kills row's wait.
                                         onClicked: {
                                             doomedMembers.ask(model.contact_id)
                                             memberRow.raiseRemorse()

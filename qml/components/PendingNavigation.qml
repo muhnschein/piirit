@@ -3,34 +3,29 @@ import QtQuick 2.0
 /*
  * Page-stack move, held until stack can make it.
  *
- * Silica's PageStack refuses push/replace mid-transition, logging only to
- * stderr. Fine for taps, not core moves (backup import, last-profile delete
- * lost moves on phone).
- *
- * So retry until done. `busy`: Silica's property (absent in test probe: never
- * busy). `ready`: owner's own condition, page on screen with nothing over it
- * (Silica won't move from under a picker either). Call page over owner must
- * not move: moves act on stack top, taking call page and call with it
- * (CallCenter.qml). So waits for `ready` indefinitely; `patience` only bounds
- * busy waits.
+ * Silica PageStack refuses push/replace mid-transition (stderr only): core
+ * moves (backup import, last-profile delete) got lost on phone. So retry.
+ * `busy`: Silica's (absent in test probe). `ready`: owner on screen, nothing
+ * over it (Silica won't move from under picker; move under call page would
+ * take call with it, CallCenter.qml). Waits for `ready` indefinitely;
+ * `patience` bounds busy waits only.
  */
 QtObject {
     id: root
 
-    /// Stack to move. Owner passes it: `pageStack` is unreachable here.
+    /// Stack; owner passes it (`pageStack` unreachable here).
     property var stack: null
 
-    /// Owner can move: page sets `page.status === PageStatus.Active` (on screen,
-    /// nothing over it).
+    /// Owner movable: page binds `page.status === PageStatus.Active`.
     property bool ready: true
 
-    /// Move waiting. Page with one closes back gesture (swipe takes move too).
+    /// Move waiting; page closes back gesture meanwhile.
     readonly property bool pending: root._move !== null
 
     /// Retry period mid-transition, ms.
     property int retryInterval: 50
 
-    /// Max wait on busy stack, ms. Stops never-quiet stack leaving timer alive.
+    /// Max busy wait, ms: never-quiet stack can't keep timer alive.
     property int patience: 5000
 
     /// Move waiting: `{ kind, target, page, properties }`, or null.
@@ -60,7 +55,7 @@ QtObject {
         root._go()
     }
 
-    /// Drop move not yet made. Unused in app; lets page change its mind.
+    /// Drop pending move (unused in app).
     function forget() {
         root._move = null
         root._retry.stop()
@@ -71,12 +66,12 @@ QtObject {
         if (!root._move || !root.stack) {
             return
         }
-        // Wait until owner on screen. `onReadyChanged` retries.
+        // Wait for owner; `onReadyChanged` retries.
         if (!root.ready) {
             root._retry.stop()
             return
         }
-        // `=== true`: stack without property gives undefined, not busy.
+        // `=== true`: missing property = not busy.
         if (root.stack.busy === true && root._waited < root.patience) {
             root._waited += root.retryInterval
             root._retry.restart()

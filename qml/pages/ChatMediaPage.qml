@@ -9,17 +9,12 @@ import "../js/Format.js" as Format
 import Piirit 1.0
 
 /*
- * One kind of chat media: grid (pictures, videos) or list (rest).
- * From contact/group tiles (components/MediaKinds.qml); same four pages as
- * deltachat-android/ios.
- * Grid: gallery-style cells filled by platform thumbnailer, play mark on video.
- * List: conversation's attachment rows minus bubbles (voice plays in place,
- * app runs, file handed to other app), sender and time above.
- * Long press: go to message, or delete; files also copy, open with. Delete
- * waits out countdown beside views (PendingRemoval). Show in chat walks back
- * down stack to conversation.
- * Core sends newest last, model reverses: rows newest first, no sorting here
- * (chat_media.rs).
+ * One chat media kind, from contact/group tiles (components/MediaKinds.qml),
+ * as deltachat-android/ios's four pages. Grid (pictures, videos): thumbnailer
+ * cells, video play mark. List (rest): conversation's attachment rows, no
+ * bubbles, sender and time above. Long press: go to message, delete; files
+ * also copy, open with. Delete waits beside views (PendingRemoval). Newest
+ * first: model reverses core (chat_media.rs).
  */
 Page {
     id: page
@@ -49,9 +44,9 @@ Page {
 
     Connections {
         target: core
-        // Model re-reads list on arrival or delete; moves nothing still there.
+        // Model re-reads on arrival or delete; kept rows don't move.
         onCore_event: media.handle_event(context_id, kind, payload_json)
-        // Model made before core is up has nothing to load.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 media.reload()
@@ -59,14 +54,11 @@ Page {
         }
     }
 
-    /// Messages awaiting delete (undo wait).
-    ///
-    /// Beside views, not on rows: deleting destroys rows, every event reloads
-    /// them. See PendingRemoval.
+    /// Messages awaiting delete. Beside views, not rows: deleting destroys rows,
+    /// every event reloads them. See PendingRemoval.
     PendingRemoval {
         id: doomedMessages
-        // `tag`: delete kind picked in DeleteMessageDialog. True asks other ends
-        // too.
+        // `tag`: DeleteMessageDialog's kind; true asks other ends too.
         onRemove: {
             if (tag === true) {
                 media.delete_message_for_all(id)
@@ -76,16 +68,15 @@ Page {
         }
     }
 
-    // Leaving mid-wait still deletes. Conversation writes its draft then too.
+    // Leaving mid-wait still deletes (conversation writes draft then too).
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             doomedMessages.flush()
         }
     }
 
-    /// Ask delete kind in the conversation's dialog. Wait starts on accept.
-    ///
-    /// Gate read now: row may be gone by answer.
+    /// Ask delete kind in conversation's dialog; wait starts on accept. Gate read
+    /// now: row may be gone by answer.
     function askDelete(messageId, canDeleteForEveryone) {
         var chooser = pageStack.push(
             Qt.resolvedUrl("DeleteMessageDialog.qml"),
@@ -97,12 +88,10 @@ Page {
         }
     }
 
-    /// Silica's countdown over item. Built on first ask (row `loader`), not per
-    /// row. Deletion is `doomedMessages`'s (outlives row): given no-op
-    /// callback, only draws, reports tap.
+    /// Silica's countdown over item, built on first ask (row `loader`). Deletion is
+    /// `doomedMessages`'s (outlives row): no-op callback, only draws, reports tap.
     function raiseRemorse(cell, loader, over, messageId) {
-        // Once per wait: start and rebuild both land here. Two `execute` calls
-        // restart countdown.
+        // Once per wait (start and rebuild both land here): second `execute` restarts.
         if (cell.countingDown) {
             return
         }
@@ -114,13 +103,12 @@ Page {
                             doomedMessages.countdownFor(messageId))
     }
 
-    /// Path as URL views load. Empty for empty path (row not loaded yet).
+    /// Path as URL views load; empty until row loaded.
     function fileUrlOf(path) {
         return path.length > 0 ? Qt.resolvedUrl(Media.fileUrl(path)) : ""
     }
 
-    /// Tap opens per kind (ConversationPage.openAttachment). Files go to other
-    /// apps.
+    /// Tap opens per kind (ConversationPage.openAttachment); files to other apps.
     function open(fileUrl, fileName, viewType) {
         // Row not loaded yet: no file.
         if (String(fileUrl).length === 0) {
@@ -151,10 +139,9 @@ Page {
         })
     }
 
-    /// Back to conversation at this message. Walks down stack to first page
-    /// with `showMessage` (under contact/group page). Told first, popped to
-    /// second: it acts once on screen, over restored place
-    /// (ConversationPage.showMessage).
+    /// Back to conversation at this message: down stack to first page with
+    /// `showMessage`. Told first, popped to second: acts once on screen, over
+    /// restored place (ConversationPage.showMessage).
     function showInChat(messageId) {
         var below = pageStack.previousPage(page)
         while (below && typeof below.showMessage !== "function") {
@@ -167,8 +154,7 @@ Page {
         pageStack.pop(below)
     }
 
-    // Copy under sender's name, as conversation's row menu does. See
-    // AttachmentSaver.
+    // Copy under sender's name, as conversation row menu. See AttachmentSaver.
     AttachmentSaver {
         id: saver
         objectName: "saver"
@@ -176,8 +162,7 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // Two views: grid for pictures, list for rest. Loader builds only the
-    // shown one: hidden view would still build delegates.
+    // Loader builds only shown view: hidden one would still build delegates.
     Loader {
         id: view
         anchors {
@@ -189,7 +174,7 @@ Page {
         sourceComponent: page.isGallery ? gallery : listing
     }
 
-    // Only while filling: a list filling from top says so itself.
+    // Only while filling: filling list shows it itself.
     BusyIndicator {
         objectName: "mediaBusy"
         anchors.centerIn: view
@@ -207,7 +192,7 @@ Page {
             clip: true
             model: media.rows
 
-            /// Columns: as many platform largest items as fit. Three upright.
+            /// Columns: platform largest items that fit; three upright.
             readonly property int columns:
                 Math.max(1, Math.floor(width / Theme.itemSizeExtraLarge))
             cellWidth: Math.floor(width / columns)
@@ -217,7 +202,7 @@ Page {
                 title: Media.kindName(page.kind)
             }
 
-            // Silica's grid cell with menu: long press opens it under the row.
+            // Silica grid cell with menu: long press opens it under row.
             delegate: GridItem {
                 id: tile
                 objectName: "mediaTile" + model.message_id
@@ -234,7 +219,7 @@ Page {
                 /// Picture on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
-                /// Countdown already up for this wait; see `page.raiseRemorse`.
+                /// Countdown already up for this wait (`page.raiseRemorse`).
                 property bool countingDown: false
 
                 Loader {
@@ -246,7 +231,7 @@ Page {
                     }
                 }
 
-                // Wait asked on page, starts while menu gone: tile hears here.
+                // Page starts wait after menu closes: tile hears here.
                 onDoomedChanged: {
                     if (tile.doomed) {
                         page.raiseRemorse(tile, remorse, body, model.message_id)
@@ -255,14 +240,14 @@ Page {
                     }
                 }
 
-                // Rebuilt on scroll-back: loses countdown. Re-show it.
+                // Rebuilt on scroll-back loses countdown: re-show.
                 Component.onCompleted: {
                     if (tile.doomed) {
                         page.raiseRemorse(tile, remorse, body, model.message_id)
                     }
                 }
 
-                // Component, built on first open. See ConversationList.
+                // Built on first open (ConversationList).
                 menu: Component {
                     ContextMenu {
                         MenuItem {
@@ -274,8 +259,8 @@ Page {
                         MenuItem {
                             objectName: "deleteItem"
                             text: qsTr("Delete")
-                            // Page told, not tile: wait must outlive it (see
-                            // PendingRemoval). Delete kind: DeleteMessageDialog.
+                            // Page told, not tile: wait outlives it (PendingRemoval). Kind:
+                            // DeleteMessageDialog.
                             onClicked: page.askDelete(
                                            model.message_id,
                                            model.is_outgoing && model.show_padlock
@@ -284,38 +269,34 @@ Page {
                     }
                 }
 
-                // Drawn in cell, so countdown covers it: faded, out of tap's
-                // reach.
+                // In cell, so countdown covers it: faded, untappable.
                 Item {
                     id: body
                     width: tile.contentWidth
                     height: tile.contentHeight
                     enabled: !tile.doomed
 
-                    // Shows until thumbnailer draws: row not loaded, or file
-                    // not reached.
+                    // Until thumbnailer draws: row not loaded, or file not reached.
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: tile.inset
                         color: Theme.rgba(Theme.highlightDimmerColor, 0.4)
                     }
 
-                    // Platform thumbnailer: cell-sized, cached. No full decode
-                    // per tile.
+                    // Platform thumbnailer: cell-sized, cached; no full decode per tile.
                     Thumbnail {
                         objectName: "tileThumbnail"
                         anchors.fill: parent
                         anchors.margins: tile.inset
                         sourceSize.width: width
                         sourceSize.height: height
-                        // Type told: thumbnailer picks its reader by it. No
-                        // core type: assume tile's kind.
+                        // Type told: thumbnailer picks reader by it. No core type: tile's kind.
                         mimeType: model.file_mime.length > 0 ? model.file_mime
                                   : tile.isVideo ? "video/mp4" : "image/jpeg"
                         source: tile.fileUrl
                     }
 
-                    // Marks conversation draws for same two kinds.
+                    // Conversation's marks for same two kinds.
                     Rectangle {
                         objectName: "playMark"
                         visible: tile.isVideo || tile.isAnimated
@@ -379,10 +360,10 @@ Page {
                 /// Message on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
-                /// Countdown already up. See the tile.
+                /// Countdown already up; see tile.
                 property bool countingDown: false
 
-                // Wait starts on page menu leads to. See tile.
+                // Wait starts on page menu leads to; see tile.
                 onDoomedChanged: {
                     if (row.doomed) {
                         page.raiseRemorse(row, remorse, content, model.message_id)
@@ -400,14 +381,14 @@ Page {
                     }
                 }
 
-                // Rebuilt mid-wait: comes back bare. See tile.
+                // Rebuilt mid-wait comes back bare; see tile.
                 Component.onCompleted: {
                     if (row.doomed) {
                         page.raiseRemorse(row, remorse, content, model.message_id)
                     }
                 }
 
-                // Built when first opened. See tile.
+                // Built on first open; see tile.
                 menu: Component {
                     ContextMenu {
                         MenuItem {
@@ -431,7 +412,7 @@ Page {
                         MenuItem {
                             objectName: "deleteItem"
                             text: qsTr("Delete")
-                            // Page told, not row. See tile.
+                            // Page told, not row; see tile.
                             onClicked: page.askDelete(
                                            model.message_id,
                                            model.is_outgoing && model.show_padlock
@@ -465,8 +446,7 @@ Page {
                               : ""
                     }
 
-                    // Two row shapes, zero-high unless showing; height is their
-                    // sum.
+                    // Two row shapes, zero-high unless shown; height is sum.
                     Item {
                         id: body
                         x: Theme.horizontalPageMargin
@@ -474,8 +454,7 @@ Page {
                         width: parent.width - 2 * Theme.horizontalPageMargin
                         height: fileRow.height + preview.height
 
-                        // File: theme icon, name, size. Like platform file
-                        // browser.
+                        // File: theme icon, name, size, as platform file browser.
                         Item {
                             id: fileRow
                             readonly property bool shown: row.isFile
@@ -526,8 +505,8 @@ Page {
                             }
                         }
 
-                        // Sound or app: conversation's own rendering. Gets no
-                        // file for a file (row above draws it): measures 0.
+                        // Sound or app: conversation's rendering. No file for a file (row above
+                        // draws it): measures 0.
                         AttachmentPreview {
                             id: preview
                             objectName: "attachment"
@@ -543,8 +522,7 @@ Page {
                             webxdcDocument: model.webxdc_document
                             webxdcSummary: model.webxdc_summary
                             webxdcIcon: model.webxdc_icon
-                            // Apps page only offered where apps on, so row
-                            // draws as the app.
+                            // Apps page only where apps on: row draws as app.
                             appsEnabled: true
                             onMenuRequested: row.openMenu()
                         }

@@ -1,26 +1,20 @@
 //! Loopback host for one call's page.
 //!
-//! Media is browser engine's: Gecko has peer connection, codecs, echo cancellation; upstream
-//! calls-webapp (`vendor/calls-webapp/`) drives them. Page needs core (place, accept, end)
-//! and asks via `window.calls`, ours to provide: so page served from here, and its
-//! `calls.js` is a bridge whose five functions are requests back to this host. Same
-//! arrangement as `webxdc_host.rs` for an app.
+//! Gecko does media; upstream calls-webapp (`vendor/calls-webapp/`) drives it. Page reaches
+//! core (place, accept, end) via `window.calls`: served from here, its `calls.js` bridge's five
+//! functions are requests back to this host (as `webxdc_host.rs`).
 //!
-//! Other direction: other end's answer arrives as core event. [`Call`](crate::calls::Call)
-//! hears it on Qt thread, hands hash command (`#onAnswer=...`) here via [`Host::command`];
-//! bridge long-polls and sets it on page. App's mic switch goes same way ([`mute_command`]);
-//! bridge has page press its own switch.
+//! Other way: [`Call`](crate::calls::Call) hears answer (core event, Qt thread), queues hash
+//! command (`#onAnswer=...`) via [`Host::command`]; bridge long-polls, sets it on page.
+//! Mic too ([`mute_command`]).
 //!
-//! Guards as webxdc host: 127.0.0.1 on kernel-picked port, `Host:` must be page's address,
-//! core routes behind unguessable token, nothing served after call. Page compiled in:
-//! nothing on disk to swap.
+//! Guards as webxdc host: 127.0.0.1, kernel port, `Host:` must match, core routes behind
+//! unguessable token, nothing served after call, page compiled in.
 //!
-//! Token only in address app gives own `WebView`; served bridge carries none. Foreign page
-//! can load `calls.js` via script tag (cross-origin allowed, right `Host:` sent) and learns
-//! nothing to answer or end a ringing call.
+//! Token only in app's `WebView` address, not bridge: foreign page loading `calls.js` by script
+//! tag learns nothing to answer or end a call.
 //!
-//! Policy differs: page's job is reaching other end, via peer connection, which CSP does not
-//! govern. What CSP does govern (fetches, scripts, frames) stays on origin: no other route out.
+//! CSP: peer connection ungoverned (page's point); fetches, scripts, frames stay on origin.
 
 use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
@@ -39,16 +33,14 @@ use tokio::task::JoinHandle;
 use crate::json;
 use crate::webxdc_host::{content_type, read_body, read_head, token};
 
-/// Upstream release build, byte for byte. Compiled in like webxdc bridge: served, not
-/// loaded; file package could lose = call failing on phone only.
-/// `scripts/fetch-calls-webapp.sh` pins it.
+/// Upstream release build, verbatim; pinned by `scripts/fetch-calls-webapp.sh`. Compiled in:
+/// file package could lose = call failing on phone only.
 const PAGE: &str = include_str!("../../../vendor/calls-webapp/index.html");
 
 /// `window.calls` JS: `call_video.js` (camera) then bridge.
 const BRIDGE: &str = concat!(include_str!("call_video.js"), include_str!("calls.js"));
 
-/// What page may do in `WebView`: inline own script/style, other end's picture from here,
-/// every fetch on this origin. Peer connection is not a fetch, not held back: page's point.
+/// Page CSP: inline script/style, pictures and fetches on origin.
 const POLICY: &str = "default-src 'self'; \
      script-src 'self' 'unsafe-inline'; \
      style-src 'self' 'unsafe-inline'; \
@@ -60,28 +52,27 @@ const POLICY: &str = "default-src 'self'; \
      form-action 'none'; \
      frame-ancestors 'none'";
 
-/// Long-poll wait before empty answer. Bridge re-asks at once: only sets how often a
-/// quiet call costs a request.
+/// Long-poll wait before empty answer; bridge re-asks at once.
 const COMMAND_WAIT: Duration = Duration::from_secs(20);
 
-/// Hosts serving calls, for [`end_all`]. Weak: gone host (call ended) not kept.
+/// Hosts for [`end_all`]; weak.
 static HOSTS: Mutex<Vec<Weak<Shared>>> = Mutex::new(Vec::new());
 
-/// Count of messages core is done sending (sent or given up). See [`note_sent`].
+/// Messages core is done sending (sent or given up); [`note_sent`].
 static SENT: AtomicU64 = AtomicU64::new(0);
 
-/// How often [`end_all`] polls for call-ending message to have gone.
+/// [`end_all`] poll interval for call-ending message to go.
 const SENT_POLL: Duration = Duration::from_millis(50);
 
 /// Host setup.
 pub(crate) struct Setup {
     /// Account.
     pub(crate) account_id: u32,
-    /// Chat: outgoing call placed into it.
+    /// Chat outgoing call goes into.
     pub(crate) chat_id: u32,
-    /// Call message: known from start if incoming; 0 if outgoing until core places it.
+    /// Call message; 0 for outgoing until core places it.
     pub(crate) message_id: u32,
-    /// Outgoing call placed as video.
+    /// Outgoing call is video.
     pub(crate) has_video: bool,
     /// Core's ICE servers, JSON string.
     pub(crate) ice_servers: String,
@@ -98,7 +89,7 @@ pub(crate) enum Report {
     Accepted,
     /// ICE state: `checking`, `connected`, `completed`, `disconnected`, `failed`, `closed`.
     Connection(String),
-    /// Pictures: camera live, other end drawn, camera facing, last camera failed.
+    /// Picture state from bridge.
     Video(Video),
     /// Page asked call end (red button).
     EndedByPage,
@@ -115,7 +106,7 @@ pub(crate) struct Video {
     pub(crate) local: bool,
     /// Other end's picture drawn.
     pub(crate) remote: bool,
-    /// Camera painted a frame since last given one (shown, not black), or given up on.
+    /// Camera painted since last given stream (not black), or given up.
     pub(crate) local_painted: bool,
     /// Same, other end.
     pub(crate) remote_painted: bool,
@@ -128,7 +119,7 @@ pub(crate) struct Video {
 }
 
 impl Video {
-    /// Parse bridge JSON object; missing field false. None if not object.
+    /// Parse bridge JSON; missing field false, non-object None.
     pub(crate) fn from_json(text: &str) -> Option<Self> {
         let value: serde_json::Value = serde_json::from_str(text).ok()?;
         value.is_object().then(|| Self {
@@ -143,7 +134,7 @@ impl Video {
     }
 }
 
-/// Reports to call on Qt thread via queued callback, as `webxdc_host::HandedOver` to its page.
+/// Reports to call on Qt thread via queued callback (as `webxdc_host::HandedOver`).
 pub(crate) type Reporter = Arc<dyn Fn(Report) + Send + Sync>;
 
 /// Shared by every connection.
@@ -156,7 +147,7 @@ struct Shared {
     avatar_path: String,
     /// Call message; 0 until known.
     message_id: AtomicU32,
-    /// Core-route token. Page address has it; served content does not.
+    /// Core-route token: in page address, not served content.
     key: String,
     /// `/call-api/<key>`: core routes.
     api: String,
@@ -164,17 +155,15 @@ struct Shared {
     authority: String,
     /// Cleared on drop: nothing served after.
     running: AtomicBool,
-    /// Set once this end is done (red button or app hang-up). Place still en route to core
-    /// is ended on landing, not left ringing other end for nobody.
+    /// This end done (red button or hang-up): place still en route ends on landing.
     ending: AtomicBool,
-    /// Set once `end_call` sent (so sent once), or core known not to need it;
-    /// see [`Host::settle`].
+    /// `end_call` sent (once), or not needed ([`Host::settle`]).
     ended: AtomicBool,
-    /// `end_call` sent from here: core has message for other end.
+    /// `end_call` sent from here.
     told: AtomicBool,
-    /// Held while `end_call` runs: second asker (app closing just after hang-up) waits.
+    /// Held while `end_call` runs: second asker (close just after hang-up) waits.
     ending_call: tokio::sync::Mutex<()>,
-    /// Set once page asked call placed. Page asks once; second ask = second call.
+    /// Page asked call placed; second ask = second call.
     placing: AtomicBool,
     /// Hash commands awaiting bridge.
     commands: Mutex<VecDeque<String>>,
@@ -210,20 +199,18 @@ impl Shared {
     }
 }
 
-/// Served call: page location, serving task.
-///
-/// Drop stops host; if leaving, tells core.
+/// Served call. Drop stops host, tells core if leaving.
 pub(crate) struct Host {
     /// Page location, no query or command.
     page: String,
     shared: Arc<Shared>,
     task: JoinHandle<()>,
-    /// Where call-ending runs after host gone: drop is not async, runs on Qt thread.
+    /// Runs call-ending after drop (sync, on Qt thread).
     runtime: Handle,
 }
 
 impl Host {
-    /// `WebView` URL: page, `options` and key in query, `command` as hash.
+    /// `WebView` URL: `options` and key in query, `command` as hash.
     pub(crate) fn url(&self, options: &str, command: &str) -> String {
         format!("{}?{options}&key={}#{command}", self.page, self.shared.key)
     }
@@ -234,7 +221,7 @@ impl Host {
         self.shared.changed.notify_waiters();
     }
 
-    /// Call over at other end and core knows: nothing to tell core on drop.
+    /// Core already knows call over: drop tells nothing.
     pub(crate) fn settle(&self) {
         self.shared.ended.store(true, Ordering::SeqCst);
     }
@@ -245,10 +232,9 @@ impl Drop for Host {
         self.shared.running.store(false, Ordering::SeqCst);
         self.shared.ending.store(true, Ordering::SeqCst);
         self.task.abort();
-        // Answer waiting request now, not hold connection for gone page.
+        // Answer waiting long poll now.
         self.shared.changed.notify_waiters();
-        // Core hears once, whatever ends call. If other end ended it, core has too:
-        // `end_call` is no-op there.
+        // Core hears once; if other end ended it, `end_call` is no-op.
         let shared = Arc::clone(&self.shared);
         drop(self.runtime.spawn(async move { shared.end().await }));
     }
@@ -318,16 +304,11 @@ pub(crate) async fn start(
     })
 }
 
-/// End hosted calls, give core time to tell other end: app's last moment, before core
-/// stops. Caller bounds wait.
+/// End hosted calls at app exit, before core stops (which precedes Qt dropping hosts); caller
+/// bounds wait. Ringing call (no host) left alone: close is no decline, other device may answer.
 ///
-/// App closed mid-call takes call with it, but core stops before Qt side drops its host:
-/// this is where core hears. Ringing call (no host) left alone: close is no decline, other
-/// device may answer.
-///
-/// `end_call` only queues message; sending is core's work, cut off by stopping core. So
-/// after ending, waits for core to say a message went; else other end rings on, or talks
-/// to nobody, till its own timeout.
+/// `end_call` only queues message; stopping core cuts sending. So waits for core to report a
+/// message went, else other end rings on till its own timeout.
 pub(crate) async fn end_all() {
     let sent_before = SENT.load(Ordering::SeqCst);
     let hosts: Vec<Arc<Shared>> = HOSTS
@@ -351,15 +332,14 @@ pub(crate) async fn end_all() {
     }
 }
 
-/// Count core event if core is done sending a message: sent, delivered, or failed.
-/// What [`end_all`] waits for.
+/// Count send-ending core events for [`end_all`].
 pub(crate) fn note_sent(kind: &str) {
     if matches!(kind, "SmtpMessageSent" | "MsgDelivered" | "MsgFailed") {
         SENT.fetch_add(1, Ordering::SeqCst);
     }
 }
 
-/// Page load: several connections at once, one a long poll that holds; each own task.
+/// Page opens several connections, one a held long poll: task each.
 async fn accept(listener: TcpListener, shared: Arc<Shared>) {
     while shared.running.load(Ordering::SeqCst) {
         let Ok((stream, _)) = listener.accept().await else {
@@ -367,7 +347,7 @@ async fn accept(listener: TcpListener, shared: Arc<Shared>) {
         };
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            // Failed connection: page gave up on it, nobody to answer.
+            // Failed connection: page gave up.
             answer(stream, shared).await.ok();
         });
     }
@@ -421,10 +401,9 @@ const LOG_LINE_MAX: usize = 300;
 /// Last call's log file in app cache.
 const LOG_FILE: &str = "call.log";
 
-/// Media plugin capabilities for log: `APIs:` line per `MOZ_GMP_PATH` dir.
+/// Log line: `APIs:` per `MOZ_GMP_PATH` dir.
 ///
-/// Gecko encodes H264 only via plugin (Sailfish: gmp-droid, hardware encoder). `iPhone`
-/// peer offers no other codec, so call sending it no picture is debugged from here.
+/// Gecko encodes H264 only via plugin (Sailfish: gmp-droid); `iPhone` takes nothing else.
 fn media_plugins(path: Option<&str>) -> String {
     let Some(path) = path.filter(|path| !path.is_empty()) else {
         return "media plugins: MOZ_GMP_PATH is not set".to_string();
@@ -440,8 +419,7 @@ fn media_plugins(path: Option<&str>) -> String {
     format!("media plugins: {}", found.join("; "))
 }
 
-/// `APIs:` line of plugin dir's `.info`, e.g. `decode-video[h264:vp8], encode-video[h264]`
-/// (gmp-droid, hardware doing both).
+/// `APIs:` line of plugin dir's `.info`, e.g. `decode-video[h264:vp8], encode-video[h264]`.
 fn plugin_apis(dir: &Path) -> Option<String> {
     std::fs::read_dir(dir)
         .ok()
@@ -458,8 +436,7 @@ fn plugin_apis(dir: &Path) -> Option<String> {
         })
 }
 
-/// Whether `APIs:` offers H.264 encoder, as Gecko parses (`GMPParent::ReadGMPInfoFile`).
-/// Split at ", " for capabilities, ":" for tags.
+/// `APIs:` offers H.264 encoder, parsed as Gecko (`GMPParent::ReadGMPInfoFile`): ", " then ":".
 fn encodes_h264(apis: &str) -> bool {
     apis.split(", ").any(|capability| {
         capability
@@ -472,10 +449,8 @@ fn encodes_h264(apis: &str) -> bool {
 /// Package's H.264 encoder plugin (`piirit-video/build.rs`).
 const BUNDLED_ENCODER: &str = "/usr/share/harbour-piirit/lib/gmp-piirit/1.0";
 
-/// `MOZ_GMP_PATH` for H.264 send: existing dirs then `ours`. Skipped if a named plugin
-/// already encodes H.264 (gmp-droid, which sets var session-wide when installed; hardware
-/// cheaper than any software) or `ours` already there. `None` leaves var alone, also if
-/// `ours` not installed.
+/// `MOZ_GMP_PATH`: existing dirs then `ours`. `None` (left alone) if listed plugin encodes
+/// H.264 (gmp-droid, session-wide; hardware beats software), or `ours` listed or absent.
 fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
     let ours_text = ours.to_str()?;
     if !ours.join("piirit.info").is_file() {
@@ -500,10 +475,8 @@ fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
     )
 }
 
-/// Before app starts threads (so before engine): point Gecko at H.264 encoder
-/// (`encoder_path`), tell encoder call log's path. Gecko runs plugin as own process,
-/// inheriting both. `PIIRIT_GMP_DIR` names another encoder, for trying builds on phone.
-/// Ensure `PULSE_PROP`, which calls change once threads run (`label_call_audio`).
+/// Before any thread: point Gecko at H.264 encoder (`encoder_path`), give it call log path
+/// (plugin process inherits). `PIIRIT_GMP_DIR` overrides encoder. Ensures `PULSE_PROP`.
 pub fn prepare_media_plugins() {
     let log = crate::qr::cache_file(LOG_FILE).ok();
     for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
@@ -512,7 +485,7 @@ pub fn prepare_media_plugins() {
     keep_pulse_properties();
 }
 
-/// Ensure `PULSE_PROP` exists, keep value. Done while one thread: see `label_call_audio`.
+/// Ensure `PULSE_PROP` exists, keep value. Single-threaded only: see `label_call_audio`.
 fn keep_pulse_properties() {
     let session = match std::env::var(PULSE_PROP) {
         Ok(session) => session,
@@ -526,34 +499,30 @@ fn keep_pulse_properties() {
     SESSION_PULSE_PROP.get_or_init(|| session);
 }
 
-/// Variable `PulseAudio` adds connection properties from, at open.
+/// `PulseAudio` connection properties, read at open.
 const PULSE_PROP: &str = "PULSE_PROP";
 
-/// Call sound's audio policy role: internet call, at in-call volume.
+/// Audio policy role: internet call, in-call volume.
 const CALL_ROLE: &str = "media.role=voip";
 
-/// `PULSE_PROP` as app found it, set by `prepare_media_plugins`. Unset: var never written later.
+/// `PULSE_PROP` as found, by `prepare_media_plugins`. Unset: var never written.
 static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
 
-/// Label call sound as call while one is on, or not.
+/// Label call sound as call while talking.
 ///
-/// Engine gives it no role, so sound server treats it as media (`x-maemo-match.table`) at
-/// media volume, while in-call volume keys set call volume: call was as quiet as media
-/// volume, keys did nothing. Role in `PULSE_PROP` goes on every stream of connection opened
-/// while set; engine opens its one connection at first sound (call page, if session played
-/// none before).
+/// Engine sets no role, so sound server used media volume (`x-maemo-match.table`) while volume
+/// keys set call volume: keys did nothing. `PULSE_PROP` role applies to connections opened
+/// while set; engine opens its one at first sound (call page, if nothing played before).
 ///
-/// Written while other threads run; env reads from them generally unsafe, safe here: var
-/// made before threads (`prepare_media_plugins`), so write replaces its string in place,
-/// never moves environment; glibc frees no string it put there, so old readers keep theirs.
+/// Written while threads run, safe here: var exists from before threads, so write replaces
+/// string in place, never moves environment; glibc never frees old string.
 pub fn label_call_audio(talking: bool) {
     if let Some(session) = SESSION_PULSE_PROP.get() {
         std::env::set_var(PULSE_PROP, pulse_properties(session, talking));
     }
 }
 
-/// `PULSE_PROP` value: session's own, plus call role after it during call (wins over
-/// session's role).
+/// `PULSE_PROP` value: session's, plus call role after it while talking (later wins).
 fn pulse_properties(session: &str, talking: bool) -> String {
     if !talking {
         session.to_owned()
@@ -564,7 +533,7 @@ fn pulse_properties(session: &str, talking: bool) -> String {
     }
 }
 
-/// Vars [`prepare_media_plugins`] sets, from vars read via `var` and call log path.
+/// Vars [`prepare_media_plugins`] sets.
 fn media_environment(
     var: impl Fn(&str) -> Option<String>,
     log: Option<PathBuf>,
@@ -580,16 +549,15 @@ fn media_environment(
     set
 }
 
-/// Call log: lines to stderr (phone log, when started from terminal) and own file
-/// (launcher drops stderr). Lines prefixed with seconds since call served; file restarted
-/// per call, so holds call just gone wrong, never grows.
+/// Call log: stderr plus own file (launcher drops stderr). Lines prefixed with seconds since
+/// call served; file restarted per call.
 struct CallLog {
     path: Option<PathBuf>,
     started: Instant,
 }
 
 impl CallLog {
-    /// Log for call starting now: file at `path` (emptied), or stderr only.
+    /// New call's log: `path` emptied, or stderr only.
     fn begin(path: Option<PathBuf>) -> Self {
         let path = path.filter(|path| std::fs::write(path, "").is_ok());
         Self {
@@ -610,13 +578,12 @@ impl CallLog {
             .and_then(|mut file| {
                 std::io::Write::write_all(&mut file, format!("{seconds:7.1} {line}\n").as_bytes())
             });
-        // Full disk: call unaffected, line still on stderr.
+        // Full disk: line still on stderr.
         drop(appended);
     }
 }
 
-/// Log line from page: phone-only facts (camera opened, codecs agreed, remote frames
-/// arriving). One line, capped in length, whatever page sends.
+/// Page log text as one capped line (camera opened, codecs, remote frames).
 fn log_line(text: &str) -> String {
     text.chars()
         .map(|c| if c.is_control() { ' ' } else { c })
@@ -635,7 +602,7 @@ async fn route(
     if !shared.running.load(Ordering::SeqCst) || host != shared.authority {
         return Response::empty("404 Not Found");
     }
-    // Page loads with options in query, command in hash: neither part of path.
+    // Strip query (options) and hash (command).
     let path = target.split(['?', '#']).next().unwrap_or_default();
     if path.starts_with("/call-api") {
         let Some(rest) = path.strip_prefix(&shared.api) else {
@@ -671,12 +638,11 @@ async fn route(
         ("GET", "" | "/" | "/index.html") => {
             Response::new("text/html; charset=utf-8", PAGE.as_bytes().to_vec())
         }
-        // Same for every call and anyone: nothing secret (see module doc).
+        // Nothing secret (module doc).
         ("GET", "/calls.js") => {
             Response::new("text/javascript; charset=utf-8", BRIDGE.as_bytes().to_vec())
         }
-        // Page asks too: upstream dev setup runs it as webxdc app, tag stays in build.
-        // Nothing calls it outside that setup.
+        // Upstream dev setup's webxdc tag, left in build; unused.
         ("GET", "/webxdc.js") => Response::new("text/javascript; charset=utf-8", Vec::new()),
         _ => Response::empty("404 Not Found"),
     }
@@ -698,7 +664,7 @@ async fn place(shared: &Arc<Shared>, offer: String) -> Response {
     match placed {
         Ok(message_id) => {
             shared.message_id.store(message_id, Ordering::SeqCst);
-            // Hung up mid-place: told at once, else other end rings for nobody.
+            // Hung up mid-place: end now.
             if shared.ending.load(Ordering::SeqCst) {
                 shared.end().await;
             }
@@ -737,8 +703,7 @@ async fn accept_call(shared: &Arc<Shared>, answer: String) -> Response {
     }
 }
 
-/// Page's red button. Core told here, not when page goes: other end stops ringing even if
-/// app slow to remove page.
+/// Page's red button: core told now, not at page removal.
 async fn end(shared: &Arc<Shared>) -> Response {
     shared.ending.store(true, Ordering::SeqCst);
     shared.end().await;
@@ -746,8 +711,8 @@ async fn end(shared: &Arc<Shared>) -> Response {
     Response::empty("204 No Content")
 }
 
-/// Waiting commands as JSON array of hash strings. Long poll: none waiting, holds until one
-/// queued or [`COMMAND_WAIT`] passes. 404 once call over: bridge's cue to stop.
+/// Waiting commands, JSON array. Long poll up to [`COMMAND_WAIT`]; 404 after call: bridge
+/// stops.
 async fn commands(shared: &Arc<Shared>) -> Response {
     let now = tokio::time::Instant::now();
     let deadline = now.checked_add(COMMAND_WAIT).unwrap_or(now);
@@ -784,8 +749,7 @@ async fn avatar(shared: &Arc<Shared>) -> Response {
     }
 }
 
-/// Core's ICE servers (JSON string), as page parses them. Non-JSON = no servers; page can
-/// still call where ends reach each other directly.
+/// Core's ICE servers JSON; else `[]` (direct reach still works).
 fn ice_servers(shared: &Shared) -> Response {
     let servers = if serde_json::from_str::<serde_json::Value>(&shared.ice_servers).is_ok() {
         shared.ice_servers.as_bytes().to_vec()
@@ -795,14 +759,12 @@ fn ice_servers(shared: &Shared) -> Response {
     Response::new("application/json; charset=utf-8", servers)
 }
 
-/// Hash command carrying SDP: standard base64 (padded), then percent-encoded, since `=`
-/// also separates command from payload.
+/// Hash command with SDP: padded base64, percent-encoded (`=` separates payload).
 pub(crate) fn command(name: &str, sdp: &str) -> String {
     format!("{name}={}", percent_encode(&encode_base64(sdp.as_bytes())))
 }
 
-/// Command: page mic off/on. Not hash command: bridge (`calls.js`) takes these itself, has
-/// page press its own switch.
+/// Mic off/on: bridge (`calls.js`) presses page's switch.
 pub(crate) fn mute_command(on: bool) -> String {
     (if on { "mute" } else { "unmute" }).to_string()
 }
@@ -822,8 +784,8 @@ pub(crate) fn facing_command(front: bool) -> String {
     .to_string()
 }
 
-/// Bridge (`call_video.js`) commands: mic shut and kept shut, or reopened, around moving
-/// call's sound, which must not happen with mic open (`CallAudio.qml`).
+/// Bridge (`call_video.js`): mic shut and held, or reopened, around moving call sound, which
+/// must not happen with mic open (`CallAudio.qml`).
 pub(crate) fn microphone_command(on: bool) -> String {
     (if on {
         "microphone-on"
@@ -833,12 +795,12 @@ pub(crate) fn microphone_command(on: bool) -> String {
     .to_string()
 }
 
-/// Bridge: which back camera to open, by index: main lens, where engine would take first listed.
+/// Bridge: back camera index to open (main lens; engine would take first listed).
 pub(crate) fn back_camera_command(place: usize) -> String {
     format!("back-camera-{place}")
 }
 
-/// Bridge: stop drawing pictures (app in background), or resume.
+/// Bridge: stop drawing (background), or resume.
 pub(crate) fn shown_command(shown: bool) -> String {
     (if shown { "shown" } else { "hidden" }).to_string()
 }
@@ -931,8 +893,7 @@ mod tests {
 
     #[test]
     fn a_command_survives_the_hash_it_travels_in() {
-        // Page takes all after first `=`, `decodeURIComponent`s, then `atob`: payload must
-        // not read as separator or hash end, nor be mangled by decoding.
+        // Page: after first `=`, `decodeURIComponent`, `atob`: payload must survive.
         let sdp = "v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\na=ice-ufrag:+/x\r\n";
         let hash = command("onAnswer", sdp);
         let (name, payload) = hash.split_once('=').expect("a separator");
@@ -960,8 +921,7 @@ mod tests {
 
     #[test]
     fn the_page_asks_for_the_bridge_before_its_own_code_runs() {
-        // Whole arrangement rests on this: page loads classic `calls.js` from beside it,
-        // ahead of its module, so `window.calls` exists when page reaches for it.
+        // `calls.js` loads before page module.
         let bridge = PAGE.find("<script src=\"calls.js\"></script>");
         let module = PAGE.find("<script type=\"module\"");
         assert!(
@@ -984,7 +944,7 @@ mod tests {
                 "the bridge has no {name}"
             );
         }
-        // Key from page address; nothing filled into bridge: served as written.
+        // Key from page address; bridge served as written.
         assert!(BRIDGE.contains("key="), "the bridge does not read its key");
         assert!(
             !BRIDGE.contains("__"),
@@ -1253,7 +1213,7 @@ mod tests {
 
     #[test]
     fn the_camera_and_microphone_commands_are_the_ones_the_bridge_takes() {
-        // `take` names these; unknown command does nothing.
+        // `take` names these; unknown ignored.
         for (made, name) in [
             (camera_command(true), "camera-on"),
             (camera_command(false), "camera-off"),
@@ -1279,7 +1239,7 @@ mod tests {
 
     #[test]
     fn the_page_still_has_what_the_camera_half_reads_off_it() {
-        // Page labels must stay: renamed, camera and page disagree.
+        // Camera half matches these page labels.
         for needle in [
             "Start camera",
             "Stop camera",

@@ -4,12 +4,11 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick a chat to send into, or for a quick action to open.
- * Core list (DC_GCL_FOR_FORWARDING): no chats a forward would refuse.
- * Answers by signal; caller acts.
+ * Pick a chat to send into, or for a quick action. Core list
+ * DC_GCL_FOR_FORWARDING (no refusable chats); answers by signal.
  *
- * One profile's chats (`accountId`). Quick action: `profileChoice` switches
- * profile. Forward and share send from start profile.
+ * One profile's chats (`accountId`); quick action may switch (`profileChoice`),
+ * forward and share stay on start profile.
  */
 Page {
     id: page
@@ -17,10 +16,10 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    /// Offer other profiles' chats. Only with 2+ profiles.
+    /// Offer other profiles (2+ only).
     property bool profileChoice: false
 
-    /// Profiles to turn to: configured ones.
+    /// Configured profiles.
     readonly property int profileCount: {
         var count = 0
         for (var i = 0; i < profiles.count; i++) {
@@ -32,13 +31,11 @@ Page {
         return count
     }
 
-    /// Turn-to profile when accountId is gone (deleted quick-action profile). 0
-    /// for first.
+    /// Fallback when accountId gone (deleted quick-action profile); 0: first.
     property int fallbackAccountId: 0
 
-    /// Gone profile lists only "account not found": turn to an existing one.
-    /// Only with `profileChoice`; without, picker sends from start profile,
-    /// which exists.
+    /// Gone profile lists only "account not found": switch. Only with
+    /// `profileChoice` (else start profile, which exists).
     function settleProfile() {
         if (!page.profileChoice || profiles.count === 0
                 || page.profileName(page.accountId) !== "") {
@@ -81,17 +78,16 @@ Page {
         return ""
     }
 
-    // Other profile's chats: no answer yet, and last profile's error is stale.
+    // Other profile: no answer yet, old error stale.
     onAccountIdChanged: {
         page.chatsLoaded = false
         page.errorMessage = ""
     }
 
-    /// Closes page when picked? True for forward (sends from here). False for
-    /// share: chat takes this page's place; popping first would drop it.
+    /// Pop on pick: forward yes; share no (chat replaces page, pop would drop it).
     property bool closeOnPick: true
 
-    /// Header and empty-list words: forward's by default.
+    /// Header and empty text; forward's default.
     property string title: qsTr("Forward to")
     property string emptyText: qsTr("No chats to forward to")
 
@@ -104,8 +100,7 @@ Page {
         onTriggered: chats.query = searchField.text
     }
 
-    // Core answered, however empty. Empty before is no answer: see
-    // ChatListPage.
+    // Core answered, even empty (see ChatListPage).
     property bool chatsLoaded: false
 
     ChatList {
@@ -122,8 +117,7 @@ Page {
         onCore_event: chats.handle_event(context_id, kind, payload_json)
     }
 
-    // Outside list (see ChatListPage): header field's id won't resolve from
-    // page, so debounce read undefined and search did nothing.
+    // Outside list (see ChatListPage): header field id unresolvable from page.
     Column {
         id: heading
         anchors {
@@ -136,7 +130,7 @@ Page {
             title: page.title
         }
 
-        // Whose chats, when a choice exists: profile names as on profiles page.
+        // Whose chats, when choice: names as profiles page.
         ComboBox {
             objectName: "pickerProfileCombo"
             width: parent.width
@@ -144,7 +138,7 @@ Page {
             //: Over a list of chats to pick from: which profile's chats
             //: they are.
             label: qsTr("Profile")
-            // Profile list is on, whatever item Silica last moved choice to.
+            // Shown profile, whatever Silica last moved choice to.
             value: page.profileName(page.accountId)
 
             menu: ContextMenu {
@@ -186,7 +180,7 @@ Page {
         clip: true
         model: chats.rows
 
-        // No context menu: choosing is the only row action.
+        // No context menu: picking is only action.
         delegate: ListItem {
             objectName: "pickerRow"
             contentHeight: body.height
@@ -203,7 +197,7 @@ Page {
                 isMuted: model.is_muted
                 chatColor: model.color
                 avatarPath: model.avatar_path
-                // Unread badge is noise: not a chat being read.
+                // No unread badge: noise here.
                 unreadCount: 0
             }
 

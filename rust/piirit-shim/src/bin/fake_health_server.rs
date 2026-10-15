@@ -1,5 +1,5 @@
 //! JSON-RPC double answering `get_system_info` only, for smoke test.
-//! Separate from transport crate's: `CARGO_BIN_EXE_*` covers same-package binaries only.
+//! Separate from transport crate's: `CARGO_BIN_EXE_*` covers own package only.
 
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
@@ -35,7 +35,7 @@ async fn serve() {
         let Some(id) = request.get("id").cloned() else {
             continue;
         };
-        // Real core's event long poll blocks until event. Any other answer looks like server died.
+        // Real core's event long poll blocks until event; else server looks dead.
         if request.get("method").and_then(Value::as_str) == Some("get_next_event_batch") {
             continue;
         }

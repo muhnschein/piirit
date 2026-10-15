@@ -9,9 +9,7 @@ import "js/StockStrings.js" as StockStrings
 ApplicationWindow {
     id: appWindow
 
-    /// Profile to open on. 0: none yet.
-    ///
-    /// Read once: later dconf writes must not reach the screen.
+    /// Profile to open on; 0: none yet. Read once: later dconf writes must not reach screen.
     property int resumeAccountId: appWindow.rememberedProfile()
 
     /// dconf number. `> 0`: dconf gives `undefined` until read.
@@ -19,7 +17,7 @@ ApplicationWindow {
         return Settings.lastAccountId > 0 ? Settings.lastAccountId : 0
     }
 
-    // Used phone opens on chat list. Welcome page never made (no put-up/animate-out).
+    // Used phone opens on chat list; welcome page never made (no put-up/animate-out).
     initialPage: appWindow.resumeAccountId > 0 ? resumedChats : firstScreen
 
     Component {
@@ -44,8 +42,8 @@ ApplicationWindow {
     /// Chat list app is on (quick action target). Null before first, after last profile.
     property Item chatList: null
 
-    /// Page up that quick actions must not leave (backup, profile made/moved/joined,
-    /// code shown or read). Each such page sets `pausesQuickActions`.
+    /// Page quick actions must not leave (backup, profile made/moved/joined, code shown/read);
+    /// each sets `pausesQuickActions`.
     readonly property bool quickActionsPaused: {
         // Re-run when stack moves.
         var depth = pageStack.depth
@@ -58,7 +56,7 @@ ApplicationWindow {
         return false
     }
 
-    /// Quick action on cover: app opens, chat list does rest, like a notification.
+    /// Cover quick action: app opens, chat list does rest, like notification.
     function quickAction(side) {
         var action = QuickActions.shown(Settings, side)
         if (appWindow.chatList === null || action.kind === "") {
@@ -68,11 +66,10 @@ ApplicationWindow {
                                        action.sendNow)
     }
 
-    /// Profile app is on. Shares land in window; 0 = none yet.
+    /// Profile app is on; shares land in window. 0 = none yet.
     property int accountId: 0
 
-    /// Share arrived: ask which chat, then open it with file on attachment bar, text
-    /// in field.
+    /// Share arrived: ask chat, open it with file on attachment bar, text in field.
     function shareInto(filePath, text) {
         if (appWindow.accountId === 0) {
             return
@@ -88,7 +85,7 @@ ApplicationWindow {
         })
     }
 
-    /// Open chat a share pointed at. Replaces picker: back goes to before the share.
+    /// Open share's chat, replacing picker: back goes to before share.
     function openShared(chatId, chatName, filePath, text) {
         pageStack.replace(Qt.resolvedUrl("pages/ConversationPage.qml"), {
             accountId: appWindow.accountId,
@@ -99,9 +96,9 @@ ApplicationWindow {
         })
     }
 
-    // Share sheet. Loaded, not declared: `Sailfish.Share` only resolves on releases that ship it,
-    // and a failed import would take down the window.
-    // Background, off first frame. See qml/share/ShareTarget.qml.
+    // Share sheet, loaded not declared: `Sailfish.Share` resolves only on releases shipping it;
+    // failed import would take window down. Background, off first frame. See
+    // qml/share/ShareTarget.qml.
     Loader {
         id: shareTarget
         objectName: "shareTarget"
@@ -109,7 +106,7 @@ ApplicationWindow {
         source: Qt.resolvedUrl("share/ShareTarget.qml")
     }
 
-    // Three core settings; each applies to all profiles, follows its key.
+    // Three core settings, all profiles, each follows its key.
     Binding {
         target: core
         property: "download_limit"
@@ -125,21 +122,21 @@ ApplicationWindow {
         property: "delete_device_after"
         value: Settings.deleteDeviceAfter
     }
-    // Calls ring: nobody if ringing off, else contacts (core 2 / 1). Non-ringers' calls kept.
-    // Only reader's choice writes 2: key travels with profile (backup, second device).
+    // Who rings: nobody if off, else contacts (core 2 / 1); others' calls kept. Only reader's
+    // choice writes 2: key travels with profile (backup, second device).
     Binding {
         target: core
         property: "who_can_call_me"
         value: Settings.callsRing === false ? 2 : 1
     }
 
-    /// App's one call, owned by no page. See components/CallCenter.qml.
+    /// App's one call, no page owns it. See components/CallCenter.qml.
     CallCenter {
         id: callCenter
         objectName: "callCenter"
         stack: pageStack
         onRaise: appWindow.activate()
-        // Tapped missed-call notification: open its chat, like a quick action.
+        // Missed-call notification: open its chat, like quick action.
         onChatRequested: {
             if (appWindow.chatList !== null) {
                 appWindow.chatList.quickAction("chat", accountId, chatId)
@@ -147,10 +144,10 @@ ApplicationWindow {
         }
     }
 
-    /// Call under way: notifications and quick actions keep its page up.
+    /// Call under way: notifications, quick actions keep its page up.
     readonly property bool callBusy: callCenter.busy
 
-    /// Call a chat; camera on for video. False if already in a call.
+    /// Call chat; camera on for video. False if already in call.
     function placeCall(accountId, chatId, video) {
         return callCenter.place(accountId, chatId, video === true)
     }
@@ -160,38 +157,34 @@ ApplicationWindow {
         callCenter.show()
     }
 
-    /// Take up ringing call from its chat row.
+    /// Take up ringing call from chat row.
     function pickUpCall(accountId, chatId, messageId) {
         callCenter.pickUp(accountId, chatId, messageId)
     }
 
-    /// IO asked for. Once, for app's life.
+    /// IO asked for. Once per app life.
     property bool askedForIo: false
 
-    /// Whether this run ever had a profile.
-    ///
-    /// Tells empty lists apart: no profile yet (welcome page, don't resend),
-    /// or last profile gone (chat list on account core lacks; taps answer "account not found").
+    /// Run ever had a profile: tells empty lists apart. None yet (welcome, don't resend) vs last
+    /// gone (chat list on account core lacks; taps answer "account not found").
     property bool hadProfile: false
 
-    /// Way back to welcome page, held until stack takes it (last profile leaves mid-pop).
+    /// Way back to welcome, held until stack takes it (last profile leaves mid-pop).
     PendingNavigation {
         id: welcomeAgain
         stack: pageStack
     }
 
-    /// Way to another profile's chats, held the same way.
+    /// Way to another profile's chats, held likewise.
     PendingNavigation {
         id: otherProfile
         stack: pageStack
     }
 
-    /// Move window off profiles core lacks, onto `resumeAccountId`.
-    ///
-    /// Deleted list profile stayed on list (and dconf): pages said "account not found".
-    /// Runs each refresh, so a stale or elsewhere-deleted profile is left on first listing.
+    /// Move window off profiles core lacks onto `resumeAccountId`. Deleted profile stayed on list
+    /// (and dconf): pages said "account not found". Each refresh: stale profile left at once.
     function leaveGoneProfiles(resumeAccountId) {
-        // Quick action's chat went with its profile: none, cover can't open it.
+        // Quick action's chat gone with profile: cover can't open it.
         var sides = ["quickActionLeft", "quickActionRight"]
         for (var i = 0; i < sides.length; i++) {
             var prefix = sides[i]
@@ -206,15 +199,15 @@ ApplicationWindow {
                 || core.is_configured_account(appWindow.accountId)) {
             return
         }
-        // Now, not on new list: app may close first, next launch must not resume onto it.
+        // Now, not on new list: app may close first; next launch must not resume onto it.
         appWindow.accountId = resumeAccountId
         Settings.lastAccountId = resumeAccountId
         otherProfile.replaceAbove(null, Qt.resolvedUrl("pages/ChatListPage.qml"),
                                   { accountId: resumeAccountId })
     }
 
-    // Last profile gone: welcome move lives here, not on pages (swipe destroys profiles page,
-    // chat list mid-transition: move ran twice or never).
+    // Last profile gone: welcome move lives here, not pages (swipe destroys profiles page, chat
+    // list mid-transition: ran twice or never).
     Connections {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -228,7 +221,7 @@ ApplicationWindow {
                 return
             }
             appWindow.hadProfile = false
-            // Nothing to share into or come back to.
+            // Nothing to share into or return to.
             appWindow.accountId = 0
             Settings.lastAccountId = 0
             welcomeAgain.replaceAbove(null,
@@ -237,7 +230,7 @@ ApplicationWindow {
         }
     }
 
-    // IO belongs to window: resuming onto chat list never shows welcome page. All profiles get IO.
+    // IO is window's: resuming onto chat list skips welcome. All profiles get IO.
     Connections {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -245,8 +238,8 @@ ApplicationWindow {
             if (core.status !== "ready") {
                 return
             }
-            // Network gone before core up: nothing to start. Marked asked-for and stopped;
-            // `resumeIo` reads that. Core dying mid-outage: `pauseIo` guard makes this no-op.
+            // No network before core up: nothing to start. Marked asked-for and stopped for
+            // `resumeIo`. Core dying mid-outage: `pauseIo` guard makes it no-op.
             if (networkWatch.lost) {
                 appWindow.askedForIo = true
                 appWindow.pauseIo()
@@ -259,19 +252,17 @@ ApplicationWindow {
         }
     }
 
-    /// Whether app is in front. Property: bindings notice when it turns true again.
-    /// Not named `applicationActive`, so Silica's isn't shadowed.
+    /// App in front. Property so bindings see it turn true. Not `applicationActive`: Silica's.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
-    /// IO stopped for no network. Only stop reason while running (costs no message).
-    /// Other reasons (backgrounded) would break messages: background is their only path.
+    /// IO stopped for no network: only stop reason while running (no message cost). Others
+    /// (background) break messages: background is their only path.
     property bool ioPaused: false
 
-    /// Network back: start IO if stopped for lack of one; ask core.
-    ///
-    /// Called by connman and app open: two ways back, so a wrong watch costs a reconnect only.
+    /// Network back: restart IO if stopped for it; ask core. Called by connman and app open:
+    /// wrong watch costs only a reconnect.
     function resumeIo() {
-        // Core still starting: nothing to reconsider; its IO starts fresh.
+        // Core still starting: its IO starts fresh.
         if (core.status !== "ready") {
             return
         }
@@ -282,11 +273,9 @@ ApplicationWindow {
         core.maybe_network()
     }
 
-    /// No network for a while: stop IO once.
-    ///
-    /// Not gated on core: shim remembers IO asked for and resumes it on a restarted core;
-    /// stopping now makes it forget, so core returns with IO stopped.
-    /// Never-asked or already-stopped IO left alone.
+    /// No network a while: stop IO once. Not gated on core: shim remembers IO asked for, resumes
+    /// on restarted core; stopping now makes it forget, so core returns stopped. Never-asked or
+    /// stopped IO left alone.
     function pauseIo() {
         if (!appWindow.askedForIo || appWindow.ioPaused) {
             return
@@ -295,30 +284,29 @@ ApplicationWindow {
         core.stop_all_account_io()
     }
 
-    // Back in app: connection may be dead after pocket network change (IDLE takes 5 min).
-    // Reconnect now.
+    // Back in app: connection may be dead after network change (IDLE takes 5 min). Reconnect.
     onAppActiveChanged: {
         if (appWindow.appActive) {
             appWindow.resumeIo()
         }
     }
 
-    // For when nobody looks: phone announces network changes on its bus; this rescues messages.
-    // See components/NetworkWatch.qml.
+    // Nobody looking: phone announces network changes on bus; rescues messages. See
+    // components/NetworkWatch.qml.
     NetworkWatch {
         id: networkWatch
         objectName: "networkWatch"
 
         onNetworkChanged: appWindow.resumeIo()
 
-        // Gone long enough not to be a handover. Stopping gives nothing up; reconnects wake radio.
+        // Gone past a handover. Stopping costs nothing; reconnects wake radio.
         onNetworkLost: appWindow.pauseIo()
     }
 
     Component.onCompleted: {
-        // Drops `resumeAccountId` binding: window has answer, key is the list's.
+        // Drops `resumeAccountId` binding: window has answer; key is list's.
         appWindow.resumeAccountId = appWindow.rememberedProfile()
-        // Resumed phone had a profile last look: empty list means it lost it.
+        // Phone had profile last look: empty list means it lost it.
         appWindow.hadProfile = appWindow.resumeAccountId > 0
         // First server gets strings before any message: see DeltaChatCore.set_stock_strings.
         core.set_stock_strings(JSON.stringify(StockStrings.all()))

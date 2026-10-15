@@ -1,13 +1,11 @@
 //! Calls: what core says about one, and making one.
 //!
-//! Call is a message (`Viewtype::Call`). Core keeps whole state (ringing, accepted, ended,
-//! duration) and all signalling (that message plus two hidden ones). Not media: SDP opaque
-//! to core; made by `WebRTC` stack, here browser engine running upstream calls-webapp,
-//! served by `call_host.rs`.
+//! Call is a message (`Viewtype::Call`); core keeps all state (ringing, accepted, ended,
+//! duration) and signalling (it plus two hidden messages). SDP opaque to core, made by
+//! `WebRTC` stack: browser engine running upstream calls-webapp, served by `call_host.rs`.
 //!
-//! - [`summary`]: message row reads it so call draws as call, not as core's text (English
-//!   whatever phone language).
-//! - [`Call`]: the one call app can be in (ringing, answered, placed, ended), with its page.
+//! - [`summary`]: row draws call as call, not core's always-English text.
+//! - [`Call`]: app's one call, with its page.
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -28,12 +26,12 @@ pub(crate) struct Summary {
     pub(crate) has_video: bool,
     /// Seconds if completed; 0 otherwise.
     pub(crate) duration: i32,
-    /// Caller's SDP offer; answering starts from it. Opaque: core and this carry, never read.
+    /// Caller's SDP offer, answered from; opaque, carried not read.
     pub(crate) sdp_offer: String,
 }
 
 impl Summary {
-    /// Read `CallInfo`; state is object tagged `kind`, only `Completed` carries more.
+    /// Read `CallInfo`: state tagged `kind`; only `Completed` carries more.
     pub(crate) fn from_json(info: &serde_json::Value) -> Self {
         Self {
             state: json::str_at(info, "/state/kind").to_string(),
@@ -57,8 +55,8 @@ pub(crate) async fn summary(
     Ok(Summary::from_json(&answer))
 }
 
-/// Page load option: whether camera starts on. Never `disableVideoCompletely`: drops other
-/// end's picture too. Voice call = camera starts off; `call_video.js` keeps it closed until on.
+/// Load option: camera starts on? Not `disableVideoCompletely`: drops peer picture too. Voice
+/// call starts off; `call_video.js` keeps it shut until on.
 fn page_options(camera: bool) -> &'static str {
     if camera {
         ""
@@ -67,9 +65,8 @@ fn page_options(camera: bool) -> &'static str {
     }
 }
 
-/// Main back camera's index among back cameras: label nearest "1.0" in platform camera's
-/// ring labels, in order ("1.0,0.5"); else first. Engine names back cameras alike, and
-/// first listed may be wide one.
+/// Main back camera index: label nearest "1.0" in platform ring labels ("1.0,0.5"), else 0.
+/// Engine names back cameras alike; first may be wide.
 fn main_back_camera(labels: &str) -> usize {
     labels
         .split(',')
@@ -92,10 +89,9 @@ fn main_back_camera(labels: &str) -> usize {
         .map_or(0, |(place, _)| place)
 }
 
-/// Audio policy id: 22nd field of `/proc/<pid>/stat` (start time, clock ticks since boot),
-/// lower-case hex. Sailfish libpulse puts it on every stream (`policy.application.id`),
-/// libresource sends same for resource set's streams; both split at single spaces, as does
-/// this, so all three agree on any line. None if line short or field not a number.
+/// Audio policy id: `/proc/<pid>/stat` field 22 (start time, ticks since boot), lower hex.
+/// Sailfish libpulse tags every stream (`policy.application.id`), libresource its set's
+/// streams; all three split at single spaces, so agree on any line. None if short or non-numeric.
 fn audio_app_id(stat: &str) -> Option<String> {
     let ticks: u64 = stat.split(' ').nth(21)?.parse().ok()?;
     Some(format!("{ticks:x}"))
@@ -116,8 +112,7 @@ struct Prepared {
 /// WebView { url: call.url }
 /// ```
 ///
-/// One object for window: belongs to no page. Leaving page is not hang-up.
-/// Moves through `state`:
+/// One per window, no page's: leaving page is not hang-up. `state`:
 ///
 /// - `""`: no call.
 /// - `ringing`: came in, not answered.
@@ -135,7 +130,7 @@ pub struct Call {
 
     /// Account. 0 without call.
     pub account_id: qt_property!(u32; NOTIFY call_changed),
-    /// Chat of call.
+    /// Call's chat.
     pub chat_id: qt_property!(u32; NOTIFY call_changed),
     /// Call's message. 0 until placed.
     pub message_id: qt_property!(u32; NOTIFY call_changed),
@@ -157,19 +152,18 @@ pub struct Call {
     /// Why ended: `hung-up` (here), `declined` (here, ringing), `remote` (other end),
     /// `answered-elsewhere` (other device), `missed` (unanswered), `failed` (gave up).
     pub end_reason: qt_property!(QString; NOTIFY state_changed),
-    /// Unix secs both ends first heard each other; 0 until then. Clock runs from it.
+    /// Unix secs both first heard each other, else 0; clock base.
     pub connected_at: qt_property!(f64; NOTIFY state_changed),
     /// Emitted on state, reason or clock change.
     pub state_changed: qt_signal!(),
 
-    /// Mic off: other end hears nothing. Reset to on for each new call.
+    /// Mic off; reset each call.
     pub muted: qt_property!(bool; NOTIFY muted_changed),
     /// Emitted on mic change.
     pub muted_changed: qt_signal!(),
 
-    /// Reader wants camera on: from start of video call, and when switched on. Kept in
-    /// background, where camera itself is let go (`set_background`). Self-clears when
-    /// camera will not open.
+    /// Camera wanted (video call, or switched on). Kept in background, where camera is let
+    /// go (`set_background`); clears if camera won't open.
     pub camera: qt_property!(bool; NOTIFY video_changed),
     /// Back camera. Front again each call.
     pub rear_camera: qt_property!(bool; NOTIFY video_changed),
@@ -184,7 +178,7 @@ pub struct Call {
     /// Emitted on any of six above.
     pub video_changed: qt_signal!(),
 
-    /// Page URL with opening command; what `WebView` points at. Empty until host up and after call.
+    /// `WebView` URL with opening command; empty until host up and after call.
     pub url: qt_property!(QString; NOTIFY url_changed),
     /// Emitted when page comes or goes.
     pub url_changed: qt_signal!(),
@@ -193,14 +187,13 @@ pub struct Call {
     pub ringing: qt_signal!(),
     /// Call over; `end_reason` says why.
     pub ended: qt_signal!(reason: QString),
-    /// Failed. Message is core's own.
+    /// Failed, with core's message.
     pub error: qt_signal!(message: QString),
 
     /// Place call. False if already in one.
     pub place: qt_method!(fn(&mut self, account_id: u32, chat_id: u32, video: bool) -> bool),
-    /// Take up call core still has ringing, from its chat row: rang while nothing here
-    /// listened (app starting, event missed). Answers on `state` -> `ringing`, without
-    /// `ringing` signal: reader already looking at it.
+    /// Take up call core still rings, from chat row (rang unheard: app starting, event
+    /// missed). Sets `state` `ringing`, no `ringing` signal: reader already sees it.
     pub pick_up: qt_method!(fn(&mut self, account_id: u32, chat_id: u32, message_id: u32)),
     /// Answer ringing call.
     pub answer: qt_method!(fn(&mut self)),
@@ -214,21 +207,19 @@ pub struct Call {
     pub set_camera: qt_method!(fn(&mut self, on: bool)),
     /// Flip camera facing.
     pub flip_camera: qt_method!(fn(&mut self)),
-    /// Let page have mic, or shut it and keep it shut while call's sound moves
-    /// (`CallAudio.qml`); must not move with mic open. Not mute: page's switch and what
-    /// other end is told stay.
+    /// Give page mic, or keep it shut while call sound moves (`CallAudio.qml`; must not move
+    /// with mic open). Not mute: page switch and peer's view unchanged.
     pub set_microphone: qt_method!(fn(&mut self, on: bool)),
-    /// App away or back: camera let go while away (other end told it is off), pictures not
-    /// drawn. Back in front, camera reopens if on.
+    /// Away: camera let go (peer told off), pictures not drawn. Back: camera reopens if on.
     pub set_background: qt_method!(fn(&mut self, away: bool)),
-    /// Audio policy id for app sound: call's resource set names streams with it
-    /// (`CallAudio.qml`). Empty if `/proc` lacks it.
+    /// Audio policy id; call's resource set names streams by it (`CallAudio.qml`). Empty if
+    /// `/proc` lacks it.
     pub audio_id: qt_method!(fn(&self) -> QString),
     /// Apply core event (four call kinds).
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Ring limit ms; 0: app's own, a little over core's 120 s. Tests only.
+    /// Ring limit ms; 0 = `RING_LIMIT`. Tests only.
     pub ring_limit_ms: qt_property!(u32),
 
     /// Platform back-camera ring labels ("1.0,0.5"). Empty if none.
@@ -240,13 +231,11 @@ pub struct Call {
     offer: String,
     /// Counts calls: late answer for old call lands nowhere.
     generation: u64,
-    /// Call events for account while outgoing call has no message yet: core's event can
-    /// overtake host's report of placed id, and answer dropped for unknown call = call
-    /// never connects. Replayed once id known; see `take_report`.
+    /// Account's call events before outgoing call has an id: core's event can overtake host's
+    /// report, and a dropped answer never connects. Replayed once id known (`take_report`).
     early: Vec<(String, String)>,
-    /// Core needs nothing more (it ended call, or other device took it). Host let go after
-    /// (up now or still coming up) goes without `end_call`, which would end call on device
-    /// that answered. One per call, so late host reads its own call's flag.
+    /// Core needs nothing more (ended, or other device took it): host dropped after skips
+    /// `end_call`, which would end it on answering device. Per call: late host reads its own.
     settled: Arc<AtomicBool>,
     /// App in background.
     away: bool,
@@ -254,18 +243,18 @@ pub struct Call {
     mic_shut: bool,
 }
 
-/// Placed or answered, not over: sound is a call's that long (`CallAudio.qml`'s `talking`
-/// holds audio policy set); see `call_host::label_call_audio`.
+/// Placed or answered, not over: sound is call's (`CallAudio.qml` `talking` holds policy
+/// set; `call_host::label_call_audio`).
 fn talking(state: &str) -> bool {
     !matches!(state, "" | "ringing" | "ended")
 }
 
-/// Ring time before rung out with no word from core. Core rings 120 s from send, then says
-/// `CallEnded` once, from timer only in server that heard call. Overflowed event channel or
-/// restarted server loses it: would ring until declined. A little over core's, so its word wins.
+/// Ring time without core's word. Core rings 120 s, then sends `CallEnded` once, only from
+/// server that heard call; lost on channel overflow or restart, rings until declined. Over
+/// 120 s so core's word wins.
 const RING_LIMIT: std::time::Duration = std::time::Duration::from_secs(125);
 
-/// Max early events kept per call. Window is one core round trip; more aren't about placing.
+/// Max early events per call; window is one round trip.
 const EARLY_EVENTS: usize = 16;
 
 impl Call {
@@ -376,8 +365,7 @@ impl Call {
     pub fn hang_up(&mut self) {
         match self.state.to_string().as_str() {
             "" | "ended" => {}
-            // Core tells caller and other devices, says `CallEnded`;
-            // arriving at ended call, not acted on twice.
+            // Core tells caller and devices; its `CallEnded` then finds call ended, no-op.
             "ringing" => {
                 self.end_call();
                 self.finish("declined");
@@ -387,8 +375,7 @@ impl Call {
         }
     }
 
-    /// Mic off or on. Page keeps mic state and tells other end, so it is told to press own
-    /// switch. Page not up yet told once up (`serve`).
+    /// Page owns mic state and tells peer, so press its switch. Page not up: told in `serve`.
     pub fn mute(&mut self, on: bool) {
         if !self.busy() || self.muted == on {
             return;
@@ -400,8 +387,7 @@ impl Call {
         }
     }
 
-    /// Mic allowed or shut; kept across calls, as `CallAudio.qml` last said. Page not up yet
-    /// told once up (see `serve`).
+    /// Mic allowed or shut, kept across calls per `CallAudio.qml`. Page not up: told in `serve`.
     pub fn set_microphone(&mut self, on: bool) {
         if self.mic_shut != on {
             return;
@@ -415,7 +401,7 @@ impl Call {
         self.camera && !self.away
     }
 
-    /// Command to page if up. Page still coming up gets state as it then is (`serve`).
+    /// Command page if up; page coming up gets current state (`serve`).
     fn tell(&self, command: String) {
         if let Some(host) = &self.host {
             host.command(command);
@@ -482,9 +468,9 @@ impl Call {
         self.remote_video = video.remote;
         self.local_painted = video.local_painted;
         self.remote_painted = video.remote_painted;
-        // Facing as page says: page turns back when other camera won't open.
+        // Page's facing: it turns back if other camera won't open.
         self.rear_camera = !video.front;
-        // Camera that won't open switched off, as reader sees; not one let go for background.
+        // Won't open: switch off visibly; not if let go for background.
         if video.failed && self.camera_live() {
             // Phone-only: written where log is read.
             eprintln!(
@@ -566,14 +552,14 @@ impl Call {
             return;
         };
         runtime.spawn(async move {
-            // No wait, no answer to act on: ending reaches page as core's own event.
+            // Ending reaches page as core's event.
             rpc.call::<_, serde_json::Value>("end_call", (account_id, message_id))
                 .await
                 .ok();
         });
     }
 
-    /// Other end's name and picture: chat's, which in 1:1 chat are theirs.
+    /// Peer name and picture: chat's (1:1, so theirs).
     fn load_peer(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         let Some((rpc, runtime)) = connection() else {
@@ -644,8 +630,7 @@ impl Call {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Host, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Hung up while page coming up: dropping host lets it go, quietly (settled) if
-            // core needs nothing more.
+            // Hung up meanwhile: drop host (quietly if settled).
             if this.borrow().generation != generation {
                 if let (Ok(host), true) = (&result, settled.load(Ordering::SeqCst)) {
                     host.settle();
@@ -656,7 +641,7 @@ impl Call {
                 Ok(host) => {
                     {
                         let mut this_mut = this.borrow_mut();
-                        // Camera as now: may have switched while page came up.
+                        // Current camera: may have switched meanwhile.
                         let camera = this_mut.camera_live();
                         this_mut.url = host.url(page_options(camera), &command).into();
                         // Muted before page.
@@ -784,15 +769,14 @@ impl Call {
         }
         let payload: serde_json::Value =
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
-        // Call events only snake_case part of core stream: `msg_id`, not `msgId`.
+        // Call events alone are snake_case in core stream: `msg_id`.
         let Some(message_id) = json::u32_opt(&payload, "msg_id") else {
             return;
         };
         let ours = context_id == self.account_id && message_id == self.message_id;
         match kind.as_str() {
             "IncomingCall" => {
-                // One at a time, as both reference clients: second rings nowhere, becomes
-                // missed once core gives up.
+                // One at a time, as reference clients: second rings nowhere, core marks missed.
                 if self.busy() {
                     return;
                 }
@@ -807,16 +791,16 @@ impl Call {
                 self.watch_ringing();
                 self.ringing();
             }
-            // Answered here (host already reported) or on other device. Core says latter only
-            // for call this device hasn't accepted, and voids own accept after; so short of
-            // over, call is that device's: letting go must not end it there.
+            // Answered here (host reported) or elsewhere. Core says so only for calls this
+            // device hasn't accepted, voiding own accept after; unless over, call is other
+            // device's: don't end it there.
             "IncomingCallAccepted" if ours => {
                 if !json::flag(&payload, "from_this_device") && self.busy() {
                     self.settle();
                     self.finish("answered-elsewhere");
                 }
             }
-            // Other end's answer to page. All account's devices hear it; only placer has page.
+            // Peer's answer to page; all devices hear it, only placer has page.
             "OutgoingCallAccepted" if ours && !self.incoming => {
                 if let Some(host) = &self.host {
                     let answer = json::str_at(&payload, "accept_call_info");
@@ -839,9 +823,8 @@ impl Call {
         }
     }
 
-    /// Stop call ringing past [`RING_LIMIT`] with no word from core. Core counts it over by
-    /// then whatever its timer did (stale 120 s after send, `call_info` says so): end as
-    /// rung out, core asked which way.
+    /// Stop ringing past [`RING_LIMIT`] without core's word. Core counts it stale 120 s after
+    /// send regardless (`call_info`): end as rung out, asking core which way.
     fn watch_ringing(&self) {
         let Some((_, runtime)) = connection() else {
             return;
@@ -854,7 +837,7 @@ impl Call {
         let ptr: QPointer<Self> = QPointer::from(self);
         let done = queued_callback(move |()| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Answered, declined, ended meanwhile: answering keeps call, ending starts new count.
+            // Answered/declined/ended meanwhile: answer keeps call, end starts new count.
             if this.borrow().generation != generation
                 || this.borrow().state.to_string() != "ringing"
             {
@@ -868,8 +851,8 @@ impl Call {
         });
     }
 
-    /// Ended unanswered: missed, or declined on other device. Core knows which; matters for
-    /// notification. Ringing stops now, only reason waits for core.
+    /// Ended unanswered: missed or declined elsewhere; core knows which (matters for
+    /// notification). Ringing stops now; reason waits on core.
     fn finish_unanswered(&mut self) {
         let (account_id, message_id) = (self.account_id, self.message_id);
         if !self.close() {
@@ -904,8 +887,7 @@ impl Call {
     }
 }
 
-/// Host needs from core: ICE servers, other end's picture. Neither worth failing call:
-/// unanswered question answered with nothing.
+/// Host's needs from core: ICE servers, peer picture. Neither fails call: no answer, empty.
 async fn prepare(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Prepared {
     let ice_servers: String = rpc
         .call("ice_servers", (account_id,))
@@ -972,8 +954,7 @@ mod tests {
                     0 0 12 4 0 0 20 0 9 0 4660 917504000 9000 18446744073709551615 \
                     1 1 0 0 0 0 0 4096 17663 0 0 0 17 3 0 0 0 0 0\n";
         assert_eq!(audio_app_id(stat).as_deref(), Some("1234"));
-        // Single-space split, as libpulse and libresource:
-        // name with space shifts field for all three.
+        // Name with space shifts field alike for all three splitters.
         let spaced = stat.replace("(harbour-piirit)", "(harbour piirit)");
         assert_eq!(audio_app_id(&spaced).as_deref(), Some("0"));
         assert_eq!(audio_app_id("4242 (piirit) S 1"), None);

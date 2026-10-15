@@ -4,8 +4,7 @@ import "../js/Format.js" as Format
 import "."
 
 /*
- * Search result, any kind. Laid out like chat-list row. Names and message text
- * from others: PlainText (MessageDelegate.qml).
+ * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml).
  */
 Item {
     id: root
@@ -22,8 +21,7 @@ Item {
     // Guard vs stray width binding; labels handle overflow.
     clip: true
 
-    // Row height and title x use this id. Unresolved id throws: height never
-    // runs, rows collapse.
+    // Height and title x use this id; unresolved, rows collapse.
     Avatar {
         id: avatar
         objectName: "resultAvatar"
@@ -34,9 +32,8 @@ Item {
         picturePath: root.picturePath
     }
 
-    // Positioned off row, never title (as ChatListDelegate's time label): title
-    // takes its width from this x. Anchoring this to title while title subtracted
-    // this width = loop; long name ran off edge.
+    // Off row, not title (as ChatListDelegate's time): title width uses this x, so
+    // anchoring to title looped and long names ran off edge.
     Label {
         id: timeLabel
         objectName: "resultTime"
@@ -66,7 +63,7 @@ Item {
         x: titleLabel.x
         y: titleLabel.y + titleLabel.height
         width: root.width - x - Theme.horizontalPageMargin
-        // Two lines then fade: one line of a sentence can't tell hits apart.
+        // Two lines: one can't tell hits apart.
         wrapMode: Text.Wrap
         maximumLineCount: 2
         truncationMode: TruncationMode.Fade

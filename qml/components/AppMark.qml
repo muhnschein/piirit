@@ -2,16 +2,15 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * App mark: nine squares in a grid, the phone "apps" mark.
- *
- * Drawn, not named: app asks theme only for icon names seen on devices (missing icon = invisible button), and no webxdc icon name can be relied on. Rects scale with size, take host colour.
- *
- * Bindings, not Grid: positioner sizes in a polish pass, which never runs headless. Mark would measure zero in tests.
+ * App mark: nine-square grid, phone's "apps" mark. Drawn, not named: app asks theme only
+ * for names seen on devices (missing icon = invisible button); no webxdc icon name is
+ * reliable. Rects scale with size, take host colour. Bindings, not Grid: positioner sizes
+ * in polish pass, never headless; mark would measure zero in tests.
  */
 Item {
     id: root
 
-    /// Whole mark size. Squares divide it: three squares, two gaps.
+    /// Whole mark size: three squares, two gaps.
     property real size: Theme.iconSizeSmall
     /// Colour.
     property color color: Theme.primaryColor

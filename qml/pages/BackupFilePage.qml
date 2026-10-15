@@ -2,10 +2,8 @@ import QtQuick 2.0
 import Sailfish.Pickers 1.0
 
 /*
- * Backup picker: platform browser, only files a Delta Chat backup can be in.
- *
- * Own page: `Sailfish.Pickers` types resolve at load; a missing type costs one
- * button, not the page offering it.
+ * Backup picker: platform browser, only files a Delta Chat backup can be. Own page:
+ * `Sailfish.Pickers` types resolve at load; missing type costs one button, not the page.
  */
 FilePickerPage {
     id: picker

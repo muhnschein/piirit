@@ -1,9 +1,8 @@
-//! Loads a chat before its page exists, so the page opens full.
+//! Loads a chat before its page exists, so page opens full.
 //!
-//! Fetch runs before push, while chat list still shown: during transition it stutters; after,
-//! page arrives empty. Page's model takes result without core call.
-//!
-//! Holds one chat, latest asked. Taken, not read: reopening later does normal fetch, never stale.
+//! Fetch runs before push, while chat list shows: during transition it stutters; after, page
+//! arrives empty. Page's model takes result, no core call. Holds one chat, latest asked.
+//! Taken, not read: later reopen fetches normally, never stale.
 
 use std::sync::Mutex;
 
@@ -18,9 +17,9 @@ struct Cached {
     account_id: u32,
     chat_id: u32,
     shape: ChatShape,
-    /// Every message, by day. Not worth fetching twice.
+    /// Every message, by day; not worth fetching twice.
     entries: Vec<Entry>,
-    /// Messages of the page's first fill.
+    /// Page's first fill.
     rows: Vec<MessageListItem>,
 }
 
@@ -29,7 +28,7 @@ static CACHE: Mutex<Option<Cached>> = Mutex::new(None);
 /// Chat shape, all messages, first page's content.
 type Loaded = (ChatShape, Vec<Entry>, Vec<MessageListItem>);
 
-/// Hand a prefetch to the next model that asks.
+/// Hand prefetch to next model asking.
 fn store(account_id: u32, chat_id: u32, loaded: Loaded) {
     let (shape, entries, rows) = loaded;
     if let Ok(mut cache) = CACHE.lock() {
@@ -43,7 +42,7 @@ fn store(account_id: u32, chat_id: u32, loaded: Loaded) {
     }
 }
 
-/// Take this chat's prefetch if held; others stay for their page.
+/// Take this chat's prefetch if held; others stay.
 pub(crate) fn take(account_id: u32, chat_id: u32) -> Option<Loaded> {
     let mut cache = CACHE.lock().ok()?;
     let held = cache.as_ref()?;
@@ -55,7 +54,7 @@ pub(crate) fn take(account_id: u32, chat_id: u32) -> Option<Loaded> {
         .map(|held| (held.shape, held.entries, held.rows))
 }
 
-/// Loads a chat so a page opens already full.
+/// Loads a chat so page opens full.
 /// ```qml
 /// ChatPrefetch {
 ///     id: prefetch
@@ -73,27 +72,27 @@ pub struct ChatPrefetch {
     /// Start loading; answers on `ready`. `find_message_id` (0: newest) to open at.
     pub start: qt_method!(fn(&mut self, chat_id: u32, find_message_id: u32)),
 
-    /// Loaded, or failed: opening empty beats never opening.
+    /// Loaded or failed: opening empty beats never.
     pub ready: qt_signal!(chat_id: u32),
 
     /// True while loading.
     pub loading: qt_property!(bool; NOTIFY loading_changed),
-    /// Emitted when `loading` changes.
+    /// `loading` changed.
     pub loading_changed: qt_signal!(),
 
-    /// Counts prefetches: an earlier tap's answer must not win.
+    /// Prefetch counter: earlier tap's answer mustn't win.
     generation: u64,
 }
 
 impl ChatPrefetch {
-    /// Start loading a chat.
+    /// Start loading chat.
     pub fn start(&mut self, chat_id: u32, find_message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || chat_id == 0 {
             return;
         }
         let Some((rpc, runtime)) = connection() else {
-            // Nothing to wait for: page opens and reports it.
+            // Nothing to wait for: page opens, reports it.
             self.ready(chat_id);
             return;
         };
@@ -108,11 +107,11 @@ impl ChatPrefetch {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Option<Loaded>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Newer tap started: this answer would open the wrong page.
+            // Newer tap started: this would open wrong page.
             if this.borrow().generation != generation {
                 return;
             }
-            // Store under fetch's account, not current one: property may have changed meanwhile.
+            // Under fetch's account, not current: property may have changed.
             if let Some(loaded) = result {
                 store(account_id, chat_id, loaded);
             }
@@ -125,10 +124,9 @@ impl ChatPrefetch {
         });
 
         runtime.spawn(async move {
-            // First fill only, not all messages: that would undo placeholders.
-            // Around a search hit, so the page does not jump.
+            // First fill only, not all: would undo placeholders. Around search hit: no jump.
             let loaded = open_chat(&rpc, account_id, chat_id, find_message_id).await;
-            // Errors: the page's model reruns and shows them.
+            // Errors: page's model reruns, shows them.
             done(loaded.ok());
         });
     }

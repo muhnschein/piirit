@@ -8,10 +8,8 @@ use tokio::task::JoinHandle;
 use crate::client::RpcClient;
 use crate::error::RpcError;
 
-/// One event from `get_next_event_batch`.
-///
-/// Raw [`serde_json::Value`]: typing core's dozens of variants is protocol reimplementation
-/// `docs/PROJECT.md` rules out. Match on `event["kind"]`.
+/// One event from `get_next_event_batch`. Raw [`serde_json::Value`] (typing dozens of variants
+/// reimplements protocol, against `docs/PROJECT.md`): match on `event["kind"]`.
 #[derive(Debug, Clone, Deserialize)]
 pub struct CoreEvent {
     /// Account (core's "context").
@@ -21,9 +19,7 @@ pub struct CoreEvent {
     pub event: serde_json::Value,
 }
 
-/// Backoff after non-batch answer, doubles to ceiling.
-/// Only transport close ends loop: shim reads stream end as death, and a server answering,
-/// even wrongly, is alive.
+/// Backoff after non-batch answer, doubling to ceiling.
 const ERROR_BACKOFF_MIN: Duration = Duration::from_millis(50);
 const ERROR_BACKOFF_MAX: Duration = Duration::from_secs(5);
 
@@ -52,16 +48,13 @@ impl EventLoopHandle {
 
 impl Drop for EventLoopHandle {
     fn drop(&mut self) {
-        // Dropping `JoinHandle` alone detaches: task would keep polling a dead listener.
+        // Dropping `JoinHandle` alone detaches: task would poll dead listener.
         self.task.abort();
     }
 }
 
-/// Poll `get_next_event_batch` into channel until transport close or stop.
-///
-/// Core has no unsolicited notifications: plain repeated RPC; call blocks server-side.
-///
-/// Stream end = transport closed, nothing else. Callers rely on it: shim restarts server.
+/// Poll `get_next_event_batch` (blocks server-side; core has no unsolicited notifications) into
+/// channel till stop or transport close. Only close ends stream: shim restarts server on it.
 pub fn spawn_event_loop(
     client: Arc<RpcClient>,
 ) -> (mpsc::UnboundedReceiver<CoreEvent>, EventLoopHandle) {
@@ -81,10 +74,10 @@ pub fn spawn_event_loop(
                         }
                     }
                 }
-                // The server is gone; nothing to poll.
+                // Server gone.
                 Err(RpcError::TransportClosed) => return,
-                // Other errors: bad answer (unreadable event, refused call), not dead core.
-                // Ending stream makes shim kill a running server for a new one. So back off, retry.
+                // Else bad answer (unreadable event, refused call); core alive. Ending stream would
+                // make shim replace a running server: back off, retry.
                 Err(_) => {
                     failures = failures.saturating_add(1);
                     tokio::time::sleep(error_backoff(failures)).await;

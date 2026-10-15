@@ -3,11 +3,10 @@ import Sailfish.Silica 1.0
 import Piirit 1.0
 
 /*
- * Voice recording in place of message field. Own component so it is testable
- * headless; recorder lives here, page gets only a recording or nothing. Tap to
- * start, tap to send (not hold: can't be let go by accident). Page hides field
- * and attach button meanwhile. Length capped by relay size (over 1.5 h), not
- * shown: at it, recording stops and sends.
+ * Voice recording in place of message field; own component, headless-testable. Recorder
+ * here; page gets recording or nothing. Tap start, tap send (not hold: no accidental
+ * release). Page hides field and attach button meanwhile. Length capped by relay size
+ * (over 1.5 h), unshown: at cap, recording stops and sends.
  */
 Item {
     id: root
@@ -16,8 +15,7 @@ Item {
     readonly property bool available: recorder.available
     /// Running or finishing.
     readonly property bool recording: recorder.recording
-    /// Relay max bytes (core limit; 0 = unknown). Recording stops at longest
-    /// fit.
+    /// Relay max bytes (core limit; 0 = unknown). Recording stops at longest fit.
     property real limitBytes: 0
     /// Quality: 0 balanced, 1 less data. Sets bit rate.
     property int mediaQuality: 0
@@ -98,7 +96,7 @@ Item {
         radius: width / 2
         color: Theme.errorColor
 
-        // Blink: stopped strip reads as stopped.
+        // Blink: stopped strip reads stopped.
         SequentialAnimation on opacity {
             running: recorder.recording
             loops: Animation.Infinite

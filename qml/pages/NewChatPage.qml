@@ -4,15 +4,15 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick contact: known contacts plus search.
- * Adds no contact: address alone gives unencryptable chat.
- * Contacts come from invites (QR page, chat list pull-down); groups too.
+ * Pick contact: known ones plus search. Adds none: address alone gives
+ * unencryptable chat. Contacts from invites (QR page, chat list pull-down);
+ * groups too.
  */
 Page {
     id: page
 
-    // Core move held until on screen: call page may cover it.
-    // See PendingNavigation.qml.
+    // Core move held until on screen: call page may cover it
+    // (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -22,10 +22,8 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    // Core has said who is in profile.
-    //
-    // Empty model: no contacts or no answer yet. Right after open, the
-    // latter; "No contacts yet" flashed under rows every visit.
+    // Core has said who is in profile. Empty model: none, or no answer yet;
+    // "No contacts yet" flashed under rows every visit.
     property bool contactsLoaded: false
 
     // Not bound to field: round trip per keystroke, only last answer used.
@@ -61,7 +59,7 @@ Page {
         }
     }
 
-    // Search outside list (see ChatListPage): in header it moves per keystroke,
+    // Search outside list (as ChatListPage): in header it moves per keystroke,
     // dropping keyboard. Non-scrolling flickable holds both.
     SilicaFlickable {
         id: host
@@ -105,8 +103,7 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // Rows otherwise draw outside list box, which starts under search:
-            // flick ran contacts over field.
+            // Else rows draw outside list box: flick ran contacts over search field.
             clip: true
             model: contacts.rows
 

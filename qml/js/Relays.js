@@ -1,10 +1,6 @@
 // Public chatmail relays for pick lists (profile dialog, add-relay page).
-// One list so they can't drift.
-//
-// chatmail.at/relays snapshot, 2026-10-07. Not whole list; anyone may run one.
-// Refresh by hand; drop relays unlisted there.
-//
-// Library: nothing translated, shared by reference, one copy.
+// chatmail.at/relays snapshot, 2026-10-07, partial. Refresh by hand; drop
+// relays unlisted there. Library: nothing translated, one shared copy.
 .pragma library
 
 var list = [

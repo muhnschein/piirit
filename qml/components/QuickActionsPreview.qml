@@ -3,33 +3,31 @@ import Sailfish.Silica 1.0
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * Small cover with room for one or two quick actions: choice's picture and what
- * it puts on the home screen.
- *
- * Drawn like cover/CoverPage.qml, scaled from a real cover so icons match.
- * Circles empty. Unchosen = dot. Reads no settings: page hands it icons.
+ * Small cover with one or two quick actions, as on home screen. Drawn like
+ * cover/CoverPage.qml, scaled from real cover so icons match. Circles empty;
+ * unchosen = dot. Reads no settings: page hands icons.
  */
 BackgroundItem {
     id: preview
 
-    /// Actions this cover has room for: 1 or 2.
+    /// Action slots: 1 or 2.
     property int count: 1
     /// Icon names (QuickActions.iconName), left and right; "" = not chosen.
     property string leftIcon
     property string rightIcon
-    /// Whether this is the reader's choice.
+    /// Reader's choice.
     property bool selected: false
     /// Choice name, under picture.
     property alias text: caption.text
 
-    /// Real cover size to scale from. Theme says; else Jolla phone's.
+    /// Real cover size: Theme's, else Jolla phone's.
     readonly property real coverWidth: Theme.coverSizeLarge
                                        && Theme.coverSizeLarge.width > 0
                                        ? Theme.coverSizeLarge.width : 234
     readonly property real coverHeight: Theme.coverSizeLarge
                                         && Theme.coverSizeLarge.height > 0
                                         ? Theme.coverSizeLarge.height : 374
-    /// How much smaller than real cover.
+    /// Scale vs real cover.
     readonly property real ratio: preview.width / preview.coverWidth
 
     // Cover's own measures, scaled; see CoverPage.
@@ -98,9 +96,8 @@ BackgroundItem {
                     color: "transparent"
                     border.width: Math.max(1, Math.round(2 * preview.ratio))
                     border.color: Theme.secondaryColor
-                    // Fade at each ring's middle (QuickActions.fade): rings too
-                    // thin to fade across, and a fading shader is what cover faces
-                    // once got drawn with by mistake (Avatar.qml).
+                    // Fade at ring's middle (QuickActions.fade): too thin to fade across;
+                    // no shader (Avatar.qml).
                     opacity: 0.6 * QuickActions.fade(y + height / 2,
                                                      faces.height - 2 * preview.strip,
                                                      faces.height)
@@ -108,14 +105,14 @@ BackgroundItem {
             }
         }
 
-        // Home screen puts action tops ~18% of cover height up.
+        // Home screen: action tops ~18% of cover height up.
         Repeater {
             model: preview.count === 2 ? [preview.leftIcon, preview.rightIcon]
                                        : [preview.leftIcon]
 
             Item {
                 objectName: "previewAction" + index
-                /// Icon picture; "" for an unchosen dot.
+                /// Icon; "" unchosen dot.
                 readonly property string source: preview.iconSource(modelData)
                 width: preview.iconSize
                 height: preview.iconSize

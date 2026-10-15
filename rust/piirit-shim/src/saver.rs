@@ -1,8 +1,8 @@
 //! Attachment copy for the reader.
 //!
-//! Blob dir is app's own (goes with it) and core names files by content. Save = one copy to
-//! Piirit's folder in Downloads (`qml/components/AttachmentSaver.qml`) under sender's name,
-//! numbered if taken. Own thread: big video copy on Qt thread froze app.
+//! Blob dir goes with app; core names by content. Save = copy into Piirit's Downloads folder
+//! (`qml/components/AttachmentSaver.qml`) under sender's name, numbered if taken. Own thread:
+//! big video on Qt thread froze app.
 
 use std::collections::VecDeque;
 use std::sync::{Mutex, PoisonError};
@@ -27,8 +27,8 @@ pub struct FileSaver {
     /// Emitted when [`Self::busy`] changes.
     pub busy_changed: qt_signal!(),
 
-    /// Copy `file_url` (`file://` or path) to `folder`, made if missing.
-    /// Answers `saved`/`error`, in ask order.
+    /// Copy `file_url` (`file://` or path) to `folder` (made if missing); `saved`/`error` in
+    /// order.
     pub save: qt_method!(fn(&mut self, file_url: QString, folder: QString)),
     /// [`Self::save`] under `name` (sender's). Empty or path-only: file's own.
     pub save_as: qt_method!(fn(&mut self, file_url: QString, folder: QString, name: QString)),
@@ -61,7 +61,7 @@ impl FileSaver {
             folder: folder.to_string(),
             name: name.to_string(),
         });
-        // One copy at a time: answers in ask order.
+        // One at a time: answers in order.
         if !self.busy {
             self.busy = true;
             self.busy_changed();
@@ -97,12 +97,11 @@ impl FileSaver {
     }
 }
 
-/// Held while picking name and copying: else two savers (two pages) find same name free and
-/// overwrite each other.
+/// Held over name pick and copy: else two savers take same free name.
 static COPYING: Mutex<()> = Mutex::new(());
 
-/// Copy `source` to `folder` as `name` (empty or only separators: source's own), numbered if
-/// another file has it. Returns path written.
+/// Copy `source` to `folder` as `name` (empty/separators: source's), numbered if taken. Returns
+/// path.
 pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String, String> {
     if source.is_empty() {
         return Err("nothing to save".to_string());
@@ -122,7 +121,7 @@ pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String
     let folder = std::path::Path::new(folder);
     std::fs::create_dir_all(folder)
         .map_err(|err| format!("cannot create {}: {err}", folder.display()))?;
-    // Poisoned lock: safe, next save re-picks name.
+    // Poisoned: safe, name re-picked.
     let _copying = COPYING.lock().unwrap_or_else(PoisonError::into_inner);
     let target = free_name(folder, &name);
     std::fs::copy(source, &target).map_err(|err| {

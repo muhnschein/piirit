@@ -3,14 +3,10 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Three ways a profile gets onto phone, asked at once. Opened from plus under
- * profiles.
- *
- * Same three as first screen gives no-profile readers (ProfileStartPage.qml,
- * ExistingProfilePage.qml).
- *
- * Does nothing itself: AddProfileDialog picks relay, hands to setup;
- * RestoreProfilePage does both transfers, `from` says which.
+ * Three ways a profile gets onto phone, asked at once; from plus under profiles. Same three
+ * as first screen (ProfileStartPage.qml, ExistingProfilePage.qml). Does nothing itself:
+ * AddProfileDialog picks relay, hands to setup; RestoreProfilePage does both transfers
+ * (`from` says which).
  */
 Page {
     id: page
@@ -33,7 +29,7 @@ Page {
             title: qsTr("Add profile")
         }
 
-        // Stacked: a third of screen is too narrow for two lines.
+        // Stacked: third of screen too narrow for two lines.
         ChoiceTiles {
             id: ways
             objectName: "addWays"

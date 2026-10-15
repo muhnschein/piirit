@@ -2,7 +2,7 @@
 //!
 //! `Runtime::new` and drop touch tokio's thread-local context, which on Qt main thread
 //! (Sailfish aarch64) panics `already borrowed: BorrowMutError`. So built and dropped on own
-//! thread; only a `Handle` returned, whose `spawn` never enters runtime context.
+//! thread; only a `Handle` returned (its `spawn` never enters runtime context).
 
 use std::future::Future;
 use std::sync::mpsc;
@@ -52,7 +52,7 @@ impl CoreRuntime {
                 if handle_tx.send(Ok(runtime.handle().clone())).is_err() {
                     return;
                 }
-                // Park until clones gone; drop runtime here, not Qt thread.
+                // Park until clones gone; drop runtime here, not on Qt thread.
                 shutdown_rx.recv().ok();
             })
             .map_err(|err| format!("could not start runtime thread: {err}"))?;

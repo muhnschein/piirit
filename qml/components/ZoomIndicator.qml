@@ -3,8 +3,8 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Zoom line with dot, shown while zooming and 2 s after. Ends: 1 and camera
- * max. Numbers, not "min"/"max" (translation).
+ * Zoom line with dot, while zooming and 2 s after. Ends 1 and camera max:
+ * numbers, not "min"/"max" (translation).
  */
 Item {
     id: indicator

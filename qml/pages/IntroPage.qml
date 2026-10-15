@@ -3,10 +3,9 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * What Delta Chat is: five facts, one per swiped screen.
- * Wording from delta.chat/en/help, tech half cut (FAQ has it).
- * Swipe past last fact: setup. First screen swipes back too.
- * No faces field: pictures over facts are the look. Masks from
+ * What Delta Chat is: five facts, one per swiped screen. Wording from
+ * delta.chat/en/help minus tech half (FAQ has it). Swipe past last: setup;
+ * first swipes back too. No faces field: pictures are the look. Masks from
  * components/InkArt.qml, painted by tools/faces/scenes.py.
  */
 Page {
@@ -18,8 +17,7 @@ Page {
     // Set past end: one drag cannot ask twice.
     property bool leaving: false
 
-    /// Facts in order. Plain array: ListElement takes literals only;
-    /// all translated.
+    /// Facts in order. Plain array: ListElement takes literals only; translated.
     readonly property var facts: [
         {
             picture: "../art/intro-profile.png",
@@ -82,8 +80,8 @@ Page {
         boundsBehavior: Flickable.DragOverBounds
         model: page.facts
 
-        // Only drag asks. Rotation resizes view: briefly measured against
-        // old width, read as pull past last fact and left page untouched.
+        // Only drag asks: rotation briefly measured view vs old width, read as pull
+        // past last fact, left page untouched.
         onContentXChanged: {
             if (slides.dragging) {
                 page.advanceIfPastEnd()
@@ -181,8 +179,7 @@ Page {
             color: Theme.secondaryHighlightColor
             text: qsTr("Keep swiping to set up your profile.")
 
-            // Tap does what line says. For the thumb that finds it, not a
-            // second pull.
+            // Tap does what line says: for thumb that finds it, not second pull.
             MouseArea {
                 anchors.fill: parent
                 onClicked: page.goOn()

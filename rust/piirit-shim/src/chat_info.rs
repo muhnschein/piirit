@@ -1,7 +1,7 @@
 //! Chat name, picture, members.
 //!
-//! One model for both kinds. Group's name, picture, members editable here. 1:1 chat has one
-//! member (the contact), read by same model, so contact page needs nothing of its own.
+//! One model for both kinds: group's name, picture, members editable; 1:1 chat has one member
+//! (the contact), so contact page needs nothing of its own.
 
 use std::cell::RefCell;
 
@@ -64,23 +64,22 @@ pub struct ChatInfo {
     pub color: qt_property!(QString; NOTIFY loaded_changed),
     /// Group, not 1:1.
     pub is_group: qt_property!(bool; NOTIFY loaded_changed),
-    /// Group this account is still in. Core refuses edits to left group or non-group, so
-    /// page offers none.
+    /// Group account is still in. Core refuses edits to left group or non-group: page offers none.
     pub can_edit: qt_property!(bool; NOTIFY loaded_changed),
-    /// Account can write here: false for left group and contact request. Gates whole-chat
-    /// settings (disappearing messages).
+    /// Account can write: false for left group, contact request. Gates whole-chat settings
+    /// (disappearing messages).
     pub can_send: qt_property!(bool; NOTIFY loaded_changed),
     /// Call placeable: 1:1, encrypted, takes messages. Same as `ChatMessages::can_call`.
     pub can_call: qt_property!(bool; NOTIFY loaded_changed),
-    /// Group/channel description, line breaks kept; empty if none. From
-    /// `get_chat_description`: `get_full_chat_by_id` lacks it.
+    /// Group/channel description, line breaks kept; empty if none. From `get_chat_description`
+    /// (`get_full_chat_by_id` lacks it).
     pub description: qt_property!(QString; NOTIFY loaded_changed),
-    /// Description editable: group/channel still in. Narrower than `can_edit`: core refuses
-    /// other kinds (e.g. mailing list).
+    /// Description editable: group/channel still in. Narrower than `can_edit`: core refuses other
+    /// kinds (mailing list).
     pub can_edit_description: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds until messages disappear; 0 = never. Core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
-    /// True after any load, good or bad. Re-emitted every reload (all fields change with it).
+    /// True after any load, good or bad. Re-emitted per reload (all fields change with it).
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted per load.
     pub loaded_changed: qt_signal!(),
@@ -115,7 +114,7 @@ pub struct ChatInfo {
     pub set_picture: qt_method!(fn(&mut self, path: QString)),
     /// Clear picture. Answers `saved`.
     pub clear_picture: qt_method!(fn(&mut self)),
-    /// Add contacts. Answers `saved`; any refused named on `error`, rest are in.
+    /// Add contacts; `saved`. Refused ones named on `error`, rest in.
     pub add_members: qt_method!(fn(&mut self, contact_ids: QVariantList)),
     /// Remove member; `saved`.
     pub remove_member: qt_method!(fn(&mut self, contact_id: u32)),
@@ -123,8 +122,7 @@ pub struct ChatInfo {
     pub leave: qt_method!(fn(&mut self)),
     /// Local name; empty restores theirs; `saved`.
     pub rename_contact: qt_method!(fn(&mut self, contact_id: u32, name: QString)),
-    /// Messages disappear after `seconds`, 0 = never. For every member (core tells them);
-    /// `saved`.
+    /// Messages disappear after `seconds`, 0 = never; core tells every member. `saved`.
     pub set_ephemeral_timer: qt_method!(fn(&mut self, seconds: u32)),
 
     /// Stale-load guard. See `ContactList`.
@@ -197,8 +195,8 @@ impl ChatInfo {
                         this_mut.ephemeral_timer = found.ephemeral_timer;
                         this_mut.description = found.description.into();
                         this_mut.can_edit_description = found.can_edit_description;
-                        // In place: runs on every contact change in account, mostly no
-                        // member change; reset rebuilt every row. Touch only changed members.
+                        // In place: runs on every contact change in account, mostly no member
+                        // change; reset rebuilt every row.
                         reconcile_rows(&mut this_mut.members.borrow_mut(), found.members, |item| {
                             item.contact_id
                         });
@@ -207,7 +205,7 @@ impl ChatInfo {
                     this.borrow().loaded_changed();
                 }
                 Err(err) => {
-                    // Loaded where it matters: wait is over.
+                    // Loaded where it matters: wait over.
                     this.borrow_mut().loaded = true;
                     this.borrow().loaded_changed();
                     this.borrow().error(err.into());
@@ -229,7 +227,7 @@ impl ChatInfo {
         match kind.as_str() {
             // Contact's name/picture; core omits whose.
             "ContactsChanged" | "EventChannelOverflow" => self.reload(),
-            // Rename, picture, join/leave (any device), timer (any member can set).
+            // Rename, picture, join/leave (any device), timer (any member).
             "ChatModified" | "ChatEphemeralTimerModified" => {
                 let payload: serde_json::Value =
                     serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
@@ -283,7 +281,7 @@ impl ChatInfo {
         let done = self.stored_callback(Outcome::Saved);
 
         runtime.spawn(async move {
-            // Empty clears. Promoted group or channel: members told too, not local note.
+            // Empty clears. Promoted group/channel: members told, not local note.
             let result = rpc
                 .call::<_, ()>("set_chat_description", (account_id, chat_id, text))
                 .await
@@ -307,7 +305,7 @@ impl ChatInfo {
         let done = self.stored_callback(Outcome::Saved);
 
         runtime.spawn(async move {
-            // Core copies to blob dir: reload on save.
+            // Core copies to blob dir: reload.
             let result = rpc
                 .call::<_, ()>("set_chat_profile_image", (account_id, chat_id, Some(path)))
                 .await
@@ -365,8 +363,8 @@ impl ChatInfo {
             .filter_map(|value| u32::try_from(value).ok())
             .collect();
         runtime.spawn(async move {
-            // Try all, as create_group: one refusal (address contact in encrypted group)
-            // must not stop rest.
+            // Try all, as create_group: one refusal (address contact in encrypted group) mustn't
+            // stop rest.
             let mut refused = Vec::new();
             for member in members {
                 if let Err(err) = rpc
@@ -442,7 +440,7 @@ impl ChatInfo {
         let done = self.stored_callback(Outcome::Saved);
 
         runtime.spawn(async move {
-            // Empty = "theirs again". Pinned: deltachat-jsonrpc/tests/real_server.rs.
+            // Empty = theirs again. Pinned: deltachat-jsonrpc/tests/real_server.rs.
             let result = rpc
                 .call::<_, ()>("change_contact_name", (account_id, contact_id, name))
                 .await
@@ -469,8 +467,7 @@ impl ChatInfo {
         });
     }
 
-    /// Report change, reread what core kept: picture rewritten into blob dir, core knows
-    /// current members.
+    /// Report change, reread what core kept (picture rewritten into blob dir, current members).
     fn stored_callback(&self, outcome: Outcome) -> impl Fn(Result<(), String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<(), String>| {
@@ -492,8 +489,8 @@ impl ChatInfo {
 
 /// Chat and members.
 ///
-/// `get_full_chat_by_id` names members by id only. `get_contacts_by_ids` keys contacts by
-/// id as strings (JSON keys), so order restored from id list.
+/// `get_full_chat_by_id` names members by id; `get_contacts_by_ids` keys by id string (JSON),
+/// so order restored from id list.
 async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded, String> {
     let chat: serde_json::Value = rpc
         .call("get_full_chat_by_id", (account_id, chat_id))
@@ -524,7 +521,7 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
     // "Single" = 1:1. Others have members.
     let is_group = !matches!(json::str_at(&chat, "chatType"), "Single" | "");
     let can_send = json::flag(&chat, "canSend");
-    // Only these kinds have one; core refuses set on others. Failed read = empty, not lost page.
+    // Only these kinds have one; core refuses others. Failed read = empty, not lost page.
     let chat_type = json::str_at(&chat, "chatType");
     let has_description = matches!(chat_type, "Group" | "OutBroadcast" | "InBroadcast");
     let description: String = if has_description {
@@ -540,7 +537,7 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         avatar_path: json::str_at(&chat, "profileImage").to_string(),
         color: json::str_at(&chat, "color").to_string(),
         is_group,
-        // Pinned vs real core: after leave, `selfInGroup` and `canSend` false, edits refused.
+        // Pinned vs core: after leave, `selfInGroup` and `canSend` false, edits refused.
         can_edit: is_group && self_in_group,
         can_send,
         can_call: crate::chat::takes_calls(&chat, is_group, can_send),

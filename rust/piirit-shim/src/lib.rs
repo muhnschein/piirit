@@ -3,9 +3,8 @@
 //!
 //! Needs Qt5 dev headers to build.
 
-// Phone code: a panic ends a Qt callback or tokio task silently; release overflow wraps.
-// Not Cargo.toml lints: those cannot exempt tests. Tests, build scripts, src/bin fakes are other
-// crates or `cfg(test)`.
+// Phone code: panic silently ends Qt callback or tokio task; release overflow wraps. Not
+// Cargo.toml lints: can't exempt tests (other crates or `cfg(test)`, as build scripts, src/bin).
 #![cfg_attr(
     not(test),
     deny(
@@ -90,7 +89,7 @@ pub use crate::second_device::SecondDevice;
 pub use crate::transports::Transports;
 pub use crate::webxdc::{WebxdcApp, WebxdcStore};
 
-/// Register the shim's QML types. App and tests share it.
+/// Register shim's QML types; app and tests.
 pub fn register_qml_types() {
     // `c"..."` literals need Rust 1.77; Sailfish floor is 1.75.
     let (Ok(uri), Ok(messages), Ok(list)) = (

@@ -3,28 +3,24 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Bring existing profile onto this phone, two ways (as other apps), one page:
+ * Bring existing profile here, two ways (as other apps):
  *
- * - `from: "device"`: other device offers profile over LAN, shows code; this
- *   one reads it, transfer via `get_backup`. Both keep the profile.
- * - `from: "file"`: backup file read back via `import_backup`.
+ * - `from: "device"`: other device offers over LAN, shows code; read here,
+ *   transfer via `get_backup`. Both keep profile.
+ * - `from: "file"`: backup via `import_backup`.
  *
- * Core transfers; page is bar + stop. One transfer at a time (shim counts it as
- * an attempt, like making a profile): Cancel is `cancel_ongoing`; second
- * attempt orphans first.
+ * Core transfers; page is bar + stop. One at a time (shim attempt, like making
+ * a profile): Cancel is `cancel_ongoing`; second orphans first. App words
+ * refusals (core's are protocol talk). Profile already here refused: two
+ * accounts on one address fetch mailbox twice.
  *
- * App words refusals (core's are protocol talk). Profile already here refused:
- * two accounts on one address fetch one mailbox twice.
- *
- * Hand-over via PendingNavigation: file browser still animating during a small
- * import; a move mid-transition was refused, leaving reader on restore page
- * with profile already here.
+ * Hand-over via PendingNavigation: file browser still animates during small
+ * import; mid-transition move was refused, stranding reader here.
  */
 Page {
     id: page
 
-    /// No quick actions while up: jump away leaves profile half brought over.
-    /// See piirit.qml.
+    /// No quick actions while up: jump leaves profile half over. piirit.qml.
     readonly property bool pausesQuickActions: true
 
     allowedOrientations: Orientation.All
@@ -35,32 +31,29 @@ Page {
 
     /// True while core transfers.
     property bool busy: false
-    /// Progress, permille, as core counts.
+    /// Progress, permille.
     property int permille: 0
     property string errorMessage: ""
-    /// Failure, not yet dismissed. Page state, not strip: reader must read it;
-    /// back to live viewfinder reads as app carrying on.
+    /// Undismissed failure. Page state, not strip: live viewfinder reads as carrying on.
     readonly property bool failed: page.errorMessage.length > 0
-    /// App in front. Not read-only: tests (no app in front) set it.
+    /// App in front. Writable: tests set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
-    // No going back mid-transfer: drops answer listener, core carries on. Nor
-    // while hand-over waits on stack: swipe would take page and move with it.
+    // No back mid-transfer (drops listener, core goes on) or while hand-over waits (swipe takes
+    // page and move).
     backNavigation: !page.busy && !navigation.pending
 
     /// Hand-over to arrived profile, held until stack can make it.
     PendingNavigation {
         id: navigation
         stack: pageStack
-        // Page with file browser over it, or animating, is not one Silica moves
-        // from.
+        // Silica won't move from covered or animating page.
         ready: page.status === PageStatus.Active
     }
 
-    /// Start transfer with first-step output: camera code or browser path.
+    /// Start transfer from camera code or browser path.
     function begin(text) {
-        // Browser reports choice by property change, maybe more than once;
-        // second import = second account.
+        // Browser may report choice twice; second import = second account.
         if (page.busy) {
             return
         }
@@ -74,9 +67,8 @@ Page {
         }
     }
 
-    /// Scanner back on its feet after failure. View stops on code read and
-    /// stays stopped (no duplicate reports). Reset view first, then clear
-    /// failure: view starts camera on activation only if holding no code.
+    /// Scanner reset after failure. View stops on code (no duplicates); reset it before clearing
+    /// failure: activation starts camera only if holding no code.
     function rescan() {
         if (scanLoader.item) {
             scanLoader.item.framesTried = 0
@@ -84,8 +76,7 @@ Page {
         }
     }
 
-    /// File browser, pushed by URL and connected, as conversation pushes
-    /// pickers.
+    /// File browser, pushed by URL and connected, as conversation's pickers.
     function chooseFile() {
         var picker = pageStack.push(Qt.resolvedUrl("BackupFilePage.qml"), {})
         if (picker) {
@@ -93,7 +84,7 @@ Page {
         }
     }
 
-    /// Refusal reason in words for reader.
+    /// Refusal reason in words.
     function reasonText(reason) {
         if (reason === "too-new") {
             return qsTr("The profile is from a newer Delta Chat version than this app can read.")
@@ -117,8 +108,7 @@ Page {
             }
         }
 
-        // Profile here, IO started: app opens on it, above nothing (no earlier
-        // screen worth going back to).
+        // Profile here, IO started: open on it, nothing below (nothing worth going back to).
         onProfile_restored: {
             if (!page.busy) {
                 return
@@ -145,14 +135,14 @@ Page {
         }
     }
 
-    // Device half: camera only, picture gets page. File half: ordinary page.
+    // Device half: camera, picture gets page. File half: ordinary page.
     Item {
         id: scanArea
         objectName: "scanArea"
         anchors.fill: parent
         visible: page.fromDevice && !page.busy && !page.failed
 
-        // Loaded by URL as QR page does: no camera costs scanner, not page.
+        // By URL as QR page: no camera costs scanner, not page.
         Loader {
             id: scanLoader
             objectName: "scanLoader"
@@ -162,14 +152,12 @@ Page {
             onLoaded: {
                 scanLoader.item.hintText =
                     qsTr("Hold your camera over the QR code")
-                // Same string as code, for a camera that won't read it: typed
-                // or pasted.
+                // Code string typed or pasted, for camera that won't read it.
                 scanLoader.item.linkButtonText = qsTr("Enter the code instead")
                 scanLoader.item.linkLabel = qsTr("Code from the other device")
                 scanLoader.item.linkPlaceholder = "DCBACKUP5:..."
                 scanLoader.item.linkActionText = qsTr("Copy the profile")
-                // Digit is core transfer version (pinned 5); prefix names none.
-                // Meaning: core's call (`check_qr`).
+                // Digit: core transfer version (pinned 5); meaning is core's (`check_qr`).
                 scanLoader.item.linkPrefixes = ["dcbackup"]
                 scanLoader.item.scanned.connect(page.begin)
                 scanLoader.item.failed.connect(function(message) {
@@ -178,8 +166,7 @@ Page {
             }
         }
 
-        // Camera runs on screen while nothing under way. Not in background or
-        // screen-off (Silica keeps page active then).
+        // Camera on screen while idle; not background or screen-off (page stays active).
         Binding {
             target: scanLoader.item
             property: "active"
@@ -187,14 +174,14 @@ Page {
                    && !page.busy && !page.failed
         }
 
-        // View puts its own line at top; clear it so words sit under.
+        // Clear view's own top line; words sit under.
         Binding {
             target: scanLoader.item
             property: "hintTopMargin"
             value: deviceChrome.height
         }
 
-        // Page turns with phone; camera picture turned back.
+        // Page turns with phone; picture turned back.
         Binding {
             target: scanLoader.item
             property: "pageOrientation"
@@ -212,7 +199,7 @@ Page {
             text: qsTr("No camera on this device. You can restore from a backup file instead.")
         }
 
-        // Over picture: strip video runs behind, not block video starts under.
+        // Over picture: video runs behind strip, not starts under block.
         Rectangle {
             id: deviceChrome
             objectName: "deviceChrome"
@@ -258,7 +245,7 @@ Page {
         }
     }
 
-    // File half and transfer: where both end.
+    // File half and transfer: both end here.
     SilicaFlickable {
         id: flickable
         anchors.fill: parent
@@ -318,7 +305,7 @@ Page {
                 }
             }
 
-            // Where progress bar was: what went wrong, way to retry.
+            // In progress bar's place: what failed, retry.
             Column {
                 objectName: "failureBlock"
                 visible: page.failed

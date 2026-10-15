@@ -11,10 +11,8 @@ use crate::models::{AccountItem, AccountListModel};
 use crate::runtime::CoreRuntime;
 use crate::signup::{self, Attempts, Outcome, Source, Taken, Transport};
 
-/// Live server connection, shared by per-chat models.
-///
-/// One per process by convention: `start` guard in [`DeltaChatCore::start`] is per object, not
-/// global; second instance would spawn second server and take this over. Nothing enforces it.
+/// Live server connection, shared by per-chat models. One per process, unenforced: `start` guard
+/// is per object; second instance would spawn second server and take this over.
 static CONNECTION: Mutex<Option<(Arc<RpcClient>, CoreRuntime)>> = Mutex::new(None);
 
 /// Transport and runtime, once [`DeltaChatCore::start`] done.
@@ -37,13 +35,11 @@ pub const DEFAULT_PROVIDER_QR: &str = "dcaccount:nine.testrun.org";
 /// RPM install path: not on `PATH`.
 pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-server";
 
-/// Event kinds the app reads. Only these reach `core_event`.
+/// Kinds reaching `core_event`; rest (log, unused: most of bulk syncs) dropped early.
 ///
-/// Others are log or unused; dropped early, as bulk syncs send most. See `DeltaChatCore::relay`.
-///
-/// Union of kinds matched in any `handle_event` in this crate and kinds named in any
-/// `onCore_event` in `qml/`. **New reader kind: add here**, or it never arrives.
-/// `tests/event_kinds.rs` checks both sides match; `tests/event_fanout.rs` checks gate applied.
+/// Union of kinds matched by any `handle_event` here and named by any `onCore_event` in `qml/`.
+/// **New reader kind: add here**, or it never arrives. `tests/event_kinds.rs`: sides match;
+/// `tests/event_fanout.rs`: gate applied.
 pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "CallEnded",
     "ChatDeleted",
@@ -71,8 +67,7 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "WebxdcStatusUpdate",
 ];
 
-/// Kinds that can move unread count; `DeltaChatCore::relay` rereads it on each. Overflow could
-/// hide any.
+/// Kinds that can move unread count (overflow may hide any); `relay` rereads it on each.
 const UNREAD_EVENT_KINDS: &[&str] = &[
     "ChatDeleted",
     "ChatModified",
@@ -88,7 +83,7 @@ const UNREAD_EVENT_KINDS: &[&str] = &[
 /// Kinds `relay` turns into typed signals. Keep in step by hand.
 const SIGNALLED_EVENT_KINDS: &[&str] = &["ConfigureProgress", "Error", "ImexProgress"];
 
-/// Hand event to Qt thread? Only if read by `core_event` or `relay`.
+/// Cross to Qt thread only if `core_event` or `relay` reads it.
 fn is_relayed(kind: &str) -> bool {
     HANDLED_EVENT_KINDS.contains(&kind)
         || UNREAD_EVENT_KINDS.contains(&kind)
@@ -101,14 +96,12 @@ const EVENT_BATCH_LIMIT: usize = 256;
 /// Exit wait for server.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
-/// Exit wait before stopping server: live call ends first. See `call_host::end_all`.
+/// Exit wait for live call to end (`call_host::end_all`) before server stop.
 const CALL_END_TIMEOUT: Duration = Duration::from_secs(3);
 
 /// Server binary: `--rpc-server <path>` / `--rpc-server=<path>`, else `PIIRIT_RPC_SERVER`, else
-/// [`BUNDLED_SERVER`].
-///
-/// Never `PATH`: server gets mail password and keys, so must be packaged or developer-named.
-/// Flag, not `argv[1]`: Sailfish invoker passes own args.
+/// [`BUNDLED_SERVER`]. Never `PATH`: server gets mail password, keys. Flag, not `argv[1]`: Sailfish
+/// invoker passes own args.
 #[must_use]
 pub fn server_path<I>(args: I, env: Option<String>) -> String
 where
@@ -138,12 +131,9 @@ pub fn server_pid() -> Option<u32> {
         .and_then(|(rpc, _)| rpc.pid())
 }
 
-/// Stop server after Qt loop returned.
-///
-/// Child else dies only when last `RpcClient` drops; statics never do. Bounded.
-///
-/// Ends live call first (`call_host::end_all`), telling other end; only place possible: window
-/// (call host) still up, server not yet gone.
+/// Stop server after Qt loop returns, bounded; else child dies only with last `RpcClient` (statics
+/// never drop). Ends live call first, telling peer: only here is window (call host) up and server
+/// not yet gone.
 pub fn shutdown() {
     let Some((rpc, runtime)) = CONNECTION
         .lock()
@@ -173,7 +163,7 @@ pub fn shutdown() {
         .ok();
 }
 
-/// Last server stderr lines, or nothing. Only crash clue user sees.
+/// Last server stderr lines, if any: user's only crash clue.
 fn last_words(tail: &[String]) -> Option<String> {
     const KEEP: usize = 5;
     if tail.is_empty() {
@@ -186,16 +176,16 @@ fn last_words(tail: &[String]) -> Option<String> {
     ))
 }
 
-/// First restart wait; doubles to ceiling. Short first: phone reclaims memory, respawn works.
-/// Ceiling stops spin.
+/// First restart wait, doubling to ceiling (stops spin). Short: phone reclaims memory, respawn
+/// works.
 const RESTART_DELAY_MIN: Duration = Duration::from_secs(1);
 const RESTART_DELAY_MAX: Duration = Duration::from_secs(30);
 
 /// Uptime counting as healthy; next failure backs off from minimum.
 const HEALTHY_UPTIME: Duration = Duration::from_secs(60);
 
-/// Restarts without healthy run before giving up: ~3 minutes. Outlasts transients; stops
-/// never-starting binary keeping phone awake.
+/// Restarts without healthy run before giving up (~3 min): outlasts transients; stops dead binary
+/// keeping phone awake.
 const RESTART_LIMIT: u32 = 12;
 
 /// Wait before restart `attempt`.
@@ -205,28 +195,25 @@ fn restart_delay(attempt: u32) -> Duration {
         .min(RESTART_DELAY_MAX)
 }
 
-/// Owns connection to spawned `deltachat-rpc-server`.
-///
-/// Fire-and-forget methods; results via [`qmetaobject::queued_callback`] on Qt thread.
-///
-/// Slice of ~100 JSON-RPC methods.
+/// Owns spawned `deltachat-rpc-server`; slice of ~100 JSON-RPC methods. Fire-and-forget; results
+/// via [`qmetaobject::queued_callback`] on Qt thread.
 #[derive(QObject, Default)]
-// Flags are independent facts, not one state machine.
+// Independent flags, not one state machine.
 #[allow(clippy::struct_excessive_bools)]
 pub struct DeltaChatCore {
     base: qt_base_class!(trait QObject),
 
     /// "idle", "starting", "ready", "stopped" (server died), or `"error: ..."`.
     pub status: qt_property!(QString; NOTIFY status_changed),
-    /// [`DeltaChatCore::status`] changed.
+    /// `status` changed.
     pub status_changed: qt_signal!(),
 
     /// `get_system_info` JSON. Empty until [`DeltaChatCore::check_health`] runs.
     pub system_info: qt_property!(QString; NOTIFY system_info_changed),
-    /// [`DeltaChatCore::system_info`] refreshed.
+    /// `system_info` refreshed.
     pub system_info_changed: qt_signal!(),
 
-    /// Raw core event: `kind`, whole event as `payload_json`. Untyped, so QML reads any kind.
+    /// Raw core event, whole as `payload_json`; untyped so QML reads any kind.
     pub core_event: qt_signal!(context_id: u32, kind: QString, payload_json: QString),
 
     /// New unconfigured account created.
@@ -242,53 +229,49 @@ pub struct DeltaChatCore {
 
     /// Create unconfigured account.
     pub add_account: qt_method!(fn(&mut self)),
-    /// Delete profile and contents, this device. No undo.
-    ///
-    /// Core name `remove_account`: pinned binary lacks `delete_account`.
+    /// Delete profile and contents from device; no undo. `remove_account`: pinned core lacks
+    /// `delete_account`.
     pub remove_account: qt_method!(fn(&mut self, account_id: u32)),
 
     /// All accounts known to core.
     pub account_list: qt_property!(RefCell<AccountListModel>; CONST),
 
-    /// Attachments above this many bytes fetched on request; 0: all. Reader's setting, all
-    /// accounts: on set, and on each account-list read to accounts lacking it (later profiles).
-    /// Core's `download_limit`; applies to future messages.
+    /// Core `download_limit`: attachments over this many bytes fetched on request; 0: all. Future
+    /// messages only. Reader's, all accounts: written on set and on list reads to accounts lacking
+    /// it (later profiles); same for settings below.
     pub download_limit: qt_property!(u32; WRITE set_download_limit NOTIFY download_limit_changed),
-    /// [`DeltaChatCore::download_limit`] changed.
+    /// `download_limit` changed.
     pub download_limit_changed: qt_signal!(),
 
-    /// Send compression: 0 balanced, 1 smaller. Reader's setting, all accounts. Core's
-    /// `media_quality`, read when recoding outgoing picture.
+    /// Core `media_quality`: 0 balanced, 1 smaller; read when recoding outgoing picture.
     pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY media_quality_changed),
-    /// [`DeltaChatCore::media_quality`] changed.
+    /// `media_quality` changed.
     pub media_quality_changed: qt_signal!(),
 
-    /// Whose calls ring: 0 all, 1 contacts, 2 nobody. Reader's setting, all accounts. Core's
-    /// `who_can_call_me`: unrung call still kept, answerable from chat, just silent.
+    /// Core `who_can_call_me`: 0 all, 1 contacts, 2 nobody ring. Unrung call kept, answerable
+    /// from chat.
     pub who_can_call_me: qt_property!(u32; WRITE set_who_can_call_me NOTIFY who_can_call_me_changed),
-    /// [`DeltaChatCore::who_can_call_me`] changed.
+    /// `who_can_call_me` changed.
     pub who_can_call_me_changed: qt_signal!(),
 
-    /// Delete messages older than this many seconds from device; 0 keeps. Reader's setting, all
-    /// accounts. Core's `delete_device_after`: overrides each chat's own timer; never "Saved
-    /// messages".
+    /// Core `delete_device_after`: delete from device after this many seconds; 0 keeps. Overrides
+    /// chat timers; spares "Saved messages".
     pub delete_device_after: qt_property!(u32; WRITE set_delete_device_after NOTIFY delete_device_after_changed),
-    /// [`DeltaChatCore::delete_device_after`] changed.
+    /// `delete_device_after` changed.
     pub delete_device_after_changed: qt_signal!(),
-    /// Count messages `delete_device_after` = `seconds` would delete now, all accounts (shown
-    /// before confirm). Answers on `auto_deletion_estimated` or `core_error`.
+    /// Count what `seconds` period would delete now, all accounts (shown before confirm). Answers
+    /// `auto_deletion_estimated` or `core_error`.
     pub estimate_auto_deletion: qt_method!(fn(&mut self, seconds: u32)),
-    /// Answer to `estimate_auto_deletion`, with its seconds, so stale answers are told apart.
+    /// Answer to `estimate_auto_deletion`; `seconds` tells stale ones apart.
     pub auto_deletion_estimated: qt_signal!(seconds: u32, count: u32),
 
     /// Repopulate `account_list`; QML resumes or onboards on `accounts_refreshed`.
     pub refresh_accounts: qt_method!(fn(&mut self)),
-    /// [`DeltaChatCore::account_list`] repopulated. `configured_count`: usable.
-    /// `resume_account_id`: core's selected (last shown, kept across runs) if usable, else first
-    /// configured, else 0.
+    /// `account_list` repopulated. `configured_count`: usable. `resume_account_id`: see
+    /// `resume_account`.
     pub accounts_refreshed: qt_signal!(configured_count: u32, resume_account_id: u32),
-    /// Whether `account_id` configured in `account_list` as last read. Window asks per held id on
-    /// refresh, to move off deleted profiles.
+    /// `account_id` configured, per last list read? Window asks per held id on refresh, to leave
+    /// deleted profiles.
     pub is_configured_account: qt_method!(fn(&self, account_id: u32) -> bool),
 
     /// Tell core shown profile, for next start. Chat list calls per opened profile.
@@ -301,22 +284,16 @@ pub struct DeltaChatCore {
     /// Result of resume. `account_id` 0: all.
     pub io_started: qt_signal!(account_id: u32, success: bool, error: QString),
 
-    /// Stop IO for all accounts while no network.
-    ///
-    /// Only when phone reports no connection (`qml/components/NetworkWatch.qml`). IO on dead
-    /// network retries connecting forever, each try waking radio. Nothing lost: no network, no
-    /// messages.
-    ///
-    /// Never on background: backgrounded app is only way messages arrive here. Forgets requested
-    /// IO, so restart while offline stays stopped; whoever restarts IO asks afresh.
+    /// Stop IO, all accounts, only while phone reports no network
+    /// (`qml/components/NetworkWatch.qml`): dead-network IO retries forever, each try waking radio;
+    /// nothing to lose. Never on background: backgrounded app is only way messages arrive. Forgets
+    /// requested IO, so offline restart stays stopped; restarter asks afresh.
     pub stop_all_account_io: qt_method!(fn(&mut self)),
     /// Stop-IO result, for tests.
     pub io_stopped: qt_signal!(success: bool, error: QString),
 
-    /// Tell core network may have changed.
-    ///
-    /// Core's `maybe_network`. Wi-fi to mobile switch kills connection silently; core notices only
-    /// at IDLE timeout (five minutes). This reconnects now. Hint: core may find connection fine.
+    /// Core `maybe_network` hint: wi-fi/mobile switch kills connection silently, noticed only at
+    /// IDLE timeout (5 min); this reconnects now.
     pub maybe_network: qt_method!(fn(&mut self)),
 
     /// Default chatmail server's `dcaccount:` payload.
@@ -333,7 +310,7 @@ pub struct DeltaChatCore {
 
     /// Profile ready; `account_id` has working transport.
     pub profile_created: qt_signal!(account_id: u32),
-    /// Profile creation failed. Core's message.
+    /// Profile creation failed; core's message.
     pub profile_error: qt_signal!(message: QString),
     /// Relay silent for `seconds`; attempt abandoned, core process stopped, late profile removed.
     pub profile_timed_out: qt_signal!(seconds: u32),
@@ -387,9 +364,9 @@ pub struct DeltaChatCore {
     /// Core `Error` event: message for user. Typed, so pages skip parsing.
     pub core_error: qt_signal!(message: QString),
 
-    /// Reader's words for core text: "Draft", "Saved messages", errors. JSON: stock id to
-    /// translation (`qml/js/StockStrings.js`). Kept and given to each spawned server first: text
-    /// written to DB on arrival stays English otherwise.
+    /// Reader's words for core text ("Draft", "Saved messages", errors): JSON stock id to
+    /// translation (`qml/js/StockStrings.js`). Kept, given to each spawned server first, else text
+    /// written to DB on arrival stays English.
     pub set_stock_strings: qt_method!(fn(&mut self, strings_json: QString)),
 
     rpc: Option<Arc<RpcClient>>,
@@ -397,7 +374,7 @@ pub struct DeltaChatCore {
 
     /// Server binary from `start`, for restart.
     rpc_server_path: String,
-    /// Accounts with IO resumed, replayed after restart. Fresh server has files, no IO.
+    /// Accounts with IO resumed; replayed after restart (fresh server runs none).
     io_accounts: BTreeSet<u32>,
     /// IO resumed for all accounts; repeated after restart.
     io_all: bool,
@@ -415,12 +392,12 @@ pub struct DeltaChatCore {
     media_quality_set: bool,
     /// Same, whose calls ring.
     who_can_call_me_set: bool,
-    /// Values `write_config` wrote per account and key, so list re-reads write only what's
-    /// missing (each write costs; `delete_device_after` triggers deletion pass). Forgotten with
-    /// server: no way to know old server's writes landed.
+    /// `write_config`'s writes per account and key, so list re-reads write only what's missing
+    /// (writes cost; `delete_device_after` starts deletion pass). Cleared with server: old writes
+    /// may not have landed.
     written_config: RefCell<BTreeMap<(u32, &'static str), String>>,
-    /// Profiles whose unread read is in progress, each with 'asked since' flag. One read per
-    /// profile at a time: one message is 3-4 events; each read returns every unread id.
+    /// Profiles with unread read running, each with 'asked since' flag. One at a time: a message
+    /// is 3-4 events; each read returns every unread id.
     unread_reads: RefCell<BTreeMap<u32, bool>>,
     /// Attempts per profile, shared with their tasks.
     attempts: Arc<Attempts>,
@@ -461,11 +438,9 @@ impl DeltaChatCore {
         Self::spawn_server(QPointer::from(&*self), path, runtime, stock);
     }
 
-    /// Spawn server, wire result. Shared by `start` and restarts.
-    ///
-    /// Associated fn, not method: object must not be borrowed here. QML's `start` holds a mutable
-    /// borrow; QML `status_changed` handler calls straight back in. Mutations scoped to callbacks;
-    /// signals emitted with no borrow held.
+    /// Spawn server, wire result; for `start` and restarts. Associated fn: QML's `start` holds a
+    /// mutable borrow and `status_changed` handler calls straight back in, so mutations stay in
+    /// scoped borrows, signals emit with none held.
     fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
         let started_ptr = ptr;
         let retry_path = path.clone();
@@ -544,10 +519,8 @@ impl DeltaChatCore {
         });
     }
 
-    /// Server gone: `reconnecting`, respawn after backoff, or `stopped`.
-    ///
-    /// `failure`: reported on give-up. Spawn error for failed restart, last words for exited
-    /// server, `None` for silent exit.
+    /// Server gone: `reconnecting` + respawn after backoff, or `stopped`. `failure` (spawn error,
+    /// last words, or `None`) reported on give-up.
     fn schedule_restart(ptr: QPointer<Self>, path: String, failure: Option<String>) {
         let Some(this) = ptr.as_pinned() else { return };
         set_connection(None);
@@ -625,10 +598,9 @@ impl DeltaChatCore {
         });
     }
 
-    /// Account dir: `PIIRIT_ACCOUNTS_DIR`, else inside sailjail's grant.
-    ///
-    /// Nesting deliberate: sailjail grants `~/.local/share/<OrganizationName>/<ApplicationName>`;
-    /// piirit.desktop declares both as `piirit`. Old name Postivene: profiles looked up once.
+    /// Account dir: `PIIRIT_ACCOUNTS_DIR`, else inside sailjail's grant,
+    /// `~/.local/share/<OrganizationName>/<ApplicationName>`; piirit.desktop declares both as
+    /// `piirit`. Old name Postivene: profiles looked up once.
     ///
     /// # Errors
     ///
@@ -648,7 +620,7 @@ impl DeltaChatCore {
             Self::adopt_legacy_accounts(&base.join("postivene/postivene/accounts"), &dir);
             dir
         };
-        // Private: holds keys and mail password. Mode also set on existing dirs.
+        // Private (keys, mail password); mode set on existing dirs too.
         let mut builder = std::fs::DirBuilder::new();
         builder.recursive(true);
         #[cfg(unix)]
@@ -689,18 +661,15 @@ impl DeltaChatCore {
         }
     }
 
-    /// Forward events to `core_event` via queued callbacks.
-    ///
-    /// One callback per batch, `is_relayed` events only. Qt 5.6: each queued callback is costly.
-    ///
-    /// Shares one `runtime.spawn`: `spawn_event_loop` needs runtime context.
+    /// Forward `is_relayed` events to `relay`, one queued callback per batch (Qt 5.6: each
+    /// costly). One `runtime.spawn`: `spawn_event_loop` needs runtime context.
     fn forward_events(
         ptr: QPointer<Self>,
         rpc: Arc<RpcClient>,
         runtime: CoreRuntime,
         path: String,
     ) {
-        // Stream ends when server dies: invisible to app otherwise. Next server starts here.
+        // Stream ends only when server dies; next server starts here.
         let stopped_ptr = ptr.clone();
         let stopped = queued_callback(move |tail: Vec<String>| {
             Self::schedule_restart(stopped_ptr.clone(), path.clone(), last_words(&tail));
@@ -720,8 +689,8 @@ impl DeltaChatCore {
                     .drain(..)
                     .filter(|event| {
                         let kind = json::str_at(&event.event, "kind");
-                        // Here, not Qt-thread `relay`: read at exit after Qt thread stopped.
-                        // Before filter, which drops `SmtpMessageSent`.
+                        // Here, before filter (drops `SmtpMessageSent`): read at exit, after Qt
+                        // thread stopped.
                         crate::call_host::note_sent(kind);
                         is_relayed(kind)
                     })
@@ -730,14 +699,12 @@ impl DeltaChatCore {
                     emit(batch);
                 }
             }
-            // Stream ends only with server gone. Stderr is the only clue.
+            // Server gone; stderr only clue.
             stopped(rpc.stderr_tail());
         });
     }
 
-    /// One event as QML-side signals.
-    ///
-    /// Kinds something reads fire `core_event`; some also typed signals.
+    /// One event as signals: `core_event` for read kinds, typed signals for some.
     fn relay(&self, event: &CoreEvent) {
         let kind = match json::str_at(&event.event, "kind") {
             "" => "Unknown".to_string(),
@@ -755,18 +722,16 @@ impl DeltaChatCore {
                 self.configure_progress(event.context_id, permille);
             }
         }
-        // Takeover reported like configure; account is the page's business.
+        // Takeover reported like configure; account is page's business.
         if kind == "ImexProgress" {
             if let Some(permille) = json::u32_opt(&event.event, "progress") {
                 self.restore_progress(permille);
             }
         }
-        // Row count follows what could move it.
         if UNREAD_EVENT_KINDS.contains(&kind.as_str()) {
             self.refresh_unread(event.context_id);
         }
-        // Own work runs for every kind. Fan-out skips rest: serialising per listener is costly with
-        // screen off.
+        // Fan-out only read kinds: per-listener serialising costs with screen off.
         if !HANDLED_EVENT_KINDS.contains(&kind.as_str()) {
             return;
         }
@@ -939,11 +904,8 @@ impl DeltaChatCore {
         }
     }
 
-    /// Write config value to each account not last given it. Failure reported; others still
-    /// written; failed one retried next time.
-    ///
-    /// Remembered, not `get_config`: list re-read often; read per key per account would cost most
-    /// of the saving. Lives as long as server (see `schedule_restart`).
+    /// Write value to each account not last given it; failure reported, others written, failed one
+    /// retried next time. Remembered, not `get_config`: per-key reads would eat the saving.
     fn write_config(&self, ids: &[u32], key: &'static str, value: String) {
         let Some((rpc, runtime)) = self.connection() else {
             return;
@@ -1072,7 +1034,7 @@ impl DeltaChatCore {
                         Some(AccountItem {
                             account_id: json::u32_opt(account, "id")?,
                             display_name: json::text(account, "displayName"),
-                            // Filled below: core list has no address since 2.61.
+                            // Filled below (`primary_addr`).
                             addr: QString::default(),
                             is_configured: json::str_at(account, "kind") == "Configured",
                             avatar_path: json::text(account, "profileImage"),
@@ -1095,7 +1057,7 @@ impl DeltaChatCore {
         });
     }
 
-    /// Whether `account_id` configured, per last read.
+    /// Configured, per last read?
     pub fn is_configured_account(&self, account_id: u32) -> bool {
         self.account_list
             .borrow()
@@ -1124,9 +1086,7 @@ impl DeltaChatCore {
         });
     }
 
-    /// Re-read profile's unread count, update row in place.
-    ///
-    /// One read per profile; asks during a read run after it.
+    /// Re-read profile's unread count into its row; asks mid-read rerun after.
     pub fn refresh_unread(&self, account_id: u32) {
         if account_id == 0 {
             return;
@@ -1251,13 +1211,12 @@ impl DeltaChatCore {
         });
     }
 
-    /// Tell core network may have changed. Best effort; dropped before core up.
+    /// Network hint. Best effort; dropped before core up.
     pub fn maybe_network(&mut self) {
         let Some((rpc, runtime)) = self.connection() else {
             return;
         };
         runtime.spawn(async move {
-            // Hint, not request.
             rpc.call_unit::<()>("maybe_network").await.ok();
         });
     }
@@ -1404,8 +1363,8 @@ impl DeltaChatCore {
         })
     }
 
-    /// Shared completion of `create_profile*`. Stale profile (relay answered after cancel) removed,
-    /// not announced: else app opens on it next start.
+    /// Completion of `create_profile*`. Stale profile (relay answered after cancel) removed, not
+    /// announced: else app opens on it next start.
     fn profile_callback(&self, attempt: u64) -> impl Fn(Outcome) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |outcome: Outcome| {
@@ -1565,8 +1524,8 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
         .map_err(|err| err.to_string())
 }
 
-/// Profile's own address: `configured_addr`. Account list lacks address since 2.61;
-/// `list_transports` doesn't say which relay is own. `None` if core can't say.
+/// Own address via `configured_addr`: account list lacks it since 2.61; `list_transports` doesn't
+/// say which relay is own. `None` if core can't say.
 async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
     rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
         .await
@@ -1592,7 +1551,8 @@ async fn start_io(rpc: &RpcClient, account_id: Option<u32>) -> Result<(), String
     .map_err(|err| err.to_string())
 }
 
-/// Profile to open on: selected if configured, else first configured, else 0.
+/// Profile to open on: core's selected (last shown, kept across runs) if configured, else first
+/// configured, else 0.
 fn resume_account(items: &[AccountItem], selected: Option<u32>) -> u32 {
     let usable = |item: &&AccountItem| item.is_configured;
     selected

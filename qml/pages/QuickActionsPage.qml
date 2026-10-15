@@ -4,18 +4,14 @@ import "../components"
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * Cover quick actions: one or two, and what each does. Choice is two live
- * cover pictures (components/QuickActionsPreview.qml); settings below
- * (components/QuickActionSetting.qml). With one, left is used; right kept for
- * two again.
- * Own page, from settings Advanced: on settings page it crowded the rest.
- * No save: controls write on tap; cover (qml/cover/CoverPage.qml) follows.
+ * Cover quick actions: one or two (live pictures, QuickActionsPreview.qml),
+ * each set below (QuickActionSetting.qml). One: left used, right kept. Own
+ * page (crowded settings). Writes on tap; qml/cover/CoverPage.qml follows.
  */
 Page {
     id: page
 
-    /// Profile a chat action's chat is picked from: the one settings page was
-    /// opened from.
+    /// Profile chat action's chat is picked from (settings page's).
     property int accountId
 
     readonly property int actionCount: QuickActions.count(Settings)
@@ -55,8 +51,7 @@ Page {
                 text: qsTr("Piirit's cover on the home screen can show up to two quick actions.")
             }
 
-            // Two pictures centred, at most real cover size. Bindings, not Row:
-            // see ChoiceTiles.
+            // Centred, at most real cover size. Bindings, not Row: see ChoiceTiles.
             Item {
                 id: choices
                 objectName: "quickActionCountChoices"

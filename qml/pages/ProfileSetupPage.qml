@@ -4,11 +4,10 @@ import "../components"
 
 /*
  * Work behind AddProfileDialog: core gets account from relay, stores it,
- * starts IO; page shows progress, then lands in chat list. Cancel or failure:
- * back to dialog, which keeps input.
- * Silica makes accept destination when dialog shows; dialog fills name and
- * relay on accept. So work starts once on screen, not at creation.
- * Relay past 4 s: say so under Cancel. Shim gives up at 30 s (signup.rs).
+ * starts IO; page shows progress, lands in chat list. Cancel or failure: back
+ * to dialog (keeps input). Silica makes accept destination when dialog shows,
+ * dialog fills name/relay on accept: work starts once on screen. Relay past
+ * 4 s: say so under Cancel. Shim gives up at 30 s (signup.rs).
  */
 Page {
     id: page
@@ -38,12 +37,12 @@ Page {
         onTriggered: page.slowRelay = true
     }
 
-    // Cancel is way back while core works: swipe-back would drop handler that
-    // opens chat list, leaving profile made, nothing shown.
+    // Cancel is way back while working: swipe-back would drop handler opening
+    // chat list, profile made, nothing shown.
     backNavigation: !busy
 
-    // Core move held until on screen: call page may cover it, and move then
-    // would take that page (PendingNavigation.qml).
+    // Core move held until on screen: else may take covering call page
+    // (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -95,8 +94,8 @@ Page {
             page.errorMessage = message
         }
 
-        // Shim gave up on relay. Worded here: the one failure app decides
-        // itself, so it can say it in reader's language.
+        // Shim gave up on relay. Worded here: only failure app decides itself, so in
+        // reader's language.
         onProfile_timed_out: {
             if (!page.busy) {
                 return
@@ -145,9 +144,9 @@ Page {
             }
         }
 
-        // Under Cancel once relay past 4 s: what relay is, what if silent.
-        // Stays through error (Back below is where it points). Not when core
-        // picks relays: trying others is what it does.
+        // Under Cancel once relay past 4 s: what relay is, what if silent. Stays
+        // through error (Back below is where it points). Not when core picks relays
+        // (it tries others).
         Label {
             objectName: "slowHint"
             x: Theme.horizontalPageMargin

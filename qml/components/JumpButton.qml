@@ -21,7 +21,7 @@ Item {
         // Theme highlight is transparent: set amount here.
         color: Theme.rgba(Theme.highlightBackgroundColor, 0.5)
 
-        // Drawn: icon-m-down reads as two circles.
+        // Drawn: icon-m-down looks like two circles.
         Item {
             id: chevron
             objectName: "jumpChevron"
@@ -35,7 +35,7 @@ Item {
             readonly property real slope:
                 Math.atan2(height, width / 2) * 180 / Math.PI
 
-            // Pivot at left-edge middle: corner pivot misaligns the halves.
+            // Pivot at left-edge middle: corner pivot misaligns halves.
             Rectangle {
                 objectName: "chevronLeft"
                 x: 0

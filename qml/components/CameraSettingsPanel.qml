@@ -3,10 +3,10 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Camera settings, platform camera's way: icons on viewfinder top show what is
- * in force. Tap pulls panel down, a column per setting (timer, flash, white
- * balance, grid); tap elsewhere hides it. Page sets choices (`flashModes` empty
- * on front camera) and decides what picks (signals) mean.
+ * Camera settings, platform camera's way: viewfinder-top icons show what's in
+ * force; tap pulls panel down, column per setting (timer, flash, white
+ * balance, grid); tap elsewhere hides. Page sets choices (`flashModes` empty
+ * on front camera), decides what picks (signals) mean.
  */
 Item {
     id: panel

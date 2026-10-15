@@ -1,16 +1,14 @@
 //! Voice message recorder, platform audio stack.
 //!
-//! Qt 5.6 QML has no recorder (`QAudioRecorder` is C++ only, unbound by qmetaobject): hence
-//! tree's second `cpp!` block after `piirit-app/src/translations.rs`, and shim's C++ build step.
-//! Kept to this module, short blocks.
+//! Qt 5.6 QML lacks recorder (`QAudioRecorder` C++ only, not in qmetaobject): hence second
+//! `cpp!` use (after `piirit-app/src/translations.rs`) and shim's C++ build step.
 //!
-//! WAV via `GStreamer`, encoded to MP3 as it lands (`voice.rs` says why MP3). WAV is scratch in
-//! captures dir (`capture.rs`). MP3 sent as core `Voice` viewtype, so drawn as voice, not music.
+//! `GStreamer` WAV (scratch in captures dir, `capture.rs`) encoded to MP3 as it lands (why MP3:
+//! `voice.rs`); sent as core `Voice` viewtype, drawn as voice not music.
 //!
-//! Stops itself at relay limit: page passes core's attachment limit, `limit_ms` follows, stop as
-//! a send tap would. Page polls on a timer while recording, no signal bridge; each poll encodes
-//! new data. `GStreamer` stop is async (file finished after `stop()`), so reported once poll sees
-//! recorder no longer finalising.
+//! Stops at relay limit (core attachment limit sets `limit_ms`) as send tap would. Page polls on
+//! timer (no signal bridge); each poll encodes new data. `GStreamer` stop is async: reported once
+//! poll sees recorder done finalising.
 
 // `cpp!` is unsafe FFI. Allowed here only; docs/BUILDING.md says why.
 #![allow(unsafe_code)]
@@ -44,10 +42,8 @@ struct Format {
 
 /// Pick plain-sample WAV from what recorder offers.
 ///
-/// Names vary: Sailfish plugin says `audio/PCM`, `wav`; `GStreamer` names `audio/x-raw`,
-/// `audio/x-wav`. Lowercase substring match.
-/// No fallback: recorder's encoders made voice FLAC; Ogg is a file on iOS.
-/// None offered (headless, no `GStreamer`): `None`, no mic button.
+/// Lowercase substring match: Sailfish plugin `audio/PCM`, `wav`; `GStreamer` `audio/x-raw`,
+/// `audio/x-wav`. No fallback: encoders made FLAC; Ogg is a file on iOS. None: no mic button.
 fn choose_format(codecs: &[String], containers: &[String]) -> Option<Format> {
     let named = |name: &&String, words: &[&str]| {
         let name = name.to_ascii_lowercase();
@@ -80,18 +76,16 @@ const RECORDING_STATE: i32 = 1;
 pub struct VoiceRecorder {
     base: qt_base_class!(trait QObject),
 
-    /// Audio input and encoder present. False headless or without encoders: no mic button.
+    /// Audio input and encoder present; false: no mic button.
     pub available: qt_property!(bool; READ is_available),
-    /// Extension: `mp3`, or empty when nothing recordable.
+    /// `mp3`, or empty if nothing recordable.
     pub extension: qt_property!(QString; READ extension_name),
 
-    /// Relay limit in bytes, from core attachment limit; 0 unknown (no limit but reader's).
-    /// `f64`: no 64-bit in QML.
+    /// Relay limit bytes (core attachment limit); 0 unknown. `f64`: QML lacks 64-bit int.
     pub limit_bytes: qt_property!(f64; WRITE set_limit_bytes NOTIFY limit_changed),
-    /// Core's `media_quality`: 0 balanced, 1 less data. MP3 bit rate follows it.
+    /// Core's `media_quality` (0 balanced, 1 less data): sets MP3 bit rate.
     pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY limit_changed),
-    /// Longest recording in ms whose MP3 fits `limit_bytes`; 0 no limit. While recording: that
-    /// recording's.
+    /// Longest ms whose MP3 fits `limit_bytes` (current recording's while on); 0 no limit.
     pub limit_ms: qt_property!(u32; READ longest NOTIFY limit_changed),
     /// Emitted when [`Self::limit_ms`] may change.
     pub limit_changed: qt_signal!(),
@@ -105,19 +99,18 @@ pub struct VoiceRecorder {
     /// Emitted on [`Self::duration_ms`] change.
     pub duration_changed: qt_signal!(),
 
-    /// Record into `path` (MP3). Answers `recorded` once stopped (or limit hit) and file
-    /// finished; or `error`.
+    /// Record MP3 into `path`; `recorded` once stopped and finished, else `error`.
     pub start: qt_method!(fn(&mut self, path: QString)),
     /// Stop; report once finished.
     pub stop: qt_method!(fn(&mut self)),
     /// Stop; discard file.
     pub cancel: qt_method!(fn(&mut self)),
-    /// Encode new data, stop at limit, finish pending stop. Page calls on timer while recording.
+    /// Encode new data, stop at limit, finish pending stop. Page timer calls.
     pub poll: qt_method!(fn(&mut self)),
 
     /// Recording finished, at `path`.
     pub recorded: qt_signal!(path: QString),
-    /// Failed to start, or on the way.
+    /// Failed starting or recording.
     pub error: qt_signal!(message: QString),
 
     /// Made on first use (needs app object).
@@ -132,9 +125,8 @@ pub struct VoiceRecorder {
 
 /// Platform recorder capabilities, once per process.
 ///
-/// Probing is slow: loads `GStreamer` capture service, lists devices, element factories, on Qt
-/// thread, as each chat page builds. Never changes, so first recorder answers for all; others
-/// make a `QAudioRecorder` only to record.
+/// Probing slow (loads `GStreamer` capture service, devices, factories on Qt thread per chat
+/// page); never changes, so first recorder answers for all.
 #[derive(Debug)]
 struct Probe {
     /// Format to record in; `None` if nothing recordable.
@@ -143,7 +135,7 @@ struct Probe {
     input: Option<String>,
 }
 
-/// The process's [`Probe`], once a recorder has made it.
+/// Process's [`Probe`], once made.
 static PROBE: std::sync::OnceLock<Probe> = std::sync::OnceLock::new();
 
 impl VoiceRecorder {
@@ -161,7 +153,7 @@ impl VoiceRecorder {
         }
     }
 
-    /// Take relay limit; hold recording under way to it too.
+    /// Take relay limit, also for recording under way.
     pub fn set_limit_bytes(&mut self, bytes: f64) {
         if self.limit_bytes.to_bits() == bytes.to_bits() {
             return;
@@ -201,8 +193,7 @@ impl VoiceRecorder {
         }
     }
 
-    /// Format to record in; `None` if nothing can be ([`Probe`]).
-    /// Not kept without app object: a later recorder asks again.
+    /// Format to record in ([`Probe`]); not cached without app object.
     fn chosen(&mut self) -> Option<Format> {
         if let Some(probe) = PROBE.get() {
             return probe.chosen.clone();
@@ -212,7 +203,7 @@ impl VoiceRecorder {
             return None;
         }
         let probe = PROBE.get_or_init(|| read_probe(handle));
-        // Made before an answer, so input was unset: set now.
+        // Made before probe: set input now.
         if let Some(input) = &probe.input {
             set_input(handle, input);
         }
@@ -360,8 +351,7 @@ impl VoiceRecorder {
             self.error(message.into());
             return;
         }
-        // At limit: stop and send, as tap on send. MP3 keeps to limit whatever recorder writes
-        // after.
+        // At limit: stop and send as tap would; MP3 holds limit whatever comes after.
         let limit = self.longest();
         if limit > 0 && duration >= limit {
             self.stop();
@@ -431,7 +421,7 @@ impl Drop for VoiceRecorder {
     }
 }
 
-/// Ask recorder what it writes and reads, then choose.
+/// Probe recorder, choose.
 fn read_probe(handle: usize) -> Probe {
     let codecs = read_list(handle, ListKind::Codecs);
     let containers = read_list(handle, ListKind::Containers);
@@ -495,9 +485,8 @@ fn set_input(handle: usize, input: &str) {
 
 /// Pick input from what recorder offers.
 ///
-/// `PulseAudio` by name if offered: backend default picked a silent source on phone.
-/// Else backend default, else first listed.
-/// None offered: recorder left alone.
+/// `PulseAudio` if offered (backend default was silent on phone), else default, else first;
+/// none: left alone.
 fn choose_input(inputs: &[String], default: &str) -> Option<String> {
     inputs
         .iter()

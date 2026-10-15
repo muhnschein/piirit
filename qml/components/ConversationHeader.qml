@@ -2,24 +2,20 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Page header for a peer-chosen title. Silica's PageHeader has no textFormat:
- * `<img src=...>` in a chat name would fetch the image (network watching is
- * what this app avoids). Same layout as PageHeader, label pinned to PlainText.
- *
- * Header keeps PageHeader's height whatever it holds. Second line
- * (description, e.g. "7 members") drawn only if it fits; with big fonts the name
- * alone keeps it, not a header over the first message.
+ * PageHeader layout, PlainText label, for peer-chosen titles: PageHeader lacks
+ * textFormat, so `<img src=...>` in a name would fetch (a network tell). Keeps
+ * PageHeader's height; second line (e.g. "7 members") only if it fits.
  */
 Item {
     id: root
 
-    /// Header text. Shown as written.
+    /// Shown as written.
     property alias title: titleLabel.text
 
-    /// Line under title; empty: none. Shown as written.
+    /// Line under title, as written; empty none.
     property alias subtitle: subtitleLabel.text
 
-    /// Leads to another page: drawn like PageHeader's forward header.
+    /// Drawn like PageHeader's forward header.
     property bool interactive: false
 
     /// Second line drawn: set, and room for it.
@@ -27,7 +23,7 @@ Item {
         subtitleLabel.text.length > 0
         && titleLabel.height + subtitleLabel.height <= root.height
 
-    /// Header tapped. Page decides what opens.
+    /// Page decides what opens.
     signal clicked()
 
     width: parent ? parent.width : 0
@@ -44,7 +40,7 @@ Item {
         objectName: "headerTitle"
         // No wider than text or page less margins.
         width: Math.min(implicitWidth, root.width - 2 * Theme.horizontalPageMargin)
-        // PageHeader's first-line spot. With subtitle, pair centred on same spot.
+        // PageHeader's first-line spot; with subtitle, pair centred there.
         y: root.showsSubtitle
            ? Math.floor((root.height - height - subtitleLabel.height) / 2)
            : Math.floor((root.height - height) / 2)

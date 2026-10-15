@@ -1,7 +1,7 @@
 use qmetaobject::listmodel::SimpleListModel;
 use qmetaobject::QString;
 
-/// Chat-list row from `get_chatlist_items_by_entries`. UI fields only; upstream has ~20 more.
+/// Chat-list row from `get_chatlist_items_by_entries`; UI fields only (upstream ~20 more).
 // Flags are QML roles: cannot fold.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Default, Clone, PartialEq, Eq, qmetaobject::SimpleListItem)]
@@ -28,7 +28,7 @@ pub struct ChatListItem {
     pub is_muted: bool,
     /// From unaccepted contact.
     pub is_contact_request: bool,
-    /// Chat with oneself ("Saved messages"). Not a person: cover doesn't draw it.
+    /// "Saved messages". Not a person: cover skips it.
     pub is_self_talk: bool,
     /// Core's device chat. Not a person.
     pub is_device_talk: bool,
@@ -48,10 +48,7 @@ pub type ChatListModel = SimpleListModel<ChatListItem>;
 pub struct MessageListItem {
     /// Core message id.
     pub message_id: u32,
-    /// Content fetched?
-    ///
-    /// One row per message, so first message stays row 0; rows away from reader are
-    /// placeholders of own height until in view.
+    /// Content fetched? Row per message (first stays row 0); unviewed rows are placeholders.
     pub loaded: bool,
     /// Body text.
     pub text: QString,
@@ -63,8 +60,8 @@ pub struct MessageListItem {
     pub day_number: i64,
     /// `showPadlock`: encrypted and signed. False: mail icon.
     pub show_padlock: bool,
-    /// `DC_STATE_*`: out 20 pending, 24 failed, 26 delivered, 28 read;
-    /// in 10 fresh, 13 noticed, 16 seen.
+    /// `DC_STATE_*`: out 20 pending, 24 failed, 26 delivered, 28 read; in 10 fresh, 13 noticed,
+    /// 16 seen.
     pub state: u32,
     /// `overrideSenderName`, else contact name.
     pub sender_name: QString,
@@ -72,30 +69,30 @@ pub struct MessageListItem {
     pub sender_color: QString,
     /// Core notice, not typed by anyone.
     pub is_info: bool,
-    /// `isForwarded`. Core sets it on sender's copy too.
+    /// `isForwarded`; set on sender's copy too.
     pub is_forwarded: bool,
     /// Quoted text; empty if none.
     pub quote_text: QString,
     /// Quoted author.
     pub quote_author: QString,
-    /// Absolute attachment path, in core's blob dir.
+    /// Absolute attachment path in blob dir.
     pub file_path: QString,
     /// Attachment name.
     pub file_name: QString,
-    /// `viewType` upstream: Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call,
-    /// Webxdc, Vcard. Core decides from file.
+    /// `viewType`, core's pick: Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call,
+    /// Webxdc, Vcard.
     pub view_type: QString,
     /// Pixel size; 0 if not image. GIF read from header.
     pub image_width: i32,
     /// Pixel size; 0 if not image.
     pub image_height: i32,
-    /// Incoming and unread when built. Decides GIF autoplay.
+    /// Incoming, unread when built; GIF autoplay.
     pub is_new: bool,
     /// MIME type; empty if none.
     pub file_mime: QString,
     /// Bytes; 0 if unknown.
     pub file_bytes: f64,
-    /// Length in ms, 0 if unknown; sender-written for recordings, core never measures.
+    /// Length ms, 0 unknown; sender-written, core never measures.
     pub duration_ms: i32,
     /// Shared contact name; empty if not vCard.
     pub vcard_name: QString,
@@ -103,21 +100,20 @@ pub struct MessageListItem {
     pub vcard_addr: QString,
     /// Shared contact colour, `#rrggbb`.
     pub vcard_color: QString,
-    /// `downloadState`: Done, Available, `InProgress`, Failure, Undecipherable.
-    /// Not Done: header only, held back by download limit until asked.
+    /// `downloadState`: Done, Available, `InProgress`, Failure, Undecipherable. Not Done:
+    /// header only, held by download limit.
     pub download_state: QString,
-    /// `hasHtml`: HTML part behind `get_message_html` has more than `text`. Also raised by HTML
-    /// alternative, HTML-only mail, stripped quote, forward: not "cut" alone; see `wasCut` in
-    /// `MessageDelegate.qml`.
+    /// `hasHtml`: `get_message_html` has more than `text`. Also HTML alternative or only,
+    /// stripped quote, forward: not just "cut" (`wasCut` in `MessageDelegate.qml`).
     pub has_html: bool,
-    /// Markdown rendered as `Text.StyledText`, once here.
+    /// Markdown as `Text.StyledText`, rendered once.
     pub styled_text: QString,
-    /// `isEdited` upstream: text changed after send. Footer "Edited".
+    /// `isEdited`: changed after send; footer "Edited".
     pub is_edited: bool,
-    /// Reactions: JSON array of `{"emoji", "count", "self"}`, core order (most frequent first);
-    /// empty if none. One string, not per-row model: only chips read it.
+    /// JSON array of `{"emoji", "count", "self"}`, most frequent first; empty if none. One
+    /// string: only chips read it.
     pub reactions: QString,
-    /// This account's reaction; empty if none. Second tap on it removes it.
+    /// Own reaction; empty if none. Tapping again removes it.
     pub my_reaction: QString,
     /// Webxdc app name from manifest (`webxdc.rs`); else empty.
     pub webxdc_name: QString,
@@ -127,8 +123,8 @@ pub struct MessageListItem {
     pub webxdc_summary: QString,
     /// App icon path, cached; empty if none.
     pub webxdc_icon: QString,
-    /// Call state (`call_info`): `Alerting` (ringing), `Active`, `Completed`, `Missed`,
-    /// `Declined`, `Canceled`; empty for non-calls. Row drawn from this, not `text` (core English).
+    /// `call_info` state: `Alerting` (ringing), `Active`, `Completed`, `Missed`, `Declined`,
+    /// `Canceled`; empty for non-calls. Row drawn from it, not English `text`.
     pub call_state: QString,
     /// Video call.
     pub call_has_video: bool,
@@ -146,7 +142,7 @@ pub struct AccountItem {
     pub account_id: u32,
     /// Profile name; empty if unset.
     pub display_name: QString,
-    /// Profile address (`configured_addr`); empty if unconfigured or core can't say.
+    /// `configured_addr`; empty if unconfigured or unknown.
     pub addr: QString,
     /// Has a usable transport.
     pub is_configured: bool,
@@ -164,22 +160,22 @@ pub type AccountListModel = SimpleListModel<AccountItem>;
 /// Relay from `list_transports`, with core's connectivity report.
 #[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
 pub struct TransportItem {
-    /// Per-address id, stable across reloads, for `PendingRemoval.qml` countdown (waits on
-    /// numbers). Positive, fits QML `int`.
+    /// Per-address id, stable across reloads, for `PendingRemoval.qml` (keys on numbers).
+    /// Positive, fits QML `int`.
     pub id: u32,
-    /// Address on this relay; what core is handed to remove it.
+    /// Address on relay; handed to core to remove it.
     pub addr: QString,
     /// Relay domain (after `@`).
     pub domain: QString,
-    /// Own address (`configured_addr`): one per profile, first row. Not necessarily relay mail
-    /// leaves through (core picks per connect, unsaid).
+    /// `configured_addr`: one per profile, first row. Not necessarily send relay (core picks
+    /// per connect, unsaid).
     pub is_primary: bool,
     /// Dot colour: `green`, `yellow`, `red`, `grey`; empty before reported.
     pub dot: QString,
-    /// Core's connection words, in its language. Empty before reported.
+    /// Core's localized connection words; empty before reported.
     pub status: QString,
-    /// Profile not connected; report lists relays only while connecting/connected (IO stopped:
-    /// no network, or offered to second device). Dot red; page's own words.
+    /// Profile not connected (IO stopped: no network, or offered to second device); report then
+    /// omits relays. Dot red, page's own words.
     pub offline: bool,
     /// Quota reported; fields below meaningless if false.
     pub has_quota: bool,
@@ -187,7 +183,7 @@ pub struct TransportItem {
     pub quota_percent: u32,
     /// Core's mailbox sentence, e.g. `1.3 MiB of 2 GiB used`.
     pub quota_text: QString,
-    /// Bytes behind `quota_text`; 0 if none or unreadable. f64: QML has no 64-bit int.
+    /// Bytes behind `quota_text`; 0 if unknown. f64: QML lacks 64-bit int.
     pub quota_used_bytes: f64,
     /// See `quota_used_bytes`.
     pub quota_limit_bytes: f64,
@@ -209,7 +205,7 @@ pub struct ContactItem {
     pub auth_name: QString,
     /// Email address.
     pub address: QString,
-    /// Encrypted-capable. Address contacts are not.
+    /// Encryption-capable (address contacts aren't).
     pub is_key_contact: bool,
     /// This account's own contact.
     pub is_self: bool,
@@ -226,9 +222,7 @@ pub struct ContactItem {
 /// Contact model.
 pub type ContactListModel = SimpleListModel<ContactItem>;
 
-/// One search result, any kind.
-///
-/// Three kinds in one model for counted headings: QML `section` groups one flat model.
+/// Search result, any kind: one flat model, as QML `section` needs for counted headings.
 #[derive(Default, Clone, qmetaobject::SimpleListItem)]
 pub struct SearchItem {
     /// `chat`, `contact` or `message`; QML sections on it.

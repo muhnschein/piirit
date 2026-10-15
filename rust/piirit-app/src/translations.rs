@@ -1,11 +1,8 @@
 //! Load catalog for reader's language.
 //!
-//! This crate's `unsafe` and C++ build step: qmetaobject doesn't bind `QTranslator`. Kept to one
-//! short block.
-//!
-//! Silica strings come translated with system; these are app's: `translations/piirit-<lang>.qm`
-//! (RPM runs lrelease on `.ts`). Follows reader's Language via startup locale: `de_DE`, then
-//! `de`; no catalog: nothing loaded, strings as written.
+//! Crate's only `unsafe` and C++ build step: qmetaobject doesn't bind `QTranslator`. Silica
+//! strings come translated with system; these are app's: `translations/piirit-<lang>.qm` (RPM
+//! runs lrelease on `.ts`). Startup locale: `de_DE`, then `de`; no catalog: strings as written.
 
 // `cpp!` call crosses FFI, so unsafe. Only this file; see docs/PROJECT.md.
 #![allow(unsafe_code)]
@@ -23,17 +20,15 @@ cpp! {{
 /// Catalog file name prefix.
 const CATALOG: &str = "piirit";
 
-/// Install catalog for `locale` from `dir`; true if found.
-///
-/// Empty `locale`: system's (reader's Settings choice). Else e.g. `de_DE`, for tests.
-///
-/// After app object (after view, in `main`), before QML: Qt 5.6 cannot retranslate built pages.
+/// Install catalog for `locale` from `dir`; true if found. Empty `locale`: system's (reader's
+/// Settings); else e.g. `de_DE`, for tests. Call after app object (after view, in `main`),
+/// before QML: Qt 5.6 can't retranslate built pages.
 pub fn install(dir: &str, locale: &str) -> bool {
     let dir = QString::from(dir);
     let locale = QString::from(locale);
     let name = QString::from(CATALOG);
-    // SAFETY: QStrings owned by this frame, read by value. Translator parented to app object,
-    // which owns it; no Rust pointer kept.
+    // SAFETY: QStrings owned by this frame, read by value. Translator parented to (owned by)
+    // app object; no Rust pointer kept.
     cpp!(unsafe [dir as "QString", locale as "QString", name as "QString"] -> bool as "bool" {
         QCoreApplication *app = QCoreApplication::instance();
         if (!app) {
@@ -50,7 +45,7 @@ pub fn install(dir: &str, locale: &str) -> bool {
     })
 }
 
-// Qt harness, as shim tests: `unused_unsafe` (`set_var` unsafe only from edition 2024),
+// Qt harness, as shim tests: `unused_unsafe` (`set_var` unsafe from edition 2024),
 // `borrow_as_ptr` (engine pointer), `disallowed_methods` (`single_shot` Duration), `expect_used`.
 #[cfg(test)]
 #[allow(
@@ -128,8 +123,8 @@ mod tests {
             "the German catalog did not load from {dir}"
         );
 
-        // Context as qsTr() in that page. Core words: via window's table.
-        // Script qsTr() context = file name, must match lupdate.
+        // Context as qsTr() in that page; core words via window's table. Script context = file
+        // name, must match lupdate.
         let stock = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/js/StockStrings.js");
         engine.load_data(QByteArray::from(
             r"

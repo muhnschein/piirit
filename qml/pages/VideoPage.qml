@@ -4,8 +4,8 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * One video, played in-app (system player leaves Piirit and fails on device).
- * Same player as voice messages. Share-out in pull-down; copy via AttachmentSaver.
+ * One video, played in-app (system player leaves Piirit, fails on device). Voice messages'
+ * player. Share-out in pull-down; copy via AttachmentSaver.
  */
 Page {
     id: page
@@ -14,8 +14,8 @@ Page {
     property url fileUrl
     property string fileName
 
-    /// `MediaPlayer.PlayingState` value: enum lives on type, and headless
-    /// QtMultimedia stub can't declare one on Qt 5.6. See AttachmentPreview.
+    /// `MediaPlayer.PlayingState` value: enum lives on type; headless QtMultimedia stub can't
+    /// declare one on Qt 5.6. See AttachmentPreview.
     readonly property int playingState: 1
 
     readonly property bool playing: player.playbackState === page.playingState
@@ -47,7 +47,7 @@ Page {
         autoPlay: true
     }
 
-    // Copy the reader keeps: see AttachmentSaver.
+    // Reader's copy: see AttachmentSaver.
     AttachmentSaver {
         id: saver
         objectName: "saver"
@@ -61,11 +61,11 @@ Page {
         }
     }
 
-    // Stop on way out: decoder must not run for a gone page.
+    // Stop on way out: no decoder for gone page.
     Component.onDestruction: player.stop()
 
-    // Inside flickable (pull-down). `contentHeight` set: else children anchored to `parent` vanish.
-    // Nothing scrolls. Stub can't test this layout.
+    // In flickable (pull-down). `contentHeight` set, else `parent`-anchored children vanish.
+    // Nothing scrolls. Stub can't test layout.
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: height
@@ -95,10 +95,9 @@ Page {
                 top: notice.bottom
                 bottom: controls.top
             }
-            // fillMode default; naming it needs an enum the stub lacks.
+            // fillMode default; naming it needs enum stub lacks.
             source: player
-            // Upright video stored sideways with turn in metadata; turned back,
-            // as gallery does.
+            // Upright video stored sideways with turn in metadata; turned back, as gallery.
             autoOrientation: true
 
             MouseArea {
@@ -107,7 +106,7 @@ Page {
             }
         }
 
-        // Where the copy went, or why not.
+        // Where copy went, or why not.
         Banner {
             id: notice
             objectName: "notice"
@@ -166,14 +165,13 @@ Page {
                     verticalCenter: parent.verticalCenter
                 }
                 minimumValue: 0
-                // Never zero: equal ends leave no room for handle, and duration
-                // is 0 until media loads.
+                // Never zero: equal ends leave no handle room; duration 0 until loaded.
                 maximumValue: Math.max(1, player.duration)
                 onReleased: player.seek(seek.value)
             }
 
-            // Not a binding on `value`: dragging breaks it for good (stops
-            // following after first seek). `when` restores.
+            // Not bound to `value`: drag breaks binding for good (stops following after first
+            // seek). `when` restores.
             Binding {
                 target: seek
                 property: "value"

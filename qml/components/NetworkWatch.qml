@@ -2,21 +2,13 @@ import QtQuick 2.0
 import Nemo.DBus 2.0
 
 /*
- * Phone's network state, as two signals.
+ * Network state as two signals. Change silently kills core's connection (found at 5 min IDLE
+ * timeout); window rechecks on front, this covers app in background. Lasting loss: core
+ * retries waking radio, so window stops IO until return.
  *
- * Network change silently kills core's connection; core learns only at IDLE timeout (5 min).
- * Window asks core to recheck on coming to front; this covers readers who don't open the
- * app, which is where notifications come from.
- *
- * Lasting loss: core retries uselessly, waking radio. So loss is passed on too; window
- * stops IO until network returns.
- *
- * No polling: connman announces changes on system bus. `Internet` in `[X-Sailjail]` grants
- * `net.connman` via `Connman.permission`.
- *
- * connman `State`: "offline"/"idle" = no network; "ready"/"online" = network. Repeats not news.
- *
- * Blind spot: handover staying "online". Way back: window's ask, plus IDLE timeout.
+ * connman announces on system bus (`Internet` in `[X-Sailjail]` grants `net.connman` via
+ * `Connman.permission`). `State` "offline"/"idle" = none; "ready"/"online" = network.
+ * Blind spot: handover staying "online" (window's ask, IDLE timeout cover it).
  */
 Item {
     id: watch
@@ -24,43 +16,32 @@ Item {
     /// Network back, or changed to a working one. Holder decides.
     signal networkChanged()
 
-    /// No network for a while. Deliberately slow (`lostMs`), never sent on a state connman
-    /// has not announced: acting on a wrong loss costs messages.
+    /// No network for a while. Slow (`lostMs`), only on announced state: wrong loss costs
+    /// messages.
     signal networkLost()
 
     /// Last connman state; "" before any. Repeats not change.
     property string connectivity: ""
 
-    /// True from `networkLost` until a network is announced.
-    ///
-    /// For readers not listening then (e.g. core restarting), to ask later. Never set on
-    /// an unannounced state.
-    /// Set only here; writable because QML <5.10 can't set it from a handler otherwise.
+    /// True from `networkLost` until network announced, for listeners absent then (core
+    /// restarting). Set only here; writable: QML <5.10 can't set it from handler otherwise.
     property bool lost: false
 
-    /// Last announced state is network. False before any announcement, not known none.
-    /// Nothing acts on false alone.
+    /// Last announced state is network. False before any too: nothing acts on false alone.
     readonly property bool online: watch.connectivity === "ready"
                                    || watch.connectivity === "online"
 
-    /// Wait before passing a return on.
-    ///
-    /// Merges handover announcements (idle, ready, online) into one.
+    /// Wait before passing a return on: merges handover (idle, ready, online).
     readonly property int settleMs: 1500
 
-    /// How long gone before loss passed on.
-    ///
-    /// Much longer than `settleMs`: early return costs a reconnect, early loss costs messages
-    /// (handover passes "idle"). Half a minute: longer than any handover.
-    /// Writable so tests skip the wait.
+    /// How long gone before loss passed on. Far over `settleMs`: early return costs reconnect,
+    /// early loss costs messages; 30 s beats any handover. Writable: tests skip it.
     property int lostMs: 30000
 
-    /// `DBusInterface.Available` by value.
-    ///
-    /// Literal: QML <5.10 can't declare enums, so the test stub lacks one. Device floor Qt 5.6.
+    /// `DBusInterface.Available` by value: QML <5.10 can't declare enums, test stub lacks it.
     readonly property int dbusAvailable: 2
 
-    /// connman's state, entry point. Interface and first look call it; nothing else.
+    /// connman's state in; interface and first look call it.
     function heard(name, value) {
         if (name !== "State") {
             return
@@ -71,25 +52,21 @@ Item {
         }
         watch.connectivity = state
         if (watch.online) {
-            // Either way: back network cancels a loss being announced, ends one announced.
+            // Return cancels a pending loss, ends an announced one.
             lost.stop()
             watch.lost = false
             settle.restart()
         } else {
             settle.stop()
-            // Started, not restarted: connman passes "idle" en route to "offline"; restart
-            // on each would defer it forever.
+            // Started, not restarted: "idle" en route to "offline" would defer it forever.
             if (!lost.running) {
                 lost.start()
             }
         }
     }
 
-    /// Ask connman for state now. Without it, a phone launched in a basement holds IO
-    /// open on a network it never had.
-    ///
-    /// connman's own `GetProperties` (no standard properties interface). Failure is silence:
-    /// state stays unknown, and unknown stops nothing.
+    /// Ask connman now, else app launched offline holds IO open. connman's own
+    /// `GetProperties` (no standard interface). Failure: state unknown, stops nothing.
     function look() {
         manager.typedCall("GetProperties", [], function (properties) {
             if (properties && properties.State !== undefined) {
@@ -106,8 +83,8 @@ Item {
         path: "/"
         iface: "net.connman.Manager"
         signalsEnabled: true
-        // connman can restart; interface introspected while away never reconnects.
-        // Watching the name re-hooks signals on return.
+        // connman can restart; interface introspected while away never reconnects, so
+        // name watched.
         watchServiceStatus: true
 
         /// connman's `PropertyChanged`: Nemo.DBus calls same-named function, first letter lowered.
@@ -115,7 +92,7 @@ Item {
             watch.heard(name, value)
         }
 
-        // Asked each time connman appears: covers app starting first, and connman restart.
+        // Each time connman appears: app started first, connman restart.
         onStatusChanged: {
             if (manager.status === watch.dbusAvailable) {
                 watch.look()

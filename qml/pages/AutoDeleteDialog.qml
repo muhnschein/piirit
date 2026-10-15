@@ -2,10 +2,9 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Deleting old messages, asked once, on own page (as deltachat-android/ios).
- * Period deletes older messages in every chat of every profile, read or not,
- * now and from then on. Switch must be on before accept. Settings page writes
- * on `accepted`; back edge writes nothing.
+ * Deleting old messages, asked on own page (as deltachat-android/ios): every
+ * chat of every profile, read or not, now and on. Switch on before accept.
+ * Settings page writes on `accepted`; back edge writes nothing.
  */
 Dialog {
     id: dialog
@@ -88,8 +87,7 @@ Dialog {
             }
         }
 
-        // Off until reader turns it; accept disabled till then (reference
-        // clients' checkbox).
+        // Accept disabled till on (reference clients' checkbox).
         TextSwitch {
             id: confirm
             objectName: "confirmSwitch"

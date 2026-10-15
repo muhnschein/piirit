@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Reply/edit bar above field. Own file so wrap is testable (ConversationPage
+ * Reply/edit bar above field; own file so wrap is testable (ConversationPage
  * won't load headless).
  */
 Item {
@@ -35,8 +35,7 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
-        // One `arg`, joined: a 2nd call would rescan output (contact "%2"
-        // misplaced).
+        // One joined `arg`: 2nd call rescans output (contact "%2" misplaced).
         text: root.editing
               //: Above the message field while a sent message's text is
               //: being changed; the message's text follows.

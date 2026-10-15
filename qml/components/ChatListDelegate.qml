@@ -4,9 +4,8 @@ import "../js/Format.js" as Format
 import "."
 
 /*
- * Chat-list row. Peer-sent name, preview: PlainText, see MessageDelegate.qml.
- * Own component so it loads and measures alone; bindings, not positioner (see
- * MessageDelegate.qml).
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml). Own
+ * component, loads and measures alone; bindings, not positioner (ditto).
  */
 Item {
     id: root
@@ -44,7 +43,7 @@ Item {
         picturePath: root.avatarPath
     }
 
-    // Mute mark, time, pin mark on right: name stays plain.
+    // Mute mark, time, pin mark on right: name plain.
     Row {
         id: marks
         x: root.width - width - Theme.horizontalPageMargin
@@ -84,7 +83,7 @@ Item {
         width: marks.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
-        // Mail icon: not encryptable. Pin/mute right: placement, not name.
+        // Mail icon: unencryptable. Pin/mute on right: placement, not name.
         text: (root.isEncrypted ? "" : "✉ ") + root.chatName
     }
 

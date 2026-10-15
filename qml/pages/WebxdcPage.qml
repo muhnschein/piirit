@@ -5,19 +5,14 @@ import "../components"
 import Piirit 1.0
 
 /*
- * A webxdc app, running. App is a served zip, not unpacked: shim serves each file
- * from the archive via core on a loopback address; WebView points there (`webxdc_host.rs`).
- * API injected by host.
- *
- * Own page, pushed by URL: `Sailfish.WebView` resolves only where engine installed.
- *
- * Object serves the app: leaving the page destroys it and closes the socket.
+ * Running webxdc app: zip files served via core on loopback, API injected
+ * (`webxdc_host.rs`). Pushed by URL: `Sailfish.WebView` resolves only where engine
+ * installed. Leaving destroys the serving object, closing the socket.
  */
 Page {
     id: page
 
-    // Move from core, held until this page is on screen: a call's page may cover it
-    // (PendingNavigation.qml).
+    // Core move held until page on screen; a call page may cover it (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -32,10 +27,10 @@ Page {
 
     property string errorMessage: ""
 
-    /// App has drawn once. Waits only once: later loads don't bring back the spinner.
+    /// App drew once; later loads bring no spinner.
     property bool drew: false
 
-    /// Served address, `127.0.0.1:port`. What the app may not leave.
+    /// Served `127.0.0.1:port`, which app may not leave.
     function authorityOf(where) {
         var at = ("" + where).indexOf("//")
         if (at < 0) {
@@ -46,11 +41,9 @@ Page {
         return slash < 0 ? rest : rest.substring(0, slash)
     }
 
-    /// Put view back if app moves itself to another address.
-    ///
-    /// No network by policy, but page could move to open web under app's name.
-    /// Compare address only: engine's
-    /// `about:blank`/`about:neterror` pages would otherwise be replaced by blank page.
+    /// Put view back if app navigates off-host (policy blocks network, but page could reach
+    /// open web under app's name). Address only: else engine's `about:blank`/`about:neterror`
+    /// get replaced by blank.
     function keepInside() {
         var here = page.authorityOf(view.url)
         var ours = page.authorityOf(app.url)
@@ -58,8 +51,7 @@ Page {
             return
         }
         view.stop()
-        // Rewrite binding: app overwrote it; binding re-runs only on `app.url` change.
-        // Restoring binding (not address) keeps view following app, so close still empties it.
+        // App broke the binding; restore it (not address) so close still empties view.
         view.url = Qt.binding(function () { return app.url })
     }
 
@@ -69,17 +61,14 @@ Page {
         account_id: page.accountId
         message_id: page.messageId
         onError: page.errorMessage = message
-        // Message deleted here or on another device: nothing left to run.
+        // Message deleted (any device): nothing to run.
         onGone: navigation.pop()
-        // App handed a file over: kept, not put in a chat (see `offer`).
+        // Handed-over file kept, not sent to a chat (see `offer`).
         onHanded_over: page.offer(file_path, text)
     }
 
-    /// Keep a file the app produced.
-    ///
-    /// Saved, not asked (the app's button is a download). Copy goes where every copy
-    /// goes (AttachmentSaver), with notice. Text without a file goes to clipboard,
-    /// also with notice: never dropped silently.
+    /// Save app's file unasked (its button is a download) via AttachmentSaver, with notice.
+    /// Text alone goes to clipboard, with notice: never dropped.
     function offer(filePath, text) {
         if (filePath.length === 0) {
             if (text.length > 0) {
@@ -92,21 +81,19 @@ Page {
         handoverSaver.keep(page.urlOf(filePath), "")
     }
 
-    /// Path as URL, encoded: a "#" or "%" in app's name would point elsewhere. Per segment.
+    /// Path as URL, encoded per segment: "#" or "%" in name would misdirect.
     function urlOf(filePath) {
         return Qt.resolvedUrl("file://" + filePath.split("/")
                                                   .map(encodeURIComponent)
                                                   .join("/"))
     }
 
-    // Saving: same copy the conversation makes of an attachment, same folder.
+    // Same copy and folder as conversation attachments.
     AttachmentSaver {
         id: handoverSaver
         objectName: "handoverSaver"
-        /// File app handed over: cache copy awaiting save. Dropped once saved or
-        /// failed (no retry; no pile of leftovers).
-        ///
-        /// List, oldest first: copy is off the Qt thread, so answers keep request order.
+        /// Cache copies awaiting save, oldest first (off-thread copy answers in order).
+        /// Dropped once saved or failed: no retry, no leftovers.
         property var handedOver: []
         onSaved: {
             notice.show(handoverSaver.savedText)
@@ -128,7 +115,7 @@ Page {
     Connections {
         target: core
         onCore_event: app.handle_event(context_id, kind, payload_json)
-        // App started before core up has nothing to serve: page waits, as chat list does.
+        // Core not up: nothing to serve yet; wait, as chat list does.
         onStatus_changed: page.run()
     }
 
@@ -141,25 +128,20 @@ Page {
 
     Component.onCompleted: page.run()
 
-    // Leaving stops app; covering does not. Not `Deactivating`: `sendToChat` opens picker over app,
-    // stopping there would kill host mid-request. Destruction is the leave signal (pop or replace).
+    // Leaving (destruction: pop or replace) stops app; covering doesn't. Not `Deactivating`:
+    // `sendToChat` picker over app would kill host mid-request.
     Component.onDestruction: app.stop()
 
-    // Not a PageHeader: name is the app's own, and header can't draw plain text.
-    // No pulley: needs SilicaFlickable, which takes the app's drags. `source_code_url` is on shim
-    // (docs/PROJECT.md).
+    // Not PageHeader: can't draw app's name as plain text. No pulley: SilicaFlickable takes
+    // app's drags. `source_code_url` on shim (docs/PROJECT.md).
     ConversationHeader {
         id: header
         objectName: "webxdcHeader"
         title: app.name.length > 0 ? app.name : page.appName
     }
 
-    // Where app draws. Nothing loads until host answers with an address; empty URL shows nothing.
-    //
-    // `active` not set here: WebView.qml binds it to page status and app focus. Overriding it left
-    // a grey view never activated by the transition.
-    //
-    // Address is a binding, never assigned: a handler-set address drew grey; `url:` binding worked.
+    // Empty until host gives address. `active` left to WebView.qml (page status, focus):
+    // overriding left grey, never-activated view. Address only as binding: assigned drew grey.
     WebView {
         id: view
         objectName: "webxdcView"
@@ -185,7 +167,7 @@ Page {
         running: !page.drew && page.errorMessage.length === 0
     }
 
-    // What shows until app draws something, and why if it never does. Gone once app is up.
+    // Shown until app draws, with reason if it never does.
     Label {
         objectName: "webxdcWaiting"
         anchors {
@@ -202,13 +184,13 @@ Page {
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
-        // Reason, not the wait: banner clears itself after seconds, leaving blank view unexplained.
+        // Reason stays here: banner clears in seconds, leaving blank view unexplained.
         //: Shown while a webxdc app is being made ready to run.
         text: page.errorMessage.length > 0 ? page.errorMessage
                                            : qsTr("Starting the app")
     }
 
-    // Says what just happened where there's no state: file copied out, or text on clipboard.
+    // Stateless notice: file copied out, or text on clipboard.
     Banner {
         id: notice
         objectName: "notice"

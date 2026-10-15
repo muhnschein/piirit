@@ -5,22 +5,19 @@ import "../js/Format.js" as Format
 import Piirit 1.0
 
 /*
- * One profile's settings: picture, name, status line, relays, read receipts,
- * relay and phone storage. From profile row on profiles page (invite code,
- * backup live there); profile-less settings on SettingsPage.qml. Core config
- * keys via Profile object (get_config/set_config), no model. No save button:
- * edits apply after pause and on exit, switch on tap.
+ * One profile's settings: picture, name, status, relays, read receipts,
+ * storage. Opened from profiles page row (invite code, backup there); global
+ * settings: SettingsPage.qml. Config via Profile get_config/set_config. No save
+ * button: edits apply after pause and on exit, switches on tap.
  *
- * Storage follows parla's profile dialog (github.com/trufae/parla): phone use,
- * then per relay a connection dot with core's words and a mailbox bar (0 until
- * relay says). No per-chat storage scan: too slow on phone.
- * Relays: profile reachable via several, each own address (Transports,
- * transports.rs); one with profile's own (invite) address first. Outgoing
- * relay is core's per-connect choice, unreported: no row claims it. Menu
- * removes (countdown); plus adds (AddRelayPage.qml). Last relay not
- * removable: core refuses. Changes reread core account list for profiles
- * page. Countdown beside list (PendingRemoval): rows rebuild on every relay
- * read.
+ * Storage as parla's dialog (github.com/trufae/parla): phone use, then per
+ * relay a dot with core's words and mailbox bar (0 until relay says). No
+ * per-chat scan: too slow.
+ * Relays (Transports, transports.rs), each own address; invite-address one
+ * first. Outgoing relay is core's unreported choice: no row claims it. Menu
+ * removes (countdown), plus adds (AddRelayPage.qml); last one not removable
+ * (core refuses). Changes reread account list for profiles page. Countdown
+ * kept outside rows (PendingRemoval): rows rebuild on each read.
  */
 Page {
     id: page
@@ -32,12 +29,10 @@ Page {
         objectName: "profile"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // Filled from core, not while typing: a save reloads and would reset
-        // cursor.
+        // Not refilled while typing: save reloads, would reset cursor.
         onLoaded_changed: {
             if (profile.loaded && !page.edited) {
-                // Assigning fires onTextChanged; else load counts as edit,
-                // writes back.
+                // Assigning fires onTextChanged: guard, or load writes back.
                 page.filling = true
                 nameField.text = profile.display_name
                 bioField.text = profile.status
@@ -51,8 +46,7 @@ Page {
         objectName: "transports"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // One relay fewer: address (may have gone with it), storage and
-        // profiles page row follow.
+        // Relay gone: address, storage, profiles row follow.
         onChanged: {
             profile.reload()
             profile.refresh_connectivity()
@@ -60,30 +54,27 @@ Page {
         }
     }
 
-    /// Relay wait before removal, ms; tests lower it.
+    /// Removal wait, ms; tests lower.
     property alias pendingDelay: doomedRelays.delay
 
-    /// Relays asked to remove, undo window. Address is tag: row may be gone.
+    /// Relays pending removal, by address (row may be gone).
     PendingRemoval {
         id: doomedRelays
         onRemove: transports.remove(tag)
     }
 
-    // Destroy as well as leave: "leaving" and "told it is leaving" differ
-    // (see profiles page). Flushing twice is harmless.
+    // Destroy as well as leave (see profiles page); double flush harmless.
     Component.onDestruction: doomedRelays.flush()
 
     Connections {
         target: core
-        // Connection change: mailbox, storage, relay mailboxes re-read. Relay
-        // change (here or other device) too.
+        // Connection or relay change (any device): re-read storage, mailboxes.
         onCore_event: {
             if (kind === "ConnectivityChanged" && context_id === page.accountId) {
                 connectivityRefresh.start()
                 relayRefresh.restart()
             }
-            // Other device changed relays: own-address relay may be gone; core
-            // moves address.
+            // Own-address relay may be gone; core moves address.
             if (kind === "TransportsModified" && context_id === page.accountId) {
                 profile.reload()
                 core.refresh_accounts()
@@ -92,17 +83,16 @@ Page {
         }
     }
 
-    // Several connection events on IO restart: reread once when quiet, not per
-    // event (a rebuild per event closes menu under finger).
+    // IO restart sends several events: reread once quiet (rebuild closes menu
+    // under finger).
     Timer {
         id: relayRefresh
         interval: 1000
         onTriggered: transports.reload()
     }
 
-    // Same events for connection, mailbox, storage (four round trips, one sizes
-    // every file): at most once a second. Started, not restarted: nothing under
-    // finger, dot worth following meanwhile. First read on open.
+    // Storage reads (four round trips, one sizes every file): max once a second,
+    // not restarted so dot keeps moving. Read on open.
     Timer {
         id: connectivityRefresh
         interval: 1000
@@ -138,22 +128,22 @@ Page {
         }
     }
 
-    // Leaving saves too: back-swipe in pause drops typing. Cursor leaves field
-    // so keyboard does not follow. Back from relay-add page rereads relays.
+    // Leaving saves (back-swipe in pause); unfocus so keyboard goes. Back from
+    // relay-add rereads relays.
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             nameField.done()
-            // Pending removals go now; timer may not have fired.
+            // Pending removals go now.
             doomedRelays.flush()
         } else if (status === PageStatus.Active) {
             transports.reload()
         }
     }
 
-    // Gallery via URL, as conversation attaches photo. Only Attach*Page files
-    // name `Sailfish.Pickers`; missing type costs button. That page ignores a
-    // cancelled pick, so core never gets `undefined` path.
+    // Gallery via URL as conversation does: only Attach*Page names
+    // `Sailfish.Pickers` (missing type costs button only); it drops cancelled
+    // pick, so core never gets `undefined`.
     function pickPicture() {
         var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
         if (picker) {
@@ -164,8 +154,8 @@ Page {
         }
     }
 
-    /// Relay dot in core report colours: green connected, yellow working, red
-    /// not, grey unreported. Names from transports.rs.
+    /// Relay dot: green connected, yellow working, red not, grey unreported
+    /// (names: transports.rs).
     function dotColor(dot) {
         if (dot === "green") {
             return "#34c759"
@@ -184,8 +174,7 @@ Page {
         return bytes > 0 ? Format.readableSize(bytes) : "0 B"
     }
 
-    /// Text under relay bar: amounts, else core's sentence, else "not said
-    /// yet".
+    /// Under relay bar: amounts, else core's sentence, else "not said yet".
     function quotaWords(usedBytes, limitBytes, text) {
         if (limitBytes > 0) {
             //: The mailbox on the relay. %1 used, %2 the whole, each a size such as "1.4 GB".
@@ -203,8 +192,7 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Only with picture to remove; off the picture (no delete tap under
-        // finger).
+        // Only with picture; off picture (no delete under finger).
         PullDownMenu {
             visible: profile.avatar_path.length > 0
 
@@ -224,7 +212,7 @@ Page {
                 title: qsTr("Profile")
             }
 
-            // Picture is the control: tap opens gallery; badge says so.
+            // Tap picture opens gallery; badge says so.
             Item {
                 width: parent.width
                 height: bigAvatar.height + 2 * Theme.paddingLarge
@@ -265,8 +253,7 @@ Page {
                 }
             }
 
-            // Name under picture (EditableName.qml). No hint: heading says what
-            // it is for.
+            // Name under picture (EditableName.qml); no hint.
             EditableName {
                 id: nameField
                 objectName: "profileNameControl"
@@ -288,19 +275,18 @@ Page {
             TextSwitch {
                 objectName: "readReceiptsSwitch"
                 text: qsTr("Send read receipts")
-                // Core: mdns_enabled is two-way; off stops read marks coming
-                // back.
+                // mdns_enabled is two-way: off also stops incoming marks.
                 description: qsTr("If read receipts are disabled, you won't be able to see read receipts from others.")
-                // Not held here: core decides. Tap must not flip it (Silica
-                // would detach binding). Tap asks core; binding shows answer.
+                // Core decides: tap asks, binding shows answer (Silica flip
+                // would detach it).
                 automaticCheck: false
                 checked: profile.read_receipts
                 enabled: profile.loaded
                 onClicked: profile.set_read_receipts(!checked)
             }
 
-            // Relay addresses, minted by relays, and what tells profiles apart.
-            // Not edited: change = add + remove.
+            // Relay-minted addresses, what tells profiles apart. Change = add +
+            // remove.
             SectionHeader {
                 text: qsTr("Relays")
             }
@@ -317,9 +303,9 @@ Page {
                     width: column.width
                     contentHeight: relayBody.height + 2 * Theme.paddingSmall
 
-                    /// Address on this relay, for tests.
+                    /// Address, for tests.
                     readonly property string addr: model.addr
-                    /// Relay on its way out.
+                    /// Pending removal.
                     readonly property bool doomed: doomedRelays.pending(model.id)
 
                     Column {
@@ -350,8 +336,7 @@ Page {
                         }
                     }
 
-                    /// Silica countdown over relay. Removal in `doomedRelays`:
-                    /// rows rebuild on relay read. Draws, reports tap.
+                    /// Silica countdown; state in `doomedRelays` (rows rebuild).
                     function raiseRemorse() {
                         //: What Silica's countdown says it is doing, over a
                         //: relay the reader has asked to remove.
@@ -379,7 +364,7 @@ Page {
                             objectName: "removeRelayItem"
                             enabled: transports.count > 1
                             text: qsTr("Remove relay")
-                            // Page told, not row: rebuilt on reload.
+                            // Tell page: row rebuilt on reload.
                             onClicked: {
                                 doomedRelays.ask(model.id, model.addr)
                                 relayRow.raiseRemorse()
@@ -416,8 +401,7 @@ Page {
                       .arg(Format.readableSize(profile.storage_bytes))
             }
 
-            // Relay row: connection dot and mailbox bar. Drawn, not ProgressBar
-            // (its track sits inside margins).
+            // Relay row: dot and mailbox bar, drawn (ProgressBar track inset).
             Repeater {
                 objectName: "relayReports"
                 model: transports.rows
@@ -461,8 +445,7 @@ Page {
                             wrapMode: Text.Wrap
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.highlightColor
-                            // Core's words when any. Not connected (IO
-                            // stopped): core has none for any relay.
+                            // Core's words; none when IO stopped.
                             textFormat: Text.PlainText
                             text: model.status.length > 0 ? model.status
                                   : model.offline ? qsTr("Not connected")
@@ -547,12 +530,11 @@ Page {
 
     Connections {
         target: profile
-        // Quiet confirmation: something reached core.
+        // Quiet save confirmation.
         onSaved: {
             notice.show(qsTr("Saved"))
-            // Profiles page rows come from core account list, which doesn't
-            // signal name/picture change: reread so swipe back shows it.
-            // Reconciled in place (core.rs), no flicker.
+            // Account list doesn't signal name/picture change: reread for
+            // profiles page (reconciled in place, core.rs).
             core.refresh_accounts()
         }
     }

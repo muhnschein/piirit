@@ -3,15 +3,13 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Profile exists elsewhere: on a device they have (local network, both keep
- * it) or in a backup file copied here. Both go to RestoreProfilePage. This
- * page asks which: first steps differ (camera vs file browser).
+ * Existing profile: other device (local network, both keep it) or backup
+ * file. Asks which (camera vs file browser), then RestoreProfilePage.
  */
 Page {
     id: page
 
-    /// No quick actions while up: first step of a profile transfer.
-    /// See piirit.qml.
+    /// No quick actions: profile transfer step. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
     allowedOrientations: Orientation.All
@@ -45,7 +43,7 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        // Each answer shows what it is about: other phone, file it wrote.
+        // Each answer pictured: phone, file.
         ChoiceTiles {
             objectName: "whereWays"
             width: parent.width

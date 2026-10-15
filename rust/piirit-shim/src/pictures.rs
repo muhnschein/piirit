@@ -1,15 +1,14 @@
-//! Screen-ready pictures: avatar circle, tinted face, intro drawing, blurred backdrop.
-//! QML draws `image://piirit/<kind>?<recipe>` ([`Recipe`]) as a plain `Image`.
+//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop), drawn
+//! by QML as plain `Image` of `image://piirit/<kind>?<recipe>` ([`Recipe`]).
 //!
-//! Not `ShaderEffect`: on Sailfish Qt 5.6, hiding a window with persistent scene graph (cover,
-//! each time app comes to front) runs `cleanupMaterialCache()`, deleting material types while
-//! materials and program cache keyed by them live on. A new `ShaderEffect` reusing a freed type
-//! address gets the dead one's program, its uniforms set by position (flat squares, issue #102).
-//! Qt 5.15 fixed it; Sailfish ships 5.6.
+//! Not `ShaderEffect`: Sailfish Qt 5.6 (fixed 5.15) hiding a persistent-scene-graph window
+//! (cover, each return to front) runs `cleanupMaterialCache()`, freeing material types while
+//! program cache keyed by them lives on; new `ShaderEffect` at freed address gets dead one's
+//! program, uniforms by position: flat squares (issue #102).
 //!
-//! Plain `Image` uses Qt's texture material: static type, never deleted. Per-pixel shader math
-//! done once per picture here; Qt's pixmap cache keeps result. Decode and scale: Qt, in C++
-//! provider below. Arithmetic: Rust on straight ARGB32, pinned by tests.
+//! `Image`'s texture material is static, never freed. Shader math done once per picture,
+//! kept in Qt's pixmap cache. Qt decodes, scales (C++ below); Rust does arithmetic on
+//! straight ARGB32, pinned by tests.
 
 // `cpp!` is FFI, so `unsafe`. Allowed here only: see docs/BUILDING.md.
 #![allow(unsafe_code)]
@@ -35,7 +34,7 @@ cpp! {{
     // Size per recipe kind; `requested` from Image or not.
     static QSize piirit_want(int kind, const QSize &natural, const QSize &requested) {
         if (kind == 2) {
-            // Blur keeps nothing a small copy lacks: blur small, draw large.
+            // Blur loses nothing to small copy: blur small, draw large.
             return natural.scaled(QSize(64, 64), Qt::KeepAspectRatio);
         }
         return requested.isValid() && requested.width() > 0 && requested.height() > 0
@@ -58,8 +57,8 @@ cpp! {{
             return QImage();
         }
         QImageReader reader(piirit_local(file));
-        // Decode at drawn size: a 12 MP photo is 48 MB for a 200 px circle. Big enough to
-        // cover draw in own proportions (crop below unchanged); never above natural size.
+        // Decode at drawn size (12 MP photo = 48 MB for 200 px circle): covering draw in own
+        // proportions, never above natural.
         QSize natural = reader.size();
         if (natural.isValid() && !natural.isEmpty()) {
             QSize decode = natural.scaled(piirit_want(kind, natural, requested),
@@ -132,10 +131,8 @@ cpp! {{
 
 }}
 
-/// Give `engine` the provider: `image://piirit/<recipe>`.
-///
-/// Provider is per engine: app's view and each picture-reading test add it. Without: pictures
-/// fail, avatars show initial.
+/// Give `engine` the provider: `image://piirit/<recipe>`. Per engine: app's view and each
+/// picture test add it; without, avatars show initial.
 pub fn install(engine: &qmetaobject::QmlEngine) {
     let engine = engine.cpp_ptr();
     cpp!(unsafe [engine as "QQmlEngine *"] {
@@ -145,9 +142,7 @@ pub fn install(engine: &qmetaobject::QmlEngine) {
     });
 }
 
-/// Draw `id` as the provider, `width` by `height`: straight ARGB32.
-///
-/// `None` if no picture. For tests.
+/// Draw `id` as provider would, `width` by `height`, straight ARGB32; `None` if no picture.
 #[must_use]
 pub fn render(id: &str, width: i32, height: i32) -> Option<(Vec<u32>, usize, usize)> {
     let id = QString::from(id);

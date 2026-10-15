@@ -1,13 +1,11 @@
 //! Pictures, sounds, files, apps, calls of a chat: pages behind contact/group page tiles.
 //!
-//! Core keeps the index: `get_chat_media` gives ids of up to three kinds, oldest first, and
-//! its note says not to re-sort. Only reversed (newest first, as gallery). Three kinds per
-//! call is core's limit; reference clients' four tabs each fit one, hence four pages.
+//! Core's `get_chat_media`: ids of up to three kinds (core's limit; reference clients' four
+//! tabs each fit one call, hence four pages), oldest first, not to re-sort; only reversed.
 //!
-//! Messages read like conversation's (`get_messages`, pages of fifty), but top down without
-//! waiting to be asked: placeholder rows from ids on (count known), first screen filled
-//! before rest. Thousand pictures = twenty background calls, no wait. Read rows kept across
-//! reload: new picture = one row fetched, nothing moved.
+//! Messages read as conversation (`get_messages`, pages of fifty) but top down unasked:
+//! placeholder rows from ids, first screen first. Read rows kept across reload: new picture =
+//! one row fetched, nothing moved.
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
@@ -27,8 +25,7 @@ const PAGE: usize = 50;
 
 /// View types per kind, as `get_chat_media` takes: one required, two optional.
 ///
-/// No stickers: gallery's three slots hold what reference clients put there. Shared
-/// contacts in files (reference clients have no place; else findable nowhere).
+/// No stickers (gallery slots as reference clients). Contacts in files: else findable nowhere.
 fn view_types(kind: &str) -> Option<(&'static str, Option<&'static str>, Option<&'static str>)> {
     match kind {
         "gallery" => Some(("Image", Some("Gif"), Some("Video"))),
@@ -72,16 +69,14 @@ pub struct ChatMedia {
     /// Account, chat or kind changed.
     pub source_changed: qt_signal!(),
 
-    /// Rows, newest first, for `model`. Placeholder (id only) until page read; row's
-    /// `loaded` says which.
+    /// Rows, newest first, for `model`; id-only until read (row's `loaded`).
     pub rows: qt_property!(RefCell<MessageListModel>; CONST),
     /// Row count.
     pub count: qt_property!(u32; READ count NOTIFY rows_changed),
     /// Emitted on any `rows` change.
     pub rows_changed: qt_signal!(),
 
-    /// True once ids in, success or not: `count` now valid, empty page can say so. Rows
-    /// may still fill.
+    /// Ids in (or failed): `count` valid; rows may still fill.
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// True from load start until last page.
     pub loading: qt_property!(bool; NOTIFY loaded_changed),
@@ -93,18 +88,16 @@ pub struct ChatMedia {
 
     /// Reload list, keeping read rows.
     pub reload: qt_method!(fn(&mut self)),
-    /// Delete here and on server, as conversation menu does.
+    /// Delete here and on server (as conversation menu).
     pub delete_message: qt_method!(fn(&mut self, message_id: u32)),
-    /// Delete for all in chat, as conversation offers.
+    /// Delete for all in chat.
     pub delete_message_for_all: qt_method!(fn(&mut self, message_id: u32)),
     /// Apply core event; this chat only.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Load counter: older load's page can't land in newer's rows; see `ChatInfo`.
-    ///
-    /// Shared with load, read before each page: stops once newer starts. Every chat message
-    /// starts one; run to end, old load reread pages newer was reading anyway.
+    /// Load counter, as `ChatInfo`: older page can't land in newer rows. Checked per page, so
+    /// old load stops (every chat message starts one).
     generation: Arc<AtomicU64>,
 }
 
@@ -141,7 +134,7 @@ impl ChatMedia {
         }
     }
 
-    /// Drop rows, reread: held rows are other chat/kind or untrusted.
+    /// Drop rows, reread: held rows other chat/kind or untrusted.
     fn start_over(&mut self) {
         self.rows.borrow_mut().reset_data(Vec::new());
         self.rows_changed();
@@ -152,7 +145,7 @@ impl ChatMedia {
         self.reload();
     }
 
-    /// Reread, keep read rows. Fetch only missing: no-op event costs one call.
+    /// Reread, keep read rows; fetch only missing (no-op event = one call).
     pub fn reload(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         let kind = self.kind.to_string();
@@ -204,7 +197,7 @@ impl ChatMedia {
                 .collect();
             step(Step::Ids(ids));
             for page in wanted.chunks(PAGE) {
-                // Newer load supersedes this one; page now would be dropped.
+                // Newer load started.
                 if current.load(Ordering::Relaxed) != generation {
                     return;
                 }
@@ -239,8 +232,7 @@ impl ChatMedia {
         }
     }
 
-    /// Ids back: one row per id, in order, keeping read rows.
-    /// Unchanged list touches nothing.
+    /// Ids back: row per id, keeping read rows; unchanged list touches nothing.
     fn place(&mut self, ids: &[u32]) {
         let same = {
             let rows = self.rows.borrow();
@@ -265,7 +257,7 @@ impl ChatMedia {
         self.set_loaded(true);
     }
 
-    /// Fill rows by id, not index, as conversation (list may change mid-read). Returns rows filled.
+    /// Fill rows by id, not index (list may change mid-read). Returns rows filled.
     fn fill(&mut self, items: Vec<MessageListItem>) -> usize {
         let mut rows = self.rows.borrow_mut();
         let index_of: BTreeMap<u32, usize> = rows
@@ -283,8 +275,7 @@ impl ChatMedia {
         landed
     }
 
-    /// Reread one message, replace its row: rest of download-limited message landing, or
-    /// edit from elsewhere.
+    /// Reread one message's row: limited download landing, or remote edit.
     fn refresh_one(&mut self, message_id: u32) {
         let account_id = self.account_id;
         if !self
@@ -329,9 +320,8 @@ impl ChatMedia {
 
     /// Ask core to delete, then reread list.
     ///
-    /// Core announces deletion and list rereads on that; reread here so row goes on
-    /// agreement, not a turn later, and refusal reported as any failure. Second read moves
-    /// nothing. No core: nothing to delete from (every row came from one).
+    /// Reread here too (core event follows): row goes at once, refusal reported as failure.
+    /// No core: nothing to delete.
     fn remove(&mut self, method: &'static str, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -366,15 +356,14 @@ impl ChatMedia {
         match kind.as_str() {
             // Arrived or gone: reread; fetch only new.
             "IncomingMsg" | "MsgDeleted" => self.reload(),
-            // Reread, and the named message: download held back by limit lands as this
-            // event, nothing else different, filling row already here.
+            // Also reread named message: limited download lands as this event.
             "MsgsChanged" => {
                 self.reload();
                 if let Some(message_id) = json::u32_opt(&payload, "msgId").filter(|id| *id != 0) {
                     self.refresh_one(message_id);
                 }
             }
-            // Core dropped events: held rows may be wrong in ways no later event says. Restart, don't patch.
+            // Core dropped events: rows may be wrong silently. Restart.
             "EventChannelOverflow" => self.start_over(),
             _ => {}
         }
@@ -408,7 +397,7 @@ fn placeholder(message_id: u32) -> MessageListItem {
 
 /// Ids of these kinds in chat, newest first.
 ///
-/// Core answers oldest first, asks not to re-sort; reversing isn't sorting.
+/// Core answers oldest first, not to re-sort; reversed only.
 async fn fetch_ids(
     rpc: &RpcClient,
     account_id: u32,

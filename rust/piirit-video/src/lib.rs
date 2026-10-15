@@ -1,13 +1,9 @@
-//! Shrinks video to send. Phone video often exceeds `sys.msgsize_max_recommended`
-//! (~22 MB), so some relays refuse it; core recodes pictures, not videos.
-//! FFmpeg decodes and scales; x264 encodes at outgoing media quality's bit rate
-//! (in-app camera's rates, `qml/pages/CapturePage.qml`), aimed under the
-//! recommendation. deltachat-android does this with platform codecs
-//! (`VideoRecoder.java`); Harbour app may not link those, so built in
-//! (`build.rs`).
+//! Shrinks video to send: phone video often exceeds `sys.msgsize_max_recommended` (~22 MB),
+//! refused by some relays; core recodes only pictures. FFmpeg decodes, scales; x264 encodes
+//! at media quality's rate (in-app camera's, `qml/pages/CapturePage.qml`). Built in
+//! (`build.rs`): Harbour app may not link platform codecs deltachat-android uses.
 //!
-//! Three steps, so shim can say what's coming first: [`probe`] reads header,
-//! [`plan`] decides whether and at what size, [`recode`] does it.
+//! [`probe`] reads header, [`plan`] decides, [`recode`] does it: shim says what's coming.
 
 // Shipped code: stricter lints than tests; see piirit-shim/src/lib.rs.
 #![cfg_attr(
@@ -118,14 +114,12 @@ struct Quality {
     least_video: u64,
 }
 
-/// Video bit/s per quality. Worse: `CapturePage.qml`'s worse rate (deltachat-ios
-/// low preset) at phone screen width. Balanced: recoded only to fit
-/// recommendation, so twice camera's balanced rate (1.5 Mbit/s smears 720p in
-/// motion; near-limit video has room). Long ones squeezed below (see `plan`).
+/// Video bit/s per quality. Worse: `CapturePage.qml`'s (deltachat-ios low preset) at phone
+/// screen width. Balanced recodes only to fit: twice camera's rate (1.5 Mbit/s smears 720p
+/// in motion). Long ones squeezed (`plan`).
 ///
-/// Least: floor for long video (480p at 700 kbit/s, 360p at 300 kbit/s still
-/// show faces and hands). Below that: mush. Video that cannot fit at least is
-/// sent at it, past recommendation; conversation flags it large, as any file.
+/// Least: floor for long video (480p 700 kbit/s, 360p 300 kbit/s still show faces, hands).
+/// Not fitting at least: sent at it, past recommendation, flagged large.
 const BALANCED_QUALITY: Quality = Quality {
     video: 3_000_000,
     audio: 64_000,
@@ -139,22 +133,19 @@ const WORSE_QUALITY: Quality = Quality {
     least_video: 300_000,
 };
 
-/// Balanced recodes only when video is this close to recommended size (percent);
-/// below, it fits and recoding only costs picture. Worse: any size.
+/// Balanced recodes only within this percent of recommended size (below, only costs
+/// picture). Worse: any.
 const NEAR_LIMIT_PERCENT: u64 = 80;
 
-/// Container cost over streams, as percent of budget held back: a few percent
-/// for a long file's index.
+/// Container overhead: percent of budget held back (long file's index).
 const CONTAINER_SHARE: u64 = 5;
 
-/// Recode or not, and at what size; `None` sends as is.
+/// Recode or not, at what size. `None` sends as is: undecodable, length unknown, saving
+/// under a fifth (in-app camera already at these rates), or balanced not near limit
+/// (`NEAR_LIMIT_PERCENT`).
 ///
-/// Balanced: only near recommended size (`NEAR_LIMIT_PERCENT`). Worse: any.
-/// Always as is if not decodable, length unknown, or saving under a fifth (in-app
-/// camera video is already at these rates).
-///
-/// `limit`: core's recommended max attachment; 0 if unknown. Output past it gets
-/// lower bit rate, down to quality's least (below: not worth sending).
+/// `limit`: core's recommended max, 0 if unknown. Output past it gets lower rate, down to
+/// quality's least.
 #[must_use]
 pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> Option<Target> {
     if !matches!(probe.video_codec, VideoCodec::H264 | VideoCodec::Hevc)
@@ -222,8 +213,7 @@ fn fit(width: u32, height: u32, long_side: u32) -> (u32, u32) {
         (width, height)
     } else {
         let scale = |side: u32| {
-            // Integer rounding (sides a few thousand at most); `long` > `long_side`,
-            // so not 0.
+            // Integer rounding (sides few thousand max); `long` > `long_side`, so not 0.
             let scaled = u64::from(side)
                 .saturating_mul(u64::from(long_side))
                 .saturating_add(u64::from(long) / 2)
@@ -284,15 +274,12 @@ pub fn probe(path: &Path) -> Result<Probe, String> {
     })
 }
 
-/// Recodes `input` to `output` (MP4) as `target` says.
-///
-/// `progress` gets 0.0..=1.0, returns whether to go on; called on this thread.
-/// Blocks (a minute of video is seconds of work): call from a worker.
+/// Recodes `input` to `output` (MP4) per `target`; `progress` gets 0.0..=1.0 on this thread,
+/// returns go on. Blocks (seconds per video minute): call from worker.
 ///
 /// # Errors
 ///
-/// On read, decode or write failure. `output` then partial (as after cancel);
-/// caller removes it.
+/// On read, decode or write failure; partial `output` left for caller to remove.
 pub fn recode<F>(
     input: &Path,
     output: &Path,
@@ -333,8 +320,8 @@ where
     }
 }
 
-/// Writes test clip: `seconds` of moving H.264 at `width` x `height`, `bit_rate`;
-/// AAC tone if `with_sound`; `rotation` degrees clockwise. Tests only (no camera).
+/// Test clip: `seconds` of moving H.264, `width` x `height`, `bit_rate`; AAC tone if
+/// `with_sound`; `rotation` degrees clockwise.
 ///
 /// # Errors
 ///
@@ -374,7 +361,7 @@ pub fn synth(
 /// Error buffer size for C messages.
 const ERROR_LEN: usize = 256;
 
-/// Called by C with progress. Closure says keep going; reply is its opposite.
+/// Called by C with progress; reply is opposite of closure's keep-going.
 extern "C" fn report<F: FnMut(f64) -> bool>(context: *mut c_void, permille: i32) -> c_int {
     // SAFETY: `context` is `recode`'s `&mut F`, alive and unborrowed during the call.
     #[allow(unsafe_code)]

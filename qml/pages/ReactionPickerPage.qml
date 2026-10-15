@@ -5,28 +5,26 @@ import "../js/Emoji.js" as Emoji
 import "../js/EmojiPicker.js" as Picker
 
 /*
- * Any emoji as reaction: the "+" at end of quick reactions. One tap reacts and
- * returns; back picks nothing. Asking page sends the pick (as ChatPickerPage):
- * source row may be gone by then. Emoji drawn as pictures (EmojiGlyph: Sailfish
- * draws few); text if reader wants system's own. Unicode list minus skin tones,
- * by group, recent first. Bindings, not positioners, so tests find each emoji.
+ * Any emoji as reaction ("+" after quick reactions). Tap reacts, returns; back picks
+ * none. Asking page sends (as ChatPickerPage): source row may be gone. Pictures
+ * (EmojiGlyph: Sailfish draws few), text if reader wants system's. Unicode minus
+ * skin tones, by group, recent first. Bindings, not positioners: tests find each.
  */
 Page {
     id: page
 
-    /// Reader's own reaction, marked; "" for none. Tap takes it off.
+    /// Own reaction, marked; "" none.
     property string current: ""
     /// Recently picked here, newest first.
     property var recent: []
 
-    /// Emoji picked. `current` when marked one tapped, spelled exactly as sent:
-    /// core takes it as same reaction and removes it.
+    /// Emoji picked; marked one tapped gives `current` spelled exactly: core removes it.
     signal picked(string emoji)
 
     /// Search text, once typing stops.
     property string query: ""
 
-    /// Unicode group titles, in EmojiData.js numbering.
+    /// Group titles, EmojiData.js numbering.
     readonly property var groupTitles: [
         qsTr("Smileys & emotion"),
         qsTr("People & body"),
@@ -39,16 +37,15 @@ Page {
         qsTr("Flags")
     ]
 
-    /// Recent group: before every group.
+    /// Recent group: first.
     readonly property int recentGroup: -1
 
-    /// Emoji per row: square cells with room around, any width (packed grid is
-    /// hard to aim at).
+    /// Emoji per row: roomy square cells, any width (packed grid hard to aim).
     readonly property int columns: Math.max(5, Math.floor(width / Theme.itemSizeMedium))
     readonly property real cellSize: width / columns
     /// Emoji size in its cell.
     readonly property real glyphSize: Math.round(page.cellSize * 0.5)
-    /// `current` as grid compares it, worked out once.
+    /// `current` as grid compares it, once.
     readonly property string currentKey: page.current.length > 0 ? Emoji.key(page.current) : ""
 
     /// Search results; [] when no search.
@@ -74,7 +71,7 @@ Page {
         return out.concat(Picker.rows(Picker.all(), page.columns, page.groupTitles))
     }
 
-    /// Group at top of grid now, lit on jump strip.
+    /// Top group, lit on jump strip.
     property int topGroup: page.recentGroup
 
     function choose(emoji) {
@@ -127,7 +124,7 @@ Page {
             onTextChanged: searchDebounce.restart()
         }
 
-        // Jump button per group; gone while searching.
+        // Jump per group; hidden while searching.
         Item {
             id: strip
             objectName: "groupStrip"
@@ -168,11 +165,10 @@ Page {
             right: parent.right
             bottom: parent.bottom
         }
-        // Under search field, not in header: flicked rows would draw over it.
+        // Not in header: flicked rows drew over field.
         clip: true
-        // A count, not rows: list handed to a view is copied out of JS whole,
-        // each row copied back per delegate; scrolling stalled on it. Each
-        // delegate reads its own row.
+        // Count, not rows: JS list given to view is copied whole, then per delegate;
+        // scrolling stalled. Delegates read own row.
         model: page.rows.length
         onContentYChanged: page.followScroll()
 
@@ -182,7 +178,7 @@ Page {
             readonly property var entry: page.rows[index]
             width: grid.width
             height: entry.heading.length > 0 ? sectionTitle.height : page.cellSize
-            /// Cell being pressed: the row's one highlight.
+            /// Pressed cell: row's one highlight.
             property int pressedCell: -1
             /// Cell with reader's own reaction, or -1.
             readonly property int markedCell: {
@@ -197,9 +193,8 @@ Page {
                 return -1
             }
 
-            // Built only on heading row. Loader gets no width: it would pass it
-            // to header, which keeps inset x, pushing text off screen. Header
-            // gets the row-derived width itself.
+            // Heading row only. Loader unsized: it would pass width to header,
+            // whose inset x pushed text off screen; header sizes from row.
             Loader {
                 id: sectionTitle
                 active: row.entry.heading.length > 0
@@ -210,8 +205,7 @@ Page {
                 }
             }
 
-            // Pressed feedback per row, not per cell: row build cost is flick
-            // cost per frame.
+            // Press feedback per row, not cell: build cost is flick cost.
             Rectangle {
                 visible: row.pressedCell >= 0
                 x: row.pressedCell * page.cellSize
@@ -221,8 +215,7 @@ Page {
                                   Theme.highlightBackgroundOpacity)
             }
 
-            // Cells plain touch areas: BackgroundItem each was most of row
-            // weight.
+            // Plain touch cells: BackgroundItems were most of row weight.
             Repeater {
                 model: row.entry.cells.length
 
@@ -248,7 +241,7 @@ Page {
                 }
             }
 
-            // Own reaction underlined; tap takes it off. One per row.
+            // Own reaction underlined; tap removes. One per row.
             Rectangle {
                 objectName: "currentMark"
                 visible: row.markedCell >= 0

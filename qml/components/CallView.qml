@@ -3,14 +3,10 @@ import Sailfish.WebView 1.0
 import Sailfish.WebEngine 1.0
 
 /*
- * Call media page: upstream calls-webapp, served by shim on loopback
- * (call_host.rs), run by browser engine (peer connection, codecs, echo cancel).
- *
- * Own component. `Sailfish.WebView` resolves only on releases with the engine;
- * missing, only this breaks.
- *
- * Decides nothing about the call. Here: how engine treats the page, in two
- * places a call differs from a page.
+ * Call media page: upstream calls-webapp, served on loopback (call_host.rs),
+ * run by browser engine (peer connection, codecs, echo cancel). Own component:
+ * `Sailfish.WebView` missing on some releases, only this breaks. Decides
+ * nothing about the call; only how engine treats the page.
  */
 Item {
     id: root
@@ -27,12 +23,11 @@ Item {
     /// Page drawn once.
     readonly property bool loaded: view.loaded
 
-    /// Page up once call sound routed (CallAudio.ready). Earlier mic opens before
-    /// sound moves, which kills sound server (CallAudio.qml). Only coming up
-    /// waits: an up page is not taken down.
+    /// Page up once call sound routed (CallAudio.ready): earlier, mic opens
+    /// before sound moves, killing sound server (CallAudio.qml). Up page stays.
     property bool allowed: true
 
-    /// Target URL, once mic granted. Set, not bound, so grant always comes first.
+    /// Target URL, once mic granted. Set, not bound: grant first.
     property string target: ""
 
     /// Page address: `127.0.0.1:port`.
@@ -61,14 +56,12 @@ Item {
     property string granted: ""
 
     /// Device grants. Camera opens only when switched on (call_video.js); grant
-    /// keeps that switch from prompting too.
+    /// keeps switch from prompting.
     readonly property var devices: ["microphone", "camera"]
 
-    /// Grant page mic and camera before it asks.
-    ///
-    /// Engine prompts per origin; call origin is a new port each call, so
-    /// "remember" fails. Reader consented already. Session grant, revoked at
-    /// call end. Origin only: engine-wide switch hits webxdc apps too.
+    /// Grant page mic and camera before it asks. Engine prompts per origin, new
+    /// port each call ("remember" fails); reader consented already. Session
+    /// grant, revoked at end. Origin only: engine-wide hits webxdc apps too.
     function grant(origin) {
         if (root.granted === origin) {
             return
@@ -104,11 +97,9 @@ Item {
         root.granted = ""
     }
 
-    /// Grant origin, then point view: page cannot ask before it is there.
-    ///
-    /// Not before engine up (starts on event loop after first import, i.e. now on
-    /// a run's first call): earlier requests dropped with warning only; grant lost,
-    /// call opens on engine's mic prompt.
+    /// Grant origin, then point view. Not before engine up (event loop after first
+    /// import, i.e. first call): earlier requests dropped with warning, call opens
+    /// on mic prompt.
     function go() {
         if (!WebEngine.isInitialized()) {
             return
@@ -133,9 +124,9 @@ Item {
     Component.onCompleted: root.go()
     Component.onDestruction: root.revoke()
 
-    // `active`: WebView.qml's binding (page on screen, app in front), as `shown`
-    // until page up. Hidden document pauses media (other end's voice), so it
-    // stays active for the call. Never-active view draws nothing (WebxdcPage.qml).
+    // `active`: WebView.qml's binding (`shown`) until page up. Hidden document
+    // pauses media (other end's voice): active for the call. Never-active view
+    // draws nothing (WebxdcPage.qml).
     WebView {
         id: view
         objectName: "callView"

@@ -1,7 +1,6 @@
 //! One chat's messages, as a QML type.
 //!
-//! One instance per conversation page, so two open chats don't share a model. Loading is a
-//! batch call; events update rows in place, not refetch whole history.
+//! One per conversation page: no shared model. Batch load; events update rows in place.
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashSet, VecDeque};
@@ -23,43 +22,30 @@ const UNSEEN_STATES: [u32; 2] = [10, 13];
 
 /// Messages per fetch.
 ///
-/// Ids cheap, messages not: `get_message_list_items` gives numbers for whole chat,
-/// `get_messages` builds every field. So model holds a row per message once the list
-/// arrives, fills only viewed ones.
-///
-/// Keeps first message at row 0. Moving window would replace model contents to go anywhere,
-/// losing view's place. Whisperfish and deltachat-android keep whole chat addressable too.
+/// Ids cheap, messages not: model holds a row per message once id list arrives, fills only
+/// viewed ones. First message stays row 0: moving window would lose view's place
+/// (Whisperfish, deltachat-android likewise).
 const PAGE: usize = 50;
 
-/// Rows filled past the view: no blanks on scroll.
-///
-/// Rows; placeholder is one line, so screen ~thirty rows. Smaller than a screen: fast scroll
-/// hits blanks halfway down, rest waiting a round trip.
+/// Rows filled past view. Screen ~thirty one-line placeholders; less and fast scroll hits
+/// blanks.
 const MARGIN: usize = 40;
 
-/// Max fetches in flight.
-///
-/// More than one: fling outruns round trip; single fetch for rows already passed would block
-/// rows ahead, screen blank meanwhile. Bounded: long flick asks for what it passes, not all at
-/// once.
+/// Max fetches in flight: fling outruns one round trip, and fetch for passed rows would
+/// block rows ahead. Bounded: long flick asks only what it passes.
 const IN_FLIGHT: usize = 4;
 
 /// Message in id list: id and day.
 ///
-/// Day comes with id, not message, on purpose: placeholder with unknown day gets
-/// re-sectioned on fetch; heading gaining height after layout draws over row beneath, while
-/// waiting rows share an epoch-headed section. Both reported: "1 January 1970" strip, real
-/// date overlapping first message. `get_message_list_items` interleaves core's day markers
-/// when asked: costs only the flag.
+/// Day with id, not message: unknown-day placeholder re-sectioned on fetch drew heading over
+/// row beneath; waiting rows shared "1 January 1970". Core's day markers cost one flag.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Entry {
     pub message_id: u32,
     pub day_number: i64,
 }
 
-/// Page a chat opens with.
-///
-/// `find`: message to open at. Not in chat (0 included): newest.
+/// Page a chat opens with: at `find`, or newest if not in chat (0 too).
 pub(crate) fn opening_page(entries: &[Entry], find: u32) -> &[Entry] {
     let start = match entries.iter().position(|entry| entry.message_id == find) {
         // Half page above: not on top edge.
@@ -107,10 +93,8 @@ pub struct ChatMessages {
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY chat_changed),
     /// Chat id. Set reloads.
     pub chat_id: qt_property!(u32; WRITE set_chat_id NOTIFY chat_changed),
-    /// True once load finished, however it went.
-    ///
-    /// `count` can't tell empty chat from not-yet-arrived: without this, "no messages yet"
-    /// flashed on every open.
+    /// True once load finished, however. `count` can't tell empty from not-arrived ("no
+    /// messages yet" flashed).
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted on `loaded` change.
     pub loaded_changed: qt_signal!(),
@@ -121,28 +105,26 @@ pub struct ChatMessages {
     pub is_group: qt_property!(bool; NOTIFY is_group_changed),
     /// Emitted once chat kind known.
     pub is_group_changed: qt_signal!(),
-    /// Member count incl. reader, under group name in header. 0 until shape known, and for
-    /// 1:1 (says nothing name doesn't).
+    /// Member count incl. reader, for header; 0 until known, and for 1:1.
     pub member_count: qt_property!(u32; NOTIFY member_count_changed),
     /// Emitted when member count read and changed.
     pub member_count_changed: qt_signal!(),
-    /// Account can write: false if left group or unaccepted contact request. Decides whether
-    /// own message offered for editing (core would refuse; reference client checks first).
+    /// Account can write (not if left group / unaccepted request). Gates edit offer, as
+    /// reference client.
     pub can_send: qt_property!(bool; NOTIFY can_send_changed),
     /// Emitted once can-send known.
     pub can_send_changed: qt_signal!(),
-    /// End-to-end encrypted. Edit is a Delta Chat message; unencrypted = plain-email chat, where
-    /// a mail program would show edit as another mail. Reference client offers no edit there.
+    /// End-to-end encrypted. Plain-email chat gets no edit: mail program shows it as another
+    /// mail (reference client likewise).
     pub is_encrypted: qt_property!(bool; NOTIFY is_encrypted_changed),
     /// Emitted once encryption known.
     pub is_encrypted_changed: qt_signal!(),
-    /// Call placeable: one other person, encrypted, writable, not "Saved messages". Reference
-    /// clients' call-button rule; core refuses elsewhere.
+    /// Call placeable: one other person, encrypted, writable, not "Saved messages" (reference
+    /// clients' rule; core refuses elsewhere).
     pub can_call: qt_property!(bool; NOTIFY can_call_changed),
     /// Emitted once call-ability known.
     pub can_call_changed: qt_signal!(),
-    /// Chat name as core shows; empty until read. Re-read on relevant events, so header follows
-    /// renames from page beside or other device.
+    /// Chat name as core shows; empty until read. Re-read on events (renames elsewhere).
     pub chat_name: qt_property!(QString; NOTIFY chat_name_changed),
     /// Emitted when `chat_name` re-read and changed.
     pub chat_name_changed: qt_signal!(),
@@ -150,7 +132,7 @@ pub struct ChatMessages {
     /// Rows, for a `SilicaListView` `model`.
     pub rows: qt_property!(RefCell<MessageListModel>; CONST),
 
-    /// Row count: `QAbstractListModel` has no `count` for QML; placeholders need it.
+    /// Row count: `QAbstractListModel` has no QML `count`.
     pub count: qt_property!(u32; READ count NOTIFY rows_changed),
     /// Emitted on any `rows` change.
     pub rows_changed: qt_signal!(),
@@ -161,8 +143,7 @@ pub struct ChatMessages {
     /// Reload chat. Called on chat change.
     pub reload: qt_method!(fn(&mut self)),
 
-    /// Fill rows between `first` and `last`, plus a margin. Called as view scrolls. Rows
-    /// outside view stay placeholders; only fetch of messages after open.
+    /// Fill rows `first..last` plus margin as view scrolls; only message fetch after open.
     pub hydrate: qt_method!(fn(&mut self, first: i32, last: i32)),
     /// Rows filling; quiet indicator.
     pub hydrating: qt_property!(bool; NOTIFY hydrating_changed),
@@ -170,13 +151,11 @@ pub struct ChatMessages {
     pub hydrating_changed: qt_signal!(),
 
     /// Scroll target for `message_id`.
-    ///
-    /// Every message has a row once ids arrive; nothing to fetch.
     pub reveal: qt_method!(fn(&mut self, message_id: u32)),
     /// `message_id` at `row`, or -1 if not in this chat.
     pub revealed: qt_signal!(message_id: u32, row: i32),
 
-    /// Unsent text, kept by core: survives app close, shown in chat list summary.
+    /// Unsent text, kept by core: survives app close, in chat list summary.
     pub draft: qt_property!(QString; NOTIFY draft_changed),
     /// Emitted on draft load or write.
     pub draft_changed: qt_signal!(),
@@ -187,14 +166,13 @@ pub struct ChatMessages {
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Reader is up in history: only visible messages marked read; arrival further down stays
-    /// unread, badge and all, until they return. Default false: chat opens that way, and flag
-    /// is set after chat id.
+    /// Reader up in history: only visible messages marked read; arrivals below stay unread
+    /// (badge too). Default false; set after chat id.
     pub reading_history: qt_property!(bool; WRITE set_reading_history NOTIFY reading_history_changed),
     /// Emitted on `reading_history` change.
     pub reading_history_changed: qt_signal!(),
 
-    /// Message next send replies to; 0 = none. Page sets on Reply; send clears.
+    /// Message next send replies to; 0 = none. Send clears.
     pub quoted_message_id: qt_property!(u32; NOTIFY quote_changed),
     /// Emitted on `quoted_message_id` change.
     pub quote_changed: qt_signal!(),
@@ -204,38 +182,34 @@ pub struct ChatMessages {
     /// Emitted on `clean_links` change.
     pub clean_links_changed: qt_signal!(),
 
-    /// File on attachment bar; empty if none.
-    ///
-    /// Held here, not only on page: answer is core's. Page hands path, reads back whether
-    /// file exceeds what some relays take.
+    /// File on attachment bar; empty if none. Here so core says if it exceeds what some relays
+    /// take.
     pub pending_file: qt_property!(QString; WRITE set_pending_file NOTIFY pending_file_changed),
     /// Emitted on `pending_file` change.
     pub pending_file_changed: qt_signal!(),
-    /// `pending_file` size when sent, bytes; 0 if none/unmeasurable. Bar's large-file note.
-    /// Video to be shrunk: its output size (`video.rs`); else phone size. f64: QML has no
-    /// 64-bit int.
+    /// `pending_file` send size, bytes; 0 if none. Shrinking video: output size (`video.rs`);
+    /// else phone size. f64: QML has no 64-bit int.
     pub attachment_bytes: qt_property!(f64; NOTIFY attachment_large_changed),
-    /// Phone size of `pending_file` when sent as smaller video; else 0. Beside
-    /// `attachment_bytes`, bar shows how much smaller. f64, as `attachment_bytes`.
+    /// Phone size of `pending_file` if sent shrunk, else 0: bar shows saving. f64.
     pub original_bytes: qt_property!(f64; NOTIFY attachment_large_changed),
-    /// Largest attachment core recommends, bytes; 0 until known. Recommendation, not what this
-    /// profile's relay takes: see `media.rs`. f64.
+    /// Core's recommended max attachment, bytes; 0 until known. Not relay's real limit
+    /// (`media.rs`). f64.
     pub attachment_limit: qt_property!(f64; NOTIFY attachment_limit_changed),
     /// Emitted when limit read.
     pub attachment_limit_changed: qt_signal!(),
     /// `pending_file` over limit: page warns, still sends. False while limit unknown, and for
-    /// pictures whatever size (core recodes them on way out).
+    /// pictures (core recodes).
     pub attachment_large: qt_property!(bool; NOTIFY attachment_large_changed),
     /// Emitted on any attachment size or limit change.
     pub attachment_large_changed: qt_signal!(),
 
-    /// Outgoing media quality, core's `media_quality`: 0 balanced, 1 worse. Video shrink
-    /// target (`video.rs`); core reads same setting for pictures.
+    /// Outgoing media quality, core's `media_quality`: 0 balanced, 1 worse. Video shrink target
+    /// (`video.rs`); core's for pictures.
     pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY media_quality_changed),
     /// Emitted on `media_quality` change.
     pub media_quality_changed: qt_signal!(),
-    /// Video on bar being made smaller, from pick. Nothing sent until done and reader sends:
-    /// page holds send button, so caption can be written meanwhile.
+    /// Bar video being shrunk. Nothing sent until done and reader sends; caption writable
+    /// meanwhile.
     pub preparing: qt_property!(bool; NOTIFY preparing_changed),
     /// Progress of `preparing`, 0 to 1.
     pub preparing_progress: qt_property!(f64; NOTIFY preparing_changed),
@@ -249,94 +223,75 @@ pub struct ChatMessages {
 
     /// Send plain-text message.
     pub send: qt_method!(fn(&mut self, text: QString)),
-    /// Send message with file; `text` may be empty.
-    ///
-    /// One file per message, core's shape: `misc_send_msg` takes one `file`, message has one
-    /// `viewType`. Core decides type from file, copies into blob dir: picked file may go after.
+    /// Send message with one file (core's shape); `text` may be empty. Core types it from file,
+    /// copies into blob dir: picked file may go after.
     pub send_file: qt_method!(fn(&mut self, text: QString, file_path: QString)),
-    /// Send recording as voice message: core's `Voice` view type, drawn as one at other end,
-    /// not as music. Core otherwise types by file, and recording is just a sound file to it.
+    /// Send recording as `Voice` type; typed by file it would be music.
     pub send_voice: qt_method!(fn(&mut self, file_path: QString)),
     /// Mark loaded unread messages read. Called at newest message.
     pub mark_seen_all: qt_method!(fn(&mut self)),
 
-    /// Row of `message_id`, or -1 if not loaded.
-    ///
-    /// Search opens at the match, not newest.
+    /// Row of `message_id`, or -1 if not loaded. Search opens at match, not newest.
     pub row_of: qt_method!(fn(&self, message_id: u32) -> i32),
     /// Delete here and on mail server, where this client keeps it.
     pub delete_message: qt_method!(fn(&mut self, message_id: u32)),
-    /// Delete for everyone: core's `delete_messages_for_all`.
-    ///
-    /// Deletes as `delete_message`, sends others a request to do same. Core takes own
-    /// encrypted messages only: row menu reads `is_outgoing` and `show_padlock` before offering.
-    /// Refusal comes on `error`.
+    /// Delete for everyone (`delete_messages_for_all`). Core takes own encrypted messages only
+    /// (menu checks `is_outgoing`, `show_padlock`); refusal on `error`.
     pub delete_message_for_all: qt_method!(fn(&mut self, message_id: u32)),
     /// Retry failed message.
     pub resend_message: qt_method!(fn(&mut self, message_id: u32)),
-    /// Replace text of own message, here and at every end: core's `send_edit_request`.
-    /// Answers on `edited`, or `error`.
+    /// Replace own message text everywhere (`send_edit_request`). Answers `edited` or `error`.
     pub edit_message: qt_method!(fn(&mut self, message_id: u32, text: QString)),
     /// Edit reached core; row shows new text.
     pub edited: qt_signal!(message_id: u32),
     /// Copy message into another chat; QML calls this.
     pub forward_to: qt_method!(fn(&mut self, message_id: u32, chat_id: u32)),
-    /// Put `emoji` on message as own reaction; same emoji again removes it. One per person:
-    /// different emoji replaces old, as reference clients.
+    /// Toggle `emoji` as own reaction; one per person, other emoji replaces.
     pub react: qt_method!(fn(&mut self, message_id: u32, emoji: QString)),
-    /// True from send request until core answers.
-    ///
-    /// Compose state clears on answer, not tap, so failed send keeps input. Leaves a window
-    /// (seconds, for large video core copies) where field and bar still hold content and a
-    /// second tap sends all again: impatient thumbs do. This flag guards it.
+    /// Send request until core answers. Compose clears on answer (failed send keeps input), so
+    /// content stays for seconds (large video copy): guards double send.
     pub sending: qt_property!(bool; NOTIFY sending_changed),
     /// Emitted on `sending` change.
     pub sending_changed: qt_signal!(),
-    /// Message the "new messages" line sits above; 0 if none.
-    ///
-    /// Read from core once per chat, then kept. Visible rows marked read moments after open,
-    /// so line tracking current unread would vanish unseen; reader wants where they left off.
+    /// Message "new messages" line sits above; 0 if none. Read once per chat: visible rows are
+    /// marked read just after open, so a live line would vanish unseen.
     pub unread_from: qt_property!(u32; NOTIFY unread_from_changed),
     /// Emitted when line moves (chat opened).
     pub unread_from_changed: qt_signal!(),
 
     /// Own message reached core and is in `rows`.
     pub sent: qt_signal!(message_id: u32),
-    /// Count of others' messages just added. Explicit: row count also moves on deletes, and
-    /// doesn't move when removal and arrival land in same reload.
+    /// Others' messages just added. Row count can't tell: moves on deletes, still when removal
+    /// and arrival share a reload.
     pub arrived: qt_signal!(count: u32),
 
-    /// Chat `unread_from` was read for. Same-chat reload (core up, overflow, reorder) keeps
-    /// line, not re-asks and gets told (correctly) nothing is unread now.
+    /// Chat `unread_from` read for. Same-chat reload (core up, overflow, reorder) keeps line:
+    /// re-ask says nothing unread.
     unread_marked_chat: u32,
 
-    /// Video on bar made smaller, if worth it; restarted when limit or quality moves.
+    /// Bar video shrunk if worth it; restarted on limit or quality change.
     recode: Option<Recode>,
-    /// Numbers each `Recode`, so stale finished work is told apart.
+    /// Numbers each `Recode`: stale finished work told apart.
     next_recode: u64,
-    /// Smaller video handed to core while copying to blob dir; not removed under it, even if
-    /// bar moves on.
+    /// Shrunk video core is copying to blob dir: kept even if bar moves on.
     in_flight: Option<String>,
 
-    /// Account `attachment_limit` read for; 0 = none. Core answers per profile: asked once per
-    /// profile, not per chat.
+    /// Account `attachment_limit` read for; 0 none. Per profile in core: asked once each.
     limit_account: u32,
 
     /// Rows asked, not yet answered; next ask skips them.
     pending: HashSet<u32>,
     /// Fetches in flight; `hydrating` if any.
     fetches: usize,
-    /// Reload counter: fill in flight during reload lands nowhere; view re-asks for what it
-    /// shows once new rows in.
+    /// Reload counter: fill in flight during reload lands nowhere.
     generation: u64,
 
-    /// Id-list read in flight. One at a time: each is whole chat, and a burst of arrivals
-    /// (catch-up after night offline, busy group) started one per message, each diffed on Qt
-    /// thread.
+    /// Id-list read in flight; one at a time: each reads whole chat, and bursts (night
+    /// catch-up, busy group) started one per message, each diffed on Qt thread.
     syncing: bool,
-    /// Change during read: one more read follows, sees what came meanwhile.
+    /// Change during read: one more read follows.
     sync_again: bool,
-    /// Messages re-read one at a time, each at most once: same reason as `syncing`.
+    /// Messages re-read one at a time, each once (as `syncing`).
     refreshing: HashSet<u32>,
     /// See [`Self::refreshing`].
     refresh_again: HashSet<u32>,
@@ -369,10 +324,8 @@ impl ChatMessages {
         }
     }
 
-    /// Ask core where reader left off. Once per chat (`unread_marked_chat`).
-    ///
-    /// Same-chat reload (core up, overflow, reorder) doesn't ask. Issued from `reload` before
-    /// the fetch whose answer gets marked read, so answer is state reader arrived to.
+    /// Ask core where reader left off, once per chat (`unread_marked_chat`). From `reload`
+    /// before fetch marked read: answer is state on arrival.
     fn load_unread_mark(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 || self.unread_marked_chat == chat_id {
@@ -385,7 +338,7 @@ impl ChatMessages {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |first: Option<u32>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Reader may leave meanwhile: answer about chat they left isn't this one's.
+            // Reader may have left: answer not this chat's.
             if this.borrow().chat_id != chat_id {
                 return;
             }
@@ -432,17 +385,17 @@ impl ChatMessages {
         self.weigh_pending_file();
     }
 
-    /// Bar path as core opens it: picker gives URL, `local_path` makes path.
+    /// Bar path as core opens it (picker gives URL).
     fn pending_path(&self) -> String {
         local_path(&self.pending_file.to_string())
     }
 
-    /// Plan bar file vs limit; shrink if worth it; say weight. Called on file/limit/quality change.
+    /// Plan bar file vs limit; shrink if worth it; say weight.
     fn weigh_pending_file(&mut self) {
         let path = self.pending_path();
         let limit = self.recommended_limit();
         let plan = video::plan(&path, self.media_quality, limit);
-        // Keep plan while same file and plan. File sent as-is (stopped, or unshrinkable) stays.
+        // Same file and plan: keep. As-is file (stopped, unshrinkable) stays.
         let same = match (&self.recode, &plan) {
             (Some(recode), _) if recode.source == path && recode.as_is => true,
             (Some(recode), Some(target)) => recode.source == path && recode.target == *target,
@@ -457,10 +410,8 @@ impl ChatMessages {
         self.weigh();
     }
 
-    /// Bar file's send weight; large if past limit.
-    ///
-    /// Video being shrunk: planned size, then output size. Fits = not large, however big phone
-    /// copy; still too big = large at send size. Else (incl. unshrinkable video): phone size.
+    /// Bar file's send weight; large if past limit. Shrinking video: planned, then output size.
+    /// Else (incl. unshrinkable): phone size.
     fn weigh(&mut self) {
         let path = self.pending_path();
         let limit = self.recommended_limit();
@@ -546,7 +497,7 @@ impl ChatMessages {
         }
     }
 
-    /// Video made smaller, or not: hold result for reader to send.
+    /// Shrink done or not: hold result for reader to send.
     fn recoded(&mut self, id: u64, prepared: Prepared) {
         let Some(recode) = self.recode.as_mut().filter(|recode| recode.id == id) else {
             // Moved on or plan changed meanwhile.
@@ -556,8 +507,7 @@ impl ChatMessages {
             return;
         };
         match prepared {
-            // Planned smaller, but x264 may not beat input (short, mostly first frame):
-            // use original.
+            // x264 may not beat input (short, mostly still): send original.
             Prepared::Made(made)
                 if media::file_bytes(&made) >= media::file_bytes(&recode.source) =>
             {
@@ -566,8 +516,7 @@ impl ChatMessages {
                 recode.as_is = true;
             }
             Prepared::Made(made) => recode.made = Some(made),
-            // Recoding is courtesy to relay: video it can't read goes as is, with bar's notice
-            // if large, as every video did before.
+            // Courtesy to relay: unreadable video goes as is.
             Prepared::Failed(reason) => {
                 eprintln!("piirit: sending the video as it is: {reason}");
                 recode.as_is = true;
@@ -611,7 +560,7 @@ impl ChatMessages {
         }
     }
 
-    /// Ask core recommended max attachment. Once per profile: kept in `limit_account`.
+    /// Ask core recommended max attachment, once per profile (`limit_account`).
     fn load_attachment_limit(&mut self) {
         let account_id = self.account_id;
         if account_id == 0 || self.limit_account == account_id {
@@ -624,7 +573,7 @@ impl ChatMessages {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |limit: u64| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Reader may have moved profile: answer about one they left isn't this one's.
+            // Reader may have moved profile: answer not this one's.
             if this.borrow().account_id != account_id {
                 return;
             }
@@ -662,8 +611,7 @@ impl ChatMessages {
         }
     }
 
-    /// Read this chat's draft. Own call, not part of reload: draft small, messages slow;
-    /// waiting would put reader's unsent words behind page fetch.
+    /// Read draft: own call, so unsent words don't wait on slow page fetch.
     fn load_draft(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 {
@@ -676,7 +624,7 @@ impl ChatMessages {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |text: String| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Reader may have moved on or typed meanwhile: keep newer.
+            // Reader moved on or typed meanwhile: keep newer.
             if this.borrow().chat_id != chat_id || !this.borrow().draft.to_string().is_empty() {
                 return;
             }
@@ -726,10 +674,9 @@ impl ChatMessages {
                 rpc.call::<_, serde_json::Value>("remove_draft", (account_id, chat_id))
                     .await
             } else {
-                // `misc_set_draft` params: account, chat, text, file, filename, quote, view type.
-                // Not `misc_send_msg`'s tail (location there, quote here). Pinned:
-                // deltachat-jsonrpc/tests/real_server.rs. Text only: unsent file and unmade reply
-                // are still page's, not core's.
+                // `misc_set_draft` params: account, chat, text, file, filename, quote, view type
+                // (not `misc_send_msg`'s). Pinned: deltachat-jsonrpc/tests/real_server.rs.
+                // Text only: file, reply stay page's.
                 rpc.call::<_, serde_json::Value>(
                     "misc_set_draft",
                     (
@@ -754,27 +701,24 @@ impl ChatMessages {
         if account_id == 0 || chat_id == 0 {
             return;
         }
-        // In-flight fills: generation drops replies; view asks again after new rows.
+        // In-flight fills: generation drops replies; view asks again.
         self.generation = self.generation.wrapping_add(1);
         self.pending.clear();
         self.fetches = 0;
         self.set_hydrating(false);
-        // Sync in flight: generation drops what it reads; re-read still lands (by id). Neither
-        // holds back next event's: starts at once. So one never answering (runtime gone with
-        // core) holds nothing past reload core's return brings.
+        // Sync in flight: generation drops its read; re-read lands by id. Neither blocks next
+        // event's, so one never answering (runtime gone) holds nothing.
         self.syncing = false;
         self.sync_again = false;
         self.refreshing.clear();
         self.refresh_again.clear();
-        // Name is its own small fetch on both paths: prefetch lacks it, page opens with list's
-        // name anyway.
+        // Name: own small fetch (prefetch lacks it; page shows list's).
         self.refresh_name();
-        // Read-mark asked before any row is marked read.
+        // Read-mark asked before rows marked read.
         self.load_unread_mark();
-        // Attachment limit asked before reader picks a file.
+        // Limit asked before file picked.
         self.load_attachment_limit();
-        // Prefetched by whoever opened the page: take it, skip round trip. Lets transition
-        // start with rows in place.
+        // Prefetched by opener: no round trip; transition starts with rows.
         if let Some((shape, entries, items)) = crate::prefetch::take(account_id, chat_id) {
             self.take_shape(shape);
             self.rows.borrow_mut().reset_data(rows_for(&entries, items));
@@ -808,14 +752,14 @@ impl ChatMessages {
                         }
                         this.borrow().loaded_changed();
                         this.borrow().rows_changed();
-                        // Asked now, not before fetch: reader may scroll away, or app go behind.
+                        // Asked now: reader may scroll away, or app go behind.
                         let looking = !this.borrow().reading_history;
                         if looking {
                             this.borrow_mut().mark_chat_seen();
                         }
                     }
                     Err(err) => {
-                        // Loaded: wait over. Left false, view stays empty forever.
+                        // Left false, view stays empty forever.
                         this.borrow_mut().loaded = true;
                         this.borrow().loaded_changed();
                         this.borrow().error(err.into());
@@ -825,12 +769,12 @@ impl ChatMessages {
         );
 
         runtime.spawn(async move {
-            // Marking read is the callback's job: visible rows known only once landed.
+            // Callback marks read: visible rows known only once landed.
             done(open_chat(&rpc, account_id, chat_id, 0).await);
         });
     }
 
-    /// Take in chat kind. Each fact announced on its own: each has its own binding.
+    /// Take in chat kind; each fact announced alone (own binding).
     fn take_shape(&mut self, shape: ChatShape) {
         self.is_group = shape.is_group;
         self.can_send = shape.can_send;
@@ -850,11 +794,8 @@ impl ChatMessages {
         self.revealed(message_id, row);
     }
 
-    /// Fill rows between `first` and `last`, plus `MARGIN` each side.
-    ///
-    /// View asks generously: filled or already-asked rows skipped here. Fetches overlap, up to
-    /// `IN_FLIGHT`, so rows ahead are asked while ones behind are on way; past that ask drops,
-    /// page re-asks when a fetch lands.
+    /// Fill rows `first..=last` plus `MARGIN` each side, skipping filled/asked. Up to
+    /// `IN_FLIGHT` overlap; past that ask drops, page re-asks when one lands.
     pub fn hydrate(&mut self, first: i32, last: i32) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 || self.fetches >= IN_FLIGHT {
@@ -894,11 +835,8 @@ impl ChatMessages {
         }
     }
 
-    /// Unfetched row ids between two view indices, plus margin.
-    ///
-    /// Only missing, max one page per ask: fling through long chat would ask every row passed.
-    /// On-screen first, then margin nearest first: screen of one-line placeholders holds more
-    /// than margin, and page starting at margin left screen bottom for next fetch.
+    /// Unfetched row ids for view plus margin, max one page (fling would ask every row). On
+    /// screen first, then margin nearest first (margin-first left screen bottom to next fetch).
     fn unloaded_between(&self, first: i32, last: i32) -> Vec<u32> {
         let rows = self.rows.borrow();
         let first = usize::try_from(first.max(0)).unwrap_or(0);
@@ -919,7 +857,7 @@ impl ChatMessages {
         asked: &[u32],
         result: Result<Vec<MessageListItem>, String>,
     ) {
-        // Replaced by reload (another chat, or re-read): drop; view asked again.
+        // Replaced by reload: drop; view asked again.
         if generation != self.generation {
             return;
         }
@@ -930,17 +868,15 @@ impl ChatMessages {
         let filled = result.map(|items| self.fill_rows(items).len());
         self.set_hydrating(self.fetches > 0);
         match filled {
-            // Filled in place: view keeps position and delegates.
+            // In place: view keeps position, delegates.
             Ok(filled) if filled > 0 => self.rows_changed(),
             Ok(_) => {}
             Err(err) => self.error(err.into()),
         }
     }
 
-    /// Fill fetched rows in place, by id. Returns rows that landed.
-    ///
-    /// By id: rows added/removed mid-fetch, remembered index would hit another message. Map,
-    /// not scan: rows are whole chat, scan per message = 10k rows fifty times.
+    /// Fill fetched rows in place by id (rows move mid-fetch); returns landed. Map, not scan:
+    /// 10k rows times fifty.
     fn fill_rows(&mut self, items: Vec<MessageListItem>) -> Vec<MessageListItem> {
         let mut rows = self.rows.borrow_mut();
         let index_of: BTreeMap<u32, usize> = rows
@@ -954,7 +890,7 @@ impl ChatMessages {
                 continue;
             };
             landed.push(item.clone());
-            // In-place fill keeps order and count: map stays valid.
+            // Fill keeps order and count: map valid.
             rows.change_line(index, item);
         }
         landed
@@ -971,28 +907,27 @@ impl ChatMessages {
         };
 
         match kind.as_str() {
-            // New or changed content: sync what we lack.
+            // New or changed content: sync what's lacking.
             "IncomingMsg" | "MsgDeleted" => self.sync_rows(),
-            // Plus re-read of named message. Download held back by limit lands as this event,
-            // id list unchanged: sync alone found nothing, row said "Downloading…" till
-            // reopen. Edits from other devices arrive same way.
+            // Plus re-read: limit-held download and other devices' edits land as this event, ids
+            // unchanged (row said "Downloading…" till reopen).
             "MsgsChanged" => {
                 self.sync_rows();
                 if let Some(message_id) = json::u32_opt(&payload, "msgId").filter(|id| *id != 0) {
                     self.refresh_one(message_id);
                 }
             }
-            // Dropped events: held rows may be wrong, no later event says so. Restart.
+            // Dropped events: rows may be wrong, nothing will say. Restart.
             "EventChannelOverflow" => self.reload(),
-            // Delivery state, reaction, webxdc status ("3 votes", score: on row whether or not
-            // app open). No id-list change; each names its one row.
+            // Delivery state, reaction, webxdc status ("3 votes", shown even if app closed): no
+            // id-list change; names its row.
             "MsgDelivered" | "MsgRead" | "MsgFailed" | "ReactionsChanged"
             | "WebxdcStatusUpdate" => {
                 if let Some(message_id) = json::u32_opt(&payload, "msgId") {
                     self.refresh_one(message_id);
                 }
             }
-            // Rename of group or of one-to-one's contact (core doesn't say whose).
+            // Group or 1:1 contact rename (core doesn't say whose).
             "ChatModified" | "ContactsChanged" => {
                 self.refresh_name();
                 // Join or leave: other half of header.
@@ -1034,8 +969,7 @@ impl ChatMessages {
         });
     }
 
-    /// Reread group member count. Only for known groups: 1:1 not worth round trip, chat can't
-    /// become group. Read on join/leave events, beside name (same header).
+    /// Reread group member count (known groups only: 1:1 can't become one). On join/leave.
     fn refresh_member_count(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 || !self.is_group {
@@ -1061,12 +995,8 @@ impl ChatMessages {
         });
     }
 
-    /// Bring rows in line with the chat's current id list.
-    ///
-    /// Rows *are* the id list, so only arrivals and removals, both in place: reader doesn't move.
-    ///
-    /// One read at a time (see [`Self::syncing`]). Event during read marks follow-up, which
-    /// reads after event and can't miss it.
+    /// Bring rows in line with chat's id list: arrivals and removals in place, reader stays.
+    /// One read at a time ([`Self::syncing`]); event during read sets follow-up.
     fn sync_rows(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 {
@@ -1100,8 +1030,7 @@ impl ChatMessages {
                     Err(err) => this.borrow().error(err.into()),
                 }
             }
-            // Flag taken after rows in, so follow-up diffs against them. Reorder above reloaded,
-            // clearing flag: reload's own read covers all.
+            // Flag taken after rows in: follow-up diffs vs them. Reorder reloaded.
             let again = std::mem::take(&mut this.borrow_mut().sync_again);
             if again {
                 this.borrow_mut().sync_rows();
@@ -1113,12 +1042,9 @@ impl ChatMessages {
         });
     }
 
-    /// Id list came back: remove gone rows, insert arrivals in place.
-    ///
-    /// Arrival stands as placeholder under its day until fetched. Not only at end: core sorts
-    /// received message below newest *seen* only, so late message in busy group lands among
-    /// unread while reader is in history. Treating that as reorder would restart model, empty
-    /// filled rows, lose reader's place.
+    /// Id list came back: remove gone rows, insert arrivals as placeholders under day. Not only
+    /// at end: core sorts received below newest *seen*, so late group message lands among
+    /// unread; reorder would restart model, losing reader's place.
     fn synced(&mut self, entries: &[Entry]) {
         let current: Vec<u32> = self
             .rows
@@ -1159,9 +1085,7 @@ impl ChatMessages {
         }
     }
 
-    /// Fetch arrived messages, fill their rows.
-    ///
-    /// Now, not when view asks: reader is told about arrivals (`arrived`), and placeholder can't
+    /// Fetch arrived messages now, not on view ask: reader told (`arrived`); placeholder can't
     /// tell own from others'.
     fn absorb(&mut self, ids: Vec<u32>) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
@@ -1176,13 +1100,13 @@ impl ChatMessages {
                 return;
             }
             let Ok(items) = result else { return };
-            // By id: rows may have moved; send's own reply may have filled one already.
+            // By id: rows may move; send's reply may have filled one.
             let landed = this.borrow_mut().fill_rows(items);
             if landed.is_empty() {
                 return;
             }
             this.borrow().rows_changed();
-            // After fill: reader scrolled away mid-fetch is not credited.
+            // After fill: reader gone mid-fetch not credited.
             let looking = !this.borrow().reading_history;
             let incoming = u32::try_from(landed.iter().filter(|item| !item.is_outgoing).count())
                 .unwrap_or(u32::MAX);
@@ -1199,9 +1123,8 @@ impl ChatMessages {
         });
     }
 
-    /// Reread one message, replace its row. One read at a time per message.
-    ///
-    /// Bursts of receipts: one read, one more if any came meanwhile.
+    /// Reread one message, replace row. One read per message at a time; one more if marked
+    /// meanwhile (receipt bursts).
     fn refresh_one(&mut self, message_id: u32) {
         let account_id = self.account_id;
         if !self
@@ -1225,7 +1148,7 @@ impl ChatMessages {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<MessageListItem>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Marks are this generation's: reload cleared them; later ones are later reads.
+            // Marks are this generation's: reload cleared them.
             let again = {
                 let mut this_mut = this.borrow_mut();
                 if this_mut.generation == generation {
@@ -1235,8 +1158,7 @@ impl ChatMessages {
                     false
                 }
             };
-            // Follow-up read for marks set meanwhile. Started before answer applied so no return
-            // below skips it; order irrelevant (rows found by id).
+            // Follow-up started before answer applied: no return skips it.
             if again {
                 this.borrow_mut().refresh_one(message_id);
             }
@@ -1247,8 +1169,7 @@ impl ChatMessages {
             let Some(item) = result.ok().and_then(|items| items.into_iter().next()) else {
                 return;
             };
-            // Index re-found, not carried: reload may replace rows, old index hits wrong message
-            // or none. `change_line` doesn't check bounds.
+            // Index re-found (reload may replace rows); `change_line` doesn't check bounds.
             let existing = this
                 .borrow()
                 .rows
@@ -1294,8 +1215,8 @@ impl ChatMessages {
         });
     }
 
-    /// Incoming unread rows, owed read receipts. Read in place: cloning 10k rows to find few
-    /// unread ran on each foreground and end-reach, on Qt thread, while page slid in.
+    /// Incoming unread rows owing receipts, read in place: cloning 10k rows ran on Qt thread per
+    /// foreground and end-reach.
     fn unseen_ids(&self) -> Vec<u32> {
         self.rows
             .borrow()
@@ -1305,8 +1226,7 @@ impl ChatMessages {
             .collect()
     }
 
-    /// Send read receipts for these incoming unread rows.
-    /// Takes items, not model: sync marks only what it added.
+    /// Send read receipts for these rows; items, not model: sync marks only what it added.
     fn mark_items_seen(&self, items: &[MessageListItem]) {
         let account_id = self.account_id;
         let unseen: Vec<u32> = items
@@ -1325,12 +1245,9 @@ impl ChatMessages {
         });
     }
 
-    /// Someone started or stopped looking at the screen.
-    ///
-    /// Marking on entry isn't enough: reader isn't looking during transition and local fetch
-    /// usually finishes first, so load-return check sees `reading_history` true and skips.
-    /// Later only *arriving* messages are marked: badge never clears. Marking here catches page
-    /// settling and app returning to foreground with chat open.
+    /// Someone started or stopped looking. Entry-only marking failed: local fetch beats
+    /// transition, sees `reading_history` true, skips; badge never cleared. Catches page
+    /// settling and return to foreground.
     pub fn set_reading_history(&mut self, reading_history: bool) {
         if self.reading_history == reading_history {
             return;
@@ -1342,8 +1259,7 @@ impl ChatMessages {
         }
     }
 
-    /// Tell core chat seen so list drops badge; send receipts for loaded rows. `mark_seen_all`
-    /// alone doesn't drop badge.
+    /// Mark chat seen (`mark_seen_all` alone keeps badge); receipts for loaded rows.
     fn mark_chat_seen(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 {
@@ -1369,21 +1285,15 @@ impl ChatMessages {
         self.remove_message("delete_messages", message_id);
     }
 
-    /// Delete here and for everyone: a deletion message peers' cores act on.
-    /// Refusals (others' message, unencrypted) reported like failed sends.
+    /// Delete here and for everyone (peers' cores act on deletion message). Refusals reported
+    /// as failed sends.
     pub fn delete_message_for_all(&mut self, message_id: u32) {
         self.remove_message("delete_messages_for_all", message_id);
     }
 
-    /// Ask core to delete, then take the row out once it agrees.
-    ///
-    /// Row goes here, not on core's later event: id list read then can't show *newest* message
-    /// gone. Row past every id reads as list too old (keeps just-sent messages from vanishing,
-    /// `RowDiff::between`). Deleting own last message is exactly that, and likeliest
-    /// delete-for-all: it stayed till reopen.
-    ///
-    /// Refusal leaves row, reported like failed send: core deletes for all only own encrypted
-    /// messages (what menu offers), and hasn't deleted what it refuses.
+    /// Ask core to delete; take row out once it agrees, not on core's event: id-list read can't
+    /// show *newest* message gone (row past every id = list too old, `RowDiff::between`), and
+    /// own last message is likeliest. Refusal leaves row.
     fn remove_message(&mut self, method: &'static str, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -1408,7 +1318,7 @@ impl ChatMessages {
         });
     }
 
-    /// Take one row out, if still here. Core's event then finds the list agreeing.
+    /// Take one row out if still here; core's event then agrees.
     fn drop_row(&mut self, message_id: u32) {
         let index = self
             .rows
@@ -1427,12 +1337,9 @@ impl ChatMessages {
         self.act("resend_messages", message_id);
     }
 
-    /// Replace text of own message.
-    ///
-    /// Not `act`: takes text beside id, and page wants to hear it landed to restore field.
-    /// Text goes out as new message does (links cleaned if asked). Core refuses others'
-    /// messages, notices, no-text; menu offers none; refusal reported like failed send. Same
-    /// text = success core does nothing for.
+    /// Replace own message text. Not `act`: takes text, page awaits landing. Links cleaned as
+    /// sent. Core refuses others', notices, no-text (menu offers none): failed send. Same text:
+    /// no-op success.
     pub fn edit_message(&mut self, message_id: u32, text: QString) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -1449,8 +1356,7 @@ impl ChatMessages {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
                 Ok(()) => {
-                    // Core's `MsgsChanged` too, but races page clearing field: re-read so row shows
-                    // new text by time `edited` is heard.
+                    // Re-read: `MsgsChanged` may come after `edited` clears field.
                     this.borrow_mut().refresh_one(message_id);
                     this.borrow().edited(message_id);
                 }
@@ -1468,10 +1374,8 @@ impl ChatMessages {
         });
     }
 
-    /// Fetch rest of download-limited message.
-    ///
-    /// Not `act`: takes one id, not list. Row re-read on core's `MsgsChanged` once download
-    /// lands, not on this return (says only started).
+    /// Fetch rest of download-limited message (one id, not `act`). Row re-read on `MsgsChanged`
+    /// once landed; return says only started.
     pub fn download_full(&mut self, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -1486,7 +1390,7 @@ impl ChatMessages {
         let done = queued_callback(move |result: Result<(), String>| {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
-                // State is InProgress now: show it.
+                // InProgress now: show it.
                 Ok(()) => this.borrow_mut().refresh_one(message_id),
                 Err(err) => this.borrow().error(err.into()),
             }
@@ -1501,8 +1405,8 @@ impl ChatMessages {
         });
     }
 
-    /// Copy message into another chat. Not `act` (`method(account, [ids])`): needs destination.
-    /// Nothing refreshed: copy lands in a chat this model doesn't show.
+    /// Copy message into another chat (needs destination, not `act`). Nothing refreshed: copy
+    /// lands elsewhere.
     pub fn forward_to(&mut self, message_id: u32, chat_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 || chat_id == 0 {
@@ -1530,11 +1434,8 @@ impl ChatMessages {
         });
     }
 
-    /// React, or take this account's reaction off.
-    ///
-    /// Toggle decided here from row: core sets account's whole reaction list, so same emoji
-    /// becomes empty list. Not `act`: takes reaction too. Row re-read on answer (tap shows at
-    /// once) and on core's `ReactionsChanged` (how others' reactions arrive).
+    /// React, or remove own reaction. Toggle from row: core sets whole list, same emoji gives
+    /// empty. Not `act`. Row re-read on answer (instant tap) and `ReactionsChanged` (others').
     pub fn react(&mut self, message_id: u32, emoji: QString) {
         let account_id = self.account_id;
         let emoji = emoji.to_string().trim().to_string();
@@ -1568,9 +1469,8 @@ impl ChatMessages {
         });
 
         runtime.spawn(async move {
-            // send_reaction params: account, message, account's reactions. Answers hidden
-            // carrier message's id, unused.
-            // Pinned: deltachat-jsonrpc/tests/real_server.rs.
+            // send_reaction params: account, message, reactions; answers carrier id. Pinned:
+            // deltachat-jsonrpc/tests/real_server.rs.
             let result = rpc
                 .call::<_, serde_json::Value>("send_reaction", (account_id, message_id, reaction))
                 .await
@@ -1580,10 +1480,8 @@ impl ChatMessages {
         });
     }
 
-    /// Call `method` with `(account, [message])`, then re-read that row.
-    ///
-    /// Deletion changes id list, so its event reloads. Resend doesn't: list same, sync fetches
-    /// only missing ids, so without re-read row keeps failed state ("Send again") indefinitely.
+    /// Call `method(account, [message])`, re-read row. Resend leaves id list unchanged (sync
+    /// fetches missing only): row would keep "Send again".
     fn act(&mut self, method: &'static str, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -1613,7 +1511,7 @@ impl ChatMessages {
         self.send_message(self.outgoing_text(&text.to_string()), None);
     }
 
-    /// Text as sent: links cleaned if reader asked, else as written.
+    /// Text as sent: links cleaned if asked.
     fn outgoing_text(&self, text: &str) -> String {
         if self.clean_links {
             links::clean_text(text)
@@ -1624,9 +1522,8 @@ impl ChatMessages {
 
     /// Send message with file.
     ///
-    /// Bar video goes as made smaller, once made. Nothing sent while being made (page holds
-    /// button). Video not the bar's is started here for reader to send when ready: a send never
-    /// goes out later on its own.
+    /// Bar video goes shrunk, once done (page holds button meanwhile). Other video started here
+    /// for reader to send when ready: no send goes out on its own later.
     pub fn send_file(&mut self, text: QString, file_path: QString) {
         let path = local_path(&file_path.to_string());
         if path.is_empty() {
@@ -1636,8 +1533,7 @@ impl ChatMessages {
         if self.sending {
             return;
         }
-        // Not held to recommended size: warning only (page gives it); relays often take more.
-        // One that won't fails message like any refusal.
+        // Not held to recommended size (page warns; relays often take more).
         let name = file_name_of(&path);
         let text = self.outgoing_text(&text.to_string());
         let ours = self.recode.as_ref().filter(|recode| recode.source == path);
@@ -1660,8 +1556,8 @@ impl ChatMessages {
         }
     }
 
-    /// Stop making a video smaller. File stays on bar, goes as is: kept as a not-to-be-made
-    /// recode so moving limit or quality doesn't restart it behind reader's back.
+    /// Stop shrinking: file goes as is; kept as not-to-make recode so limit or quality change
+    /// doesn't restart it.
     pub fn cancel_preparing(&mut self) {
         let Some(recode) = self.recode.as_mut() else {
             return;
@@ -1687,15 +1583,14 @@ impl ChatMessages {
         self.send_message(String::new(), Some((path, String::new())));
     }
 
-    /// The one send. `file`: path to attach and name shown; empty name for voice.
+    /// The one send. `file`: path and shown name; empty name for voice.
     fn send_message(&mut self, text: String, file: Option<(String, String)>) {
-        // One at a time. UI disables button too, but guard belongs here: button isn't only way
-        // in, model knows whether core answered.
+        // One at a time; guarded here, not only by button: other ways in, model knows answer.
         if self.sending {
             return;
         }
         let (account_id, chat_id) = (self.account_id, self.chat_id);
-        // Nothing to send to yet: no round trip for core's error.
+        // No chat yet: skip round trip for core's error.
         if account_id == 0 || chat_id == 0 {
             return;
         }
@@ -1721,12 +1616,12 @@ impl ChatMessages {
         });
     }
 
-    /// Core answered send: clear the way, then put message on row or report failure.
+    /// Core answered send: clear the way, put message on row or report failure.
     fn sent_or_not(&mut self, quoted: u32, result: Result<MessageListItem, String>) {
-        // Cleared on both paths: failed send leaves reader able to retry.
+        // Both paths: failed send retryable.
         self.sending = false;
         self.sending_changed();
-        // Core copied it or won't. Kept while bar holds it, for retry; else put away.
+        // Core copied it or won't. Kept while on bar (retry); else removed.
         if let Some(made) = self.in_flight.take() {
             let held = self
                 .recode
@@ -1742,8 +1637,7 @@ impl ChatMessages {
         }
     }
 
-    /// Sent message goes at chat end; nothing else moves.
-    /// Own event beat the reply: fill that row instead.
+    /// Sent message goes at chat end, or fills row own event made first.
     fn place_sent(&mut self, quoted: u32, item: MessageListItem) {
         let message_id = item.message_id;
         {
@@ -1756,7 +1650,7 @@ impl ChatMessages {
             }
         }
         self.rows_changed();
-        // Cleared once really gone, not before: failed send keeps the chosen reply.
+        // Cleared once gone: failed send keeps reply.
         if quoted != 0 {
             self.quoted_message_id = 0;
             self.quote_changed();
@@ -1766,7 +1660,7 @@ impl ChatMessages {
 }
 
 impl Drop for ChatMessages {
-    /// Drop video being made or made for this conversation; not sent from it.
+    /// Drop this conversation's video being made or made; unsent.
     fn drop(&mut self) {
         if let Some(recode) = self.recode.take() {
             recode.cancel.store(true, Ordering::Relaxed);
@@ -1791,7 +1685,7 @@ struct Recode {
     cancel: Arc<AtomicBool>,
     /// Smaller file, once made.
     made: Option<String>,
-    /// Goes as is: not made smaller, not smaller after all, or stopped.
+    /// Goes as is: not shrunk, not smaller, or stopped.
     as_is: bool,
 }
 
@@ -1813,10 +1707,9 @@ impl Outgoing {
         account_id: u32,
         chat_id: u32,
     ) -> Result<MessageListItem, String> {
-        // Two kinds named; core reads rest off file. Unnamed file = voice (recording is just
-        // a sound file to core). Picture named so core recodes it: `misc_send_msg` would leave
-        // `File` at original size, and media quality setting is read only during that
-        // recoding. See `media.rs`.
+        // Two kinds named, rest typed from file. Empty name = voice (just sound to core). Picture
+        // named so core recodes it: `misc_send_msg` keeps `File` original size, and media quality
+        // is read only in that recode (`media.rs`).
         let viewtype = match &self.file {
             Some((_, name)) if name.is_empty() => Some("Voice"),
             Some((path, _)) => media::outgoing_viewtype(path),
@@ -1841,7 +1734,7 @@ impl Outgoing {
         // send_msg params: account, chat, MessageData (camelCase, view type by variant name).
         // Pinned: deltachat-jsonrpc/tests/real_server.rs.
         let data = serde_json::json!({
-            // Empty, not absent, would be a message with body ""; voice is named for nobody.
+            // Empty would be body ""; voice is named for nobody.
             "text": (!self.text.is_empty()).then_some(self.text),
             "file": path,
             "filename": name.filter(|name| !name.is_empty()),
@@ -1872,7 +1765,7 @@ impl Outgoing {
         chat_id: u32,
     ) -> Result<MessageListItem, String> {
         let (path, name) = self.file.unzip();
-        // Caption-only is a text message; empty string would be body "".
+        // Caption-only is text; "" would be body "".
         let text = (!self.text.is_empty()).then_some(self.text);
         // misc_send_msg params: account, chat, text, file, filename, location, quote.
         // Pinned: deltachat-jsonrpc/tests/real_server.rs.
@@ -1894,7 +1787,7 @@ impl Outgoing {
         match sent {
             Ok((message_id, message)) => {
                 let mut row = row_from(message_id, &message);
-                // A sent .xdc is an app on its row at once, not a file until chat reopens.
+                // Sent .xdc an app on its row at once, not a file until reopen.
                 with_extras(rpc, account_id, std::slice::from_mut(&mut row)).await;
                 Ok(row)
             }
@@ -1916,19 +1809,14 @@ enum RowDiff {
 }
 
 impl RowDiff {
-    /// Compare row ids with chat's, in order.
-    ///
-    /// Kept rows must stay in chat order, else reorder. Arrivals may go anywhere: core doesn't
-    /// only append.
-    ///
-    /// Missing row with id past every listed id isn't gone but newer than list: ids only count
-    /// up, and send's reply adds its row while an older list read is in flight. Removing it
-    /// made sent message vanish and return.
+    /// Compare row ids with chat's in order. Kept rows must keep chat order, else reorder;
+    /// arrivals anywhere. Missing row with id past every listed id is newer, not gone: ids
+    /// count up; send's reply adds row during older list read (else it vanished and returned).
     fn between(current: &[u32], ids: &[u32]) -> Self {
         if current == ids {
             return Self::Same;
         }
-        // Common case first: one comparison, not a set built on the Qt thread.
+        // Common case first: one comparison, no set.
         if let Some(tail) = ids.strip_prefix(current) {
             return Self::Extended {
                 arrived: tail.to_vec(),
@@ -1950,7 +1838,7 @@ impl RowDiff {
             .filter(|(_, id)| !present.contains(id) && **id <= newest)
             .map(|(index, _)| index)
             .collect();
-        // Set: scanning rows per id is ten thousand squared on every event.
+        // Set: per-id row scan is 10k squared per event.
         let held: HashSet<u32> = kept.iter().copied().collect();
         let arrived: Vec<u32> = ids
             .iter()
@@ -1977,11 +1865,9 @@ fn in_order(kept: &[u32], ids: &[u32]) -> bool {
     next.is_none()
 }
 
-/// Place a placeholder for each of `arrived` where the chat's list has it.
-///
-/// Walks alongside rows: arrivals can go mid-list. Rows are list minus arrivals, in list order
-/// (`RowDiff` ensures, else reload), so each entry is an arrival (goes right after previous
-/// entry) or held row: at walk, or just past rows newer than list, which keep their place.
+/// Placeholder for each of `arrived` at its list position. Rows are list minus arrivals, in
+/// order (`RowDiff` ensures), so each entry is arrival (after previous) or held row: at
+/// walk, or past rows newer than list.
 fn place_arrivals(rows: &mut MessageListModel, entries: &[Entry], arrived: &[u32]) {
     if arrived.is_empty() {
         return;
@@ -2002,7 +1888,7 @@ fn place_arrivals(rows: &mut MessageListModel, entries: &[Entry], arrived: &[u32
     }
 }
 
-/// Rows to fill for view `first..=last` of `count`: on-screen, then margin below and above
+/// Rows to fill for view `first..=last` of `count`: on-screen, then margin below/above
 /// alternately, nearest first.
 fn fill_order(first: usize, last: usize, count: usize) -> Vec<usize> {
     let Some(bottom) = count.checked_sub(1).filter(|_| first <= last) else {
@@ -2022,11 +1908,9 @@ fn fill_order(first: usize, last: usize, count: usize) -> Vec<usize> {
     order
 }
 
-/// Chat's messages, oldest first, each under its day.
-///
-/// Last arg asks core for day markers, at local midnight starting each day (checked vs real
-/// `deltachat-rpc-server` in three zones: UTC midnight would file zone-behind messages under
-/// yesterday). `local_day_number` is what fetched rows use, so day can't change on fill.
+/// Chat's messages, oldest first, under their day. Last arg asks core for day markers at
+/// local midnight (not UTC; checked vs `deltachat-rpc-server`, three zones), as
+/// `local_day_number` on fetched rows: day can't change on fill.
 pub(crate) async fn message_entries(
     rpc: &RpcClient,
     account_id: u32,
@@ -2037,7 +1921,7 @@ pub(crate) async fn message_entries(
         .await
         .map_err(|err| err.to_string())?;
     let mut entries = Vec::with_capacity(items.len());
-    // Day carried from last marker: core emits one before each day's first message.
+    // Day from last marker: core emits one before each day's first message.
     let mut day_number = 0;
     for item in &items {
         match json::str_at(item, "kind") {
@@ -2047,8 +1931,8 @@ pub(crate) async fn message_entries(
                 }
             }
             "message" => {
-                // `rename_all` renames variants, not fields: snake_case on the wire.
-                // `msgId` in case that changes.
+                // `rename_all` renames variants, not fields: snake_case on wire.
+                // `msgId` too, in case.
                 if let Some(message_id) =
                     json::u32_opt(item, "msg_id").or_else(|| json::u32_opt(item, "msgId"))
                 {
@@ -2064,8 +1948,8 @@ pub(crate) async fn message_entries(
     Ok(entries)
 }
 
-/// Call `method` with `(account, [message])`: any one-message action (delete, resend).
-/// Shared by conversation rows and media pages; each decides what to do after.
+/// Call `method(account, [message])`: one-message action (delete, resend), for rows and
+/// media pages.
 pub(crate) async fn act_on_message(
     rpc: &RpcClient,
     method: &'static str,
@@ -2077,7 +1961,7 @@ pub(crate) async fn act_on_message(
         .map_err(|err| err.to_string())
 }
 
-/// Fetch several messages in one call; one round trip, not one per message.
+/// Fetch several messages in one round trip.
 pub(crate) async fn fetch_messages(
     rpc: &Arc<RpcClient>,
     account_id: u32,
@@ -2094,7 +1978,7 @@ pub(crate) async fn fetch_messages(
         .iter()
         .filter_map(|id| {
             let message = loaded.get(id)?;
-            // Core's `{kind: "loadingError"}` placeholder: skip, not a blank row.
+            // Core's `{kind: "loadingError"}`: skip, no blank row.
             if json::str_at(message, "kind") == "loadingError" {
                 return None;
             }
@@ -2105,25 +1989,20 @@ pub(crate) async fn fetch_messages(
     Ok(rows)
 }
 
-/// Round trips for extras in flight at once.
-///
-/// Calls/Apps page = fifty rows needing one each: serial was fifty round trips before showing
-/// anything; all at once would queue ahead of other core calls.
+/// Extras round trips in flight. Calls/Apps page: fifty rows; serial = fifty trips before
+/// anything shows, all at once queues ahead of other calls.
 const EXTRAS_IN_FLIGHT: usize = 8;
 
 /// Extra a row needs from core, for kinds that need one.
 enum Extra {
     /// App row's drawing data.
     Webxdc(webxdc::Extras),
-    /// Call state; nothing for a call the core can't describe.
+    /// Call state; nothing if core can't describe it.
     Call(Option<calls::Summary>),
 }
 
-/// Fill extras for app and call rows: one round trip each, none for other kinds.
-///
-/// App: name, icon, self-description (file-name-only row is what feature replaces). Call:
-/// state, drawn instead of core's English sentence; core's `MsgsChanged` on state move
-/// re-reads row. Up to `EXTRAS_IN_FLIGHT` tasks; answers go to own row, order kept.
+/// Extras for app and call rows, one round trip each. App: name, icon, self-description.
+/// Call: state, drawn instead of core's English sentence. Up to `EXTRAS_IN_FLIGHT`.
 async fn with_extras(rpc: &Arc<RpcClient>, account_id: u32, rows: &mut [MessageListItem]) {
     let mut wanted: VecDeque<(usize, u32, bool)> = rows
         .iter()
@@ -2153,7 +2032,7 @@ async fn with_extras(rpc: &Arc<RpcClient>, account_id: u32, rows: &mut [MessageL
         let Some(answered) = asked.join_next().await else {
             break;
         };
-        // Task lost with runtime: row stays as `row_from` built it.
+        // Task lost with runtime: row stays as built.
         if let Ok((index, extra)) = answered {
             if let Some(row) = rows.get_mut(index) {
                 put_extra(row, extra);
@@ -2186,8 +2065,8 @@ fn is_unseen(item: &MessageListItem) -> bool {
     !item.is_outgoing && UNSEEN_STATES.contains(&item.state)
 }
 
-/// Mark read here and on other devices; sends the requested read receipt. `marknoticed_chat`
-/// alone does neither.
+/// Mark read here and on other devices, sending read receipt (`marknoticed_chat` does
+/// neither).
 async fn mark_seen(rpc: &RpcClient, account_id: u32, unseen: Vec<u32>) {
     if unseen.is_empty() {
         return;
@@ -2230,22 +2109,18 @@ fn is_group_info(info: &serde_json::Value) -> bool {
 pub(crate) struct ChatShape {
     /// Group, mailing list or broadcast.
     pub is_group: bool,
-    /// Account can send here: false if left group or unaccepted contact request.
+    /// Account can send (not if left group / unaccepted request).
     pub can_send: bool,
     /// End-to-end encrypted (all chatmail chats are).
     pub is_encrypted: bool,
     /// Call placeable; see `ChatMessages::can_call`.
     pub can_call: bool,
-    /// Member count incl. reader. Group header only, not 1:1.
-    /// 0 elsewhere.
+    /// Member count incl. reader, for group header; 0 elsewhere (1:1 too).
     pub member_count: u32,
 }
 
-/// Opening content: shape, messages by day, one page's content around `find_message_id`
-/// (newest if 0 or not in chat; see `opening_page`).
-///
-/// Page waits on it all (prefetch push too), so nothing waits needlessly: shape asked beside
-/// messages, not before.
+/// Opening content: shape, messages by day, one page around `find_message_id`
+/// (`opening_page`). Page waits on all, so shape asked beside messages.
 pub(crate) async fn open_chat(
     rpc: &Arc<RpcClient>,
     account_id: u32,
@@ -2258,14 +2133,14 @@ pub(crate) async fn open_chat(
     };
     let messages = async {
         let entries = message_entries(rpc, account_id, chat_id).await?;
-        // Row per message, content for one page: ten thousand messages would stall Qt.
+        // One page's content: ten thousand messages would stall Qt.
         let page = ids_of(opening_page(&entries, find_message_id));
         let items = fetch_messages(rpc, account_id, &page).await?;
         Ok::<_, String>((entries, items))
     }
     .await;
     match messages {
-        // Shape unreadable (task lost): counts as an undescribable chat.
+        // Shape unreadable (task lost): undescribable chat.
         Ok((entries, items)) => Ok((shape.await.unwrap_or_default(), entries, items)),
         Err(err) => {
             shape.abort();
@@ -2274,9 +2149,8 @@ pub(crate) async fn open_chat(
     }
 }
 
-/// Chat shape from core: kind, encryption (`get_basic_chat_info`), `can_send`. Unknown reads
-/// as 1:1 taking nothing: offers least. `can_send` asked beside description; group member
-/// count meanwhile.
+/// Chat shape: kind, encryption (`get_basic_chat_info`), `can_send` (asked beside), group
+/// member count. Unknown = 1:1 taking nothing, offers least.
 async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> ChatShape {
     let can_send = {
         let rpc = Arc::clone(rpc);
@@ -2307,10 +2181,8 @@ async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> Chat
     }
 }
 
-/// Call placeable, from core's flags (`get_basic_chat_info` and `get_full_chat_by_id` both
-/// carry them).
-///
-/// `can_send` rules out device chat and contact request; rest is core's refusal, asked ahead.
+/// Call placeable, from core flags (basic and full chat info). `can_send` rules out device
+/// chat and contact request; rest pre-asks core's refusal.
 pub(crate) fn takes_calls(info: &serde_json::Value, is_group: bool, can_send: bool) -> bool {
     !is_group
         && can_send
@@ -2319,8 +2191,7 @@ pub(crate) fn takes_calls(info: &serde_json::Value, is_group: bool, can_send: bo
         && !json::flag(info, "isDeviceChat")
 }
 
-/// Member count, 0 if not listed. `get_chat_contacts` ids only: enough for a count; members
-/// themselves are group page's (`chat_info.rs`).
+/// Member count, 0 if unlisted (`get_chat_contacts` ids; members are `chat_info.rs`'s).
 pub(crate) async fn member_count(rpc: &RpcClient, account_id: u32, chat_id: u32) -> u32 {
     rpc.call::<_, Vec<u32>>("get_chat_contacts", (account_id, chat_id))
         .await
@@ -2329,12 +2200,8 @@ pub(crate) async fn member_count(rpc: &RpcClient, account_id: u32, chat_id: u32)
         .unwrap_or(0)
 }
 
-/// Days since epoch for this instant, in viewer's timezone.
-///
-/// Offset taken *at that instant*: current one puts messages across DST an hour out, so near
-/// midnight wrong heading, shifting as year turns.
-///
-/// Unplaceable timestamp falls back to UTC: wrong heading, not missing list.
+/// Days since epoch in viewer's timezone, offset *at that instant*: current one put
+/// DST-crossing messages an hour out. Unplaceable timestamp: UTC, not missing list.
 #[must_use]
 pub fn local_day_number(timestamp: i64) -> i64 {
     let Some(when) = Local.timestamp_opt(timestamp, 0).single() else {
@@ -2346,13 +2213,11 @@ pub fn local_day_number(timestamp: i64) -> i64 {
         .num_days()
 }
 
-/// Placeholder for an unfetched entry.
-///
-/// One per message from id-list arrival: row 0 stays first.
+/// Placeholder for unfetched entry, one per id-list message: row 0 stays first.
 fn placeholder(entry: Entry) -> MessageListItem {
     MessageListItem {
         message_id: entry.message_id,
-        // Day known before the message: heading right from the start, never resizes.
+        // Day known before message: heading right, never resizes.
         day_number: entry.day_number,
         loaded: false,
         ..MessageListItem::default()
@@ -2371,15 +2236,15 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
     let state = json::u32_at(message, "state");
     let file_path = json::str_at(message, "file");
     let view_type = json::str_at(message, "viewType");
-    // Core probes PNG/JPEG size, returns 0x0 for valid GIF. Row knowing shape before decode
-    // doesn't change height on land: read GIF size from its header (ten bytes at front).
+    // Core gives 0x0 for GIF (probes PNG/JPEG only): read header so row height holds on
+    // decode.
     let (image_width, image_height) = match (
         json::i32_at(message, "dimensionsWidth"),
         json::i32_at(message, "dimensionsHeight"),
     ) {
         (0, 0) if view_type == "Gif" => gif_dimensions(file_path).unwrap_or((0, 0)),
-        // Core doesn't probe video; only some clients send size. Track header gives it: row
-        // takes video's real shape, upright or not, not 16:9 guess.
+        // Core doesn't probe video, few clients send size: track header gives real shape, not
+        // 16:9 guess.
         (0, 0) if view_type == "Video" => video_dimensions(file_path).unwrap_or((0, 0)),
         known => known,
     };
@@ -2387,12 +2252,12 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         message_id,
         loaded: true,
         text: text.into(),
-        // Rendered per fetch: row switches rendering vs raw text without round trip.
+        // Rendered per fetch: switch rendered/raw needs no round trip.
         styled_text: markdown::render(text).into(),
         is_edited: json::flag(message, "isEdited"),
-        // Absent from send's abbreviated object; composed messages never held back.
+        // Absent from send's short object; composed messages never held back.
         download_state: json::text(message, "/downloadState"),
-        // Core marks cut messages both ways: our own long sends too.
+        // Core marks cut messages both ways, own long sends too.
         has_html: json::flag(message, "hasHtml"),
         // Contact 1 is DC_CONTACT_ID_SELF.
         is_outgoing,
@@ -2400,21 +2265,20 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         day_number: local_day_number(timestamp),
         show_padlock: json::flag(message, "showPadlock"),
         state,
-        // Set at build. Rebuilt on change, usually seen by then; but a playing GIF keeps its
-        // runs, and one not yet scrolled to is still new to reader.
+        // Set at build, rebuilt on change; playing GIF keeps its runs, unscrolled-to one still new.
         is_new: !is_outgoing && UNSEEN_STATES.contains(&state),
         sender_name,
         sender_color: json::text(message, "/sender/color"),
         is_info: json::flag(message, "isInfo"),
-        // Absent from fake core's short `misc_send_msg` object; false right there (composed
-        // messages never forwards). Real forwards come via `get_messages`, full shape.
+        // Absent from fake core's short `misc_send_msg` object; composed isn't forward. Real
+        // forwards via `get_messages`.
         is_forwarded: json::flag(message, "isForwarded"),
         quote_text: json::text(message, "/quote/text"),
         quote_author: json::text(message, "/quote/authorDisplayName"),
         file_path: file_path.into(),
         file_name: json::text(message, "/fileName"),
         view_type: view_type.into(),
-        // 0 if nothing sized it: nothing may divide by these.
+        // 0 if unsized: nothing may divide by these.
         image_width,
         image_height,
         file_mime: json::text(message, "/fileMime"),
@@ -2422,7 +2286,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
             .get("fileBytes")
             .and_then(serde_json::Value::as_u64)
             .map_or(0.0, |bytes| {
-                // f64, as QML has no 64-bit int; saturates at 4 GiB (exact to 2^53).
+                // f64 (QML has no 64-bit int); saturates at 4 GiB, exact to 2^53.
                 f64::from(u32::try_from(bytes).unwrap_or(u32::MAX))
             }),
         duration_ms: json::i32_at(message, "duration"),
@@ -2431,12 +2295,12 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         vcard_color: json::text(message, "/vcardContact/color"),
         reactions: reactions_json(message).into(),
         my_reaction: own_reaction(message).into(),
-        // Filled by `with_extras` for app rows: another call, so not here.
+        // Filled by `with_extras` for app rows (another call).
         ..MessageListItem::default()
     }
 }
 
-/// GIF size from screen descriptor: two LE u16 after six-byte signature. `None` if not GIF.
+/// GIF size from screen descriptor: two LE u16 after 6-byte signature; `None` if not GIF.
 fn gif_dimensions(path: &str) -> Option<(i32, i32)> {
     use std::io::Read;
     if path.is_empty() {
@@ -2455,19 +2319,16 @@ fn gif_dimensions(path: &str) -> Option<(i32, i32)> {
     (width > 0 && height > 0).then_some((width, height))
 }
 
-/// Video frame size from MP4 `tkhd`: swapped if matrix turns it upright.
-///
-/// Phone stores upright video sideways with quarter turn in matrix. Box headers only, nothing
-/// decoded: walks boxes (`ftyp`, `mdat` skipped by size, into `moov` and tracks), so works
-/// whether movie header is before or after media. `None` if missing, not ISO media (MP4, MOV,
-/// 3GP), or no video track.
+/// Video size from MP4 `tkhd`, swapped if matrix turns it upright (phones store upright
+/// video sideways). Box headers only (`mdat` skipped by size): movie header before or after
+/// media. `None` if missing, not ISO media (MP4, MOV, 3GP), or no video track.
 fn video_dimensions(path: &str) -> Option<(i32, i32)> {
     if path.is_empty() {
         return None;
     }
     let mut file = std::fs::File::open(path).ok()?;
     let len = file.metadata().ok()?.len();
-    // `box_header` keeps boxes inside file: sums can't near u64 top.
+    // `box_header` keeps boxes inside file: sums stay far from u64 top.
     let mut at = 0_u64;
     let mut first = true;
     while at.saturating_add(8) <= len {
@@ -2488,7 +2349,7 @@ fn video_dimensions(path: &str) -> Option<(i32, i32)> {
 mod mp4 {
     use std::io::{Read, Seek, SeekFrom};
 
-    /// Box at `at`: whole size with header, and type. `None` for impossible size.
+    /// Box at `at`: size with header, type; `None` if impossible.
     pub(super) fn box_header(
         file: &mut std::fs::File,
         at: u64,
@@ -2509,7 +2370,7 @@ mod mp4 {
             }
             size => u64::from(size),
         };
-        // Checked: wrapped size would walk back to start, forever.
+        // Checked: wrapped size would walk back to start forever.
         (size >= 8 && at.checked_add(size).is_some_and(|stop| stop <= end)).then_some((size, kind))
     }
 
@@ -2546,10 +2407,8 @@ mod mp4 {
         None
     }
 
-    /// Width and height from `tkhd`, swapped for a quarter turn.
-    ///
-    /// Fields before matrix longer in version 1 (64-bit times). Matrix: nine 16.16 numbers;
-    /// quarter turn has zeros where identity has ones.
+    /// Width, height from `tkhd`, swapped for quarter turn. Version 1 has 64-bit times. Matrix:
+    /// nine 16.16; quarter turn has zeros where identity has ones.
     fn header_size(file: &mut std::fs::File, at: u64, size: u64) -> Option<(i32, i32)> {
         // Version 1 fields reach 96 bytes, size at end.
         let mut body = [0_u8; 96];
@@ -2581,11 +2440,8 @@ mod mp4 {
     }
 }
 
-/// Reactions as row carries them.
-///
-/// Core sends `reactions.reactions` counted, most frequent first; order kept, per-contact
-/// breakdown dropped (nothing draws it). Null, absent, empty = none. Emoji is whatever other
-/// end sent (core doesn't check): shown as plain text.
+/// Reactions for row: core's counted `reactions.reactions`, most first, order kept,
+/// per-contact breakdown dropped. Null/absent/empty = none. Emoji unchecked: plain text.
 fn reactions_json(message: &serde_json::Value) -> String {
     let Some(list) = message
         .pointer("/reactions/reactions")
@@ -2602,7 +2458,7 @@ fn reactions_json(message: &serde_json::Value) -> String {
             }
             Some(serde_json::json!({
                 "emoji": emoji,
-                // Never 0: core lists a reaction only if someone sent it.
+                // Never 0: listed only if someone sent it.
                 "count": json::u32_at(reaction, "count").max(1),
                 "self": json::flag(reaction, "isFromSelf"),
             }))
@@ -2627,9 +2483,8 @@ fn own_reaction(message: &serde_json::Value) -> String {
         .unwrap_or_default()
 }
 
-/// Local path from a picker. Silica pickers' `filePath` is plain; `selectedContent` and
-/// anything via a `url` property arrive as percent-encoded `file://` URLs. Both reach
-/// `send_file`; core takes a path.
+/// Local path from picker: Silica `filePath` plain; `selectedContent`, `url` give
+/// percent-encoded `file://` URLs. Core takes a path.
 pub(crate) fn local_path(raw: &str) -> String {
     let path = raw.strip_prefix("file://").unwrap_or(raw);
     if !path.contains('%') {
@@ -2663,9 +2518,8 @@ pub(crate) fn local_path(raw: &str) -> String {
     String::from_utf8(out).unwrap_or_else(|_| path.to_string())
 }
 
-/// Name the recipient sees for a file. Core would derive one from path, often camera's
-/// serial filename for gallery pictures; this one is ours to change. Pictures get core's own
-/// dated name anyway (same reason it recodes them).
+/// Name recipient sees; core would use path (gallery: camera serial). Pictures get core's
+/// dated name (it recodes them).
 fn file_name_of(path: &str) -> String {
     std::path::Path::new(path)
         .file_name()
@@ -2731,7 +2585,7 @@ mod tests {
         let mdat = mp4_box(*b"mdat", &[0_u8; 64]);
         let audio = mp4_box(*b"trak", &mp4_box(*b"tkhd", &tkhd(0, 0, false)));
 
-        // Movie header after media, as camera writes it: video size is the answer.
+        // Movie header after media, as camera writes: size found.
         let landscape = mp4_box(
             *b"moov",
             &[
@@ -2781,7 +2635,7 @@ mod tests {
         .expect("write");
         assert_eq!(video_dimensions(&big.to_string_lossy()), Some((640, 480)));
 
-        // Not there, not a movie, no video track: nothing, not a guess.
+        // Not there, not a movie, no video track: nothing, no guess.
         let gif = dir.join("clip.gif");
         std::fs::write(&gif, b"GIF89a\x2c\x01\x02\x00rest").expect("write");
         assert_eq!(video_dimensions(&gif.to_string_lossy()), None);
@@ -3045,7 +2899,7 @@ mod tests {
 
     #[test]
     fn a_row_newer_than_the_list_keeps_its_place() {
-        // 9: a send the list lacks yet. Arrival goes after the entry before it.
+        // 9: a send the list lacks yet; arrival goes after entry before it.
         let mut rows = rows_of(&[1, 2, 3, 9]);
         place_arrivals(&mut rows, &entries(&[1, 2, 3, 7, 8]), &[7, 8]);
         assert_eq!(ids_in(&rows), vec![1, 2, 3, 7, 8, 9]);

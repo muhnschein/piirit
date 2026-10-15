@@ -3,31 +3,26 @@ import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
 
 /*
- * File the next message carries, above field.
- *
- * Own component like ReplyBar: ConversationPage can't load headless, so measurable parts must test alone. Looks like ReplyBar on purpose: same "next message has this" idiom.
+ * File next message carries, above field. Own component (ConversationPage can't
+ * load headless, so tested alone); looks like ReplyBar on purpose.
  */
 Item {
     id: root
 
     /// Picked file; empty for none. Makes bar appear.
     property string filePath
-    /// Display name. Falls back to path when picker gave none.
+    /// Display name; path if picker gave none.
     property string fileName
-    /// Video being shrunk before send; progress 0 to 1. See
-    /// ChatMessages.preparing.
+    /// Video shrinking before send; progress 0-1 (ChatMessages.preparing).
     property bool preparing: false
     property real progress: 0
-    /// Picked size while sending shrunk video; 0 otherwise (no sizes shown).
-    /// See ChatMessages.original_bytes.
+    /// Picked size for shrunk video, else 0 (ChatMessages.original_bytes).
     property real originalBytes: 0
-    /// Size sent; while still shrinking, planned size. See
-    /// ChatMessages.attachment_bytes.
+    /// Size sent, or planned while shrinking (ChatMessages.attachment_bytes).
     property real bytes: 0
     /// File removed.
     signal cancelled()
-    /// Shrinking stopped; file kept, sent as is. Same button, other meaning
-    /// while shrinking.
+    /// Shrinking stopped, file sent as is (same button while shrinking).
     signal stopped()
 
     readonly property string shownName:
@@ -36,8 +31,7 @@ Item {
     // Sized by `shown`, not `visible`: see ReplyBar.
     readonly property bool shown: root.filePath.length > 0
     visible: root.shown
-    // Both heights: cancel button is icon-tall. One-line quote measured short
-    // in ReplyBar, bar overlapped field.
+    // Both heights: button is icon-tall (else overlaps field, as in ReplyBar).
     height: root.shown ? Math.max(lines.height, cancel.height) + 2 * Theme.paddingSmall : 0
 
     Column {
@@ -50,8 +44,7 @@ Item {
             id: attached
             objectName: "pendingAttachmentLabel"
             width: parent.width
-            // Name cut, not grown. No name while shrinking: wraps, since number
-            // at end matters in long languages.
+            // Name elided; shrink text wraps (number at end must show).
             truncationMode: root.preparing ? TruncationMode.None : TruncationMode.Fade
             wrapMode: root.preparing ? Text.Wrap : Text.NoWrap
             font.pixelSize: Theme.fontSizeExtraSmall
@@ -70,7 +63,7 @@ Item {
                   : qsTr("Sending %1").arg(root.shownName)
         }
 
-        // How much smaller the video goes: what was picked, what is sent.
+        // Picked vs sent size.
         Label {
             objectName: "attachmentSizesLabel"
             visible: root.originalBytes > 0
@@ -96,7 +89,7 @@ Item {
         }
     }
 
-    // Shrink progress: line along bottom of bar, fills as it goes.
+    // Shrink progress line along bottom.
     Rectangle {
         objectName: "preparingProgress"
         anchors {

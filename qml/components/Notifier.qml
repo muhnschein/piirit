@@ -3,33 +3,30 @@ import Nemo.Notifications 1.0
 import Nemo.DBus 2.0
 
 /*
- * Notifies arrivals the reader is not looking at; takes them down once they are.
+ * Notifies unseen arrivals; withdraws once seen. One per chat, reused (`replacesId`),
+ * counting up. Edit updates it; deletion drops it or shows prior message, no banner.
+ * ChatList decides arrivals, skips muted. Here: was reader there, how much to say (lock
+ * screen shows anyone; `detail` follows setting).
  *
- * One notification per chat, reused (`replacesId`); same-chat messages count up.
- * Edits update it; a deletion drops it or shows the message before. No banner then.
- *
- * ChatList decides arrivals and skips muted chats. Here: was reader there, and how much
- * to say (lock screen shows to anyone; `detail` follows the setting).
- *
- * Taps return over D-Bus: Sailjail lets the app own OrganizationName.ApplicationName from
- * its desktop file, `piirit.piirit`. Adaptor below owns it, notification's remote action
- * names it; lipstick's call lands here as `openRequested`.
+ * Taps return over D-Bus: Sailjail lets app own OrganizationName.ApplicationName from
+ * desktop file, `piirit.piirit`. Adaptor below owns it, remote action names it;
+ * lipstick's call lands as `openRequested`.
  */
 Item {
     id: notifier
 
     /// Chat on screen; 0 for none.
     property int viewingChatId: 0
-    /// False in background: on screen is not seen.
+    /// False in background: on screen isn't seen.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
-    /// Detail: 0 chat and message, 1 chat only, 2 arrival only. Page binds it; component
-    /// reads no setting, so it loads alone.
+    /// 0 chat and message, 1 chat only, 2 arrival only. Page binds it: no setting read here,
+    /// loads alone.
     property int detail: 0
 
     /// Tapped: chat to open.
     signal openRequested(int chatId)
 
-    // `enabled`: off means nothing announced and what is up comes down. Page binds it.
+    // `enabled` off: nothing announced, shown ones withdrawn. Page binds it.
     onEnabledChanged: {
         if (!enabled) {
             notifier.clearAll()
@@ -38,17 +35,16 @@ Item {
 
     /// chatId -> Notification.
     property var notes: ({})
-    /// chatId -> chat name, kept since notification may not say it.
+    /// chatId -> chat name (notification may not say it).
     property var names: ({})
     /// chatId -> messages announced since notification up.
     property var counts: ({})
 
-    /// D-Bus name for tap callbacks (see header); one string for service and interface,
-    /// as Nemo's remote-action reference does.
+    /// Tap D-Bus name (header); service and interface alike, as Nemo's remote-action reference.
     readonly property string busName: "piirit.piirit"
     readonly property string busPath: "/"
 
-    // Reading a chat means seen: drop its notification.
+    // Read chat = seen: drop its notification.
     onViewingChatIdChanged: {
         if (viewingChatId !== 0 && appActive) {
             notifier.clear(viewingChatId)
@@ -72,8 +68,7 @@ Item {
              "    </method>\n" +
              "  </interface>\n"
 
-        /// Tap's call. Chat id is the notification's own argument, so one outliving the
-        /// app's memory still names its chat.
+        /// Tap's call. Chat id is notification's own argument: survives app restart.
         function showChat(chatId) {
             notifier.openRequested(chatId)
         }
@@ -87,8 +82,7 @@ Item {
         }
     }
 
-    /// Chat name for a notification, "" for none: title a tap opens the chat under until
-    /// core says.
+    /// Chat name, "" none: title tap opens chat under until core says.
     function nameOf(chatId) {
         var name = notifier.names[chatId]
         return name ? name : ""
@@ -109,7 +103,7 @@ Item {
         }
     }
 
-    /// Announce message unless reader is looking at it.
+    /// Announce message unless seen.
     function arrived(chatId, chatName, sender, preview) {
         if (!notifier.enabled) {
             return
@@ -129,7 +123,7 @@ Item {
         var count = (notifier.counts[chatId] || 0) + 1
         notifier.counts[chatId] = count
         var says = notifier.wording(chatName, sender, preview, count)
-        // Banner and entry: the previewed pair pops up.
+        // Banner and entry: previewed pair pops up.
         note.summary = says.summary
         note.body = says.body
         note.previewSummary = says.summary
@@ -147,8 +141,8 @@ Item {
         note.publish()
     }
 
-    /// Restate after edit/delete. `unread` now; zero takes it down. Nothing raised for a
-    /// chat with none up; nothing changed if it already says this.
+    /// Restate after edit/delete with `unread` now; zero withdraws. None up: nothing raised;
+    /// same text: unchanged.
     function restated(chatId, chatName, sender, preview, unread) {
         var note = notifier.notes[chatId]
         var shown = notifier.counts[chatId] || 0
@@ -169,14 +163,14 @@ Item {
         notifier.counts[chatId] = count
         note.summary = says.summary
         note.body = says.body
-        // No banner: nothing arrived, so no preview pops up.
+        // No banner: nothing arrived.
         note.previewSummary = ""
         note.previewBody = ""
         note.itemCount = count
         note.publish()
     }
 
-    /// Take down this chat's notification.
+    /// Withdraw chat's notification.
     function clear(chatId) {
         var note = notifier.notes[chatId]
         if (note) {
@@ -185,7 +179,7 @@ Item {
         notifier.counts[chatId] = 0
     }
 
-    /// Every notification down, counts to zero.
+    /// Withdraw all, counts zeroed.
     function clearAll() {
         for (var id in notifier.notes) {
             notifier.clear(parseInt(id, 10))

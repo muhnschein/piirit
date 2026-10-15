@@ -3,18 +3,10 @@ import Sailfish.Silica 1.0
 import "../js/Media.js" as Media
 
 /*
- * Chat's non-text content as tiles: pictures and videos, sounds, files, apps (where on), calls
- * (contact chats only). Each opens its kind page (pages/ChatMediaPage.qml), as deltachat-android
- * and -ios do.
- *
- * Tiles, not rows: doors, not settings. Apps have no theme icon: AppMark draws one.
- *
- * Bindings, not Row: positioners size in a polish pass, which never runs headless.
- *
- * Row keeps own room above and below tiles, so a page column gets the gap
- * without knowing its size.
- *
- * Opens nothing: owning page pushes the media page; keeps this testable alone.
+ * Chat media tiles: gallery, sounds, files, apps (if on), calls (contact chats), each to
+ * pages/ChatMediaPage.qml, as deltachat-android/-ios. Tiles: doors, not settings. AppMark
+ * draws apps' missing theme icon. Bindings, not Row: polish never runs headless. Own room
+ * above/below for page columns. Opens nothing (page pushes), so testable alone.
  */
 Item {
     id: root
@@ -25,7 +17,7 @@ Item {
     /// Calls tile: contact chats only.
     property bool callsAvailable: false
 
-    /// Tapped kind: gallery, audio, files, apps or calls.
+    /// Tapped: gallery, audio, files, apps or calls.
     signal kindRequested(string kind)
 
     /// Kinds on offer, tile order.
@@ -35,8 +27,7 @@ Item {
         ? (root.width - 2 * Theme.horizontalPageMargin) / root.kinds.length
         : 0
 
-    /// Room above/below tiles. More above: combo below has line room, caption none,
-    /// so gaps look even.
+    /// Room around tiles; more above (combo below has line room, caption none).
     readonly property real gapAbove: Theme.paddingLarge + Theme.paddingMedium
     readonly property real gapBelow: Theme.paddingLarge
     /// Tile height: icon, gap, one caption line, row padding.

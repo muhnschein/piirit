@@ -1,8 +1,5 @@
-//! Tracking params stripped from outgoing links. Rules: parla's (github.com/trufae/parla,
-//! `link_cleaner.vala`).
-//!
-//! Content params (video id, timestamp, search) stay; anything not listed left byte for byte.
-//! Nothing fetched: text rewritten on way out.
+//! Tracking params stripped from outgoing links; parla's rules (github.com/trufae/parla,
+//! `link_cleaner.vala`). Content params stay; unlisted left byte for byte. Nothing fetched.
 
 /// Ad-click and campaign ids: safe on any site.
 const GLOBAL_PARAMS: &[&str] = &[
@@ -206,7 +203,7 @@ pub(crate) fn clean_text(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut at = 0;
     for (start, end) in url_spans(text) {
-        // Bad span: link goes out uncleaned; no words lost.
+        // Bad span: sent uncleaned, no words lost.
         if let (Some(before), Some(url)) = (text.get(at..start), text.get(start..end)) {
             out.push_str(before);
             out.push_str(&clean_url(url));
@@ -243,9 +240,8 @@ fn url_start(text: &str, from: usize) -> Option<usize> {
     None
 }
 
-/// End of link at `start`: whitespace, quote or angle bracket.
-///
-/// Trailing punctuation is sentence's; `)`/`]` too unless opened.
+/// End of link at `start`: whitespace, quote or angle bracket. Trailing punctuation is
+/// sentence's; `)`/`]` too unless opened.
 fn url_end(text: &str, start: usize) -> usize {
     let tail = text.as_bytes().get(start..).unwrap_or_default();
     let mut link = tail
@@ -257,7 +253,7 @@ fn url_end(text: &str, start: usize) -> usize {
         })
         .next()
         .unwrap_or_default();
-    // Closers counted once. Per-char recount was quadratic.
+    // Closers counted once; recount per char was quadratic.
     let mut parens = unopened(link, b'(', b')');
     let mut brackets = unopened(link, b'[', b']');
     while let Some((&last, shorter)) = link.split_last() {
@@ -294,7 +290,7 @@ fn unopened(span: &[u8], open: u8, close: u8) -> usize {
 /// Link with tracking params removed; fragment kept.
 pub(crate) fn clean_url(url: &str) -> String {
     let host = host_of(url);
-    // `#` kept; a `?` after it belongs to fragment.
+    // `#` kept; `?` after it is fragment's.
     let (before_fragment, fragment) = url
         .find('#')
         .and_then(|at| Some((url.get(..at)?, url.get(at..)?)))

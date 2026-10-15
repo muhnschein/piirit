@@ -1,14 +1,12 @@
 //! Write profile to backup file.
 //!
-//! Wraps core `export_backup`; other half of `signup.rs` takeover. Per profile, owned by its page.
+//! Core `export_backup`; other half of `signup.rs` takeover. Page-owned, per profile.
 //!
-//! Core names file, answers nothing: name found by folder diff (before vs after).
-//! `ImexFileWritten` unusable: events polled on own call (`deltachat-jsonrpc` event loop),
-//! so one emitted before export answers can arrive after; page waiting on it may hang.
-//! Folder is no race.
+//! Core names file, says nothing: found by folder diff. `ImexFileWritten` unusable: events
+//! polled separately (`deltachat-jsonrpc` event loop), may arrive after answer; page would hang.
 //!
-//! Progress via `ImexProgress`, shared with import, nothing says which. Page feeds core events
-//! (`handle_event`, like chat models); shown progress is only this object's write.
+//! Progress: `ImexProgress`, shared with import, unlabelled; page feeds events (`handle_event`),
+//! shown only while this writes.
 
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -65,8 +63,7 @@ pub struct Backup {
 impl Backup {
     /// Write backup into `folder`.
     pub fn write(&mut self, folder: QString) {
-        // Core refuses a second (one ongoing process per account);
-        // refusal would show as the running write failing.
+        // Core refuses second (one process per account): would read as failure.
         if self.running {
             return;
         }
@@ -110,7 +107,7 @@ impl Backup {
         if !self.running {
             return;
         }
-        // Set before call: refusal answer must know who asked.
+        // Set first: refusal answer must know who asked.
         self.cancelled = true;
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -137,7 +134,7 @@ impl Backup {
         let Some(permille) = json::u32_opt(&payload, "progress") else {
             return;
         };
-        // 0 is failure; reason arrives in call answer. Reset would look like restart.
+        // 0 = failure, reason in call answer; reset would look like restart.
         if permille > 0 {
             self.set_permille(permille);
         }
@@ -162,7 +159,7 @@ impl Backup {
 
 /// Run core export into `folder`; answer with what it wrote.
 ///
-/// One new `.tar` is the backup. None or several (other writers): answer folder.
+/// One new `.tar` = backup; none or several: folder.
 async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String, String> {
     let path = folder.to_string();
     let before = off_the_runtime(move || prepare(&path)).await?;
@@ -186,8 +183,7 @@ async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String
 
 /// Run blocking fs work off runtime threads.
 ///
-/// `std::fs` blocks thread; runtime threads carry core's connection and drain its events.
-/// `spawn_blocking` pool is for this.
+/// Runtime threads carry core's connection and events; `spawn_blocking` pool takes `std::fs`.
 async fn off_the_runtime<T, F>(work: F) -> Result<T, String>
 where
     F: FnOnce() -> Result<T, String> + Send + 'static,
@@ -202,8 +198,7 @@ where
 
 /// Make folder if absent; answer existing `.tar`s.
 ///
-/// Core makes folder too, but only once it gets there: fail now, not after a minute of writing.
-/// Plain fn (like `tars_in`) so blocking work goes to `off_the_runtime` whole.
+/// Core makes it too, but late: fail now, not after a minute. Plain fn for `off_the_runtime`.
 fn prepare(folder: &str) -> Result<BTreeSet<PathBuf>, String> {
     std::fs::create_dir_all(folder).map_err(|err| format!("cannot use {folder}: {err}"))?;
     Ok(tars_in(folder))

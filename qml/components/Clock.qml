@@ -2,16 +2,10 @@ pragma Singleton
 import QtQuick 2.0
 
 /*
- * Current time as a binding dependency.
- *
- * `Date.now()` in a binding is read once; QML never re-evaluates. Row drawn
- * on arrival said "now" for delegate's life (days). Issue 108.
- *
- * Relative times read `Clock.now`; one tick re-evaluates all. One shared
- * timer: per-row timers would be 300 chats = 300 timers.
- *
- * Ticks only while app visible. On return clock read at once, so labels are not
- * up to a tick stale (overnight phone shows morning's answer).
+ * Current time as binding dependency: `Date.now()` in a binding is read once
+ * (row said "now" for days; issue 108). Relative times read `Clock.now`; one
+ * shared timer, not one per row (300 chats). Ticks only while visible; read at
+ * once on return, not up to a tick stale.
  */
 QtObject {
     id: clock
@@ -19,11 +13,10 @@ QtObject {
     /// Ms since epoch, at last tick.
     property double now: Date.now()
 
-    /// Tick period. Minute is coarsest label step, so labels lag at most this.
+    /// Tick period: minute, coarsest label step.
     property int interval: 30000
 
-    /// App on screen, so time is needed. Headless tests set this: cannot change
-    /// `Qt.application.state`.
+    /// App on screen. Headless tests set it (can't change `Qt.application.state`).
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     onAppActiveChanged: {
@@ -32,7 +25,7 @@ QtObject {
         }
     }
 
-    /// Singleton: no children for timer, so a property.
+    /// Singleton has no children: timer as property.
     property Timer ticker: Timer {
         interval: clock.interval
         repeat: true

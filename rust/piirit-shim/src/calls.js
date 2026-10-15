@@ -1,21 +1,18 @@
 /*
  * `window.calls` for calls-webapp, served by call host (call_host.rs) as `calls.js`.
  *
- * Page does call (camera, mic, peer connection, codecs). Asks host for five things: send
- * offer, send answer, end call, ICE servers, other end's picture. All core's job; core is
- * behind loopback host, so each is a request. Other end's answer comes back as hash
- * command, set here once host has it.
+ * Page does media. Core, behind loopback host, does offer, answer, end, ICE servers, peer
+ * picture: one request each. Peer's answer returns as hash command.
  *
- * No secrets, nothing templated. Host API key is in page's own address, which app gives
- * its own WebView only: page elsewhere loading this script (cross-origin allowed) finds
- * no key in its address, reaches nothing.
+ * No secrets, nothing templated: API key is in page's address, given only to app's own
+ * WebView; another page loading this script (cross-origin allowed) reaches nothing.
  *
- * XHR, not fetch, as webxdc.js: Gecko has both, XHR predates every release this runs on.
+ * XHR, not fetch, as webxdc.js: XHR predates every Gecko this runs on.
  */
 (function () {
     "use strict";
 
-    /* Key from page's query. */
+    /* From page's query. */
     var KEY = (function () {
         var found = /[?&]key=([0-9a-f]+)/.exec(window.location.search);
         return found ? found[1] : "";
@@ -26,8 +23,8 @@
     var RETRY = 1000;
 
     /*
-     * Gecko <126 lacks RTCIceCandidate.type. Needed for offer on first relay candidate;
-     * missing, offer waits for gathering (slow servers time out). Parsed from candidate.
+     * Gecko <126 lacks RTCIceCandidate.type, needed to offer on first relay candidate
+     * (else waits for gathering; slow servers time out). Parsed from candidate.
      */
     if (window.RTCIceCandidate
             && !("type" in window.RTCIceCandidate.prototype)) {
@@ -41,11 +38,9 @@
     }
 
     /*
-     * VP8 first per video line. Sailfish Gecko enables hardware H264 for WebRTC and lists it
-     * first; other end answers in offer order, so calls placed here get H264, which this
-     * engine draws unreliably (answered calls get VP8 from other end's offer). Order only,
-     * only in what other end is sent: every codec stays offered, so any answer is one this
-     * end has. Codec's retransmission (rtx) stream stays next to it.
+     * VP8 first per video line. Sailfish Gecko lists hardware H264 first; peer answers in
+     * offer order, and this engine draws H264 unreliably. Reorder only, sent offer only:
+     * every codec stays offered. rtx stream stays beside its codec.
      */
     function preferVp8(sdp) {
         var lines = sdp.split("\r\n");
@@ -78,9 +73,8 @@
     }
 
     /*
-     * One request at a time, in order. Each goes on own connection; two in flight seen
-     * arriving swapped, leaving call screen (goes by last picture report) with older one.
-     * Unanswered request holds queue at most WAIT.
+     * One request at a time: on separate connections two arrived swapped, leaving the
+     * screen (last picture report wins) stale. Unanswered holds queue at most WAIT.
      */
     var WAIT = 10000;
     var outbox = [];
@@ -101,7 +95,7 @@
         xhr.open("POST", API + next.path, true);
         xhr.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
         xhr.timeout = WAIT;
-        /* Any outcome, incl. timeout. */
+        /* Any outcome, timeout too. */
         xhr.onloadend = postNext;
         xhr.send(next.body);
     }
@@ -110,19 +104,16 @@
     piiritVideo.attach(post);
 
     /*
-     * Page never reports connection state; peer connections do. Each watched,
-     * state passed on: app's "Connected" and end-on-failure use it.
-     *
-     * Built as page does, with `new`: constructor returning object hands it to `new`;
-     * shared prototype keeps `instanceof` true.
+     * Page never reports connection state: watch each peer connection for app's
+     * "Connected" and end-on-failure. Constructor returns the native object to `new`;
+     * shared prototype keeps `instanceof`.
      */
     var Native = window.RTCPeerConnection;
 
     /*
-     * Gecko <115 (ESR 91, Sailfish OS 5.0) lacks setConfiguration. Page makes connection
-     * with no servers, sets them after getIceServers; that throws, place and answer both
-     * wait on it, so no call starts. There servers go in at construction (sync fetch, host
-     * on same machine); page's later setConfiguration does nothing.
+     * Gecko <115 (ESR 91, Sailfish OS 5.0) lacks setConfiguration, which page calls after
+     * getIceServers: throws, no call starts. There servers go in at construction (sync
+     * fetch, local host); page's later call is a no-op.
      */
     var fixedServers = Native && !Native.prototype.setConfiguration;
     function iceServersNow() {
@@ -164,9 +155,9 @@
     }
 
     /*
-     * Mic switched from app's own screen; page runs unseen under it. Page keeps mic state
-     * and tells other end from its own switch (labelled with what a press would do): press
-     * that switch, never turn track off behind page. Switch not drawn yet: retry until it is.
+     * Mic switched from app screen over unseen page. Page owns mic state and tells peer via
+     * its switch (labelled with press's effect): press it, never kill track behind page.
+     * Not drawn yet: retry.
      */
     var MUTE_LABEL = "Mute microphone";
     var UNMUTE_LABEL = "Unmute microphone";
@@ -195,8 +186,8 @@
     }
 
     /*
-     * Host queue for page, in order: hash commands, plus two mic commands above. Long poll:
-     * host holds request until it has something, so other end's answer arrives promptly.
+     * Host's ordered queue: hash commands plus mic commands. Long poll, so answers arrive
+     * promptly.
      */
     var waiting = [];
     function apply() {
@@ -204,7 +195,7 @@
             return;
         }
         window.location.hash = waiting.shift();
-        /* One per turn: page reads hash when change reaches it; two in one turn read as last. */
+        /* One per turn: two in one turn read as last. */
         window.setTimeout(apply, 0);
     }
     function listen() {
@@ -245,7 +236,7 @@
     }
 
     window.calls = {
-        /* Page's offer, gathered. Core places call. */
+        /* Gathered offer; core places call. */
         startCall: function (offer) {
             post("/start", preferVp8(offer));
         },
@@ -253,11 +244,11 @@
         acceptCall: function (answer) {
             post("/accept", answer);
         },
-        /* Red button, any state. App removes page. */
+        /* Red button, any state; app removes page. */
         endCall: function () {
             post("/end", "");
         },
-        /* Core's servers, JSON string. Fetched, not baked in: keeps TURN credentials behind key. */
+        /* JSON string; fetched so TURN credentials stay behind key. */
         getIceServers: function () {
             return new Promise(function (resolve) {
                 var xhr = new XMLHttpRequest();
@@ -271,7 +262,7 @@
                 xhr.send();
             });
         },
-        /* Drawn over page's placeholder, which still shows if host has no picture. */
+        /* Over page's placeholder, shown if host has none. */
         getAvatar: function () {
             return API + "/avatar";
         }

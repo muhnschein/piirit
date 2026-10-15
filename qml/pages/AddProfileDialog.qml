@@ -3,16 +3,13 @@ import Sailfish.Silica 1.0
 import "../js/Relays.js" as Relays
 
 /*
- * Add profile: name only unless asked. Relay mints address and credentials;
- * keys made on device (docs/PROJECT.md).
+ * Add profile: name only unless asked; relay mints address and credentials,
+ * keys made on device (docs/PROJECT.md). Accept hands off to ProfileSetupPage.
+ * Shape from parla (github.com/trufae/parla).
  *
- * Accept hands off to ProfileSetupPage. Shape from parla (github.com/trufae/parla).
- *
- * Core uses first answering relay, adds more later: one relay down does not
- * cut profile off (init_transports, core 2.61).
- * "Advanced" (shut by default) holds relay choice: Relays.js list or "Other
- * relay" field. Relay chosen there is used alone; header still names it when
- * shut.
+ * Core uses first answering relay, adds more later, so one down doesn't cut
+ * profile off (init_transports, core 2.61). Shut "Advanced" holds relay choice
+ * (Relays.js list or "Other relay"); a chosen one is used alone, named in header.
  */
 Dialog {
     id: dialog
@@ -28,14 +25,14 @@ Dialog {
     property bool advanced: false
     /// First entry, "Automatic", is core's pick.
     readonly property bool automatic: relayCombo.currentIndex === 0
-    /// Typed for "Other relay", else picked; empty for "Automatic".
+    /// Typed or picked relay; empty for "Automatic".
     property string domain: relayCombo.currentIndex === otherIndex
                             ? customField.text.trim()
                             : (relayCombo.currentIndex >= firstRelayIndex
                                && relayCombo.currentIndex - firstRelayIndex < relays.length
                                ? relays[relayCombo.currentIndex - firstRelayIndex].domain : "")
-    /// Core gets `dcaccount:` + relay (takes it with or without
-    /// `https://.../new`). Empty for "Automatic": shim passes no relay.
+    /// `dcaccount:` + relay (core takes it with or without `https://.../new`). Empty for
+    /// "Automatic": shim passes none.
     property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
     // Relays.js (chatmail.at/relays).
@@ -44,8 +41,7 @@ Dialog {
     // Name and relays: core's, or picked/typed.
     canAccept: nameField.text.trim().length > 0 && (automatic || domain.length > 0)
 
-    // Setup page does the work. Silica builds it as soon as this dialog shows,
-    // so typed values handed over on accept, not at creation.
+    // Setup page does work. Silica builds it when dialog shows: values passed on accept.
     acceptDestination: Qt.resolvedUrl("ProfileSetupPage.qml")
     onAccepted: {
         dialog.acceptDestinationInstance.displayName = nameField.text.trim()
@@ -153,7 +149,7 @@ Dialog {
                     label: qsTr("Relay")
                     // "Automatic": several relays, core's choice.
                     currentIndex: 0
-                    // Automatic: explain why several relays; else says one only.
+                    // Automatic: why several; else one only.
                     description: dialog.automatic
                                  ? qsTr("Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.")
                                  : qsTr("Only this relay. More can be added later on the profile page.")

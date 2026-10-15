@@ -4,17 +4,15 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * One picture, as big as screen allows. Shown here: a system handler leaves
- * Piirit and fails on some devices; pull-down keeps way out to other apps.
- * Fit at zoom 1, scaled from there; content is the larger of picture and view,
- * so no pan until something to pan, centred meanwhile.
+ * One picture, big as screen allows; here, not system handler (leaves Piirit,
+ * fails on some devices); pull-down keeps way to other apps. Fit at zoom 1;
+ * content is larger of picture and view: no pan until needed, centred.
  *
- * Two steps: tapped row's decode is a cache hit, drawn first, nothing decoding
- * during transition. Full decode and GIF movie start once in place (decoding
- * during transition was the reported stutter).
+ * Two steps: tapped row's decode is cache hit, drawn first, nothing decoding
+ * in transition (the reported stutter); full decode, GIF movie once in place.
  *
- * Save copies to Piirit's Downloads (AttachmentSaver): chat files live in
- * core's dir and go with the app.
+ * Save copies to Piirit's Downloads (AttachmentSaver): chat files in core's
+ * dir go with app.
  */
 Page {
     id: page
@@ -26,13 +24,12 @@ Page {
     property string viewType: "Image"
 
     readonly property bool isAnimated: page.viewType === "Gif"
-    /// Width conversation drew it at; 0 if not from there. Row still under this
-    /// page, so same size is a Qt cache hit: first frame free.
+    /// Width conversation drew it at; 0 if not from there. Row still under page,
+    /// so same size is Qt cache hit: first frame free.
     property real previewWidth: 0
 
-    /// Page in place (transition over, or none). Until then decode and upload
-    /// drop transition frames: full picture and GIF movie wait; row's decode
-    /// carries page.
+    /// Page in place (transition over, or none). Until then decode and upload drop
+    /// transition frames: full picture, GIF wait; row's decode carries page.
     property bool settled: false
     onStatusChanged: if (page.status === PageStatus.Active) page.settled = true
     Component.onCompleted: if (page.status === PageStatus.Active) page.settled = true
@@ -59,18 +56,16 @@ Page {
         ? page.fittedWidth * page.measured.implicitHeight / page.measured.implicitWidth
         : page.height
 
-    /// Decode box: twice the page, so zoom 2 stays sharp. Bigger wastes memory
-    /// and upload; past GPU texture limit Qt rescales on render thread (stall).
-    /// Per side, Qt fits keeping shape. One bound of twice long edge on both
-    /// sides let landscape photo through whole (12 MP, 48 MB to draw 1080
-    /// wide). Qt 5.6 fits stored pixels before orientation turn: upright 4:3
-    /// stored sideways gets 1.5x, not 2x.
-    ///
+    /// Decode box: twice page, so zoom 2 stays sharp. Bigger wastes memory and
+    /// upload; past GPU texture limit Qt rescales on render thread (stall). Per
+    /// side, Qt keeps shape: one bound of twice long edge on both let landscape
+    /// photo through whole (12 MP, 48 MB for 1080 wide). Qt 5.6 fits stored pixels
+    /// before orientation turn: upright 4:3 stored sideways gets 1.5x, not 2x.
     /// Screen size until page has one.
     readonly property int decodeWidth: 2 * (page.width > 0 ? page.width : Screen.width)
     readonly property int decodeHeight: 2 * (page.height > 0 ? page.height : Screen.height)
 
-    /// Kept inside content; flickable does this after layout, this runs before.
+    /// Kept inside content: flickable does this after layout, this before.
     function within(value, limit) {
         return Math.max(0, Math.min(Math.max(0, limit), value))
     }
@@ -80,8 +75,8 @@ Page {
         return Math.max(0, (Math.max(size, viewport) - size) / 2)
     }
 
-    /// Zoom, keeping (`viewX`, `viewY`) point under it. Coordinates in view:
-    /// else zoom grows from top-left.
+    /// Zoom keeping (`viewX`, `viewY`) under it; view coordinates, else zoom grows
+    /// from top-left.
     function zoomAt(target, viewX, viewY) {
         var next = Math.max(1, Math.min(page.maximumZoom, target))
         var wide = page.fittedWidth * page.zoom
@@ -186,8 +181,8 @@ Page {
                 x: Math.max(0, (flick.contentWidth - frame.width) / 2)
                 y: Math.max(0, (flick.contentHeight - frame.height) / 2)
 
-                // Row's decode at its width: cache hit, on screen from first
-                // frame. Gone once full picture is in.
+                // Row's decode at its width: cache hit, shown from first frame; gone once full
+                // picture in.
                 Image {
                     id: preview
                     objectName: "previewPicture"
@@ -200,8 +195,8 @@ Page {
                     visible: picture.status !== Image.Ready
                 }
 
-                // Layering as message row: Image shows GIF's first frame and
-                // sizes page; animation covers it. See AttachmentPreview.
+                // Layered as message row: Image shows GIF's first frame, sizes page; animation
+                // covers it. See AttachmentPreview.
                 Image {
                     id: picture
                     objectName: "fullPicture"
@@ -211,8 +206,8 @@ Page {
                     autoTransform: true
                     sourceSize.width: page.decodeWidth
                     sourceSize.height: page.decodeHeight
-                    // Once settled if a preview carries page; else at once (empty
-                    // page worse than dropped frame).
+                    // Once settled if preview carries page; else at once (empty page worse than
+                    // dropped frame).
                     source: page.settled || page.previewWidth <= 0 ? page.fileUrl : ""
                 }
 
@@ -221,8 +216,7 @@ Page {
                     anchors.fill: parent
                     visible: page.isAnimated
                     fillMode: Image.PreserveAspectFit
-                    // Frames decoded as they come, not whole movie kept. See
-                    // AttachmentPreview.
+                    // Frames decoded as they come, not whole movie kept (AttachmentPreview).
                     cache: false
                     playing: visible
                     // Movie decodes on main thread: starts after transition.
@@ -240,8 +234,7 @@ Page {
             }
         }
 
-        // Only while picture still coming: failed decode would leave spinner
-        // forever.
+        // Only while picture coming: failed decode would spin forever.
         BusyIndicator {
             objectName: "pictureBusy"
             anchors.centerIn: parent

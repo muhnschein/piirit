@@ -1,22 +1,19 @@
 //! Attachment size and picture naming for outgoing files.
 //!
-//! `misc_send_msg` names attachment `File`, which core sends uncompressed on purpose (how clients
-//! offer "send uncompressed"). Picked/taken pictures named `Image` instead (suffixes core reads
-//! as `Image`, `guess_msgtype_from_path_suffix`), so core recodes per media quality setting and
-//! sends as `image_<date>.jpg`. Both pinned by `deltachat-jsonrpc/tests/real_server.rs`.
+//! `misc_send_msg` sends `File` uncompressed (clients' "send uncompressed"). Pictures go as
+//! `Image` (suffixes per `guess_msgtype_from_path_suffix`), so core recodes per media quality and
+//! sends `image_<date>.jpg`. Both pinned by `deltachat-jsonrpc/tests/real_server.rs`.
 //!
-//! `sys.msgsize_max_recommended` (`RECOMMENDED_FILE_SIZE`, ~22 MB, same for every relay) is a
-//! warning, never a ceiling: relays take more (issue #101: 200 MB); Desktop and iOS ignore it.
-//! Large files still sent; a refusing relay fails that message. Pictures never warn: core shrinks
-//! them.
+//! `sys.msgsize_max_recommended` (`RECOMMENDED_FILE_SIZE`, ~22 MB, every relay) warns, never
+//! caps: relays take more (issue #101: 200 MB); Desktop and iOS ignore it. A refusing relay fails
+//! that message. Pictures never warn: core shrinks them.
 
 use deltachat_jsonrpc::RpcClient;
 
 /// Config key: core's recommended attachment size, bytes.
 const LIMIT_KEY: &str = "sys.msgsize_max_recommended";
 
-/// Suffixes the core recodes. `heic`, `tiff`, `avif` are plain files
-/// to it; `gif` would be spoiled by recoding.
+/// Suffixes core recodes; `heic`, `tiff`, `avif` are plain files to it, `gif` recoding spoils.
 const PICTURES: [&str; 5] = ["jpg", "jpeg", "jpe", "png", "webp"];
 
 /// Viewtype for core; `None` to let it decide.
@@ -24,7 +21,7 @@ pub(crate) fn outgoing_viewtype(path: &str) -> Option<&'static str> {
     is_picture(path).then_some("Image")
 }
 
-/// Whether the core recodes this file.
+/// Core recodes this file?
 pub(crate) fn is_picture(path: &str) -> bool {
     let suffix = std::path::Path::new(path)
         .extension()
@@ -33,7 +30,7 @@ pub(crate) fn is_picture(path: &str) -> bool {
     PICTURES.contains(&suffix.as_str())
 }
 
-/// File size on the phone; 0 if unmeasurable.
+/// File size; 0 if unmeasurable.
 pub(crate) fn file_bytes(path: &str) -> u64 {
     if path.is_empty() {
         return 0;
@@ -41,10 +38,8 @@ pub(crate) fn file_bytes(path: &str) -> u64 {
     std::fs::metadata(path).map_or(0, |file| file.len())
 }
 
-/// Bigger than the core recommends, so bigger than some relays take. Warning only.
-///
-/// False for pictures (core recodes). False too when limit unknown (0)
-/// or the file cannot be measured.
+/// Over core's recommendation, maybe some relays' limit; warning only. False for pictures,
+/// unknown limit (0) or unmeasurable file.
 pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     if limit == 0 || is_picture(path) {
         return false;
@@ -52,7 +47,7 @@ pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     file_bytes(path) > limit
 }
 
-/// Recommended size in bytes; 0 if core does not say.
+/// Recommended bytes; 0 if core unsaid.
 pub(crate) async fn attachment_limit(rpc: &RpcClient, account_id: u32) -> u64 {
     rpc.call::<_, Option<String>>("get_config", (account_id, LIMIT_KEY))
         .await

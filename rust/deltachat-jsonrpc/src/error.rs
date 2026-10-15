@@ -1,5 +1,4 @@
-//! Transport errors: spawn and per-call.
-//! Hand-written Display: no proc-macro crate for two enums.
+//! Transport errors. Hand-written Display: no proc-macro crate for two enums.
 
 use std::fmt;
 
@@ -10,7 +9,7 @@ use crate::protocol::ErrorObject;
 pub enum SpawnError {
     /// Exec failed (missing binary, bad perms).
     Io(std::io::Error),
-    /// Child lacks a requested stdio pipe; should be impossible.
+    /// Child lacks a requested stdio pipe (impossible).
     MissingPipe,
 }
 

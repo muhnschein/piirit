@@ -1,8 +1,8 @@
 /*
  * C side of piirit-video: plain types for Rust.
  *
- * FFmpeg and x264 structs change layout between releases, so they stay here.
- * Only the numbers below cross; src/lib.rs mirrors them field for field.
+ * FFmpeg/x264 struct layouts vary by release: only these numbers cross;
+ * src/lib.rs mirrors field for field.
  */
 #ifndef PIIRIT_RECODE_H
 #define PIIRIT_RECODE_H
@@ -18,7 +18,7 @@ enum piirit_codec {
     PIIRIT_CODEC_OTHER = 3,
 };
 
-/* What a file holds, from header, nothing decoded. */
+/* File contents from header, nothing decoded. */
 struct piirit_probe {
     int64_t duration_ms;
     /* Picture as stored, before display matrix. */
@@ -58,9 +58,8 @@ int piirit_video_recode(const char *input, const char *output,
                         piirit_progress progress, void *context,
                         char *error, size_t error_len);
 
-/* Test clip: `seconds` of moving H.264 at `width` x `height`, `bit_rate`; AAC
- * tone if `with_sound`; `rotation` applied. Tests have no camera and no binary
- * fixture. */
+/* Test clip: `seconds` moving H.264, `width` x `height`, `bit_rate`; AAC tone
+ * if `with_sound`; `rotation` applied. No camera or binary fixture in tests. */
 struct piirit_clip {
     int32_t width;
     int32_t height;

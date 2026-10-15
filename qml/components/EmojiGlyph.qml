@@ -3,13 +3,9 @@ import Sailfish.Silica 1.0
 import "../js/Emoji.js" as Emoji
 
 /*
- * One emoji as a picture.
- *
- * Qt 5.6 cannot draw colour fonts; system emoji are mono and few. So Twemoji
- * picture where shipped (qml/art/emoji/, scripts/fetch-emoji.py), else text.
- * Text unchecked: core does not verify it is an emoji.
- *
- * Pickers hold hundreds: decode off UI thread at drawn size.
+ * One emoji as picture: Qt 5.6 can't draw colour fonts, system emoji mono, few.
+ * Twemoji where shipped (qml/art/emoji/, scripts/fetch-emoji.py), else text
+ * (core doesn't verify emoji).
  */
 Item {
     id: root
@@ -19,7 +15,7 @@ Item {
     /// Drawn edge length.
     property real size: Theme.fontSizeMedium
 
-    /// Picture name, or "" for text.
+    /// Picture name; "" text.
     readonly property string picture: Emoji.pictureFor(root.emoji)
     /// Picture showing.
     readonly property bool drawn: root.picture.length > 0 && image.status !== Image.Error
@@ -36,7 +32,7 @@ Item {
         width: root.size
         height: root.size
         visible: root.drawn
-        // 72px, decoded at drawn size. Off UI thread: no scroll stalls.
+        // 72px, decoded at drawn size off UI thread: pickers hold hundreds.
         asynchronous: true
         sourceSize.width: Math.ceil(root.size)
         sourceSize.height: Math.ceil(root.size)

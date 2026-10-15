@@ -2,35 +2,29 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Name under a picture: always a field, never label-then-field.
- * Centred, in the name's size and colour, with the field's underline.
- *
- * `text` is the given name. Empty field shows `fallbackText` (contact's own
- * name), else `placeholderText`, dimmed.
- *
- * `hint` shows under it only while focused. Inner items named via *ObjectName,
- * as Banner does.
+ * Name under picture: always a field, centred, name size and colour, with
+ * underline. Empty shows `fallbackText`, else `placeholderText`, dimmed.
+ * `hint` only while focused. Inner items named via *ObjectName (as Banner).
  */
 Item {
     id: root
 
-    /// Field text: given name.
+    /// Given name.
     property alias text: field.text
-    /// Empty-field fallback: contact's own name.
+    /// Empty fallback: contact's own name.
     property string fallbackText: ""
-    /// Empty-field placeholder, no fallback.
+    /// Placeholder without fallback.
     property string placeholderText: ""
     /// Hint while focused.
     property string hint: ""
-    /// Editable. Left group: shown, not editable.
+    /// Editable (left group: not).
     property bool canEdit: true
 
     property alias fieldObjectName: field.objectName
     property alias hintObjectName: hintLabel.objectName
 
-    /// Has cursor. Hint and page-done check follow it.
-    ///
-    /// `focus`, not `activeFocus` (needs a window; tests have none).
+    /// Has cursor; hint and page-done follow. `focus`: `activeFocus` needs a
+    /// window, tests have none.
     readonly property bool editing: field.focus
 
     width: parent ? parent.width : 0
@@ -50,20 +44,19 @@ Item {
         id: column
         width: parent.width
 
-        // Full width: TextField insets own text. Inset here too and the bio field
-        // below misaligns.
+        // Full width: TextField insets text itself; more misaligns bio below.
         TextField {
             id: field
             width: parent.width
             horizontalAlignment: TextInput.AlignHCenter
-            // Old label's size and colour: still a heading.
+            // Heading size and colour.
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.highlightColor
             placeholderColor: Theme.secondaryHighlightColor
             placeholderText: root.fallbackText.length > 0 ? root.fallbackText
                                                           : root.placeholderText
             readOnly: !root.canEdit
-            // Silica label would sit left above centred name; hint covers it.
+            // Silica label sits left of centred name; hint replaces it.
             labelVisible: false
         }
 

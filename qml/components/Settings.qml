@@ -3,48 +3,45 @@ import QtQuick 2.0
 import Nemo.Configuration 1.0
 
 /*
- * Profile-less settings: drawing, links, media, notifications, calls, cover,
- * camera; plus lens labels, read never written. dconf under app path (outlives
- * app). qml/pages/SettingsPage.qml writes; every page reads through this object,
- * each value follows its key, so changes reach open pages untold. Singleton: a
- * row three components deep, loaded alone in tests, needs the same answer.
+ * Profile-less settings (drawing, links, media, notifications, calls, cover,
+ * camera) plus read-only lens labels; dconf under app path (outlives app).
+ * qml/pages/SettingsPage.qml writes; pages read here, each value following its
+ * key, so changes reach open pages. Singleton: deep row, loaded alone in
+ * tests, needs same answer.
  */
 QtObject {
     /// 0 draws Markdown; else shows message as written (1 = old installs).
     property alias markdownMode: markdownValue.value
     /// Strip known tracking parameters from links before sending.
     property alias cleanLinks: cleanLinksValue.value
-    /// Media compression on send: 0 balanced, 1 less data. Core's
-    /// `media_quality`, all profiles; camera records video at it too.
+    /// Send compression: 0 balanced, 1 less data. Core's `media_quality`, all
+    /// profiles; camera video too.
     property alias mediaQuality: mediaQualityValue.value
-    /// Attachments above this many bytes wait to be asked for; 0 = all. Core's
+    /// Attachments over this many bytes wait to be asked for; 0 = all. Core's
     /// `download_limit`, all profiles.
     property alias downloadLimit: downloadLimitValue.value
-    /// Delete messages older than this many s from the phone, all chats, ignoring
-    /// chat timers; 0 keeps. Core's `delete_device_after`, all profiles.
+    /// Delete from phone messages older than this many s, all chats, over chat
+    /// timers; 0 keeps. Core's `delete_device_after`, all profiles.
     property alias deleteDeviceAfter: deleteDeviceAfterValue.value
     /// Off: no notifications, whatever below says. Kept for re-enable.
     property alias notificationsEnabled: notificationsEnabledValue.value
-    /// Notification detail: 0 who and what, 1 who, 2 only arrival. Lock screen
-    /// shows it.
+    /// Notification detail (lock screen too): 0 who and what, 1 who, 2 arrival.
     property alias notificationDetail: notificationDetailValue.value
     /// Reply to own message announced even from muted group (on by default).
     property alias mentionNotifications: mentionNotificationsValue.value
-    /// Last chat-list profile, 0 = none. Read before core starts (slow to
-    /// answer).
+    /// Last chat-list profile, 0 = none. Read before core starts (slow).
     property alias lastAccountId: lastAccountValue.value
     /// Webxdc apps offered (tray, store, running). Off until asked.
     property alias webxdcEnabled: webxdcEnabledValue.value
-    /// Contact calls ring here. Core's `who_can_call_me`, all profiles. Calls on for all
-    /// since #119. Old key /apps/harbour-piirit/calls_enabled no longer read.
+    /// Contact calls ring here. Core's `who_can_call_me`, all profiles. On for all
+    /// since #119; old key /apps/harbour-piirit/calls_enabled unread.
     property alias callsRing: callsRingValue.value
-    /// Cover quick-action slots: 1 or 2. With 1, left is used; right kept for
-    /// later.
+    /// Cover quick-action slots, 1 or 2; with 1, left used, right kept.
     property alias quickActionCount: quickActionCountValue.value
-    /// Cover quick actions, left and right. Kind: "" none, "chat", "search",
-    /// "qr", "scan", "profiles", or camera "photo", "video", "selfie",
-    /// "selfie-video". Chat: profile, chat, icon. Camera: send at once on chat
-    /// pick. Read by qml/js/QuickActions.js.
+    /// Cover quick actions, left and right. Kind: "" none, "chat", "search", "qr",
+    /// "scan", "profiles", or camera "photo", "video", "selfie", "selfie-video".
+    /// Chat: profile, chat, icon. Camera: send on chat pick. Read by
+    /// qml/js/QuickActions.js.
     property alias quickActionLeft: quickActionLeftValue.value
     property alias quickActionLeftAccount: quickActionLeftAccountValue.value
     property alias quickActionLeftChat: quickActionLeftChatValue.value
@@ -57,17 +54,15 @@ QtObject {
     property alias quickActionRightSendNow: quickActionRightSendNowValue.value
     /// Recent reactions, newest first, offered before all. Picker only.
     property alias recentReactions: recentReactionsValue.value
-    /// Camera settings, as platform camera keeps them: flash mode (see
-    /// qml/js/Viewfinder.js), self-timer seconds, grid on.
+    /// Camera settings as platform camera keeps them: flash mode
+    /// (qml/js/Viewfinder.js), self-timer s, grid.
     property alias cameraFlash: cameraFlashValue.value
     property alias cameraTimer: cameraTimerValue.value
     property alias cameraGrid: cameraGridValue.value
-    /// Back lens labels platform camera writes ("1.0", "0.5"). Read-only; empty
-    /// if none.
+    /// Back lens labels platform camera writes ("1.0", "0.5"); empty if none.
     readonly property var backLensLabels: backLensLabelsValue.value || []
 
-    // Keys named here only: tests/qml_syntax.rs holds other files to reading
-    // via this object.
+    // Keys named only here: tests/qml_syntax.rs makes others read via this.
     property ConfigurationValue markdownConfig: ConfigurationValue {
         id: markdownValue
         key: "/apps/harbour-piirit/markdown_mode"
@@ -130,8 +125,8 @@ QtObject {
     property ConfigurationValue webxdcEnabledConfig: ConfigurationValue {
         id: webxdcEnabledValue
         key: "/apps/harbour-piirit/webxdc_enabled"
-        // Off until asked. Others' code, however sandboxed, is not for unasked
-        // readers; our half is new and still finding bugs.
+        // Off until asked: others' code, however sandboxed, not for unasked readers;
+        // our half still new, finding bugs.
         defaultValue: false
     }
 
@@ -141,8 +136,7 @@ QtObject {
         defaultValue: true
     }
 
-    // One, and none on fresh phone: cover is faces alone until user adds
-    // something.
+    // One, none on fresh phone: cover is faces alone until user adds.
     property ConfigurationValue quickActionCountConfig: ConfigurationValue {
         id: quickActionCountValue
         key: "/apps/harbour-piirit/quick_action_count"

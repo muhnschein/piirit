@@ -2,38 +2,29 @@ import QtQuick 2.0
 import Nemo.DBus 2.0
 
 /*
- * Call sound: earpiece or loudspeaker, or headset/Bluetooth (takes it itself;
- * switch has nothing to move). Voice call: earpiece. Video: loudspeaker, as
- * reference clients; voice call whose pictures come on moves there too unless
- * reader switched. Reader switch holds for the call; mic goes quiet while sound
- * moves, switch shows busy until mic back.
+ * Call sound: earpiece (voice), loudspeaker (video, or pictures come on unless
+ * reader switched; as reference clients), headset/Bluetooth (unswitchable).
+ * Reader switch holds for call; busy until mic back.
  *
- * Why: on Sailfish, moving sound while call mic open kills PulseAudio. Gecko
- * (cubeb) opens mic pinned to its device (not movable); policy module moves
- * every call stream to the new route and asserts each went (policy-group.c,
- * start_move_group). Restarted PulseAudio forgets call streams; a few crashes
- * and systemd stops restarting it: no sound until manual restart. Headset
- * plugged mid-call does the same; can't be prevented here. So the app never
- * moves sound while call mic may be open (`open`):
+ * Sailfish: moving sound while call mic open kills PulseAudio (Gecko/cubeb
+ * pins mic; policy asserts every call stream moved, policy-group.c
+ * start_move_group). Restarted, it forgets call streams; a few crashes and
+ * systemd gives up (no sound till manual restart). Headset plugged mid-call
+ * too; unpreventable. So never move while mic may be open (`open`):
  * - call set acquired before mic opens (`ready`, CallView.allowed);
  * - switch: page stops mic (`micWanted`); move once MicWatch sees no
  *   recording stream (`micKnown`, `micOpen`); page reopens mic;
  * - call over: set returned once mic shut.
- * Watcher can't tell: stopped mic counts as shut after a few seconds; no
- * switching while one may be open.
+ * Watcher can't tell: stopped mic counts shut after a few seconds.
  *
- * Set: class `aliencall` on ohm resource manager (system bus): Sailfish's class
- * for non-phone calls, routed as call (earpiece, or headset/paired device
- * first); with video playback in set: loudspeaker. Names app streams by
- * libpulse id (Call.audio_id): they join call group instead of being held back
- * like other apps'; other apps' music pauses. Nothing outlives app: ohm drops
- * sets when app's bus connection goes (crash/kill restores routing). Set
- * refused, no manager, or no id: let go, loudspeaker for good.
+ * Set: class `aliencall` (Sailfish non-phone call) on ohm resource manager:
+ * earpiece or headset first; with video playback: loudspeaker. Names streams
+ * by libpulse id (Call.audio_id) to join call group; other music pauses. ohm
+ * drops sets with app's bus connection (crash restores routing). Refused, no
+ * manager, or no id: loudspeaker for good.
  *
- * Ringing: second set, class `ringtone` (other music yields, as for a phone
- * call). Names no streams (ngfd plays ringtone; policy knows its streams) and
- * asks only sound, so moves nothing of the app's. Released when ringing stops;
- * answered call acquires own set first, so held-off music stays off.
+ * Ringing: set class `ringtone`, no streams (ngfd rings), moves nothing of
+ * app's. Released after; answered call's set acquired first: music stays off.
  */
 Item {
     id: audio
@@ -50,10 +41,10 @@ Item {
     /// Pictures on screen.
     property bool watching: false
 
-    /// Policy's stream id (Call.audio_id); none: nothing asked.
+    /// Policy stream id (Call.audio_id); none: nothing asked.
     property string appId: ""
 
-    /// Mic watcher knows (MicWatch.known); recording stream open (MicWatch.open).
+    /// Mic watcher knows; recording open (MicWatch.known, .open).
     property bool micKnown: false
     property bool micOpen: false
 
@@ -69,35 +60,35 @@ Item {
     /// Set refused or no id: loudspeaker for good.
     property bool denied: false
 
-    /// Page may come up (CallView.allowed): sound routed. Till call over.
+    /// Sound routed: page may come up (CallView.allowed). Till call over.
     property bool ready: false
 
     /// Page may hold mic: not while sound moves, not before routed.
     property bool micWanted: false
 
-    /// Mic may be open: page had it, until surely shut. Nothing sent meanwhile.
+    /// Mic may be open (page had it, not surely shut). Nothing sent meanwhile.
     property bool open: false
 
     /// Switch in progress: tap until mic back.
     property bool switching: false
 
-    /// Reader can switch: sound on phone, under call's set, mic seen shut.
+    /// Switchable: sound on phone, under call's set, mic seen shut.
     readonly property bool switchable: talking && !denied && !elsewhere && !switching
                                        && (micKnown || !open)
 
     /// Held set number; 0 none.
     property int held: 0
 
-    /// Held set includes video playback (loudspeaker).
+    /// Held set has video playback (loudspeaker).
     property bool heldLoud: false
 
     /// Ringing set number; 0 none.
     property int ringHeld: 0
 
-    /// Policy refused ringing set: not asked again while rings.
+    /// Ringing set refused: not asked again this ring.
     property bool ringRefused: false
 
-    /// Last set number: manager keys sets by client and number.
+    /// Last set number (manager keys sets by client + number).
     property int count: 0
 
     /// Last request number; manager answers by it.
@@ -124,8 +115,8 @@ Item {
     readonly property int routeWired: 8
     readonly property int routeWireless: 16
 
-    // After acquire: policy moves sound before mic opens (ohm answers, then tells
-    // PulseAudio).
+    // After acquire: policy moves sound before mic opens (ohm answers, then
+    // tells PulseAudio).
     Timer {
         id: settling
         objectName: "settling"
@@ -137,7 +128,7 @@ Item {
         }
     }
 
-    // Watcher: mic shut, and again a moment later (catches streams just opening).
+    // Watcher: mic shut, and again moment later (streams just opening).
     Timer {
         id: quieting
         objectName: "quieting"
@@ -150,8 +141,8 @@ Item {
         }
     }
 
-    // No mic-shut signal: time after stop until surely shut. Engine stops it off
-    // event loop when tearing down.
+    // No mic-shut signal: time after stop till surely shut (engine stops off
+    // event loop on teardown).
     Timer {
         id: shutting
         objectName: "shutting"
@@ -164,8 +155,8 @@ Item {
         }
     }
 
-    // Max wait for policy before page up. Manager silent: call goes on; unsent
-    // waits for call over.
+    // Max wait for policy before page up. Silent: call goes on; unsent waits
+    // for call over.
     Timer {
         id: patience
         objectName: "patience"
@@ -177,7 +168,7 @@ Item {
         }
     }
 
-    // Ring over: checked once state settles, so answered call acquires own set first.
+    // Ring over: checked once state settles (answered call's set first).
     Timer {
         id: ringOver
         objectName: "ringOver"
@@ -185,8 +176,8 @@ Item {
         onTriggered: audio.settle()
     }
 
-    // Switch limit: mic not shutting, policy silent, or mic not back. Given up:
-    // mic back, sound where it is.
+    // Switch limit (mic not shutting, policy silent, mic not back): mic back,
+    // sound stays.
     Timer {
         id: stalled
         objectName: "stalled"
@@ -285,8 +276,8 @@ Item {
         audio.look()
     }
 
-    /// Call set wanted (none once over). Mic may be open: switch, page told first.
-    /// Ring set while ringing.
+    /// Call set wanted (none once over; mic may be open: page told first). Ring
+    /// set while ringing.
     function settle() {
         if (audio.open) {
             if (audio.talking && audio.ready && audio.held !== 0
@@ -308,7 +299,7 @@ Item {
         audio.pump()
     }
 
-    /// Ring set: acquired while ringing, released after; call's set queued first.
+    /// Ring set while ringing; call's set queued first.
     function ring() {
         if (audio.ringing) {
             if (audio.ringHeld === 0 && !audio.ringRefused && audio.appId.length > 0) {
@@ -336,7 +327,7 @@ Item {
         audio.look()
     }
 
-    /// Failed switch: mic back, switch as sound is.
+    /// Failed switch: mic back, switch shows sound as is.
     function giveUp() {
         if (!audio.switching) {
             return
@@ -399,9 +390,9 @@ Item {
         audio.drop(id)
     }
 
-    /// Release set `id`. Unregister matters; release first, libresource style.
-    /// Queued messages for set dropped; these go after the one already out, so
-    /// a pending register is answered first.
+    /// Release set `id`: release then unregister (libresource style). Queued
+    /// messages dropped; these go after one already out (pending register
+    /// answered first).
     function drop(id) {
         if (id === 0) {
             return
@@ -418,10 +409,9 @@ Item {
         audio.queue = audio.queue.concat([{ "id": id, "method": method, "args": args }])
     }
 
-    /// Send oldest pending once earlier answered (libresource clients do). Manager
-    /// answers register only after asking bus whose connection it is; refuses
-    /// other ops on set before. Nothing while mic may be open. Queue empty in a
-    /// call: mic's turn (`letIn`).
+    /// Send oldest once earlier answered (as libresource): manager answers
+    /// register after asking bus, refuses other ops before. Nothing while mic
+    /// may be open. Queue empty in call: `letIn` mic.
     function pump() {
         if (audio.waiting || audio.open) {
             return
@@ -448,8 +438,8 @@ Item {
         })
     }
 
-    /// Refused or no manager: release set; call to loudspeaker for good. Only if
-    /// still held: refusal may come for a set already released.
+    /// Refused or no manager: release set, loudspeaker for good. Only if still
+    /// held: refusal may be for a released set.
     function refused(id) {
         if (id === audio.held) {
             audio.letGo()
@@ -467,7 +457,7 @@ Item {
         return audio.reqno
     }
 
-    /// Call set wants video playback too, for loudspeaker.
+    /// Call set wants video playback (loudspeaker).
     function callResources() {
         return audio.heldLoud ? audio.audioPlayback | audio.videoPlayback : audio.audioPlayback
     }
@@ -478,7 +468,7 @@ Item {
             { "type": "i", "value": type },
             { "type": "u", "value": id },
             { "type": "u", "value": audio.next() },
-            // Mandatory: better no set than one whose route policy won't give.
+            // Mandatory: no set beats one whose route policy won't give.
             { "type": "u", "value": resources },
             { "type": "u", "value": 0 },
             { "type": "u", "value": 0 },
@@ -526,7 +516,7 @@ Item {
         iface: "org.nemomobile.Route.Manager"
         signalsEnabled: true
 
-        // AudioRouteChanged. `rc` before signal name: QML functions can't start capital.
+        // AudioRouteChanged; `rc` prefix: QML functions can't start capital.
         function rcAudioRouteChanged(name, type) {
             if (audio.talking) {
                 audio.lookAtRoute()
@@ -534,9 +524,9 @@ Item {
         }
     }
 
-    // Exit: nothing sent while mic may be open; ohm drops set when app's connection
-    // goes, after process's own streams. Else send now, unanswered (component
-    // gone): unregister overtaking a pending register still drops the set.
+    // Exit: nothing sent while mic may be open; ohm drops set when connection
+    // goes, after own streams. Else send now unanswered: unregister overtaking
+    // pending register still drops set.
     Component.onDestruction: {
         if (audio.open) {
             return

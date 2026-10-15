@@ -5,11 +5,9 @@ import "../components"
 import "../js/Emoji.js" as Emoji
 
 /*
- * One message, whole: bubble collapses long bodies, and a message the sender's
- * core cut holds only its start. Full text from core (`full_text.rs`).
- * Markdown per setting; plain unless shim rendered it (MessageDelegate.qml).
- * Label not selectable: "Select text" swaps in selectable field. Label
- * stays until then: owns formatting and links.
+ * Whole message: bubble collapses long bodies, sender-cut ones hold only a start.
+ * Full text from core (`full_text.rs`); Markdown per setting (MessageDelegate.qml).
+ * "Select text" swaps label (formatting, links) for selectable field.
  */
 Page {
     id: page
@@ -23,8 +21,7 @@ Page {
     /// 0 draws Markdown; else as written.
     property int markdownMode: 1
 
-    /// Error, kept on screen, not cleared: blank page with no reason is what
-    /// this page avoids.
+    /// Error, kept on screen: no unexplained blank page.
     property string errorMessage: ""
 
     /// Body is selectable field.
@@ -51,9 +48,7 @@ Page {
     readonly property string emojiText: Emoji.inText(page.shownText, page.drawsStyled,
                                                      bodyLabel.font.pixelSize)
 
-    /// Swap label for selectable field, focused, all selected.
-    ///
-    /// Select end to start: cursor at start, no scroll to end.
+    /// Swap in selectable field, focused, all selected end-to-start (cursor at start, no scroll).
     function beginSelecting() {
         page.selecting = true
         selectableBody.forceActiveFocus()
@@ -103,8 +98,7 @@ Page {
                 title: qsTr("Message")
             }
 
-            // Author. Own label: header `description` draws input as markup (see
-            // ConversationHeader).
+            // Own label: header `description` draws markup (see ConversationHeader).
             Label {
                 objectName: "senderLabel"
                 visible: page.senderName.length > 0
@@ -141,8 +135,7 @@ Page {
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 
-            // As written, as Copy copies. Read-only field takes no focus;
-            // focusOnClick makes it focusable.
+            // As written, as Copy copies. focusOnClick lets read-only field focus.
             TextArea {
                 id: selectableBody
                 objectName: "selectableBody"
@@ -152,7 +145,7 @@ Page {
                 focusOnClick: true
                 labelVisible: false
                 color: Theme.primaryColor
-                // Empty until shown: field lays out text even hidden.
+                // Empty until shown: hidden field still lays out.
                 text: page.selecting ? whole.text : ""
                 // Each selection copied as made.
                 onSelectedTextChanged: {
@@ -194,7 +187,7 @@ Page {
         onDismissed: notice.text = ""
     }
 
-    // Failure stays until left: 4 s toast too short to explain empty page.
+    // Failure stays: 4 s toast can't explain empty page.
     Banner {
         objectName: "failure"
         labelObjectName: "errorLabel"

@@ -3,12 +3,9 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Back cameras, one ring each, lit = in use. Lens toggle. Shown
- * if 2+ back cameras. Beside shutter (portrait), column (landscape).
- *
- * Ring shows lens zoom ("1.0", "0.5") from labels phone adaptation gives the
- * platform camera; QtMultimedia knows only side and id.
- * No labels: numbered in platform order.
+ * Back-lens toggle: ring per camera, lit = in use; if 2+. Ring shows zoom
+ * ("1.0", "0.5") from adaptation's platform-camera labels (QtMultimedia knows
+ * only side and id); none: numbered in platform order.
  */
 Grid {
     id: toggle

@@ -1,12 +1,10 @@
 //! Capture (photo, video, voice message): from make until sent.
 //!
-//! Core copies sent files into blob dir: capture needed only until send lands. Lives in app
-//! cache dir (inside sandbox grant), named by kind + time; name is what other end sees.
-//! Discard bounded to captures dir: page can name any attachment path, gallery picks stay.
+//! Core copies sent files into blob dir, so capture lives only until send lands. In app cache
+//! dir (sandbox grant), named kind + time. Discard bounded to captures dir: gallery picks stay.
 //!
-//! Leftovers page never discards (chat closed mid-send, app stopped) swept at first `Captures`
-//! of run (chat list's, at app start): files over a day old here and in recoded-video dir
-//! (`video.rs`). Nothing of this run's is that old, so no in-flight send loses its file.
+//! Leftovers (chat closed mid-send, app stopped) swept at run's first `Captures` (chat list's):
+//! files over a day old here and in recoded-video dir (`video.rs`).
 
 use std::path::Path;
 use std::sync::Once;
@@ -19,7 +17,7 @@ use crate::qr::cache_file;
 /// Captures dir in cache.
 const CAPTURES_DIR: &str = "captures";
 
-/// Sweep age: older than any send takes, young enough that leftovers don't sit on phone long.
+/// Sweep age: longer than any send, short enough leftovers don't sit long.
 const STALE_AFTER: Duration = Duration::from_secs(24 * 60 * 60);
 
 /// Hands out capture paths; takes them back.
@@ -33,8 +31,7 @@ const STALE_AFTER: Duration = Duration::from_secs(24 * 60 * 60);
 pub struct Captures {
     base: qt_base_class!(trait QObject),
 
-    /// Fresh path for `kind`, `extension`; dir made if absent.
-    /// Empty on failure (`error` says why).
+    /// Fresh path for `kind`, `extension`; dir made if absent. Empty on failure (`error`).
     pub new_path: qt_method!(fn(&mut self, kind: QString, extension: QString) -> QString),
     /// Remove `path` if capture; else leave alone.
     pub discard: qt_method!(fn(&mut self, path: QString)),
@@ -55,7 +52,7 @@ impl Default for Sweep {
     }
 }
 
-/// Once per run, own thread: cache shares flash with everything, chat list builds meanwhile.
+/// Once per run, own thread: flash is shared, chat list builds meanwhile.
 fn sweep_once() {
     static SWEPT: Once = Once::new();
     SWEPT.call_once(|| {
@@ -75,8 +72,8 @@ fn sweep_once() {
     });
 }
 
-/// Remove files in `dir` older than [`STALE_AFTER`] before `now`.
-/// Dirs, links, files after `now` (clock put back) stay.
+/// Remove files in `dir` older than [`STALE_AFTER`] before `now`. Dirs, links, future files
+/// (clock put back) stay.
 fn sweep(dir: &Path, now: SystemTime) {
     let Ok(entries) = std::fs::read_dir(dir) else {
         return;
@@ -131,8 +128,7 @@ fn is_capture(path: &Path, dir: &Path) -> bool {
     path.parent() == Some(dir) && path.file_name().is_some()
 }
 
-/// `photo-20260904-151212.jpg`: kind, local time, extension. File's name wherever it goes,
-/// so must read well in chat.
+/// `photo-20260904-151212.jpg`: kind, local time, extension. Other end sees it: must read well.
 fn capture_name(kind: &str, extension: &str, stamp: String) -> String {
     let kind = kind
         .chars()
@@ -202,7 +198,7 @@ mod tests {
         ));
     }
 
-    /// Leftovers go at a day old, nothing younger: a send of this run's may still read it.
+    /// Leftovers go at a day old, not younger: this run's send may still read it.
     #[test]
     fn the_sweep_takes_only_files_older_than_a_day() {
         let dir = std::env::temp_dir().join(format!("piirit-sweep-{}", std::process::id()));

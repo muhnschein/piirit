@@ -1,10 +1,8 @@
-// Quick action on cover. Used by cover (offers), window (does), settings
-// (picks). Cover's call action drawn the same way, same files.
-//
+// Cover quick actions: cover offers, window does, settings picks; call action drawn alike.
 // Library: nothing translated, lists shared (as Relays.js).
 .pragma library
 
-/// Kinds Settings stores. Photo/video sent to chat picked after.
+/// Kinds Settings stores. Photo/video: chat picked after.
 var kinds = ["chat", "search", "qr", "scan", "profiles",
              "photo", "video", "selfie", "selfie-video"]
 
@@ -16,7 +14,7 @@ var captures = {
     "selfie-video": { mode: 1, front: true }
 }
 
-/// Whether an action of `kind` starts with the camera.
+/// `kind` starts with camera?
 function isCapture(kind) {
     return Object.keys(captures).indexOf(kind) >= 0
 }
@@ -25,15 +23,13 @@ function isCapture(kind) {
 var chatIcons = ["heart", "star", "person", "group", "home", "bubble", "robot", "school",
                  "work", "office", "dog", "cat", "ball"]
 
-/// Call-time cover icons, not user-picked. `mic-off` while on, `mic` off.
+/// Call cover icons, fixed. `mic-off` while on, `mic` off.
 var callIcons = ["mic", "mic-off"]
 
 /// Sizes render-cover-icons.sh draws at: Silica small icon, scales 1.0-2.0.
 var sizes = [32, 40, 48, 56, 64]
 
-/// One side's action from Settings. `side`: left/right.
-///
-/// Unknown kind, or unread dconf `undefined`: no action.
+/// `side` (left/right) action from Settings; unknown or unread (`undefined`): none.
 function read(settings, side) {
     var prefix = side === "right" ? "quickActionRight" : "quickActionLeft"
     var kind = "" + settings[prefix]
@@ -53,8 +49,7 @@ function count(settings) {
     return settings.quickActionCount === 2 ? 2 : 1
 }
 
-/// Action on `side`: `read`, but right blanked when one chosen.
-/// Right setup kept for when two again.
+/// `read`, but right blanked when one chosen (setup kept).
 function shown(settings, side) {
     var action = read(settings, side)
     if (side === "right" && count(settings) < 2) {
@@ -68,9 +63,8 @@ function iconName(action) {
     return action.kind === "chat" ? action.icon : action.kind
 }
 
-/// Icon path rel. to qml/: nearest `size`, white if dark ambience else black.
-///
-/// Home screen draws file as-is, so size must match.
+/// Icon path rel. to qml/: nearest `size` (home screen draws as-is), white on dark ambience
+/// else black.
 function iconFile(name, size, onDark) {
     var best = sizes[0]
     for (var i = 1; i < sizes.length; i++) {
@@ -86,11 +80,8 @@ function isLight(colour) {
     return 0.299 * colour.r + 0.587 * colour.g + 0.114 * colour.b > 0.5
 }
 
-/// Fade under actions: `from` down to `to`, eased like vuo cover.
-/// `at` in same units as `from`/`to`. Used by cover grid and quick-action
-/// previews. Same curve as src/pictures.rs face fade.
-///
-/// Was ShaderEffect. See Avatar.qml: no shaders.
+/// Fade under actions, `from` to `to` (`at` same units), eased as vuo cover; cover grid,
+/// previews. Curve = src/pictures.rs face fade. No ShaderEffect: see Avatar.qml.
 function fade(at, from, to) {
     if (!(to > from)) {
         return 1
