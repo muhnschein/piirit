@@ -76,8 +76,8 @@ fn main() {
 
     // After the view, which is what makes the application object the
     // translator hangs off; before the QML, which is translated as it is
-    // built and not again. A language with no catalog gets the English
-    // one, for its plural forms; every other string is English already.
+    // built and not again. A language with no catalog gets none, so its
+    // reader sees the source text: English, with plurals as "%n message(s)".
     translations::install(&translations_dir().to_string_lossy(), "");
 
     // Must exist before the QML is sourced, or bindings see undefined.
