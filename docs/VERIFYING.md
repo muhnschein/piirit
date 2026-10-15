@@ -11,8 +11,12 @@ $ scripts/verify-release.sh 2.2.0    # or a given one
 ```
 
 Needs Linux on x86_64, git, curl, and Podman (rootless is fine) or Docker.
-First run: ~2.3 GB image pull, ~30 min build. Builds in a fresh clone of the
-tag under `$TMPDIR`, never in your tree.
+Both installed: Docker if running; `--podman` or `--docker` picks.
+First run: ~2.3 GB image pull (~7 GB unpacked, where Podman or Docker keep
+images), ~30 min build. Builds in a fresh clone of the tag under
+`~/.cache/piirit-verify`, never in your tree: ~1 GB, checks for 2 GB free.
+Elsewhere: `PIIRIT_WORKDIR=/some/big/disk scripts/verify-release.sh`. Not
+`/tmp`: often a RAM disk, small and shared.
 
 | Result | Exit | Meaning |
 |---|---|---|
@@ -42,11 +46,18 @@ $ podman system migrate
 
 ## An RPM from elsewhere
 
-E.g. one copied off a phone:
+E.g. one copied off a phone. Checked with GitHub's in one run: one build,
+each copy compared with it, a line per copy; exit is the worst.
 
 ```
 $ scripts/verify-release.sh --rpm harbour-piirit-2.2.0-1.aarch64.rpm
+github: VERIFIED, same file as the rebuild, byte for byte.
+local: VERIFIED, same file as the rebuild, byte for byte.
 ```
+
+`--no-download`: that copy only. Store installs keep no RPM; on the phone,
+`pkcon download ~/Downloads harbour-piirit` fetches it again (untested: Piirit
+isn't in the Store yet).
 
 ## What makes it reproducible
 
