@@ -1807,10 +1807,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Toto není kód druhého zařízení. Použij kód, který ukazuje druhé zařízení.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Namiřte kameru na QR kód</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Zkopírovat profil</translation>
     </message>
@@ -1840,14 +1836,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Connect</source>
         <translation>Připojit</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Nebo namiřte fotoaparát na kód</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Namiřte fotoaparát na něčí kód pozvánky</translation>
     </message>
 </context>
 <context>

@@ -1800,10 +1800,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>See ei ole teise seadme kood. Kasuta koodi, mida näitab teine seade.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Hoia oma kaamerat QR-koodi kohal</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Kopeeri profiil</translation>
     </message>
@@ -1833,14 +1829,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Connect</source>
         <translation>Ühenda</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Või suuna kaamera koodile</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Suuna kaamera kellegi kutsekoodile</translation>
     </message>
 </context>
 <context>

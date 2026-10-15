@@ -1800,10 +1800,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>यह दूसरे डिवाइस का कोड नहीं है। दूसरे डिवाइस पर दिख रहे कोड का उपयोग करें।</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>अपना कैमरा QR कोड के ऊपर रखें</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>प्रोफ़ाइल कॉपी करें</translation>
     </message>
@@ -1833,14 +1829,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>कनेक्ट करें</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>या कैमरा कोड पर रखें</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>कैमरा किसी के आमंत्रण कोड पर रखें</translation>
     </message>
 </context>
 <context>

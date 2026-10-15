@@ -1800,10 +1800,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Ce n&apos;est pas un code de second appareil. Utilisez le code affiché par l&apos;autre appareil.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Placez votre caméra au-dessus du code QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Copier le profil</translation>
     </message>
@@ -1833,14 +1829,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Connect</source>
         <translation>Se connecter</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Ou pointez la caméra vers le code</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Pointez la caméra vers le code d&apos;invitation de quelqu&apos;un</translation>
     </message>
 </context>
 <context>

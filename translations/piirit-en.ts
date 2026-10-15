@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1828,14 +1824,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

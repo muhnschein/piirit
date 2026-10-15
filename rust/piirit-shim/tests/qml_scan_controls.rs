@@ -1,7 +1,7 @@
-//! Scanner camera controls: pinch or zoom button brings small code closer, never past
-//! camera's max; torch lights code on paper; rings and switch change cameras, restarting
-//! zoom and putting torch out on front; tap focuses on its point with camera page's ring.
-//! Rings wear platform lens labels; on page turned with phone, picture is turned back.
+//! Scanner camera controls: pinch brings small code closer, never past camera's max;
+//! torch lights code on paper; tap focuses on its point with camera page's ring. Only
+//! torch and link button, one row: no lens rings, zoom steps or camera switch (camera
+//! page's), default camera kept. On page turned with phone, picture is turned back.
 //!
 //! Decoding itself: `qml_scan.rs`. This is what is around it.
 
@@ -28,8 +28,6 @@ const PROBE_QML: &str = r"
     import 'file://__COMPONENTS__'
     Item {
         Loader { id: loader; width: 540; height: 960 }
-        property var defaultCameras
-        Component.onCompleted: defaultCameras = QtMultimedia.availableCameras
         function load(url) {
             loader.setSource('', {})
             loader.setSource(url, {})
@@ -50,7 +48,6 @@ const PROBE_QML: &str = r"
             if (!hit) { throw new Error('missing: ' + name) }
             return hit
         }
-        function click(name) { item(name).clicked(null) }
         function tap(name) { item(name).clicked() }
 
         function run(url) {
@@ -64,19 +61,24 @@ const PROBE_QML: &str = r"
             view.active = true
 
             step('start', function() {
-                return { zoom: cam.digitalZoom, label: item('zoomLabel').text,
-                         torch: item('torchButton').visible, lenses: item('lensToggle').visible,
-                         flip: item('flipButton').visible, flash: cam.flash.mode,
+                return { zoom: cam.digitalZoom, device: cam.deviceId,
+                         torch: item('torchButton').visible, flash: cam.flash.mode,
                          controls: item('cameraControls').visible }
             })
-            // One, two, four and back, each shown on the button.
-            step('steps', function() {
-                var seen = []
-                for (var i = 0; i < 4; i++) {
-                    click('zoomButton')
-                    seen.push([cam.digitalZoom, item('zoomLabel').text])
-                }
-                return seen
+            // Torch and link button share the one row.
+            step('row', function() {
+                var torch = item('torchButton')
+                var link = item('typeLinkButton')
+                var t = torch.mapToItem(view, 0, torch.height / 2)
+                var l = link.mapToItem(view, 0, link.height / 2)
+                return { same: Math.round(t.y) === Math.round(l.y),
+                         apart: t.x + torch.width < l.x,
+                         centred: Math.round(l.x + link.width / 2) === view.width / 2 }
+            })
+            step('gone', function() {
+                return ['lensToggle', 'zoomButton', 'flipButton'].map(function(name) {
+                    return findIn(view, name) === null
+                })
             })
             step('clamped', function() {
                 view.zoomTo(12)
@@ -84,12 +86,6 @@ const PROBE_QML: &str = r"
                 var shown = item('zoomIndicator').shown
                 view.zoomTo(-1)
                 return [high, cam.digitalZoom, shown]
-            })
-            step('labels', function() {
-                Settings.backLensLabelsConfig.value = ['1.0', '0.5']
-                var labelled = [item('lensLabel0').text, item('lensLabel1').text]
-                Settings.backLensLabelsConfig.value = []
-                return labelled
             })
             // On a page turned with the phone, the picture is turned back.
             step('turned', function() {
@@ -123,23 +119,9 @@ const PROBE_QML: &str = r"
                 var on = cam.flash.mode
                 return [on, item('torchButton').icon.source.toString()]
             })
-            // The second back camera: no zoom; the torch stays lit.
-            step('lens', function() {
-                view.zoomTo(2)
-                click('lens1')
-                return [cam.deviceId, cam.digitalZoom, cam.flash.mode]
-            })
-            // The front: no torch, no rings; back is the lens last used,
-            // still lit.
-            step('front', function() {
-                tap('flipButton')
-                return { device: cam.deviceId, flash: cam.flash.mode,
-                         torch: item('torchButton').visible,
-                         lenses: item('lensToggle').visible }
-            })
-            step('back', function() {
-                tap('flipButton')
-                return [cam.deviceId, cam.flash.mode]
+            step('off', function() {
+                tap('torchButton')
+                return [cam.flash.mode, item('torchButton').icon.source.toString()]
             })
             step('focus', function() {
                 var reticle = item('reticle')
@@ -155,13 +137,12 @@ const PROBE_QML: &str = r"
                 tap('typeLinkButton')
                 return item('cameraControls').visible
             })
-            step('single', function() {
-                QtMultimedia.availableCameras = [{ deviceId: 'back-0', position: 1 }]
-                load(url)
-                var answer = [item('flipButton').visible, item('lensToggle').visible,
-                              item('torchButton').visible]
-                QtMultimedia.availableCameras = defaultCameras
-                return answer
+            // No link to type: torch alone.
+            step('noLink', function() {
+                view.typing = false
+                view.offerLink = false
+                return [item('cameraControls').visible, item('torchButton').visible,
+                        item('typeLinkButton').visible]
             })
             return JSON.stringify(out)
         }
@@ -170,7 +151,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_scanner_zooms_lights_and_switches_cameras() {
+fn the_scanner_zooms_and_lights_with_only_the_torch_and_link_button() {
     let temp = std::env::temp_dir().join(format!("piirit-scan-controls-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
 
@@ -211,30 +192,25 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
 
     assert_eq!(
         out["start"],
-        json!({"zoom": 1, "label": "1\u{d7}", "torch": true, "lenses": true, "flip": true,
-               "flash": 2, "controls": true}),
-        "the scanner does not start unzoomed with the torch off and its controls up. \
-         {context}"
+        json!({"zoom": 1, "device": "back-0", "torch": true, "flash": 2, "controls": true}),
+        "the scanner does not start on the default camera, unzoomed, with the torch off \
+         and its controls up. {context}"
     );
     assert_eq!(
-        out["steps"],
-        json!([
-            [2, "2\u{d7}"],
-            [4, "4\u{d7}"],
-            [1, "1\u{d7}"],
-            [2, "2\u{d7}"]
-        ]),
-        "the zoom button does not step one, two, four and back. {context}"
+        out["row"],
+        json!({"same": true, "apart": true, "centred": true}),
+        "the torch and the link button are not one row, the button centred clear of the \
+         torch. {context}"
+    );
+    assert_eq!(
+        out["gone"],
+        json!([true, true, true]),
+        "the scanner still has lens rings, a zoom button or a camera switch. {context}"
     );
     assert_eq!(
         out["clamped"],
         json!([4, 1, true]),
         "the scanner asked for a zoom the camera cannot do, or did not show it. {context}"
-    );
-    assert_eq!(
-        out["labels"],
-        json!(["1.0", "0.5"]),
-        "the scanner's rings do not wear the platform's lens labels. {context}"
     );
     assert_eq!(
         out["turned"],
@@ -254,20 +230,9 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
         "the torch button did not light the torch. {context}"
     );
     assert_eq!(
-        out["lens"],
-        json!(["back-1", 1, 32]),
-        "the second ring did not change to the second back camera at no zoom, with the \
-         torch kept. {context}"
-    );
-    assert_eq!(
-        out["front"],
-        json!({"device": "front-0", "flash": 2, "torch": false, "lenses": false}),
-        "the front camera kept the torch, or offers it or the rings. {context}"
-    );
-    assert_eq!(
-        out["back"],
-        json!(["back-1", 32]),
-        "back from the front is not the lens last used with its torch. {context}"
+        out["off"],
+        json!([2, "image://theme/icon-camera-flash-off"]),
+        "a second tap on the torch button did not put the torch out. {context}"
     );
     assert_eq!(
         out["focus"],
@@ -283,8 +248,8 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
         "the camera's controls stayed up over the link panel. {context}"
     );
     assert_eq!(
-        out["single"],
-        json!([false, false, true]),
-        "a phone with one camera offers a switch or rings, or lost its torch. {context}"
+        out["noLink"],
+        json!([true, true, false]),
+        "with no link to type, the torch went too, or the link button stayed. {context}"
     );
 }

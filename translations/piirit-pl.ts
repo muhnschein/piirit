@@ -1807,10 +1807,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>To nie jest kod drugiego urządzenia. Użyj kodu pokazywanego przez drugie urządzenie.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Umieść aparat nad kodem QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Skopiuj profil</translation>
     </message>
@@ -1840,14 +1836,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Connect</source>
         <translation>Połącz</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Albo skieruj aparat na kod</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Skieruj aparat na czyjś kod zaproszenia</translation>
     </message>
 </context>
 <context>

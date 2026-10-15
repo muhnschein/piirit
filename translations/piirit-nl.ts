@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Dit is geen code voor een tweede apparaat. Gebruik de code die het andere apparaat toont.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Houd je camera boven de QR-code</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Profiel kopiëren</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Verbinden</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Of richt de camera op de code</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Richt de camera op iemands uitnodigingscode</translation>
     </message>
 </context>
 <context>

@@ -1800,10 +1800,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಇದು ಎರಡನೇ ಸಾಧನದ ಸಂಕೇತವಲ್ಲ. ಇನ್ನೊಂದು ಸಾಧನ ತೋರಿಸುವ ಸಂಕೇತವನ್ನು ಬಳಸಿ.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>ನಿಮ್ಮ ಕ್ಯಾಮೆರಾವನ್ನು QR ಸಂಕೇತದ ಮೇಲೆ ಹಿಡಿಯಿರಿ</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>ಪ್ರೊಫೈಲನ್ನು ನಕಲಿಸಿ</translation>
     </message>
@@ -1833,14 +1829,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>ಸಂಪರ್ಕಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>ಅಥವಾ ಕ್ಯಾಮೆರಾವನ್ನು ಕೋಡ್‌ನತ್ತ ತೋರಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>ಕ್ಯಾಮೆರಾವನ್ನು ಯಾರದಾದರೂ ಆಹ್ವಾನ ಕೋಡ್‌ನತ್ತ ತೋರಿಸಿ</translation>
     </message>
 </context>
 <context>

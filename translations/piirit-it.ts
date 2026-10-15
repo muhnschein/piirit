@@ -1800,10 +1800,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Questo non è un codice per un secondo dispositivo. Usa il codice mostrato dall&apos;altro dispositivo.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Posiziona la camera sopra il codice QR</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Copia il profilo</translation>
     </message>
@@ -1833,14 +1829,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Connect</source>
         <translation>Connetti</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Oppure punta la fotocamera sul codice</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Punta la fotocamera sul codice di invito di qualcuno</translation>
     </message>
 </context>
 <context>

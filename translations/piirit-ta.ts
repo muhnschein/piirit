@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>இது இரண்டாவது சாதனத்தின் குறியீடு அல்ல. மற்ற சாதனம் காட்டும் குறியீட்டைப் பயன்படுத்துங்கள்.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>உங்கள் கேமராவை QR குறியீட்டின் மேல் பிடியுங்கள்</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>சுயவிவரத்தை நகலெடு</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>இணை</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>அல்லது கேமராவைக் குறியீட்டின் மீது காட்டவும்</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>கேமராவை ஒருவரின் அழைப்புக் குறியீட்டின் மீது காட்டவும்</translation>
     </message>
 </context>
 <context>
