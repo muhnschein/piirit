@@ -135,12 +135,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # Upstream's image needs two images' room, and its build user is 100000:
-      # beyond a runner's 65536 subordinate ids (scripts/container-engine.sh).
+      # Upstream's image needs two images' room.
       - name: Make room
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
                       /usr/local/share/boost "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
+      # Upstream's build user is 100000: beyond a runner's 65536 subordinate
+      # ids (docs/VERIFYING.md). Ours needs none of this.
+      - name: Widen the subordinate id range
+        if: matrix.sdk == 'upstream'
+        run: |
           sudo sed -i "s/^$(id -un):.*/$(id -un):165536:1000000/" /etc/subuid /etc/subgid
           podman system migrate
       - run: gh run download "$GITHUB_RUN_ID" -n repro-build --dir rpms
