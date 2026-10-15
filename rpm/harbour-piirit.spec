@@ -12,6 +12,13 @@
 
 %bcond_with vendor
 
+# Reproducible package (docs/VERIFYING.md). With SOURCE_DATE_EPOCH set
+# (build-in-container.sh: commit time): build time = it, file dates clamped to
+# it. Unset: rpm's defaults. Host name fixed either way (rpm records it).
+%define use_source_date_epoch_as_buildtime 1
+%define clamp_mtime_to_source_date_epoch 1
+%define _buildhost piirit-build
+
 # No i486 server (no musl build upstream): i486 needs PIIRIT_RPC_SERVER. Device arches bundle it.
 %ifarch %ix86
 %define bundle_rpc_server 0

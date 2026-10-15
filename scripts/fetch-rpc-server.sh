@@ -9,12 +9,21 @@
 # Source: PyPI wheels, holding the same binaries upstream attaches to its GitHub
 # release (both nix `result/bin/deltachat-rpc-server`, per upstream
 # .github/workflows/deltachat-rpc-server.yml). PyPI: plain HTTPS, wheel is a zip.
+# Needs curl, unzip, sha256sum.
+#
+#     scripts/fetch-rpc-server.sh [--check]
+#
+# --check: fetch nothing; fail unless each binary present matches its pin
+# (build-in-container.sh runs it every build).
 #
 # All pinned: bump VERSION and every checksum together (fetch new wheels, run
 # `sha256sum`, update below), then vendor/deltachat-rpc-server/SOURCE.md: its
 # MPL-2.0 source notice must describe the binaries actually bundled.
 
 set -eu
+
+check_only=0
+[ "${1:-}" = --check ] && check_only=1
 
 VERSION="2.63.0"
 
@@ -36,14 +45,10 @@ fetch_one() {
     wheel="deltachat_rpc_server-$VERSION-$wheel_tag.whl"
 
     echo ">> $sfos_arch (upstream $upstream_arch)"
-    # pip fetches PyPI's hash URL. --no-deps, exact pin and the sha256 check
-    # below keep it honest, even with a tampered index. --isolated and explicit
-    # index: a PIP_INDEX_URL or pip.conf would silently point at a mirror (hashes
-    # catch it, but as a puzzling failure, not a named one).
-    pip download "deltachat-rpc-server==$VERSION" --no-deps \
-        --isolated --index-url https://pypi.org/simple --no-cache-dir \
-        --platform "musllinux_1_1_$upstream_arch" --only-binary=:all: \
-        -d "$workdir" >/dev/null
+    # PyPI's by-name file URL (redirects to the hashed one). Exact file name and
+    # the sha256 check below keep it honest, whatever answers.
+    curl -sSfL --proto '=https' --proto-redir '=https' --retry 3 -o "$workdir/$wheel" \
+        "https://files.pythonhosted.org/packages/py3/d/deltachat_rpc_server/$wheel"
 
     echo "$wheel_sha  $workdir/$wheel" | sha256sum -c - >/dev/null || {
         echo "fetch-rpc-server: checksum mismatch for $wheel; refusing to install it" >&2
@@ -60,6 +65,27 @@ fetch_one() {
     install -Dm 755 "$bin" "$vendor_dir/$sfos_arch/deltachat-rpc-server"
     echo "   -> vendor/deltachat-rpc-server/$sfos_arch/deltachat-rpc-server"
 }
+
+# Present binaries only: a build needs its own arch, and checks that itself.
+check_one() {
+    sfos_arch="$1"; bin_sha="$2"
+    bin="$vendor_dir/$sfos_arch/deltachat-rpc-server"
+    [ -f "$bin" ] || return 0
+    echo "$bin_sha  $bin" | sha256sum -c - >/dev/null 2>&1 || {
+        echo "fetch-rpc-server: vendor/deltachat-rpc-server/$sfos_arch/deltachat-rpc-server" \
+             "is not the pinned v$VERSION binary; run scripts/fetch-rpc-server.sh" >&2
+        exit 1
+    }
+}
+
+if [ "$check_only" = 1 ]; then
+    echo "$TABLE" | while read -r sfos_arch _ _ _ bin_sha; do
+        [ -n "$sfos_arch" ] || continue
+        check_one "$sfos_arch" "$bin_sha"
+    done
+    echo "fetch-rpc-server: bundled binaries match the v$VERSION pins"
+    exit 0
+fi
 
 echo "$TABLE" | while read -r sfos_arch upstream_arch wheel_tag wheel_sha bin_sha; do
     [ -n "$sfos_arch" ] || continue
