@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αυτός δεν είναι κωδικός δεύτερης συσκευής. Χρησιμοποίησε τον κωδικό που δείχνει η άλλη συσκευή.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Κρατήστε την κάμερά σας πάνω από τον κωδικό QR.</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Αντιγραφή προφίλ</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Σύνδεση</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Ή στρέψτε την κάμερα στον κωδικό</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Στρέψτε την κάμερα στον κωδικό πρόσκλησης κάποιου</translation>
     </message>
 </context>
 <context>

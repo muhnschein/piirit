@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Това не е код за второ устройство. Използвайте кода, който показва другото устройство.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Задръжте камерата си върху QR кода</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Копирай профила</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Свързване</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Или насочете камерата към кода</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Насочете камерата към нечий код за покана</translation>
     </message>
 </context>
 <context>

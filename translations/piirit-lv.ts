@@ -1807,10 +1807,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Šis nav otras ierīces kods. Izmanto kodu, ko rāda otra ierīce.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Turi kameru virs QR koda</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Kopēt profilu</translation>
     </message>
@@ -1840,14 +1836,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Connect</source>
         <translation>Savienot</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Vai pavērsiet kameru pret kodu</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Pavērsiet kameru pret kāda ielūguma kodu</translation>
     </message>
 </context>
 <context>

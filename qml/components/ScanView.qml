@@ -21,7 +21,10 @@ import "../js/Viewfinder.js" as Viewfinder
  * Focus continuous; tap focuses point. No periodic search: video maps
  * continuous to Android HAL "continuous-video", where trigger locks lens
  * mid-sweep ("continuous-picture" finishes first); blurred Jolla Phone. CodeReader and Foil Auth also
- * search only on tap. Front switch: codes on a screen.
+ * search only on tap.
+ *
+ * Plain on purpose: default (back, main) camera, torch, pinch zoom. No lens rings,
+ * zoom steps or front switch: those are the camera page's.
  */
 Item {
     id: root
@@ -43,11 +46,8 @@ Item {
     /// Link panel open. Camera keeps running: may still find code.
     property bool typing: false
 
-    /// Line offset from view top, for host's own words above.
-    property real hintTopMargin: 0
-
-    /// What to point at (host's: invite, or other phone's offer).
-    property string hintText: qsTr("Point the camera at someone's invite code")
+    /// Host's own strip over view top; zoom indicator sits under it.
+    property real topInset: 0
 
     /// Link can be typed or pasted (no reading = dead end).
     property bool offerLink: true
@@ -111,35 +111,8 @@ Item {
         onError: root.failed(message)
     }
 
-    /// Device ids per side, platform order.
-    readonly property var backCameras:
-        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.backFace)
-    readonly property var frontCameras:
-        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.frontFace)
-    readonly property int facing: root.frontCameras.indexOf(camera.deviceId) >= 0
-                                  ? Viewfinder.frontFace : Viewfinder.backFace
-    property string lastBackCamera: ""
-    readonly property string otherCamera:
-        Viewfinder.otherSide(QtMultimedia.availableCameras, root.facing, root.lastBackCamera)
-
-    /// Torch on. Back only.
+    /// Torch on.
     property bool torch: false
-
-    /// Switch camera; zoom and tap focus reset.
-    function useCamera(deviceId) {
-        if (deviceId.length === 0 || deviceId === camera.deviceId || root.done) {
-            return
-        }
-        focusHold.stop()
-        if (root.facing === Viewfinder.backFace && camera.deviceId.length > 0) {
-            root.lastBackCamera = camera.deviceId
-        }
-        if (root.backCameras.indexOf(deviceId) >= 0) {
-            root.lastBackCamera = deviceId
-        }
-        camera.deviceId = deviceId
-        camera.digitalZoom = 1
-    }
 
     /// Zoom to `value`, within camera capability.
     function zoomTo(value) {
@@ -152,8 +125,7 @@ Item {
         objectName: "camera"
         // Autofocus and torch in video pipeline.
         captureMode: Camera.CaptureVideo
-        flash.mode: root.torch && root.facing === Viewfinder.backFace
-                    ? Viewfinder.flashTorch : Viewfinder.flashOff
+        flash.mode: root.torch ? Viewfinder.flashTorch : Viewfinder.flashOff
         // Continuous, except few s after tap: continuous-video search locks, so tap
         // uses plain autofocus (which looks).
         focus {
@@ -275,7 +247,6 @@ Item {
             }
             viewfinder.grabToImage(function(result) {
                 if (result.saveToFile(path)) {
-                    root.framesTried += 1
                     scanner.decode(path)
                 }
             }, root.grabSize())
@@ -327,15 +298,15 @@ Item {
         objectName: "zoomIndicator"
         anchors {
             horizontalCenter: parent.horizontalCenter
-            top: hint.bottom
-            topMargin: Theme.paddingLarge
+            top: parent.top
+            topMargin: root.topInset + Theme.paddingLarge
         }
         zoom: camera.digitalZoom
         maximumZoom: camera.maximumDigitalZoom
     }
 
-    // Controls over picture bottom: torch, zoom (lens rings above), other side.
-    // Gone once read and while typing link.
+    // One row over picture bottom: torch at edge, link button centred (narrowed
+    // before it reaches torch). Gone once read and while typing link.
     Item {
         id: cameraControls
         objectName: "cameraControls"
@@ -343,76 +314,37 @@ Item {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: typeLinkButton.visible ? typeLinkButton.top : parent.bottom
+            bottom: parent.bottom
             bottomMargin: Theme.paddingLarge
         }
         height: Theme.itemSizeMedium
 
         IconButton {
+            id: torchButton
             objectName: "torchButton"
             anchors {
                 left: parent.left
                 leftMargin: Theme.horizontalPageMargin
                 verticalCenter: parent.verticalCenter
             }
-            visible: root.facing === Viewfinder.backFace
             icon.source: Viewfinder.flashIcon(root.torch ? Viewfinder.flashTorch
                                                          : Viewfinder.flashOff)
             onClicked: root.torch = !root.torch
         }
 
-        CameraLensToggle {
-            objectName: "lensToggle"
+        // Opens link panel.
+        Button {
+            id: typeLinkButton
+            objectName: "typeLinkButton"
+            visible: root.offerLink
             anchors {
                 horizontalCenter: parent.horizontalCenter
-                bottom: zoomButton.top
-                bottomMargin: Theme.paddingSmall
-            }
-            cameras: root.backCameras
-            labels: Settings.backLensLabels
-            current: camera.deviceId
-            visible: root.backCameras.length > 1 && root.facing === Viewfinder.backFace
-            onSelected: root.useCamera(deviceId)
-        }
-
-        // Zoom steps: 1, 2, 4x, back.
-        MouseArea {
-            id: zoomButton
-            objectName: "zoomButton"
-            anchors.centerIn: parent
-            width: Theme.itemSizeSmall
-            height: width
-            visible: camera.maximumDigitalZoom > 1
-            onClicked: root.zoomTo(Viewfinder.nextZoomPreset(camera.digitalZoom,
-                                                             camera.maximumDigitalZoom))
-
-            Rectangle {
-                anchors.fill: parent
-                radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.4)
-                border.width: 2
-                border.color: zoomButton.pressed ? Theme.highlightColor : "white"
-            }
-
-            Label {
-                objectName: "zoomLabel"
-                anchors.centerIn: parent
-                color: zoomButton.pressed ? Theme.highlightColor : "white"
-                font.pixelSize: Theme.fontSizeSmall
-                text: Viewfinder.zoomText(camera.digitalZoom)
-            }
-        }
-
-        IconButton {
-            objectName: "flipButton"
-            anchors {
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
                 verticalCenter: parent.verticalCenter
             }
-            visible: root.otherCamera.length > 0
-            icon.source: "image://theme/icon-camera-switch"
-            onClicked: root.useCamera(root.otherCamera)
+            width: Math.min(implicitWidth, parent.width
+                            - 2 * (torchButton.x + torchButton.width + Theme.paddingSmall))
+            text: root.linkButtonText
+            onClicked: root.typeLink()
         }
     }
 
@@ -422,36 +354,6 @@ Item {
         anchors.centerIn: parent
         running: root.done
         size: BusyIndicatorSize.Large
-    }
-
-    /// Frames read, nothing found. Spinner, not number.
-    property int framesTried: 0
-
-    // Inside page margin (line's left edge hung off screen).
-    BusyIndicator {
-        id: looking
-        objectName: "looking"
-        anchors {
-            left: parent.left
-            leftMargin: Theme.horizontalPageMargin
-            verticalCenter: hint.verticalCenter
-        }
-        running: root.active && !root.done && root.framesTried > 0
-        size: BusyIndicatorSize.Small
-    }
-
-    // Button under viewfinder opens link panel.
-    Button {
-        id: typeLinkButton
-        objectName: "typeLinkButton"
-        visible: root.offerLink && !root.typing && !root.done
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            bottom: parent.bottom
-            bottomMargin: Theme.paddingLarge
-        }
-        text: root.linkButtonText
-        onClicked: root.typeLink()
     }
 
     Column {
@@ -497,25 +399,5 @@ Item {
                 onClicked: root.useLink()
             }
         }
-    }
-
-    // At top: phone held up, eye there.
-    Label {
-        id: hint
-        objectName: "hint"
-        anchors {
-            left: looking.right
-            leftMargin: Theme.paddingMedium
-            right: parent.right
-            rightMargin: Theme.horizontalPageMargin
-            top: parent.top
-            topMargin: root.hintTopMargin + Theme.paddingMedium
-        }
-        wrapMode: Text.Wrap
-        color: Theme.secondaryHighlightColor
-        visible: !root.done
-        text: root.typing
-              ? qsTr("Or point the camera at the code")
-              : root.hintText
     }
 }

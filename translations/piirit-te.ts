@@ -1796,10 +1796,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఇది రెండో పరికరపు కోడ్ కాదు. మరో పరికరం చూపుతున్న కోడ్‌ను వాడండి.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>మీ కెమెరాను QR కోడ్ పైన ఉంచండి</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>ప్రొఫైల్‌ను కాపీ చేయి</translation>
     </message>
@@ -1829,14 +1825,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>కనెక్ట్ చేయి</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>లేదా కెమెరాను కోడ్ వైపు చూపండి</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>కెమెరాను ఎవరిదైనా ఆహ్వాన కోడ్ వైపు చూపండి</translation>
     </message>
 </context>
 <context>

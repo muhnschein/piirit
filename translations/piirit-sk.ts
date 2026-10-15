@@ -1807,10 +1807,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Toto nie je kód druhého zariadenia. Použi kód, ktorý zobrazuje druhé zariadenie.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Podržte fotoaparát nad QR kódom.</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Skopírovať profil</translation>
     </message>
@@ -1840,14 +1836,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Connect</source>
         <translation>Pripojiť</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Alebo namierte fotoaparát na kód</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Namierte fotoaparát na niečí kód pozvánky</translation>
     </message>
 </context>
 <context>

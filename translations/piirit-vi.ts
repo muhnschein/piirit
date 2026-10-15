@@ -1789,10 +1789,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Đây không phải mã thiết bị thứ hai. Hãy dùng mã mà thiết bị kia hiển thị.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Giữ máy ảnh của bạn phía trên mã QR.</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Sao chép hồ sơ</translation>
     </message>
@@ -1822,14 +1818,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Kết nối</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Hoặc hướng máy ảnh vào mã</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Hướng máy ảnh vào mã mời của ai đó</translation>
     </message>
 </context>
 <context>

@@ -1793,10 +1793,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Бу икенче җиһаз коды түгел. Икенче җиһаз күрсәткән кодны кулланыгыз.</translation>
     </message>
     <message>
-        <source>Hold your camera over the QR code</source>
-        <translation>Камераны QR код өстендә тотыгыз</translation>
-    </message>
-    <message>
         <source>Copy the profile</source>
         <translation>Профильне күчерү</translation>
     </message>
@@ -1826,14 +1822,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Connect</source>
         <translation>Тоташырга</translation>
-    </message>
-    <message>
-        <source>Or point the camera at the code</source>
-        <translation>Яки камераны кодка юнәлтегез</translation>
-    </message>
-    <message>
-        <source>Point the camera at someone&apos;s invite code</source>
-        <translation>Камераны кемнеңдер чакыру кодына юнәлтегез</translation>
     </message>
 </context>
 <context>

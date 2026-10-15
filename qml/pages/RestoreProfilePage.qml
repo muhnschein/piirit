@@ -71,7 +71,6 @@ Page {
     /// failure: activation starts camera only if holding no code.
     function rescan() {
         if (scanLoader.item) {
-            scanLoader.item.framesTried = 0
             scanLoader.item.done = false
         }
     }
@@ -150,8 +149,6 @@ Page {
             active: page.fromDevice
             source: Qt.resolvedUrl("../components/ScanView.qml")
             onLoaded: {
-                scanLoader.item.hintText =
-                    qsTr("Hold your camera over the QR code")
                 // Code string typed or pasted, for camera that won't read it.
                 scanLoader.item.linkButtonText = qsTr("Enter the code instead")
                 scanLoader.item.linkLabel = qsTr("Code from the other device")
@@ -174,10 +171,10 @@ Page {
                    && !page.busy && !page.failed
         }
 
-        // Clear view's own top line; words sit under.
+        // Zoom indicator under page's own strip.
         Binding {
             target: scanLoader.item
-            property: "hintTopMargin"
+            property: "topInset"
             value: deviceChrome.height
         }
 
