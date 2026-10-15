@@ -24,6 +24,11 @@ docs/BUILDING.md, "Cutting a release").
 - **The cover shows a call** while one is up: who, with their picture behind, how long, whether your microphone is off or your camera paused, and one quick action to switch the microphone off and on.
 - Emoji such as ❤ ☺ ⭐ ✅ ✨ ❌ ⚡ ☕ ☀ ✌ in a message are drawn as Twemoji like the rest, rather than in Sailfish's own glyph beside the pictures. Signs such as ©, ™ and arrows are still text. A 👍 picked from the emoji picker is the same reaction as the quick row's.
 - A message or a quote that begins with an emoji no longer shows it twice, as its picture and then Sailfish's own glyph.
+- Faces on the cover no longer turn into white squares after the app has been in the background.
+- **Faster all round.** The chat list moves a chat to its new place rather than being rebuilt, the open chat and its message rows are quicker to build, Markdown and lines full of links are drawn in one pass, and the core's events are filtered and batched. In the background the app stops its cameras, call clocks and webxdc polling, and photos taken, recoded videos and QR images no longer pile up in the cache.
+- Making a video smaller uses half the phone's cores at a lower priority, so the rest of the phone stays responsive meanwhile.
+- A received video in an unusual MP4 layout no longer hangs the app, and a full message whose HTML has an emoji right after a "<" no longer stays loading. A webxdc app whose page holds certain non-English letters, and an unusual quota report from a relay, no longer make them fail.
+- **Reproducible builds.** Each release RPM from this one on rebuilds from its tag to the same file, byte for byte. `scripts/verify-release.sh` checks a release for you (docs/VERIFYING.md).
 
 ## 2.1.0 — 2026-10-08
 
