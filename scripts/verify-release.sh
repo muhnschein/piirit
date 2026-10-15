@@ -82,17 +82,17 @@ if [ -n "$rpm" ]; then
     echo ">> checking $rpm"
 else
     if [ -z "$version" ]; then
-        version=$(curl -sSf "https://api.github.com/repos/$github/releases/latest" |
+        version=$(curl -sSf --proto '=https' --proto-redir '=https' "https://api.github.com/repos/$github/releases/latest" |
             sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p' | head -1) ||
             fail "can't ask GitHub for the latest release"
         [ -n "$version" ] || fail "can't find the latest release"
     fi
     url="https://github.com/$github/releases/download/v$version"
     echo ">> downloading release $version"
-    curl -sSfL -o "$work/SHA256SUMS" "$url/SHA256SUMS" || fail "no release v$version"
+    curl -sSfL --proto '=https' --proto-redir '=https' -o "$work/SHA256SUMS" "$url/SHA256SUMS" || fail "no release v$version"
     name=$(awk '/\.rpm$/ { sub(/^\*/, "", $2); print $2; exit }' "$work/SHA256SUMS")
     [ -n "$name" ] || fail "release v$version's SHA256SUMS names no RPM"
-    curl -sSfL -o "$work/$name" "$url/$name" || fail "can't download $name"
+    curl -sSfL --proto '=https' --proto-redir '=https' -o "$work/$name" "$url/$name" || fail "can't download $name"
     (cd "$work" && grep " \*\{0,1\}$name\$" SHA256SUMS | sha256sum -c -) >/dev/null ||
         fail "$name doesn't match the release's SHA256SUMS; download damaged?"
     cp "$work/$name" "$work/cmp/published.rpm"

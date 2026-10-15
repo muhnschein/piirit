@@ -1,4 +1,5 @@
-# shellcheck shell=sh disable=SC2154 # prog: set by the caller.
+#!/bin/sh
+# shellcheck disable=SC2154 # prog: set by the caller.
 # Sourced, not run: container engine for build-in-container.sh and
 # verify-release.sh. Caller sets `prog` (message prefix).
 #
@@ -48,12 +49,14 @@ ctr_run() {
     else
         docker run --rm "$@"
     fi
+    return
 }
 
 # Pulls unless present. Rootless Podman failing on ids: say what fixes it.
 ctr_pull() {
-    "$engine" image inspect "$1" >/dev/null 2>&1 && return 0
-    "$engine" pull "$1" && return 0
+    ref=$1
+    "$engine" image inspect "$ref" >/dev/null 2>&1 && return 0
+    "$engine" pull "$ref" && return 0
     if [ "$engine" = podman ] && [ "$rootless" = 1 ]; then
         echo "$prog: if Podman said 'insufficient UIDs or GIDs', this image needs more" \
              "subordinate ids than your user has (images before 2026-10 use 100000+):" >&2

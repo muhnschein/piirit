@@ -47,7 +47,7 @@ fetch_one() {
     echo ">> $sfos_arch (upstream $upstream_arch)"
     # PyPI's by-name file URL (redirects to the hashed one). Exact file name and
     # the sha256 check below keep it honest, whatever answers.
-    curl -sSfL --retry 3 -o "$workdir/$wheel" \
+    curl -sSfL --proto '=https' --proto-redir '=https' --retry 3 -o "$workdir/$wheel" \
         "https://files.pythonhosted.org/packages/py3/d/deltachat_rpc_server/$wheel"
 
     echo "$wheel_sha  $workdir/$wheel" | sha256sum -c - >/dev/null || {
