@@ -29,6 +29,14 @@ jobs:
           podman info --format 'rootless={{.Host.Security.Rootless}} driver={{.Store.GraphDriverName}}'
           id; grep "^$(id -un):" /etc/subuid /etc/subgid || echo "no subuid entry"
 
+      # Run 1 failed here with the runner's default 65536 subuids: the
+      # image owns /home/appsupport-root as 500000. Widen it to see whether
+      # anything else stands in the way, and list what needs the range.
+      - name: Widen the subuid range
+        run: |
+          sudo sed -i 's/^runner:.*/runner:165536:1000000/' /etc/subuid /etc/subgid
+          podman system migrate
+
       - name: Fetch the rpc server
         run: sh scripts/fetch-rpc-server.sh
 
@@ -37,6 +45,8 @@ jobs:
           set -eu
           img=ghcr.io/muhnschein/piirit-sdk:5.2.0.15-aarch64
           podman pull -q "$img"
+          echo "== files owned by ids above 65535:"
+          podman run --rm --user 0 "$img" sh -c 'find / -xdev \( -uid +65535 -o -gid +65535 \) 2>/dev/null | head -20; echo "count: $(find / -xdev \( -uid +65535 -o -gid +65535 \) 2>/dev/null | wc -l)"'
           uid=$(podman run --rm "$img" id -u)
           gid=$(podman run --rm "$img" id -g)
           home=$(podman run --rm "$img" sh -c 'echo $HOME')
