@@ -10,7 +10,7 @@ $ scripts/verify-release.sh          # latest release
 $ scripts/verify-release.sh 2.2.0    # or a given one
 ```
 
-Needs Linux on x86_64, git, curl, and Podman (rootless is fine) or Docker.
+Needs Linux on x86_64, git, curl, unzip, and Podman (rootless is fine) or Docker.
 Both installed: Docker if running; `--podman` or `--docker` picks.
 First run: ~2.3 GB image pull (~7 GB unpacked, where Podman or Docker keep
 images), ~30 min build. Builds in a fresh clone of the tag under
