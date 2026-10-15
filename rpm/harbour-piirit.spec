@@ -29,7 +29,7 @@
 # Harbour: `harbour-` prefix, lowercase. Users see .desktop Name=, not this.
 Name:       harbour-piirit
 Summary:    Native SailfishOS client for Delta Chat
-Version:    2.1.0
+Version:    2.2.0
 Release:    1
 # Licences: GPL-3.0-or-later app; MPL-2.0 server; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
 # emoji CC-BY-4.0, MIT, Unicode-3.0; FFmpeg LGPL-2.1+, x264 GPL-2.0+. Tag = package contents.
