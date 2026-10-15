@@ -22,6 +22,8 @@ docs/BUILDING.md, "Cutting a release").
 - **Video calls.** Call with the camera on from a contact's Calls page, or switch it on in any call; their picture fills the screen and yours sits in the top right corner. The button on your picture turns the camera, a tap puts the lines and switches away, and a spinner shows while a picture is on its way.
 - **Earpiece and loudspeaker.** A voice call is on the earpiece, as a phone call is, and a video call on the loudspeaker; the switch on the call screen goes between the two, with your microphone off for about a second while it does. The volume keys set the call's volume, as they do in a phone call. A headset or a Bluetooth device takes the sound by itself. Nothing stays behind: should the app close or crash mid-call, the phone's sound goes back to where it was.
 - **The cover shows a call** while one is up: who, with their picture behind, how long, whether your microphone is off or your camera paused, and one quick action to switch the microphone off and on.
+- Emoji such as ❤ ☺ ⭐ ✅ ✨ ❌ ⚡ ☕ ☀ ✌ in a message are drawn as Twemoji like the rest, rather than in Sailfish's own glyph beside the pictures. Signs such as ©, ™ and arrows are still text. A 👍 picked from the emoji picker is the same reaction as the quick row's.
+- A message or a quote that begins with an emoji no longer shows it twice, as its picture and then Sailfish's own glyph.
 
 ## 2.1.0 — 2026-10-08
 

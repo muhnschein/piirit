@@ -23,13 +23,17 @@
 //   Basic Multilingual Plane, by its code: the only ones a scan of a
 //   message has to stop at, besides the planes above it.
 // - `textStyle`: the symbols that are text unless U+FE0F says otherwise
-//   -- a heart, a copyright sign, an arrow -- by key. Unicode draws these
-//   as text by default, and so does every other client; a message that
-//   says "(c)" with the sign has not sent an emoji. One character and the
-//   selector in the data -- fully qualified only with it, so text without
-//   it. Only in the Basic Multilingual Plane, among the symbols every
-//   font has: above it the data spells even a thumbs-up with the
-//   selector, and nobody sends one as text.
+//   -- a copyright sign, an arrow, a check box -- by key. Unicode draws
+//   these as text by default; a message that says "(c)" with the sign
+//   has not sent an emoji. One character and the selector in the data
+//   -- fully qualified only with it, so text without it -- and in the
+//   picker's Symbols group. A heart, a smiley or a sun is text by
+//   Unicode's default too, but whoever sends one bare means the emoji,
+//   and every phone draws it as one; a star or a check mark is an emoji
+//   bare by Unicode as well, and the data spells it bare
+//   (scripts/fetch-emoji.py, `spelled`). Only in the Basic Multilingual
+//   Plane, among the symbols every font has: above it a sign sent bare
+//   would be an empty box, so it is a picture.
 // - `mayHold`: matches a text only if it has a character of some emoji's
 //   key in it -- the first, or a keycap's mark -- so any text it does not
 //   match has nothing in it to draw, and need not be read through.
@@ -146,19 +150,47 @@ function escaped(text, lineStart) {
 ///
 /// `size` is the font's pixel size; the pictures are drawn a little
 /// taller than its letters, as an emoji in a font is.
+///
+/// Two passes: where the pictures go, then the text with them in. One
+/// pass kept where the text last left off beside where the scan was,
+/// and set both to where an emoji ended. Sailfish compiles this for
+/// ARM64 with a JIT that, copying one value into two variables at the
+/// end of a pass round the loop, can overwrite it before the second
+/// copy: some launches lost where the text left off on the first
+/// emoji, and a message that began with one showed it twice, the
+/// picture and then the character. Each pass here sets each of its
+/// variables from a value of its own.
 function inText(text, styled, size) {
+    var cuts = emojiCuts(text, styled)
+    if (cuts.length === 0) {
+        return ""
+    }
+    var edge = Math.round(size * 1.15)
+    var out = ""
+    var from = 0
+    for (var k = 0; k < cuts.length; k += 3) {
+        var before = text.substring(from, cuts[k])
+        out += styled ? before : escaped(before, from === 0)
+        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+               + "\" height=\"" + edge + "\" align=\"middle\">"
+        from = cuts[k + 1]
+    }
+    var rest = text.substring(from)
+    return out + (styled ? rest : escaped(rest, from === 0))
+}
+
+/// Where in `text` the emoji are that `inText` draws as pictures: the
+/// start, end and picture of each, one after the other in one list.
+function emojiCuts(text, styled) {
+    var cuts = []
     // Most messages have no emoji, and the scan below calls out for
     // nearly every character: a long body cost a millisecond of the
     // frame its row was built in.
     if (!text || !Pictures.mayHold.test(text)) {
-        return ""
+        return cuts
     }
     var known = Pictures.byKey
     var textStyle = Pictures.textStyle
-    var edge = Math.round(size * 1.15)
-    var out = ""
-    var from = 0
-    var drew = false
     var inTag = false
     var i = 0
     while (i < text.length) {
@@ -179,23 +211,15 @@ function inText(text, styled, size) {
         if (name === undefined) {
             name = known[untoned(emoji)]
         }
-        if (name === undefined || (textStyle[bare] === true && bare === emoji)) {
-            i = end
-            continue
+        // Not where the sender asked for text with U+FE0E, either: a
+        // star so marked is the font's. Down here only, as `textStyle` is.
+        if (name !== undefined && !(textStyle[bare] === true && bare === emoji)
+                && !(code < 0xD800 && text.charCodeAt(end) === 0xFE0E)) {
+            cuts.push(i, end, name)
         }
-        var before = text.substring(from, i)
-        out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + name + ".png\" width=\"" + edge
-               + "\" height=\"" + edge + "\" align=\"middle\">"
-        drew = true
-        from = end
         i = end
     }
-    if (!drew) {
-        return ""
-    }
-    var rest = text.substring(from)
-    return out + (styled ? rest : escaped(rest, from === 0))
+    return cuts
 }
 
 /// Where the pictures are, for an <img> in text. Beside js/ as beside

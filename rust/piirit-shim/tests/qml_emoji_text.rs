@@ -155,12 +155,17 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     let texts: Vec<(&'static str, &'static str, bool)> = vec![
         ("thumb", "hi 👍", false),
+        ("first", "💾 saved 💾", false),
         ("none", "no emoji at all, 1 # * 2", false),
         ("escaped", "a <b> & 👍\n  two  spaces", false),
         ("copyright-text", "(c) © 2024", false),
         ("copyright-emoji", "©\u{fe0f}", false),
         ("heart-text", "\u{2764}", false),
+        ("smiley-text", "\u{263a} hi", false),
         ("heart-emoji", "\u{2764}\u{fe0f}", false),
+        // An emoji whatever follows it, as every client sends it: bare.
+        ("star", "\u{2b50} \u{2705}\u{2728}", false),
+        ("star-text", "\u{2b50}\u{fe0e}", false),
         ("keycap", "1\u{fe0f}\u{20e3}", false),
         ("flag", "🇫🇮!", false),
         ("family", "👨\u{200d}👩\u{200d}👧", false),
@@ -253,6 +258,9 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     for (label, expected) in [
         ("thumb", format!("hi {}", img("1f44d"))),
+        // One at the very start, and the text after it from where it
+        // ended: Sailfish's ARM64 JIT lost that once (Emoji.js, inText).
+        ("first", format!("{} saved {}", img("1f4be"), img("1f4be"))),
         ("none", String::new()),
         // The sender's markup is text, their line break a <br> and their
         // runs of spaces kept, which StyledText would fold.
@@ -265,8 +273,21 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ),
         ("copyright-text", String::new()),
         ("copyright-emoji", img("a9")),
-        ("heart-text", String::new()),
+        // A heart or a smiley is text by Unicode's default, as the
+        // copyright sign is, but whoever sends one bare means the emoji:
+        // left to the font, it was Sailfish's glyph where every phone
+        // draws the emoji.
+        ("heart-text", img("2764")),
         ("heart-emoji", img("2764")),
+        ("smiley-text", format!("{} hi", img("263a"))),
+        // An emoji bare by Unicode: left to the font, a star sat between
+        // pictures in Sailfish's own glyph.
+        (
+            "star",
+            format!("{} {}{}", img("2b50"), img("2705"), img("2728")),
+        ),
+        // Unless the sender asked for text.
+        ("star-text", String::new()),
         ("keycap", img("31-20e3")),
         ("flag", format!("{}!", img("1f1eb-1f1ee"))),
         ("family", img("1f468-200d-1f469-200d-1f467")),

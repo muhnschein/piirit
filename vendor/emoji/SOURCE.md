@@ -44,8 +44,10 @@ match them byte for byte; CI runs that (`ci/vendor-check.sh`).
   `emojibase-data`
 - **Version:** `17.0.0`, tarball sha256
   `d01d0e2ca4e22cb402679532155342c71e2e871f25c32223c013b8b166ebdf5a`
-- **Files:** `en/data.json`, of which each emoji's character, group,
-  order, name and keywords are kept; skin-tone variants and the
+- **Files:** `en/data.json`, of which each emoji's character (spelled
+  as Unicode spells it: emojibase puts U+FE0F after every lone
+  character, the script only after those that are text by default),
+  group, order, name and keywords are kept; skin-tone variants and the
   components group are left out
 - **Licence:** MIT, Copyright (c) 2017-2019 Miles Johnson. The names and
   keywords come from the Unicode CLDR annotations, under the

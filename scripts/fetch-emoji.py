@@ -59,6 +59,9 @@ TWEMOJI_REPO = "https://github.com/jdecked/twemoji.git"
 # is the skin-tone and hair components, which are not emoji anyone
 # reacts with on their own.
 GROUPS = [0, 1, 3, 4, 5, 6, 7, 8, 9]
+# Where Symbols is among them: the one group whose text-by-default
+# characters are drawn as text when they arrive without U+FE0F.
+SYMBOLS = GROUPS.index(8)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_JS = os.path.join("qml", "js", "EmojiData.js")
@@ -115,6 +118,24 @@ def picture_for(emoji, pictures):
     return None
 
 
+def spelled(entry):
+    """An emoji as Unicode spells it, fully qualified: with U+FE0F after a
+    lone character only when that character is text unless told otherwise.
+
+    emojibase puts the selector after every lone character, a thumbs-up
+    and a star as much as a heart (its `type` says which ones need it:
+    0 is text by default, 1 an emoji). Kept, that made a star a symbol
+    that is text without the selector -- so a star as everyone sends it,
+    bare, was left to Sailfish's font beside the pictures around it -- and
+    made the picker react with a thumbs-up other than the quick row's and
+    every other client's. Sequences are left as they are: the selectors
+    inside them are Unicode's own."""
+    emoji = entry["emoji"]
+    if entry.get("type") == 1 and len(emoji) == 2 and emoji[1] == "️":
+        return emoji[0]
+    return emoji
+
+
 def search_text(entry):
     """What a search matches: the CLDR name and its keywords, lowercase,
     each word once."""
@@ -135,12 +156,13 @@ def build(data, picture_dir):
     used = []
     missing = []
     for entry in entries:
-        name = picture_for(entry["emoji"], pictures)
+        emoji = spelled(entry)
+        name = picture_for(emoji, pictures)
         if name is None:
-            missing.append(entry["emoji"])
+            missing.append(emoji)
             continue
         used.append(name)
-        rows.append([entry["emoji"], name, GROUPS.index(entry["group"]), search_text(entry)])
+        rows.append([emoji, name, GROUPS.index(entry["group"]), search_text(entry)])
     if missing:
         fail("no Twemoji picture for " + " ".join(missing))
     return rows, used
@@ -203,8 +225,12 @@ def pictures_js(rows):
         if first <= 0xFFFF:
             if first not in bmp_starts:
                 bmp_starts.append(first)
-            # One character and the selector: text without it.
-            if len(bare) == 1 and emoji[1:2] == "\ufe0f" and bare not in text_style:
+            # One character and the selector: text without it -- among
+            # the symbols. A heart, a smiley or a sun sent bare is meant
+            # as one, whatever Unicode's default; a "(c)" sign or an
+            # arrow in a sentence is not.
+            if (len(bare) == 1 and emoji[1:2] == "\ufe0f" and row[2] == SYMBOLS
+                    and bare not in text_style):
                 text_style.append(bare)
 
     # One code unit out of every key, so that a text with none of them in
