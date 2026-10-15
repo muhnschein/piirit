@@ -1,5 +1,6 @@
-# Throwaway experiment for issue #166: build the same commit three times
-# and report what differs. Not for merging; the branch is deleted after.
+# Throwaway experiment for issue #166: does a build under rootless Podman
+# produce the same payload as the Docker build of the same commit (run
+# 38560773614, variant a)? Not for merging.
 name: repro-experiment
 
 on:
@@ -10,59 +11,59 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    # Already ran (run 38560773614); the compare below reads its artifacts.
-    if: false
-    runs-on: ubuntu-latest
+  podman:
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        # a and b are set up identically; full-depth differs only in the
-        # submodules' clone depth.
-        variant: [a, b, full-depth]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           submodules: true
 
-      - name: Unshallow the submodules
-        if: matrix.variant == 'full-depth'
-        run: git submodule foreach 'git fetch --unshallow --tags || git fetch --tags'
-
       - name: Make room
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
 
-      - name: Build
-        run: ./scripts/build-in-docker.sh
-
-      - name: Toolchain facts
-        if: matrix.variant == 'a'
+      - name: Podman facts
         run: |
+          podman version
+          podman info --format 'rootless={{.Host.Security.Rootless}} driver={{.Store.GraphDriverName}}'
+          id; grep "^$(id -un):" /etc/subuid /etc/subgid || echo "no subuid entry"
+
+      - name: Fetch the rpc server
+        run: sh scripts/fetch-rpc-server.sh
+
+      - name: Build under rootless Podman
+        run: |
+          set -eu
           img=ghcr.io/muhnschein/piirit-sdk:5.2.0.15-aarch64
-          docker image inspect --format 'image id {{.Id}}' "$img"
-          docker run --rm "$img" bash -c '
-            t=SailfishOS-5.2.0.15-aarch64
-            echo "tooling rpm: $(rpm --version)"
-            echo "target rpm: $(sb2 -t $t rpm --version)"
-            echo "target rpmbuild: $(sb2 -t $t rpmbuild --version)"
-            for m in _buildhost source_date_epoch_from_changelog use_source_date_epoch_as_buildtime clamp_mtime_to_source_date_epoch _build_id_links; do
-              echo "%$m = $(sb2 -t $t rpm --eval "%{?$m}")"
-            done
-            echo "rustc: $(sb2 -t $t rustc --version)"
-            echo "gcc: $(sb2 -t $t gcc --version | head -1)"' || true
+          podman pull -q "$img"
+          uid=$(podman run --rm "$img" id -u)
+          gid=$(podman run --rm "$img" id -g)
+          home=$(podman run --rm "$img" sh -c 'echo $HOME')
+          target=$(podman run --rm "$img" sb2-config -l | grep -- '-aarch64$' | tail -1)
+          echo "uid=$uid gid=$gid home=$home target=$target"
+          # keep-id maps the host user onto the image's SDK user, so the
+          # mounted tree is already theirs: no chown in either direction.
+          podman run --rm --privileged --userns=keep-id:uid="$uid",gid="$gid" \
+            -v "$PWD:$home/harbour-piirit" -w "$home/harbour-piirit" \
+            -e TARGET="$target" "$img" bash -c 'set -e
+              id
+              mb2 -t "$TARGET" -X build-init
+              mb2 -t "$TARGET" -X build --no-check --define "jobs 1"'
+          ls -l RPMS
+          echo "host owner of RPMS: $(stat -c %U RPMS)"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: rpm-${{ matrix.variant }}
+          name: rpm-podman
           path: RPMS/**/*.rpm
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 3
 
   compare:
+    needs: podman
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     permissions:
       contents: read
       actions: read
@@ -74,30 +75,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - run: ./ci/apt-install.sh rpm rpm2cpio cpio binutils diffoscope
+      - run: ./ci/apt-install.sh rpm rpm2cpio cpio
 
-      - run: gh run download 38560773614 --dir rpms
-
-      - name: Compare
+      - name: Fetch both RPMs
         run: |
-          pick() { find "rpms/rpm-$1" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name '*.src.rpm' | head -1; }
-          for v in a b full-depth; do
+          gh run download 38560773614 -n rpm-a --dir rpms/a
+          gh run download "$GITHUB_RUN_ID" -n rpm-podman --dir rpms/podman
+
+      - name: Compare payloads
+        run: |
+          pick() { find "rpms/$1" -name 'harbour-piirit-*.rpm' ! -name '*debug*' | head -1; }
+          for v in a podman; do
             f=$(pick $v); mkdir -p "x/$v"
             echo "== $v: $(sha256sum < "$f" | cut -c1-16) $(basename "$f")"
-            rpm -qp --qf 'buildtime=%{BUILDTIME} buildhost=%{BUILDHOST} size=%{SIZE} payloaddigest=%{PAYLOADDIGEST}\n' "$f"
             (cd "x/$v" && rpm2cpio "../../$f" | cpio -idm --quiet)
+            (cd "x/$v" && find . -type f -exec sha256sum {} + | sort -k2) > "$v.sums"
           done
-          for pair in "a b" "a full-depth"; do
-            set -- $pair
-            echo; echo "######## $1 vs $2: payload files whose contents differ"
-            (cd "x/$1" && find . -type f -exec sha256sum {} + | sort -k2) > "$1.sums"
-            (cd "x/$2" && find . -type f -exec sha256sum {} + | sort -k2) > "$2.sums"
-            diff "$1.sums" "$2.sums" | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u > differ.txt || true
-            cat differ.txt; echo "($(wc -l < differ.txt) of $(wc -l < "$1.sums") files)"
-            while read -r f; do
-              echo "---- diffoscope $f"
-              diffoscope --text - --max-diff-block-lines 15 "x/$1/$f" "x/$2/$f" 2>&1 | head -c 12000 || true
-            done < differ.txt
-          done
-          echo; echo "######## mtimes: distinct payload mtimes in a"
-          rpm -qp --qf '[%{FILEMTIMES}\n]' "$(pick a)" | sort -u | head -5
+          diff a.sums podman.sums | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u > differ.txt || true
+          cat differ.txt
+          echo "($(wc -l < differ.txt) of $(wc -l < a.sums) files differ)"
