@@ -8,8 +8,11 @@
 //
 // Tables: `byKey` picture per `key`; `bmpStarts` first char of BMP emoji (scan
 // stops only there and at astral chars); `textStyle` text-default symbols
-// (heart, (c), arrow), emoji only with U+FE0F, BMP only (data spells astral
-// with selector); `mayHold` key chars worth scanning for.
+// (c), arrow, check box: emoji only with U+FE0F. Symbols group only: bare
+// heart, smiley, sun meant as emoji, drawn as one; star, check mark bare are
+// emoji by Unicode, data spells them bare (scripts/fetch-emoji.py `spelled`).
+// BMP only: above it a bare sign is an empty box in fonts, so picture.
+// `mayHold` key chars (first, or keycap mark) worth scanning for.
 .pragma library
 .import "EmojiPictures.js" as Pictures
 
@@ -104,17 +107,39 @@ function escaped(text, lineStart) {
 /// `styled`: already StyledText (shim's Markdown, sender chars escaped, tags
 /// untouched); else escaped here. Only added tag: `<img>` under qml/art/emoji/,
 /// so a message can load nothing. `size`: font px; pictures a bit taller.
+///
+/// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
+/// from one value: Sailfish's ARM64 JIT could clobber it between the two
+/// copies, so some launches showed a leading emoji twice (picture + char).
+/// Each pass sets each variable from its own value.
 function inText(text, styled, size) {
-    // Most messages have none; per-char scan costly on long bodies.
-    if (!text || !Pictures.mayHold.test(text)) {
+    var cuts = emojiCuts(text, styled)
+    if (cuts.length === 0) {
         return ""
     }
-    var known = Pictures.byKey
-    var textStyle = Pictures.textStyle
     var edge = Math.round(size * 1.15)
     var out = ""
     var from = 0
-    var drew = false
+    for (var k = 0; k < cuts.length; k += 3) {
+        var before = text.substring(from, cuts[k])
+        out += styled ? before : escaped(before, from === 0)
+        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+               + "\" height=\"" + edge + "\" align=\"middle\">"
+        from = cuts[k + 1]
+    }
+    var rest = text.substring(from)
+    return out + (styled ? rest : escaped(rest, from === 0))
+}
+
+/// Emoji `inText` draws: start, end, picture of each, flat list.
+function emojiCuts(text, styled) {
+    var cuts = []
+    // Most messages have none; per-char scan cost ~1 ms of row's frame on long bodies.
+    if (!text || !Pictures.mayHold.test(text)) {
+        return cuts
+    }
+    var known = Pictures.byKey
+    var textStyle = Pictures.textStyle
     var inTag = false
     var i = 0
     while (i < text.length) {
@@ -135,23 +160,15 @@ function inText(text, styled, size) {
         if (name === undefined) {
             name = known[untoned(emoji)]
         }
-        if (name === undefined || (textStyle[bare] === true && bare === emoji)) {
-            i = end
-            continue
+        // Not where the sender asked for text with U+FE0E, either: a
+        // star so marked is the font's. Down here only, as `textStyle` is.
+        if (name !== undefined && !(textStyle[bare] === true && bare === emoji)
+                && !(code < 0xD800 && text.charCodeAt(end) === 0xFE0E)) {
+            cuts.push(i, end, name)
         }
-        var before = text.substring(from, i)
-        out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + name + ".png\" width=\"" + edge
-               + "\" height=\"" + edge + "\" align=\"middle\">"
-        drew = true
-        from = end
         i = end
     }
-    if (!drew) {
-        return ""
-    }
-    var rest = text.substring(from)
-    return out + (styled ? rest : escaped(rest, from === 0))
+    return cuts
 }
 
 /// Pictures' path for `<img>`. art/ is sibling of js/, components/, pages/:
