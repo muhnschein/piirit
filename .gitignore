@@ -35,8 +35,8 @@ build-*/
 # `cargo vendor` output: offline crate sources for OBS/Chum
 # (`sfdk build -- --with vendor`) and for builds inside the SDK chroot,
 # where scratchbox2 has no reliable network path to crates.io. All of it is
-# regenerated from rust/Cargo.lock by scripts/vendor-crates.sh -- see
-# "Building without network access" in docs/BUILDING.md.
+# regenerated from rust/Cargo.lock by scripts/vendor-crates.sh, whose
+# header says what each file is for.
 /rpm/vendor.tar.xz
 /rpm/vendor.toml
 /rust/vendor/
