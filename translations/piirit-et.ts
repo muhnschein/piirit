@@ -1366,7 +1366,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2736,7 +2736,7 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
     </message>
 </context>
 <context>
-    <name>VideoPage</name>
+    <name>VideoView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>

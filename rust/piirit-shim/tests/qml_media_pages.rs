@@ -1,8 +1,8 @@
 //! Pictures and video open in Piirit (system handover failed to show them). Conversation
-//! picks kinds for the two pages; others still go to system (a page only saying "cannot show this"
-//! would be worse than the handover). Checks wiring: which kind gets which page, picture page draws
-//! and pans once zoomed, seek bar follows player without fighting reader, Save to device copies
-//! into Piirit's folder in Downloads.
+//! picks kinds for the pages (swiping: `qml_gallery.rs`); others still go to system (a page only
+//! saying "cannot show this" would be worse than the handover). Checks wiring: which kind gets
+//! which page, picture page draws and pans once zoomed, video plays on open, seek bar follows
+//! player without fighting reader, Save to device copies into Piirit's folder in Downloads.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -25,7 +25,7 @@ mod common;
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
-    /// `push:PicturePage.qml|push:VideoPage.qml|...`
+    /// `push:GalleryPage.qml(9)|push:PicturePage.qml|...`: message opened at, if any.
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
 
@@ -35,12 +35,17 @@ struct PageStackProbe {
 impl PageStackProbe {
     // `qt_method!` params match dispatcher's by-value ones: piirit-shim/src/lib.rs.
     #[allow(clippy::needless_pass_by_value)]
-    fn push(&mut self, page: QString, _properties: QVariantMap) {
-        // Only file name matters.
+    fn push(&mut self, page: QString, properties: QVariantMap) {
+        // File name, and message gallery opens at.
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page);
+        let at = i32::from_qvariant(
+            properties.value(QString::from("messageId"), QVariant::default()),
+        )
+        .map(|id| format!("({id})"))
+        .unwrap_or_default();
         let current = self.log.to_string();
-        self.log = format!("{current}push:{name}|").into();
+        self.log = format!("{current}push:{name}{at}|").into();
         self.log_changed();
     }
 }
@@ -80,16 +85,18 @@ const PROBE_QML: &str = r"
                 status: PageStatus.Activating
             })
         }
-        /// What a tap on an attachment of this kind does.
+        /// What a tap on an attachment of this kind, message 9, does.
         function route(viewType) {
             loader.item.openAttachment('file:///tmp/whatever', 'whatever',
-                                       viewType)
+                                       viewType, 0, 9)
             return 'ok'
         }
         function call(name) { return '' + loader.item[name]() }
         /// A double tap at a point in the view, and where the view ends up.
         function zoomAt(viewX, viewY) {
-            loader.item.toggleZoom(viewX, viewY)
+            var view = findIn(loader.item, 'pictureView')
+            if (!view) { return 'missing:pictureView' }
+            view.toggleZoom(viewX, viewY)
             var flick = findIn(loader.item, 'pictureFlick')
             if (!flick) { return 'missing:pictureFlick' }
             return Math.round(flick.contentX) + ',' + Math.round(flick.contentY)
@@ -206,7 +213,8 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     let picture_page = common::page_url_in(&tree, "PicturePage.qml");
     let gif_page = picture_page.clone();
     let row_page = picture_page.clone();
-    let video_page = common::page_url_in(&tree, "VideoPage.qml");
+    // Gallery's video slide.
+    let video_page = common::component_url("VideoView.qml");
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push((
             "conversation",
@@ -387,9 +395,8 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
             call!("load", QString::from(video_page.clone()), properties),
         ));
         (*steps_ptr).push(("wiring", call!("outputIsWiredToPlayer")));
-        (*steps_ptr).push(("play", call!("call", QString::from("toggle"))));
         (*steps_ptr).push((
-            "playing",
+            "opened",
             call!(
                 "flagOf",
                 QString::from("player"),
@@ -399,6 +406,15 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         (*steps_ptr).push(("pause", call!("call", QString::from("toggle"))));
         (*steps_ptr).push((
             "paused",
+            call!(
+                "flagOf",
+                QString::from("player"),
+                QString::from("playbackState")
+            ),
+        ));
+        (*steps_ptr).push(("play", call!("call", QString::from("toggle"))));
+        (*steps_ptr).push((
+            "playing",
             call!(
                 "flagOf",
                 QString::from("player"),
@@ -476,14 +492,16 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     );
     // Image, Gif, Sticker: picture page; Video: video page; File, Vcard: system. No page for a
     // file: what it needs and a tap can't give is a copy, which is on row menu.
+    // Image, Gif, Video: gallery, at tapped message; Sticker (not in gallery): alone.
     assert_eq!(
         navigation,
-        "push:PicturePage.qml|push:PicturePage.qml|push:PicturePage.qml|\
-         push:VideoPage.qml|",
+        "push:GalleryPage.qml(9)|push:GalleryPage.qml(9)|push:PicturePage.qml|\
+         push:GalleryPage.qml(9)|",
         "tapping an attachment did not open the right thing. Nothing at \
          all for a picture means it still leaves the app; a page for a \
          file or a contact means the app took on something it cannot \
-         show. {context}"
+         show; a gallery without the message means it opens somewhere \
+         else in the chat. {context}"
     );
 
     assert_eq!(
@@ -610,15 +628,20 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     );
     // MediaPlayer values: 1 playing, 2 paused.
     assert_eq!(
-        value("playing"),
+        value("opened"),
         "1",
-        "the play button did not start the video. {context}"
+        "the video did not start playing when it was opened. {context}"
     );
     assert_eq!(
         value("paused"),
         "2",
         "the button did not pause a playing video, so it only ever plays. \
          {context}"
+    );
+    assert_eq!(
+        value("playing"),
+        "1",
+        "the play button did not start the video again. {context}"
     );
     assert_eq!(
         number("followed"),

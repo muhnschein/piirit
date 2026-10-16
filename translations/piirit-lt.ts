@@ -1369,7 +1369,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2743,7 +2743,7 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
     </message>
 </context>
 <context>
-    <name>VideoPage</name>
+    <name>VideoView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>

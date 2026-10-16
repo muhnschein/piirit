@@ -507,7 +507,7 @@ Page {
             notice.show(qsTr("Copied to clipboard"))
         }
         onOpenRequested: page.openAttachment(fileUrl, fileName, viewType,
-                                             previewWidth)
+                                             previewWidth, messageId)
         onSaveRequested: attachmentSaver.keep(fileUrl, fileName)
         onFullTextRequested: pageStack.push(Qt.resolvedUrl("MessagePage.qml"), {
             accountId: page.accountId,
@@ -846,22 +846,27 @@ Page {
         }
     }
 
-    // Pictures and videos shown here (system handover failed to play them).
-    // Rest handed on ("cannot show" page is worse). Copy is on row menu.
-    function openAttachment(fileUrl, fileName, viewType, previewWidth) {
-        if (viewType === "Image" || viewType === "Gif"
-                || viewType === "Sticker") {
-            pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
+    // Pictures and videos shown here (system handover failed to play them), swiped through
+    // chat's whole gallery. Stickers aren't in it: alone. Rest handed on ("cannot show" page is
+    // worse). Copy is on row menu.
+    function openAttachment(fileUrl, fileName, viewType, previewWidth, messageId) {
+        if (viewType === "Image" || viewType === "Gif" || viewType === "Video") {
+            pageStack.push(Qt.resolvedUrl("GalleryPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                messageId: messageId > 0 ? messageId : 0,
                 fileUrl: fileUrl,
                 fileName: fileName,
                 viewType: viewType,
                 // Row's drawn width, if from a row.
                 previewWidth: previewWidth > 0 ? previewWidth : 0
             })
-        } else if (viewType === "Video") {
-            pageStack.push(Qt.resolvedUrl("VideoPage.qml"), {
+        } else if (viewType === "Sticker") {
+            pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
                 fileUrl: fileUrl,
-                fileName: fileName
+                fileName: fileName,
+                viewType: viewType,
+                previewWidth: previewWidth > 0 ? previewWidth : 0
             })
         } else {
             Qt.openUrlExternally(fileUrl)

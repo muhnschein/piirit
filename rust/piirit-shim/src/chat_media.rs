@@ -5,7 +5,8 @@
 //!
 //! Messages read as conversation (`get_messages`, pages of fifty) but top down unasked:
 //! placeholder rows from ids, first screen first. Read rows kept across reload: new picture =
-//! one row fetched, nothing moved.
+//! one row fetched, one row inserted; views keep their place (swiped viewer stays on its
+//! picture).
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
@@ -92,6 +93,8 @@ pub struct ChatMedia {
     pub delete_message: qt_method!(fn(&mut self, message_id: u32)),
     /// Delete for all in chat.
     pub delete_message_for_all: qt_method!(fn(&mut self, message_id: u32)),
+    /// Row of message, -1 if not here (yet).
+    pub index_of: qt_method!(fn(&self, message_id: u32) -> i32),
     /// Apply core event; this chat only.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -105,6 +108,16 @@ impl ChatMedia {
     /// Row count.
     pub fn count(&self) -> u32 {
         u32::try_from(self.rows.borrow().iter().count()).unwrap_or(u32::MAX)
+    }
+
+    /// Row of message, -1 if not here (yet).
+    pub fn index_of(&self, message_id: u32) -> i32 {
+        self.rows
+            .borrow()
+            .iter()
+            .position(|row| row.message_id == message_id)
+            .and_then(|index| i32::try_from(index).ok())
+            .unwrap_or(-1)
     }
 
     /// Set account; start over if changed.
@@ -233,25 +246,38 @@ impl ChatMedia {
     }
 
     /// Ids back: row per id, keeping read rows; unchanged list touches nothing.
+    ///
+    /// Arrival or delete = row inserts/removes, not reset: reset sends every view to row 0
+    /// and rebuilds every delegate (viewer swiped to old picture jumped to newest).
     fn place(&mut self, ids: &[u32]) {
-        let same = {
-            let rows = self.rows.borrow();
-            rows.iter().count() == ids.len()
-                && rows.iter().zip(ids).all(|(row, id)| row.message_id == *id)
-        };
-        if !same {
-            let kept: BTreeMap<u32, MessageListItem> = self
-                .rows
-                .borrow()
-                .iter()
-                .filter(|row| row.loaded)
-                .map(|row| (row.message_id, row.clone()))
-                .collect();
-            let rows: Vec<MessageListItem> = ids
-                .iter()
-                .map(|id| kept.get(id).cloned().unwrap_or_else(|| placeholder(*id)))
-                .collect();
-            self.rows.borrow_mut().reset_data(rows);
+        let old: Vec<u32> = self.rows.borrow().iter().map(|row| row.message_id).collect();
+        if old != ids {
+            // Empty: one reset, not a signal per row.
+            match edits(&old, ids).filter(|_| !old.is_empty()) {
+                Some((removals, insertions)) => {
+                    let mut rows = self.rows.borrow_mut();
+                    for index in removals {
+                        rows.remove(index);
+                    }
+                    for (index, id) in insertions {
+                        rows.insert(index, placeholder(id));
+                    }
+                }
+                None => {
+                    let kept: BTreeMap<u32, MessageListItem> = self
+                        .rows
+                        .borrow()
+                        .iter()
+                        .filter(|row| row.loaded)
+                        .map(|row| (row.message_id, row.clone()))
+                        .collect();
+                    let rows: Vec<MessageListItem> = ids
+                        .iter()
+                        .map(|id| kept.get(id).cloned().unwrap_or_else(|| placeholder(*id)))
+                        .collect();
+                    self.rows.borrow_mut().reset_data(rows);
+                }
+            }
             self.rows_changed();
         }
         self.set_loaded(true);
@@ -395,6 +421,33 @@ fn placeholder(message_id: u32) -> MessageListItem {
     }
 }
 
+/// Row edits taking `old` ids to `new` in place: removals (indexes, back to front), then
+/// insertions (index, id; front to back). `None` when kept ids changed order: no such path.
+fn edits(old: &[u32], new: &[u32]) -> Option<(Vec<usize>, Vec<(usize, u32)>)> {
+    let wanted: BTreeSet<u32> = new.iter().copied().collect();
+    let removals: Vec<usize> = old
+        .iter()
+        .enumerate()
+        .rev()
+        .filter(|(_, id)| !wanted.contains(id))
+        .map(|(index, _)| index)
+        .collect();
+    let mut kept = old.iter().filter(|id| wanted.contains(id)).peekable();
+    let mut insertions = Vec::new();
+    for (index, id) in new.iter().enumerate() {
+        if kept.peek() == Some(&id) {
+            kept.next();
+        } else {
+            insertions.push((index, *id));
+        }
+    }
+    // Kept row left over: order changed.
+    if kept.next().is_some() {
+        return None;
+    }
+    Some((removals, insertions))
+}
+
 /// Ids of these kinds in chat, newest first.
 ///
 /// Core answers oldest first, not to re-sort; reversed only.
@@ -419,7 +472,48 @@ async fn fetch_ids(
 
 #[cfg(test)]
 mod tests {
-    use super::view_types;
+    use super::{edits, view_types};
+
+    /// `old` after `edits`, as model applies them.
+    fn applied(old: &[u32], new: &[u32]) -> Option<Vec<u32>> {
+        let (removals, insertions) = edits(old, new)?;
+        let mut rows = old.to_vec();
+        for index in removals {
+            rows.remove(index);
+        }
+        for (index, id) in insertions {
+            rows.insert(index, id);
+        }
+        Some(rows)
+    }
+
+    #[test]
+    fn arrivals_and_deletes_become_row_edits_not_a_reset() {
+        // Newest first: arrival at top, one gone mid-list, one gone at end.
+        let old = [9, 7, 5, 3, 1];
+        let new = [11, 9, 5, 3];
+        assert_eq!(applied(&old, &new), Some(new.to_vec()));
+        let (removals, insertions) = edits(&old, &new).unwrap_or_default();
+        // Back to front: earlier index still valid after each removal.
+        assert_eq!(removals, vec![4, 1]);
+        assert_eq!(insertions, vec![(0, 11)]);
+        // Several in, several places.
+        assert_eq!(
+            applied(&[8, 4], &[10, 8, 6, 4, 2]),
+            Some(vec![10, 8, 6, 4, 2])
+        );
+        // All gone, all new, none before.
+        assert_eq!(applied(&[3, 2], &[]), Some(vec![]));
+        assert_eq!(applied(&[], &[2, 1]), Some(vec![2, 1]));
+        // Unchanged: nothing to do.
+        assert_eq!(edits(&[2, 1], &[2, 1]), Some((vec![], vec![])));
+    }
+
+    #[test]
+    fn kept_rows_out_of_order_have_no_edit_path() {
+        assert_eq!(edits(&[2, 1], &[1, 2]), None);
+        assert_eq!(edits(&[3, 2, 1], &[3, 1, 2, 0]), None);
+    }
 
     #[test]
     fn every_kind_names_what_the_core_can_take_in_one_call() {
