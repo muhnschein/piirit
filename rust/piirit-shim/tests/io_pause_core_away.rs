@@ -4,6 +4,10 @@
 //! core would run IO on dead network: the outage the stop prevents.
 //!
 //! Required: window stop still asked; shim forgets IO; restarted core starts none.
+//!
+//! Steps hang on core's own restarts, not the clock. Fixed reads raced spawn time: each restart
+//! lands a little later under load (coverage), and `single_shot` drops sub-seconds, so a read meant
+//! for 6.5 s ran at 6 s, beside the edge of the away window, and saw `ready`.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -14,6 +18,7 @@
     clippy::expect_used
 )]
 
+use std::path::PathBuf;
 use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
@@ -27,30 +32,100 @@ struct StackProbe {
     base: qt_base_class!(trait QObject),
 }
 
+/// Fake core's journal, read from QML at the moment a step happens.
+#[derive(QObject, Default)]
+struct JournalProbe {
+    base: qt_base_class!(trait QObject),
+    path: PathBuf,
+    /// How many times core was asked to start IO for all accounts.
+    starts: qt_method!(fn(&self) -> QString),
+}
+
+impl JournalProbe {
+    fn starts(&self) -> QString {
+        common::methods(&self.path)
+            .into_iter()
+            .filter(|method| method == "start_io_for_all_accounts")
+            .count()
+            .to_string()
+            .into()
+    }
+}
+
+/// Every server dies 300 ms after start; shim waits 1, 2, 4, 8 s before each replacement. Network
+/// goes as core goes away the third time: 4 s away, ten times the 400 ms loss wait, so loss lands
+/// while core is away. Fourth away: the server that came back mid-outage has lived and died, so
+/// any IO it was asked for is in the journal.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
+        id: probe
         Loader { id: window }
+
+        /// Times core went away.
+        property int aways: 0
+        /// Network gone; window not yet seen stopping IO.
+        property bool waitingForPause: false
+        /// Labelled readings, each taken when what it waits for happens.
+        property var readings: ({})
+
+        function note(label, value) { readings[label] = '' + value }
+        function reading(label) {
+            return readings[label] !== undefined ? readings[label] : '<step did not run>'
+        }
+        function finished() { return readings['starts-after-restart'] !== undefined ? 'yes' : 'no' }
 
         function loadWindow(url) {
             window.setSource(url, {})
             return window.status === Loader.Ready ? 'ok' : 'load-failed'
         }
-        function coreStatus() { return '' + core.status }
         function paused() { return window.item.ioPaused ? 'yes' : 'no' }
-        // See io_pause.rs: the real wait is half a minute.
-        function hurry() {
+
+        Connections {
+            target: core
+            // Qt 5.6 handler syntax; see WelcomePage.qml.
+            onStatus_changed: {
+                if (core.status !== 'reconnecting') { return }
+                probe.aways += 1
+                if (probe.aways === 3) {
+                    probe.loseNetwork()
+                } else if (probe.aways === 4) {
+                    probe.afterRestart()
+                }
+            }
+        }
+
+        function loseNetwork() {
             var watch = findIn(window.item, 'networkWatch')
-            if (!watch) { return 'missing:networkWatch' }
+            if (!watch) { note('hurry', 'missing:networkWatch'); return }
+            // See io_pause.rs: the real wait is half a minute.
             watch.lostMs = 400
-            return 'ok'
+            note('hurry', 'ok')
+            note('starts-before-loss', journal.starts())
+            watch.heard('State', 'offline')
+            waitingForPause = true
         }
-        function connman(value) {
-            var watch = findIn(window.item, 'networkWatch')
-            if (!watch) { return 'missing:networkWatch' }
-            watch.heard('State', value)
-            return 'ok'
+
+        Timer {
+            interval: 50; repeat: true; running: probe.waitingForPause
+            onTriggered: {
+                if (!window.item.ioPaused) { return }
+                probe.waitingForPause = false
+                note('status-after-loss', core.status)
+                note('paused-after-loss', 'yes')
+                note('starts-after-loss', journal.starts())
+            }
         }
+
+        function afterRestart() {
+            if (waitingForPause) {
+                waitingForPause = false
+                note('paused-after-loss', 'no')
+            }
+            note('paused-after-restart', paused())
+            note('starts-after-restart', journal.starts())
+        }
+
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -64,14 +139,19 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// How many times core was asked `name`.
-fn count(journal: &std::path::Path, name: &str) -> String {
-    common::methods(journal)
-        .into_iter()
-        .filter(|method| method == name)
-        .count()
-        .to_string()
-}
+/// Readings the probe takes, copied out before quitting.
+const READINGS: [&str; 7] = [
+    "hurry",
+    "starts-before-loss",
+    "status-after-loss",
+    "paused-after-loss",
+    "starts-after-loss",
+    "paused-after-restart",
+    "starts-after-restart",
+];
+
+/// Fourth away due ~9 s; slack for a slow runner, under nextest's 30 s warning.
+const GIVE_UP_SECS: u64 = 25;
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -87,8 +167,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Every server dies shortly after start. Restarts 1, 2, 4s apart; loss announced in 4s
-        // gap after third replacement dies. Same clock as `qml_core_gone.rs`.
+        // Every server dies shortly after start. Same clock as `qml_core_gone.rs`.
         std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "300");
     }
 
@@ -96,6 +175,10 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let stack_box = QObjectBox::new(StackProbe::default());
+    let journal_box = QObjectBox::new(JournalProbe {
+        path: journal,
+        ..JournalProbe::default()
+    });
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
@@ -103,6 +186,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
     common::register_dbus_enum();
     engine.set_object_property("core".into(), core_box.pinned());
     engine.set_object_property("pageStack".into(), stack_box.pinned());
+    engine.set_object_property("journal".into(), journal_box.pinned());
     engine.set_property(
         "rpcServerPath".into(),
         QString::from(env!("CARGO_BIN_EXE_fake-core-server")).into(),
@@ -126,7 +210,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
 
     let steps: common::Steps = common::Steps::default();
 
-    // t=1: first server up, IO asked. Replacements up ~2.8, 4.8, 9s: core away ~5.1 to 9.
+    // Window starts core; the rest runs off core's restarts, in the probe.
     let loading = steps.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         common::record(
@@ -136,45 +220,21 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         );
     });
 
-    // t=6.5: core away; network goes, stays gone.
-    let away = steps.clone();
-    let away_journal = journal.clone();
-    single_shot(Duration::from_millis(6500), move || unsafe {
-        common::record(&away, "status-at-loss", call!("coreStatus").into());
-        common::record(&away, "hurry", call!("hurry").into());
-        common::record(
-            &away,
-            "starts-before-loss",
-            count(&away_journal, "start_io_for_all_accounts").into(),
-        );
-        call!("connman", QString::from("offline"));
-    });
-
-    // t=7.8: loss announced (~6.9) to window, core still away.
-    let heard = steps.clone();
-    let heard_journal = journal.clone();
-    single_shot(Duration::from_millis(7800), move || unsafe {
-        common::record(&heard, "status-after-loss", call!("coreStatus").into());
-        common::record(&heard, "paused-after-loss", call!("paused").into());
-        common::record(
-            &heard,
-            "starts-after-loss",
-            count(&heard_journal, "start_io_for_all_accounts").into(),
-        );
-    });
-
-    // t=10.5: fourth server up ~9; must not resume IO.
-    let back = steps.clone();
-    let back_journal = journal;
-    single_shot(Duration::from_millis(10_500), move || unsafe {
-        common::record(&back, "paused-after-restart", call!("paused").into());
-        common::record(
-            &back,
-            "starts-after-restart",
-            count(&back_journal, "start_io_for_all_accounts").into(),
-        );
-        (*engine_ptr).quit();
-    });
+    // Once a second: done, or out of time.
+    for second in 2..=GIVE_UP_SECS {
+        let done = steps.clone();
+        single_shot(Duration::from_secs(second), move || unsafe {
+            if second < GIVE_UP_SECS && call!("finished") != "yes" {
+                return;
+            }
+            if !done.borrow().iter().any(|(label, _)| label == "hurry") {
+                for label in READINGS {
+                    common::record(&done, label, call!("reading", QString::from(label)).into());
+                }
+            }
+            (*engine_ptr).quit();
+        });
+    }
 
     engine.exec();
 
@@ -187,14 +247,15 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
     assert_eq!(
         common::value_of(&steps, "hurry"),
         "ok",
-        "the window holds no network watch"
+        "the window holds no network watch, or the core never went away a \
+         third time"
     );
     assert_eq!(
-        common::value_of(&steps, "status-at-loss"),
-        "reconnecting",
-        "the core was not away when the network went, so this is the case \
-         io_pause.rs already covers and proves nothing about a core that \
-         missed the loss"
+        common::value_of(&steps, "paused-after-loss"),
+        "yes",
+        "the loss was announced while the core was away and the window \
+         did nothing with it, so the core that comes back will resume IO \
+         against a network that is not there"
     );
     assert_eq!(
         common::value_of(&steps, "status-after-loss"),
@@ -215,13 +276,6 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         before.to_string(),
         "IO was started between the loss and the restart, by nothing that \
          should have been running"
-    );
-    assert_eq!(
-        common::value_of(&steps, "paused-after-loss"),
-        "yes",
-        "the loss was announced while the core was away and the window \
-         did nothing with it, so the core that comes back will resume IO \
-         against a network that is not there"
     );
     assert_eq!(
         common::value_of(&steps, "paused-after-restart"),
