@@ -177,7 +177,7 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let cases: [(&str, Vec<String>); 14] = [
+    let cases: [(&str, Vec<String>); 15] = [
         (
             "qml/components/ConversationList.qml",
             names_of::<piirit_shim::MessageListItem>(),
@@ -185,6 +185,10 @@ fn delegates_bind_only_roles_their_models_have() {
         // Media pages: message rows.
         (
             "qml/pages/ChatMediaPage.qml",
+            names_of::<piirit_shim::MessageListItem>(),
+        ),
+        (
+            "qml/pages/GalleryPage.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
         (

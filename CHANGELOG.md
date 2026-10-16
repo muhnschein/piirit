@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **Swipe through a chat's pictures and videos.** A tap on a picture or video, in a chat or in a contact's or group's Gallery, opens it full screen; swipe sideways for the next one, through every picture, GIF and video of that chat. From a chat newer ones are to the right, as they are further down the chat; from the Gallery the order is the grid's, newest first. A video plays once swiped to and stops when swiped away; until then it shows its still frame. Zoomed in, a drag pans the picture; zoom out to swipe on.
 - **Contact requests stand out.** A chat from someone you haven't written to carries a "Request" tag in the chat list. Opening it shows the messages with Accept and Block where the message field would be, or Accept and Delete for a group you were added to; accepting brings the field back, and blocking asks first. Reading a request sends no read receipt.
 
 ## 2.2.0 — 2026-10-15

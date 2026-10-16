@@ -1110,6 +1110,38 @@ async fn serve() {
             });
         }
     }
+    // Pictures arriving in gallery group (chat 2), each after its ms: `PIIRIT_FAKE_PICTURES=
+    // 1500:quiet,4500`. `quiet`: events lost (core's overflow case), only a reread finds it.
+    if let Ok(arrivals) = std::env::var("PIIRIT_FAKE_PICTURES") {
+        for arrival in arrivals.split(',') {
+            let (millis, quiet) = arrival
+                .split_once(':')
+                .map_or((arrival, false), |(millis, mode)| (millis, mode == "quiet"));
+            let Ok(millis) = millis.trim().parse() else {
+                continue;
+            };
+            let state = state.clone();
+            tokio::spawn(async move {
+                tokio::time::sleep(std::time::Duration::from_millis(millis)).await;
+                let mut state = state.lock().await;
+                let id = state.add_message(1, 2);
+                state.sent_files.insert(
+                    id,
+                    Sent {
+                        file: json!(format!("/tmp/piirit-fake/arrived-{id}.jpg")),
+                        view_type: "Image".to_string(),
+                        text: None,
+                        file_name: None,
+                    },
+                );
+                if quiet {
+                    // `add_message`'s two.
+                    state.events.pop_back();
+                    state.events.pop_back();
+                }
+            });
+        }
+    }
     // Call ringing after delay: first chat's peer, audio, offer page would answer. Core sends
     // `IncomingCall` and `MsgsChanged`.
     if let Ok(after) = std::env::var("PIIRIT_FAKE_INCOMING_CALL_MS") {

@@ -1362,7 +1362,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2736,7 +2736,7 @@ Väntar på att enheten hos %2$s ska svara...</translation>
     </message>
 </context>
 <context>
-    <name>VideoPage</name>
+    <name>VideoView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>

@@ -1366,7 +1366,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2736,7 +2736,7 @@ En attente de réponse de l&apos;appareil de %2$s...</translation>
     </message>
 </context>
 <context>
-    <name>VideoPage</name>
+    <name>VideoView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>

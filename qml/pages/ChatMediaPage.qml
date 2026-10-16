@@ -108,23 +108,22 @@ Page {
         return path.length > 0 ? Qt.resolvedUrl(Media.fileUrl(path)) : ""
     }
 
-    /// Tap opens per kind (ConversationPage.openAttachment); files to other apps.
-    function open(fileUrl, fileName, viewType) {
+    /// Tap opens per kind (ConversationPage.openAttachment): pictures, videos swiped in grid
+    /// order (GalleryPage); files to other apps.
+    function open(fileUrl, fileName, viewType, messageId) {
         // Row not loaded yet: no file.
         if (String(fileUrl).length === 0) {
             return
         }
-        if (viewType === "Image" || viewType === "Gif"
-                || viewType === "Sticker") {
-            pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
+        if (viewType === "Image" || viewType === "Gif" || viewType === "Video") {
+            pageStack.push(Qt.resolvedUrl("GalleryPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                messageId: messageId,
                 fileUrl: fileUrl,
                 fileName: fileName,
-                viewType: viewType
-            })
-        } else if (viewType === "Video") {
-            pageStack.push(Qt.resolvedUrl("VideoPage.qml"), {
-                fileUrl: fileUrl,
-                fileName: fileName
+                viewType: viewType,
+                newestFirst: true
             })
         } else {
             Qt.openUrlExternally(fileUrl)
@@ -319,7 +318,8 @@ Page {
                     }
                 }
 
-                onClicked: page.open(tile.fileUrl, model.file_name, model.view_type)
+                onClicked: page.open(tile.fileUrl, model.file_name, model.view_type,
+                                     model.message_id)
             }
 
             ViewPlaceholder {
@@ -534,7 +534,8 @@ Page {
                     if (row.isApp) {
                         page.openApp(model.message_id)
                     } else if (row.isFile) {
-                        page.open(row.fileUrl, model.file_name, model.view_type)
+                        page.open(row.fileUrl, model.file_name, model.view_type,
+                                  model.message_id)
                     }
                 }
             }

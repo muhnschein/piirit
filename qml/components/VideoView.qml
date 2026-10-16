@@ -1,24 +1,32 @@
 import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
-import "../components"
+import Nemo.Thumbnailer 1.0
+import "."
 
 /*
- * One video, played in-app (system player leaves Piirit, fails on device). Voice messages'
- * player. Share-out in pull-down; copy via AttachmentSaver.
+ * One video, played in-app (system player leaves Piirit, fails on device): GalleryPage's
+ * video slide. Share-out in pull-down; copy via AttachmentSaver.
  */
-Page {
-    id: page
+Item {
+    id: root
 
     /// File, encoded (AttachmentPreview.fileUrl).
     property url fileUrl
     property string fileName
+    property string mimeType: "video/mp4"
+    /// Plays: slide on screen, swipe over, page in place. Off: paused (cheap; mid-swipe).
+    property bool active: true
+    /// Player keeps file. Off: stopped, file out (no decoder per neighbour; swiping back
+    /// starts over). Gallery drops it only once swipe over: pipeline teardown and setup
+    /// are main-thread work that stalled the swipe's frames.
+    property bool kept: true
 
     /// `MediaPlayer.PlayingState` value: enum lives on type; headless QtMultimedia stub can't
     /// declare one on Qt 5.6. See AttachmentPreview.
     readonly property int playingState: 1
 
-    readonly property bool playing: player.playbackState === page.playingState
+    readonly property bool playing: player.playbackState === root.playingState
 
     /// m:ss from ms.
     function clock(milliseconds) {
@@ -28,7 +36,7 @@ Page {
     }
 
     function toggle() {
-        if (page.playing) {
+        if (root.playing) {
             player.pause()
         } else {
             player.play()
@@ -40,11 +48,26 @@ Page {
         color: "black"
     }
 
+    // File handed over by `follow`, not bound: binding and play order would race.
     MediaPlayer {
         id: player
         objectName: "player"
-        source: page.fileUrl
-        autoPlay: true
+    }
+
+    /// Active: file in, playing. Kept only: paused. Neither: stopped, file out.
+    function follow() {
+        var file = String(root.fileUrl)
+        if (root.active && file.length > 0) {
+            if (String(player.source) !== file) {
+                player.source = root.fileUrl
+            }
+            player.play()
+        } else if (root.kept && String(player.source).length > 0) {
+            player.pause()
+        } else {
+            player.stop()
+            player.source = ""
+        }
     }
 
     // Reader's copy: see AttachmentSaver.
@@ -61,7 +84,12 @@ Page {
         }
     }
 
-    // Stop on way out: no decoder for gone page.
+    // Plays on open (file set at creation counts), on swipe to; stops on swipe away.
+    onActiveChanged: root.follow()
+    onKeptChanged: root.follow()
+    onFileUrlChanged: root.follow()
+
+    // Stop on way out: no decoder for gone slide.
     Component.onDestruction: player.stop()
 
     // In flickable (pull-down). `contentHeight` set, else `parent`-anchored children vanish.
@@ -76,18 +104,33 @@ Page {
                 //: Hands the attachment to whatever else on the phone
                 //: handles files of its kind.
                 text: qsTr("Open in another app")
-                onClicked: Qt.openUrlExternally(page.fileUrl)
+                onClicked: Qt.openUrlExternally(root.fileUrl)
             }
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
                 // Off while copying (long for video): second pull = second copy.
                 enabled: !saver.busy
-                onClicked: saver.keep(page.fileUrl, page.fileName)
+                onClicked: saver.keep(root.fileUrl, root.fileName)
             }
         }
 
+        // Platform thumbnailer's frame (grid's, cached) until player has file: swipe shows
+        // video, not black.
+        Thumbnail {
+            objectName: "poster"
+            anchors.fill: videoOutput
+            visible: String(player.source).length === 0
+            sourceSize.width: width
+            sourceSize.height: height
+            // Whole frame, as player draws it.
+            fillMode: Thumbnail.PreserveAspectFit
+            mimeType: root.mimeType
+            source: visible ? root.fileUrl : ""
+        }
+
         VideoOutput {
+            id: videoOutput
             objectName: "videoOutput"
             anchors {
                 left: parent.left
@@ -102,7 +145,7 @@ Page {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: page.toggle()
+                onClicked: root.toggle()
             }
         }
 
@@ -138,9 +181,9 @@ Page {
                     leftMargin: Theme.horizontalPageMargin
                     verticalCenter: parent.verticalCenter
                 }
-                icon.source: page.playing ? "image://theme/icon-m-pause"
+                icon.source: root.playing ? "image://theme/icon-m-pause"
                                           : "image://theme/icon-m-play"
-                onClicked: page.toggle()
+                onClicked: root.toggle()
             }
 
             Label {
@@ -153,7 +196,7 @@ Page {
                 }
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: page.clock(player.position) + " / " + page.clock(player.duration)
+                text: root.clock(player.position) + " / " + root.clock(player.duration)
             }
 
             Slider {
