@@ -547,6 +547,14 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>ChatListDelegate</name>
+    <message>
+        <source>Request</source>
+        <extracomment>Tag in front of a chat-list row&apos;s preview when the chat is a contact request (someone new wrote, not yet accepted).</extracomment>
+        <translation>Prośba</translation>
+    </message>
+</context>
+<context>
     <name>ChatListPage</name>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
@@ -860,6 +868,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Przy %1 ten plik jest większy niż %2, które przyjmuje większość przekaźników. Wysłanie może się nie udać.</translation>
     </message>
+    <message>
+        <source>Contact request</source>
+        <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
+        <translation>Prośba o kontakt</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -877,6 +890,27 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Camera paused</source>
         <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
         <translation>Kamera wstrzymana</translation>
+    </message>
+</context>
+<context>
+    <name>DeleteGroupRequestDialog</name>
+    <message>
+        <source>Delete group</source>
+        <extracomment>Title of the question asked before a group request is deleted.</extracomment>
+        <translation>Usuń grupę</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Usuń</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its messages from this device?</source>
+        <extracomment>%1 is the group&apos;s name.</extracomment>
+        <translation>Usunąć %1 i jej wiadomości z tego urządzenia?</translation>
     </message>
 </context>
 <context>
@@ -1746,6 +1780,32 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Edycja wiadomości</translation>
+    </message>
+</context>
+<context>
+    <name>RequestBar</name>
+    <message>
+        <source>Someone who isn&apos;t in your contacts added you to this group. Accept to reply, or delete the group.</source>
+        <extracomment>Over the buttons of a group the account was added to by someone it has never written to.</extracomment>
+        <translation>Ktoś spoza twoich kontaktów dodał cię do tej grupy. Zaakceptuj, aby odpowiadać, albo usuń grupę.</translation>
+    </message>
+    <message>
+        <source>%1 isn&apos;t in your contacts yet. Accept to reply. They won&apos;t be told that you&apos;ve read their messages.</source>
+        <extracomment>Over the buttons of a chat started by someone the account has never written to. %1 is their name. Core sends no read receipts for these messages, ever.</extracomment>
+        <translation>Osoby %1 nie ma jeszcze w twoich kontaktach. Zaakceptuj, aby odpowiedzieć. Nadawca nie dowie się, że wiadomości zostały przeczytane.</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Usuń</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>Zablokuj</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <extracomment>Accepts a contact request: the chat becomes an ordinary one and the message field appears.</extracomment>
+        <translation>Akceptuj</translation>
     </message>
 </context>
 <context>

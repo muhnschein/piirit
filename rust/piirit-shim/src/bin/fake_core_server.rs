@@ -111,6 +111,8 @@ struct State {
     left_groups: std::collections::BTreeSet<u32>,
     /// Deleted chats: core can't load.
     deleted_chats: std::collections::BTreeSet<u32>,
+    /// Contact requests accepted here; requests are `PIIRIT_FAKE_REQUESTS` chats.
+    accepted_requests: std::collections::BTreeSet<u32>,
     /// Accounts with unanswered transport call: core allows one, refuses second.
     configuring: std::collections::BTreeSet<u32>,
     /// Accounts asked to stop ongoing process.
@@ -376,6 +378,12 @@ impl State {
             "lastSeen": 0,
             "freshness": if contact == SELF { "Normal" } else { "Old" },
         }))
+    }
+
+    /// Unaccepted contact request: named in `PIIRIT_FAKE_REQUESTS`, not accepted since.
+    fn is_request(&self, chat: u32) -> bool {
+        env_ids("PIIRIT_FAKE_REQUESTS").contains(&u64::from(chat))
+            && !self.accepted_requests.contains(&chat)
     }
 
     /// Announce name, picture, member change, as core.
@@ -1983,17 +1991,47 @@ async fn serve() {
                             "name": state.chat_name(chat),
                             "isEncrypted": true,
                             "isMuted": state.muted.contains(&chat),
+                            "isContactRequest": state.is_request(chat),
                         }),
                     )
                 }
-                // Writable: not left group, as `get_full_chat_by_id`.
+                // Request becomes ordinary chat; core announces it.
+                "accept_chat" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    state.accepted_requests.insert(chat);
+                    state.chat_modified(account, chat);
+                    ok(&id, &Value::Null)
+                }
+                // Sender blocked: core hides chat, as deleted.
+                "block_chat" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    state.chats.remove(&chat);
+                    state.chat_order.retain(|id| *id != chat);
+                    state.deleted_chats.insert(chat);
+                    ok(&id, &Value::Null)
+                }
+                // Writable: not left group nor unaccepted request, as `get_full_chat_by_id`.
                 "can_send" => {
                     let chat = positional(1)
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
                     let state = state.lock().await;
-                    ok(&id, &json!(!state.left_groups.contains(&chat)))
+                    ok(
+                        &id,
+                        &json!(!state.left_groups.contains(&chat) && !state.is_request(chat)),
+                    )
                 }
                 // Edit own text. Core refuses empty and others' (menu offers neither): only empty
                 // refused, `fail` fails like send. Announced as core: model re-reads row.
@@ -2158,6 +2196,8 @@ async fn serve() {
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
                                 // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
+                                "isContactRequest": u32::try_from(chat)
+                                    .is_ok_and(|chat| state.is_request(chat)),
                             }),
                         );
                     }

@@ -6,6 +6,10 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+- **Contact requests stand out.** A chat from someone you haven't written to carries a "Request" tag in the chat list. Opening it shows the messages with Accept and Block where the message field would be, or Accept and Delete for a group you were added to; accepting brings the field back, and blocking asks first. Reading a request sends no read receipt.
+
 ## 2.2.0 — 2026-10-15
 
 - **Photo and video quick actions.** The cover's quick actions can open the camera for a photo, a video, a selfie or a selfie video; once it is taken, pick the chat to send it to. The chat opens with it ready for a caption, or, with "Send right away" turned on for that action, it goes as soon as the chat is picked. Turning that on asks first, since a chat tapped by mistake gets it too, and it is off again whenever the action is chosen anew. The choice of action is Silica's own drop-down again, which lists the kinds on a page of their own.
