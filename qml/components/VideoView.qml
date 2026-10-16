@@ -74,10 +74,9 @@ Item {
         }
     }
 
-    // Plays on open, on swipe to; stops on swipe away.
+    // Plays on open (file set at creation counts), on swipe to; stops on swipe away.
     onActiveChanged: root.follow()
     onFileUrlChanged: root.follow()
-    Component.onCompleted: root.follow()
 
     // Stop on way out: no decoder for gone slide.
     Component.onDestruction: player.stop()

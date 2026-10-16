@@ -1,11 +1,12 @@
 //! Tap on a picture or video opens chat's whole gallery, swiped one per screen, at what was
 //! tapped: from conversation (oldest left) and from contact/group gallery grid (newest left).
 //!
-//! Headless vs stub Silica, recording double; group seeded with picture (10) and video (15).
-//! Swipe = list's current index moved, as flick snapping does. Checks: tapped one shown alone
-//! until list has it, then list placed there; video plays only on screen and once page in
-//! place; zoomed picture holds list still; restart of model and a delete elsewhere leave reader
-//! where they were (zoom too: slide not rebuilt); message not in gallery stays alone.
+//! Headless vs stub Silica, recording double; group seeded with picture (10) and video (15),
+//! two more pictures arriving (first with its events lost). Swipe = list's current index moved,
+//! as flick snapping does. Checks: tapped one shown alone until list has it, then list placed
+//! there; video plays only on screen and once page in place; zoomed picture holds list still;
+//! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
+//! slide not rebuilt); message not in gallery stays alone.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -71,6 +72,11 @@ const PROBE_QML: &str = r"
             slides().currentIndex = index
             return 'ok'
         }
+        /// Swipe by rows: + toward older.
+        function swipeBy(rows) {
+            slides().currentIndex = slides().currentIndex + rows
+            return 'ok'
+        }
         function get(name, property) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -125,6 +131,8 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_FAKE_MEDIA", "1");
+        // First unannounced: only restart finds it. Second while reader on grid's picture.
+        std::env::set_var("PIIRIT_FAKE_PICTURES", "1500:quiet,4500");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
 
@@ -240,7 +248,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("zoomed-swipeable", call!("list", s!("interactive")));
         record!("zoom-out", call!("zoomCurrent"));
         record!("fitted-swipeable", call!("list", s!("interactive")));
-        // Model starts over: list back at row 0 meanwhile.
+        // Model starts over, finds unannounced picture: rows below shift by one.
         record!("overflow", call!("overflow"));
     });
 
@@ -248,7 +256,9 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("restart-current", call!("current", s!(""), s!("messageId")));
         record!("restart-shown", call!("page", s!("shownId")));
-        // From grid: video 15 tapped, page still arriving.
+        record!("restart-index", call!("list", s!("currentIndex")));
+        // From grid (newest first, unannounced picture above): video 15 tapped, page still
+        // arriving.
         record!(
             "load-grid",
             call!(
@@ -280,15 +290,17 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "grid-video-arrived",
             call!("current", s!("player"), s!("playbackState"))
         );
-        // Older: the picture; zoomed, then the video deleted.
-        record!("grid-swipe", call!("swipeTo", 1));
+        // Older: the picture; zoomed, then the video deleted, a picture arrives.
+        record!("grid-swipe", call!("swipeBy", 1));
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
     });
 
-    let page = gallery;
+    let page = gallery.clone();
+    let gallery_again = gallery;
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("after-delete-count", call!("list", s!("count")));
+        record!("after-delete-index", call!("list", s!("currentIndex")));
         record!(
             "after-delete-current",
             call!("current", s!(""), s!("messageId"))
@@ -312,10 +324,25 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         );
     });
 
+    let page = gallery_again;
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("sticker-placed", call!("page", s!("placed")));
         record!("sticker-seed", call!("get", s!("seedPicture"), s!("fileUrl")));
         record!("sticker-list", call!("list", s!("visible")));
+        // Video not in gallery (deleted above), page in place: plays alone, at once.
+        record!(
+            "load-lone-video",
+            call!(
+                "load",
+                s!(page.clone()),
+                15,
+                s!("Video"),
+                s!("file:///tmp/piirit-fake/clip.mp4"),
+                false,
+                2
+            )
+        );
+        record!("lone-video", call!("get", s!("seedVideo"), s!("playing")));
         (*engine_ptr).quit();
     });
 
@@ -347,6 +374,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         "grid-swipe",
         "delete-video",
         "load-sticker",
+        "load-lone-video",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -461,6 +489,12 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
              read again",
         ),
         ("restart-shown", "10", "the page forgot what was on screen"),
+        (
+            "restart-index",
+            "2",
+            "after the reread the reader's picture is not where the list \
+             holds it",
+        ),
         // From grid: grid's order, at tapped video; plays once page in place.
         (
             "grid-seed-state",
@@ -476,7 +510,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "grid-index",
-            "0",
+            "1",
             "the gallery from the grid did not open at the tapped video",
         ),
         (
@@ -490,22 +524,27 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "the video did not play once the page was in place",
         ),
         ("grid-zoom", "true", "the picture did not zoom in"),
-        // Delete elsewhere: same picture, still zoomed (slide not rebuilt).
+        // Delete and arrival elsewhere: same picture, still zoomed (slide not rebuilt).
         (
             "after-delete-count",
-            "1",
-            "the deleted video stayed in the gallery",
+            "3",
+            "the gallery did not lose the deleted video and gain the new picture",
+        ),
+        (
+            "after-delete-index",
+            "2",
+            "the reader's picture is not where the list now holds it",
         ),
         (
             "after-delete-current",
             "10",
-            "deleting another message moved the reader off their picture",
+            "deleting or receiving another message moved the reader off their picture",
         ),
         (
             "after-delete-zoomed",
             "true",
-            "deleting another message rebuilt the reader's slide and \
-             threw away their zoom",
+            "deleting or receiving another message rebuilt the reader's \
+             slide and threw away their zoom",
         ),
         // Not in gallery: alone.
         (
@@ -523,6 +562,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "sticker-list",
             "false",
             "a message the gallery does not hold was put among the gallery's",
+        ),
+        (
+            "lone-video",
+            "true",
+            "a video opened on a page already in place did not play",
         ),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");
