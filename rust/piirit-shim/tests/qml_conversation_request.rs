@@ -142,6 +142,11 @@ fn a_contact_request_opens_with_its_answer_where_the_field_would_be() {
 
     engine.exec();
 
+    assert_outcome(&steps);
+}
+
+/// What the page shows before and after Accept.
+fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
             .iter()
