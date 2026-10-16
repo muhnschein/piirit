@@ -124,6 +124,19 @@ pub struct ChatMessages {
     pub can_call: qt_property!(bool; NOTIFY can_call_changed),
     /// Emitted once call-ability known.
     pub can_call_changed: qt_signal!(),
+    /// Unaccepted contact request (someone new wrote, or added reader to a group). Page shows
+    /// accept and block (group: delete) in field's place, as reference clients.
+    pub is_contact_request: qt_property!(bool; NOTIFY is_contact_request_changed),
+    /// Emitted once request-ness known, and when accepted (here or other device).
+    pub is_contact_request_changed: qt_signal!(),
+    /// Accept request: core makes it ordinary chat; shape re-read (field comes back).
+    pub accept_chat: qt_method!(fn(&mut self)),
+    /// Block request's sender: core hides chat, contact goes on block list. Answers `closed`.
+    pub block_chat: qt_method!(fn(&mut self)),
+    /// Delete chat on this device (group request turned down). Answers `closed`.
+    pub delete_chat: qt_method!(fn(&mut self)),
+    /// Chat blocked or deleted: nothing left to show, page leaves.
+    pub closed: qt_signal!(),
     /// Chat name as core shows; empty until read. Re-read on events (renames elsewhere).
     pub chat_name: qt_property!(QString; NOTIFY chat_name_changed),
     /// Emitted when `chat_name` re-read and changed.
@@ -781,11 +794,86 @@ impl ChatMessages {
         self.is_encrypted = shape.is_encrypted;
         self.can_call = shape.can_call;
         self.member_count = shape.member_count;
+        self.is_contact_request = shape.is_contact_request;
         self.is_group_changed();
         self.can_send_changed();
         self.is_encrypted_changed();
         self.can_call_changed();
         self.member_count_changed();
+        self.is_contact_request_changed();
+    }
+
+    /// Accept contact request; see `accept_chat` property.
+    pub fn accept_chat(&mut self) {
+        self.act_on_chat("accept_chat", AfterChatAct::Reshape);
+    }
+
+    /// Block request's sender; see `block_chat` property.
+    pub fn block_chat(&mut self) {
+        self.act_on_chat("block_chat", AfterChatAct::Close);
+    }
+
+    /// Delete chat here; see `delete_chat` property.
+    pub fn delete_chat(&mut self) {
+        self.act_on_chat("delete_chat", AfterChatAct::Close);
+    }
+
+    /// Whole-chat call (`method(account, chat)`); on success re-read shape or close page.
+    /// Refusal reported, page stays.
+    fn act_on_chat(&mut self, method: &'static str, after: AfterChatAct) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answer for a chat already left.
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            match (result, after) {
+                (Ok(()), AfterChatAct::Reshape) => this.borrow_mut().refresh_shape(),
+                (Ok(()), AfterChatAct::Close) => this.borrow().closed(),
+                (Err(err), _) => this.borrow().error(err.into()),
+            }
+        });
+
+        runtime.spawn(async move {
+            let result = rpc
+                .call::<_, ()>(method, (account_id, chat_id))
+                .await
+                .map_err(|err| err.to_string());
+            done(result);
+        });
+    }
+
+    /// Reread chat shape (request accepted here or elsewhere: field, edit, calls follow).
+    fn refresh_shape(&mut self) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |shape: ChatShape| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answer for a chat already left.
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            this.borrow_mut().take_shape(shape);
+        });
+        runtime.spawn(async move {
+            done(chat_shape(&rpc, account_id, chat_id).await);
+        });
     }
 
     /// Scroll target for `message_id`.
@@ -932,6 +1020,10 @@ impl ChatMessages {
                 self.refresh_name();
                 // Join or leave: other half of header.
                 self.refresh_member_count();
+                // Request accepted on other device: field comes back here too.
+                if self.is_contact_request {
+                    self.refresh_shape();
+                }
             }
             _ => {}
         }
@@ -2102,9 +2194,9 @@ fn is_group_info(info: &serde_json::Value) -> bool {
     !matches!(json::str_at(info, "chatType"), "Single" | "")
 }
 
-/// Chat facts beside messages: sender shown, writable, encrypted, calls.
+/// Chat facts beside messages: sender shown, writable, encrypted, calls, request.
 #[derive(Clone, Copy, Default)]
-// Four facts, each bound on its own; see `ChatMessages`.
+// Five facts, each bound on its own; see `ChatMessages`.
 #[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ChatShape {
     /// Group, mailing list or broadcast.
@@ -2117,6 +2209,15 @@ pub(crate) struct ChatShape {
     pub can_call: bool,
     /// Member count incl. reader, for group header; 0 elsewhere (1:1 too).
     pub member_count: u32,
+    /// Unaccepted contact request.
+    pub is_contact_request: bool,
+}
+
+/// What a whole-chat call leaves: same chat, new shape (accepted), or nothing (blocked, deleted).
+#[derive(Clone, Copy)]
+enum AfterChatAct {
+    Reshape,
+    Close,
 }
 
 /// Opening content: shape, messages by day, one page around `find_message_id`
@@ -2178,6 +2279,7 @@ async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> Chat
         is_encrypted,
         can_call: takes_calls(&info, is_group, can_send),
         member_count,
+        is_contact_request: json::flag(&info, "isContactRequest"),
     }
 }
 

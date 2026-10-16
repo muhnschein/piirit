@@ -355,16 +355,58 @@ Page {
         objectName: "conversationHeader"
         title: page.chatName
         // Member count. None for one-to-one ("2") or before chat shape arrives
-        // ("0 members" flicker).
-        //: Under a group's name, over its messages. %n is how many
-        //: people are in the group.
-        subtitle: messages.is_group && messages.member_count > 0
-                  ? qsTr("%n member(s)", "", messages.member_count)
-                  : ""
+        // ("0 members" flicker). Request says so first.
+        subtitle: messages.is_contact_request
+                  ? page.requestSubtitle
+                  : page.memberSubtitle
         // White once info page attached, as navigable PageHeader.
         interactive: page.canNavigateForward
         // Name goes swipe's way.
         onClicked: page.openInfo()
+    }
+
+    //: Under a group's name, over its messages. %n is how many
+    //: people are in the group.
+    readonly property string memberSubtitle: messages.is_group && messages.member_count > 0
+                                             ? qsTr("%n member(s)", "", messages.member_count)
+                                             : ""
+    //: Under the name of a chat that is an unanswered contact request.
+    readonly property string requestSubtitle: page.memberSubtitle.length > 0
+                                              ? qsTr("Contact request") + " · " + page.memberSubtitle
+                                              : qsTr("Contact request")
+
+    /// Turn request down, asked first. One-to-one: block sender. Group: delete here (reference
+    /// clients; whole group not blocked).
+    function declineRequest() {
+        var dialog = messages.is_group
+                ? pageStack.push(Qt.resolvedUrl("DeleteGroupRequestDialog.qml"), {
+                                     groupName: page.chatName
+                                 })
+                : pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
+                                     contactName: page.chatName,
+                                     blocking: true
+                                 })
+        if (dialog) {
+            dialog.accepted.connect(function() {
+                if (messages.is_group) {
+                    messages.delete_chat()
+                } else {
+                    messages.block_chat()
+                }
+            })
+        }
+    }
+
+    // Blocked or deleted: nothing left here. Confirm pop may still run; Silica drops stack
+    // ops mid-transition: finish it (as GroupPage's leave).
+    Connections {
+        target: messages
+        onClosed: {
+            if (pageStack.completeAnimation) {
+                pageStack.completeAnimation()
+            }
+            pageStack.pop(page)
+        }
     }
 
     /// Call this chat, or bring existing call to front. One call at a time (as
@@ -676,24 +718,43 @@ Page {
         onClicked: attachButton.close()
     }
 
+    // Unanswered contact request: answer in field's place (can't send till accepted).
+    RequestBar {
+        id: requestBar
+        objectName: "requestBar"
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        shown: messages.is_contact_request
+        isGroup: messages.is_group
+        chatName: page.chatName
+        onAcceptClicked: messages.accept_chat()
+        onDeclineClicked: page.declineRequest()
+    }
+
     Row {
         id: inputRow
         objectName: "inputRow"
+        // Not `visible` in sizes: false under another page too.
+        visible: !messages.is_contact_request
         anchors {
             left: parent.left
             right: parent.right
             // Field's own left inset; else send button hugs edge.
             rightMargin: Theme.horizontalPageMargin
-            bottom: parent.bottom
+            bottom: requestBar.top
             // Off screen edge: TextArea has no room under text, recording less.
-            bottomMargin: Theme.paddingLarge
+            bottomMargin: messages.is_contact_request ? 0 : Theme.paddingLarge
         }
         spacing: Theme.paddingSmall
 
-        // Field plus lifted buttons: Row ignores child anchors.
-        height: Math.max(textField.visible ? textField.height : 0,
-                         voiceBar.visible ? voiceBar.height : 0,
-                         sendButton.height + inputRow.buttonLift)
+        // Field plus lifted buttons: Row ignores child anchors. Hidden: none.
+        height: messages.is_contact_request ? 0
+                : Math.max(textField.visible ? textField.height : 0,
+                           voiceBar.visible ? voiceBar.height : 0,
+                           sendButton.height + inputRow.buttonLift)
 
         /// Buttons' lift over field. None: Silica field keeps descender room;
         /// padding lift made them float.

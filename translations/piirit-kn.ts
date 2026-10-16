@@ -545,6 +545,14 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatListDelegate</name>
+    <message>
+        <source>Request</source>
+        <extracomment>Tag in front of a chat-list row&apos;s preview when the chat is a contact request (someone new wrote, not yet accepted).</extracomment>
+        <translation>ವಿನಂತಿ</translation>
+    </message>
+</context>
+<context>
     <name>ChatListPage</name>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
@@ -857,6 +865,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
         <translation>%1 ಗಾತ್ರದ ಈ ಫೈಲ್ ಹೆಚ್ಚಿನ ರಿಲೇಗಳು ಸ್ವೀಕರಿಸುವ %2 ಗಿಂತ ದೊಡ್ಡದಾಗಿದೆ. ಕಳುಹಿಸುವುದು ವಿಫಲವಾಗಬಹುದು.</translation>
     </message>
+    <message>
+        <source>Contact request</source>
+        <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
+        <translation>ಸಂಪರ್ಕ ವಿನಂತಿ</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -874,6 +887,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Camera paused</source>
         <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
         <translation>ಕ್ಯಾಮೆರಾ ವಿರಾಮದಲ್ಲಿದೆ</translation>
+    </message>
+</context>
+<context>
+    <name>DeleteGroupRequestDialog</name>
+    <message>
+        <source>Delete group</source>
+        <extracomment>Title of the question asked before a group request is deleted.</extracomment>
+        <translation>ಗುಂಪನ್ನು ಅಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>ಅಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>Delete %1 and its messages from this device?</source>
+        <extracomment>%1 is the group&apos;s name.</extracomment>
+        <translation>ಈ ಸಾಧನದಿಂದ %1 ಮತ್ತು ಅದರ ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಬೇಕೆ?</translation>
     </message>
 </context>
 <context>
@@ -1739,6 +1773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>ಸಂದೇಶವನ್ನು ಸಂಪಾದಿಸಲಾಗುತ್ತಿದೆ</translation>
+    </message>
+</context>
+<context>
+    <name>RequestBar</name>
+    <message>
+        <source>Someone who isn&apos;t in your contacts added you to this group. Accept to reply, or delete the group.</source>
+        <extracomment>Over the buttons of a group the account was added to by someone it has never written to.</extracomment>
+        <translation>ನಿಮ್ಮ ಸಂಪರ್ಕಗಳಲ್ಲಿ ಇಲ್ಲದ ಯಾರೋ ನಿಮ್ಮನ್ನು ಈ ಗುಂಪಿಗೆ ಸೇರಿಸಿದ್ದಾರೆ. ಉತ್ತರಿಸಲು ಸ್ವೀಕರಿಸಿ, ಅಥವಾ ಗುಂಪನ್ನು ಅಳಿಸಿ.</translation>
+    </message>
+    <message>
+        <source>%1 isn&apos;t in your contacts yet. Accept to reply. They won&apos;t be told that you&apos;ve read their messages.</source>
+        <extracomment>Over the buttons of a chat started by someone the account has never written to. %1 is their name. Core sends no read receipts for these messages, ever.</extracomment>
+        <translation>%1 ಇನ್ನೂ ನಿಮ್ಮ ಸಂಪರ್ಕಗಳಲ್ಲಿ ಇಲ್ಲ. ಉತ್ತರಿಸಲು ಸ್ವೀಕರಿಸಿ. ನೀವು ಅವರ ಸಂದೇಶಗಳನ್ನು ಓದಿದ್ದೀರಿ ಎಂದು ಅವರಿಗೆ ತಿಳಿಸಲಾಗುವುದಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>ಅಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>ನಿರ್ಬಂಧಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <extracomment>Accepts a contact request: the chat becomes an ordinary one and the message field appears.</extracomment>
+        <translation>ಸ್ವೀಕರಿಸಿ</translation>
     </message>
 </context>
 <context>

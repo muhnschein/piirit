@@ -87,10 +87,37 @@ Item {
         text: (root.isEncrypted ? "" : "✉ ") + root.chatName
     }
 
+    // Contact request: tagged before preview (Accept or Block waits in the chat).
+    Rectangle {
+        id: requestTag
+        objectName: "requestTag"
+        visible: root.isContactRequest
+        x: nameLabel.x
+        anchors.verticalCenter: previewLabel.verticalCenter
+        width: visible ? requestLabel.implicitWidth + 2 * Theme.paddingMedium : 0
+        height: requestLabel.implicitHeight
+        radius: height / 2
+        color: "transparent"
+        border.color: Theme.highlightColor
+        border.width: 1
+
+        Label {
+            id: requestLabel
+            objectName: "requestLabel"
+            anchors.centerIn: parent
+            font.pixelSize: Theme.fontSizeExtraSmall
+            color: Theme.highlightColor
+            //: Tag in front of a chat-list row's preview when the chat is a
+            //: contact request (someone new wrote, not yet accepted).
+            text: qsTr("Request")
+        }
+    }
+
     Label {
         id: previewLabel
         objectName: "previewLabel"
-        x: nameLabel.x
+        x: requestTag.visible ? requestTag.x + requestTag.width + Theme.paddingSmall
+                              : nameLabel.x
         y: nameLabel.y + nameLabel.height
         width: badge.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade

@@ -1,4 +1,4 @@
-//! Chat-list row: unread badge, last message time, sender, filing.
+//! Chat-list row: unread badge, last message time, sender, filing, contact request tag.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
 // `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
@@ -119,6 +119,9 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         record!("today", get!("timeLabel", "text"));
         record!("preview", get!("previewLabel", "text"));
         record!("name", get!("nameLabel", "text"));
+        record!("no-request-tag", get!("requestTag", "visible"));
+        record!("plain-preview-x", get!("previewLabel", "x"));
+        record!("name-x", get!("nameLabel", "x"));
 
         set!("unreadCount", 3.0);
         // Older than today, within week.
@@ -150,10 +153,16 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         // Older than week: date, not a weekday that would read as one of last seven days.
         let old = call!("ago", 30.0);
         set!("lastUpdated", old.parse::<f64>().unwrap_or_default());
+        set!("isContactRequest", true);
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("older", get!("timeLabel", "text"));
+        record!("request-tag", get!("requestTag", "visible"));
+        record!("request-text", get!("requestLabel", "text"));
+        record!("tag-x", get!("requestTag", "x"));
+        record!("tag-width", get!("requestTag", "width"));
+        record!("request-preview-x", get!("previewLabel", "x"));
         (*engine_ptr).quit();
     });
 
@@ -239,5 +248,32 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("ours"),
         "✓ see you there",
         "our own last message shows a sender instead of its delivery mark. {context}"
+    );
+    // Request: tagged on preview line, preview moved past tag (tag over text unreadable).
+    assert_eq!(
+        value("no-request-tag"),
+        "false",
+        "an ordinary chat is tagged as a contact request. {context}"
+    );
+    assert_eq!(
+        value("plain-preview-x"),
+        value("name-x"),
+        "an ordinary chat's preview does not line up under its name. {context}"
+    );
+    assert_eq!(
+        value("request-tag"),
+        "true",
+        "a contact request looks like any other chat in the list. {context}"
+    );
+    assert_eq!(
+        value("request-text"),
+        "Request",
+        "the request tag does not say what it marks. {context}"
+    );
+    let number = |label: &str| value(label).parse::<f64>().unwrap_or(f64::NAN);
+    assert!(
+        number("tag-width") > 0.0
+            && number("request-preview-x") >= number("tag-x") + number("tag-width"),
+        "the preview runs under the request tag. {context}"
     );
 }
