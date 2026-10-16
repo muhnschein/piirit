@@ -79,11 +79,10 @@ impl PageStackProbe {
         .map(|gate| format!("everyone={gate}"))
         .unwrap_or_default();
         // Gallery: message it opens at, and in grid order.
-        let at = i32::from_qvariant(
-            properties.value(QString::from("messageId"), QVariant::default()),
-        )
-        .map(|id| format!("at={id}"))
-        .unwrap_or_default();
+        let at =
+            i32::from_qvariant(properties.value(QString::from("messageId"), QVariant::default()))
+                .map(|id| format!("at={id}"))
+                .unwrap_or_default();
         let order = bool::from_qvariant(
             properties.value(QString::from("newestFirst"), QVariant::default()),
         )

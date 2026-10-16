@@ -39,11 +39,10 @@ impl PageStackProbe {
         // File name, and message gallery opens at.
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page);
-        let at = i32::from_qvariant(
-            properties.value(QString::from("messageId"), QVariant::default()),
-        )
-        .map(|id| format!("({id})"))
-        .unwrap_or_default();
+        let at =
+            i32::from_qvariant(properties.value(QString::from("messageId"), QVariant::default()))
+                .map(|id| format!("({id})"))
+                .unwrap_or_default();
         let current = self.log.to_string();
         self.log = format!("{current}push:{name}{at}|").into();
         self.log_changed();

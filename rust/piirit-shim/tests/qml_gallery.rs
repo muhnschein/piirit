@@ -195,7 +195,10 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             )
         );
         record!("chat-placed-early", call!("page", s!("placed")));
-        record!("chat-seed-early", call!("get", s!("seedPicture"), s!("fileUrl")));
+        record!(
+            "chat-seed-early",
+            call!("get", s!("seedPicture"), s!("fileUrl"))
+        );
         record!(
             "chat-seed-preview",
             call!("get", s!("seedPicture"), s!("previewWidth"))
@@ -221,10 +224,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         // Swipe to newer: the video, playing.
         record!("swipe-newer", call!("swipeTo", 0));
         record!("shown-after-swipe", call!("page", s!("shownId")));
-        record!(
-            "video-file",
-            call!("current", s!("player"), s!("source"))
-        );
+        record!("video-file", call!("current", s!("player"), s!("source")));
         record!(
             "video-state",
             call!("current", s!("player"), s!("playbackState"))
@@ -327,7 +327,10 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     let page = gallery_again;
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("sticker-placed", call!("page", s!("placed")));
-        record!("sticker-seed", call!("get", s!("seedPicture"), s!("fileUrl")));
+        record!(
+            "sticker-seed",
+            call!("get", s!("seedPicture"), s!("fileUrl"))
+        );
         record!("sticker-list", call!("list", s!("visible")));
         // Video not in gallery (deleted above), page in place: plays alone, at once.
         record!(
@@ -357,10 +360,10 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
     let value = |label: &str| {
-        steps
-            .iter()
-            .find(|(name, _)| *name == label)
-            .map_or_else(|| "<step did not run>".to_string(), |(_, value)| value.clone())
+        steps.iter().find(|(name, _)| *name == label).map_or_else(
+            || "<step did not run>".to_string(),
+            |(_, value)| value.clone(),
+        )
     };
     let context = format!("steps: {steps:?}");
 
@@ -446,11 +449,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "file:///tmp/piirit-fake/clip.mp4",
             "swiping to the video did not give the player its file",
         ),
-        (
-            "video-state",
-            "1",
-            "the video swiped to did not play",
-        ),
+        ("video-state", "1", "the video swiped to did not play"),
         (
             "picture-off-screen",
             "false",
@@ -501,7 +500,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "false",
             "the tapped video played during the page transition",
         ),
-        ("grid-placed", "true", "the gallery from the grid never took over"),
+        (
+            "grid-placed",
+            "true",
+            "the gallery from the grid never took over",
+        ),
         (
             "grid-direction",
             "0",

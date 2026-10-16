@@ -250,33 +250,35 @@ impl ChatMedia {
     /// Arrival or delete = row inserts/removes, not reset: reset sends every view to row 0
     /// and rebuilds every delegate (viewer swiped to old picture jumped to newest).
     fn place(&mut self, ids: &[u32]) {
-        let old: Vec<u32> = self.rows.borrow().iter().map(|row| row.message_id).collect();
+        let old: Vec<u32> = self
+            .rows
+            .borrow()
+            .iter()
+            .map(|row| row.message_id)
+            .collect();
         if old != ids {
             // Empty: one reset, not a signal per row.
-            match edits(&old, ids).filter(|_| !old.is_empty()) {
-                Some((removals, insertions)) => {
-                    let mut rows = self.rows.borrow_mut();
-                    for index in removals {
-                        rows.remove(index);
-                    }
-                    for (index, id) in insertions {
-                        rows.insert(index, placeholder(id));
-                    }
+            if let Some((removals, insertions)) = edits(&old, ids).filter(|_| !old.is_empty()) {
+                let mut rows = self.rows.borrow_mut();
+                for index in removals {
+                    rows.remove(index);
                 }
-                None => {
-                    let kept: BTreeMap<u32, MessageListItem> = self
-                        .rows
-                        .borrow()
-                        .iter()
-                        .filter(|row| row.loaded)
-                        .map(|row| (row.message_id, row.clone()))
-                        .collect();
-                    let rows: Vec<MessageListItem> = ids
-                        .iter()
-                        .map(|id| kept.get(id).cloned().unwrap_or_else(|| placeholder(*id)))
-                        .collect();
-                    self.rows.borrow_mut().reset_data(rows);
+                for (index, id) in insertions {
+                    rows.insert(index, placeholder(id));
                 }
+            } else {
+                let kept: BTreeMap<u32, MessageListItem> = self
+                    .rows
+                    .borrow()
+                    .iter()
+                    .filter(|row| row.loaded)
+                    .map(|row| (row.message_id, row.clone()))
+                    .collect();
+                let rows: Vec<MessageListItem> = ids
+                    .iter()
+                    .map(|id| kept.get(id).cloned().unwrap_or_else(|| placeholder(*id)))
+                    .collect();
+                self.rows.borrow_mut().reset_data(rows);
             }
             self.rows_changed();
         }
