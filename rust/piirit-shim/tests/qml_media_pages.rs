@@ -280,8 +280,37 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("contentWidth")
             ),
         ));
+        // Fitted: no zoomed copy decoded.
+        (*steps_ptr).push((
+            "fitted-sharp",
+            call!(
+                "flagOf",
+                QString::from("sharpPicture"),
+                QString::from("source")
+            ),
+        ));
         // Zoomed bottom right, where fingers went.
         (*steps_ptr).push(("zoomed", call!("zoomAt", 480, 700)));
+        (*steps_ptr).push((
+            "sharp-decode-box",
+            call!("decodeBoxOf", QString::from("sharpPicture")),
+        ));
+        (*steps_ptr).push((
+            "full-file",
+            call!(
+                "flagOf",
+                QString::from("fullPicture"),
+                QString::from("source")
+            ),
+        ));
+        (*steps_ptr).push((
+            "zoomed-sharp",
+            call!(
+                "flagOf",
+                QString::from("sharpPicture"),
+                QString::from("source")
+            ),
+        ));
         (*steps_ptr).push((
             "zoomed-content",
             call!(
@@ -577,13 +606,36 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "the picture page keeps every frame of a GIF at full size for as \
          long as it is open. {context}"
     );
-    // Twice stub page's 540x960, which Qt fits picture inside: twice fitted size, no more. A
-    // bound of twice long edge on both sides let a landscape photo through whole.
+    // Stub page 540x960, width a third over (sideways-stored 4:3 photo fits exactly). Twice
+    // the page on every slide was a 14-25 MB upload per swipe (lag). A bound of the long edge
+    // on both sides let a landscape photo through whole.
     assert_eq!(
         value("full-decode-box"),
-        "1080x1920",
-        "the full picture is not decoded to twice the page it is fitted \
+        "720x960",
+        "the full picture is not decoded to about the page it is fitted \
          to. {context}"
+    );
+    // Twice the page, only once zoomed: zoom 2 stays sharp.
+    assert_eq!(
+        value("fitted-sharp"),
+        "",
+        "a picture at fitted size decodes a twice-size copy it does not \
+         need. {context}"
+    );
+    assert!(
+        value("full-file").starts_with("file://"),
+        "the full picture has no file. {context}"
+    );
+    assert_eq!(
+        value("zoomed-sharp"),
+        value("full-file"),
+        "a zoomed picture is not decoded again sharp. {context}"
+    );
+    assert_eq!(
+        value("sharp-decode-box"),
+        "1080x1920",
+        "the zoomed picture's copy is not decoded to twice the page. \
+         {context}"
     );
 
     assert_eq!(

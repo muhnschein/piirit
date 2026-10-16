@@ -60,14 +60,20 @@ Item {
         ? root.fittedWidth * root.measured.implicitHeight / root.measured.implicitWidth
         : root.height
 
-    /// Decode box: twice view, so zoom 2 stays sharp. Bigger wastes memory and
-    /// upload; past GPU texture limit Qt rescales on render thread (stall). Per
-    /// side, Qt keeps shape: one bound of twice long edge on both let landscape
-    /// photo through whole (12 MP, 48 MB for 1080 wide). Qt 5.6 fits stored pixels
-    /// before orientation turn: upright 4:3 stored sideways gets 1.5x, not 2x.
+    /// Decode box: about view's size; twice only once zoomed (`sharp*`). Twice on every
+    /// slide was a 14-25 MB texture each, uploaded as it swiped in (lag). Width a
+    /// third over view's: Qt 5.6 fits stored pixels before orientation turn, so 4:3
+    /// photo stored sideways (phone camera) comes out exactly fitted, not 0.75x
+    /// (blurred); upright one 1.33x. Per side, Qt keeps shape: one bound of long edge
+    /// on both let landscape photo through whole (12 MP, 48 MB for 1080 wide).
     /// Screen size until view has one.
-    readonly property int decodeWidth: 2 * (root.width > 0 ? root.width : Screen.width)
-    readonly property int decodeHeight: 2 * (root.height > 0 ? root.height : Screen.height)
+    readonly property int decodeWidth:
+        Math.round(4 / 3 * (root.width > 0 ? root.width : Screen.width))
+    readonly property int decodeHeight: root.height > 0 ? root.height : Screen.height
+    /// Zoomed copy's box: twice view, so zoom 2 stays sharp. Bigger wastes memory
+    /// and upload; past GPU texture limit Qt rescales on render thread (stall).
+    readonly property int sharpWidth: 2 * (root.width > 0 ? root.width : Screen.width)
+    readonly property int sharpHeight: 2 * root.decodeHeight
 
     /// Kept inside content: flickable does this after layout, this before.
     function within(value, limit) {
@@ -213,6 +219,21 @@ Item {
                     // Once settled if preview carries page; else at once (empty page worse than
                     // dropped frame).
                     source: root.settled || root.previewWidth <= 0 ? root.fileUrl : ""
+                }
+
+                // Zoomed: twice-size copy over fitted one, once decoded; dropped on zoom out.
+                // GIF: animation covers it anyway.
+                Image {
+                    id: sharp
+                    objectName: "sharpPicture"
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    autoTransform: true
+                    sourceSize.width: root.sharpWidth
+                    sourceSize.height: root.sharpHeight
+                    visible: sharp.status === Image.Ready
+                    source: root.zoomed && root.settled && !root.isAnimated ? root.fileUrl : ""
                 }
 
                 AnimatedImage {

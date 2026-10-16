@@ -10,13 +10,13 @@ import Piirit 1.0
  * rows loaded.
  *
  * Order as where opened (reference clients alike): conversation oldest left, newest right;
- * gallery grid newest first, so newest left.
+ * gallery grid newest first, so newest left. Model ordered so (`oldest_first`).
  *
  * Tapped one shown alone (`seed`) until list has its id (one core call).
  * Seed's picture is row's cached decode (PictureView); list's slide asks same, so swap draws
  * nothing new. Not in list (sticker, not yet sent): seed stays, nothing to swipe.
  *
- * Zoomed picture pans, list holds still. Video plays only on screen.
+ * Zoomed picture pans, list holds still. Video plays only on screen, once swipe over.
  */
 Page {
     id: page
@@ -51,6 +51,9 @@ Page {
         account_id: page.accountId
         chat_id: page.chatId
         kind: "gallery"
+        // List always left to right, older left: model in shown order. Right-to-left list
+        // broke Silica's back transition from chat (slid to a neighbour, then cut).
+        oldest_first: !page.newestFirst
         onLoaded_changed: page.place()
         // Tapped one arrived late (list read before it): place then.
         onRows_changed: {
@@ -104,8 +107,6 @@ Page {
         visible: page.placed
         model: media.rows
         orientation: ListView.Horizontal
-        // Index 0 = newest: right-to-left puts it rightmost.
-        layoutDirection: page.newestFirst ? Qt.LeftToRight : Qt.RightToLeft
         snapMode: ListView.SnapOneItem
         highlightRangeMode: ListView.StrictlyEnforceRange
         // Swipe is the motion; placing is a jump.
@@ -131,9 +132,12 @@ Page {
 
             readonly property int messageId: model.message_id
             readonly property bool isTapped: model.message_id === page.messageId
-            /// On screen, page in place: plays, animates.
-            readonly property bool active: slide.ListView.isCurrentItem && page.placed
-                                           && page.settled
+            /// On screen, swipe over, page in place: plays, animates. Not mid-swipe: current
+            /// changes halfway, and starting a player there stalled the swipe.
+            readonly property bool active: slide.ListView.isCurrentItem && !slides.moving
+                                           && page.placed && page.settled
+            /// Video keeps its file: on screen, or swipe still running (teardown waits).
+            readonly property bool kept: slide.ListView.isCurrentItem || slides.moving
             readonly property bool zoomed: shown.item !== null && shown.item.zoomed === true
             // Unread row: tapped one's from page, else nothing yet.
             readonly property url fileUrl:
@@ -144,9 +148,12 @@ Page {
             readonly property string viewType:
                 model.loaded ? model.view_type : slide.isTapped ? page.viewType : ""
 
+            // Neighbours built over several frames, not in one during the swipe. Tapped one
+            // at once: swap from seed draws nothing new.
             Loader {
                 id: shown
                 anchors.fill: parent
+                asynchronous: !slide.isTapped
                 sourceComponent: slide.viewType === "Video" ? videoSlide
                                  : slide.viewType.length > 0 ? pictureSlide : null
             }
@@ -171,7 +178,9 @@ Page {
                     objectName: "videoView"
                     fileUrl: slide.fileUrl
                     fileName: slide.fileName
+                    mimeType: model.file_mime.length > 0 ? model.file_mime : "video/mp4"
                     active: slide.active
+                    kept: slide.kept
                 }
             }
         }

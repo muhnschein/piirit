@@ -67,10 +67,13 @@ pub struct ChatMedia {
     /// `gallery` pics/video, `audio` voice/music, `files` incl. contacts,
     /// `apps` webxdc, `calls`. Set reloads.
     pub kind: qt_property!(QString; WRITE set_kind NOTIFY source_changed),
-    /// Account, chat or kind changed.
+    /// Rows oldest first (conversation's order); default newest first. Set reloads.
+    pub oldest_first: qt_property!(bool; WRITE set_oldest_first NOTIFY source_changed),
+    /// Account, chat, kind or order changed.
     pub source_changed: qt_signal!(),
 
-    /// Rows, newest first, for `model`; id-only until read (row's `loaded`).
+    /// Rows, newest first unless `oldest_first`, for `model`; id-only until read (row's
+    /// `loaded`).
     pub rows: qt_property!(RefCell<MessageListModel>; CONST),
     /// Row count.
     pub count: qt_property!(u32; READ count NOTIFY rows_changed),
@@ -147,7 +150,16 @@ impl ChatMedia {
         }
     }
 
-    /// Drop rows, reread: held rows other chat/kind or untrusted.
+    /// Set order; start over if changed.
+    pub fn set_oldest_first(&mut self, oldest_first: bool) {
+        if self.oldest_first != oldest_first {
+            self.oldest_first = oldest_first;
+            self.source_changed();
+            self.start_over();
+        }
+    }
+
+    /// Drop rows, reread: held rows other chat/kind/order or untrusted.
     fn start_over(&mut self) {
         self.rows.borrow_mut().reset_data(Vec::new());
         self.rows_changed();
@@ -162,6 +174,7 @@ impl ChatMedia {
     pub fn reload(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         let kind = self.kind.to_string();
+        let oldest_first = self.oldest_first;
         if account_id == 0 || chat_id == 0 || kind.is_empty() {
             return;
         }
@@ -196,8 +209,13 @@ impl ChatMedia {
         });
 
         runtime.spawn(async move {
-            let ids = match fetch_ids(&rpc, account_id, chat_id, first, second, third).await {
-                Ok(ids) => ids,
+            let ids = match fetch_ids(&rpc, account_id, chat_id, (first, second, third)).await {
+                Ok(mut ids) => {
+                    if !oldest_first {
+                        ids.reverse();
+                    }
+                    ids
+                }
                 Err(err) => {
                     step(Step::Failed(err));
                     return;
@@ -450,26 +468,19 @@ fn edits(old: &[u32], new: &[u32]) -> Option<(Vec<usize>, Vec<(usize, u32)>)> {
     Some((removals, insertions))
 }
 
-/// Ids of these kinds in chat, newest first.
-///
-/// Core answers oldest first, not to re-sort; reversed only.
+/// Ids of these kinds in chat, oldest first, as core answers (not to re-sort; reversed only).
 async fn fetch_ids(
     rpc: &RpcClient,
     account_id: u32,
     chat_id: u32,
-    first: &str,
-    second: Option<&str>,
-    third: Option<&str>,
+    (first, second, third): (&str, Option<&str>, Option<&str>),
 ) -> Result<Vec<u32>, String> {
-    let mut ids: Vec<u32> = rpc
-        .call(
-            "get_chat_media",
-            (account_id, Some(chat_id), first, second, third),
-        )
-        .await
-        .map_err(|err| err.to_string())?;
-    ids.reverse();
-    Ok(ids)
+    rpc.call(
+        "get_chat_media",
+        (account_id, Some(chat_id), first, second, third),
+    )
+    .await
+    .map_err(|err| err.to_string())
 }
 
 #[cfg(test)]

@@ -3,8 +3,9 @@
 //!
 //! Headless vs stub Silica, recording double; group seeded with picture (10) and video (15),
 //! two more pictures arriving (first with its events lost). Swipe = list's current index moved,
-//! as flick snapping does. Checks: tapped one shown alone until list has it, then list placed
-//! there; video plays only on screen and once page in place; zoomed picture holds list still;
+//! as flick snapping does, or real flick watched while it runs. Checks: tapped one shown alone
+//! until list has it, then list placed there; video plays only on screen, once swipe over and
+//! page in place, keeps file till swipe over; zoomed picture holds list still;
 //! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
 //! slide not rebuilt); message not in gallery stays alone.
 
@@ -28,6 +29,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
+        id: probe
         Loader { id: loader }
         function load(url, messageId, viewType, file, newestFirst, status) {
             loader.setSource('', {})
@@ -67,15 +69,15 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function list(property) { return '' + slides()[property] }
-        /// Swipe: list's current moves, as snapping on a flick does.
+        /// Swipe, landed: list's current moves, view with it, as snapping on a flick does.
         function swipeTo(index) {
             slides().currentIndex = index
+            slides().positionViewAtIndex(index, ListView.SnapPosition)
             return 'ok'
         }
-        /// Swipe by rows: + toward older.
+        /// Swipe by rows: + rightward.
         function swipeBy(rows) {
-            slides().currentIndex = slides().currentIndex + rows
-            return 'ok'
+            return swipeTo(slides().currentIndex + rows)
         }
         function get(name, property) {
             var item = findIn(loader.item, name)
@@ -106,6 +108,49 @@ const PROBE_QML: &str = r"
             view.toggleZoom(100, 100)
             return '' + view.zoomed
         }
+        /// Real swipe: list flicked, snaps a slide on. Watched every few ms while it moves:
+        /// what was current, whether video 15 played or lost its file before it settled.
+        property bool watching: false
+        property bool sawMoving: false
+        property int movingCurrent: -1
+        property bool playedMidSwipe: false
+        property bool droppedMidSwipe: false
+        function videoPlayer() {
+            var slide = findIn(slides(), 'slide15')
+            return slide ? findIn(slide, 'player') : null
+        }
+        function flickBy(velocity) {
+            sawMoving = false
+            movingCurrent = -1
+            playedMidSwipe = false
+            droppedMidSwipe = false
+            watching = true
+            // Headless Qt 5.15 won't flick() a SnapOneItem list at all; per-item snap moves
+            // alike (two slides: lands one over). Motion is what's under test.
+            slides().snapMode = ListView.SnapToItem
+            slides().flick(velocity, 0)
+            return 'ok'
+        }
+        function watched(property) { return '' + probe[property] }
+        Timer {
+            interval: 5
+            repeat: true
+            running: probe.watching
+            onTriggered: {
+                var list = slides()
+                if (!list.moving) {
+                    if (probe.sawMoving) { probe.watching = false }
+                    return
+                }
+                probe.sawMoving = true
+                if (list.currentItem) { probe.movingCurrent = list.currentItem.messageId }
+                var player = videoPlayer()
+                if (player && player.playbackState === 1) { probe.playedMidSwipe = true }
+                if (player && ('' + player.source).length === 0) {
+                    probe.droppedMidSwipe = true
+                }
+            }
+        }
         function media() { return findIn(loader.item, 'media') }
         /// Core dropped events: model starts over.
         function overflow() {
@@ -132,7 +177,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_FAKE_MEDIA", "1");
         // First unannounced: only restart finds it. Second while reader on grid's picture.
-        std::env::set_var("PIIRIT_FAKE_PICTURES", "1500:quiet,4500");
+        std::env::set_var("PIIRIT_FAKE_PICTURES", "5500:quiet,7500");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
 
@@ -209,8 +254,12 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("chat-placed", call!("page", s!("placed")));
         record!("chat-seed-gone", call!("get", s!("seed"), s!("active")));
         record!("chat-count", call!("list", s!("count")));
-        // Qt.RightToLeft: index 0 (newest) rightmost.
-        record!("chat-direction", call!("list", s!("layoutDirection")));
+        // Always left to right: right-to-left list broke back transition.
+        record!(
+            "chat-direction",
+            call!("list", s!("effectiveLayoutDirection"))
+        );
+        // Oldest first, as in chat: picture 10 leftmost, video 15 right of it.
         record!("chat-index", call!("list", s!("currentIndex")));
         record!("chat-current", call!("current", s!(""), s!("messageId")));
         record!(
@@ -222,7 +271,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             call!("current", s!("pictureView"), s!("previewWidth"))
         );
         // Swipe to newer: the video, playing.
-        record!("swipe-newer", call!("swipeTo", 0));
+        record!("swipe-newer", call!("swipeTo", 1));
         record!("shown-after-swipe", call!("page", s!("shownId")));
         record!("video-file", call!("current", s!("player"), s!("source")));
         record!(
@@ -234,7 +283,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             call!("onSlide", 10, s!("pictureView"), s!("active"))
         );
         // Back: video stops, lets go of file.
-        record!("swipe-back", call!("swipeTo", 1));
+        record!("swipe-back", call!("swipeTo", 0));
         record!(
             "video-left-state",
             call!("onSlide", 15, s!("player"), s!("playbackState"))
@@ -248,17 +297,50 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("zoomed-swipeable", call!("list", s!("interactive")));
         record!("zoom-out", call!("zoomCurrent"));
         record!("fitted-swipeable", call!("list", s!("interactive")));
-        // Model starts over, finds unannounced picture: rows below shift by one.
-        record!("overflow", call!("overflow"));
+        // Finger flicks on to the video: nothing starts while list moves.
+        record!("flick-on", call!("flickBy", -2000.0));
     });
 
-    let page = gallery.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
-        record!("restart-current", call!("current", s!(""), s!("messageId")));
-        record!("restart-shown", call!("page", s!("shownId")));
-        record!("restart-index", call!("list", s!("currentIndex")));
-        // From grid (newest first, unannounced picture above): video 15 tapped, page still
-        // arriving.
+        record!("flick-on-moved", call!("watched", s!("sawMoving")));
+        record!("flick-on-current", call!("watched", s!("movingCurrent")));
+        record!("flick-on-played", call!("watched", s!("playedMidSwipe")));
+        record!("flick-on-at", call!("current", s!(""), s!("messageId")));
+        record!(
+            "flick-on-settled",
+            call!("current", s!("player"), s!("playbackState"))
+        );
+        record!(
+            "flick-on-poster",
+            call!("current", s!("poster"), s!("visible"))
+        );
+        // And off again: video paused, keeps file till list stops.
+        record!("flick-off", call!("flickBy", 2000.0));
+    });
+
+    single_shot(Duration::from_secs(4), move || unsafe {
+        record!("flick-off-moved", call!("watched", s!("sawMoving")));
+        record!("flick-off-played", call!("watched", s!("playedMidSwipe")));
+        record!("flick-off-dropped", call!("watched", s!("droppedMidSwipe")));
+        record!("flick-off-at", call!("current", s!(""), s!("messageId")));
+        record!(
+            "flick-off-state",
+            call!("onSlide", 15, s!("player"), s!("playbackState"))
+        );
+        record!(
+            "flick-off-file",
+            call!("onSlide", 15, s!("player"), s!("source"))
+        );
+        // Player let go: platform's still frame stands in, not black.
+        record!(
+            "flick-off-poster",
+            call!("onSlide", 15, s!("poster"), s!("source"))
+        );
+    });
+
+    // From grid (newest first): video 15 tapped, page still arriving.
+    let page = gallery.clone();
+    single_shot(Duration::from_secs(5), move || unsafe {
         record!(
             "load-grid",
             call!(
@@ -277,9 +359,8 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    single_shot(Duration::from_secs(6), move || unsafe {
         record!("grid-placed", call!("page", s!("placed")));
-        record!("grid-direction", call!("list", s!("layoutDirection")));
         record!("grid-index", call!("list", s!("currentIndex")));
         record!(
             "grid-video-arriving",
@@ -290,15 +371,23 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "grid-video-arrived",
             call!("current", s!("player"), s!("playbackState"))
         );
-        // Older: the picture; zoomed, then the video deleted, a picture arrives.
+        // Older: the picture. Model starts over, finds unannounced picture above.
         record!("grid-swipe", call!("swipeBy", 1));
+        record!("overflow", call!("overflow"));
+    });
+
+    single_shot(Duration::from_secs(7), move || unsafe {
+        record!("restart-current", call!("current", s!(""), s!("messageId")));
+        record!("restart-shown", call!("page", s!("shownId")));
+        record!("restart-index", call!("list", s!("currentIndex")));
+        // Zoomed, then the video deleted, a picture arrives.
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
     });
 
     let page = gallery.clone();
     let gallery_again = gallery;
-    single_shot(Duration::from_secs(5), move || unsafe {
+    single_shot(Duration::from_secs(8), move || unsafe {
         record!("after-delete-count", call!("list", s!("count")));
         record!("after-delete-index", call!("list", s!("currentIndex")));
         record!(
@@ -325,7 +414,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     });
 
     let page = gallery_again;
-    single_shot(Duration::from_secs(6), move || unsafe {
+    single_shot(Duration::from_secs(9), move || unsafe {
         record!("sticker-placed", call!("page", s!("placed")));
         record!(
             "sticker-seed",
@@ -371,10 +460,12 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         "load-chat",
         "swipe-newer",
         "swipe-back",
-        "overflow",
+        "flick-on",
+        "flick-off",
         "load-grid",
         "arrived",
         "grid-swipe",
+        "overflow",
         "delete-video",
         "load-sticker",
         "load-lone-video",
@@ -414,14 +505,15 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "chat-direction",
-            "1",
-            "from the conversation, newer is not to the right as it is \
-             below in the chat",
+            "0",
+            "the gallery is laid out right to left, which breaks the page's \
+             back transition into the chat",
         ),
         (
             "chat-index",
-            "1",
-            "the gallery did not open at the tapped picture",
+            "0",
+            "from the conversation, the oldest picture is not leftmost, as \
+             it is topmost in the chat",
         ),
         (
             "chat-current",
@@ -480,21 +572,72 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "true",
             "the gallery cannot be swiped after zooming out",
         ),
-        // Restart: back where reader was.
+        // Real flick on: video current mid-swipe, but starts only once list still.
         (
-            "restart-current",
+            "flick-on-moved",
+            "true",
+            "the flick did not move the gallery",
+        ),
+        (
+            "flick-on-current",
+            "15",
+            "the video never became current while the flick ran",
+        ),
+        (
+            "flick-on-played",
+            "false",
+            "the video started while the swipe was still running (its \
+             pipeline setup stalls the swipe)",
+        ),
+        ("flick-on-at", "15", "the flick did not land on the video"),
+        (
+            "flick-on-settled",
+            "1",
+            "the video did not play once the swipe was over",
+        ),
+        // Flick off: paused, file kept till still; then let go.
+        (
+            "flick-off-moved",
+            "true",
+            "the flick back did not move the gallery",
+        ),
+        (
+            "flick-off-played",
+            "false",
+            "the video kept playing while swiped away",
+        ),
+        (
+            "flick-off-dropped",
+            "false",
+            "the video let go of its file while the swipe was still running \
+             (pipeline teardown stalls the swipe)",
+        ),
+        (
+            "flick-off-at",
             "10",
-            "the gallery jumped to the newest picture when its list was \
-             read again",
+            "the flick back did not land on the picture",
         ),
-        ("restart-shown", "10", "the page forgot what was on screen"),
         (
-            "restart-index",
-            "2",
-            "after the reread the reader's picture is not where the list \
-             holds it",
+            "flick-off-state",
+            "0",
+            "the video swiped away from was not stopped once the swipe was over",
         ),
-        // From grid: grid's order, at tapped video; plays once page in place.
+        (
+            "flick-off-file",
+            "",
+            "the video swiped away from kept its file once the swipe was over",
+        ),
+        (
+            "flick-off-poster",
+            "file:///tmp/piirit-fake/clip.mp4",
+            "the video swiped away from shows black, not its still frame",
+        ),
+        (
+            "flick-on-poster",
+            "false",
+            "the still frame covers the playing video",
+        ),
+        // From grid: grid's order (newest left), at tapped video; plays once page in place.
         (
             "grid-seed-state",
             "false",
@@ -506,15 +649,10 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "the gallery from the grid never took over",
         ),
         (
-            "grid-direction",
-            "0",
-            "from the grid, the gallery is not in the grid's order, \
-             newest first",
-        ),
-        (
             "grid-index",
-            "1",
-            "the gallery from the grid did not open at the tapped video",
+            "0",
+            "from the grid, the gallery is not in the grid's order, newest \
+             first",
         ),
         (
             "grid-video-arriving",
@@ -525,6 +663,20 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "grid-video-arrived",
             "1",
             "the video did not play once the page was in place",
+        ),
+        // Restart: back where reader was.
+        (
+            "restart-current",
+            "10",
+            "the gallery jumped to another picture when its list was read \
+             again",
+        ),
+        ("restart-shown", "10", "the page forgot what was on screen"),
+        (
+            "restart-index",
+            "2",
+            "after the reread the reader's picture is not where the list \
+             holds it",
         ),
         ("grid-zoom", "true", "the picture did not zoom in"),
         // Delete and arrival elsewhere: same picture, still zoomed (slide not rebuilt).

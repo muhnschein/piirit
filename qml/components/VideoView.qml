@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
+import Nemo.Thumbnailer 1.0
 import "."
 
 /*
@@ -13,9 +14,13 @@ Item {
     /// File, encoded (AttachmentPreview.fileUrl).
     property url fileUrl
     property string fileName
-    /// Slide on screen, page in place. Off: no file in player (no decoder per neighbour),
-    /// so swiping away stops, back starts over.
+    property string mimeType: "video/mp4"
+    /// Plays: slide on screen, swipe over, page in place. Off: paused (cheap; mid-swipe).
     property bool active: true
+    /// Player keeps file. Off: stopped, file out (no decoder per neighbour; swiping back
+    /// starts over). Gallery drops it only once swipe over: pipeline teardown and setup
+    /// are main-thread work that stalled the swipe's frames.
+    property bool kept: true
 
     /// `MediaPlayer.PlayingState` value: enum lives on type; headless QtMultimedia stub can't
     /// declare one on Qt 5.6. See AttachmentPreview.
@@ -49,11 +54,16 @@ Item {
         objectName: "player"
     }
 
-    /// Active: file in, playing. Off: stopped, file out.
+    /// Active: file in, playing. Kept only: paused. Neither: stopped, file out.
     function follow() {
-        if (root.active && String(root.fileUrl).length > 0) {
-            player.source = root.fileUrl
+        var file = String(root.fileUrl)
+        if (root.active && file.length > 0) {
+            if (String(player.source) !== file) {
+                player.source = root.fileUrl
+            }
             player.play()
+        } else if (root.kept && String(player.source).length > 0) {
+            player.pause()
         } else {
             player.stop()
             player.source = ""
@@ -76,6 +86,7 @@ Item {
 
     // Plays on open (file set at creation counts), on swipe to; stops on swipe away.
     onActiveChanged: root.follow()
+    onKeptChanged: root.follow()
     onFileUrlChanged: root.follow()
 
     // Stop on way out: no decoder for gone slide.
@@ -104,7 +115,22 @@ Item {
             }
         }
 
+        // Platform thumbnailer's frame (grid's, cached) until player has file: swipe shows
+        // video, not black.
+        Thumbnail {
+            objectName: "poster"
+            anchors.fill: videoOutput
+            visible: String(player.source).length === 0
+            sourceSize.width: width
+            sourceSize.height: height
+            // Whole frame, as player draws it.
+            fillMode: Thumbnail.PreserveAspectFit
+            mimeType: root.mimeType
+            source: visible ? root.fileUrl : ""
+        }
+
         VideoOutput {
+            id: videoOutput
             objectName: "videoOutput"
             anchors {
                 left: parent.left
