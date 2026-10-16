@@ -14,7 +14,7 @@
 #                   (scripts/build-in-container.sh)
 #   --podman, --docker  engine to use; default: Docker if running, else Podman
 #
-# Needs git, curl, sha256sum, Podman or Docker. First run: ~2.3 GB pull, ~30
+# Needs git, curl, unzip, sha256sum, Podman or Docker. First run: ~2.3 GB pull, ~30
 # min build. Builds in a fresh clone under PIIRIT_WORKDIR, never in this tree;
 # needs ~1 GB free there (checks for 2).
 #
@@ -138,6 +138,34 @@ if [ ! -f "$src/scripts/build-in-container.sh" ]; then
          "different packaging"
     cp "$here/scripts/build-in-container.sh" "$here/scripts/container-engine.sh" "$src/scripts/"
     cp "$here/ci/build-sdk-image.sh" "$src/ci/"
+    # Its fetch-rpc-server.sh needs pip, lacks --check: this tree's, with its
+    # pins (VERSION, TABLE).
+    old="$src/scripts/fetch-rpc-server.sh"
+    awk -v old="$old" '
+        BEGIN {
+            while ((getline l < old) > 0) {
+                if (l ~ /^VERSION=/) ver = l
+                if (l ~ /^TABLE="/) intab = 1
+                if (intab) tab = tab l "\n"
+                if (intab && l == "\"") intab = 0
+            }
+        }
+        /^VERSION=/ { print ver; next }
+        /^TABLE="/ { printf "%s", tab; skip = 1; next }
+        skip { if ($0 == "\"") skip = 0; next }
+        { print }
+    ' "$here/scripts/fetch-rpc-server.sh" > "$work/fetch-rpc-server.sh" ||
+        fail "can't carry $ref's deltachat-rpc-server pins over"
+    mv "$work/fetch-rpc-server.sh" "$old"
+    # Build tooling, not packaged: hide from the uncommitted-changes warning.
+    for f in scripts/build-in-container.sh scripts/container-engine.sh \
+             ci/build-sdk-image.sh scripts/fetch-rpc-server.sh; do
+        if git -C "$src" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+            git -C "$src" update-index --assume-unchanged "$f"
+        else
+            echo "/$f" >> "$src/.git/info/exclude"
+        fi
+    done
     [ -n "$upstream_sdk" ] || [ -f "$src/ci/sdk-images" ] ||
         PIIRIT_SDK_IMAGE=${PIIRIT_SDK_IMAGE:-$legacy_image}
     export PIIRIT_SDK_IMAGE
