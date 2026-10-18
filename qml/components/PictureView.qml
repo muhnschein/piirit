@@ -46,6 +46,9 @@ Item {
     /// Zoomed in: pans, so swiping viewer leaves drags to it.
     readonly property bool zoomed: root.zoom > 1
 
+    /// Pull-down menu out: header over it steps aside.
+    readonly property bool pulled: menu.active
+
     /// Fitted width. View width until decoded (no divide by zero).
     readonly property real fittedWidth: {
         if (root.measured.implicitWidth <= 0 || root.measured.implicitHeight <= 0) {
@@ -145,6 +148,8 @@ Item {
         clip: true
 
         PullDownMenu {
+            id: menu
+            objectName: "pictureMenu"
             MenuItem {
                 objectName: "openExternally"
                 //: Hands the attachment to whatever else on the phone

@@ -7,7 +7,9 @@
 //! until list has it, then list placed there; video plays only on screen, once swipe over and
 //! page in place, keeps file till swipe over; zoomed picture holds list still;
 //! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
-//! slide not rebuilt); message not in gallery stays alone.
+//! slide not rebuilt); slide far off built only once on screen or list still; list clipped (Back
+//! slides page out over chat); header: Back, "x of y", day sent; message not in gallery stays
+//! alone.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -31,6 +33,34 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
         Loader { id: loader }
+        /// Silica's, as page finds it: pops counted, not done.
+        property QtObject pageStack: QtObject {
+            property int pops: 0
+            function pop() { pops += 1 }
+        }
+        function tapBack() {
+            var button = findIn(loader.item, 'backButton')
+            if (!button) { return 'missing:backButton' }
+            button.clicked()
+            return '' + probe.pageStack.pops
+        }
+        /// See-through: neither solid nor invisible.
+        function headerAlpha() {
+            var alpha = findIn(loader.item, 'header').color.a
+            return alpha > 0.2 && alpha < 0.9 ? 'see-through' : '' + alpha
+        }
+        /// Fake core's send time of every message but the first, in phone's short format.
+        function sentDay() {
+            return Qt.formatDate(new Date(1700090000 * 1000), Qt.DefaultLocaleShortDate)
+        }
+        /// Pull-down menu on picture now on screen out or in; header shown then?
+        function pullCurrent(out) {
+            var slide = slides().currentItem
+            var menu = findIn(slide, 'pictureMenu') || findIn(slide, 'videoMenu')
+            if (!menu) { return 'missing:menu' }
+            menu.active = out
+            return '' + findIn(loader.item, 'header').visible
+        }
         function load(url, messageId, viewType, file, newestFirst, status) {
             loader.setSource('', {})
             loader.setSource(url, {
@@ -115,6 +145,44 @@ const PROBE_QML: &str = r"
         property int movingCurrent: -1
         property bool playedMidSwipe: false
         property bool droppedMidSwipe: false
+        /// Slide two over, watched: built only once list still or on screen.
+        property string farName: ''
+        property bool farSeenOffScreen: false
+        property bool farBuiltOffScreen: false
+        property bool farSeenOnScreen: false
+        property bool farUnbuiltOnScreen: false
+        function onScreen(list, item) {
+            return item.x < list.contentX + list.width && item.x + item.width > list.contentX
+        }
+        function slideState(messageId) {
+            var slide = findIn(slides(), 'slide' + messageId)
+            if (!slide) { return 'none' }
+            return findIn(slide, 'pictureView') || findIn(slide, 'videoView') ? 'built' : 'empty'
+        }
+        function atStart() {
+            var list = slides()
+            return '' + (!list.moving && Math.round(list.contentX) === Math.round(list.originX))
+        }
+        function flickFar(velocity, name) {
+            farName = name
+            farSeenOffScreen = false
+            farBuiltOffScreen = false
+            farSeenOnScreen = false
+            farUnbuiltOnScreen = false
+            sawMoving = false
+            watching = true
+            // Snapping flick aims at slides laid out at its start, re-aimed as more appear:
+            // headless, landing hung on frame timing. Plain flick runs to list's start every
+            // time; current stays put (no matter: building under test, not current).
+            var list = slides()
+            list.highlightRangeMode = ListView.NoHighlightRange
+            list.snapMode = ListView.NoSnap
+            list.maximumFlickVelocity = velocity
+            // Brisk: stopped well inside the second between checks.
+            list.flickDeceleration = 6000
+            list.flick(velocity, 0)
+            return 'ok'
+        }
         function videoPlayer() {
             var slide = findIn(slides(), 'slide15')
             return slide ? findIn(slide, 'player') : null
@@ -149,6 +217,17 @@ const PROBE_QML: &str = r"
                 if (player && ('' + player.source).length === 0) {
                     probe.droppedMidSwipe = true
                 }
+                var far = probe.farName.length > 0 ? findIn(list, probe.farName) : null
+                if (far) {
+                    var built = findIn(far, 'pictureView') !== null
+                    if (onScreen(list, far)) {
+                        probe.farSeenOnScreen = true
+                        if (!built) { probe.farUnbuiltOnScreen = true }
+                    } else {
+                        probe.farSeenOffScreen = true
+                        if (built) { probe.farBuiltOffScreen = true }
+                    }
+                }
             }
         }
         function media() { return findIn(loader.item, 'media') }
@@ -176,8 +255,17 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_FAKE_MEDIA", "1");
-        // First unannounced: only restart finds it. Second while reader on grid's picture.
-        std::env::set_var("PIIRIT_FAKE_PICTURES", "5500:quiet,7500");
+        // First unannounced: only restart finds it. Three more while reader on grid's picture.
+        // Counted from here, not from fake's start (which lags by a varying while).
+        std::env::set_var("PIIRIT_FAKE_PICTURES", "5500:quiet,7300,7400,7500");
+        std::env::set_var(
+            "PIIRIT_FAKE_EPOCH_MS",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("clock after 1970")
+                .as_millis()
+                .to_string(),
+        );
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
 
@@ -270,9 +358,31 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "chat-current-preview",
             call!("current", s!("pictureView"), s!("previewWidth"))
         );
+        // Neighbours beside screen don't draw over what's under page as it slides out.
+        record!("chat-clipped", call!("list", s!("clip")));
+        // Neighbour built while list still: ready before swiped to.
+        record!("neighbour-built", call!("slideState", 15));
+        // Header: Back, place, day sent. Silica's own corner indicator off.
+        record!("header-see-through", call!("headerAlpha"));
+        record!("header-back", call!("get", s!("backLabel"), s!("text")));
+        record!("header-place", call!("get", s!("position"), s!("text")));
+        record!("header-day", call!("get", s!("sentDate"), s!("text")));
+        record!("header-day-expected", call!("sentDay"));
+        record!("silica-back", call!("page", s!("backNavigation")));
+        record!("pulled-header", call!("pullCurrent", true));
+        record!("pushed-header", call!("pullCurrent", false));
+        record!("back-tapped", call!("tapBack"));
         // Swipe to newer: the video, playing.
         record!("swipe-newer", call!("swipeTo", 1));
         record!("shown-after-swipe", call!("page", s!("shownId")));
+        record!(
+            "header-place-swiped",
+            call!("get", s!("position"), s!("text"))
+        );
+        record!("video-inset", call!("current", s!("notice"), s!("y")));
+        record!("video-pulled-header", call!("pullCurrent", true));
+        record!("video-pushed-header", call!("pullCurrent", false));
+        record!("header-height", call!("get", s!("header"), s!("height")));
         record!("video-file", call!("current", s!("player"), s!("source")));
         record!(
             "video-state",
@@ -362,6 +472,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("grid-placed", call!("page", s!("placed")));
         record!("grid-index", call!("list", s!("currentIndex")));
+        record!("grid-place", call!("get", s!("position"), s!("text")));
         record!(
             "grid-video-arriving",
             call!("current", s!("player"), s!("playbackState"))
@@ -380,13 +491,12 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("restart-current", call!("current", s!(""), s!("messageId")));
         record!("restart-shown", call!("page", s!("shownId")));
         record!("restart-index", call!("list", s!("currentIndex")));
+        record!("restart-place", call!("get", s!("position"), s!("text")));
         // Zoomed, then the video deleted, a picture arrives.
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
     });
 
-    let page = gallery.clone();
-    let gallery_again = gallery;
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("after-delete-count", call!("list", s!("count")));
         record!("after-delete-index", call!("list", s!("currentIndex")));
@@ -398,6 +508,34 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "after-delete-zoomed",
             call!("current", s!("pictureView"), s!("zoomed"))
         );
+        // Out again; flick toward newest, about a slide and a third: slide three over enters
+        // cache as list moves, stays off screen.
+        record!("unzoom", call!("zoomCurrent"));
+        record!("near-before", call!("slideState", 103));
+        record!("flick-near", call!("flickFar", 2900.0, s!("slide103")));
+    });
+
+    single_shot(Duration::from_secs(9), move || unsafe {
+        record!("near-moved", call!("watched", s!("sawMoving")));
+        record!("near-seen-off", call!("watched", s!("farSeenOffScreen")));
+        record!("near-built-off", call!("watched", s!("farBuiltOffScreen")));
+        record!("near-seen-on", call!("watched", s!("farSeenOnScreen")));
+        record!("near-after", call!("slideState", 103));
+        // On to newest: slide there enters cache mid-flick, then comes on screen.
+        record!("far-before", call!("slideState", 104));
+        record!("flick-far", call!("flickFar", 8000.0, s!("slide104")));
+    });
+
+    let page = gallery.clone();
+    let gallery_again = gallery;
+    single_shot(Duration::from_secs(10), move || unsafe {
+        record!("far-moved", call!("watched", s!("sawMoving")));
+        record!("far-seen-off", call!("watched", s!("farSeenOffScreen")));
+        record!("far-built-off", call!("watched", s!("farBuiltOffScreen")));
+        record!("far-seen-on", call!("watched", s!("farSeenOnScreen")));
+        record!("far-unbuilt-on", call!("watched", s!("farUnbuiltOnScreen")));
+        record!("far-at-start", call!("atStart"));
+        record!("far-after", call!("slideState", 104));
         // Not in gallery (sticker): alone, nothing to swipe.
         record!(
             "load-sticker",
@@ -414,13 +552,16 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     });
 
     let page = gallery_again;
-    single_shot(Duration::from_secs(9), move || unsafe {
+    single_shot(Duration::from_secs(11), move || unsafe {
         record!("sticker-placed", call!("page", s!("placed")));
         record!(
             "sticker-seed",
             call!("get", s!("seedPicture"), s!("fileUrl"))
         );
         record!("sticker-list", call!("list", s!("visible")));
+        record!("sticker-place", call!("get", s!("position"), s!("text")));
+        record!("sticker-day", call!("get", s!("sentDate"), s!("text")));
+        record!("sticker-back", call!("get", s!("backLabel"), s!("text")));
         // Video not in gallery (deleted above), page in place: plays alone, at once.
         record!(
             "load-lone-video",
@@ -435,6 +576,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             )
         );
         record!("lone-video", call!("get", s!("seedVideo"), s!("playing")));
+        record!("lone-video-inset", call!("get", s!("notice"), s!("y")));
         (*engine_ptr).quit();
     });
 
@@ -467,6 +609,8 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         "grid-swipe",
         "overflow",
         "delete-video",
+        "flick-near",
+        "flick-far",
         "load-sticker",
         "load-lone-video",
     ] {
@@ -493,6 +637,67 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         // Then list, at tapped one, whole gallery.
         ("chat-placed", "true", "the gallery never took over"),
+        // Back: page slides out over chat, nothing of gallery beside it.
+        (
+            "chat-clipped",
+            "true",
+            "the slides beside the screen are drawn outside it: on Back the \
+             neighbouring picture slides in over the chat, then cuts",
+        ),
+        // Header: Back left, place and day right, see-through.
+        (
+            "header-see-through",
+            "see-through",
+            "the header is not a see-through band over the picture",
+        ),
+        ("header-back", "Back", "the header has no Back on the left"),
+        (
+            "header-place",
+            "1 of 2",
+            "the header does not say where the picture is among the chat's",
+        ),
+        (
+            "silica-back",
+            "false",
+            "Silica's own back indicator still sits under the header's Back",
+        ),
+        (
+            "pulled-header",
+            "false",
+            "the header covers the picture's pull-down menu",
+        ),
+        (
+            "pushed-header",
+            "true",
+            "the header did not come back once the pull-down menu closed",
+        ),
+        ("back-tapped", "1", "tapping Back did not go back"),
+        (
+            "header-place-swiped",
+            "2 of 2",
+            "the header's place did not follow the swipe",
+        ),
+        (
+            "video-inset",
+            "120",
+            "the video and its notices start under the header, not below it",
+        ),
+        (
+            "video-pulled-header",
+            "false",
+            "the header covers the video's pull-down menu",
+        ),
+        (
+            "video-pushed-header",
+            "true",
+            "the header did not come back once the video's menu closed",
+        ),
+        (
+            "neighbour-built",
+            "built",
+            "the slide beside the tapped one was not built while the list \
+             stood still, so it is built mid-swipe",
+        ),
         (
             "chat-seed-gone",
             "false",
@@ -655,6 +860,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
              first",
         ),
         (
+            "grid-place",
+            "1 of 2",
+            "from the grid, the header's place is not the grid's order",
+        ),
+        (
             "grid-video-arriving",
             "0",
             "the video played during the page transition",
@@ -673,6 +883,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         ("restart-shown", "10", "the page forgot what was on screen"),
         (
+            "restart-place",
+            "3 of 3",
+            "the header's place did not count the picture the reread found",
+        ),
+        (
             "restart-index",
             "2",
             "after the reread the reader's picture is not where the list \
@@ -682,12 +897,12 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         // Delete and arrival elsewhere: same picture, still zoomed (slide not rebuilt).
         (
             "after-delete-count",
-            "3",
-            "the gallery did not lose the deleted video and gain the new picture",
+            "5",
+            "the gallery did not lose the deleted video and gain the new pictures",
         ),
         (
             "after-delete-index",
-            "2",
+            "4",
             "the reader's picture is not where the list now holds it",
         ),
         (
@@ -700,6 +915,83 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "true",
             "deleting or receiving another message rebuilt the reader's \
              slide and threw away their zoom",
+        ),
+        // Flicks: slide far off built only once list still, or on screen.
+        ("unzoom", "false", "the picture did not zoom out"),
+        (
+            "near-before",
+            "none",
+            "the slide three over already existed, so the flick tests nothing",
+        ),
+        (
+            "near-moved",
+            "true",
+            "the short flick did not move the gallery",
+        ),
+        (
+            "near-seen-off",
+            "true",
+            "the slide three over never came into the list mid-flick, so the \
+             flick tests nothing",
+        ),
+        (
+            "near-built-off",
+            "false",
+            "a slide off screen was built while the list still moved (its \
+             decode and upload drop the swipe's last frames)",
+        ),
+        (
+            "near-seen-on",
+            "false",
+            "the short flick went further than meant, so it tests nothing",
+        ),
+        (
+            "near-after",
+            "built",
+            "a slide that came into the list mid-swipe was not built once the \
+             list stopped, so it is built as it is swiped to",
+        ),
+        (
+            "far-before",
+            "none",
+            "the newest slide already existed, so the long flick tests nothing",
+        ),
+        (
+            "far-moved",
+            "true",
+            "the long flick did not move the gallery",
+        ),
+        (
+            "far-seen-off",
+            "true",
+            "the newest slide never came into the list off screen mid-flick, \
+             so the flick tests nothing",
+        ),
+        (
+            "far-built-off",
+            "false",
+            "a slide off screen was built while the list still moved (its \
+             decode and upload drop the swipe's last frames)",
+        ),
+        (
+            "far-seen-on",
+            "true",
+            "the long flick never brought the far slide on screen",
+        ),
+        (
+            "far-unbuilt-on",
+            "false",
+            "a slide swiped onto the screen was left empty until the list stopped",
+        ),
+        (
+            "far-at-start",
+            "true",
+            "the long flick did not run to the newest picture",
+        ),
+        (
+            "far-after",
+            "built",
+            "the slide was not built once the list stopped",
         ),
         // Not in gallery: alone.
         (
@@ -719,13 +1011,41 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "a message the gallery does not hold was put among the gallery's",
         ),
         (
+            "sticker-place",
+            "",
+            "a message the gallery does not hold got a place in it",
+        ),
+        (
+            "sticker-day",
+            "",
+            "a message the gallery does not hold got a day from another",
+        ),
+        ("sticker-back", "Back", "a lone picture has no Back"),
+        (
             "lone-video",
             "true",
             "a video opened on a page already in place did not play",
         ),
+        (
+            "lone-video-inset",
+            "120",
+            "a lone video starts under the header, not below it",
+        ),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
+
+    // Day sent, phone's short format.
+    assert!(
+        !value("header-day-expected").is_empty(),
+        "the probe could not format the day. {context}"
+    );
+    assert_eq!(
+        value("header-day"),
+        value("header-day-expected"),
+        "the header does not give the day the picture was sent, in the \
+         phone's date format. {context}"
+    );
 
     // Gallery read from core, chat's pictures, GIFs, videos.
     assert!(

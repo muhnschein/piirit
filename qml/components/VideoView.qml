@@ -21,6 +21,10 @@ Item {
     /// starts over). Gallery drops it only once swipe over: pipeline teardown and setup
     /// are main-thread work that stalled the swipe's frames.
     property bool kept: true
+    /// Top band something lies over (GalleryPage's header): video and notice start below it.
+    property real topInset: 0
+    /// Pull-down menu out: header over it steps aside.
+    readonly property bool pulled: menu.active
 
     /// `MediaPlayer.PlayingState` value: enum lives on type; headless QtMultimedia stub can't
     /// declare one on Qt 5.6. See AttachmentPreview.
@@ -99,6 +103,8 @@ Item {
         contentHeight: height
 
         PullDownMenu {
+            id: menu
+            objectName: "videoMenu"
             MenuItem {
                 objectName: "openExternally"
                 //: Hands the attachment to whatever else on the phone
@@ -160,6 +166,7 @@ Item {
                 left: parent.left
                 right: parent.right
                 top: parent.top
+                topMargin: root.topInset
             }
             onDismissed: notice.text = ""
         }

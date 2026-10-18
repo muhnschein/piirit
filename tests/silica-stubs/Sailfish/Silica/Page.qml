@@ -9,7 +9,7 @@ Item {
     property bool canNavigateForward: false
     property int allowedOrientations: 1
     property int orientation
-    property string backNavigation
+    property bool backNavigation: true
     width: 540
     height: 960
 }

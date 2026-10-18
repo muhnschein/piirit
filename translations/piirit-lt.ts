@@ -1057,6 +1057,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>GalleryPage</name>
+    <message>
+        <source>Back</source>
+        <extracomment>Top left of the full-screen picture and video viewer: back to the chat or the gallery it was opened from.</extracomment>
+        <translation>Atgal</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
+        <translation>%1 iš %2</translation>
+    </message>
+</context>
+<context>
     <name>GroupPage</name>
     <message>
         <source>Saved</source>

@@ -6,6 +6,7 @@ import Piirit 1.0
 
 /*
  * Chat's pictures and videos, one per screen, swiped: from conversation row or gallery tile.
+ * Header over it: Back, where in gallery ("3 of 12"), day sent.
  * All of chat's gallery (ChatMedia "gallery": pictures, GIFs, videos; no stickers), not only
  * rows loaded.
  *
@@ -33,6 +34,10 @@ Page {
     property real previewWidth: 0
     /// Grid order (newest left); else conversation's (oldest left).
     property bool newestFirst: false
+
+    // Header's Back is way out: list takes edge swipe; Silica's corner indicator sat under
+    // header's Back.
+    backNavigation: false
 
     /// Page in place (transition over, or none); decodes, video wait. See PictureView.
     property bool settled: false
@@ -105,6 +110,9 @@ Page {
         objectName: "slides"
         anchors.fill: parent
         visible: page.placed
+        // Neighbours lie beside screen: unclipped, left one drew over chat as page slid out on
+        // Back (slide, then cut).
+        clip: true
         model: media.rows
         orientation: ListView.Horizontal
         snapMode: ListView.SnapOneItem
@@ -139,6 +147,31 @@ Page {
             /// Video keeps its file: on screen, or swipe still running (teardown waits).
             readonly property bool kept: slide.ListView.isCurrentItem || slides.moving
             readonly property bool zoomed: shown.item !== null && shown.item.zoomed === true
+            readonly property bool pulled: shown.item !== null && shown.item.pulled === true
+            /// Send time, s; 0 until row read.
+            readonly property real timestamp: model.loaded ? model.timestamp : 0
+
+            /// Content built. Slide two over enters cache as swipe starts; building it then
+            /// (decode, texture upload) landed in swipe's last frames (lag as it eased off).
+            /// So: once list still, or on screen, or tapped one. Kept once built.
+            property bool built: false
+            function build(placed) {
+                if (slide.built) {
+                    return
+                }
+                var onScreen = placed && slide.x < slides.contentX + slides.width
+                               && slide.x + slide.width > slides.contentX
+                if (slide.isTapped || !slides.moving || onScreen) {
+                    slide.built = true
+                }
+            }
+            // Not yet placed at completion (x 0 until list lays it out): screen check later.
+            Component.onCompleted: slide.build(false)
+            Connections {
+                target: slides
+                onMovingChanged: slide.build(true)
+                onContentXChanged: slide.build(true)
+            }
             // Unread row: tapped one's from page, else nothing yet.
             readonly property url fileUrl:
                 model.loaded ? page.fileUrlOf(model.file_path)
@@ -153,6 +186,7 @@ Page {
             Loader {
                 id: shown
                 anchors.fill: parent
+                active: slide.built
                 asynchronous: !slide.isTapped
                 sourceComponent: slide.viewType === "Video" ? videoSlide
                                  : slide.viewType.length > 0 ? pictureSlide : null
@@ -181,6 +215,7 @@ Page {
                     mimeType: model.file_mime.length > 0 ? model.file_mime : "video/mp4"
                     active: slide.active
                     kept: slide.kept
+                    topInset: header.height
                 }
             }
         }
@@ -214,6 +249,80 @@ Page {
             fileUrl: page.fileUrl
             fileName: page.fileName
             active: page.settled
+            topInset: header.height
+        }
+    }
+
+    // Over slides, fixed while they swipe. Dark, see-through: photo shows under it. Light text
+    // whatever the ambience: page is black.
+    Rectangle {
+        id: header
+        objectName: "header"
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+        }
+        height: Theme.itemSizeLarge
+        color: Qt.rgba(0, 0, 0, 0.6)
+        // Pull-down menu opens where header is.
+        visible: !(page.placed && slides.currentItem && slides.currentItem.pulled)
+
+        BackgroundItem {
+            id: back
+            objectName: "backButton"
+            anchors {
+                left: parent.left
+                top: parent.top
+                bottom: parent.bottom
+            }
+            width: backLabel.width + 2 * Theme.horizontalPageMargin
+            onClicked: pageStack.pop()
+
+            Label {
+                id: backLabel
+                objectName: "backLabel"
+                anchors {
+                    left: parent.left
+                    leftMargin: Theme.horizontalPageMargin
+                    verticalCenter: parent.verticalCenter
+                }
+                //: Top left of the full-screen picture and video viewer: back to the chat or
+                //: the gallery it was opened from.
+                text: qsTr("Back")
+                color: back.highlighted ? Theme.highlightColor : Theme.lightPrimaryColor
+            }
+        }
+
+        Column {
+            anchors {
+                right: parent.right
+                rightMargin: Theme.horizontalPageMargin
+                verticalCenter: parent.verticalCenter
+            }
+
+            Label {
+                objectName: "position"
+                anchors.right: parent.right
+                color: Theme.lightPrimaryColor
+                // Only once list shows: seed alone has no place in it.
+                //: Where the shown picture or video is among the chat's, top right of the
+                //: viewer, such as "3 of 12".
+                text: page.placed && slides.count > 0
+                      ? qsTr("%1 of %2").arg(slides.currentIndex + 1).arg(slides.count)
+                      : ""
+            }
+            Label {
+                objectName: "sentDate"
+                anchors.right: parent.right
+                color: Theme.lightSecondaryColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                // Phone's short date format, as gallery grid's captions.
+                text: page.placed && slides.currentItem && slides.currentItem.timestamp > 0
+                      ? Qt.formatDate(new Date(slides.currentItem.timestamp * 1000),
+                                      Qt.DefaultLocaleShortDate)
+                      : ""
+            }
         }
     }
 }

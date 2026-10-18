@@ -22,6 +22,9 @@ QtObject {
     property string fontFamilyHeading: "Sans Serif"
     property color primaryColor: "#ffffff"
     property color secondaryColor: "#a0a0a0"
+    // Light-on-dark whatever the ambience: text over photos.
+    property color lightPrimaryColor: "#ffffff"
+    property color lightSecondaryColor: "#a0a0a0"
     property color highlightColor: "#80c0ff"
     property color secondaryHighlightColor: "#6090c0"
     property color highlightBackgroundColor: "#2060a0"

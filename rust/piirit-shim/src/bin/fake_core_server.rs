@@ -1112,17 +1112,31 @@ async fn serve() {
     }
     // Pictures arriving in gallery group (chat 2), each after its ms: `PIIRIT_FAKE_PICTURES=
     // 1500:quiet,4500`. `quiet`: events lost (core's overflow case), only a reread finds it.
+    // Counted from `PIIRIT_FAKE_EPOCH_MS` (Unix ms, test's clock) if set, else from start: this
+    // process starts a varying while after test does (cold binary: half a second).
     if let Ok(arrivals) = std::env::var("PIIRIT_FAKE_PICTURES") {
+        let started = std::env::var("PIIRIT_FAKE_EPOCH_MS")
+            .ok()
+            .and_then(|epoch| epoch.trim().parse::<u64>().ok())
+            .map_or(0, |epoch| {
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map_or(0, |since| {
+                        u64::try_from(since.as_millis()).unwrap_or(u64::MAX)
+                    });
+                now.saturating_sub(epoch)
+            });
         for arrival in arrivals.split(',') {
             let (millis, quiet) = arrival
                 .split_once(':')
                 .map_or((arrival, false), |(millis, mode)| (millis, mode == "quiet"));
-            let Ok(millis) = millis.trim().parse() else {
+            let Ok(millis) = millis.trim().parse::<u64>() else {
                 continue;
             };
+            let wait = millis.saturating_sub(started);
             let state = state.clone();
             tokio::spawn(async move {
-                tokio::time::sleep(std::time::Duration::from_millis(millis)).await;
+                tokio::time::sleep(std::time::Duration::from_millis(wait)).await;
                 let mut state = state.lock().await;
                 let id = state.add_message(1, 2);
                 state.sent_files.insert(
