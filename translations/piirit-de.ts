@@ -1063,6 +1063,16 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
         <translation>%1 von %2</translation>
     </message>
+    <message>
+        <source>%1, %2</source>
+        <extracomment>Second line of the full-screen viewer&apos;s header: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
+        <translation>%1, %2</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <extracomment>Top left of the full-screen picture and video viewer, beside the back arrow: back to the chat or gallery it was opened from.</extracomment>
+        <translation>Zurück</translation>
+    </message>
 </context>
 <context>
     <name>GroupPage</name>

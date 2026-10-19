@@ -9,7 +9,11 @@ Item {
     property bool canNavigateForward: false
     property int allowedOrientations: 1
     property int orientation
+    // Silica's turn: fade out, resize, fade in. Test sets it round a resize.
+    property bool orientationTransitionRunning: false
     property bool backNavigation: true
+    // Silica's back arrow drawn (when back is possible).
+    property bool showNavigationIndicator: true
     // Silica's colours for page's items; pages set scheme.
     property Palette palette: Palette {}
     width: 540

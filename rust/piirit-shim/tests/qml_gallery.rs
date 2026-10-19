@@ -9,7 +9,7 @@
 //! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
 //! slide not rebuilt); slide far off built only once on screen or list still; list clipped (Back
 //! slides page out over chat); header: chat's (Silica's, its back arrow), light on dark, "x of
-//! y", day sent; message not in gallery stays alone.
+//! y", sender and day; message not in gallery stays alone.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -42,9 +42,11 @@ const PROBE_QML: &str = r"
             var alpha = findIn(loader.item, 'header').color.a
             return alpha > 0.2 && alpha < 0.9 ? 'see-through' : '' + alpha
         }
-        /// Fake core's send time of every message but the first, in phone's short format.
+        /// Fake core's sender, send time of every message but the first in phone's short
+        /// format.
         function sentDay() {
-            return Qt.formatDate(new Date(1700090000 * 1000), Qt.DefaultLocaleShortDate)
+            return 'Ada Lovelace, '
+                   + Qt.formatDate(new Date(1700090000 * 1000), Qt.DefaultLocaleShortDate)
         }
         /// Pull-down menu on picture now on screen out or in; header shown then?
         function pullCurrent(out) {
@@ -189,6 +191,9 @@ const PROBE_QML: &str = r"
             // Headless Qt 5.15 won't flick() a SnapOneItem list at all; per-item snap moves
             // alike (two slides: lands one over). Motion is what's under test.
             slides().snapMode = ListView.SnapToItem
+            // Brisk enough that Qt aims at a slide. Slower, it keeps aim never set (5.15 leaves
+            // it uninitialised) and, by what memory held, bounced back after one frame.
+            slides().flickDeceleration = 6000
             slides().flick(velocity, 0)
             return 'ok'
         }
@@ -1055,7 +1060,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
     assert_eq!(
         value("header-day"),
         value("header-day-expected"),
-        "the header does not give the day the picture was sent, in the \
+        "the header does not give who sent the picture and the day, in the \
          phone's date format. {context}"
     );
 

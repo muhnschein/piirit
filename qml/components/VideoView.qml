@@ -23,6 +23,12 @@ Item {
     property bool kept: true
     /// Top band something lies over (GalleryPage's header): video and notice start below it.
     property real topInset: 0
+    /// Length, ms, as sender wrote it (row's); 0 unknown. Shown till player has file: mid-swipe
+    /// it has none, and Qt 5.6 says -1 ("-1:0-1").
+    property int durationMs: 0
+    /// Player's length once it knows, else sender's; 0 unknown.
+    readonly property int length:
+        player.duration > 0 ? player.duration : Math.max(0, root.durationMs)
     /// Pull-down menu out: header over it steps aside.
     readonly property bool pulled: menu.active
 
@@ -146,8 +152,8 @@ Item {
             }
             // fillMode default; naming it needs enum stub lacks.
             source: player
-            // Upright video stored sideways with turn in metadata; turned back, as gallery.
-            autoOrientation: true
+            // Not `autoOrientation`: turns with screen, and page turns too: twice, sideways or
+            // distorted.
 
             MouseArea {
                 anchors.fill: parent
@@ -203,7 +209,10 @@ Item {
                 }
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: root.clock(player.position) + " / " + root.clock(player.duration)
+                // Length unknown: blank, not a made-up 0:00 (as message row).
+                text: root.length > 0
+                      ? root.clock(Math.max(0, player.position)) + " / " + root.clock(root.length)
+                      : ""
             }
 
             Slider {
@@ -215,8 +224,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
                 minimumValue: 0
-                // Never zero: equal ends leave no handle room; duration 0 until loaded.
-                maximumValue: Math.max(1, player.duration)
+                // Never zero: equal ends leave no handle room; length 0 until known.
+                maximumValue: Math.max(1, root.length)
                 onReleased: player.seek(seek.value)
             }
 

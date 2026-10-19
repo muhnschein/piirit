@@ -49,6 +49,9 @@ Item {
     /// Pull-down menu out: header over it steps aside.
     readonly property bool pulled: menu.active
 
+    /// Single tap (no second follows): GalleryPage hides or brings back its header.
+    signal tapped()
+
     /// Fitted width. View width until decoded (no divide by zero).
     readonly property real fittedWidth: {
         if (root.measured.implicitWidth <= 0 || root.measured.implicitHeight <= 0) {
@@ -117,6 +120,19 @@ Item {
     /// Double tap: all the way in on tapped point, or all the way out.
     function toggleZoom(viewX, viewY) {
         root.zoomAt(root.zoom > 1 ? 1 : 3, viewX, viewY)
+    }
+
+    /// Second tap of a double: zoom, first tap no single one.
+    function zoomTap(viewX, viewY) {
+        single.stop()
+        root.toggleZoom(viewX, viewY)
+    }
+
+    // First tap waits out double-tap time: zooming must not flash header.
+    Timer {
+        id: single
+        interval: Qt.styleHints.mouseDoubleClickInterval
+        onTriggered: root.tapped()
     }
 
     // Reader's copy: see AttachmentSaver.
@@ -188,6 +204,18 @@ Item {
             onPinchUpdated: root.zoomAt(pincher.startZoom * pinch.scale,
                                         pincher.focusX, pincher.focusY)
 
+            // Whole slide, not picture only: black beside it taps too.
+            MouseArea {
+                id: tap
+                objectName: "pictureTap"
+                anchors.fill: parent
+                onClicked: single.restart()
+                onDoubleClicked: {
+                    var point = tap.mapToItem(flick, mouse.x, mouse.y)
+                    root.zoomTap(point.x, point.y)
+                }
+            }
+
             Item {
                 id: frame
                 width: root.fittedWidth * root.zoom
@@ -251,15 +279,6 @@ Item {
                     playing: visible && root.active
                     // Movie decodes on main thread: starts after transition, on screen only.
                     source: visible && root.settled && root.active ? root.fileUrl : ""
-                }
-
-                MouseArea {
-                    id: tap
-                    anchors.fill: parent
-                    onDoubleClicked: {
-                        var point = tap.mapToItem(flick, mouse.x, mouse.y)
-                        root.toggleZoom(point.x, point.y)
-                    }
                 }
             }
         }

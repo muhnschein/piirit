@@ -6,9 +6,10 @@ import Piirit 1.0
 
 /*
  * Chat's pictures and videos, one per screen, swiped: from conversation row or gallery tile.
- * Header over it, chat's kind (Silica's, back arrow left): where in gallery ("3 of 12"), day
- * sent. All of chat's gallery (ChatMedia "gallery": pictures, GIFs, videos; no stickers), not
- * only rows loaded; not yet downloaded ones too, as their row says, with Download.
+ * Header over it, chat's kind (Silica's, back arrow and "Back" left): where in gallery ("3 of
+ * 12"), sender and day. Tap on picture hides whole header, tap again brings it. All of chat's
+ * gallery (ChatMedia "gallery": pictures, GIFs, videos; no stickers), not only rows loaded; not
+ * yet downloaded ones too, as their row says, with Download. Turns with phone.
  *
  * Order as where opened (reference clients alike): conversation oldest left, newest right;
  * gallery grid newest first, so newest left. Model ordered so (`oldest_first`).
@@ -38,6 +39,19 @@ Page {
     // Black page: Silica's light-on-dark colours for header, back arrow, menus, whatever the
     // ambience.
     palette.colorScheme: Theme.LightOnDark
+
+    // Landscape picture or video wants phone turned (Silica default: upright only).
+    allowedOrientations: Orientation.All
+
+    /// Header tapped away on a picture; tap again brings it.
+    property bool headerHidden: false
+    /// Header, back arrow shown: unless tapped away on a picture. Video's tap plays, held one
+    /// has Download: header stays there, else nothing brings it back.
+    readonly property bool headerShown: !page.headerHidden
+                                        || !(page.placed ? slides.currentItem !== null
+                                                           && slides.currentItem.tapHides
+                                                         : page.viewType !== "Video")
+    showNavigationIndicator: page.headerShown
 
     /// Page in place (transition over, or none); decodes, video wait. See PictureView.
     property bool settled: false
@@ -92,6 +106,13 @@ Page {
         slides.currentIndex = at
         slides.positionViewAtIndex(at, ListView.SnapPosition)
         page.placed = true
+    }
+
+    /// Header's second line: sender, day; day alone if sender unknown.
+    function sentBy(sender, day) {
+        //: Second line of the full-screen viewer's header: who sent the picture or video,
+        //: then the day, such as "Ada Lovelace, 15/11/2023".
+        return sender.length > 0 ? qsTr("%1, %2").arg(sender).arg(day) : day
     }
 
     /// Path as URL views load; empty until row loaded.
@@ -153,6 +174,11 @@ Page {
             /// Not yet downloaded: row's text and Download stand in (HeldBackView).
             readonly property bool held: model.loaded && model.download_state.length > 0
                                          && model.download_state !== "Done"
+            /// Picture: tap hides header. Video's tap plays.
+            readonly property bool tapHides: !slide.held && slide.viewType.length > 0
+                                             && slide.viewType !== "Video"
+            /// Sender, as conversation names them; empty until row read.
+            readonly property string sender: model.loaded ? model.sender_name : ""
 
             /// Content built. Slide two over enters cache as swipe starts; building it then
             /// (decode, texture upload) landed in swipe's last frames (lag as it eased off).
@@ -219,6 +245,7 @@ Page {
                     previewWidth: slide.isTapped ? page.previewWidth : 0
                     settled: page.settled
                     active: slide.active
+                    onTapped: page.headerHidden = !page.headerHidden
                 }
             }
 
@@ -232,6 +259,8 @@ Page {
                     active: slide.active
                     kept: slide.kept
                     topInset: header.height
+                    // Sender's: shown till player has file (mid-swipe).
+                    durationMs: model.loaded ? model.duration_ms : 0
                 }
             }
         }
@@ -255,6 +284,7 @@ Page {
             viewType: page.viewType
             previewWidth: page.previewWidth
             settled: page.settled
+            onTapped: page.headerHidden = !page.headerHidden
         }
     }
 
@@ -269,8 +299,8 @@ Page {
         }
     }
 
-    // Over slides, fixed while they swipe: chat's header (Silica's; its back arrow left of it).
-    // Dark, see-through: photo shows under it.
+    // Over slides, fixed while they swipe: chat's header (Silica's; its back arrow left of it,
+    // "Back" beside). Dark, see-through: photo shows under it.
     Rectangle {
         id: header
         objectName: "header"
@@ -281,8 +311,9 @@ Page {
         }
         height: pageHeader.height
         color: Qt.rgba(0, 0, 0, 0.6)
-        // Pull-down menu opens where header is.
-        visible: !(page.placed && slides.currentItem && slides.currentItem.pulled)
+        // Tapped away; pull-down menu opens where header is.
+        visible: page.headerShown
+                 && !(page.placed && slides.currentItem && slides.currentItem.pulled)
 
         PageHeader {
             id: pageHeader
@@ -293,11 +324,35 @@ Page {
             title: page.placed && slides.count > 0
                    ? qsTr("%1 of %2").arg(slides.currentIndex + 1).arg(slides.count)
                    : ""
-            // Phone's short date format, as gallery grid's captions.
+            // Who sent it, day in phone's short date format (gallery grid's captions').
             description: page.placed && slides.currentItem && slides.currentItem.timestamp > 0
-                         ? Qt.formatDate(new Date(slides.currentItem.timestamp * 1000),
-                                         Qt.DefaultLocaleShortDate)
+                         ? page.sentBy(slides.currentItem.sender,
+                                       Qt.formatDate(new Date(slides.currentItem.timestamp * 1000),
+                                                     Qt.DefaultLocaleShortDate))
                          : ""
+
+            // Beside Silica's back arrow (left of interior): says what it does, wider to tap.
+            extraContent.children: [
+                BackgroundItem {
+                    id: back
+                    objectName: "backButton"
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: backLabel.width + 2 * Theme.paddingMedium
+                    height: Theme.itemSizeSmall
+                    onClicked: pageStack.pop()
+
+                    Label {
+                        id: backLabel
+                        objectName: "backLabel"
+                        x: Theme.paddingMedium
+                        anchors.verticalCenter: parent.verticalCenter
+                        //: Top left of the full-screen picture and video viewer, beside the
+                        //: back arrow: back to the chat or gallery it was opened from.
+                        text: qsTr("Back")
+                        color: back.highlighted ? Theme.highlightColor : Theme.lightPrimaryColor
+                    }
+                }
+            ]
         }
     }
 }

@@ -738,6 +738,8 @@ fn message_object(msg: u64) -> Value {
             message["fileName"] = json!("clip.mp4");
             message["fileMime"] = json!("video/mp4");
             message["fileBytes"] = json!(1_048_576);
+            // Ms, as sender writes: viewer shows it till player has file.
+            message["duration"] = json!(7_000);
         }
         _ => {}
     }
