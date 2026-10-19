@@ -1059,11 +1059,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>GalleryPage</name>
     <message>
-        <source>Back</source>
-        <extracomment>Top left of the full-screen picture and video viewer: back to the chat or the gallery it was opened from.</extracomment>
-        <translation>Indietro</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
         <translation>%1 di %2</translation>
@@ -1125,6 +1120,27 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Cambia immagine</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>Download in corso…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>Download non riuscito</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>Impossibile decifrare</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>Scarica</translation>
     </message>
 </context>
 <context>

@@ -1055,11 +1055,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GalleryPage</name>
     <message>
-        <source>Back</source>
-        <extracomment>Top left of the full-screen picture and video viewer: back to the chat or the gallery it was opened from.</extracomment>
-        <translation>Tillbaka</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
         <translation>%1 av %2</translation>
@@ -1121,6 +1116,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Byt bild</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>Hämtar…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>Hämtningen misslyckades</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>Kan inte dekrypteras</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>Hämta</translation>
     </message>
 </context>
 <context>

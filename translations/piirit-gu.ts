@@ -1059,11 +1059,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GalleryPage</name>
     <message>
-        <source>Back</source>
-        <extracomment>Top left of the full-screen picture and video viewer: back to the chat or the gallery it was opened from.</extracomment>
-        <translation>પાછળ</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
         <translation>%2 માંથી %1</translation>
@@ -1125,6 +1120,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>ચિત્ર બદલો</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>ડાઉનલોડ થઈ રહ્યું છે…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>ડાઉનલોડ નિષ્ફળ</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>ડિક્રિપ્ટ કરી શકાતું નથી</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>ડાઉનલોડ કરો</translation>
     </message>
 </context>
 <context>

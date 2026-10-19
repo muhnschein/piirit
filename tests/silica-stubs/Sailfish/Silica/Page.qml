@@ -10,6 +10,8 @@ Item {
     property int allowedOrientations: 1
     property int orientation
     property bool backNavigation: true
+    // Silica's colours for page's items; pages set scheme.
+    property Palette palette: Palette {}
     width: 540
     height: 960
 }

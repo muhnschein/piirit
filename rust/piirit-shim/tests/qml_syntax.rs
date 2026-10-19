@@ -1510,7 +1510,7 @@ fn qualified_uses(code: &str) -> Vec<(usize, String)> {
 #[test]
 fn qml_reads_no_name_that_is_not_there() {
     // In scope without declaring.
-    const IN_SCOPE: [&str; 24] = [
+    const IN_SCOPE: [&str; 25] = [
         // Grouped props and configured element's props, unqualified.
         "anchors",
         "font",
@@ -1532,6 +1532,8 @@ fn qml_reads_no_name_that_is_not_there() {
         "layer",
         // Image, AnimatedImage, Nemo Thumbnail: decode size.
         "sourceSize",
+        // Silica item colours (`palette.colorScheme`); GalleryPage.
+        "palette",
         // PinchArea `pinch` group; PinchEvent to handlers.
         "pinch",
         // MouseEvent to MouseArea handlers.

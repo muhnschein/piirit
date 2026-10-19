@@ -251,6 +251,12 @@ impl State {
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
             }
+            // Not yet downloaded too (`pre_message`), plus plain text. 16 sent before 14 and 15
+            // (conversation order, not id): gallery must merge by it.
+            if std::env::var_os("PIIRIT_FAKE_PRE_MESSAGES").is_some() {
+                self.chats
+                    .insert(2, vec![10, 12, 13, 16, 14, 15, 17, 18, 19, 20]);
+            }
             self.chat_order = vec![1, 2];
             // Extra empty chats from 201, on request.
             let many = std::env::var("PIIRIT_FAKE_MANY_CHATS")
@@ -453,6 +459,9 @@ impl State {
         } else {
             "Done"
         });
+        if std::env::var_os("PIIRIT_FAKE_PRE_MESSAGES").is_some() {
+            pre_message(&mut message, msg, fetched);
+        }
         message["reactions"] = self.reactions_object(id);
         message
     }
@@ -739,6 +748,60 @@ fn message_object(msg: u64) -> Value {
         message["hasHtml"] = json!(true);
     }
     message
+}
+
+/// Large attachment as core 2.x keeps it until fetched (`PIIRIT_FAKE_PRE_MESSAGES`): Text
+/// pre-message, name, size, dimensions (sender's), core's " [Image – 2.4 MiB]" after text; no
+/// file. Fetched: real kind, file, same id. 16 picture, 17 video, 18 PDF, 19 PNG sent as file
+/// (no size, as core never sizes files). 17's fetch never lands: stays `InProgress`, as core says
+/// while fetching.
+fn pre_message(message: &mut Value, msg: u64, fetched: bool) {
+    let (kind, name, bytes, said, mime) = match msg {
+        16 => (
+            "Image",
+            "beach.jpg",
+            2_516_582,
+            "Image – 2.4 MiB",
+            "image/jpeg",
+        ),
+        17 => ("Video", "trip.mp4", 8_388_608, "Video – 8 MiB", "video/mp4"),
+        18 => (
+            "File",
+            "report.pdf",
+            3_145_728,
+            "report.pdf – 3 MiB",
+            "application/pdf",
+        ),
+        19 => (
+            "File",
+            "scan.png",
+            1_048_576,
+            "scan.png – 1 MiB",
+            "image/png",
+        ),
+        _ => return,
+    };
+    message["fileName"] = json!(name);
+    message["fileBytes"] = json!(bytes);
+    if msg == 16 {
+        message["dimensionsWidth"] = json!(800);
+        message["dimensionsHeight"] = json!(600);
+    }
+    if msg == 17 {
+        message["duration"] = json!(12_000);
+    }
+    if fetched && msg != 17 {
+        message["viewType"] = json!(kind);
+        message["text"] = json!("");
+        message["file"] = json!(format!("/tmp/piirit-fake/{name}"));
+        message["fileMime"] = json!(mime);
+        message["downloadState"] = json!("Done");
+    } else {
+        message["viewType"] = json!("Text");
+        message["text"] = json!(format!(" [{said}]"));
+        message["file"] = Value::Null;
+        message["downloadState"] = json!(if fetched { "InProgress" } else { "Available" });
+    }
 }
 
 /// Start of long message: fits in `text`.

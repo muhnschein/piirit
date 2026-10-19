@@ -6,9 +6,9 @@ import Piirit 1.0
 
 /*
  * Chat's pictures and videos, one per screen, swiped: from conversation row or gallery tile.
- * Header over it: Back, where in gallery ("3 of 12"), day sent.
- * All of chat's gallery (ChatMedia "gallery": pictures, GIFs, videos; no stickers), not only
- * rows loaded.
+ * Header over it, chat's kind (Silica's, back arrow left): where in gallery ("3 of 12"), day
+ * sent. All of chat's gallery (ChatMedia "gallery": pictures, GIFs, videos; no stickers), not
+ * only rows loaded; not yet downloaded ones too, as their row says, with Download.
  *
  * Order as where opened (reference clients alike): conversation oldest left, newest right;
  * gallery grid newest first, so newest left. Model ordered so (`oldest_first`).
@@ -35,9 +35,9 @@ Page {
     /// Grid order (newest left); else conversation's (oldest left).
     property bool newestFirst: false
 
-    // Header's Back is way out: list takes edge swipe; Silica's corner indicator sat under
-    // header's Back.
-    backNavigation: false
+    // Black page: Silica's light-on-dark colours for header, back arrow, menus, whatever the
+    // ambience.
+    palette.colorScheme: Theme.LightOnDark
 
     /// Page in place (transition over, or none); decodes, video wait. See PictureView.
     property bool settled: false
@@ -150,6 +150,9 @@ Page {
             readonly property bool pulled: shown.item !== null && shown.item.pulled === true
             /// Send time, s; 0 until row read.
             readonly property real timestamp: model.loaded ? model.timestamp : 0
+            /// Not yet downloaded: row's text and Download stand in (HeldBackView).
+            readonly property bool held: model.loaded && model.download_state.length > 0
+                                         && model.download_state !== "Done"
 
             /// Content built. Slide two over enters cache as swipe starts; building it then
             /// (decode, texture upload) landed in swipe's last frames (lag as it eased off).
@@ -188,8 +191,21 @@ Page {
                 anchors.fill: parent
                 active: slide.built
                 asynchronous: !slide.isTapped
-                sourceComponent: slide.viewType === "Video" ? videoSlide
+                sourceComponent: slide.held ? heldSlide
+                                 : slide.viewType === "Video" ? videoSlide
                                  : slide.viewType.length > 0 ? pictureSlide : null
+            }
+
+            // Fetched: row gets file, slide turns picture or video.
+            Component {
+                id: heldSlide
+                HeldBackView {
+                    objectName: "heldView"
+                    viewType: slide.viewType
+                    text: model.text
+                    downloadState: model.download_state
+                    onDownloadRequested: media.download_full(slide.messageId)
+                }
             }
 
             Component {
@@ -221,12 +237,12 @@ Page {
         }
     }
 
-    // Tapped one alone, until list has it.
+    // Tapped one alone, until list has it. Not yet downloaded one has no file: black till then.
     Loader {
         id: seed
         objectName: "seed"
         anchors.fill: parent
-        active: !page.placed
+        active: !page.placed && String(page.fileUrl).length > 0
         sourceComponent: page.viewType === "Video" ? videoSeed : pictureSeed
     }
 
@@ -253,8 +269,8 @@ Page {
         }
     }
 
-    // Over slides, fixed while they swipe. Dark, see-through: photo shows under it. Light text
-    // whatever the ambience: page is black.
+    // Over slides, fixed while they swipe: chat's header (Silica's; its back arrow left of it).
+    // Dark, see-through: photo shows under it.
     Rectangle {
         id: header
         objectName: "header"
@@ -263,66 +279,25 @@ Page {
             right: parent.right
             top: parent.top
         }
-        height: Theme.itemSizeLarge
+        height: pageHeader.height
         color: Qt.rgba(0, 0, 0, 0.6)
         // Pull-down menu opens where header is.
         visible: !(page.placed && slides.currentItem && slides.currentItem.pulled)
 
-        BackgroundItem {
-            id: back
-            objectName: "backButton"
-            anchors {
-                left: parent.left
-                top: parent.top
-                bottom: parent.bottom
-            }
-            width: backLabel.width + 2 * Theme.horizontalPageMargin
-            onClicked: pageStack.pop()
-
-            Label {
-                id: backLabel
-                objectName: "backLabel"
-                anchors {
-                    left: parent.left
-                    leftMargin: Theme.horizontalPageMargin
-                    verticalCenter: parent.verticalCenter
-                }
-                //: Top left of the full-screen picture and video viewer: back to the chat or
-                //: the gallery it was opened from.
-                text: qsTr("Back")
-                color: back.highlighted ? Theme.highlightColor : Theme.lightPrimaryColor
-            }
-        }
-
-        Column {
-            anchors {
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-                verticalCenter: parent.verticalCenter
-            }
-
-            Label {
-                objectName: "position"
-                anchors.right: parent.right
-                color: Theme.lightPrimaryColor
-                // Only once list shows: seed alone has no place in it.
-                //: Where the shown picture or video is among the chat's, top right of the
-                //: viewer, such as "3 of 12".
-                text: page.placed && slides.count > 0
-                      ? qsTr("%1 of %2").arg(slides.currentIndex + 1).arg(slides.count)
-                      : ""
-            }
-            Label {
-                objectName: "sentDate"
-                anchors.right: parent.right
-                color: Theme.lightSecondaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
-                // Phone's short date format, as gallery grid's captions.
-                text: page.placed && slides.currentItem && slides.currentItem.timestamp > 0
-                      ? Qt.formatDate(new Date(slides.currentItem.timestamp * 1000),
-                                      Qt.DefaultLocaleShortDate)
-                      : ""
-            }
+        PageHeader {
+            id: pageHeader
+            objectName: "pageHeader"
+            // Only once list shows: seed alone has no place in it.
+            //: Where the shown picture or video is among the chat's, top right of the
+            //: viewer, such as "3 of 12".
+            title: page.placed && slides.count > 0
+                   ? qsTr("%1 of %2").arg(slides.currentIndex + 1).arg(slides.count)
+                   : ""
+            // Phone's short date format, as gallery grid's captions.
+            description: page.placed && slides.currentItem && slides.currentItem.timestamp > 0
+                         ? Qt.formatDate(new Date(slides.currentItem.timestamp * 1000),
+                                         Qt.DefaultLocaleShortDate)
+                         : ""
         }
     }
 }

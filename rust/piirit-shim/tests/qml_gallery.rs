@@ -8,8 +8,8 @@
 //! page in place, keeps file till swipe over; zoomed picture holds list still;
 //! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
 //! slide not rebuilt); slide far off built only once on screen or list still; list clipped (Back
-//! slides page out over chat); header: Back, "x of y", day sent; message not in gallery stays
-//! alone.
+//! slides page out over chat); header: chat's (Silica's, its back arrow), light on dark, "x of
+//! y", day sent; message not in gallery stays alone.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -33,16 +33,9 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
         Loader { id: loader }
-        /// Silica's, as page finds it: pops counted, not done.
-        property QtObject pageStack: QtObject {
-            property int pops: 0
-            function pop() { pops += 1 }
-        }
-        function tapBack() {
-            var button = findIn(loader.item, 'backButton')
-            if (!button) { return 'missing:backButton' }
-            button.clicked()
-            return '' + probe.pageStack.pops
+        /// Page's Silica colours light on dark (black page, any ambience)?
+        function lightOnDark() {
+            return '' + (loader.item.palette.colorScheme === Theme.LightOnDark)
         }
         /// See-through: neither solid nor invisible.
         function headerAlpha() {
@@ -362,22 +355,24 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("chat-clipped", call!("list", s!("clip")));
         // Neighbour built while list still: ready before swiped to.
         record!("neighbour-built", call!("slideState", 15));
-        // Header: Back, place, day sent. Silica's own corner indicator off.
+        // Header: chat's (Silica's), light on dark, place, day sent; Silica's back arrow.
         record!("header-see-through", call!("headerAlpha"));
-        record!("header-back", call!("get", s!("backLabel"), s!("text")));
-        record!("header-place", call!("get", s!("position"), s!("text")));
-        record!("header-day", call!("get", s!("sentDate"), s!("text")));
+        record!("light-on-dark", call!("lightOnDark"));
+        record!("header-place", call!("get", s!("pageHeader"), s!("title")));
+        record!(
+            "header-day",
+            call!("get", s!("pageHeader"), s!("description"))
+        );
         record!("header-day-expected", call!("sentDay"));
         record!("silica-back", call!("page", s!("backNavigation")));
         record!("pulled-header", call!("pullCurrent", true));
         record!("pushed-header", call!("pullCurrent", false));
-        record!("back-tapped", call!("tapBack"));
         // Swipe to newer: the video, playing.
         record!("swipe-newer", call!("swipeTo", 1));
         record!("shown-after-swipe", call!("page", s!("shownId")));
         record!(
             "header-place-swiped",
-            call!("get", s!("position"), s!("text"))
+            call!("get", s!("pageHeader"), s!("title"))
         );
         record!("video-inset", call!("current", s!("notice"), s!("y")));
         record!("video-pulled-header", call!("pullCurrent", true));
@@ -472,7 +467,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("grid-placed", call!("page", s!("placed")));
         record!("grid-index", call!("list", s!("currentIndex")));
-        record!("grid-place", call!("get", s!("position"), s!("text")));
+        record!("grid-place", call!("get", s!("pageHeader"), s!("title")));
         record!(
             "grid-video-arriving",
             call!("current", s!("player"), s!("playbackState"))
@@ -491,7 +486,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("restart-current", call!("current", s!(""), s!("messageId")));
         record!("restart-shown", call!("page", s!("shownId")));
         record!("restart-index", call!("list", s!("currentIndex")));
-        record!("restart-place", call!("get", s!("position"), s!("text")));
+        record!("restart-place", call!("get", s!("pageHeader"), s!("title")));
         // Zoomed, then the video deleted, a picture arrives.
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
@@ -559,9 +554,12 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             call!("get", s!("seedPicture"), s!("fileUrl"))
         );
         record!("sticker-list", call!("list", s!("visible")));
-        record!("sticker-place", call!("get", s!("position"), s!("text")));
-        record!("sticker-day", call!("get", s!("sentDate"), s!("text")));
-        record!("sticker-back", call!("get", s!("backLabel"), s!("text")));
+        record!("sticker-place", call!("get", s!("pageHeader"), s!("title")));
+        record!(
+            "sticker-day",
+            call!("get", s!("pageHeader"), s!("description"))
+        );
+        record!("sticker-back", call!("page", s!("backNavigation")));
         // Video not in gallery (deleted above), page in place: plays alone, at once.
         record!(
             "load-lone-video",
@@ -644,13 +642,18 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "the slides beside the screen are drawn outside it: on Back the \
              neighbouring picture slides in over the chat, then cuts",
         ),
-        // Header: Back left, place and day right, see-through.
+        // Header: chat's, Silica's back arrow left, place and day right, see-through.
         (
             "header-see-through",
             "see-through",
             "the header is not a see-through band over the picture",
         ),
-        ("header-back", "Back", "the header has no Back on the left"),
+        (
+            "light-on-dark",
+            "true",
+            "the header, back arrow and menus take the ambience's colours: on \
+             the black page a light ambience's dark ones vanish",
+        ),
         (
             "header-place",
             "1 of 2",
@@ -658,8 +661,14 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "silica-back",
-            "false",
-            "Silica's own back indicator still sits under the header's Back",
+            "true",
+            "Silica's back arrow, as in every chat, is off: no way back but \
+             the edge swipe the list takes",
+        ),
+        (
+            "header-height",
+            "100",
+            "the see-through band is not the Silica header's height",
         ),
         (
             "pulled-header",
@@ -671,7 +680,6 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "true",
             "the header did not come back once the pull-down menu closed",
         ),
-        ("back-tapped", "1", "tapping Back did not go back"),
         (
             "header-place-swiped",
             "2 of 2",
@@ -679,7 +687,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "video-inset",
-            "120",
+            "100",
             "the video and its notices start under the header, not below it",
         ),
         (
@@ -1020,7 +1028,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "",
             "a message the gallery does not hold got a day from another",
         ),
-        ("sticker-back", "Back", "a lone picture has no Back"),
+        (
+            "sticker-back",
+            "true",
+            "a lone picture has no Silica back arrow",
+        ),
         (
             "lone-video",
             "true",
@@ -1028,7 +1040,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "lone-video-inset",
-            "120",
+            "100",
             "a lone video starts under the header, not below it",
         ),
     ] {

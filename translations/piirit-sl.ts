@@ -1067,11 +1067,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>GalleryPage</name>
     <message>
-        <source>Back</source>
-        <extracomment>Top left of the full-screen picture and video viewer: back to the chat or the gallery it was opened from.</extracomment>
-        <translation>Nazaj</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
         <translation>%1 od %2</translation>
@@ -1135,6 +1130,27 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Spremeni sliko</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>Prenašanje…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>Prenos ni uspel</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>Ni mogoče dešifrirati</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>Prenesi</translation>
     </message>
 </context>
 <context>
