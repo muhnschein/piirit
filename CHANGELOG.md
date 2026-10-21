@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Bundles deltachat-rpc-server 2.64.0 (was 2.63.0). Invite links write the @ in an address as %40 again, so apps that cut a link short at an @, WhatsApp among them, keep the whole invite clickable.
 - **Contact requests stand out.** A chat from someone you haven't written to carries a "Request" tag in the chat list. Opening it shows the messages with Accept and Block where the message field would be, or Accept and Delete for a group you were added to; accepting brings the field back, and blocking asks first. Reading a request sends no read receipt.
 
 ## 2.2.0 — 2026-10-15

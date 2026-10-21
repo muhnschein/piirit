@@ -941,6 +941,17 @@ async fn offline_round_trip_against_real_core() {
         .call("get_messages", (sender_id, vec![first, second]))
         .await
         .expect("get_messages");
+    // Core 2.64+: a message's summary text, as notifications and pinned
+    // messages word it. Unused so far; here so a later move to it starts
+    // from what the core gives.
+    let summary: String = client
+        .call(
+            "get_message_summary_text",
+            (sender_id, first, false, false, 0u32),
+        )
+        .await
+        .expect("get_message_summary_text");
+    assert_eq!(summary, "hello there");
     let reply = &messages[&second];
     // Every field the message rows are built from.
     assert_eq!(
@@ -2107,6 +2118,27 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         .unwrap_or_else(|err| panic!("stop_io on the relays probe: {err}"));
 
     relays_listed_as_added(client, account, &addrs).await;
+
+    // Own invite link, as the QR page shows and shares it. Core 2.64+
+    // writes '@' as %40 again in every relay address the link names,
+    // so apps that end a link at an '@' keep the whole invite.
+    let invite: String = client
+        .call(
+            "get_chat_securejoin_qr_code",
+            (account, Option::<u32>::None),
+        )
+        .await
+        .unwrap_or_else(|err| panic!("get_chat_securejoin_qr_code: {err}"));
+    for addr in addrs {
+        assert!(
+            invite.contains(&addr.replace('@', "%40")),
+            "the invite link does not name relay {addr} with '@' as %40: {invite}"
+        );
+    }
+    assert!(
+        !invite.contains('@'),
+        "the invite link has a bare '@': {invite}"
+    );
 
     // Refusals in core's words, as fake core gives them.
     assert_eq!(
