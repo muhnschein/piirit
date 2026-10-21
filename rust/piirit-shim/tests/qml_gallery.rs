@@ -4,12 +4,13 @@
 //! Headless vs stub Silica, recording double; group seeded with picture (10) and video (15),
 //! two more pictures arriving (first with its events lost). Swipe = list's current index moved,
 //! as flick snapping does, or real flick watched while it runs. Checks: tapped one shown alone
-//! until list has it, then list placed there; video plays only on screen, once swipe over and
-//! page in place, keeps file till swipe over; zoomed picture holds list still;
-//! restart of model, a delete and an arrival elsewhere leave reader where they were (zoom too:
-//! slide not rebuilt); slide far off built only once on screen or list still; list clipped (Back
-//! slides page out over chat); header: chat's (Silica's, its back arrow), light on dark, "x of
-//! y", sender and day; message not in gallery stays alone.
+//! until list has it, then list placed there; video waits for its play button (Jolla's), plays
+//! only on screen, paused mid-swipe, keeps file till swipe over; playing full screen or zoomed
+//! picture holds list still; restart of model, a delete and an arrival elsewhere leave reader
+//! where they were (zoom too: slide not rebuilt); slide far off built only once on screen or list
+//! still; list clipped (page slides out over chat); Jolla's chrome: up or down closes, no back
+//! arrow, light on dark, controls up, sender and day, no pull-down; message not in gallery stays
+//! alone.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -37,24 +38,20 @@ const PROBE_QML: &str = r"
         function lightOnDark() {
             return '' + (loader.item.palette.colorScheme === Theme.LightOnDark)
         }
-        /// See-through: neither solid nor invisible.
-        function headerAlpha() {
-            var alpha = findIn(loader.item, 'header').color.a
-            return alpha > 0.2 && alpha < 0.9 ? 'see-through' : '' + alpha
-        }
         /// Fake core's sender, send time of every message but the first in phone's short
         /// format.
         function sentDay() {
             return 'Ada Lovelace, '
                    + Qt.formatDate(new Date(1700090000 * 1000), Qt.DefaultLocaleShortDate)
         }
-        /// Pull-down menu on picture now on screen out or in; header shown then?
-        function pullCurrent(out) {
-            var slide = slides().currentItem
-            var menu = findIn(slide, 'pictureMenu') || findIn(slide, 'videoMenu')
-            if (!menu) { return 'missing:menu' }
-            menu.active = out
-            return '' + findIn(loader.item, 'header').visible
+        /// Play button on video now on screen (or alone, `seedVideo`) pressed.
+        function play(name) {
+            var view = name === 'seedVideo' ? findIn(loader.item, name)
+                                            : findIn(slides().currentItem, 'videoView')
+            var button = view ? findIn(view, 'playButton') : null
+            if (!button) { return 'missing:playButton' }
+            button.clicked()
+            return 'ok'
         }
         function load(url, messageId, viewType, file, newestFirst, status) {
             loader.setSource('', {})
@@ -360,34 +357,47 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("chat-clipped", call!("list", s!("clip")));
         // Neighbour built while list still: ready before swiped to.
         record!("neighbour-built", call!("slideState", 15));
-        // Header: chat's (Silica's), light on dark, place, day sent; Silica's back arrow.
-        record!("header-see-through", call!("headerAlpha"));
+        // Jolla's: up or down closes (no back arrow), light on dark, controls up, sender
+        // and day; no pull-down (drag down is the page's).
         record!("light-on-dark", call!("lightOnDark"));
-        record!("header-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("controls", call!("get", s!("overlay"), s!("shown")));
+        record!("caption", call!("get", s!("caption"), s!("text")));
+        record!("caption-expected", call!("sentDay"));
+        record!("back-swipe", call!("page", s!("backNavigation")));
+        record!("back-way", call!("page", s!("navigationStyle")));
+        record!("back-arrow", call!("page", s!("showNavigationIndicator")));
         record!(
-            "header-day",
-            call!("get", s!("pageHeader"), s!("description"))
+            "picture-menu",
+            call!("current", s!("pictureMenu"), s!("visible"))
         );
-        record!("header-day-expected", call!("sentDay"));
-        record!("silica-back", call!("page", s!("backNavigation")));
-        record!("pulled-header", call!("pullCurrent", true));
-        record!("pushed-header", call!("pullCurrent", false));
-        // Swipe to newer: the video, playing.
+        record!(
+            "picture-drags",
+            call!("current", s!("pictureFlick"), s!("interactive"))
+        );
+        // Swipe to newer: the video, waiting for its play button.
         record!("swipe-newer", call!("swipeTo", 1));
         record!("shown-after-swipe", call!("page", s!("shownId")));
-        record!(
-            "header-place-swiped",
-            call!("get", s!("pageHeader"), s!("title"))
-        );
-        record!("video-inset", call!("current", s!("notice"), s!("y")));
-        record!("video-pulled-header", call!("pullCurrent", true));
-        record!("video-pushed-header", call!("pullCurrent", false));
-        record!("header-height", call!("get", s!("header"), s!("height")));
         record!("video-file", call!("current", s!("player"), s!("source")));
         record!(
             "video-state",
             call!("current", s!("player"), s!("playbackState"))
         );
+        record!(
+            "video-poster",
+            call!("current", s!("poster"), s!("visible"))
+        );
+        record!("video-seek", call!("get", s!("seek"), s!("visible")));
+        // Play: file in, controls away, list holds still; tap brings them, list swipes.
+        record!("play", call!("play", s!("")));
+        record!("played-file", call!("current", s!("player"), s!("source")));
+        record!(
+            "played-state",
+            call!("current", s!("player"), s!("playbackState"))
+        );
+        record!("played-controls", call!("get", s!("overlay"), s!("shown")));
+        record!("played-swipeable", call!("list", s!("interactive")));
+        record!("show-controls", call!("setPage", s!("controlsShown"), true));
+        record!("shown-swipeable", call!("list", s!("interactive")));
         record!(
             "picture-off-screen",
             call!("onSlide", 10, s!("pictureView"), s!("active"))
@@ -405,8 +415,14 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         // Zoomed: list holds still for pan; out again, swipes again.
         record!("zoom-in", call!("zoomCurrent"));
         record!("zoomed-swipeable", call!("list", s!("interactive")));
+        record!(
+            "zoomed-drags",
+            call!("current", s!("pictureFlick"), s!("interactive"))
+        );
+        record!("zoomed-controls", call!("get", s!("overlay"), s!("shown")));
         record!("zoom-out", call!("zoomCurrent"));
         record!("fitted-swipeable", call!("list", s!("interactive")));
+        record!("fitted-controls", call!("get", s!("overlay"), s!("shown")));
         // Finger flicks on to the video: nothing starts while list moves.
         record!("flick-on", call!("flickBy", -2000.0));
     });
@@ -424,7 +440,16 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "flick-on-poster",
             call!("current", s!("poster"), s!("visible"))
         );
-        // And off again: video paused, keeps file till list stops.
+        // Played, controls brought back; off again: video paused, keeps file till list stops.
+        record!("play-on", call!("play", s!("")));
+        record!(
+            "show-controls-on",
+            call!("setPage", s!("controlsShown"), true)
+        );
+        record!(
+            "playing-on",
+            call!("current", s!("player"), s!("playbackState"))
+        );
         record!("flick-off", call!("flickBy", 2000.0));
     });
 
@@ -472,7 +497,6 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("grid-placed", call!("page", s!("placed")));
         record!("grid-index", call!("list", s!("currentIndex")));
-        record!("grid-place", call!("get", s!("pageHeader"), s!("title")));
         record!(
             "grid-video-arriving",
             call!("current", s!("player"), s!("playbackState"))
@@ -491,7 +515,6 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("restart-current", call!("current", s!(""), s!("messageId")));
         record!("restart-shown", call!("page", s!("shownId")));
         record!("restart-index", call!("list", s!("currentIndex")));
-        record!("restart-place", call!("get", s!("pageHeader"), s!("title")));
         // Zoomed, then the video deleted, a picture arrives.
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
@@ -559,13 +582,13 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             call!("get", s!("seedPicture"), s!("fileUrl"))
         );
         record!("sticker-list", call!("list", s!("visible")));
-        record!("sticker-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("sticker-caption", call!("get", s!("caption"), s!("text")));
+        record!("sticker-bar", call!("get", s!("iconBar"), s!("visible")));
         record!(
-            "sticker-day",
-            call!("get", s!("pageHeader"), s!("description"))
+            "sticker-menu",
+            call!("get", s!("pictureMenu"), s!("visible"))
         );
-        record!("sticker-back", call!("page", s!("backNavigation")));
-        // Video not in gallery (deleted above), page in place: plays alone, at once.
+        // Video not in gallery (deleted above): alone, waits for play; overlay's seek bar its.
         record!(
             "load-lone-video",
             call!(
@@ -579,7 +602,9 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             )
         );
         record!("lone-video", call!("get", s!("seedVideo"), s!("playing")));
-        record!("lone-video-inset", call!("get", s!("notice"), s!("y")));
+        record!("lone-seek", call!("get", s!("seek"), s!("visible")));
+        record!("lone-play", call!("play", s!("seedVideo")));
+        record!("lone-played", call!("get", s!("seedVideo"), s!("playing")));
         (*engine_ptr).quit();
     });
 
@@ -605,7 +630,11 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         "load-chat",
         "swipe-newer",
         "swipe-back",
+        "play",
+        "show-controls",
         "flick-on",
+        "play-on",
+        "show-controls-on",
         "flick-off",
         "load-grid",
         "arrived",
@@ -616,6 +645,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         "flick-far",
         "load-sticker",
         "load-lone-video",
+        "lone-play",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -647,63 +677,45 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "the slides beside the screen are drawn outside it: on Back the \
              neighbouring picture slides in over the chat, then cuts",
         ),
-        // Header: chat's, Silica's back arrow left, place and day right, see-through.
-        (
-            "header-see-through",
-            "see-through",
-            "the header is not a see-through band over the picture",
-        ),
+        // Jolla's chrome.
         (
             "light-on-dark",
             "true",
-            "the header, back arrow and menus take the ambience's colours: on \
-             the black page a light ambience's dark ones vanish",
+            "the viewer's icons take the ambience's colours: on the black \
+             page a light ambience's dark ones vanish",
         ),
         (
-            "header-place",
-            "1 of 2",
-            "the header does not say where the picture is among the chat's",
-        ),
-        (
-            "silica-back",
+            "controls",
             "true",
-            "Silica's back arrow, as in every chat, is off: no way back but \
-             the edge swipe the list takes",
+            "the viewer opens with its controls away",
         ),
         (
-            "header-height",
-            "100",
-            "the see-through band is not the Silica header's height",
+            "back-swipe",
+            "true",
+            "the viewer cannot be swiped away at all",
         ),
         (
-            "pulled-header",
+            "back-way",
+            "1",
+            "the viewer does not close on a swipe up or down (Jolla's): \
+             sideways swipes are the gallery's, so there is no way back",
+        ),
+        (
+            "back-arrow",
             "false",
-            "the header covers the picture's pull-down menu",
+            "Silica's back arrow shows on the viewer, beside its close button",
         ),
         (
-            "pushed-header",
-            "true",
-            "the header did not come back once the pull-down menu closed",
-        ),
-        (
-            "header-place-swiped",
-            "2 of 2",
-            "the header's place did not follow the swipe",
-        ),
-        (
-            "video-inset",
-            "100",
-            "the video and its notices start under the header, not below it",
-        ),
-        (
-            "video-pulled-header",
+            "picture-menu",
             "false",
-            "the header covers the video's pull-down menu",
+            "the picture has a pull-down menu in the viewer, which the swipe \
+             down to close fights with",
         ),
         (
-            "video-pushed-header",
-            "true",
-            "the header did not come back once the video's menu closed",
+            "picture-drags",
+            "false",
+            "a fitted picture takes drags, so the swipe down to close never \
+             reaches the page",
         ),
         (
             "neighbour-built",
@@ -748,7 +760,7 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "300",
             "the tapped picture's slide does not reuse the row's decode",
         ),
-        // Swipe: video on screen plays; picture off screen idles.
+        // Swipe: video on screen waits for play; picture off screen idles.
         (
             "shown-after-swipe",
             "15",
@@ -756,10 +768,48 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "video-file",
-            "file:///tmp/piirit-fake/clip.mp4",
-            "swiping to the video did not give the player its file",
+            "",
+            "swiping to the video loaded it before its play button was pressed",
         ),
-        ("video-state", "1", "the video swiped to did not play"),
+        (
+            "video-state",
+            "0",
+            "the video swiped to played before its play button was pressed \
+             (Jolla's waits)",
+        ),
+        (
+            "video-poster",
+            "true",
+            "the video waiting for play shows black, not its still frame",
+        ),
+        (
+            "video-seek",
+            "true",
+            "the video's controls have no seek bar",
+        ),
+        (
+            "played-file",
+            "file:///tmp/piirit-fake/clip.mp4",
+            "pressing play did not give the player its file",
+        ),
+        ("played-state", "1", "pressing play did not play the video"),
+        (
+            "played-controls",
+            "false",
+            "the controls stay over the video once it plays (Jolla's goes \
+             full screen)",
+        ),
+        (
+            "played-swipeable",
+            "false",
+            "a video playing full screen swipes away under a stray drag",
+        ),
+        (
+            "shown-swipeable",
+            "true",
+            "with the controls back over the playing video, the gallery \
+             cannot be swiped",
+        ),
         (
             "picture-off-screen",
             "false",
@@ -784,13 +834,28 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "false",
             "a zoomed picture cannot be panned: dragging swipes away",
         ),
+        (
+            "zoomed-drags",
+            "true",
+            "a zoomed picture does not take drags, so it cannot be panned",
+        ),
+        (
+            "zoomed-controls",
+            "false",
+            "the controls stay over a zoomed picture (Jolla's puts them away)",
+        ),
+        (
+            "fitted-controls",
+            "true",
+            "the controls did not come back once the picture zoomed out",
+        ),
         ("zoom-out", "false", "a second double tap did not zoom out"),
         (
             "fitted-swipeable",
             "true",
             "the gallery cannot be swiped after zooming out",
         ),
-        // Real flick on: video current mid-swipe, but starts only once list still.
+        // Real flick on: video current mid-swipe, never starts on its own.
         (
             "flick-on-moved",
             "true",
@@ -807,11 +872,17 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "the video started while the swipe was still running (its \
              pipeline setup stalls the swipe)",
         ),
+        (
+            "playing-on",
+            "1",
+            "the video flicked to did not play when its button was pressed",
+        ),
         ("flick-on-at", "15", "the flick did not land on the video"),
         (
             "flick-on-settled",
-            "1",
-            "the video did not play once the swipe was over",
+            "0",
+            "the video played once the swipe was over, before its play \
+             button was pressed",
         ),
         // Flick off: paused, file kept till still; then let go.
         (
@@ -852,8 +923,8 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
         ),
         (
             "flick-on-poster",
-            "false",
-            "the still frame covers the playing video",
+            "true",
+            "the video flicked to shows black, not its still frame",
         ),
         // From grid: grid's order (newest left), at tapped video; plays once page in place.
         (
@@ -873,19 +944,15 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
              first",
         ),
         (
-            "grid-place",
-            "1 of 2",
-            "from the grid, the header's place is not the grid's order",
-        ),
-        (
             "grid-video-arriving",
             "0",
             "the video played during the page transition",
         ),
         (
             "grid-video-arrived",
-            "1",
-            "the video did not play once the page was in place",
+            "0",
+            "the video played on its own once the page was in place (Jolla's \
+             waits for play)",
         ),
         // Restart: back where reader was.
         (
@@ -895,11 +962,6 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
              again",
         ),
         ("restart-shown", "10", "the page forgot what was on screen"),
-        (
-            "restart-place",
-            "3 of 3",
-            "the header's place did not count the picture the reread found",
-        ),
         (
             "restart-index",
             "2",
@@ -1024,29 +1086,36 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
             "a message the gallery does not hold was put among the gallery's",
         ),
         (
-            "sticker-place",
+            "sticker-caption",
             "",
-            "a message the gallery does not hold got a place in it",
+            "a message the gallery does not hold got a sender and day from \
+             another",
         ),
         (
-            "sticker-day",
-            "",
-            "a message the gallery does not hold got a day from another",
-        ),
-        (
-            "sticker-back",
+            "sticker-bar",
             "true",
-            "a lone picture has no Silica back arrow",
+            "a lone picture offers no Share and Save",
+        ),
+        (
+            "sticker-menu",
+            "false",
+            "a lone picture has a pull-down menu, which the swipe down to \
+             close fights with",
         ),
         (
             "lone-video",
-            "true",
-            "a video opened on a page already in place did not play",
+            "false",
+            "a lone video played before its play button was pressed",
         ),
         (
-            "lone-video-inset",
-            "100",
-            "a lone video starts under the header, not below it",
+            "lone-seek",
+            "true",
+            "a lone video's controls have no seek bar",
+        ),
+        (
+            "lone-played",
+            "true",
+            "a lone video's play button does not play it",
         ),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");
@@ -1054,13 +1123,13 @@ fn assert_outcome(steps: &[(&str, String)], methods: &[String]) {
 
     // Day sent, phone's short format.
     assert!(
-        !value("header-day-expected").is_empty(),
+        !value("caption-expected").is_empty(),
         "the probe could not format the day. {context}"
     );
     assert_eq!(
-        value("header-day"),
-        value("header-day-expected"),
-        "the header does not give who sent the picture and the day, in the \
+        value("caption"),
+        value("caption-expected"),
+        "the viewer does not say who sent the picture and the day, in the \
          phone's date format. {context}"
     );
 

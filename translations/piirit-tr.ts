@@ -1055,19 +1055,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>GalleryPage</name>
     <message>
-        <source>%1 of %2</source>
-        <extracomment>Where the shown picture or video is among the chat&apos;s, top right of the viewer, such as &quot;3 of 12&quot;.</extracomment>
-        <translation>%1 / %2</translation>
-    </message>
-    <message>
         <source>%1, %2</source>
-        <extracomment>Second line of the full-screen viewer&apos;s header: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
+        <extracomment>Top line of the full-screen viewer: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
         <translation>%1, %2</translation>
-    </message>
-    <message>
-        <source>Back</source>
-        <extracomment>Top left of the full-screen picture and video viewer, beside the back arrow: back to the chat or gallery it was opened from.</extracomment>
-        <translation>Geri</translation>
     </message>
 </context>
 <context>
@@ -2765,18 +2755,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Message pinned by %1$s</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>İleti %1$s tarafından sabitlendi</translation>
-    </message>
-</context>
-<context>
-    <name>VideoView</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Başka bir uygulamada aç</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Cihaza kaydet</translation>
     </message>
 </context>
 <context>

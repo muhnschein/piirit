@@ -1103,29 +1103,35 @@ fn the_share_methods_and_what_answers_them_agree() {
     }
 }
 
-/// `Sailfish.Share` only in share target: missing module fails file.
-/// `Loader` from window: missing module costs sharing, not app.
+/// `Sailfish.Share` only under `qml/share/`: missing module fails file. Those
+/// files only from a `Loader` (window's share target, viewer's share sheet):
+/// missing module costs sharing, not app. So no page imports that directory
+/// as types either.
 #[test]
-fn only_the_share_target_imports_sailfish_share() {
+fn only_the_share_files_import_sailfish_share() {
     let mut offenders = Vec::new();
     for file in qml_files() {
-        let name = file
-            .file_name()
-            .map(|name| name.to_string_lossy().into_owned())
-            .unwrap_or_default();
-        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
-        let imports = code
+        let in_share = file
+            .parent()
+            .and_then(|dir| dir.file_name())
+            .is_some_and(|dir| dir == "share");
+        let code = code_only_keeping_strings(&fs::read_to_string(&file).expect("read qml"));
+        let imports_module = code
             .lines()
             .any(|line| line.trim_start().starts_with("import Sailfish.Share"));
-        if imports && name != "ShareTarget.qml" {
+        let imports_directory = code.lines().any(|line| {
+            let line = line.trim_start();
+            line.starts_with("import \"") && line.contains("share\"")
+        });
+        if (imports_module && !in_share) || imports_directory {
             offenders.push(file.display().to_string());
         }
     }
     assert!(
         offenders.is_empty(),
-        "these import Sailfish.Share outside ShareTarget.qml, so a release \
-         without the module takes them down with it; load the share target \
-         from a Loader instead, as piirit.qml does:\n  {}",
+        "these import Sailfish.Share outside qml/share/, or that directory \
+         as types, so a release without the module takes them down with it; \
+         load the share file from a Loader instead, as piirit.qml does:\n  {}",
         offenders.join("\n  ")
     );
 }

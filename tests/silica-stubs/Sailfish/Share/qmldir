@@ -1,3 +1,4 @@
 module Sailfish.Share
+ShareAction 1.0 ShareAction.qml
 ShareProvider 1.0 ShareProvider.qml
 ShareResource 1.0 ShareResource.qml

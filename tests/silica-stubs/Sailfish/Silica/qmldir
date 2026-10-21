@@ -20,6 +20,7 @@ MenuItem 1.0 MenuItem.qml
 Orientation 1.0 Orientation.qml
 Page 1.0 Page.qml
 PageHeader 1.0 PageHeader.qml
+PageNavigation 1.0 PageNavigation.qml
 Palette 1.0 Palette.qml
 ProgressBar 1.0 ProgressBar.qml
 PullDownMenu 1.0 PullDownMenu.qml

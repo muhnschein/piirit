@@ -46,10 +46,11 @@ Item {
     /// Zoomed in: pans, so swiping viewer leaves drags to it.
     readonly property bool zoomed: root.zoom > 1
 
-    /// Pull-down menu out: header over it steps aside.
-    readonly property bool pulled: menu.active
+    /// Pull-down there (PicturePage). GalleryPage's icon bar does its work instead: page swipes
+    /// down to close.
+    property bool menuEnabled: true
 
-    /// Single tap (no second follows): GalleryPage hides or brings back its header.
+    /// Single tap (no second follows): GalleryPage shows or hides its controls.
     signal tapped()
 
     /// Fitted width. View width until decoded (no divide by zero).
@@ -122,6 +123,11 @@ Item {
         root.zoomAt(root.zoom > 1 ? 1 : 3, viewX, viewY)
     }
 
+    /// Fitted again (GalleryPage: tap on zoomed picture, as Jolla's).
+    function zoomOut() {
+        root.zoomAt(1, flick.width / 2, flick.height / 2)
+    }
+
     /// Second tap of a double: zoom, first tap no single one.
     function zoomTap(viewX, viewY) {
         single.stop()
@@ -162,10 +168,14 @@ Item {
         contentWidth: Math.max(flick.width, frame.width)
         contentHeight: Math.max(flick.height, frame.height)
         clip: true
+        // No menu, fitted: nothing to pull or pan, so drags are page's (down closes) and
+        // list's.
+        interactive: root.menuEnabled || root.zoomed
 
         PullDownMenu {
             id: menu
             objectName: "pictureMenu"
+            visible: root.menuEnabled
             MenuItem {
                 objectName: "openExternally"
                 //: Hands the attachment to whatever else on the phone

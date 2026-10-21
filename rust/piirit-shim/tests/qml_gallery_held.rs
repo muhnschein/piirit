@@ -109,6 +109,11 @@ const PROBE_QML: &str = r"
                 fileName: 'trip.mp4', newestFirst: true, status: 1
             })
         }
+        /// Where on screen is among list's: list's place, not drawn (Jolla's shows none).
+        function place() {
+            var list = findIn(loader.item, 'slides')
+            return list ? (list.currentIndex + 1) + ' of ' + list.count : 'missing:slides'
+        }
         function loadGrid(url) {
             return load(url, { accountId: 1, chatId: 2, kind: 'gallery' })
         }
@@ -252,10 +257,12 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("newest", call!("newestList"));
         record!("gallery-placed", call!("page", s!("placed")));
-        record!("gallery-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("gallery-place", call!("place"));
         record!("swipe-held", call!("swipeTo", 1));
         record!("held-shown", call!("page", s!("shownId")));
-        record!("held-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("held-place", call!("place"));
+        // No file yet: nothing to share or save.
+        record!("held-bar", call!("get", s!("iconBar"), s!("visible")));
         record!("held-said", call!("current", s!("heldView"), s!("text")));
         record!(
             "held-kind",
@@ -275,7 +282,8 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     // Fetched: same slide now the picture. Then grid.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("fetched-shown", call!("page", s!("shownId")));
-        record!("fetched-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("fetched-place", call!("place"));
+        record!("fetched-bar", call!("get", s!("iconBar"), s!("visible")));
         record!(
             "fetched-picture",
             call!("current", s!("pictureView"), s!("fileUrl"))
@@ -363,7 +371,8 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
             "at-held-state",
             call!("current", s!("heldView"), s!("downloadState"))
         );
-        record!("at-held-place", call!("get", s!("pageHeader"), s!("title")));
+        record!("at-held-place", call!("place"));
+        record!("at-held-bar", call!("get", s!("iconBar"), s!("visible")));
         (*engine_ptr).quit();
     });
 
@@ -412,7 +421,23 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
         (
             "held-place",
             "2 of 4",
-            "the header lost count on the not yet downloaded picture",
+            "the viewer lost count on the not yet downloaded picture",
+        ),
+        (
+            "held-bar",
+            "false",
+            "a picture not yet downloaded offers Share and Save, with no file \
+             to hand on",
+        ),
+        (
+            "fetched-bar",
+            "true",
+            "once the picture arrived, the viewer does not offer Share and Save",
+        ),
+        (
+            "at-held-bar",
+            "false",
+            "opened at a tile with no file, the viewer offers Share and Save",
         ),
         (
             "held-said",

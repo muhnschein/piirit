@@ -14,6 +14,8 @@ Item {
     property bool backNavigation: true
     // Silica's back arrow drawn (when back is possible).
     property bool showNavigationIndicator: true
+    // Back swipe's way: sideways (Silica default) or up and down.
+    property int navigationStyle: PageNavigation.Horizontal
     // Silica's colours for page's items; pages set scheme.
     property Palette palette: Palette {}
     width: 540

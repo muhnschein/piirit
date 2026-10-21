@@ -1,8 +1,12 @@
-//! Viewer turned and tapped: page follows phone (landscape too), list keeps slide on screen;
-//! video turned by page only (screen-following turn doubled it: sideways, distorted); video's
-//! time from row until player knows it (Qt 5.6's -1 read "-1:0-1" mid-swipe); header names
-//! sender with day, "Back" top left pops page; single tap on picture hides whole header (back
-//! arrow too), again brings it; double tap zooms, header stays; video slide keeps header.
+//! Viewer turned and tapped, as Jolla Gallery's: page follows phone (landscape too), list keeps
+//! slide on screen; video turned by page only (screen-following turn doubled it: sideways,
+//! distorted); up or down closes, no back arrow; top line names sender with day, X pops page;
+//! single tap on picture fades controls, again brings them, swipes keep them as they are; double
+//! tap zooms and puts them away, tap on zoomed one zooms out; video: seek bar spans row's length
+//! until player knows it (Qt 5.6's -1 read "-1:0-1" mid-swipe), double tap 10 s on (controls
+//! stay), play puts controls away and holds list still, tap brings them, they go again after a
+//! while unless seek bar held, seek bar follows video but not under finger and seeks on release;
+//! Share hands sheet file (video paused); Save copies; lone video seeks once length known.
 //!
 //! Headless vs stub Silica; group seeded with picture (10, Ada Lovelace) and video (15, 7 s).
 //! Turn = page's width and height swapped, as Silica does. Steps a second apart (`single_shot`
@@ -36,17 +40,22 @@ const PROBE_QML: &str = r"
             function pop() { pops += 1; return null }
         }
         function pops() { return '' + probe.pageStack.pops }
+        // Where the platform says downloads go: this test's own directory.
+        function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
         function load(url, messageId, viewType, file) {
             loader.setSource('', {})
             loader.setSource(url, {
                 accountId: 1, chatId: 2, messageId: messageId, viewType: viewType,
-                fileUrl: file, fileName: 'tapped', newestFirst: false, status: 2
+                fileUrl: file, fileName: 'tapped.png', newestFirst: false, status: 2
             })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
         function loadVideo(url, durationMs) {
             loader.setSource('', {})
-            loader.setSource(url, { width: 540, height: 960, durationMs: durationMs })
+            loader.setSource(url, {
+                width: 540, height: 960, durationMs: durationMs,
+                fileUrl: 'file:///tmp/piirit-fake/clip.mp4'
+            })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
         function findIn(node, name) {
@@ -70,8 +79,19 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
+        function set(name, property, value) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item[property] = value
+            return 'ok'
+        }
         function setItem(property, value) {
             loader.item[property] = value
+            return 'ok'
+        }
+        /// Function of what's loaded (lone video), with one number.
+        function callItem(name, value) {
+            loader.item[name](value)
             return 'ok'
         }
         function current(name, property) {
@@ -109,14 +129,23 @@ const PROBE_QML: &str = r"
             var list = slides()
             return Math.round(list.contentX - list.originX) + '/' + Math.round(list.width)
         }
-        /// Single tap on picture now on screen; double: tap, then second within interval.
-        function tapCurrent() {
-            var tap = findIn(slides().currentItem, 'pictureTap')
-            if (!tap) { return 'missing:pictureTap' }
+        /// Button pressed: overlay's, or (`current`) on slide on screen.
+        function click(name, onCurrent) {
+            var item = onCurrent ? findIn(slides().currentItem, name)
+                                 : findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.clicked()
+            return 'ok'
+        }
+        /// Single tap on what's on screen (picture or video); double: tap, then second within
+        /// interval.
+        function tapCurrent(name) {
+            var tap = findIn(slides().currentItem, name)
+            if (!tap) { return 'missing:' + name }
             tap.clicked(null)
             return 'ok'
         }
-        function doubleTapCurrent() {
+        function doubleTapPicture() {
             var slide = slides().currentItem
             var tap = findIn(slide, 'pictureTap')
             var view = findIn(slide, 'pictureView')
@@ -125,25 +154,42 @@ const PROBE_QML: &str = r"
             view.zoomTap(100, 100)
             return '' + view.zoomed
         }
-        function tapBack() {
-            var back = findIn(loader.item, 'backButton')
-            if (!back) { return 'missing:backButton' }
-            back.clicked(null)
+        function doubleTapVideo() {
+            var tap = findIn(slides().currentItem, 'videoTap')
+            if (!tap) { return 'missing:videoTap' }
+            tap.clicked(null)
+            tap.doubleClicked(null)
             return 'ok'
         }
-        /// Header and Silica's back arrow both shown, or both gone.
-        function chrome() {
-            return get('header', 'visible') + '/' + page('showNavigationIndicator')
+        function controls() { return get('overlay', 'shown') }
+        /// Seek bar let go: Silica says released while still down, then not down.
+        function releaseSeek() {
+            var seek = findIn(loader.item, 'seek')
+            if (!seek) { return 'missing:seek' }
+            seek.released()
+            seek.down = false
+            return 'ok'
+        }
+        /// What share sheet was handed: times, kind, files.
+        function shared() {
+            var action = findIn(loader.item, 'shareAction')
+            if (!action) { return 'missing:shareAction' }
+            return action.triggered + '|' + action.mimeType + '|' + action.resources.join(',')
         }
     }
 ";
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
+fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
     let temp = std::env::temp_dir().join(format!("piirit-gallery-turn-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Lone picture's file, real: Save copies it.
+    let png = temp.join("tapped.png");
+    std::fs::write(&png, b"not really a png").expect("write picture");
+    let png_url = format!("file://{}", png.display());
+    let downloads = temp.join("Downloads");
 
     // SAFETY: single thread; pre-Qt.
     unsafe {
@@ -197,12 +243,13 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
     let gallery = common::page_url("GalleryPage.qml");
     let video = common::component_url("VideoView.qml");
 
+    let page = gallery.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
             call!(
                 "load",
-                s!(gallery.clone()),
+                s!(page.clone()),
                 10,
                 s!("Image"),
                 s!("file:///tmp/piirit-fake/photo.jpg")
@@ -210,32 +257,37 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
         );
     });
 
-    // Header: sender and day, Back. Video: page turns it; time from row mid-swipe.
+    // Jolla's chrome: up or down closes, X, sender and day. Video: page turns it; seek bar's
+    // length from row mid-swipe.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("allowed", call!("page", s!("allowedOrientations")));
-        record!(
-            "sender-day",
-            call!("get", s!("pageHeader"), s!("description"))
-        );
-        record!("back-label", call!("get", s!("backLabel"), s!("text")));
-        record!("tap-back", call!("tapBack"));
+        record!("back-way", call!("page", s!("navigationStyle")));
+        record!("back-arrow", call!("page", s!("showNavigationIndicator")));
+        record!("caption", call!("get", s!("caption"), s!("text")));
+        record!("close", call!("click", s!("closeButton"), false));
         record!("popped", call!("pops"));
+        record!("picture-seek", call!("get", s!("seek"), s!("visible")));
         record!("swipe-video", call!("swipeTo", 1));
         record!(
             "video-turned-by-screen",
             call!("current", s!("videoOutput"), s!("autoOrientation"))
         );
+        record!("video-seek", call!("get", s!("seek"), s!("visible")));
         // Qt 5.6's player before it has file: -1.
         record!(
             "unknown",
             call!("setCurrent", s!("player"), s!("duration"), -1)
         );
-        record!("time-unknown", call!("current", s!("elapsed"), s!("text")));
+        record!(
+            "length-unknown",
+            call!("get", s!("seek"), s!("maximumValue"))
+        );
+        record!("time-unknown", call!("get", s!("seek"), s!("valueText")));
         record!(
             "known",
             call!("setCurrent", s!("player"), s!("duration"), 125_000)
         );
-        record!("time-known", call!("current", s!("elapsed"), s!("text")));
+        record!("length-known", call!("get", s!("seek"), s!("maximumValue")));
         // Turned to landscape on the video.
         record!("turn", call!("turn", 960, 540));
     });
@@ -259,38 +311,183 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
         );
         record!("upright-standing", call!("standing"));
         record!("swipe-picture", call!("swipeTo", 0));
-        record!("chrome-before", call!("chrome"));
-        record!("tap", call!("tapCurrent"));
+        record!("controls-before", call!("controls"));
+        record!(
+            "hide-on-picture",
+            call!("get", s!("hideControls"), s!("running"))
+        );
+        record!("tap", call!("tapCurrent", s!("pictureTap")));
         // Tap told apart from double tap only once a second can't follow.
-        record!("chrome-tapped-at-once", call!("chrome"));
+        record!("controls-tapped-at-once", call!("controls"));
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!("chrome-tapped", call!("chrome"));
-        // Video slide: tap plays, so header there whatever.
+        record!("controls-tapped", call!("controls"));
+        record!("tappable", call!("get", s!("overlay"), s!("enabled")));
+        // Swipes keep them as they are; video's play button stays (not playing).
         record!("swipe-video-hidden", call!("swipeTo", 1));
-        record!("chrome-on-video", call!("chrome"));
+        record!("controls-on-video", call!("controls"));
+        record!(
+            "play-on-hidden",
+            call!("current", s!("playButton"), s!("enabled"))
+        );
         record!("swipe-picture-hidden", call!("swipeTo", 0));
-        record!("chrome-back-on-picture", call!("chrome"));
-        record!("tap-again", call!("tapCurrent"));
+        record!("controls-back-on-picture", call!("controls"));
+        record!("tap-again", call!("tapCurrent", s!("pictureTap")));
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
-        record!("chrome-tapped-again", call!("chrome"));
-        record!("double-tap", call!("doubleTapCurrent"));
+        record!("controls-tapped-again", call!("controls"));
+        record!("double-tap", call!("doubleTapPicture"));
+        record!("controls-zoomed", call!("controls"));
+        record!("tap-zoomed", call!("tapCurrent", s!("pictureTap")));
     });
 
     single_shot(Duration::from_secs(7), move || unsafe {
-        record!("chrome-double-tapped", call!("chrome"));
-        // Video alone: neither row nor player knows length.
-        record!("load-video", call!("loadVideo", s!(video.clone()), 0));
-        record!("nothing-known", call!("get", s!("elapsed"), s!("text")));
-        record!("from-row", call!("setItem", s!("durationMs"), 65_000));
-        record!("from-row-time", call!("get", s!("elapsed"), s!("text")));
         record!(
-            "from-row-seek",
-            call!("get", s!("seek"), s!("maximumValue"))
+            "zoomed-after-tap",
+            call!("current", s!("pictureView"), s!("zoomed"))
         );
+        record!("controls-zoomed-out", call!("controls"));
+        // Video: double tap 10 s on.
+        record!("swipe-video-again", call!("swipeTo", 1));
+        record!("double-tap-video", call!("doubleTapVideo"));
+        record!(
+            "double-tapped-at",
+            call!("current", s!("player"), s!("position"))
+        );
+    });
+
+    single_shot(Duration::from_secs(8), move || unsafe {
+        record!("controls-double-tapped", call!("controls"));
+        // Play: controls away, list still, play button gone.
+        record!("play", call!("click", s!("playButton"), true));
+        record!(
+            "playing",
+            call!("current", s!("player"), s!("playbackState"))
+        );
+        record!("controls-playing", call!("controls"));
+        record!(
+            "swipeable-playing",
+            call!("get", s!("slides"), s!("interactive"))
+        );
+        record!(
+            "play-button-playing",
+            call!("current", s!("playButton"), s!("enabled"))
+        );
+        record!("tap-video", call!("tapCurrent", s!("videoTap")));
+    });
+
+    single_shot(Duration::from_secs(9), move || unsafe {
+        record!("controls-video-tapped", call!("controls"));
+        record!(
+            "swipeable-tapped",
+            call!("get", s!("slides"), s!("interactive"))
+        );
+        record!(
+            "pause-button",
+            call!("current", s!("playButton"), s!("enabled"))
+        );
+        record!(
+            "hide-running",
+            call!("get", s!("hideControls"), s!("running"))
+        );
+        // Seek bar follows video...
+        record!(
+            "position",
+            call!("setCurrent", s!("player"), s!("position"), 30_000)
+        );
+        record!("followed", call!("get", s!("seek"), s!("value")));
+        // ...not under finger; controls stay meanwhile.
+        record!("hold", call!("set", s!("seek"), s!("down"), true));
+        record!(
+            "hide-running-held",
+            call!("get", s!("hideControls"), s!("running"))
+        );
+        record!("drag", call!("set", s!("seek"), s!("value"), 60_000));
+        record!(
+            "moved-while-held",
+            call!("setCurrent", s!("player"), s!("position"), 31_000)
+        );
+        record!("held-value", call!("get", s!("seek"), s!("value")));
+        record!("held-text", call!("get", s!("seek"), s!("valueText")));
+        record!("release", call!("releaseSeek"));
+        record!(
+            "released-at",
+            call!("current", s!("player"), s!("position"))
+        );
+        record!(
+            "hide-running-released",
+            call!("get", s!("hideControls"), s!("running"))
+        );
+        // Brisk, not 4 s of test: restarts.
+        record!(
+            "hide-soon",
+            call!("set", s!("hideControls"), s!("interval"), 300)
+        );
+    });
+
+    single_shot(Duration::from_secs(10), move || unsafe {
+        record!("controls-timed-out", call!("controls"));
+        record!(
+            "hide-later",
+            call!("set", s!("hideControls"), s!("interval"), 4000)
+        );
+        record!("tap-video-again", call!("tapCurrent", s!("videoTap")));
+    });
+
+    let lone = video;
+    let page = gallery;
+    let picture = png_url;
+    let downloads_for_probe = downloads.to_string_lossy().into_owned();
+    single_shot(Duration::from_secs(11), move || unsafe {
+        record!("controls-back", call!("controls"));
+        // Share: sheet gets video's file; video waits.
+        record!(
+            "share-offered",
+            call!("get", s!("shareButton"), s!("visible"))
+        );
+        record!("share", call!("click", s!("shareButton"), false));
+        record!("shared", call!("shared"));
+        record!(
+            "shared-state",
+            call!("current", s!("player"), s!("playbackState"))
+        );
+        // Lone video: length from row; seek before player knows length waits for it.
+        record!("load-lone", call!("loadVideo", s!(lone.clone()), 0));
+        record!("lone-length", call!("page", s!("length")));
+        record!("lone-from-row", call!("setItem", s!("durationMs"), 65_000));
+        record!("lone-row-length", call!("page", s!("length")));
+        record!("lone-seek", call!("callItem", s!("seekTo"), 5000));
+        record!("lone-pending", call!("page", s!("pendingSeek")));
+        record!(
+            "lone-paused",
+            call!("get", s!("player"), s!("playbackState"))
+        );
+        record!("lone-loaded", call!("get", s!("player"), s!("source")));
+        record!(
+            "lone-learns",
+            call!("set", s!("player"), s!("duration"), 30_000)
+        );
+        record!("lone-at", call!("get", s!("player"), s!("position")));
+        record!("lone-done", call!("page", s!("pendingSeek")));
+        // Save: copy of what's on screen (picture alone, not in gallery: own file).
+        record!(
+            "load-picture",
+            call!(
+                "load",
+                s!(page.clone()),
+                99,
+                s!("Image"),
+                s!(picture.clone())
+            )
+        );
+        call!("setDownloads", s!(downloads_for_probe.clone()));
+        record!("save", call!("click", s!("saveButton"), false));
+    });
+
+    single_shot(Duration::from_secs(12), move || unsafe {
+        record!("saved", call!("get", s!("viewerNoticeLabel"), s!("text")));
         (*engine_ptr).quit();
     });
 
@@ -306,7 +503,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
 
     for label in [
         "load",
-        "tap-back",
+        "close",
         "swipe-video",
         "unknown",
         "known",
@@ -317,18 +514,36 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
         "swipe-video-hidden",
         "swipe-picture-hidden",
         "tap-again",
-        "load-video",
-        "from-row",
+        "tap-zoomed",
+        "swipe-video-again",
+        "double-tap-video",
+        "play",
+        "tap-video",
+        "position",
+        "hold",
+        "drag",
+        "moved-while-held",
+        "release",
+        "hide-soon",
+        "hide-later",
+        "tap-video-again",
+        "share",
+        "load-lone",
+        "lone-from-row",
+        "lone-seek",
+        "lone-learns",
+        "load-picture",
+        "save",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
 
     // Day in phone's short format: not this test's to spell.
-    let said = value("sender-day");
+    let said = value("caption");
     assert!(
         said.strip_prefix("Ada Lovelace, ")
             .is_some_and(|day| !day.is_empty() && !day.contains(',')),
-        "the header's second line does not name who sent the picture, then the day: \
+        "the viewer's top line does not name who sent the picture, then the day: \
          {said:?}. {context}"
     );
 
@@ -338,24 +553,40 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
             "15",
             "the viewer stays upright when the phone turns: pictures never turn",
         ),
-        ("back-label", "Back", "the header has no Back top left"),
-        ("popped", "1", "tapping Back does not go back"),
+        (
+            "back-way",
+            "1",
+            "the viewer does not close on a swipe up or down, as Jolla's does",
+        ),
+        (
+            "back-arrow",
+            "false",
+            "Silica's back arrow shows beside the viewer's close button",
+        ),
+        ("popped", "1", "the close button does not close the viewer"),
+        ("picture-seek", "false", "a picture has a seek bar"),
         (
             "video-turned-by-screen",
             "false",
             "the video turns with the screen inside the page that turns too: sideways or \
              distorted",
         ),
+        ("video-seek", "true", "the video has no seek bar"),
         (
-            "time-unknown",
-            "0:00 / 0:07",
-            "before the player has the file, the video's time is not the length its message \
-             gives (Qt 5.6 says -1: \"0:00 / -1:0-1\")",
+            "length-unknown",
+            "7000",
+            "before the player has the file, the seek bar does not span the length the \
+             video's message gives (Qt 5.6 says -1: \"-1:0-1\")",
         ),
         (
-            "time-known",
-            "0:00 / 2:05",
-            "once the player knows the length, the video's time does not say it",
+            "time-unknown",
+            "0:00",
+            "the seek bar does not say where the video is",
+        ),
+        (
+            "length-known",
+            "125000",
+            "once the player knows the length, the seek bar does not span it",
         ),
         (
             "turned-index",
@@ -384,58 +615,214 @@ fn the_viewer_turns_with_the_phone_and_a_tap_hides_its_header() {
             "turned back, the list stands between slides",
         ),
         (
-            "chrome-before",
-            "true/true",
-            "the header is not there to begin with",
+            "controls-before",
+            "true",
+            "the controls are not there to begin with",
         ),
         (
-            "chrome-tapped-at-once",
-            "true/true",
-            "the header went at the first touch: a double tap to zoom would flash it",
+            "hide-on-picture",
+            "false",
+            "the controls over a picture go away on their own (only a playing video's do)",
         ),
         (
-            "chrome-tapped",
-            "false/false",
-            "a single tap on the picture does not hide the whole header, back arrow too",
+            "controls-tapped-at-once",
+            "true",
+            "the controls went at the first touch: a double tap to zoom would flash them",
         ),
         (
-            "chrome-on-video",
-            "true/true",
-            "a video slide (tap plays it) lost its header with no tap to bring it back",
+            "controls-tapped",
+            "false",
+            "a single tap on the picture does not put the controls away",
         ),
         (
-            "chrome-back-on-picture",
-            "false/false",
-            "swiped back to a picture, the hidden header came back on its own",
+            "tappable",
+            "false",
+            "the controls put away still take taps meant for the picture",
         ),
         (
-            "chrome-tapped-again",
-            "true/true",
-            "a second tap does not bring the header back",
+            "controls-on-video",
+            "false",
+            "swiping to a video brought the controls back on their own",
+        ),
+        (
+            "play-on-hidden",
+            "true",
+            "with the controls away, a video not playing has no play button",
+        ),
+        (
+            "controls-back-on-picture",
+            "false",
+            "swiped back to a picture, the controls came back on their own",
+        ),
+        (
+            "controls-tapped-again",
+            "true",
+            "a second tap does not bring the controls back",
         ),
         ("double-tap", "true", "a double tap does not zoom"),
         (
-            "chrome-double-tapped",
-            "true/true",
-            "a double tap to zoom also hid the header",
+            "controls-zoomed",
+            "false",
+            "zoomed in, the controls stay over the picture (Jolla's puts them away)",
         ),
         (
-            "nothing-known",
-            "",
-            "a video whose length nobody knows shows a made-up time",
+            "zoomed-after-tap",
+            "false",
+            "a tap on a zoomed picture does not zoom it out (Jolla's does)",
         ),
         (
-            "from-row-time",
-            "0:00 / 1:05",
-            "a video's length from its message is not shown before the player knows it",
+            "controls-zoomed-out",
+            "true",
+            "zoomed out, the controls did not come back",
         ),
         (
-            "from-row-seek",
+            "double-tapped-at",
+            "10000",
+            "a double tap on the video does not skip 10 s on",
+        ),
+        (
+            "controls-double-tapped",
+            "true",
+            "a double tap on the video also put the controls away",
+        ),
+        ("playing", "1", "the play button does not play the video"),
+        (
+            "controls-playing",
+            "false",
+            "the controls stay over the video once it plays (Jolla's goes full screen)",
+        ),
+        (
+            "swipeable-playing",
+            "false",
+            "a video playing full screen swipes away under a stray drag",
+        ),
+        (
+            "play-button-playing",
+            "false",
+            "the pause button stays over the video playing full screen",
+        ),
+        (
+            "controls-video-tapped",
+            "true",
+            "a tap on the playing video does not bring the controls back",
+        ),
+        (
+            "swipeable-tapped",
+            "true",
+            "with the controls back, the gallery cannot be swiped on",
+        ),
+        (
+            "pause-button",
+            "true",
+            "with the controls back, the playing video has no pause button",
+        ),
+        (
+            "hide-running",
+            "true",
+            "the controls brought back over a playing video never go away again",
+        ),
+        (
+            "followed",
+            "30000",
+            "the seek bar does not follow the video",
+        ),
+        (
+            "hide-running-held",
+            "false",
+            "the controls would go away while the reader holds the seek bar",
+        ),
+        (
+            "held-value",
+            "60000",
+            "the video moved the seek bar out from under the reader's finger",
+        ),
+        (
+            "held-text",
+            "1:00",
+            "the seek bar does not say where the reader is dragging to",
+        ),
+        (
+            "released-at",
+            "60000",
+            "letting go of the seek bar does not move the video there",
+        ),
+        (
+            "hide-running-released",
+            "true",
+            "once the seek bar is let go, the controls never go away again",
+        ),
+        (
+            "controls-timed-out",
+            "false",
+            "the controls over a playing video do not go away after a while",
+        ),
+        (
+            "controls-back",
+            "true",
+            "a tap does not bring the controls back after they went on their own",
+        ),
+        ("share-offered", "true", "the viewer offers no Share"),
+        (
+            "shared",
+            "1|video/mp4|file:///tmp/piirit-fake/clip.mp4",
+            "Share does not hand the share sheet the video's file and kind",
+        ),
+        (
+            "shared-state",
+            "2",
+            "the video plays on under the share sheet (Jolla's pauses it)",
+        ),
+        (
+            "lone-length",
+            "0",
+            "a video whose length nobody knows has a made-up length",
+        ),
+        (
+            "lone-row-length",
             "65000",
-            "the seek bar does not span the video's length from its message",
+            "a video's length from its message is not its length before the player knows it",
+        ),
+        (
+            "lone-pending",
+            "5000",
+            "a seek before the player knows the video's length is lost",
+        ),
+        (
+            "lone-paused",
+            "2",
+            "a seek on a video not yet loaded leaves it stopped, showing no frame",
+        ),
+        (
+            "lone-loaded",
+            "file:///tmp/piirit-fake/clip.mp4",
+            "a seek on a video not yet loaded does not load it",
+        ),
+        (
+            "lone-at",
+            "5000",
+            "once the player knows the length, the seek asked before is not done",
+        ),
+        (
+            "lone-done",
+            "-1",
+            "the seek asked before is done again later",
+        ),
+        (
+            "saved",
+            "Saved to Downloads/Piirit",
+            "Save does not say where the copy went",
         ),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
+
+    let copy = downloads.join("Piirit").join("tapped.png");
+    assert_eq!(
+        std::fs::read(&copy).ok().as_deref(),
+        Some(&b"not really a png"[..]),
+        "Save did not put a copy of what is on screen in Piirit's folder in Downloads: {}. \
+         {context}",
+        copy.display()
+    );
     let _ = std::fs::remove_dir_all(&temp);
 }

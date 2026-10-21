@@ -1,8 +1,9 @@
 //! Pictures and video open in Piirit (system handover failed to show them). Conversation
 //! picks kinds for the pages (swiping: `qml_gallery.rs`); others still go to system (a page only
 //! saying "cannot show this" would be worse than the handover). Checks wiring: which kind gets
-//! which page, picture page draws and pans once zoomed, video plays on open, seek bar follows
-//! player without fighting reader, Save to device copies into Piirit's folder in Downloads.
+//! which page, picture page draws and pans once zoomed, video waits for its play button (Jolla's)
+//! which plays and pauses it, Save to device copies into Piirit's folder in Downloads. Seek bar:
+//! viewer's overlay (`qml_gallery_turn.rs`).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -431,6 +432,23 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("playbackState")
             ),
         ));
+        (*steps_ptr).push((
+            "opened-poster",
+            call!("flagOf", QString::from("poster"), QString::from("visible")),
+        ));
+        (*steps_ptr).push(("start", call!("call", QString::from("toggle"))));
+        (*steps_ptr).push((
+            "started",
+            call!(
+                "flagOf",
+                QString::from("player"),
+                QString::from("playbackState")
+            ),
+        ));
+        (*steps_ptr).push((
+            "started-file",
+            call!("flagOf", QString::from("player"), QString::from("source")),
+        ));
         (*steps_ptr).push(("pause", call!("call", QString::from("toggle"))));
         (*steps_ptr).push((
             "paused",
@@ -448,38 +466,6 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("player"),
                 QString::from("playbackState")
             ),
-        ));
-        // Seek bar follows video...
-        (*steps_ptr).push((
-            "position",
-            call!(
-                "setOn",
-                QString::from("player"),
-                QString::from("position"),
-                5000
-            ),
-        ));
-        (*steps_ptr).push((
-            "followed",
-            call!("of", QString::from("seek"), QString::from("value")),
-        ));
-        // ...stops following while reader holds it.
-        (*steps_ptr).push((
-            "held",
-            call!("setOn", QString::from("seek"), QString::from("down"), true),
-        ));
-        (*steps_ptr).push((
-            "moved-while-held",
-            call!(
-                "setOn",
-                QString::from("player"),
-                QString::from("position"),
-                9000
-            ),
-        ));
-        (*steps_ptr).push((
-            "held-value",
-            call!("of", QString::from("seek"), QString::from("value")),
         ));
         (*engine_ptr).quit();
     });
@@ -677,11 +663,27 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "the video page has a player and a picture and did not connect \
          them. {context}"
     );
-    // MediaPlayer values: 1 playing, 2 paused.
+    // MediaPlayer values: 0 stopped, 1 playing, 2 paused.
     assert_eq!(
         value("opened"),
+        "0",
+        "the video started playing before its play button was pressed \
+         (Jolla's waits). {context}"
+    );
+    assert_eq!(
+        value("opened-poster"),
+        "true",
+        "the video waiting for play shows black, not its still frame. {context}"
+    );
+    assert_eq!(
+        value("started"),
         "1",
-        "the video did not start playing when it was opened. {context}"
+        "the play button did not start the video. {context}"
+    );
+    assert_eq!(
+        value("started-file"),
+        "file:///tmp/clip.mp4",
+        "the play button did not give the player the video's file. {context}"
     );
     assert_eq!(
         value("paused"),
@@ -693,16 +695,5 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         value("playing"),
         "1",
         "the play button did not start the video again. {context}"
-    );
-    assert_eq!(
-        number("followed"),
-        5000,
-        "the seek bar does not follow the video. {context}"
-    );
-    assert_eq!(
-        number("held-value"),
-        5000,
-        "the video moved the seek bar out from under the reader's finger \
-         while they were dragging it. {context}"
     );
 }
