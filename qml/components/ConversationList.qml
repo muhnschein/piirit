@@ -83,9 +83,9 @@ SilicaListView {
     signal deleteChoiceRequested(int messageId, bool canDeleteForEveryone)
     signal resendRequested(int messageId)
     signal forwardRequested(int messageId)
-    /// Attachment tapped; page opens it.
+    /// Attachment tapped; page opens it. Message id: gallery swipes from it.
     signal openRequested(url fileUrl, string fileName, string viewType,
-                         real previewWidth)
+                         real previewWidth, int messageId)
     /// Page picks where; copy keeps sender's file name.
     signal saveRequested(url fileUrl, string fileName)
     /// Author travels: row may be gone by build.
@@ -566,7 +566,7 @@ SilicaListView {
                     text: qsTr("Open")
                     onClicked: root.openRequested(
                                    "file://" + model.file_path, model.file_name,
-                                   model.view_type, 0)
+                                   model.view_type, 0, model.message_id)
                 }
                 MenuItem {
                     objectName: "saveItem"
@@ -811,7 +811,7 @@ SilicaListView {
                 callDuration: model.call_duration
                 reactions: model.reactions
                 onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
-                                                    previewWidth)
+                                                    previewWidth, model.message_id)
                 onFullTextRequested: root.fullTextRequested(model.message_id,
                                                            model.sender_name)
                 onAppRequested: root.appRequested(model.message_id)

@@ -45,9 +45,12 @@ const PROBE_QML: &str = r"
             rows.append(row('Image', '/tmp/holiday.png', 'Done'))
             list.setSource(url, { model: rows })
             if (list.status !== Loader.Ready) { return 'load-failed' }
-            list.item.openRequested.connect(function(fileUrl, fileName, viewType, previewWidth) {
-                raised = 'open:' + viewType + ':' + fileName + ':' + (previewWidth > 0)
-            })
+            list.item.openRequested.connect(
+                function(fileUrl, fileName, viewType, previewWidth, messageId) {
+                    // Id: gallery opens at this message.
+                    raised = 'open:' + viewType + ':' + fileName + ':' + (previewWidth > 0)
+                             + ':' + messageId
+                })
             list.item.downloadRequested.connect(function(id) {
                 raised = 'download:' + id
             })
@@ -211,9 +214,10 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
     assert_eq!(value("load"), "ok", "the list did not load. {context}");
     assert_eq!(
         value("picture-tap"),
-        "open:Image:holiday.png:true",
+        "open:Image:holiday.png:true:7",
         "a tap on a picture's row did not open the picture, at the width \
-         the row drew it. {context}"
+         the row drew it, with the message it belongs to (where the \
+         gallery opens). {context}"
     );
     assert_eq!(
         value("menu-before"),
@@ -222,12 +226,12 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
     );
     assert_eq!(
         value("video-tap"),
-        "open:Video:holiday.png:true",
+        "open:Video:holiday.png:true:7",
         "a tap on a video's row did not open the video. {context}"
     );
     assert_eq!(
         value("file-tap"),
-        "open:File:holiday.png:true",
+        "open:File:holiday.png:true:7",
         "a tap on a file's row did not open the file. {context}"
     );
     assert_eq!(
@@ -253,7 +257,7 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
     );
     assert_eq!(
         value("xdc-tap-off"),
-        "open:Webxdc:holiday.png:true",
+        "open:Webxdc:holiday.png:true:7",
         "a tap on a .xdc did not hand it on where apps are off, so the \
          reader has a row that does nothing. {context}"
     );

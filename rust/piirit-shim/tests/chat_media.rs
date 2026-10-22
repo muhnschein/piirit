@@ -209,12 +209,16 @@ fn assert_media(calls: &[(String, Value)], report: &str) {
         ),
         "the gallery does not hold the chat's picture and video, newest first. {context}"
     );
-    assert!(
+    // Once: arrival elsewhere rereads ids, not rows already here.
+    assert_eq!(
         calls
             .iter()
-            .any(|(name, params)| name == "get_messages"
-                && *params == serde_json::json!([1, [15, 10]])),
-        "the gallery's rows were not read in one batch, newest first. {context}"
+            .filter(|(name, params)| name == "get_messages"
+                && *params == serde_json::json!([1, [15, 10]]))
+            .count(),
+        1,
+        "the gallery's rows were not read in one batch, newest first, or were read again \
+         when a voice message arrived. {context}"
     );
 
     // Empty kind loaded: lets a page say so rather than wait.

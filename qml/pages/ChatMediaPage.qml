@@ -108,23 +108,23 @@ Page {
         return path.length > 0 ? Qt.resolvedUrl(Media.fileUrl(path)) : ""
     }
 
-    /// Tap opens per kind (ConversationPage.openAttachment); files to other apps.
-    function open(fileUrl, fileName, viewType) {
+    /// Tap opens per kind (ConversationPage.openAttachment): pictures, videos swiped in grid
+    /// order (GalleryPage); files to other apps. `held`: not yet downloaded picture or video, no
+    /// file: viewer offers Download.
+    function open(fileUrl, fileName, viewType, messageId, held) {
         // Row not loaded yet: no file.
-        if (String(fileUrl).length === 0) {
+        if (String(fileUrl).length === 0 && held !== true) {
             return
         }
-        if (viewType === "Image" || viewType === "Gif"
-                || viewType === "Sticker") {
-            pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
+        if (viewType === "Image" || viewType === "Gif" || viewType === "Video") {
+            pageStack.push(Qt.resolvedUrl("GalleryPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                messageId: messageId,
                 fileUrl: fileUrl,
                 fileName: fileName,
-                viewType: viewType
-            })
-        } else if (viewType === "Video") {
-            pageStack.push(Qt.resolvedUrl("VideoPage.qml"), {
-                fileUrl: fileUrl,
-                fileName: fileName
+                viewType: viewType,
+                newestFirst: true
             })
         } else {
             Qt.openUrlExternally(fileUrl)
@@ -211,6 +211,9 @@ Page {
 
                 readonly property bool isVideo: model.view_type === "Video"
                 readonly property bool isAnimated: model.view_type === "Gif"
+                /// Not yet downloaded: no picture; download mark, size (chat_media.rs).
+                readonly property bool held: model.loaded && model.download_state.length > 0
+                                             && model.download_state !== "Done"
                 /// The file, once row loaded.
                 readonly property url fileUrl:
                     model.loaded ? page.fileUrlOf(model.file_path) : ""
@@ -299,7 +302,7 @@ Page {
                     // Conversation's marks for same two kinds.
                     Rectangle {
                         objectName: "playMark"
-                        visible: tile.isVideo || tile.isAnimated
+                        visible: (tile.isVideo || tile.isAnimated) && !tile.held
                         anchors.centerIn: parent
                         width: Theme.itemSizeExtraSmall
                         height: width
@@ -317,9 +320,37 @@ Page {
                             text: tile.isVideo ? "▶" : "GIF"
                         }
                     }
+
+                    // Not yet downloaded: conversation's download arrow, size to fetch.
+                    Column {
+                        objectName: "heldMark"
+                        visible: tile.held
+                        anchors.centerIn: parent
+                        width: parent.width - 2 * Theme.paddingSmall
+
+                        Label {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: Theme.highlightColor
+                            font.pixelSize: Theme.fontSizeLarge
+                            textFormat: Text.PlainText
+                            // Conversation's Download mark: not to translate.
+                            text: "⬇"
+                        }
+                        Label {
+                            objectName: "heldSize"
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            color: Theme.highlightColor
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            truncationMode: TruncationMode.Fade
+                            textFormat: Text.PlainText
+                            text: tile.held ? Format.readableSize(model.file_bytes) : ""
+                        }
+                    }
                 }
 
-                onClicked: page.open(tile.fileUrl, model.file_name, model.view_type)
+                onClicked: page.open(tile.fileUrl, model.file_name, model.view_type,
+                                     model.message_id, tile.held)
             }
 
             ViewPlaceholder {
@@ -534,7 +565,8 @@ Page {
                     if (row.isApp) {
                         page.openApp(model.message_id)
                     } else if (row.isFile) {
-                        page.open(row.fileUrl, model.file_name, model.view_type)
+                        page.open(row.fileUrl, model.file_name, model.view_type,
+                                  model.message_id)
                     }
                 }
             }

@@ -1053,6 +1053,14 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>GalleryPage</name>
+    <message>
+        <source>%1, %2</source>
+        <extracomment>Top line of the full-screen viewer: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
+        <translation>%1, %2</translation>
+    </message>
+</context>
+<context>
     <name>GroupPage</name>
     <message>
         <source>Saved</source>
@@ -1108,6 +1116,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Vaihda kuva</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>Ladataan…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>Lataus epäonnistui</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>Salausta ei voi purkaa</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>Lataa</translation>
     </message>
 </context>
 <context>
@@ -1362,7 +1391,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2729,18 +2758,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Message pinned by %1$s</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>%1$s kiinnitti viestin</translation>
-    </message>
-</context>
-<context>
-    <name>VideoPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Avaa toisessa sovelluksessa</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Tallenna laitteelle</translation>
     </message>
 </context>
 <context>

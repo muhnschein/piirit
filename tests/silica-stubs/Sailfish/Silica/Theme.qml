@@ -3,6 +3,8 @@ import QtQuick 2.0
 
 // Constants pages read. Values arbitrary: checks only that binding resolves.
 QtObject {
+    // `palette.colorScheme` values. QML `enum`: host Qt 5.15 only.
+    enum ColorScheme { LightOnDark, DarkOnLight }
     property int paddingSmall: 4
     property int paddingMedium: 8
     property int paddingLarge: 16
@@ -22,6 +24,9 @@ QtObject {
     property string fontFamilyHeading: "Sans Serif"
     property color primaryColor: "#ffffff"
     property color secondaryColor: "#a0a0a0"
+    // Light-on-dark whatever the ambience: text over photos.
+    property color lightPrimaryColor: "#ffffff"
+    property color lightSecondaryColor: "#a0a0a0"
     property color highlightColor: "#80c0ff"
     property color secondaryHighlightColor: "#6090c0"
     property color highlightBackgroundColor: "#2060a0"
@@ -32,6 +37,7 @@ QtObject {
     property int iconSizeSmall: 32
     property int iconSizeSmallPlus: 48
     property int iconSizeMedium: 64
+    property int iconSizeLarge: 96
     property size coverSizeLarge: Qt.size(234, 374)
 
     function rgba(color, opacity) {

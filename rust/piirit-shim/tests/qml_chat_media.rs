@@ -39,7 +39,7 @@ mod common;
 #[allow(non_snake_case)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
-    /// `push:ChatMediaPage.qml(gallery)|push:PicturePage.qml()|pop|...`
+    /// `push:ChatMediaPage.qml(gallery)|push:GalleryPage.qml(at=10,newestFirst=true)|pop|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     /// Contact page under media page.
@@ -78,7 +78,17 @@ impl PageStackProbe {
         )
         .map(|gate| format!("everyone={gate}"))
         .unwrap_or_default();
-        self.note(&format!("push:{name}({kind}{everyone})"));
+        // Gallery: message it opens at, and in grid order.
+        let at =
+            i32::from_qvariant(properties.value(QString::from("messageId"), QVariant::default()))
+                .map(|id| format!("at={id}"))
+                .unwrap_or_default();
+        let order = bool::from_qvariant(
+            properties.value(QString::from("newestFirst"), QVariant::default()),
+        )
+        .map(|newest| format!(",newestFirst={newest}"))
+        .unwrap_or_default();
+        self.note(&format!("push:{name}({kind}{everyone}{at}{order})"));
         if name == "DeleteMessageDialog.qml" {
             return self.chooser.clone();
         }
@@ -685,12 +695,13 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Each tap opened right page: picture/video/app page, tile's kind page, and Delete the dialog
-    // asking delete kind (as conversation asks too).
+    // Each tap opened right page: gallery at tapped picture/video (grid order), app page, tile's
+    // kind page, and Delete the dialog asking delete kind (as conversation asks too).
     assert_eq!(
         navigation,
-        "push:PicturePage.qml()|push:VideoPage.qml()|pop|\
-         push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml()|\
+        "push:GalleryPage.qml(at=10,newestFirst=true)|\
+         push:GalleryPage.qml(at=15,newestFirst=true)|pop|\
+         push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml(at=14)|\
          push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(files)|",
         "a tap did not open the right page, or Show in chat did not pop \
          back to the conversation. {context}"

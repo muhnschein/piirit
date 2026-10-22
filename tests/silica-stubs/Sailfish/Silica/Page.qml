@@ -9,7 +9,15 @@ Item {
     property bool canNavigateForward: false
     property int allowedOrientations: 1
     property int orientation
-    property string backNavigation
+    // Silica's turn: fade out, resize, fade in. Test sets it round a resize.
+    property bool orientationTransitionRunning: false
+    property bool backNavigation: true
+    // Silica's back arrow drawn (when back is possible).
+    property bool showNavigationIndicator: true
+    // Back swipe's way: sideways (Silica default) or up and down.
+    property int navigationStyle: PageNavigation.Horizontal
+    // Silica's colours for page's items; pages set scheme.
+    property Palette palette: Palette {}
     width: 540
     height: 960
 }

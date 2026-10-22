@@ -1057,6 +1057,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>GalleryPage</name>
+    <message>
+        <source>%1, %2</source>
+        <extracomment>Top line of the full-screen viewer: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
+        <translation>%1, %2</translation>
+    </message>
+</context>
+<context>
     <name>GroupPage</name>
     <message>
         <source>Saved</source>
@@ -1112,6 +1120,27 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Changer l&apos;image</translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation>Téléchargement…</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation>Échec du téléchargement</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>Impossible à déchiffrer</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
+        <translation>Télécharger</translation>
     </message>
 </context>
 <context>
@@ -1366,7 +1395,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2733,18 +2762,6 @@ En attente de réponse de l&apos;appareil de %2$s...</translation>
         <source>Message pinned by %1$s</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Message épinglé par %1$s</translation>
-    </message>
-</context>
-<context>
-    <name>VideoPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Ouvrir dans une autre application</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Enregistrer sur l&apos;appareil</translation>
     </message>
 </context>
 <context>

@@ -1053,6 +1053,14 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>GalleryPage</name>
+    <message>
+        <source>%1, %2</source>
+        <extracomment>Top line of the full-screen viewer: who sent the picture or video, then the day, such as &quot;Ada Lovelace, 15/11/2023&quot;.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GroupPage</name>
     <message>
         <source>Saved</source>
@@ -1107,6 +1115,27 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Change picture</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HeldBackView</name>
+    <message>
+        <source>Downloading…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <extracomment>Under a picture or video not yet downloaded, after trying failed; Download button below tries again.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <extracomment>Fetches a picture or video not yet downloaded, in the full-screen viewer.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1362,7 +1391,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>PicturePage</name>
+    <name>PictureView</name>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -2705,18 +2734,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Message pinned by %1$s</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>VideoPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save to device</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
