@@ -2759,6 +2759,16 @@ Esperando que el dispositivo de %2$s responda…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Mensaje fijado por %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Dejaste de fijar un mensaje</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>%1$s dejó de fijar un mensaje</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

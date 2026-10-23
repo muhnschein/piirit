@@ -2759,6 +2759,16 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Bericht vastgemaakt door %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Je hebt een bericht losgemaakt</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Bericht losgemaakt door %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

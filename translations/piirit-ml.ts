@@ -2763,6 +2763,16 @@ Waiting for the device of %2$s to reply…</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>%1$s സന്ദേശം പിൻ ചെയ്തു</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>നിങ്ങൾ ഒരു സന്ദേശം അൺപിൻ ചെയ്തു</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>%1$s സന്ദേശം അൺപിൻ ചെയ്തു</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

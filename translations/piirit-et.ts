@@ -2763,6 +2763,16 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Sõnumi kinnitas %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Sa eemaldasid sõnumi kinnituse</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Sõnumi kinnituse eemaldas %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>
