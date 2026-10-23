@@ -26,8 +26,6 @@ itself *never* touches a mail server or a key.
 
 - No protocol or crypto reimplementation — ever. We never roll our own crypto.
 - Chats via regular email or any non-chatmail servers.
-- Calls, voice and video, are built and on; video calls are not yet
-  proven on a phone.
 - No OpenRepos/Chum.
 
 See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
@@ -83,6 +81,7 @@ toolchain floor are in [`docs/BUILDING.md`](docs/BUILDING.md).
    (`connectivity.rs`) are modeled after it.
 * [whisperfish](https://gitlab.com/whisperfish/whisperfish), for showing what's
   possible on Sailfish OS.
+* [Jolla](https://github.com/sailfishos), for publishing [jolla-gallery](https://github.com/sailfishos/jolla-gallery) and [jolla-camera](https://github.com/sailfishos/jolla-camera) under the BSD license.
 
 ## License
 
