@@ -2047,6 +2047,7 @@ async fn offline_round_trip_against_real_core() {
         "a message sent from here is not marked as fully there: {reply:?}"
     );
 
+    unpinning_against(&client, sender_id, saved, first).await;
     relays_against(&client, mailbox).await;
     calls_against(&client, mailbox).await;
 
@@ -2054,6 +2055,56 @@ async fn offline_round_trip_against_real_core() {
     handle.stop();
     client.shutdown().await.expect("shutdown");
     let _ = std::fs::remove_dir_all(&accounts_dir);
+}
+
+/// Pinning a message, then unpinning it, as another Delta Chat app does in a chat
+/// Piirit shows. Core 2.65+ leaves a visible info row for the unpin too, where it
+/// used to hide it; Piirit draws it as any other info row.
+async fn unpinning_against(client: &RpcClient, account: u32, chat: u32, message: u32) {
+    let last_row = move || async move {
+        let ids: Vec<u32> = client
+            .call("get_message_ids", (account, chat, false, false))
+            .await
+            .unwrap_or_else(|err| panic!("get_message_ids: {err}"));
+        let Some(&last) = ids.last() else {
+            panic!("the chat has no messages")
+        };
+        let rows: std::collections::HashMap<u32, Value> = client
+            .call("get_messages", (account, vec![last]))
+            .await
+            .unwrap_or_else(|err| panic!("get_messages: {err}"));
+        rows[&last].clone()
+    };
+    for (state, kind, text) in [
+        (true, "MessagePinned", "You pinned a message."),
+        (false, "MessageUnpinned", "You unpinned a message."),
+    ] {
+        client
+            .call::<_, ()>("set_pinned_message_state", (account, message, state))
+            .await
+            .unwrap_or_else(|err| panic!("set_pinned_message_state {state}: {err}"));
+        let pinned: Vec<u32> = client
+            .call("get_pinned_messages", (account, chat))
+            .await
+            .unwrap_or_else(|err| panic!("get_pinned_messages: {err}"));
+        assert_eq!(pinned.contains(&message), state, "pinned now: {pinned:?}");
+        let row = last_row().await;
+        assert_eq!(
+            row.get("systemMessageType").and_then(Value::as_str),
+            Some(kind),
+            "the chat does not end in the {kind} info row: {row:?}"
+        );
+        assert_eq!(
+            row.get("isInfo").and_then(Value::as_bool),
+            Some(true),
+            "{row:?}"
+        );
+        assert_eq!(
+            row.get("text").and_then(Value::as_str),
+            Some(text),
+            "{row:?}"
+        );
+    }
 }
 
 /// Profile relays, as profile page and duplicate check read them. Three loopback relays.
