@@ -231,6 +231,10 @@ function all() {
         //: Written by the core: Delta Chat's "message_pinned_by_you".
         243: qsTr("You pinned a message"),
         //: Written by the core: Delta Chat's "message_pinned_by_other".
-        244: qsTr("Message pinned by %1$s")
+        244: qsTr("Message pinned by %1$s"),
+        //: Written by the core: Delta Chat's "message_unpinned_by_you".
+        246: qsTr("You unpinned a message"),
+        //: Written by the core: Delta Chat's "message_unpinned_by_other".
+        247: qsTr("Message unpinned by %1$s")
     }
 }

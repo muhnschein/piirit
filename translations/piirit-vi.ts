@@ -2752,6 +2752,16 @@ Waiting for the device of %2$s to reply…</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Tin nhắn được ghim bởi %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Bạn đã bỏ ghim một tin nhắn</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Tin nhắn được bỏ ghim bởi %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

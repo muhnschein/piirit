@@ -2763,6 +2763,16 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Meddelande fäst av %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Du lösgjorde ett meddelande</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Meddelande lösgjort av %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

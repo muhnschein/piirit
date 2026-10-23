@@ -2759,6 +2759,16 @@ Waiting for the device of %2$s to reply…</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>%1$s செய்தியை பின் செய்தார்</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>நீங்கள் ஒரு செய்தியை பின் நீக்கினீர்கள்</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>%1$s செய்தியை பின் நீக்கினார்</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

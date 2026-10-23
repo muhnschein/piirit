@@ -2756,6 +2756,16 @@ Waiting for the device of %2$s to reply…</source>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>İleti %1$s tarafından sabitlendi</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Bir iletinin sabitlemesini kaldırdınız</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>İletinin sabitlemesi %1$s tarafından kaldırıldı</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

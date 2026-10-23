@@ -2766,6 +2766,16 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Mesaj fixat de %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Ați desprins un mesaj</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Mesaj desprins de %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

@@ -2763,6 +2763,16 @@ Warte auf die Antwort des Gerätes von %2$s…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Nachricht angeheftet von %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Du hast eine Nachricht losgelöst</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Nachricht losgelöst von %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>

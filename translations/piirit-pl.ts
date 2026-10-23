@@ -2770,6 +2770,16 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
         <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
         <translation>Wiadomość przypięta przez %1$s</translation>
     </message>
+    <message>
+        <source>You unpinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_you&quot;.</extracomment>
+        <translation>Odpiąłeś wiadomość</translation>
+    </message>
+    <message>
+        <source>Message unpinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_unpinned_by_other&quot;.</extracomment>
+        <translation>Wiadomość odpięta przez %1$s</translation>
+    </message>
 </context>
 <context>
     <name>VoiceBar</name>
