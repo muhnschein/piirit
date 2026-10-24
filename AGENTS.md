@@ -1,12 +1,9 @@
 # AGENTS.md
 
-How to work on Piirit. Facts live in `docs/`; this file = workflow + pointers. Read `docs/PROJECT.md` (scope) and `docs/BUILDING.md` (standards) before first change. User's words in chat beat this file.
+How to work on Piirit. What it is: `README.md`, `docs/`. Read `docs/BUILDING.md` before first change. User's words in chat beat this file.
 
 ## Ground rules
 
-- Piirit = Silica UI, platform glue, packaging on `deltachat-rpc-server` (JSON-RPC over stdio). No protocol, crypto, mail, storage code; no hand-written C FFI. Core lacks API → say so, don't build around it.
-- Harbour (Jolla Store) only. No OpenRepos/Chum, nothing needing dev mode. Platform gap that blocks → report it, propose raising with Jolla; no workaround.
-- One target: SFOS 5.2 SDK, aarch64, Jolla Phone 2026. No effort for older releases.
 - Don't know how to proceed → say "I don't know", stop, ask. Mark guesses as guesses. Unknown beats confident wrong.
 - Bugs: find root cause, state it. Symptom fix ≠ fix.
 - Good return on cost. No gold-plating, no unasked refactors.
@@ -27,56 +24,28 @@ Feature reachable from several places (chat, contact/group page, cover, quick ac
 
 User tests RPM on phone; that test judges feel, lag, transitions. Say exactly what to check on device.
 
-## Commands
+## Local checks
 
-```sh
-git submodule update --init --depth 1   # FFmpeg, x264; before any build
-make check                  # all CI gates; run before every push
-make test                   # tests; nextest if installed (cargo install --locked cargo-nextest)
-make lint fmt msrv          # clippy -D warnings, rustfmt --check, build at Rust 1.75
-scripts/update-translations.sh   # after any qsTr() change
-make translations           # .qm catalogs for local runs
-```
-
+- `git submodule update --init --depth 1` before first build (FFmpeg, x264). x264 comes from `code.videolan.org`; sandbox must allow it, else `piirit-shim` (all QML tests) doesn't build.
 - Missing optional tool = SKIP locally, FAIL in CI. Say which steps skipped.
 - Local failure → rerun on untouched `main` before calling it environment. Known: `qml_return_place` fails in some containers, green in CI.
+- `make check` gates catch device-only breakage (Rust 1.75, Cargo.lock v3, Qt 5.6 QML, shaders, lints, spec, Harbour); reasons in BUILDING.md. Gate red → fix code, never loosen gate.
 - Tests wait on signals or conditions, not fixed sleeps or wall-clock asserts (those flake on loaded runners).
-- x264 submodule comes from `code.videolan.org`; sandbox must allow it. Without it `piirit-shim` (all QML tests) doesn't build.
-
-## Where things are
-
-- `rust/piirit-shim`: JSON-RPC client, Qt models; tests in `rust/piirit-shim/tests`
-- `rust/piirit-app`: binary. `rust/piirit-video`: FFmpeg/x264 build, recode. `rust/deltachat-jsonrpc`: core types
-- `qml/`: pages, components, cover. `tests/silica-stubs/`: Silica stand-ins for QML tests
-- `ci/`: gate scripts. `scripts/`: build, release, translations. `rpm/harbour-piirit.spec`
-- Docs: `docs/PROJECT.md` scope, non-goals, string rules; `docs/BUILDING.md` toolchain, lints, test layers, CI, packaging, release; `docs/HARBOUR.md` store rules; `docs/VERIFYING.md` reproducible builds
-
-## Constraints that bite
-
-Details: `docs/BUILDING.md`.
-
-- Rust floor 1.75 on device; nothing newer from std or syntax. `rust-toolchain.toml` pins lint toolchain only.
-- `rust/Cargo.lock` stays v3; modern `cargo update` rewrites to v4 silently.
-- Qt 5.6 on device; host Qt 5.15 accepts more. `tests/qml_syntax.rs` holds 5.6 rules.
-- No `ShaderEffect`, `layer`, QtGraphicalEffects: Qt 5.6 render loop mixes up shader programs. Guard tests fail.
-- Denied: `unwrap_used`/`expect_used` outside tests, `missing_docs`, `unsafe_code`, clippy pedantic. `unsafe`/`cpp!` only in the four files BUILDING.md names.
-- `rust/clippy.toml` bans `Runtime::new` (use `CoreRuntime`) and `qmetaobject::single_shot`.
-- Spec: no bare `%` in comments; Harbour limits name, paths, `Requires:` (`ci/harbour-check.sh`).
 - New dependency must earn its keep: well maintained, widely used, more than someone's pet project, builds at Rust 1.75. Add row to BUILDING.md dependency table saying why.
 
 ## UI and words
 
 - Silica stock components, built like existing pages (e.g. chat's `PageHeader`). Jolla app has same feature (Gallery, Camera) → match it. Delta Chat apps = reference for features.
 - "Design first" / "no PR yet" → mockup on canvas, wait for approval, then code.
-- Every `qsTr()` string follows PROJECT.md "The words on screen": one plain finished sentence, literal verbs, Delta Chat's own string verbatim where one exists. New or changed source string → fill all catalogs; `tests/translation_catalogs.rs` fails otherwise.
+- Every `qsTr()` string: PROJECT.md "The words on screen". Changed strings → `scripts/update-translations.sh`, fill all catalogs.
 - QML tests stub Silica, no layout: looks unproven until device test. Say so.
 - Phone = battery: no always-running animations, timers, polling; stop work when app is in background.
 
 ## Comments and docs
 
 - Caveman-full = drop articles, filler, pleasantries, hedging. Fragments OK, short words. Identifiers, paths, code, errors exact. E.g. "`rust/Cargo.lock` stays v3: SDK cargo 1.75 can't read v4."
-- Code comments, `docs/*.md`, this file: caveman-full. What is true now + why. No history, story, changelog (git's job).
-- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users; brief, to the point.
+- Code comments, `docs/*.md`, this file: caveman-full, rules in BUILDING.md "Comments".
+- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users, but brief: as long as necessary, as short and to the point as possible.
 - User-visible change → line in `CHANGELOG.md` under `## Unreleased` (create if missing), same PR.
 - No plans, research notes, scratch files in repo.
 
@@ -103,7 +72,7 @@ Details: `docs/BUILDING.md`.
 
 ## Reporting
 
-- Replies to user: caveman-full (see Comments and docs). User-facing text (changelog, release notes, forum) stays prose, but brief: as long as necessary, as short and to the point as possible.
+- Replies to user: caveman-full (see Comments and docs).
 - Lead with result. Say what was verified, what wasn't, what is guess.
 - Non-green step → name it and why. Never hide.
 - Forum bug report → search GitHub issues first, link match.
