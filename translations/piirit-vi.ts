@@ -764,6 +764,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Đã thấy cách đây rất lâu</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Bật thông báo</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Tắt thông báo</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1112,6 +1120,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Đổi ảnh</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Bật thông báo</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Tắt thông báo</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1306,6 +1322,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Chọn văn bản</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Tắt tiếng trong 1 giờ</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Tắt tiếng trong 8 giờ</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Tắt tiếng trong 1 ngày</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Tắt tiếng trong 7 ngày</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Tắt tiếng vĩnh viễn</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Ẩn thông báo</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Tắt thông báo</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
     </message>
 </context>
 <context>

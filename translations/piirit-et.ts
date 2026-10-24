@@ -770,6 +770,14 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nähtud ammu</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Lõpeta vaigistus</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Vaigista</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Muuda pilti</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Lõpeta vaigistus</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Vaigista</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Vali tekst</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Summuta üheks tunniks</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Summuta kaheksaks tunniks</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Summuta üheks päevaks</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Summuta seitsmeks päevaks</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Summuta alatiseks</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Summuta teaavitused</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Vaigista</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
     </message>
 </context>
 <context>

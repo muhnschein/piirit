@@ -766,6 +766,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>நீண்ட காலத்துக்கு முன் பார்க்கப்பட்டது</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>ஒலியை இயக்கு</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>ஒலியடக்கு</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1117,6 +1125,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>படத்தை மாற்று</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>ஒலியை இயக்கு</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>ஒலியடக்கு</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1311,6 +1327,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>உரையைத் தேர்ந்தெடு</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>1 மணி இதற்காக ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>8 மணிகள் இதற்காக ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>1 நாள் இதற்காக ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>7 நாட்கள் இதற்காக ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>எப்போதுமே ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>அறிவிப்புகளை ஊமையாக்கு</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>ஒலியடக்கு</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
     </message>
 </context>
 <context>

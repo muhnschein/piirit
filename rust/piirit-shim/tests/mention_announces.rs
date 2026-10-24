@@ -64,7 +64,7 @@ const PROBE_QML: &str = r"
             single.send(text)
             return 'ok'
         }
-        function mute(chatId) { chats.set_muted(chatId, true); return 'ok' }
+        function mute(chatId) { chats.set_mute_duration(chatId, -1); return 'ok' }
         function setMentions(on) { chats.notify_mentions = on; return 'ok' }
         function heard() { return announced }
     }

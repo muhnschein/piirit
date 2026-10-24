@@ -772,6 +772,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Был(а) в сети очень давно</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Включить уведомления</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Отключить уведомления</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1126,6 +1134,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Изменить изображение</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Включить уведомления</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Отключить уведомления</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1320,6 +1336,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Выделить текст</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>На 1 час</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>На 8 часов</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>На 1 день</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>На 7 дней</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Постоянно</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Отключить уведомления</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Отключить уведомления</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>

@@ -770,6 +770,14 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Visto molto tempo fa</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Riattiva notifiche</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenzia</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Cambia immagine</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Riattiva notifiche</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenzia</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Seleziona testo</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Silenzia per 1 ora</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Silenzia per 8 ore</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Silenzia per 1 giorno</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Silenzia per 7 giorni</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Silenzia per sempre</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Disattiva Notifiche</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenzia</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>

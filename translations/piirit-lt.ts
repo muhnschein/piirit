@@ -768,6 +768,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Matytas seniai</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Įjungti garsą</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Nutildyti</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1122,6 +1130,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Keisti paveikslėlį</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Įjungti garsą</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Nutildyti</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1316,6 +1332,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Pažymėti tekstą</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Išjungti 1 valandai</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Išjungti 8 valandoms</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Išjungti 1 dienai</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Išjungti 7 dienoms</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Išjungti visam laikui</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Išjungti pranešimus</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Nutildyti</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atšaukti</translation>
     </message>
 </context>
 <context>

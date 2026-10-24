@@ -766,6 +766,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Visto por última vez hace mucho tiempo</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Activar sonido</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1117,6 +1125,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Cambiar imagen</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Activar sonido</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1311,6 +1327,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Seleccionar texto</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Silenciar por 1 hora</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Silenciar por 8 horas</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Silenciar por 1 día</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Silenciar por 7 días</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Silenciar por siempre</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Silenciar notificaciones</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>

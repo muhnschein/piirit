@@ -196,6 +196,20 @@ Page {
         })
     }
 
+    /// Muted: unmute at once. Else ask how long (MuteDialog.qml).
+    function toggleMute() {
+        if (chat.is_muted) {
+            chat.set_mute_duration(0)
+            return
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"))
+        if (dialog) {
+            dialog.picked.connect(function(seconds) {
+                chat.set_mute_duration(seconds)
+            })
+        }
+    }
+
     // Own page with platform accept, not countdown: no way back unless re-added,
     // and pull-down countdown easy to miss.
     function confirmLeave() {
@@ -212,10 +226,10 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Both entries for members: hidden for left/removed reader (empty pull-down).
+        // Mute for all; rest for members only (hidden once left/removed).
         PullDownMenu {
             objectName: "groupMenu"
-            visible: chat.can_edit
+            visible: chat.loaded
 
             MenuItem {
                 objectName: "leaveButton"
@@ -238,6 +252,12 @@ Page {
                 //: pick a new picture for the group.
                 text: qsTr("Change picture")
                 onClicked: page.pickPicture()
+            }
+            // Mute asks how long; unmute at once (chat list's entry).
+            MenuItem {
+                objectName: "muteItem"
+                text: chat.is_muted ? qsTr("Unmute") : qsTr("Mute")
+                onClicked: page.toggleMute()
             }
         }
 

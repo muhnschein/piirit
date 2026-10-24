@@ -766,6 +766,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Sidst set for lang tid siden</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Slå lyd til</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Slå lyd fra</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1117,6 +1125,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Skift billede</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Slå lyd til</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Slå lyd fra</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1311,6 +1327,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Markér tekst</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Dæmp i 1 time</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Dæmp i 8 timer</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Dæmp i 1 dag</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Dæmp i 7 dage</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Stille for altid</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Dæmp notifikationer</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Slå lyd fra</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annullér</translation>
     </message>
 </context>
 <context>

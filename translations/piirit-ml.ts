@@ -770,6 +770,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>വളരെ മുമ്പ് കണ്ടതാണ്</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>അൺമ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>ചിത്രം മാറ്റുക</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>അൺമ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>ടെക്സ്റ്റ് തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>1 മണിക്കൂർ മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>8 മണിക്കൂർ മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>1 ദിവസം മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>7 ദിവസം മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>എന്നേക്കുമായി മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>അറിയിപ്പുകൾ മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>മ്യൂട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
     </message>
 </context>
 <context>

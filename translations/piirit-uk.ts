@@ -772,6 +772,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Був(-ла) у мережі дуже давно</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Увімкнути сповіщення</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Вимкнути сповіщення</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1126,6 +1134,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Змінити зображення</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Увімкнути сповіщення</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Вимкнути сповіщення</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1320,6 +1336,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Виділити текст</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Вимкнути сповіщення на&#xa0;годину</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Вимкнути сповіщення на&#xa0;8&#xa0;годин</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Вимкнути сповіщення на&#xa0;добу</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Вимкнути сповіщення на&#xa0;7&#xa0;днів</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Вимкнути сповіщення назавжди</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Вимкнути сповіщення</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Вимкнути сповіщення</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
     </message>
 </context>
 <context>

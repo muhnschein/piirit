@@ -768,6 +768,14 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Çok uzun zaman önce görüldü</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Sesi aç</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Sessize al</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1116,6 +1124,14 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Resmi değiştir</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Sesi aç</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Sessize al</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1310,6 +1326,42 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Metni seç</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>1 saatliğine sessize al</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>8 saatliğine sessize al</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>1 günlüğüne sessize al</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>7 günlüğüne sessize al</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Sonsuza dek sessize al</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Bildirimleri Sessize Al</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Sessize al</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
     </message>
 </context>
 <context>

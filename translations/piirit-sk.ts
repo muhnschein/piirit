@@ -772,6 +772,14 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Naposledy videný(á) dávno</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušiť stlmenie</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stlmiť</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1126,6 +1134,14 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Zmeniť obrázok</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušiť stlmenie</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stlmiť</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1320,6 +1336,42 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Označiť text</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Stlmiť na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Stlmiť na 8 hodín</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Stlmiť na 1 deň</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Stlmiť na 7 dní</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Stlmiť navždy</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Stlmiť upozornenia</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stlmiť</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušiť</translation>
     </message>
 </context>
 <context>

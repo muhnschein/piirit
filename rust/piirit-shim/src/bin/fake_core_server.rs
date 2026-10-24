@@ -1846,6 +1846,7 @@ async fn serve() {
                                 "isSelfTalk": false,
                                 "isDeviceChat": false,
                                 "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
+                                "isMuted": state.muted.contains(&chat),
                             }),
                         )
                     }
@@ -2200,18 +2201,29 @@ async fn serve() {
                         .and_then(Value::as_str)
                         .unwrap_or_default()
                         .to_string();
-                    let mut state = state.lock().await;
-                    state.seed_chats();
-                    if kind == "NotMuted" {
-                        state.muted.remove(&chat);
+                    let duration = positional(2).get("duration").and_then(Value::as_i64);
+                    // Core's refusals: unknown kind (serde), `Until` without end ahead.
+                    let valid = match kind.as_str() {
+                        "NotMuted" | "Forever" => true,
+                        "Until" => duration.is_some_and(|seconds| seconds > 0),
+                        _ => false,
+                    };
+                    if valid {
+                        let mut state = state.lock().await;
+                        state.seed_chats();
+                        if kind == "NotMuted" {
+                            state.muted.remove(&chat);
+                        } else {
+                            state.muted.insert(chat);
+                        }
+                        state.events.push_back(json!({
+                            "contextId": account,
+                            "event": {"kind": "ChatModified", "chatId": chat},
+                        }));
+                        ok(&id, &Value::Null)
                     } else {
-                        state.muted.insert(chat);
+                        err(&id, "failed to read mute duration")
                     }
-                    state.events.push_back(json!({
-                        "contextId": account,
-                        "event": {"kind": "ChatModified", "chatId": chat},
-                    }));
-                    ok(&id, &Value::Null)
                 }
                 // One contact by id, self too: colour lookup.
                 "get_contact" => {

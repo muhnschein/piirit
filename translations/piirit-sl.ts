@@ -774,6 +774,14 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nazadnje viden(a) pred dolgim časom</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Vklopi obvestila</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Utišaj</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1131,6 +1139,14 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Spremeni sliko</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Vklopi obvestila</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Utišaj</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1325,6 +1341,42 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Izberi besedilo</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Utišaj za 1 uro</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Utišaj za 8 ur</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Utišaj za 1 dan</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Utišaj za 7 dni</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Utišaj za vedno</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Utišaj obvestila</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Utišaj</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
     </message>
 </context>
 <context>

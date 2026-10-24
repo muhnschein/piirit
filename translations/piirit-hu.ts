@@ -764,6 +764,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Utoljára régen volt látható</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Némítás feloldása</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Némítás</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1112,6 +1120,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Kép módosítása</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Némítás feloldása</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Némítás</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1306,6 +1322,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Szöveg kijelölése</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Némítás 1 órára</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Némítás 8 órára</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Némítás 1 napra</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Némítás 7 napra</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Némítás örökre</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Értesítések némítása</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Némítás</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
     </message>
 </context>
 <context>

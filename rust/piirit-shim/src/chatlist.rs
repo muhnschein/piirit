@@ -110,8 +110,8 @@ pub struct ChatList {
     pub mark_unread: qt_method!(fn(&mut self, chat_id: u32)),
     /// Pin, or back to time order.
     pub set_pinned: qt_method!(fn(&mut self, chat_id: u32, pinned: bool)),
-    /// Mute or unmute.
-    pub set_muted: qt_method!(fn(&mut self, chat_id: u32, muted: bool)),
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub set_mute_duration: qt_method!(fn(&mut self, chat_id: u32, seconds: i32)),
     /// Move chat out of list.
     pub archive: qt_method!(fn(&mut self, chat_id: u32)),
     /// Accept contact request. QML calls.
@@ -413,10 +413,13 @@ impl ChatList {
         self.act(chat_id, "set_chat_visibility", json!([visibility]));
     }
 
-    /// Mute or unmute.
-    pub fn set_muted(&mut self, chat_id: u32, muted: bool) {
-        let kind = if muted { "Forever" } else { "NotMuted" };
-        self.act(chat_id, "set_chat_mute_duration", json!([{"kind": kind}]));
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub fn set_mute_duration(&mut self, chat_id: u32, seconds: i32) {
+        self.act(
+            chat_id,
+            "set_chat_mute_duration",
+            json!([mute_duration(seconds)]),
+        );
     }
 
     /// Move chat out of list.
@@ -639,6 +642,16 @@ impl ChatList {
             .await;
             done(result);
         });
+    }
+}
+
+/// Core's tagged `MuteDuration`: -1 (any negative) forever, 0 unmuted, else `seconds` from now
+/// (core counts from its own clock).
+pub(crate) fn mute_duration(seconds: i32) -> serde_json::Value {
+    match seconds {
+        0 => json!({"kind": "NotMuted"}),
+        forever if forever < 0 => json!({"kind": "Forever"}),
+        _ => json!({"kind": "Until", "duration": seconds}),
     }
 }
 
@@ -866,4 +879,21 @@ pub(crate) async fn chat_items(
             )
         })
         .collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mute_seconds_become_the_cores_tagged_duration() {
+        assert_eq!(mute_duration(0), json!({"kind": "NotMuted"}));
+        assert_eq!(mute_duration(-1), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(i32::MIN), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(1), json!({"kind": "Until", "duration": 1}));
+        assert_eq!(
+            mute_duration(604_800),
+            json!({"kind": "Until", "duration": 604_800})
+        );
+    }
 }

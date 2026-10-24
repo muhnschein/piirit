@@ -133,6 +133,20 @@ Page {
         })
     }
 
+    /// Muted: unmute at once. Else ask how long (MuteDialog.qml).
+    function toggleMute() {
+        if (chat.is_muted) {
+            chat.set_mute_duration(0)
+            return
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"))
+        if (dialog) {
+            dialog.picked.connect(function(seconds) {
+                chat.set_mute_duration(seconds)
+            })
+        }
+    }
+
     // The contact's one row, read into page (Repeater is how QML reads rows).
     // Draws nothing: reload after save rebuilds nothing on screen.
     Repeater {
@@ -158,6 +172,18 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
+
+        PullDownMenu {
+            objectName: "contactMenu"
+            visible: chat.loaded
+
+            // Mute asks how long; unmute at once (chat list's entry).
+            MenuItem {
+                objectName: "muteItem"
+                text: chat.is_muted ? qsTr("Unmute") : qsTr("Mute")
+                onClicked: page.toggleMute()
+            }
+        }
 
         Column {
             id: column

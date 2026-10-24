@@ -770,6 +770,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Vor langer Zeit zuletzt gesehen</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Stummschaltung aufheben</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stummschalten</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Bild ändern</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Stummschaltung aufheben</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stummschalten</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Text auswählen</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Stumm für 1 Stunde</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Stumm für 8 Stunden</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Stumm für 1 Tag</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Stumm für 7 Tage</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Stumm für immer</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Stummschalten</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Stummschalten</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>

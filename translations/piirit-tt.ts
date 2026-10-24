@@ -768,6 +768,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Күптән күрелгән</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Белдерүләрне кабызырга</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Тавышсыз итәргә</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1116,6 +1124,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Рәсемне үзгәртергә</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Белдерүләрне кабызырга</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Тавышсыз итәргә</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1310,6 +1326,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Текстны сайларга</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>1 сәгатькә тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>8 сәгатькә тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>1 көнгә тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>7 көнгә тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Мәңгегә тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Белдерүләрне тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Тавышсыз итәргә</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
     </message>
 </context>
 <context>

@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- **Mute a chat for a while.** Mute now asks for how long: 1 hour, 8 hours, 1 day, 7 days or forever, as in the other Delta Chat apps. It is in a chat's long-press menu in the chat list and in the pull-down menu of a contact's or group's page. Unmute works at once.
 
 ## 2.2.0 — 2026-10-23
 

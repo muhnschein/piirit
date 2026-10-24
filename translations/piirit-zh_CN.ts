@@ -768,6 +768,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>很久以前在线</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>取消静音</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1116,6 +1124,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>更改图片</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>取消静音</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1310,6 +1326,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>选择文本</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>静音 1 小时</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>静音 8 小时</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>静音 1 天</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>静音 7 天</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>永久静音</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>通知静音</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 <context>

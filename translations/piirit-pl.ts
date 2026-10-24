@@ -772,6 +772,14 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Ostatnio widziany(-a) dawno temu</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Wyłącz wyciszenie</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Wycisz</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1126,6 +1134,14 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Zmień obraz</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Wyłącz wyciszenie</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Wycisz</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1320,6 +1336,42 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Zaznacz tekst</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Wyłącz na 1 godzinę</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Wyłącz na 8 godzin</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Wyłącz na 1 dzień</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Wyłącz na 7 dni</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Wyłącz na zawsze</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Wyłącz powiadomienia</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Wycisz</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>

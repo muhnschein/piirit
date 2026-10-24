@@ -770,6 +770,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Vu il y a longtemps</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Réactiver les notifications</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Mettre en sourdine</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Changer l&apos;image</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Réactiver les notifications</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Mettre en sourdine</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Sélectionner le texte</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Sourdine pendant 1 heure</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Sourdine pendant 8 heures</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Sourdine pendant 1 jour</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Sourdine pendant 7 jours</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Toujours en sourdine</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Mettre en sourdine</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Mettre en sourdine</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>

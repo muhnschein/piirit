@@ -772,6 +772,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Naposledy viděn(a) před dlouhou dobou</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušit ztlumení</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Ztlumit</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1126,6 +1134,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Změnit obrázek</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušit ztlumení</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Ztlumit</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1320,6 +1336,42 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Vybrat text</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Ztlumit na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Ztlumit na 8 hodin</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Ztlumit na 1 den</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Ztlumit na 7 dní</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Ztlumit navždy</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Ztlumit upozornění</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Ztlumit</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
     </message>
 </context>
 <context>

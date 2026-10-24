@@ -31,10 +31,14 @@ const PROBE_QML: &str = r"
             chats.mark_read(1)
             chats.mark_unread(2)
             chats.set_pinned(1, true)
-            chats.set_muted(1, true)
+            chats.set_mute_duration(1, 28800)
+            chats.set_mute_duration(2, -1)
             chats.archive(1)
         }
-        function remove() { chats.delete_chat(2) }
+        function remove() {
+            chats.set_mute_duration(1, 0)
+            chats.delete_chat(2)
+        }
         function count() { return chats.count }
         function error() { return lastError }
     }
@@ -134,10 +138,16 @@ fn assert_outcome(calls: &[(String, Value)], before_delete: &str, report: &str) 
         "pinning and archiving did not send the core's own variant names: {visibility:?}. \
          {context}"
     );
-    assert_eq!(
-        params_of("set_chat_mute_duration"),
-        vec![serde_json::json!([1, 1, {"kind": "Forever"}])],
-        "muting did not send the core's tagged duration. {context}"
+    // Timed, forever (both race), then unmute a step later.
+    let mutes = params_of("set_chat_mute_duration");
+    assert!(
+        mutes.len() == 3
+            && mutes[..2]
+                .contains(&serde_json::json!([1, 1, {"kind": "Until", "duration": 28800}]))
+            && mutes[..2].contains(&serde_json::json!([1, 2, {"kind": "Forever"}]))
+            && mutes[2] == serde_json::json!([1, 1, {"kind": "NotMuted"}]),
+        "muting for a while, forever, and unmuting did not send the core's tagged \
+         durations: {mutes:?}. {context}"
     );
     assert_eq!(
         params_of("delete_chat"),

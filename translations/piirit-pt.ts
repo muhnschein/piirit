@@ -770,6 +770,14 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Visto há muito tempo</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Reativar notificações</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1121,6 +1129,14 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Alterar imagem</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Reativar notificações</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1315,6 +1331,42 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Selecionar texto</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Calado por 1 hora</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Calado por 8 horas</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Calado por 1 dia</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Calado por 7 dias</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Silenciar para sempre</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Silenciar notificações</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silenciar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>

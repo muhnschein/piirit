@@ -766,6 +766,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Видян(а) преди много време</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Включване на известията</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Заглушаване</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1117,6 +1125,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Промяна на изображението</translation>
     </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Включване на известията</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Заглушаване</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1311,6 +1327,42 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Избиране на текст</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute for 1 hour</source>
+        <translation>Спиране на звука за 1 час</translation>
+    </message>
+    <message>
+        <source>Mute for 8 hours</source>
+        <translation>Спиране на звука за 8 часа</translation>
+    </message>
+    <message>
+        <source>Mute for 1 day</source>
+        <translation>Спиране на звука за 1 ден</translation>
+    </message>
+    <message>
+        <source>Mute for 7 days</source>
+        <translation>Спиране на звука за 7 дни</translation>
+    </message>
+    <message>
+        <source>Mute forever</source>
+        <translation>Спиране на звука за постоянно</translation>
+    </message>
+    <message>
+        <source>Mute notifications</source>
+        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
+        <translation>Изключване на звука на уведомленията</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Заглушаване</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
     </message>
 </context>
 <context>
