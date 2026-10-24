@@ -39,6 +39,7 @@ fn probe_qml() -> String {
         QtObject {{
             id: stack
             property string pushed: ''
+            property bool busy: false
             property QtObject dialog: QtObject {{
                 signal accepted()
             }}

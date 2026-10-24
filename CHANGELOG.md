@@ -6,6 +6,10 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+- "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+
 ## 2.2.0 — 2026-10-23
 
 - **Swipe through a chat's pictures and videos**, in the style of Jolla's Gallery. A tap on a picture or video, in a chat or in a contact's or group's Gallery, opens it full screen; swipe sideways for the next one, through every picture, GIF and video of that chat, and swipe up or down to close, or tap the X in the top right. From a chat newer ones are to the right, as they are further down the chat; from the Gallery the order is the grid's, newest first. The top line says who sent it and the day; at the bottom Share hands it to another app and Save to device copies it to Downloads. A tap fades all of that away and another brings it back. A video waits for its play button and goes full screen once it plays, with a seek bar under it when the controls are up; a double tap skips 10 seconds on, and swiping away stops it. A double tap or a pinch zooms a picture in, a drag then pans it, and a tap zooms it out again. The viewer turns with the phone, so landscape pictures and videos fill the screen. Pictures and videos not downloaded yet are there too: their slide says what their message says (such as "Image – 2.4 MiB") and has a Download button, and once downloaded the picture takes the slide's place. In the Gallery grid they show the download arrow and their size.

@@ -147,8 +147,39 @@ Page {
 
     /// Period awaiting answer, 0 none. Estimate by signal; earlier ask's ignored.
     property int pendingPeriod: 0
+    /// Counted, not yet asked: `{ seconds, count }`, or null.
+    property var pendingAnswer: null
 
     property string errorMessage: ""
+
+    /// Ask once page on screen, stack idle. Six periods: Silica lists them on
+    /// own page, count lands while it pops; push mid-transition refused
+    /// (stderr only), choice lost. As QuickActionSetting's picker.
+    function askDeletion() {
+        if (!page.pendingAnswer || page.status !== PageStatus.Active || pageStack.busy) {
+            return
+        }
+        var chosen = page.pendingAnswer.seconds
+        var count = page.pendingAnswer.count
+        page.pendingAnswer = null
+        var dialog = pageStack.push(Qt.resolvedUrl("AutoDeleteDialog.qml"), {
+            seconds: chosen,
+            periodLabel: page.periodLabel(page.periodIndex(chosen)),
+            count: count
+        })
+        if (dialog) {
+            dialog.accepted.connect(function() {
+                Settings.deleteDeviceAfter = chosen
+            })
+        }
+    }
+
+    onStatusChanged: page.askDeletion()
+
+    Connections {
+        target: pageStack
+        onBusyChanged: page.askDeletion()
+    }
 
     Connections {
         target: core
@@ -157,17 +188,8 @@ Page {
                 return
             }
             page.pendingPeriod = 0
-            var chosen = seconds
-            var dialog = pageStack.push(Qt.resolvedUrl("AutoDeleteDialog.qml"), {
-                seconds: chosen,
-                periodLabel: page.periodLabel(page.periodIndex(chosen)),
-                count: count
-            })
-            if (dialog) {
-                dialog.accepted.connect(function() {
-                    Settings.deleteDeviceAfter = chosen
-                })
-            }
+            page.pendingAnswer = { seconds: seconds, count: count }
+            page.askDeletion()
         }
         // Core refused setting or count: shown here.
         onCore_error: page.errorMessage = message

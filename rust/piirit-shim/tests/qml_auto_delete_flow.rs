@@ -3,6 +3,9 @@
 //! Settings page writes nothing on tap: asks core how many messages are older, shows that count on
 //! its own page, writes setting only on accept. Core object then writes it to every account. Test
 //! accepts the page's dialog.
+//!
+//! Six periods: Silica lists them on a page of their own, popping as the count lands. Stack refuses
+//! a push mid-transition, so the dialog waits for the page back on screen, stack idle.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -13,7 +16,7 @@
     clippy::expect_used
 )]
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
@@ -27,6 +30,7 @@ mod common;
 ///
 /// Page stack is a QML object passed as context property, not a Rust one: QML deletes what a
 /// method hands it, and one also owned from Rust was deleted twice.
+#[allow(clippy::too_many_lines)]
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -54,22 +58,41 @@ fn probe_qml() -> String {
                 }}
             }}
         }}
+        // Each step waits on what it needs: the account list read, then
+        // each count. Count step a turn later, after the page's handler.
+        property int round: 0
+        property bool finished: false
         Connections {{
             target: core
             onAccount_added: core.refresh_accounts()
+            onAccounts_refreshed: {{
+                if (round === 0) {{
+                    round = 1
+                    pickFirst()
+                }}
+            }}
+            onAuto_deletion_estimated: counted.restart()
+        }}
+        Timer {{
+            id: counted
+            interval: 0
+            onTriggered: round === 1 ? firstCounted() : secondCounted()
         }}
         // Silica's page stack, as far as the page uses it: push records
         // what was pushed and hands back a dialog for the page to
-        // connect to, the way Silica hands back the page it made.
+        // connect to, the way Silica hands back the page it made. Busy
+        // while Silica's page of choices pops; Silica drops a push then.
         QtObject {{
             id: stack
             property string pushed: ''
+            property bool busy: false
             property QtObject dialog: QtObject {{
                 signal accepted()
                 signal rejected()
                 function accept() {{ accepted() }}
             }}
             function push(url, props) {{
+                if (busy) {{ return null }}
                 var name = ('' + url).split('/').pop()
                 pushed = name + ':count=' + props.count + ',seconds=' + props.seconds
                          + ',periodLabel=' + props.periodLabel
@@ -77,10 +100,58 @@ fn probe_qml() -> String {
             }}
         }}
         function stackObject() {{ return stack }}
-        function acceptDialog() {{ stack.dialog.accept(); return 'ok' }}
-        function load(url) {{
-            loader.setSource(url, {{}})
-            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        property var steps: []
+        function record(label, value) {{ steps.push([label, '' + value]) }}
+        function stepsJson() {{ return JSON.stringify(steps) }}
+        // The page under Silica's page of choices, or back on screen.
+        function setActive(active) {{
+            loader.item.status = active ? PageStatus.Active : PageStatus.Inactive
+        }}
+        // Picked on Silica's page of choices, which pops at once.
+        function pick(seconds) {{
+            stack.pushed = ''
+            setActive(false)
+            stack.busy = true
+            return click('deletionOption' + seconds)
+        }}
+        function pickFirst() {{
+            loader.setSource('{}', {{}})
+            record('load', loader.status === Loader.Ready ? 'ok' : 'load-failed')
+            record('pick', pick(3600))
+            // Straight after tap: nothing written or pushed.
+            record('period-on-tap', period())
+            record('pushed-on-tap', stack.pushed)
+        }}
+        // Count in; the pop still going, then the page not yet on screen.
+        function firstCounted() {{
+            record('pushed-mid-transition', stack.pushed)
+            stack.busy = false
+            record('pushed-under-choices', stack.pushed)
+            setActive(true)
+            record('pushed', stack.pushed)
+            record('period-before-accept', period())
+            record('shown-before-accept', get('deletionCombo', 'currentIndex'))
+            stack.dialog.accept()
+            record('period-on-accept', period())
+            record('shown-on-accept', get('deletionCombo', 'currentIndex'))
+            round = 2
+            record('pick-again', pick(86400))
+        }}
+        // Again, the page back on screen before the stack goes idle:
+        // Silica's order is either.
+        function secondCounted() {{
+            setActive(true)
+            record('pushed-again-mid-transition', stack.pushed)
+            stack.busy = false
+            record('pushed-again', stack.pushed)
+            stack.dialog.accept()
+            record('period-on-accept-again', period())
+            // Answered: the stack's next move asks nothing.
+            stack.pushed = ''
+            stack.busy = true
+            stack.busy = false
+            record('pushed-once-answered', stack.pushed)
+            finished = true
         }}
         function findIn(node, name) {{
             if (!node) {{ return null }}
@@ -111,12 +182,16 @@ fn probe_qml() -> String {
             return 'ok'
         }}
         function period() {{ return '' + Settings.deleteDeviceAfter }}
-        function pushed() {{ return stack.pushed }}
+        function isFinished() {{ return finished ? 'true' : 'false' }}
     }}
 ",
-        components.display()
+        components.display(),
+        common::page_url("SettingsPage.qml")
     )
 }
+
+/// Ticks to wait for the steps and the last write; only a broken run spends them.
+const PATIENCE_SECONDS: u32 = 30;
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -151,73 +226,14 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let mut steps: Vec<(&str, String)> = Vec::new();
-    let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
-
-    macro_rules! call {
-        ($name:expr $(, $arg:expr)*) => {{
-            let result = (*engine_ptr).invoke_method(
-                $name.into(),
-                &[$(QVariant::from($arg)),*],
-            );
-            QString::from_qvariant(result)
-                .map(|value| value.to_string())
-                .unwrap_or_default()
-        }};
-    }
-    macro_rules! record {
-        ($label:expr, $value:expr) => {
-            (*steps_ptr).push(($label, $value))
-        };
-    }
-
-    // By now the core is up and the account read, as the app has done
-    // on its way in before the page can be opened.
-    single_shot(Duration::from_secs(3), move || unsafe {
-        record!(
-            "load",
-            call!("load", QString::from(common::page_url("SettingsPage.qml")))
-        );
-        record!("pick", call!("click", QString::from("deletionOption3600")));
-        // Straight after tap: nothing written or pushed.
-        record!("period-on-tap", call!("period"));
-        record!("pushed-on-tap", call!("pushed"));
-    });
-    single_shot(Duration::from_secs(5), move || unsafe {
-        record!("pushed", call!("pushed"));
-        record!("period-before-accept", call!("period"));
-        record!(
-            "shown-before-accept",
-            call!(
-                "get",
-                QString::from("deletionCombo"),
-                QString::from("currentIndex")
-            )
-        );
-        record!("accept", call!("acceptDialog"));
-        record!("period-on-accept", call!("period"));
-        record!(
-            "shown-on-accept",
-            call!(
-                "get",
-                QString::from("deletionCombo"),
-                QString::from("currentIndex")
-            )
-        );
-    });
-    single_shot(Duration::from_secs(7), move || unsafe {
-        (*engine_ptr).quit();
-    });
+    let mut steps_json = String::new();
+    let steps_ptr: *mut String = std::ptr::addr_of_mut!(steps_json);
+    wait_for_steps(engine_ptr, steps_ptr, journal.clone(), PATIENCE_SECONDS);
 
     engine.exec();
 
-    let value = |label: &str| {
-        steps
-            .iter()
-            .find(|(name, _)| *name == label)
-            .map(|(_, value)| value.clone())
-            .unwrap_or_default()
-    };
+    let steps: Vec<(String, String)> = serde_json::from_str(&steps_json).unwrap_or_default();
+    let value = |label: &str| common::value_of(&steps, label).to_string();
     let calls = common::calls(&journal);
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("steps: {steps:?}, calls: {names:?}");
@@ -229,6 +245,15 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
         ("0".to_string(), String::new()),
         "the tap wrote the setting or opened the dialog before the core had \
          been asked. {context}"
+    );
+    assert_eq!(
+        (
+            value("pushed-mid-transition"),
+            value("pushed-under-choices")
+        ),
+        (String::new(), String::new()),
+        "the dialog was pushed while Silica's page of choices was still \
+         leaving, when Silica drops it. {context}"
     );
     assert_eq!(
         value("pushed"),
@@ -248,6 +273,28 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
         "accepting the dialog did not write the setting and move the \
          choice to it. {context}"
     );
+    assert_eq!(
+        (value("pick-again"), value("pushed-again-mid-transition")),
+        ("ok".to_string(), String::new()),
+        "picked again, the dialog was pushed while the stack was still \
+         moving. {context}"
+    );
+    assert!(
+        value("pushed-again").starts_with("AutoDeleteDialog.qml:count=")
+            && value("pushed-again").ends_with(",seconds=86400,periodLabel=After 1 day"),
+        "picked again, the dialog did not open once the stack was idle. \
+         {context}"
+    );
+    assert_eq!(
+        value("period-on-accept-again"),
+        "86400",
+        "accepting the second dialog did not write the setting. {context}"
+    );
+    assert_eq!(
+        value("pushed-once-answered"),
+        "",
+        "the dialog was pushed again on the stack's next move. {context}"
+    );
     let written: Vec<Value> = calls
         .iter()
         .filter(|(method, params)| {
@@ -256,15 +303,41 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
         })
         .map(|(_, params)| params.clone())
         .collect();
-    // The default, when the account list was first read, and the
-    // reader's choice once they had agreed -- and nothing in between.
+    // The default, when the account list was first read, and each of the
+    // reader's choices once they had agreed -- and nothing in between.
     assert_eq!(
         written,
         vec![
             serde_json::json!([1, "delete_device_after", "0"]),
-            serde_json::json!([1, "delete_device_after", "3600"])
+            serde_json::json!([1, "delete_device_after", "3600"]),
+            serde_json::json!([1, "delete_device_after", "86400"])
         ],
         "the period did not reach the core's account exactly when the \
          reader had agreed: {calls:?}"
     );
+}
+
+/// Whether the reader's second choice has reached the core's account.
+fn second_choice_written(journal: &Path) -> bool {
+    common::calls(journal).iter().any(|(method, params)| {
+        method == "set_config" && *params == serde_json::json!([1, "delete_device_after", "86400"])
+    })
+}
+
+/// Each second: probe's steps done and last write landed, or patience spent? Then take the
+/// steps and quit. Whole seconds: vendored `single_shot` drops fraction.
+fn wait_for_steps(engine: *mut QmlEngine, steps: *mut String, journal: PathBuf, patience: u32) {
+    single_shot(Duration::from_secs(1), move || unsafe {
+        let finished = QString::from_qvariant((*engine).invoke_method("isFinished".into(), &[]))
+            .map(|value| value.to_string())
+            .unwrap_or_default();
+        if (finished == "true" && second_choice_written(&journal)) || patience == 0 {
+            *steps = QString::from_qvariant((*engine).invoke_method("stepsJson".into(), &[]))
+                .map(|value| value.to_string())
+                .unwrap_or_default();
+            (*engine).quit();
+        } else {
+            wait_for_steps(engine, steps, journal.clone(), patience - 1);
+        }
+    });
 }
