@@ -75,7 +75,7 @@ Details: `docs/BUILDING.md`.
 ## Comments and docs
 
 - Code comments, `docs/*.md`, this file: caveman-full. Terse fragments; what is true now + why. No history, story, changelog (git's job). Identifiers, paths exact.
-- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users.
+- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users; brief, to the point.
 - User-visible change → line in `CHANGELOG.md` under `## Unreleased` (create if missing), same PR.
 - No plans, research notes, scratch files in repo.
 
@@ -104,7 +104,7 @@ Details: `docs/BUILDING.md`.
 
 ## Reporting
 
-- Replies to user: caveman-full. User-facing text (changelog, release notes, forum) stays prose.
+- Replies to user: caveman-full. User-facing text (changelog, release notes, forum) stays prose, but brief: as long as necessary, as short and to the point as possible.
 - Lead with result. Say what was verified, what wasn't, what is guess.
 - Non-green step → name it and why. Never hide.
 - Forum bug report → search GitHub issues first, link match.
