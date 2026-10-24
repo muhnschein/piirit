@@ -597,7 +597,7 @@ fn assert_dialog_relays(steps: &[(String, String)], context: &str) {
     );
     expect(
         "dialog-picked",
-        "dcaccount:mehl.cloud",
+        "dcaccount:mailchat.pl",
         "the list's second relay is not the menu's fourth entry",
     );
     expect(
@@ -622,12 +622,12 @@ fn assert_dialog_relays(steps: &[(String, String)], context: &str) {
     );
     expect(
         "dialog-closed-says",
-        "Relay: mehl.cloud",
+        "Relay: mailchat.pl",
         "a shut Advanced names the wrong relay",
     );
     expect(
         "dialog-closed-provider",
-        "dcaccount:mehl.cloud",
+        "dcaccount:mailchat.pl",
         "shutting Advanced dropped the relay chosen in it",
     );
     expect(
