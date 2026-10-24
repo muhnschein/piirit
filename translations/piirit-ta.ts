@@ -563,10 +563,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>காப்பகப்படுத்தப்பட்ட அரட்டைகள்</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>புதிய அரட்டை</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>காப்பகப்படுத்தப்பட்டவை</translation>
     </message>
@@ -648,10 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR குறியீடு</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>புதிய குழு</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>படிக்காததாகக் குறி</translation>
     </message>
@@ -687,6 +679,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>இதற்கு அனுப்பு</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <translation>புதிய</translation>
     </message>
 </context>
 <context>
@@ -1117,6 +1114,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>படத்தை மாற்று</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR அழைப்புக் குறியீடு</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>சேனல்</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1378,6 +1385,62 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Create group</source>
         <translation>குழுவை உருவாக்கு</translation>
     </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>சேனலுக்கு ஒரு பெயர் இடவும்</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>சேனலை உருவாக்கு</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>புதிய சேனல்</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>சேனலின் பெயர்</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>சேனலில் உள்ள அனைவரும் பெயரைப் பார்க்கிறார்கள்</translation>
+    </message>
+</context>
+<context>
+    <name>NewPage</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
+        <translation>புதிய</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>புதிய அரட்டை</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>நீங்கள் ஒருவருக்கு எழுதுகிறீர்கள்.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>புதிய குழு</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>பலர் ஒருவருக்கொருவர் எழுதுகிறார்கள்.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>புதிய சேனல்</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>சேனல்கள் உங்கள் செய்திகளைப் பலருக்கு ஒலிபரப்பும் கருவி.</translation>
+    </message>
 </context>
 <context>
     <name>Notifier</name>
@@ -1603,6 +1666,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>அழைப்பு இணைப்பை நகலெடு</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR அழைப்புக் குறியீடு</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; சேனலில் சேர ஸ்கேன் செய்யவும்</translation>
     </message>
 </context>
 <context>

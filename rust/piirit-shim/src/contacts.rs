@@ -61,6 +61,10 @@ pub struct ContactList {
     pub create_group:
         qt_method!(fn(&mut self, name: QString, member_ids: QVariantList, picture_path: QString)),
 
+    /// Create and open own channel (core's broadcast); picture after, as group. No members:
+    /// core refuses adding any, subscribers join by channel's invite. Answers `chat_ready`.
+    pub create_channel: qt_method!(fn(&mut self, name: QString, picture_path: QString)),
+
     /// Follow invite (QR or `https://i.delta.chat/...`), open chat: how contacts are added, as
     /// bare address can't be encrypted to (docs/PROJECT.md); groups, channels joined same way.
     /// Answers `chat_ready`, or `relay_offered` for relay code.
@@ -89,6 +93,9 @@ pub struct ContactList {
 
     /// Fetch own invite. Answers `invite_ready`.
     pub fetch_invite: qt_method!(fn(&mut self)),
+    /// Fetch group's or channel's invite: how subscribers join a channel. Answers
+    /// `invite_ready`.
+    pub fetch_chat_invite: qt_method!(fn(&mut self, chat_id: u32)),
     /// Account's invite link.
     pub invite_ready: qt_signal!(link: QString),
 
@@ -320,7 +327,27 @@ impl ContactList {
 
     /// Create group, add members, set picture.
     pub fn create_group(&mut self, name: QString, member_ids: QVariantList, picture_path: QString) {
+        let members: Vec<u32> = member_ids
+            .into_iter()
+            .filter_map(|value| i32::from_qvariant(value.clone()))
+            .filter_map(|value| u32::try_from(value).ok())
+            .collect();
+        self.create(Made::Group(members), name, picture_path);
+    }
+
+    /// Create channel, set picture.
+    pub fn create_channel(&mut self, name: QString, picture_path: QString) {
+        self.create(Made::Channel, name, picture_path);
+    }
+
+    /// Create group or channel, add members, set picture; open it even if some refused.
+    fn create(&mut self, made: Made, name: QString, picture_path: QString) {
         let account_id = self.account_id;
+        // Channel's only possible refusal: picture.
+        let partly = match made {
+            Made::Group(_) => "the group was made, but some people could not be added",
+            Made::Channel => "the channel was made, but its picture could not be set",
+        };
         let Some((rpc, runtime)) = connection() else {
             self.error(QString::from("not started"));
             return;
@@ -330,15 +357,10 @@ impl ContactList {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
                 Ok((chat_id, refused)) => {
-                    // Report, then open: group exists; error on picker strands reader.
+                    // Report, then open: chat exists; error on picker strands reader.
                     if !refused.is_empty() {
-                        this.borrow().error(
-                            format!(
-                                "the group was made, but some people could not be added ({})",
-                                refused.join("; ")
-                            )
-                            .into(),
-                        );
+                        this.borrow()
+                            .error(format!("{partly} ({})", refused.join("; ")).into());
                     }
                     this.borrow().chat_ready(chat_id);
                 }
@@ -347,11 +369,6 @@ impl ContactList {
         });
 
         let name = name.to_string();
-        let members: Vec<u32> = member_ids
-            .into_iter()
-            .filter_map(|value| i32::from_qvariant(value.clone()))
-            .filter_map(|value| u32::try_from(value).ok())
-            .collect();
         let picture = picture_path.to_string();
         let picture = if picture.is_empty() {
             None
@@ -360,12 +377,23 @@ impl ContactList {
         };
         runtime.spawn(async move {
             let result = async {
-                // Encrypted key-contact group, as reference "New Group". Third arg: deprecated
-                // unread `protect`, upstream says `false`.
-                let chat_id: u32 = rpc
-                    .call("create_group_chat", (account_id, name, false))
-                    .await
-                    .map_err(|err| err.to_string())?;
+                let (chat_id, members) = match made {
+                    // Encrypted key-contact group, as reference "New Group". Third arg:
+                    // deprecated unread `protect`, upstream says `false`.
+                    Made::Group(members) => (
+                        rpc.call::<_, u32>("create_group_chat", (account_id, name, false))
+                            .await
+                            .map_err(|err| err.to_string())?,
+                        members,
+                    ),
+                    // Reference "New Channel".
+                    Made::Channel => (
+                        rpc.call::<_, u32>("create_broadcast", (account_id, name))
+                            .await
+                            .map_err(|err| err.to_string())?,
+                        Vec::new(),
+                    ),
+                };
                 // Try every member; chat returned anyway.
                 let mut refused = Vec::new();
                 for member in members {
@@ -376,7 +404,7 @@ impl ContactList {
                         refused.push(format!("{member}: {err}"));
                     }
                 }
-                // Picture last, on existing group; refusal reported like member's.
+                // Picture last, on existing chat; refusal reported like member's.
                 if let Some(path) = picture {
                     if let Err(err) = rpc
                         .call::<_, ()>("set_chat_profile_image", (account_id, chat_id, Some(path)))
@@ -454,6 +482,16 @@ impl ContactList {
 
     /// Fetch own invite link.
     pub fn fetch_invite(&mut self) {
+        self.fetch_invite_for(None);
+    }
+
+    /// Fetch group's or channel's invite link.
+    pub fn fetch_chat_invite(&mut self, chat_id: u32) {
+        self.fetch_invite_for(Some(chat_id));
+    }
+
+    /// Invite link: own (`None`) or chat's.
+    fn fetch_invite_for(&mut self, chat_id: Option<u32>) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
             return;
@@ -469,12 +507,9 @@ impl ContactList {
         });
 
         runtime.spawn(async move {
-            // Null chat: own invite. Chat id: that group's.
+            // Null chat: own invite. Chat id: that group's or channel's.
             let result = rpc
-                .call::<_, String>(
-                    "get_chat_securejoin_qr_code",
-                    (account_id, Option::<u32>::None),
-                )
+                .call::<_, String>("get_chat_securejoin_qr_code", (account_id, chat_id))
                 .await
                 .map_err(|err| err.to_string());
             done(result);
@@ -492,6 +527,14 @@ impl ContactList {
             }
         })
     }
+}
+
+/// What `ContactList::create` makes.
+enum Made {
+    /// Group with these members besides self.
+    Group(Vec<u32>),
+    /// Own channel; no members.
+    Channel,
 }
 
 /// Scan result: chat, or relay.

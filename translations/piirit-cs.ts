@@ -569,10 +569,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Archivované chaty</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Nový chat</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Archivované</translation>
     </message>
@@ -654,10 +650,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>QR kód</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nová skupina</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Označit jako nepřečtené</translation>
     </message>
@@ -693,6 +685,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Odeslat do</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <translation>Nový</translation>
     </message>
 </context>
 <context>
@@ -1126,6 +1123,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Změnit obrázek</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR kód s pozvánkou</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanál</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1388,6 +1395,62 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Create group</source>
         <translation>Vytvořit skupinu</translation>
     </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Pojmenujte prosím kanál</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Vytvořit kanál</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nový kanál</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Název kanálu</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Jméno vidí všichni v kanálu</translation>
+    </message>
+</context>
+<context>
+    <name>NewPage</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
+        <translation>Nový</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nový chat</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Píšete jednomu člověku.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nová skupina</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Několik lidí si píše navzájem.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nový kanál</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanály jsou nástrojem pro vysílání zpráv typu (jeden-k-mnoha).</translation>
+    </message>
 </context>
 <context>
     <name>Notifier</name>
@@ -1614,6 +1677,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Copy invite link</source>
         <translation>Kopírovat odkaz pozvánky</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR kód s pozvánkou</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Skenování pro připojení ke kanálu &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

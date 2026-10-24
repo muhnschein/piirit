@@ -2050,7 +2050,7 @@ async fn offline_round_trip_against_real_core() {
     unpinning_against(&client, sender_id, saved, first).await;
     relays_against(&client, mailbox).await;
     calls_against(&client, mailbox).await;
-    channel_join_against(&client, mailbox).await;
+    channels_against(&client, mailbox).await;
 
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
@@ -2397,10 +2397,10 @@ async fn calls_are_refused_where_the_core_refuses_them(client: &RpcClient, calle
     assert_eq!(who.as_deref(), Some("2"));
 }
 
-/// Channel invite as QR page follows it (`ContactList::join_by_invite`): `check_qr` kind, then
-/// `secure_join` gives read-only channel chat. Owner's channel only a fixture here. Nothing
-/// delivered: pins reader's end.
-async fn channel_join_against(client: &RpcClient, mailbox: (u16, u16)) {
+/// Channel made as New channel page makes it (`ContactList::create_channel`), joined as QR page
+/// follows its invite (`join_by_invite`): owner's chat, `check_qr` kind, read-only reader's chat.
+/// Nothing delivered: pins both ends' calls.
+async fn channels_against(client: &RpcClient, mailbox: (u16, u16)) {
     let mut accounts = Vec::new();
     for addr in ["owner@example.invalid", "reader@example.invalid"] {
         let account: u32 = client
@@ -2422,6 +2422,41 @@ async fn channel_join_against(client: &RpcClient, mailbox: (u16, u16)) {
         .call("create_broadcast", (owner, "News"))
         .await
         .unwrap_or_else(|err| panic!("create_broadcast: {err}"));
+    let own: Value = client
+        .call("get_full_chat_by_id", (owner, channel))
+        .await
+        .unwrap_or_else(|err| panic!("get_full_chat_by_id of the new channel: {err}"));
+    // Channel page tells own channel (offers its code) by this.
+    assert_eq!(
+        own.get("chatType").and_then(Value::as_str),
+        Some("OutBroadcast"),
+        "create_broadcast did not make an own channel: {own:?}"
+    );
+    assert_eq!(
+        own.get("name").and_then(Value::as_str),
+        Some("News"),
+        "the channel is not named as typed: {own:?}"
+    );
+    assert_eq!(
+        own.get("canSend").and_then(Value::as_bool),
+        Some(true),
+        "the owner cannot post to their channel: {own:?}"
+    );
+    // No members by hand: why page offers none, code is only way in.
+    let card: String = client
+        .call("make_vcard", (reader, vec![1_u32]))
+        .await
+        .unwrap_or_else(|err| panic!("make_vcard: {err}"));
+    let imported: Vec<u32> = client
+        .call("import_vcard_contents", (owner, card))
+        .await
+        .unwrap_or_else(|err| panic!("import_vcard_contents: {err}"));
+    assert!(
+        refusal(client, "add_contact_to_chat", (owner, channel, imported[0]))
+            .await
+            .contains("not a group where one can add members"),
+        "the core took a subscriber added by hand"
+    );
     let invite: String = client
         .call("get_chat_securejoin_qr_code", (owner, Some(channel)))
         .await

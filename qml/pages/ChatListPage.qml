@@ -477,17 +477,12 @@ Page {
                                           { accountId: page.accountId })
             }
             MenuItem {
-                objectName: "newGroupMenuItem"
+                // Chat, group, channel: one item, choice on own page (pulley stays short).
+                objectName: "newMenuItem"
                 visible: !page.archived
-                text: qsTr("New group")
-                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewGroupPage.qml"),
-                                          { accountId: page.accountId })
-            }
-            MenuItem {
-                objectName: "newChatMenuItem"
-                visible: !page.archived
-                text: qsTr("New chat")
-                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewChatPage.qml"),
+                //: Pull-down item. Opens a page to pick a new chat, group or channel.
+                text: qsTr("New")
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewPage.qml"),
                                           { accountId: page.accountId })
             }
         }

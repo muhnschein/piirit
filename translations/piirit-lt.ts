@@ -565,10 +565,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Archyvuoti pokalbiai</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Naujas pokalbis</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Archyvuoti</translation>
     </message>
@@ -650,10 +646,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR kodas</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nauja grupė</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Žymėti kaip neskaitytą</translation>
     </message>
@@ -689,6 +681,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Siųsti į</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <translation>Naujas</translation>
     </message>
 </context>
 <context>
@@ -1122,6 +1119,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Keisti paveikslėlį</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR pakvietimo kodas</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanalas</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1384,6 +1391,62 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Create group</source>
         <translation>Sukurti grupę</translation>
     </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Pavadinkite kanalą</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Sukurti kanalą</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Naujas kanalas</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanalo pavadinimas</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Pavadinimą mato visi kanale</translation>
+    </message>
+</context>
+<context>
+    <name>NewPage</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
+        <translation>Naujas</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Naujas pokalbis</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Rašote vienam žmogui.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nauja grupė</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Keli žmonės rašo vieni kitiems.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Naujas kanalas</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanalai – tai įrankis jūsų žinutėms transliuoti daugeliui gavėjų.</translation>
+    </message>
 </context>
 <context>
     <name>Notifier</name>
@@ -1610,6 +1673,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Kopijuoti kvietimo nuorodą</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR pakvietimo kodas</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Nuskenuokite norėdami prisijungti prie kanalo „%1“</translation>
     </message>
 </context>
 <context>

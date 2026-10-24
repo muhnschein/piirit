@@ -115,6 +115,8 @@ struct State {
     accepted_requests: std::collections::BTreeSet<u32>,
     /// Channels joined here by invite; seeded ones are `PIIRIT_FAKE_CHANNELS` chats.
     joined_channels: std::collections::BTreeSet<u32>,
+    /// Channels made here (core's `OutBroadcast`); seeded ones are `PIIRIT_FAKE_OWN_CHANNELS`.
+    own_channels: std::collections::BTreeSet<u32>,
     /// Accounts with unanswered transport call: core allows one, refuses second.
     configuring: std::collections::BTreeSet<u32>,
     /// Accounts asked to stop ongoing process.
@@ -400,10 +402,18 @@ impl State {
             || env_ids("PIIRIT_FAKE_CHANNELS").contains(&u64::from(chat))
     }
 
+    /// Own channel: made here, or named in `PIIRIT_FAKE_OWN_CHANNELS`.
+    fn is_own_channel(&self, chat: u32) -> bool {
+        self.own_channels.contains(&chat)
+            || env_ids("PIIRIT_FAKE_OWN_CHANNELS").contains(&u64::from(chat))
+    }
+
     /// Core's `chatType`.
     fn chat_type(&self, chat: u32) -> &'static str {
         if self.is_channel(chat) {
             "InBroadcast"
+        } else if self.is_own_channel(chat) {
+            "OutBroadcast"
         } else if self.is_group(chat) {
             "Group"
         } else {
@@ -1807,6 +1817,19 @@ async fn serve() {
                     }
                     ok(&id, &json!(chat))
                 }
+                // Own channel: named, no members; core refuses adding any.
+                "create_broadcast" => {
+                    let name = positional(1).as_str().unwrap_or_default().to_string();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    state.next_chat_id += 1;
+                    let chat = state.next_chat_id;
+                    state.chats.insert(chat, Vec::new());
+                    state.chat_order.insert(0, chat);
+                    state.own_channels.insert(chat);
+                    state.group_names.insert(chat, name);
+                    ok(&id, &json!(chat))
+                }
                 "create_group_chat" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -1828,12 +1851,20 @@ async fn serve() {
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
-                    let members = state.group_members.entry(chat).or_default();
-                    if !members.contains(&contact) {
-                        members.push(contact);
+                    // Core's words: subscribers join by invite only.
+                    if state.is_own_channel(chat) {
+                        err(
+                            &id,
+                            &format!("Chat#{chat} is not a group where one can add members"),
+                        )
+                    } else {
+                        let members = state.group_members.entry(chat).or_default();
+                        if !members.contains(&contact) {
+                            members.push(contact);
+                        }
+                        state.chat_modified(account, chat);
+                        ok(&id, &Value::Null)
                     }
-                    state.chat_modified(account, chat);
-                    ok(&id, &Value::Null)
                 }
                 // `ChatInfo` shape: member ids; contacts via `get_contacts_by_ids`, keyed by id
                 // string.
@@ -1847,8 +1878,11 @@ async fn serve() {
                     let is_group = state.is_group(chat);
                     // Channel subscriber: no writing, as left group.
                     let left = state.left_groups.contains(&chat) || state.is_channel(chat);
+                    // Own channel: subscribers only, none yet; reader not among them, as core.
                     let members = if is_group {
                         state.group_members.get(&chat).cloned().unwrap_or_default()
+                    } else if state.is_own_channel(chat) {
+                        Vec::new()
                     } else {
                         vec![10]
                     };
@@ -2075,10 +2109,26 @@ async fn serve() {
                     let content = positional(1).as_str().unwrap_or_default().to_string();
                     ok(&id, &qr_kind(&content))
                 }
-                "get_chat_securejoin_qr_code" => ok(
-                    &id,
-                    &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
-                ),
+                // Own invite, or own channel's (names channel in `b=`, as core).
+                "get_chat_securejoin_qr_code" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok());
+                    let state = state.lock().await;
+                    match chat {
+                        Some(chat) if state.is_own_channel(chat) => ok(
+                            &id,
+                            &json!(format!(
+                                "https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me&b={}",
+                                state.chat_name(chat)
+                            )),
+                        ),
+                        _ => ok(
+                            &id,
+                            &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
+                        ),
+                    }
+                }
                 // Here, or everywhere (deletion request as own message). No delivery here: same to
                 // chat.
                 "delete_messages" | "delete_messages_for_all" => {

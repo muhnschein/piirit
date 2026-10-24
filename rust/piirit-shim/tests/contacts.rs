@@ -1,4 +1,5 @@
-//! Starting a conversation: the three ways in. Invite way also joins channels.
+//! Starting a conversation: the three ways in. Invite way also joins channels; own channel made
+//! beside group.
 //!
 //! Calls had no caller before: app never created chats.
 
@@ -42,6 +43,7 @@ const PROBE_QML: &str = r"
                     started = true
                     contacts.open_chat_with(rows.itemAt(0).cid)
                     contacts.create_group('Team', [rows.itemAt(0).cid, rows.itemAt(1).cid], '')
+                    contacts.create_channel('News', '')
                     contacts.join_by_invite('https://i.delta.chat/#ABC&a=them%40example.org')
                     contacts.join_by_invite('https://i.delta.chat/#DEF&a=owner%40example.org&b=News')
                     contacts.join_by_invite('just some text')
@@ -147,8 +149,9 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     let invite = parts.next().unwrap_or_default();
     assert_eq!(
         opened.split(',').filter(|part| !part.is_empty()).count(),
-        4,
-        "expected a chat from each of the three ways in, plus the channel, got {opened:?}"
+        5,
+        "expected a chat from each of the three ways in, plus the channels joined and made, got \
+         {opened:?}"
     );
 
     // Invite flow: classify, then join. Plain text and invite-less fingerprint codes refused
@@ -212,6 +215,11 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         "tapping a contact did not open a chat: {names:?}"
     );
 
+    assert_made(calls, &names);
+}
+
+/// Group and channel made: right core call each, members only on group.
+fn assert_made(calls: &[(String, Value)], names: &[&str]) {
     // Group encrypted (method's choice). Third arg: deprecated `protect`; upstream says pass
     // `false`, ignores it.
     let group = calls
@@ -234,6 +242,20 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
             .filter(|name| **name == "add_contact_to_chat")
             .count(),
         2,
-        "both members should have been added: {names:?}"
+        "both members should have been added, and nobody to the channel: {names:?}"
+    );
+
+    // Channel: core's broadcast, named; no members (core refuses), no picture asked.
+    let channel = calls
+        .iter()
+        .find(|(name, _)| name == "create_broadcast")
+        .expect("the channel must be created");
+    assert_eq!(
+        channel.1.pointer("/1").and_then(Value::as_str),
+        Some("News")
+    );
+    assert!(
+        !names.contains(&"set_chat_profile_image"),
+        "a picture was set though none was chosen: {names:?}"
     );
 }

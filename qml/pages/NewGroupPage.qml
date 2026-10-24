@@ -7,6 +7,9 @@ import Piirit 1.0
  * Name group, picture, members; laid out as GroupPage.qml. Sent to core in
  * one go at create, encrypted ("New Group"). Members by id
  * (`ContactList.picked_rows`): Repeater per contact scaled with address book.
+ *
+ * `channel`: own channel instead ("New Channel"), name and picture only. Core
+ * takes no members for one: subscribers join by its invite (GroupPage.qml).
  */
 Page {
     id: page
@@ -20,6 +23,8 @@ Page {
     }
 
     property int accountId
+    /// Make channel, not group.
+    property bool channel: false
     property string errorMessage: ""
     // Create tap until core answers: no second group from second tap.
     property bool creating: false
@@ -121,13 +126,18 @@ Page {
     function createGroup() {
         var name = nameField.text.trim()
         if (name.length === 0) {
-            page.errorMessage = qsTr("Please name the group")
+            page.errorMessage = page.channel ? qsTr("Please name the channel")
+                                             : qsTr("Please name the group")
             return
         }
         page.errorMessage = ""
         page.creating = true
         nameField.done()
-        contacts.create_group(name, page.members, page.picturePath)
+        if (page.channel) {
+            contacts.create_channel(name, page.picturePath)
+        } else {
+            contacts.create_group(name, page.members, page.picturePath)
+        }
     }
 
     // Pick or unpick changes what is drawn.
@@ -169,7 +179,7 @@ Page {
             }
             MenuItem {
                 objectName: "createButton"
-                text: qsTr("Create group")
+                text: page.channel ? qsTr("Create channel") : qsTr("Create group")
                 enabled: !page.creating && nameField.text.trim().length > 0
                 onClicked: page.createGroup()
             }
@@ -181,7 +191,9 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: qsTr("New group")
+                objectName: "pageHeader"
+                //: Delta Chat's "new_channel".
+                title: page.channel ? qsTr("New channel") : qsTr("New group")
             }
 
             // Picture is the control: tap opens gallery, badge says so. Name's initial
@@ -231,8 +243,10 @@ Page {
                 objectName: "groupNameControl"
                 fieldObjectName: "nameField"
                 hintObjectName: "nameHint"
-                placeholderText: qsTr("Group name")
-                hint: qsTr("Everyone in the group sees the name")
+                //: Delta Chat's "channel_name".
+                placeholderText: page.channel ? qsTr("Channel name") : qsTr("Group name")
+                hint: page.channel ? qsTr("Everyone in the channel sees the name")
+                                   : qsTr("Everyone in the group sees the name")
             }
 
             Banner {
@@ -242,15 +256,17 @@ Page {
                 onDismissed: page.errorMessage = ""
             }
 
+            // Members: group only.
             SectionHeader {
                 objectName: "membersHeader"
+                visible: !page.channel
                 //: Heading over the member list. %n is how many there are, the reader included.
                 text: qsTr("%n member(s)", "", page.members.length + 1)
             }
 
             // Reader is in group by making it; no menu.
             Repeater {
-                model: page.selfRow
+                model: page.channel ? [] : page.selfRow
 
                 delegate: ListItem {
                     objectName: "memberRow" + modelData.contact_id
@@ -301,6 +317,7 @@ Page {
             // Way to more members.
             PlusRow {
                 objectName: "addMembersButton"
+                visible: !page.channel
                 width: column.width
                 text: qsTr("Add members")
                 onClicked: page.pickMembers()

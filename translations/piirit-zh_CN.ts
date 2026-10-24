@@ -565,10 +565,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>已归档的聊天</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>新聊天</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>已归档</translation>
     </message>
@@ -650,10 +646,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>二维码</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>新群组</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>标为未读</translation>
     </message>
@@ -689,6 +681,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>发送至</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <translation>新建</translation>
     </message>
 </context>
 <context>
@@ -1116,6 +1113,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>更改图片</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>邀请二维码</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>频道</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1376,6 +1383,62 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Create group</source>
         <translation>创建群组</translation>
     </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>请为频道命名</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>创建频道</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>新建频道</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>频道名称</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>频道中的每个人都能看到该名称</translation>
+    </message>
+</context>
+<context>
+    <name>NewPage</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
+        <translation>新建</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>新聊天</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>你与一个人聊天。</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>新群组</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>几个人互相聊天。</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>新建频道</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>频道是广播消息的一对多工具。</translation>
+    </message>
 </context>
 <context>
     <name>Notifier</name>
@@ -1600,6 +1663,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>复制邀请链接</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>邀请二维码</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>扫描即可加入频道“%1”</translation>
     </message>
 </context>
 <context>

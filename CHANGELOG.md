@@ -10,6 +10,7 @@ docs/BUILDING.md, "Cutting a release").
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 - **Join a channel** by scanning its QR code or pasting its invite link on the QR code page, as for a contact or a group. The channel opens right away; it is read-only, and new posts arrive in it from then on.
+- **Make your own channel.** "New" in the chat list's pull-down menu opens a page to pick a new chat, group or channel, each with a line on what it is. A channel has a name and a picture but no members: from its page, "QR invite code" shows the code and link others scan to join it. Only you post in it.
 
 ## 2.2.0 — 2026-10-23
 
