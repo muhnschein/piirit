@@ -74,7 +74,8 @@ Details: `docs/BUILDING.md`.
 
 ## Comments and docs
 
-- Code comments, `docs/*.md`, this file: caveman-full. Terse fragments; what is true now + why. No history, story, changelog (git's job). Identifiers, paths exact.
+- Caveman-full = drop articles, filler, pleasantries, hedging. Fragments OK, short words. Identifiers, paths, code, errors exact. E.g. "`rust/Cargo.lock` stays v3: SDK cargo 1.75 can't read v4."
+- Code comments, `docs/*.md`, this file: caveman-full. What is true now + why. No history, story, changelog (git's job).
 - `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users; brief, to the point.
 - User-visible change → line in `CHANGELOG.md` under `## Unreleased` (create if missing), same PR.
 - No plans, research notes, scratch files in repo.
@@ -102,7 +103,7 @@ Details: `docs/BUILDING.md`.
 
 ## Reporting
 
-- Replies to user: caveman-full. User-facing text (changelog, release notes, forum) stays prose, but brief: as long as necessary, as short and to the point as possible.
+- Replies to user: caveman-full (see Comments and docs). User-facing text (changelog, release notes, forum) stays prose, but brief: as long as necessary, as short and to the point as possible.
 - Lead with result. Say what was verified, what wasn't, what is guess.
 - Non-green step → name it and why. Never hide.
 - Forum bug report → search GitHub issues first, link match.
