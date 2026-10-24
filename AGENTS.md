@@ -19,7 +19,7 @@ In this order; later step only once earlier ones hold:
 4. `make check` green locally.
 5. PR CI green, SonarQube included (quality gate, new-code coverage).
 6. Device RPM: dispatch `.github/workflows/rpm.yml` on PR branch, give user the artifact link.
-7. With RPM: outline briefly what merging risks and how you mitigated it.
+7. With RPM: outline briefly what merging this PR risks and how you mitigated it.
 
 Feature reachable from several places (chat, contact/group page, cover, quick actions) → all of them.
 
