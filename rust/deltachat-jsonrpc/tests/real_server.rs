@@ -2290,6 +2290,55 @@ async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
         .unwrap_or_else(|err| panic!("create_chat_by_contact_id: {err}"));
     a_call_is_placed_and_hung_up(client, caller, chat).await;
     calls_are_refused_where_the_core_refuses_them(client, caller, chat).await;
+    // Same key contact: only one can join a group.
+    chats_in_common_against(client, caller, contact, chat).await;
+}
+
+/// Contact page's chats in common (`ChatList.contact_id`): core lists contact's 1:1 and groups,
+/// archived too; not others. Own id lists every chat: why page asks nothing for saved messages.
+async fn chats_in_common_against(client: &RpcClient, account: u32, contact: u32, chat: u32) {
+    let shared: u32 = client
+        .call("create_group_chat", (account, "Shared Group", false))
+        .await
+        .unwrap_or_else(|err| panic!("create_group_chat: {err}"));
+    client
+        .call::<_, ()>("add_contact_to_chat", (account, shared, contact))
+        .await
+        .unwrap_or_else(|err| panic!("add_contact_to_chat: {err}"));
+    let other: u32 = client
+        .call("create_group_chat", (account, "Other Group", false))
+        .await
+        .unwrap_or_else(|err| panic!("create_group_chat: {err}"));
+    client
+        .call::<_, ()>("set_chat_visibility", (account, chat, "Archived"))
+        .await
+        .unwrap_or_else(|err| panic!("set_chat_visibility: {err}"));
+    let by_contact = |contact: u32| async move {
+        client
+            .call::<_, Vec<u32>>(
+                "get_chatlist_entries",
+                (
+                    account,
+                    Option::<u32>::None,
+                    Option::<String>::None,
+                    Some(contact),
+                ),
+            )
+            .await
+            .unwrap_or_else(|err| panic!("get_chatlist_entries by contact: {err}"))
+    };
+    let common = by_contact(contact).await;
+    assert!(
+        common.contains(&chat) && common.contains(&shared) && !common.contains(&other),
+        "chats with the contact are not chat {chat} (archived) and group {shared} \
+         without group {other}: {common:?}"
+    );
+    let own = by_contact(1).await;
+    assert!(
+        own.contains(&other),
+        "own contact no longer lists every chat; saved messages could show chats in \
+         common: {own:?}"
+    );
 }
 
 /// Placed, read back, hung up before answer.

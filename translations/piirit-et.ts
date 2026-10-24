@@ -770,6 +770,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nähtud ammu</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Ühised vestlused</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

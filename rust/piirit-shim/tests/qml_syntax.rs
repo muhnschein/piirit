@@ -225,9 +225,14 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/AddMembersPage.qml",
             names_of::<piirit_shim::ContactItem>(),
         ),
+        // The contact, chats in common.
         (
             "qml/pages/ContactPage.qml",
-            names_of::<piirit_shim::ContactItem>(),
+            [
+                names_of::<piirit_shim::ContactItem>(),
+                names_of::<piirit_shim::ChatListItem>(),
+            ]
+            .concat(),
         ),
         // Block list, picker: contacts.
         (

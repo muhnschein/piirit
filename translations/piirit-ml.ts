@@ -770,6 +770,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>വളരെ മുമ്പ് കണ്ടതാണ്</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>പങ്കിട്ട ചാറ്റുകൾ</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

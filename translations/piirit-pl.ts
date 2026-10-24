@@ -772,6 +772,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Ostatnio widziany(-a) dawno temu</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Wspólne czaty</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

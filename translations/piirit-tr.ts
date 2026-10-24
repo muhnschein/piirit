@@ -768,6 +768,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Çok uzun zaman önce görüldü</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Ortak sohbetler</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

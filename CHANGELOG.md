@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. Tap one to open it.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 
 ## 2.2.0 — 2026-10-23

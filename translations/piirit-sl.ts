@@ -774,6 +774,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nazadnje viden(a) pred dolgim časom</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Skupni klepeti</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

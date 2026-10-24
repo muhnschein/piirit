@@ -772,6 +772,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Naposledy viděn(a) před dlouhou dobou</translation>
     </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Sdílené chaty</translation>
+    </message>
 </context>
 <context>
     <name>ConversationList</name>

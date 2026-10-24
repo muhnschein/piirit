@@ -1,4 +1,4 @@
-//! Searching chat list and archived list. Both must reach core.
+//! Searching chat list, archived list, one contact's chats. All must reach core.
 //!
 //! Filtering loaded rows finds only on-screen chats; archived is a disjoint list.
 
@@ -28,12 +28,18 @@ const PROBE_QML: &str = r"
         function showArchived() { chats.archived = true }
         function accept(chatId) { chats.accept_chat(chatId) }
         function block(chatId) { chats.block_chat(chatId) }
+        function byContact(contactId) { chats.contact_id = contactId }
     }
 ";
 
 /// Parameters: (`accountId`, `listFlags`, `query`, `contactId`).
 fn query_of(params: &Value) -> Option<&str> {
     params.get(2).and_then(Value::as_str)
+}
+
+/// See [`query_of`].
+fn contact_of(params: &Value) -> Option<u64> {
+    params.get(3).and_then(Value::as_u64)
 }
 
 /// See [`query_of`].
@@ -89,6 +95,11 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         (*engine_ptr).invoke_method("block".into(), &[QVariant::from(9u32)]);
     });
 
+    // Contact page's chats in common: set after account, as page sets it.
+    single_shot(Duration::from_secs(6), move || unsafe {
+        (*engine_ptr).invoke_method("byContact".into(), &[QVariant::from(10u32)]);
+    });
+
     single_shot(Duration::from_secs(8), move || unsafe {
         (*engine_ptr).quit();
     });
@@ -113,7 +124,13 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         "the archived list was never asked for with DC_GCL_ARCHIVED_ONLY, \
          so it would show the ordinary chats again. calls: {entries:?}"
     );
-    // First load: neither search nor archive.
+    assert!(
+        entries.iter().any(|params| contact_of(params) == Some(10)),
+        "a list of one contact's chats was never asked of the core by \
+         contact, so it could only filter chats already loaded. calls: \
+         {entries:?}"
+    );
+    // First load: neither search nor archive nor contact.
     let first = entries.first().cloned().unwrap_or(Value::Null);
     assert_eq!(
         query_of(&first),
@@ -124,6 +141,11 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         flags_of(&first),
         None,
         "the ordinary list was loaded with list flags. calls: {entries:?}"
+    );
+    assert_eq!(
+        contact_of(&first),
+        None,
+        "the ordinary list was loaded for one contact. calls: {entries:?}"
     );
 
     let methods = common::methods(&journal);

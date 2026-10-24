@@ -14,6 +14,9 @@ import Piirit 1.0
  *
  * Same ChatInfo as group page; one member, the contact. Row read into
  * properties: save's reload must not rebuild field under thumb.
+ *
+ * Chats in common at bottom, as Delta Chat apps: every chat core lists with
+ * contact, this one too; tap opens it in this one's place.
  */
 Page {
     id: page
@@ -36,13 +39,36 @@ Page {
     Connections {
         target: core
         // Name/picture changes arrive via contact; model reloads.
-        onCore_event: chat.handle_event(context_id, kind, payload_json)
+        onCore_event: {
+            chat.handle_event(context_id, kind, payload_json)
+            commonChats.handle_event(context_id, kind, payload_json)
+        }
         onStatus_changed: {
             if (core.status === "ready") {
                 chat.reload()
+                commonChats.reload()
             }
         }
     }
+
+    // Chats contact is in. Loaded once page first comes on screen: attached beside every 1:1
+    // chat, mostly never opened. Contact before account, each once: contact 0 lists every chat.
+    // Self, device (ids up to 9): none, as Delta Chat apps.
+    ChatList {
+        id: commonChats
+        objectName: "commonChats"
+        onError: page.errorMessage = message
+    }
+
+    function loadCommonChats() {
+        var shown = page.status === PageStatus.Activating || page.status === PageStatus.Active
+        if (shown && page.contactId > 9 && commonChats.contact_id === 0) {
+            commonChats.contact_id = page.contactId
+            commonChats.account_id = page.accountId
+        }
+    }
+
+    onContactIdChanged: page.loadCommonChats()
 
     /// The one member, lifted from row.
     property int contactId: 0
@@ -99,6 +125,7 @@ Page {
 
     // Leaving saves too: back-swipe in pause would drop text. Cursor leaves first.
     onStatusChanged: {
+        page.loadCommonChats()
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             nameField.done()
@@ -119,6 +146,25 @@ Page {
             accountId: page.accountId,
             chatId: page.chatId,
             kind: kind
+        })
+    }
+
+    // Common chat in this one's place, as Delta Chat apps; back goes to list. This one: back to it.
+    function openChat(chatId, chatName) {
+        if (chatId === page.chatId) {
+            pageStack.navigateBack()
+            return
+        }
+        // List page: it knows which chat is open (notifications). None, or other profile's: over.
+        if (typeof appWindow !== "undefined" && appWindow.chatList !== null
+                && appWindow.chatList.accountId === page.accountId) {
+            appWindow.chatList.openChatAbove(chatId, chatName)
+            return
+        }
+        pageStack.push(Qt.resolvedUrl("ConversationPage.qml"), {
+            accountId: page.accountId,
+            chatId: chatId,
+            chatName: chatName
         })
     }
 
@@ -262,6 +308,45 @@ Page {
                 seconds: chat.ephemeral_timer
                 canChange: chat.can_send
                 onChosen: chat.set_ephemeral_timer(seconds)
+            }
+
+            // None: no heading, as Delta Chat apps.
+            SectionHeader {
+                objectName: "commonChatsHeader"
+                visible: commonChats.count > 0
+                //: Over the list of chats on a contact's page that the
+                //: contact is in too. Delta Chat's "Chats in Common".
+                text: qsTr("Chats in common")
+            }
+
+            // Rows as chat list's, no menu.
+            Repeater {
+                model: commonChats.rows
+
+                delegate: ListItem {
+                    objectName: "commonChatRow" + model.chat_id
+                    width: column.width
+                    contentHeight: body.height
+
+                    ChatListDelegate {
+                        id: body
+                        width: parent.width
+                        chatName: model.name
+                        preview: model.preview
+                        previewSender: model.preview_sender
+                        unreadCount: model.unread_count
+                        lastUpdated: model.last_updated
+                        isEncrypted: model.is_encrypted
+                        isPinned: model.is_pinned
+                        isMuted: model.is_muted
+                        isContactRequest: model.is_contact_request
+                        chatColor: model.color
+                        avatarPath: model.avatar_path
+                        summaryState: model.summary_state
+                    }
+
+                    onClicked: page.openChat(model.chat_id, model.name)
+                }
             }
         }
     }

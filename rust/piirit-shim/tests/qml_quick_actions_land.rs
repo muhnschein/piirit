@@ -44,7 +44,10 @@ const PROBE_QML: &str = r"
                 log += 'push:' + name(page) + ':' + JSON.stringify(properties) + '|'
                 return null
             }
-            function replaceAbove(target, page, properties) {
+            // Page replaced above, by `aboveWhom`.
+            property var target: null
+            function replaceAbove(above, page, properties) {
+                target = above
                 log += 'replaceAbove:' + name(page) + ':' + JSON.stringify(properties) + '|'
             }
             function pop() { log += 'pop|' }
@@ -110,6 +113,14 @@ const PROBE_QML: &str = r"
             var log = pageStack.log
             pageStack.log = ''
             return log
+        }
+        // Contact page's chat in common, opened through list.
+        function openAbove(chatId, chatName) {
+            loader.item.openChatAbove(chatId, chatName)
+            return 'ok'
+        }
+        function aboveWhom() {
+            return pageStack.target === loader.item ? 'list' : '' + pageStack.target
         }
         function deleteChat(chatId) {
             findIn(loader.item, 'chats').delete_chat(chatId)
@@ -293,6 +304,21 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
 
     single_shot(Duration::from_secs(9), move || unsafe {
         record!("detached-registered", call!("registered"));
+
+        // Chat in common, from contact page over a chat: one replace above list, which now
+        // counts it as open.
+        call!("stackLog");
+        record!("above", call!("openAbove", 5, QString::from("chat 5")));
+        record!("above-stack", call!("stackLog"));
+        record!("above-whom", call!("aboveWhom"));
+        record!(
+            "above-viewing",
+            call!(
+                "get",
+                QString::from("notifier"),
+                QString::from("viewingChatId")
+            )
+        );
         (*engine_ptr).quit();
     });
 
@@ -403,6 +429,23 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         "0",
         "the arriving chat is still waiting once the list is on screen. \
          {context}"
+    );
+    assert_eq!(
+        (
+            value("above"),
+            value("above-stack"),
+            value("above-whom"),
+            value("above-viewing")
+        ),
+        (
+            "ok".to_string(),
+            r#"replaceAbove:ConversationPage.qml:{"accountId":2,"chatId":5,"chatName":"chat 5"}|"#
+                .to_string(),
+            "list".to_string(),
+            "5".to_string()
+        ),
+        "a chat in common does not open in place of the pages over the list, \
+         or the list does not count it as the open chat. {context}"
     );
     let arrived = value("arrived-stack");
     assert!(

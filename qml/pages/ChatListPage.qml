@@ -149,6 +149,17 @@ Page {
         return true
     }
 
+    /// Open chat in place of pages over list, one transition: back comes here. Contact page's chats
+    /// in common; reader on that page, stack idle.
+    function openChatAbove(chatId, chatName) {
+        notifier.viewingChatId = chatId
+        pageStack.replaceAbove(page, Qt.resolvedUrl("ConversationPage.qml"), {
+            accountId: page.accountId,
+            chatId: chatId,
+            chatName: chatName
+        })
+    }
+
     /// Open chat from notification tap.
     function showChat(chatId) {
         if (!page.comeForward()) {
