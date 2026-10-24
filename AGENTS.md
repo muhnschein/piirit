@@ -83,7 +83,7 @@ Details: `docs/BUILDING.md`.
 
 - One branch, one PR per task. Stacked PR only when asked.
 - Unrelated finding → tell user; separate PR or issue, not this PR.
-- Commit: imperative subject; body says why, plain prose.
+- Commit and PR titles: Conventional Commits, plain language, say outcome: `fix(cover): faces no longer turn into white squares`. Types `feat` `fix` `perf` `refactor` `test` `docs` `ci` `build` `chore`; scope = app area or subsystem (`chat`, `calls`, `rpm`, …). Body says why, plain prose.
 - Dependabot: fold bumps into own branch (bot PRs get no Sonar token); don't merge bot PRs.
 - Main moved and conflicts → merge `main` in, rerun checks.
 - Final diff: no debug logging, no leftovers.
