@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- **Join a channel** by scanning its QR code or pasting its invite link on the QR code page, as for a contact or a group. The channel opens right away; it is read-only, and new posts arrive in it from then on.
 
 ## 2.2.0 — 2026-10-23
 

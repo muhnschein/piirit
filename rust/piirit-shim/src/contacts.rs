@@ -62,8 +62,8 @@ pub struct ContactList {
         qt_method!(fn(&mut self, name: QString, member_ids: QVariantList, picture_path: QString)),
 
     /// Follow invite (QR or `https://i.delta.chat/...`), open chat: how contacts are added, as
-    /// bare address can't be encrypted to (docs/PROJECT.md). Answers `chat_ready`, or
-    /// `relay_offered` for relay code.
+    /// bare address can't be encrypted to (docs/PROJECT.md); groups, channels joined same way.
+    /// Answers `chat_ready`, or `relay_offered` for relay code.
     pub join_by_invite: qt_method!(fn(&mut self, qr_content: QString)),
     /// `join_by_invite` got relay code (`dcaccount:`, `dclogin:`): add to this profile, as
     /// reference clients since 2.61. `relay`: core's relay name or address.
@@ -434,7 +434,11 @@ impl ContactList {
                 if let Some(relay) = relay {
                     return Ok(Followed::Relay(qr_content, relay.to_string()));
                 }
-                if !matches!(kind, "askVerifyContact" | "askVerifyGroup") {
+                // Channel: only way in, owner can't add subscribers.
+                if !matches!(
+                    kind,
+                    "askVerifyContact" | "askVerifyGroup" | "askJoinBroadcast"
+                ) {
                     return Err(not_an_invite(kind));
                 }
                 // Returns once chat exists; handshake in background.
@@ -500,7 +504,7 @@ enum Followed {
 
 /// Payload not followed: not an invite. Core's word in brackets.
 fn not_an_invite(what: &str) -> String {
-    format!("that link is not a contact or group invite ({what})")
+    format!("that link is not a contact, group or channel invite ({what})")
 }
 
 /// `DC_CONTACT_ID_SELF`: own contact. Not in `get_contacts`, in every group.

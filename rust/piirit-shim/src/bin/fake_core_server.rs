@@ -113,6 +113,8 @@ struct State {
     deleted_chats: std::collections::BTreeSet<u32>,
     /// Contact requests accepted here; requests are `PIIRIT_FAKE_REQUESTS` chats.
     accepted_requests: std::collections::BTreeSet<u32>,
+    /// Channels joined here by invite; seeded ones are `PIIRIT_FAKE_CHANNELS` chats.
+    joined_channels: std::collections::BTreeSet<u32>,
     /// Accounts with unanswered transport call: core allows one, refuses second.
     configuring: std::collections::BTreeSet<u32>,
     /// Accounts asked to stop ongoing process.
@@ -390,6 +392,23 @@ impl State {
     fn is_request(&self, chat: u32) -> bool {
         env_ids("PIIRIT_FAKE_REQUESTS").contains(&u64::from(chat))
             && !self.accepted_requests.contains(&chat)
+    }
+
+    /// Channel read here (core's `InBroadcast`): joined, or named in `PIIRIT_FAKE_CHANNELS`.
+    fn is_channel(&self, chat: u32) -> bool {
+        self.joined_channels.contains(&chat)
+            || env_ids("PIIRIT_FAKE_CHANNELS").contains(&u64::from(chat))
+    }
+
+    /// Core's `chatType`.
+    fn chat_type(&self, chat: u32) -> &'static str {
+        if self.is_channel(chat) {
+            "InBroadcast"
+        } else if self.is_group(chat) {
+            "Group"
+        } else {
+            "Single"
+        }
     }
 
     /// Announce name, picture, member change, as core.
@@ -878,8 +897,8 @@ async fn add_transport_from_qr(
     ok(id, &Value::Null)
 }
 
-/// `check_qr`: invite, relay code, other (shim's distinctions). Relay as core reads it:
-/// `dcaccount:` domain, `dclogin:` address.
+/// `check_qr`: invite (contact, channel), relay code, other (shim's distinctions). Relay as core
+/// reads it: `dcaccount:` domain, `dclogin:` address.
 fn qr_kind(content: &str) -> Value {
     let lower = content.to_ascii_lowercase();
     if let Some(rest) = lower.strip_prefix("dcaccount:") {
@@ -897,6 +916,10 @@ fn qr_kind(content: &str) -> Value {
             .next()
             .unwrap_or_default();
         return json!({"kind": "login", "address": address});
+    }
+    // Channel link names channel in `b=`, as core writes it.
+    if content.contains("i.delta.chat") && content.contains("&b=") {
+        return json!({"kind": "askJoinBroadcast", "name": "News"});
     }
     let kind = if content.contains("i.delta.chat") || content.starts_with("OPENPGP4FPR:") {
         "askVerifyContact"
@@ -1768,14 +1791,20 @@ async fn serve() {
                     }));
                     ok(&id, &json!(carrier))
                 }
-                // Join and 1:1: fresh chat at top.
+                // Join and 1:1: fresh chat at top. Channel link (`qr_kind`): read-only channel.
                 "create_chat_by_contact_id" | "secure_join" => {
+                    let channel = method.as_str() == "secure_join"
+                        && qr_kind(positional(1).as_str().unwrap_or_default())["kind"]
+                            == "askJoinBroadcast";
                     let mut state = state.lock().await;
                     state.seed_chats();
                     state.next_chat_id += 1;
                     let chat = state.next_chat_id;
                     state.chats.insert(chat, Vec::new());
                     state.chat_order.insert(0, chat);
+                    if channel {
+                        state.joined_channels.insert(chat);
+                    }
                     ok(&id, &json!(chat))
                 }
                 "create_group_chat" => {
@@ -1816,7 +1845,8 @@ async fn serve() {
                     let mut state = state.lock().await;
                     state.seed_chats();
                     let is_group = state.is_group(chat);
-                    let left = state.left_groups.contains(&chat);
+                    // Channel subscriber: no writing, as left group.
+                    let left = state.left_groups.contains(&chat) || state.is_channel(chat);
                     let members = if is_group {
                         state.group_members.get(&chat).cloned().unwrap_or_default()
                     } else {
@@ -1833,7 +1863,7 @@ async fn serve() {
                             &id,
                             &json!({
                                 "id": chat,
-                                "chatType": if is_group { "Group" } else { "Single" },
+                                "chatType": state.chat_type(chat),
                                 "name": state.chat_name(chat),
                                 "profileImage": state.group_images.get(&chat),
                                 "color": "#0071c7",
@@ -2098,7 +2128,7 @@ async fn serve() {
                         &id,
                         &json!({
                             "id": chat,
-                            "chatType": if state.is_group(chat) { "Group" } else { "Single" },
+                            "chatType": state.chat_type(chat),
                             "name": state.chat_name(chat),
                             "isEncrypted": true,
                             "isMuted": state.muted.contains(&chat),
@@ -2141,7 +2171,11 @@ async fn serve() {
                     let state = state.lock().await;
                     ok(
                         &id,
-                        &json!(!state.left_groups.contains(&chat) && !state.is_request(chat)),
+                        &json!(
+                            !state.left_groups.contains(&chat)
+                                && !state.is_request(chat)
+                                && !state.is_channel(chat)
+                        ),
                     )
                 }
                 // Edit own text. Core refuses empty and others' (menu offers neither): only empty
