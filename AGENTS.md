@@ -99,7 +99,7 @@ Details: `docs/BUILDING.md`.
 ## Subagents
 
 - Delegate only with tight, written scope.
-- Models: only ones on cost/intelligence Pareto frontier (Artificial Analysis, Slopalytics). Dominated model = don't use. Cheapest frontier model that does the job well. User names model for task → use that.
+- Models: only ones on cost/intelligence Pareto frontier (Artificial Analysis, Slopalytics). Dominated model = don't use. Cheapest frontier model that does the job well. If user names model for task, use that.
 - Cheap-model output gets strong-model review: cheap models dropped facts, inverted conditions.
 
 ## Reporting
