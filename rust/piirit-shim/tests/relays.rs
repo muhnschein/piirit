@@ -594,7 +594,7 @@ fn assert_added(
     assert_eq!(value("sub-lit"), "true", "{context}");
     assert_eq!(
         value("sub-provider"),
-        "dcaccount:mehl.cloud",
+        "dcaccount:mailchat.pl",
         "the picked relay is not what the core would be handed. {context}"
     );
     assert_eq!(value("sub-add"), "ok", "{context}");
@@ -615,7 +615,7 @@ fn assert_added(
     );
     assert_eq!(
         added[0].pointer("/1").and_then(Value::as_str),
-        Some("dcaccount:mehl.cloud")
+        Some("dcaccount:mailchat.pl")
     );
     assert_eq!(
         value("sub-busy"),
@@ -634,12 +634,12 @@ fn assert_added(
     assert_eq!(value("added-first"), "ada@old.example.net", "{context}");
     assert_eq!(
         value("added-second"),
-        "account1@mehl.cloud",
+        "account1@mailchat.pl",
         "the added relay is not the one listed. {context}"
     );
     assert_eq!(
         value("added-report"),
-        "mehl.cloud",
+        "mailchat.pl",
         "the added relay is not reported on. {context}"
     );
     assert_eq!(

@@ -1,11 +1,10 @@
 // Public chatmail relays for pick lists (profile dialog, add-relay page).
-// chatmail.at/relays snapshot, 2026-10-07, partial. Refresh by hand; drop
+// chatmail.at/relays snapshot, 2026-10-24, partial. Refresh by hand; drop
 // relays unlisted there. Library: nothing translated, one shared copy.
 .pragma library
 
 var list = [
     { domain: "nine.testrun.org", location: "Default for many chatmail apps" },
-    { domain: "mehl.cloud", location: "German speakers" },
     { domain: "mailchat.pl", location: "Polish speakers" },
     { domain: "chatmail.woodpeckersnest.space", location: "Italian speakers" },
     { domain: "chatmail.culturanerd.it", location: "Italian speakers" },
