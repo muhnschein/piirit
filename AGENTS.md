@@ -62,7 +62,7 @@ Details: `docs/BUILDING.md`.
 - Denied: `unwrap_used`/`expect_used` outside tests, `missing_docs`, `unsafe_code`, clippy pedantic. `unsafe`/`cpp!` only in the four files BUILDING.md names.
 - `rust/clippy.toml` bans `Runtime::new` (use `CoreRuntime`) and `qmetaobject::single_shot`.
 - Spec: no bare `%` in comments; Harbour limits name, paths, `Requires:` (`ci/harbour-check.sh`).
-- New crate: rare; add row to BUILDING.md dependency table.
+- New dependency must earn its keep: well maintained, widely used, more than someone's pet project, builds at Rust 1.75. Add row to BUILDING.md dependency table saying why.
 
 ## UI and words
 
