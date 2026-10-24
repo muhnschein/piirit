@@ -11,8 +11,7 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -22,62 +21,25 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded not performed: which page pushed, at what.
-// Named as QML calls them: qmetaobject exposes methods under Rust name; Silica's are camel-cased.
-#[allow(non_snake_case)]
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    /// `push:ConversationPage.qml(...)|`, one entry per push.
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    pushAttached: qt_method!(fn(&mut self, page: QString, properties: QVariantMap) -> QVariant),
-    nextPage: qt_method!(fn(&self, page: QVariant) -> QVariant),
-}
-
-#[allow(non_snake_case)]
-impl PageStackProbe {
-    fn push(&mut self, page: QString, properties: QVariantMap) {
-        let page = page.to_string();
-        let name = page.rsplit('/').next().unwrap_or(&page).to_string();
-        let number = |key: &str| {
-            i32::from_qvariant(properties.value(QString::from(key), QVariant::default()))
-                .unwrap_or(-1)
-        };
-        let chat_name = QString::from_qvariant(
-            properties.value(QString::from("chatName"), QVariant::default()),
-        )
-        .map(|text| text.to_string())
-        .unwrap_or_default();
-        let entry = format!(
-            "push:{name}(account={},chat={},at={},name={chat_name})|",
-            number("accountId"),
-            number("chatId"),
-            number("findMessageId")
-        );
-        self.log = format!("{}{entry}", self.log).into();
-        self.log_changed();
-    }
-
-    /// Info page: not this test's; nothing handed back.
-    #[allow(clippy::unused_self)]
-    fn pushAttached(&mut self, _page: QString, _properties: QVariantMap) -> QVariant {
-        QVariant::default()
-    }
-
-    #[allow(clippy::unused_self)]
-    fn nextPage(&self, _page: QVariant) -> QVariant {
-        QVariant::default()
-    }
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     import Piirit 1.0
     Item {
+        // Silica's `pageStack`, recorded not performed: which page pushed, at what. In QML, not a
+        // Rust QObject (CodeQL flags each added `derive(QObject)`): Loader's page reads it here.
+        property QtObject pageStack: QtObject {
+            property string log: ''
+            function push(page, properties) {
+                log += 'push:' + ('' + page).split('/').pop()
+                       + '(account=' + properties.accountId + ',chat=' + properties.chatId
+                       + ',at=' + properties.findMessageId + ',name=' + properties.chatName
+                       + ')|'
+            }
+            // Info page: not this test's; nothing attached.
+            function pushAttached(page, properties) { return null }
+            function nextPage(page) { return null }
+        }
         Loader { id: loader }
         function load(url) {
             loader.setSource(url, {
@@ -238,13 +200,11 @@ fn a_tap_on_a_quote_goes_to_the_quoted_message() {
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
