@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 
 ## 2.2.0 — 2026-10-23

@@ -876,6 +876,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Prošnja za stik</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Izvirnega sporočila ni mogoče najti</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
