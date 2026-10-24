@@ -46,7 +46,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 - Caveman-full = drop articles, filler, pleasantries, hedging. Fragments OK, short words. Identifiers, paths, code, errors exact. E.g. "`rust/Cargo.lock` stays v3: SDK cargo 1.75 can't read v4."
 - Code comments, `docs/*.md`, this file: caveman-full, rules in BUILDING.md "Comments".
-- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users, but brief: as long as necessary, as short and to the point as possible.
+- `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users, as short and to the point as possible.
 - User-visible change → line in `CHANGELOG.md` under `## Unreleased` (create if missing), same PR.
 - No plans, research notes, scratch files in repo.
 
