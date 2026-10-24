@@ -51,6 +51,7 @@ fn probe_qml() -> String {
             /// The last push, as `Page.qml:key=value,...` with the keys
             /// in name order.
             property string pushed: ''
+            property bool busy: false
             property QtObject dialog: null
             function push(url, props) {{
                 var name = ('' + url).split('/').pop()
