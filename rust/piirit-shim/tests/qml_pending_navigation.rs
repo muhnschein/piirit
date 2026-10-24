@@ -21,12 +21,20 @@ mod common;
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import Sailfish.Silica 1.0
     Item {
         // A stack that records what it was asked, and can be busy.
         property QtObject stack: QtObject {
             property bool busy: false
             property string log: ''
-            function pop() { log += 'pop;' }
+            function pop(target, operation) {
+                if (target === undefined) {
+                    log += 'pop;'
+                    return
+                }
+                log += 'pop:' + target + ':'
+                    + (operation === PageStackAction.Immediate ? 'immediate' : 'animated') + ';'
+            }
             function replace(page, properties) { log += 'replace:' + page + ';' }
             function replaceAbove(target, page, properties) {
                 log += 'replaceAbove:' + target + ':' + page + ';'
@@ -44,6 +52,7 @@ const PROBE_QML: &str = r"
         }
         function pop() { loader.item.pop(); return stack.log }
         function replace() { loader.item.replace('Next.qml', {}); return stack.log }
+        function popTo() { loader.item.popTo('Chats.qml'); return stack.log }
         function replaceAbove() {
             loader.item.replaceAbove(null, 'Chats.qml', {})
             return stack.log
@@ -63,6 +72,10 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     }
 
     let mut engine = QmlEngine::new();
+    // `PageStackAction` for pop down.
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
@@ -117,6 +130,12 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("busy-done", call!("log"));
+
+        // Pop down to page under: at once, no slide back over same screen.
+        call!("busy", false);
+        call!("ready", false);
+        record!("pop-to-asked", call!("popTo"));
+        record!("pop-to-on-screen", call!("ready", true));
         (*engine_ptr).quit();
     });
 
@@ -161,5 +180,12 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         value("busy-done"),
         "pop;replace:Next.qml;replaceAbove:null:Chats.qml;",
         "a stack that never went quiet held a move for ever. {context}"
+    );
+    let before_pop_to = value("busy-done");
+    assert_eq!(value("pop-to-asked"), before_pop_to, "{context}");
+    assert_eq!(
+        value("pop-to-on-screen"),
+        format!("{before_pop_to}pop:Chats.qml:immediate;"),
+        "a pop down was not made at once to the page asked for. {context}"
     );
 }

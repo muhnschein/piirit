@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- After backing up a profile or handing it to a second device, swiping on to your chats ends there: swiping back no longer reopens the finished page.
 
 ## 2.2.0 — 2026-10-23
 
