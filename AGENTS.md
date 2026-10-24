@@ -19,6 +19,7 @@ In this order; later step only once earlier ones hold:
 4. `make check` green locally.
 5. PR CI green, SonarQube included (quality gate, new-code coverage).
 6. Device RPM: dispatch `.github/workflows/rpm.yml` on PR branch, give user the artifact link.
+7. With RPM: outline briefly what merging risks and how you mitigated it.
 
 Feature reachable from several places (chat, contact/group page, cover, quick actions) → all of them.
 
@@ -54,6 +55,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 - One branch, one PR per task. Stacked PR only when asked.
 - Unrelated finding → tell user; separate PR or issue, not this PR.
 - Commit and PR titles: Conventional Commits, plain language, say outcome: `fix(cover): faces no longer turn into white squares`. Types `feat` `fix` `perf` `refactor` `test` `docs` `ci` `build` `chore`; scope = app area or subsystem (`chat`, `calls`, `rpm`, …). Body says why, plain prose; brief, to the point.
+- PR body: the problem in a sentence or two, then how you fixed it. End with the model and harness that did the work.
 - Final diff: no debug logging, no leftovers.
 - Flaky test → find and fix cause. Never add retries (nextest runs none by design: pass on second try = defect). Never re-run CI until green and call it done. Never skip test or loosen assert. One re-run OK only for infra failure before any test ran (runner lost, apt mirror timeout); say so.
 - Merge only on user's explicit go. Merge commit, not squash/rebase.
@@ -67,7 +69,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 ## Subagents
 
 - Delegate only with tight, written scope.
-- Models: only ones on cost/intelligence Pareto frontier (Artificial Analysis, Slopalytics). Dominated model = don't use. Cheapest frontier model that does the job well. If user names model for task, use that.
+- Models: only ones on cost/intelligence Pareto frontier ([Artificial Analysis](https://artificialanalysis.ai/), [Slopalytics](https://slopalytics.com/)). Dominated model = don't use. Cheapest frontier model that does the job well. If user names model for task, use that.
 - Cheap-model output gets strong-model review: cheap models dropped facts, inverted conditions.
 
 ## Reporting
