@@ -197,6 +197,7 @@ Page {
                 isMuted: model.is_muted
                 chatColor: model.color
                 avatarPath: model.avatar_path
+                match: chats.query
                 // No unread badge: noise here.
                 unreadCount: 0
             }
