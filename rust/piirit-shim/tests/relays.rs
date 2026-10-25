@@ -24,6 +24,9 @@ use serde_json::Value;
 
 mod common;
 
+/// Seconds before offline reading counts as stuck.
+const GIVE_UP_SECS: u64 = 60;
+
 /// Address `misname` asks core to remove; no relay has it.
 const MISNAMED: &str = "nobody@nowhere.example";
 
@@ -131,10 +134,21 @@ const PROBE_QML: &str = r"
             item.currentIndex = parseInt(index)
             return 'ok'
         }
-        // No network long enough for the window to stop IO; relays read again.
+        // No network long enough for the window to stop IO; relays read again once core says
+        // IO stopped (asked earlier: read could beat stop).
+        property bool goingOffline: false
+        Connections {
+            target: core
+            onIo_stopped: {
+                if (probe.goingOffline) {
+                    probe.goingOffline = false
+                    findIn(loader.item, 'transports').reload()
+                }
+            }
+        }
         function offline() {
+            probe.goingOffline = true
             core.stop_all_account_io()
-            findIn(loader.item, 'transports').reload()
             return 'ok'
         }
         function pageProperty(property) { return '' + loader.item[property] }
@@ -395,15 +409,19 @@ fn the_relays_are_listed_removed_and_added() {
         record!("offline", call!("offline"));
     });
 
-    // Offline: core's report has no relay.
-    single_shot(Duration::from_secs(13), move || unsafe {
-        record!(
-            "offline-status",
-            get_in!("relayReport0", "reportStatus", "text")
-        );
-        record!("offline-dot", get_in!("relayReport1", "reportDot", "color"));
-        (*engine_ptr).quit();
-    });
+    // Offline: core's report has no relay. Read until it says so or out of time; loaded runner
+    // may take seconds.
+    for second in 13..=GIVE_UP_SECS {
+        single_shot(Duration::from_secs(second), move || unsafe {
+            let status = get_in!("relayReport0", "reportStatus", "text");
+            if second < GIVE_UP_SECS && status != "Not connected" {
+                return;
+            }
+            record!("offline-status", status);
+            record!("offline-dot", get_in!("relayReport1", "reportDot", "color"));
+            (*engine_ptr).quit();
+        });
+    }
 
     engine.exec();
 
