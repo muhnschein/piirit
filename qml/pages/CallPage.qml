@@ -445,7 +445,7 @@ Page {
             // Their own name for themselves; emoji as Twemoji (Emoji.js).
             readonly property string plain: page.call ? page.call.peer_name : ""
             readonly property string pictured: Emoji.inText(name.plain, false, font.pixelSize,
-                                                            color, true)
+                                                            "", Emoji.nameSaturation)
             textFormat: name.pictured.length > 0 ? Text.StyledText : Text.PlainText
             text: name.pictured.length > 0 ? name.pictured : name.plain
         }

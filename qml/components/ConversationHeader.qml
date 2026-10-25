@@ -23,7 +23,7 @@ Item {
     /// Title with emoji pictures, or "" for plain.
     readonly property string emojiTitle: Emoji.inText(root.title, false,
                                                       titleLabel.font.pixelSize,
-                                                      titleLabel.color, true)
+                                                      "", Emoji.nameSaturation)
 
     /// Second line drawn: set, and room for it.
     readonly property bool showsSubtitle:

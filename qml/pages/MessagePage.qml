@@ -110,7 +110,7 @@ Page {
                 // Emoji as Twemoji, as body's.
                 readonly property string pictured: Emoji.inText(page.senderName, false,
                                                                 font.pixelSize,
-                                                                color, true)
+                                                                "", Emoji.nameSaturation)
                 textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
                 text: pictured.length > 0 ? pictured : page.senderName
             }

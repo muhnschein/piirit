@@ -462,7 +462,7 @@ Item {
                     // Label's own size (Silica default).
                     readonly property string pictured: Emoji.inText(root.vcardName, false,
                                                                     Theme.fontSizeMedium,
-                                                                    color, true)
+                                                                    "", Emoji.nameSaturation)
                     textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
                     text: pictured.length > 0 ? pictured : root.vcardName
                 }
