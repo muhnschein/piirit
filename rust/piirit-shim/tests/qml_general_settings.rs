@@ -274,6 +274,10 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("mentions-switch", get!("mentionsSwitch", "checked"));
         record!(
+            "mentions-description",
+            get!("mentionsSwitch", "description")
+        );
+        record!(
             "apps-default",
             call!("appReads", QString::from("webxdcEnabled"))
         );
@@ -567,6 +571,13 @@ fn the_settings_page_writes_what_the_app_reads() {
     ] {
         assert_eq!(value(label), expected, "{label} is wrong. {context}");
     }
+    // Only quoted replies pass a mute (`is_mention`); reactions never notify. Words promised both.
+    let mentions = value("mentions-description");
+    assert!(
+        mentions.contains("replies") && !mentions.contains("reaction"),
+        "the Mentions switch promised what muted groups do not let through, got {mentions:?}. \
+         {context}"
+    );
     assert!(
         value("deletion-error").contains("not started"),
         "the page did not say why the period was not set, got {:?}. {context}",

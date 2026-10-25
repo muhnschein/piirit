@@ -866,6 +866,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>పరిచయ అభ్యర్థన</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>అసలు సందేశం కనుగొనబడలేదు</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2118,8 +2123,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>వివరాలు వద్దు</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>నిశ్శబ్దం చేసిన సమూహాల్లో మీకు ఉద్దేశించిన సందేశాలను, జవాబులు లేదా స్పందనల వంటివి, తెలియజేయి</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>నిశ్శబ్దం చేసిన సమూహాల్లో మీ సందేశాలకు వచ్చిన జవాబుల నోటిఫికేషన్‌లను చూపించు</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

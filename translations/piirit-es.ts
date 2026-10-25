@@ -866,6 +866,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Solicitud de contacto</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Mensaje original no encontrado</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2118,8 +2123,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sin detalles</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>En los grupos silenciados, notifica los mensajes dirigidos a ti, como respuestas o reacciones</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Mostrar notificaciones de respuestas a tus mensajes en grupos silenciados</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>
