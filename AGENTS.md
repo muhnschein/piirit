@@ -29,7 +29,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 - `git submodule update --init --depth 1` before first build (FFmpeg, x264). x264 comes from `code.videolan.org`; sandbox must allow it, else `piirit-shim` (all QML tests) doesn't build.
 - Missing optional tool = SKIP locally, FAIL in CI. Say which steps skipped.
-- Local failure → rerun on untouched `main` before calling it environment. Known: `qml_return_place` fails in some containers, green in CI.
+- Local failure → rerun on untouched `main` before calling it environment.
 - `make check` gates catch device-only breakage (Rust 1.75, Cargo.lock v3, Qt 5.6 QML, shaders, lints, spec, Harbour); reasons in BUILDING.md. Gate red → fix code, never loosen gate.
 - Tests wait on signals or conditions, not fixed sleeps or wall-clock asserts (those flake on loaded runners).
 - New dependency must earn its keep: well maintained, widely used, more than someone's pet project, builds at Rust 1.75. Add row to BUILDING.md dependency table saying why.
