@@ -119,6 +119,7 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
+                    match: contacts.query
                 }
 
                 onClicked: contacts.open_chat_with(model.contact_id)

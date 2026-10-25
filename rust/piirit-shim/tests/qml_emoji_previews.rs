@@ -99,6 +99,9 @@ fn probe_qml() -> String {
     )
 }
 
+/// Stub `Theme.highlightColor`, as Qt writes a colour.
+const HIGHLIGHT: &str = "#80c0ff";
+
 /// Largest colourfulness (max channel minus min) among drawn pixels, and how many pixels are
 /// lit at all.
 fn colour_in(file: &str) -> (i32, usize) {
@@ -239,6 +242,41 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
                 QString::from("resultSubtitle")
             )
         );
+        // Searched: marks (Marks.js) and pictures both, sender's markup still text.
+        call!(
+            "set",
+            QString::from("result"),
+            QString::from("subtitleMatch"),
+            QString::from("party")
+        );
+        call!(
+            "set",
+            QString::from("result"),
+            QString::from("subtitle"),
+            QString::from("Party 🎉 <party>")
+        );
+        record!(
+            "result-marked-emoji",
+            call!(
+                "label",
+                QString::from("result"),
+                QString::from("resultSubtitle")
+            )
+        );
+        call!(
+            "set",
+            QString::from("result"),
+            QString::from("subtitle"),
+            QString::from("a party")
+        );
+        record!(
+            "result-marked",
+            call!(
+                "label",
+                QString::from("result"),
+                QString::from("resultSubtitle")
+            )
+        );
 
         record!(
             "reply-load",
@@ -334,6 +372,22 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
         value("result-plain"),
         "plain:a <b> tonight",
         "a search hit without emoji is no longer plain text. {context}"
+    );
+    let mark = |text: &str| format!("<b><font color=\"{HIGHLIGHT}\">{text}</font></b>");
+    assert_eq!(
+        value("result-marked-emoji"),
+        format!(
+            "styled:{} {} &lt;{}&gt;",
+            mark("Party"),
+            muted("1f389"),
+            mark("party")
+        ),
+        "a searched hit with emoji loses its marks or its pictures. {context}"
+    );
+    assert_eq!(
+        value("result-marked"),
+        format!("styled:a {}", mark("party")),
+        "a searched hit without emoji loses its marks. {context}"
     );
     assert_eq!(
         value("reply-emoji"),
