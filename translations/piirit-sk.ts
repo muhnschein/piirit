@@ -688,7 +688,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nový</translation>
     </message>
 </context>
@@ -1358,6 +1358,45 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Nový</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Ďalej</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nový chat</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Píšete jednému človeku.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nová skupina</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Viacerí ľudia si píšu navzájom.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nový kanál</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanály sú nástrojom typu „jeden pre všetkých“, ktorý slúži na šírenie vašich správ.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1421,40 +1460,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Meno vidia všetci v kanáli</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Nový</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Nový chat</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Píšete jednému človeku.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Nová skupina</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Viacerí ľudia si píšu navzájom.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Nový kanál</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Kanály sú nástrojom typu „jeden pre všetkých“, ktorý slúži na šírenie vašich správ.</translation>
     </message>
 </context>
 <context>

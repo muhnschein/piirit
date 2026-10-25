@@ -686,7 +686,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Uus</translation>
     </message>
 </context>
@@ -1353,6 +1353,45 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Uus</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Edasi</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Uus vestlus</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Kirjutad ühe inimesega.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Uus grupp</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Mitu inimest kirjutavad üksteisele.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Uus kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanalid on üks-mitmele suhtlusviisid oma sõnumite levitamiseks.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1415,40 +1454,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nime näevad kõik kanalis</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Uus</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Uus vestlus</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Kirjutad ühe inimesega.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Uus grupp</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Mitu inimest kirjutavad üksteisele.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Uus kanal</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Kanalid on üks-mitmele suhtlusviisid oma sõnumite levitamiseks.</translation>
     </message>
 </context>
 <context>

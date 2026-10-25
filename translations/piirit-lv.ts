@@ -688,7 +688,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Jauns</translation>
     </message>
 </context>
@@ -1358,6 +1358,45 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Jauns</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Tālāk</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Jauna saruna</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Jūs rakstāt vienam cilvēkam.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Jauna grupa</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Vairāki cilvēki raksta cits citam.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Jauns kanāls</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanāli ir rīks jūsu ziņu pārraidīšanai daudziem saņēmējiem.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1421,40 +1460,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nosaukumu redz visi kanālā</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Jauns</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Jauna saruna</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Jūs rakstāt vienam cilvēkam.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Jauna grupa</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Vairāki cilvēki raksta cits citam.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Jauns kanāls</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Kanāli ir rīks jūsu ziņu pārraidīšanai daudziem saņēmējiem.</translation>
     </message>
 </context>
 <context>

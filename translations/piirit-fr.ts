@@ -686,7 +686,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nouveau</translation>
     </message>
 </context>
@@ -1353,6 +1353,45 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Nouveau</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nouvelle discussion</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Vous écrivez à une personne.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nouveau groupe</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Plusieurs personnes s&apos;écrivent entre elles.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nouveau canal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Les canaux sont un outil vous permettant de diffuser vos messages selon un modèle à origine unique et destinations multiples.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1415,40 +1454,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Tout le monde dans le canal voit le nom</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Nouveau</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Nouvelle discussion</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Vous écrivez à une personne.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Nouveau groupe</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Plusieurs personnes s&apos;écrivent entre elles.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Nouveau canal</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Les canaux sont un outil vous permettant de diffuser vos messages selon un modèle à origine unique et destinations multiples.</translation>
     </message>
 </context>
 <context>

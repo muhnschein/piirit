@@ -684,7 +684,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Yeni</translation>
     </message>
 </context>
@@ -1348,6 +1348,45 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Yeni</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>İleri</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Yeni sohbet</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Bir kişiyle yazışırsınız.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Yeni grup</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Birkaç kişi birbiriyle yazışır.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Yeni kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanallar, iletilerinizi yayınlamak için birden çoğa bir araçtır.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1409,40 +1448,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Adı kanaldaki herkes görür</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Yeni</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Yeni sohbet</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Bir kişiyle yazışırsınız.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Yeni grup</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Birkaç kişi birbiriyle yazışır.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Yeni kanal</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Kanallar, iletilerinizi yayınlamak için birden çoğa bir araçtır.</translation>
     </message>
 </context>
 <context>

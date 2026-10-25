@@ -684,7 +684,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>新建</translation>
     </message>
 </context>
@@ -1348,6 +1348,45 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>新建</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>下一步</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>新聊天</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>你与一个人聊天。</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>新群组</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>几个人互相聊天。</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>新建频道</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>频道是广播消息的一对多工具。</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1409,40 +1448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>频道中的每个人都能看到该名称</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>新建</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>新聊天</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>你与一个人聊天。</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>新群组</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>几个人互相聊天。</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>新建频道</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>频道是广播消息的一对多工具。</translation>
     </message>
 </context>
 <context>

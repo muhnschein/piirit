@@ -686,7 +686,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>नया</translation>
     </message>
 </context>
@@ -1353,6 +1353,45 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>नया</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>आगे</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>नई चैट</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>आप एक व्यक्ति को लिखते हैं।</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>नया समूह</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>कई लोग एक-दूसरे को लिखते हैं।</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>नया चैनल</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>चैनल आपके संदेशों को कई लोगों तक प्रसारित करने का साधन हैं।</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1415,40 +1454,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>चैनल में सभी नाम देखते हैं</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>नया</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>नई चैट</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>आप एक व्यक्ति को लिखते हैं।</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>नया समूह</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>कई लोग एक-दूसरे को लिखते हैं।</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>नया चैनल</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>चैनल आपके संदेशों को कई लोगों तक प्रसारित करने का साधन हैं।</translation>
     </message>
 </context>
 <context>

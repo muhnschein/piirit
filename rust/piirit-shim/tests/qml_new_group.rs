@@ -32,7 +32,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
         property QtObject pageStack: QtObject {
-            /// `push:Foo.qml|replace:Bar.qml|...`
+            /// `push:Foo.qml|replaceAbove:Bar.qml|...`
             property string log: ''
             /// The chat the conversation was opened on.
             property int chatId: 0
@@ -43,8 +43,15 @@ const PROBE_QML: &str = r"
                     chatId = properties.chatId
                 }
             }
+            /// Page the conversation was opened over.
+            property string landedOn: ''
             function push(page, properties) { note('push', page, properties) }
-            function replace(page, properties) { note('replace', page, properties) }
+            function replaceAbove(target, page, properties) {
+                landedOn = '' + target
+                note('replaceAbove', page, properties)
+            }
+            // Stand-in for page under this one: chat list.
+            function previousPage(page) { return 'chat-list' }
         }
         Loader { id: loader }
         function load(url, accountId) {
@@ -107,6 +114,7 @@ const PROBE_QML: &str = r"
         }
         function navigation() { return pageStack.log }
         function openedChat() { return '' + pageStack.chatId }
+        function landedOn() { return pageStack.landedOn }
     }
 ";
 
@@ -220,6 +228,7 @@ fn the_new_group_page_makes_the_group_it_shows() {
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("navigation", call!("navigation"));
         record!("opened", call!("openedChat"));
+        record!("landed-on", call!("landedOn"));
         (*engine_ptr).quit();
     });
 
@@ -366,7 +375,12 @@ fn assert_outcome(steps: &[(&str, String)], calls: &[(String, Value)]) {
         "the chosen picture was not put on the group once it existed. {context}"
     );
     assert!(
-        navigation.ends_with("replace:ConversationPage.qml|"),
+        navigation.ends_with("replaceAbove:ConversationPage.qml|"),
         "making the group did not open it in place of this page. {context}"
+    );
+    assert_eq!(
+        value("landed-on"),
+        "chat-list",
+        "the group opened over something other than the page under this one. {context}"
     );
 }

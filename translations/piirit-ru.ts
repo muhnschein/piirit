@@ -688,7 +688,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>New</source>
-        <extracomment>Pull-down item. Opens a page to pick a new chat, group or channel.</extracomment>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Создать</translation>
     </message>
 </context>
@@ -1358,6 +1358,45 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>New</source>
+        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
+        <translation>Создать</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Далее</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Новый чат</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Вы пишете одному человеку.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Новая группа</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Несколько человек пишут друг другу.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Новый канал</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Каналы представляют собой инструмент одностороннего вещания ваших сообщений множеству получателей.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1421,40 +1460,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Название видят все в канале</translation>
-    </message>
-</context>
-<context>
-    <name>NewPage</name>
-    <message>
-        <source>New</source>
-        <extracomment>Heading of the page that picks a new chat, group or channel.</extracomment>
-        <translation>Создать</translation>
-    </message>
-    <message>
-        <source>New chat</source>
-        <translation>Новый чат</translation>
-    </message>
-    <message>
-        <source>You write to one person.</source>
-        <translation>Вы пишете одному человеку.</translation>
-    </message>
-    <message>
-        <source>New group</source>
-        <translation>Новая группа</translation>
-    </message>
-    <message>
-        <source>Several people write to each other.</source>
-        <translation>Несколько человек пишут друг другу.</translation>
-    </message>
-    <message>
-        <source>New channel</source>
-        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
-        <translation>Новый канал</translation>
-    </message>
-    <message>
-        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
-        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
-        <translation>Каналы представляют собой инструмент одностороннего вещания ваших сообщений множеству получателей.</translation>
     </message>
 </context>
 <context>

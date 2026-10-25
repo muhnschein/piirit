@@ -25,6 +25,8 @@ Page {
     property int accountId
     /// Make channel, not group.
     property bool channel: false
+    /// Page chat opens over; null = page under this one (NewDialog.qml passes chat list).
+    property var landOn: null
     property string errorMessage: ""
     // Create tap until core answers: no second group from second tap.
     property bool creating: false
@@ -65,7 +67,9 @@ Page {
         }
         onChat_ready: {
             page.creating = false
-            navigation.replace(Qt.resolvedUrl("ConversationPage.qml"), {
+            // Over chat list, not over dialog: back from chat skips both.
+            navigation.replaceAbove(page.landOn || pageStack.previousPage(page),
+                                    Qt.resolvedUrl("ConversationPage.qml"), {
                 accountId: page.accountId,
                 chatId: chat_id,
                 chatName: nameField.text.trim()

@@ -26,9 +26,14 @@ const PROBE_QML: &str = r"
         property QtObject pageStack: QtObject {
             /// `push:Foo.qml {...}|...`
             property string log: ''
+            // `landOn` page itself shown as `page`: no JSON for an Item.
             function push(page, properties) {
+                var shown = {}
+                for (var key in properties) {
+                    shown[key] = properties[key] === loader.item ? 'page' : properties[key]
+                }
                 log = log + 'push:' + ('' + page).split('/').pop() + ' '
-                    + JSON.stringify(properties) + '|'
+                    + JSON.stringify(shown) + '|'
             }
         }
         Loader { id: loader }
@@ -232,9 +237,9 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     );
     assert_eq!(
         value("new-opens"),
-        r#"push:NewPage.qml {"accountId":1}|"#,
-        "New does not open the page that picks chat, group or channel, on this \
-         profile. {context}"
+        r#"push:NewDialog.qml {"accountId":1,"landOn":"page"}|"#,
+        "New does not open the dialog that picks chat, group or channel, on this \
+         profile, handed this page to open the chat over. {context}"
     );
     assert_eq!(
         value("mark-unread"),

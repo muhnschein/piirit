@@ -1,6 +1,6 @@
 //! Channel making: New group page in channel mode. Name and picture only, no member list (core
 //! takes none: subscribers join by invite), one `create_broadcast`, picture on it, channel opened
-//! in page's place.
+//! over chat list (New dialog under this page goes with it).
 //!
 //! Steps run in probe off contacts loading and page's own navigation, not clock.
 
@@ -25,7 +25,7 @@ mod common;
 const GIVE_UP_SECS: u64 = 60;
 
 /// Readings probe takes, by label.
-const READINGS: [&str; 9] = [
+const READINGS: [&str; 10] = [
     "title",
     "members-header",
     "self-row",
@@ -34,6 +34,7 @@ const READINGS: [&str; 9] = [
     "unnamed",
     "named",
     "navigation",
+    "landed-on",
     "opened",
 ];
 
@@ -55,8 +56,14 @@ const PROBE_QML: &str = r"
                     chatId = properties.chatId
                 }
             }
+            /// Page the channel was opened over.
+            property string landedOn: ''
             function push(page, properties) { note('push', page, properties) }
-            function replace(page, properties) { note('replace', page, properties) }
+            function replaceAbove(target, page, properties) {
+                landedOn = '' + target
+                note('replaceAbove', page, properties)
+            }
+            function previousPage(page) { return 'new-dialog' }
         }
         Loader { id: loader }
         function findIn(node, name) {
@@ -77,7 +84,7 @@ const PROBE_QML: &str = r"
             return item ? '' + item[property] : 'missing:' + name
         }
         function start(url) {
-            loader.setSource(url, { accountId: 1, channel: true })
+            loader.setSource(url, { accountId: 1, channel: true, landOn: 'chat-list' })
             poll.running = loader.status === Loader.Ready
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
@@ -103,8 +110,9 @@ const PROBE_QML: &str = r"
                     findIn(loader.item, 'createButton').clicked()
                     probe.step = 1
                 } else if (probe.step === 1) {
-                    if (pageStack.log.indexOf('replace:') < 0) { return }
+                    if (pageStack.log.indexOf('replaceAbove:') < 0) { return }
                     probe.readings['navigation'] = pageStack.log
+                    probe.readings['landed-on'] = pageStack.landedOn
                     probe.readings['opened'] = '' + pageStack.chatId
                     probe.step = 2
                     poll.running = false
@@ -256,7 +264,13 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
         "the chosen picture was not put on the channel once it existed. {context}"
     );
     assert!(
-        value("navigation").ends_with("replace:ConversationPage.qml|"),
+        value("navigation").ends_with("replaceAbove:ConversationPage.qml|"),
         "making the channel did not open it in place of this page. {context}"
+    );
+    // Over chat list, not over New dialog under this page: back from channel skips both.
+    assert_eq!(
+        value("landed-on"),
+        "chat-list",
+        "the channel opened over the dialog rather than the page that opened it. {context}"
     );
 }
