@@ -28,7 +28,7 @@ Item {
     /// Same with emoji pictures, muted as chat list's; "" for as written.
     readonly property string emojiQuoted: Emoji.inText(root.quotedText, false,
                                                        Theme.fontSizeExtraSmall,
-                                                       Emoji.previewSaturation)
+                                                       Theme.secondaryColor)
     visible: root.shown
     // Measure cancel too: its icon is taller than a one-line quote.
     height: root.shown ? Math.max(quoted.height, cancel.height) + 2 * Theme.paddingSmall : 0

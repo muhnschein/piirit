@@ -6,10 +6,10 @@ import "../js/Marks.js" as Marks
 import "."
 
 /*
- * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml); name
- * searched: escaped StyledText with marks (Marks.js); preview with emoji:
- * escaped StyledText, Twemoji muted (Emoji.js). Own component, loads and
- * measures alone; bindings, not positioner (ditto).
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml); with
+ * search marks (Marks.js) or emoji: escaped StyledText, Twemoji (Emoji.js),
+ * preview's grey as its text. Own component, loads and measures alone;
+ * bindings, not positioner (ditto).
  */
 Item {
     id: root
@@ -41,16 +41,23 @@ Item {
                                           + (root.previewSender.length > 0 && !root.summaryIsOurs
                                              ? root.previewSender + ": " : "")
                                           + root.preview
-    /// Same with emoji pictures, or "" for as written.
+    /// Same with emoji pictures, grey as its text; "" for as written.
     readonly property string emojiPreview: Emoji.inText(root.previewText, false,
                                                         Theme.fontSizeExtraSmall,
-                                                        Emoji.previewSaturation)
+                                                        Theme.secondaryColor)
 
     // Mail icon: unencryptable. Pin/mute on right: placement, not name.
-    readonly property string nameText: (root.isEncrypted ? "" : "✉ ") + root.chatName
-    /// Marked StyledText, or "" for plain.
-    readonly property string markedName: Marks.marked(root.nameText, root.match,
+    readonly property string mailMark: root.isEncrypted ? "" : "✉ "
+    readonly property string nameText: root.mailMark + root.chatName
+    /// Marked StyledText, or "" for plain. Name only: mark stays font's glyph.
+    readonly property string markedName: Marks.marked(root.chatName, root.match,
                                                       Theme.highlightColor)
+    /// Name as drawn, marks and emoji pictures, after mark; "" for plain.
+    readonly property string drawnName: Emoji.drawn(root.chatName, root.markedName,
+                                                    Theme.fontSizeMedium,
+                                                    Emoji.nameTint(nameLabel.color))
+    readonly property string shownName: root.drawnName.length > 0
+                                        ? root.mailMark + root.drawnName : ""
 
     height: Math.max(avatar.height, previewLabel.y + previewLabel.height)
             + 2 * Theme.paddingMedium
@@ -105,8 +112,8 @@ Item {
         y: Theme.paddingMedium
         width: marks.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
-        textFormat: root.markedName.length > 0 ? Text.StyledText : Text.PlainText
-        text: root.markedName.length > 0 ? root.markedName : root.nameText
+        textFormat: root.shownName.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.shownName.length > 0 ? root.shownName : root.nameText
     }
 
     // Contact request: tagged before preview (Accept or Block waits in the chat).

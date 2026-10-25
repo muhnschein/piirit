@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtSensors 5.0
 import "../components"
+import "../js/Emoji.js" as Emoji
 
 /*
  * Call app is in: ringing, setting up, in progress, over. Call is window's (`CallCenter.qml`).
@@ -441,9 +442,12 @@ Page {
             truncationMode: TruncationMode.Fade
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.primaryColor
-            // Their own name for themselves.
-            textFormat: Text.PlainText
-            text: page.call ? page.call.peer_name : ""
+            // Their own name for themselves; emoji as Twemoji (Emoji.js).
+            readonly property string plain: page.call ? page.call.peer_name : ""
+            readonly property string pictured: Emoji.inText(name.plain, false, font.pixelSize,
+                                                            Emoji.nameTint(color))
+            textFormat: name.pictured.length > 0 ? Text.StyledText : Text.PlainText
+            text: name.pictured.length > 0 ? name.pictured : name.plain
         }
 
         Label {

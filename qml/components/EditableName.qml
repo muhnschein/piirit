@@ -1,10 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 
 /*
  * Name under picture: always a field, centred, name size and colour, with
  * underline. Empty shows `fallbackText`, else `placeholderText`, dimmed.
  * `hint` only while focused. Inner items named via *ObjectName (as Banner).
+ * Field can't draw pictures: name with emoji, not being edited, drawn by label
+ * over it (Twemoji, Emoji.js), field's own text see-through.
  */
 Item {
     id: root
@@ -26,6 +29,11 @@ Item {
     /// Has cursor; hint and page-done follow. `focus`: `activeFocus` needs a
     /// window, tests have none.
     readonly property bool editing: field.focus
+
+    /// Name or fallback with emoji pictures, while not editing; "" when field draws it.
+    readonly property string emojiName: root.editing ? ""
+        : Emoji.inText(field.text.length > 0 ? field.text : field.placeholderText, false,
+                       field.font.pixelSize, Emoji.nameTint(Theme.highlightColor))
 
     width: parent ? parent.width : 0
     height: column.height
@@ -51,8 +59,9 @@ Item {
             horizontalAlignment: TextInput.AlignHCenter
             // Heading size and colour.
             font.pixelSize: Theme.fontSizeLarge
-            color: Theme.highlightColor
-            placeholderColor: Theme.secondaryHighlightColor
+            color: root.emojiName.length > 0 ? "transparent" : Theme.highlightColor
+            placeholderColor: root.emojiName.length > 0 ? "transparent"
+                                                        : Theme.secondaryHighlightColor
             placeholderText: root.fallbackText.length > 0 ? root.fallbackText
                                                           : root.placeholderText
             readOnly: !root.canEdit
@@ -71,5 +80,20 @@ Item {
             color: Theme.secondaryColor
             text: root.hint
         }
+    }
+
+    // Where field draws its text: between its margins, about its text's centre.
+    Label {
+        objectName: "emojiName"
+        visible: root.emojiName.length > 0
+        x: field.textLeftMargin
+        y: field.textVerticalCenterOffset - height / 2
+        width: field.width - field.textLeftMargin - field.textRightMargin
+        horizontalAlignment: Text.AlignHCenter
+        truncationMode: TruncationMode.Fade
+        font.pixelSize: field.font.pixelSize
+        color: field.text.length > 0 ? Theme.highlightColor : Theme.secondaryHighlightColor
+        textFormat: Text.StyledText
+        text: root.emojiName
     }
 }

@@ -7,8 +7,8 @@ import "."
 
 /*
  * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml),
- * or escaped StyledText with search marks (Marks.js); subtitle emoji Twemoji, muted
- * (ChatListDelegate).
+ * or escaped StyledText with search marks (Marks.js) and Twemoji (Emoji.js `drawn`);
+ * subtitle's grey, as ChatListDelegate's preview.
  */
 Item {
     id: root
@@ -29,15 +29,14 @@ Item {
     readonly property string markedSubtitle: Marks.marked(root.subtitle, root.subtitleMatch,
                                                           Theme.highlightColor)
 
-    /// Subtitle, marked, with emoji pictures (marks first: Marks.js); "" for as written.
-    readonly property string emojiSubtitle: Emoji.inText(root.markedSubtitle.length > 0
-                                                         ? root.markedSubtitle : root.subtitle,
-                                                         root.markedSubtitle.length > 0,
-                                                         Theme.fontSizeExtraSmall,
-                                                         Emoji.previewSaturation)
-    /// StyledText drawn, or "" for plain.
-    readonly property string shownSubtitle: root.emojiSubtitle.length > 0
-                                            ? root.emojiSubtitle : root.markedSubtitle
+    /// As drawn, marks and emoji pictures (Emoji.js `drawn`); "" for plain. Subtitle's
+    /// tinted as its text.
+    readonly property string shownTitle: Emoji.drawn(root.title, root.markedTitle,
+                                                     Theme.fontSizeMedium,
+                                                     Emoji.nameTint(titleLabel.color))
+    readonly property string shownSubtitle: Emoji.drawn(root.subtitle, root.markedSubtitle,
+                                                        Theme.fontSizeExtraSmall,
+                                                        Theme.secondaryColor)
 
     height: Math.max(avatar.height, subtitleLabel.y + subtitleLabel.height)
             + 2 * Theme.paddingMedium
@@ -76,8 +75,8 @@ Item {
         width: (timeLabel.visible ? timeLabel.x : root.width - Theme.horizontalPageMargin)
                - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
-        textFormat: root.markedTitle.length > 0 ? Text.StyledText : Text.PlainText
-        text: root.markedTitle.length > 0 ? root.markedTitle : root.title
+        textFormat: root.shownTitle.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.shownTitle.length > 0 ? root.shownTitle : root.title
     }
 
     Label {

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 
 /*
  * Block or unblock confirm, one dialog both ways (each other's undo). Words
@@ -36,9 +37,11 @@ Dialog {
             wrapMode: Text.Wrap
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.highlightColor
-            // Contact's own name, or given one.
-            textFormat: Text.PlainText
-            text: dialog.contactName
+            // Contact's own name, or given one; emoji as Twemoji (Emoji.js).
+            readonly property string pictured: Emoji.inText(dialog.contactName, false,
+                                                            font.pixelSize, Emoji.nameTint(color))
+            textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
+            text: pictured.length > 0 ? pictured : dialog.contactName
         }
 
         Label {

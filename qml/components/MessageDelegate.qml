@@ -353,8 +353,11 @@ Item {
             truncationMode: TruncationMode.Fade
             font.pixelSize: Theme.fontSizeExtraSmall
             color: root.senderColor.length > 0 ? root.senderColor : Theme.highlightColor
-            textFormat: Text.PlainText
-            text: root.senderName
+            // Emoji as Twemoji, as body's.
+            readonly property string pictured: Emoji.inText(root.senderName, false,
+                                                            font.pixelSize, Emoji.nameTint(color))
+            textFormat: senderLabel.pictured.length > 0 ? Text.StyledText : Text.PlainText
+            text: senderLabel.pictured.length > 0 ? senderLabel.pictured : root.senderName
         }
 
         // Marked as reference client, above quote (covers whole message). Not remote text: no
@@ -395,13 +398,19 @@ Item {
 
             Label {
                 id: quoteAuthorLabel
+                objectName: "quoteAuthor"
                 x: 2 + Theme.paddingSmall
                 width: parent.width - 2 - Theme.paddingSmall
                 truncationMode: TruncationMode.Fade
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.highlightColor
-                textFormat: Text.PlainText
-                text: root.quoteAuthor
+                readonly property string pictured: Emoji.inText(root.quoteAuthor, false,
+                                                                font.pixelSize,
+                                                                Emoji.nameTint(color))
+                textFormat: quoteAuthorLabel.pictured.length > 0 ? Text.StyledText
+                                                                 : Text.PlainText
+                text: quoteAuthorLabel.pictured.length > 0 ? quoteAuthorLabel.pictured
+                                                           : root.quoteAuthor
             }
 
             Label {

@@ -1,10 +1,10 @@
 //! Emoji in one-line previews (chat list, chat picker, search hit, reply bar) drawn as Twemoji,
-//! colour turned down (Emoji.js `previewSaturation`) by app's provider (`image://piirit/emoji`):
-//! full colour beside secondary text pulls eye off names. Pinned: preview with emoji is escaped
-//! `StyledText` with muted pictures, without stays plain; reply bar cut, not elided, with
-//! pictures (elided last line misplaces them, `qml_emoji_cut.rs`). Pixels prove the muting:
-//! row's picture, drawn through `StyledText` and provider, keeps less colour than same picture
-//! as message draws it.
+//! grey, shaded toward preview's text colour by app's provider (`image://piirit/emoji`): full
+//! colour beside secondary text pulls eye off names. Pinned: preview with emoji is escaped
+//! `StyledText` with tinted pictures, without stays plain; reply bar cut, not elided, with
+//! pictures (elided last line misplaces them, `qml_emoji_cut.rs`). Pixels prove the grey: row's
+//! picture, drawn through `StyledText` and provider, has no colour; same picture as message
+//! draws it has.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -137,7 +137,7 @@ fn wait_for_shots(engine: *mut QmlEngine, patience: u32) {
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn previews_draw_their_emoji_as_muted_twemoji() {
+fn previews_draw_their_emoji_as_grey_twemoji() {
     let temp = std::env::temp_dir().join(format!("piirit-emoji-previews-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("a temporary directory");
     // SAFETY: single thread; pre-Qt.
@@ -151,7 +151,7 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
-    // As app: muted pictures come from here.
+    // As app: grey pictures come from here.
     piirit_shim::install_pictures(&engine);
     engine.load_data(QByteArray::from(probe_qml().as_str()));
 
@@ -341,21 +341,21 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
         );
     }
 
-    let muted = |picture: &str| {
+    let grey = |picture: &str| {
         let file = common::art_dir()
             .join(format!("emoji/{picture}.png"))
             .canonicalize()
             .unwrap_or_else(|err| panic!("{picture}.png is not shipped ({err})"));
         format!(
-            "<img src=\"image://piirit/emoji?file={}&saturation=0.4\" width=\"12\" \
-             height=\"12\" align=\"middle\">",
+            "<img src=\"image://piirit/emoji?file={}&tint=%23a0a0a0&strength=0.5\" \
+             width=\"12\" height=\"12\" align=\"middle\">",
             encode(&format!("file://{}", file.display()))
         )
     };
     assert_eq!(
         value("row-emoji"),
-        format!("styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt; {}", muted("1f44d")),
-        "a chat-list preview's emoji is not a muted picture, or its text became markup. \
+        format!("styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt; {}", grey("1f44d")),
+        "a chat-list preview's emoji is not a grey picture, or its text became markup. \
          {context}"
     );
     assert_eq!(
@@ -365,8 +365,8 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
     );
     assert_eq!(
         value("result-emoji"),
-        format!("styled:party {} tonight", muted("1f389")),
-        "a search hit's emoji is not a muted picture. {context}"
+        format!("styled:party {} tonight", grey("1f389")),
+        "a search hit's emoji is not a grey picture. {context}"
     );
     assert_eq!(
         value("result-plain"),
@@ -379,7 +379,7 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
         format!(
             "styled:{} {} &lt;{}&gt;",
             mark("Party"),
-            muted("1f389"),
+            grey("1f389"),
             mark("party")
         ),
         "a searched hit with emoji loses its marks or its pictures. {context}"
@@ -391,8 +391,8 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
     );
     assert_eq!(
         value("reply-emoji"),
-        format!("styled:Replying to Ada: on my way {}", muted("1f6b2")),
-        "the reply bar's emoji is not a muted picture. {context}"
+        format!("styled:Replying to Ada: on my way {}", grey("1f6b2")),
+        "the reply bar's emoji is not a grey picture. {context}"
     );
     assert_eq!(
         value("reply-plain"),
@@ -430,10 +430,10 @@ fn previews_draw_their_emoji_as_muted_twemoji() {
         row_lit * 2 > message_lit,
         "the row's emoji are not drawn: provider not reached from StyledText. {measured}"
     );
-    let kept = f64::from(row_colour) / f64::from(message_colour);
+    // Grey: channels within antialiasing of each other.
     assert!(
-        (0.25..0.55).contains(&kept),
-        "the row's emoji keep {kept:.2} of their colour, not the 0.4 previews ask. {measured}"
+        row_colour <= 8,
+        "the row's emoji keep their colour, not grey as their text. {measured}"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }

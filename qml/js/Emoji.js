@@ -107,21 +107,23 @@ function escaped(text, lineStart) {
 /// `styled`: already StyledText (shim's Markdown, sender chars escaped, tags
 /// untouched); else escaped here. Only added tag: `<img>` of picture under
 /// qml/art/emoji/, so a message can load nothing. `size`: font px; pictures a
-/// bit taller. `saturation` below 1: colour turned down that far by app's
-/// picture provider (`image://piirit/emoji`, shim's pictures.rs).
+/// bit taller. `tint` (colour, e.g. label's): pictures grey, shaded toward it,
+/// as faint, by app's picture provider (`image://piirit/emoji`, shim's
+/// pictures.rs); "" or none: as drawn.
 ///
 /// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
 /// from one value: Sailfish's ARM64 JIT could clobber it between the two
 /// copies, so some launches showed a leading emoji twice (picture + char).
 /// Each pass sets each variable from its own value.
-function inText(text, styled, size, saturation) {
+function inText(text, styled, size, tint) {
     var cuts = emojiCuts(text, styled)
     if (cuts.length === 0) {
         return ""
     }
     var edge = Math.round(size * 1.15)
     // StyledText reads attribute raw: `&` stays `&`.
-    var muted = saturation < 1 ? "&saturation=" + saturation : ""
+    var muted = tint ? "&tint=" + encodeURIComponent("" + tint) + "&strength=" + tintStrength
+                     : ""
     var out = ""
     var from = 0
     for (var k = 0; k < cuts.length; k += 3) {
@@ -136,6 +138,14 @@ function inText(text, styled, size, saturation) {
     }
     var rest = text.substring(from)
     return out + (styled ? rest : escaped(rest, from === 0))
+}
+
+/// Label's StyledText: `marked` (Marks.js, or "") else plain `text`, with
+/// pictures (`inText`); "" when neither: draw `text` plain.
+function drawn(text, marked, size, tint) {
+    var styled = marked.length > 0
+    var pictured = inText(styled ? marked : text, styled, size, tint)
+    return pictured.length > 0 ? pictured : marked
 }
 
 /// Emoji `inText` draws: start, end, picture of each, flat list.
@@ -182,9 +192,18 @@ function emojiCuts(text, styled) {
 /// same from any.
 var artBase = Qt.resolvedUrl("../art/emoji/")
 
-/// Emoji colour kept in previews (chat list, search, reply bar): beside
-/// secondary text, full colour pulls eye off names.
-var previewSaturation = 0.4
+/// Tinted pictures' way from grey toward tint: half keeps faces readable on
+/// dark and light ambience both.
+var tintStrength = 0.5
+
+/// Names (chat, contact, sender) tinted to own colour too: else full colour.
+/// Previews always tinted: beside secondary text, colour pulls eye off names.
+var tintNames = false
+
+/// `tint` for a name drawn in `color`: "" unless `tintNames`.
+function nameTint(color) {
+    return tintNames ? color : ""
+}
 
 /// Recent-emoji cap.
 var recentLimit = 40
