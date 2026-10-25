@@ -2127,8 +2127,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Üksikasjadeta</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Summutatud gruppides teavita sinule suunatud sõnumitest, milleks võivad olla vastused või reageerimised</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Näita teavitusi vastustest sinu sõnumitele summutatud gruppides</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

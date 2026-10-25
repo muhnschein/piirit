@@ -2123,8 +2123,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen detaljer</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>I dæmpede grupper, giv besked om beskeder rettet til dig, som svar eller reaktioner</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Vis notifikationer om svar på dine beskeder i dæmpede grupper</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

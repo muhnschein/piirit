@@ -2134,8 +2134,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Без подробиць</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>У приглушених групах сповіщати про повідомлення, адресовані вам, наприклад, відповіді або реакції</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Показувати сповіщення про відповіді на ваші повідомлення в приглушених групах</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

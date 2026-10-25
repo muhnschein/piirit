@@ -2123,7 +2123,7 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <source>Show notifications for replies to your messages in muted groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

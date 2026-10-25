@@ -11,6 +11,7 @@ docs/BUILDING.md, "Cutting a release").
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
+- The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
 
 ## 2.2.0 — 2026-10-23
 

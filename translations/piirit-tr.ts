@@ -2120,8 +2120,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Ayrıntı yok</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Sessize alınan gruplarda, yanıtlar ya da tepkiler gibi size yönlendirilen iletileri bildirin</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Sessize alınan gruplarda iletilerinize gelen yanıtların bildirimlerini göster</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

@@ -2116,8 +2116,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nincsenek részletek</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>A némított csoportokban csak az Önnek címzett üzenetek, (például válaszok vagy reakciók) esetén küld értesítést.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Értesítések megjelenítése az Ön üzeneteire érkező válaszokról a némított csoportokban</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

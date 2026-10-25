@@ -2120,8 +2120,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>不显示详情</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>在静音群中，通知直接与你相关的消息，比如回复或回应</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>在静音群中显示回复你消息的通知</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>
