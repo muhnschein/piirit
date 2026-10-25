@@ -40,7 +40,7 @@ says true "a vendored notice runs them (real_server reads it)" \
     "vendor/deltachat-rpc-server/SOURCE.md"
 says true "third_party docs run them (vendor-check reads them)" \
     "third_party/qmetaobject/README.md"
-says true "a file only named like docs runs them" "docs/notes.md.bak"
+says true "a file only named like docs runs them" "CHANGELOG.md.orig"
 says true "an empty list runs them" ""
 
 # Whole script on own repo: last commit touches docs alone, so only the event
