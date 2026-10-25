@@ -1,7 +1,7 @@
-//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive, new
-//! group, QR, new chat. Row menu: mark read or unread, never both. Hiding profiles with one profile
-//! would remove the only route to making one; archive search field over empty archive is dead. It
-//! comes back the moment something is typed, or clearing it would be impossible.
+//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive, QR,
+//! new (chat, group, channel). Row menu: mark read or unread, never both. Hiding profiles with one
+//! profile would remove the only route to making one; archive search field over empty archive is
+//! dead. It comes back the moment something is typed, or clearing it would be impossible.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -14,6 +14,20 @@ mod common;
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
+        // Silica `pageStack`, recorded not performed: page resolves bare name through this root.
+        property QtObject pageStack: QtObject {
+            /// `push:Foo.qml {...}|...`
+            property string log: ''
+            // `landOn` page itself shown as `page`: no JSON for an Item.
+            function push(page, properties) {
+                var shown = {}
+                for (var key in properties) {
+                    shown[key] = properties[key] === loader.item ? 'page' : properties[key]
+                }
+                log = log + 'push:' + ('' + page).split('/').pop() + ' '
+                    + JSON.stringify(shown) + '|'
+            }
+        }
         Loader { id: loader }
         function load(url, accountId, archived) {
             loader.setSource('', {})
@@ -52,6 +66,13 @@ const PROBE_QML: &str = r"
             if (view.forceLayout) { view.forceLayout() }
             return 'ok'
         }
+        function click(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.clicked()
+            return 'ok'
+        }
+        function navigation() { return pageStack.log }
         function setText(name, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -133,7 +154,9 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     plan.after(2, move || unsafe {
         record!("profiles", get!("profilesMenuItem", "visible"));
         record!("settings", get!("settingsMenuItem", "visible"));
-        record!("new-group", get!("newGroupMenuItem", "visible"));
+        record!("new", get!("newMenuItem", "visible"));
+        record!("new-tapped", call!("click", QString::from("newMenuItem")));
+        record!("new-opens", call!("navigation"));
         record!("qr", get!("qrMenuItem", "visible"));
         record!("laid-out", call!("layout", QString::from("chatList")));
         // Seeded chats all read: first row offers mark unread.
@@ -194,14 +217,25 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
          is no way to make a second one. {context}"
     );
     // Settings belonging to no profile: own page, reached from here (a profile's are on its row on
-    // profiles page). Making group, adding contact start here too, not a page further in.
-    for label in ["settings", "new-group", "qr"] {
+    // profiles page). New chat, group, channel and adding contact start here too.
+    for label in ["settings", "new", "qr"] {
         assert_eq!(
             value(label),
             "true",
             "the pulley does not offer {label}. {context}"
         );
     }
+    assert_eq!(
+        value("new-tapped"),
+        "ok",
+        "the pulley's New could not be tapped. {context}"
+    );
+    assert_eq!(
+        value("new-opens"),
+        r#"push:NewDialog.qml {"accountId":1,"landOn":"page"}|"#,
+        "New does not open the dialog that picks chat, group or channel, on this \
+         profile, handed this page to open the chat over. {context}"
+    );
     assert_eq!(
         value("mark-unread"),
         "true",

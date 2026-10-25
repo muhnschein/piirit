@@ -215,3 +215,29 @@ fn an_introduction_drawing_is_inked_where_it_is_drawn_and_clear_elsewhere() {
         "the drawing is inked in a colour it was not given"
     );
 }
+
+#[test]
+fn an_emoji_drawn_above_its_natural_size_stays_sharp() {
+    // As shipped Twemoji: 36 px viewBox. Left half filled: edge on x = 18.
+    let file = a_dir("sharp").join("half.svg");
+    std::fs::write(
+        &file,
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 36 36\">\
+         <rect fill=\"#ffcc4d\" width=\"18\" height=\"36\"/></svg>",
+    )
+    .expect("write the test picture");
+    let (pixels, width, height) = made("emoji", &file, 144);
+
+    assert_eq!(
+        (width, height),
+        (144, 144),
+        "an emoji is not made at its size"
+    );
+    let soft = (0..width)
+        .filter(|&x| (1..255).contains(&at(&pixels, width, x, 72).0))
+        .count();
+    assert!(
+        soft <= 2,
+        "an emoji drawn at 4x was blown up from its 36 px picture, edge {soft} px soft"
+    );
+}

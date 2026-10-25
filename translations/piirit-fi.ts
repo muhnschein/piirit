@@ -563,10 +563,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Arkistoidut keskustelut</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Uusi keskustelu</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arkistoidut</translation>
     </message>
@@ -648,10 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-koodi</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Uusi ryhmä</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Merkitse lukemattomaksi</translation>
     </message>
@@ -687,6 +679,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Lähetä keskusteluun</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Uusi</translation>
     </message>
 </context>
 <context>
@@ -1122,6 +1119,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Vaihda kuva</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR-kutsukoodi</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanava</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1342,6 +1349,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Seuraava</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Uusi keskustelu</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Kirjoitat yhden ihmisen kanssa.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Uusi ryhmä</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Useampi ihminen kirjoittaa toisilleen.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Uusi kanava</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanavat ovat yhdeltä monelle -työkalu viestiesi levittämiseen.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1382,6 +1423,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Luo ryhmä</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Anna kanavalle nimi</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Luo kanava</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Uusi kanava</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanavan nimi</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Kaikki kanavalla näkevät nimen</translation>
     </message>
 </context>
 <context>
@@ -1608,6 +1671,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Kopioi kutsulinkki</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR-kutsukoodi</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Skannaa liittyäksesi kanavalle &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
