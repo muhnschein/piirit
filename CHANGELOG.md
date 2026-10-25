@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
 
 ## 2.2.0 — 2026-10-23
 

@@ -116,6 +116,7 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
+                    match: contacts.query
                 }
 
                 onClicked: page.block(model.contact_id, model.display_name)
