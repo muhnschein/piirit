@@ -142,6 +142,8 @@ Item {
                                         ? root.styledText
                                         : root.messageText
 
+    /// Few emoji, nothing else: drawn twice text size. Not a file's caption.
+    readonly property bool bigEmoji: !root.hasFile && Emoji.onlyEmoji(root.messageText)
     /// Body with emoji pictures (EmojiGlyph), or "" for as written.
     readonly property string emojiBody: !root.isCall
                                         ? Emoji.inText(root.shownText, root.drawsStyled,
@@ -541,6 +543,7 @@ Item {
             y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
             // Body width, not bubble's: differ only when offer widened it.
             width: root.bodyWidth
+            font.pixelSize: root.bigEmoji ? 2 * Theme.fontSizeMedium : Theme.fontSizeMedium
             wrapMode: Text.Wrap
             // Long body cut to a few lines; rest on page (row taller than view can't be scrolled
             // past). Line cap, not text cut: slicing a rendering could leave tag open.

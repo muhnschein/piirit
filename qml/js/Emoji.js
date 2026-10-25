@@ -171,6 +171,30 @@ function emojiCuts(text, styled) {
     return cuts
 }
 
+/// Most emoji alone in a message drawn big (as Signal).
+var bigLimit = 5
+
+/// `text` only emoji with pictures, 1 to `bigLimit`, and whitespace: drawn big.
+/// Longest emoji 15 UTF-16 units (kiss, two tones): longer text not scanned.
+function onlyEmoji(text) {
+    var trimmed = text ? text.trim() : ""
+    if (trimmed.length === 0 || trimmed.length > 16 * bigLimit) {
+        return false
+    }
+    var cuts = emojiCuts(trimmed, false)
+    if (cuts.length > 3 * bigLimit) {
+        return false
+    }
+    var from = 0
+    for (var k = 0; k < cuts.length; k += 3) {
+        if (/\S/.test(trimmed.substring(from, cuts[k]))) {
+            return false
+        }
+        from = cuts[k + 1]
+    }
+    return from === trimmed.length
+}
+
 /// Pictures' path for `<img>`. art/ is sibling of js/, components/, pages/:
 /// same from any.
 var artBase = Qt.resolvedUrl("../art/emoji/")
