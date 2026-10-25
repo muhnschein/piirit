@@ -1365,11 +1365,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>NewDialog</name>
     <message>
-        <source>New</source>
-        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
-        <translation>Novo</translation>
-    </message>
-    <message>
         <source>Next</source>
         <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
         <translation>Naprej</translation>

@@ -1360,11 +1360,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>NewDialog</name>
     <message>
-        <source>New</source>
-        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
-        <translation>Nový</translation>
-    </message>
-    <message>
         <source>Next</source>
         <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
         <translation>Další</translation>

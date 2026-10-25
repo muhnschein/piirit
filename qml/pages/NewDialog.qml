@@ -28,6 +28,14 @@ Dialog {
                                  : { accountId: dialog.accountId, landOn: dialog.landOn,
                                      channel: dialog.choice === "channel" }
 
+    // Silica builds destination once, when dialog opens or URL changes: group to channel
+    // keeps same page, built with old `channel`. Current pick set on it here.
+    onAccepted: {
+        if (dialog.choice !== "chat") {
+            dialog.acceptDestinationInstance.channel = dialog.choice === "channel"
+        }
+    }
+
     /// Turn one on, others off. Tap again clears.
     function choose(which) {
         dialog.choice = dialog.choice === which ? "" : which
@@ -37,10 +45,9 @@ Dialog {
         width: parent.width
         spacing: Theme.paddingLarge
 
+        // No title: pull-down's "New" said it; switches say rest.
         DialogHeader {
             objectName: "header"
-            //: Heading of the dialog that picks a new chat, group or channel.
-            title: qsTr("New")
             //: Goes on to the page for the picked chat, group or channel.
             acceptText: qsTr("Next")
         }

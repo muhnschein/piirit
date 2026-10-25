@@ -33,6 +33,10 @@ const PROBE_QML: &str = r"
             function replace(page, properties) { note('replace', page, properties) }
         }
         Loader { id: loader }
+        // What Silica built as destination: once per URL, so group page built for group is
+        // the one channel goes to.
+        QtObject { id: builtChat }
+        QtObject { id: builtGroup; property bool channel: false }
         function load(url) {
             loader.setSource(url, { accountId: 3, landOn: 'chat-list' })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
@@ -70,11 +74,15 @@ const PROBE_QML: &str = r"
             }).join('/')
         }
         function canAccept() { return '' + loader.item.canAccept }
-        /// Forward swipe (Silica allows it only while `canAccept`); what it pushed.
+        /// Forward swipe (Silica allows it only while `canAccept`); what it pushed, and for
+        /// group page what the built page ends up with.
         function swipeForward() {
+            var chat = loader.item.choice === 'chat'
+            loader.item.acceptDestinationInstance = chat ? builtChat : builtGroup
             var before = pageStack.log.length
             loader.item.accept()
-            return pageStack.log.substring(before)
+            var pushed = pageStack.log.substring(before)
+            return chat || pushed === '' ? pushed : pushed + 'built-channel:' + builtGroup.channel
         }
         function header(property) { return '' + findIn(loader.item, 'header')[property] }
         function navigation() { return pageStack.log }
@@ -155,8 +163,9 @@ fn the_new_dialog_offers_chat_group_and_channel() {
     assert_eq!(value("load"), "ok", "the dialog did not load. {context}");
     assert_eq!(
         (value("title").as_str(), value("accept-text").as_str()),
-        ("New", "Next"),
-        "the dialog is not headed New with Next to go on. {context}"
+        ("", "Next"),
+        "the dialog repeats the pull-down's New as a heading, or lacks Next to go on. \
+         {context}"
     );
     assert_eq!(
         value("chatSwitch"),
@@ -209,7 +218,7 @@ fn the_new_dialog_offers_chat_group_and_channel() {
     );
     assert_eq!(
         value("group-swipe"),
-        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":false}|"#,
+        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":false}|built-channel:false"#,
         "group does not push the new group page in group mode. {context}"
     );
     assert_eq!(
@@ -219,8 +228,9 @@ fn the_new_dialog_offers_chat_group_and_channel() {
     );
     assert_eq!(
         value("channel-swipe"),
-        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":true}|"#,
-        "channel does not push the group page in channel mode. {context}"
+        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":true}|built-channel:true"#,
+        "channel does not push the group page in channel mode, or the group page Silica \
+         built for group stays in group mode. {context}"
     );
     // Pushed, not replaced: back from picked page comes to this dialog.
     assert!(

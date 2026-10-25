@@ -1355,11 +1355,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>NewDialog</name>
     <message>
-        <source>New</source>
-        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
-        <translation>Nuovo</translation>
-    </message>
-    <message>
         <source>Next</source>
         <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
         <translation>Avanti</translation>

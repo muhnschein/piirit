@@ -1360,11 +1360,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
 <context>
     <name>NewDialog</name>
     <message>
-        <source>New</source>
-        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
-        <translation>Jauns</translation>
-    </message>
-    <message>
         <source>Next</source>
         <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
         <translation>Tālāk</translation>

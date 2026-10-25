@@ -1355,11 +1355,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
 <context>
     <name>NewDialog</name>
     <message>
-        <source>New</source>
-        <extracomment>Heading of the dialog that picks a new chat, group or channel.</extracomment>
-        <translation>Uus</translation>
-    </message>
-    <message>
         <source>Next</source>
         <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
         <translation>Edasi</translation>
