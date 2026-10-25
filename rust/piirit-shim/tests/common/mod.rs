@@ -215,8 +215,7 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
-/// Each step's recorded result. One step per tick: shim answers async; `single_shot` is whole
-/// seconds.
+/// Each step's recorded result. One step per tick: shim answers async.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
 /// Push one step's result onto [`Steps`].
