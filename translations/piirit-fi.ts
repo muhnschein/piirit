@@ -766,14 +766,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nähty viimeksi kauan sitten</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Poista mykistys</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Mykistä</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1125,14 +1117,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Vaihda kuva</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Poista mykistys</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Mykistä</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1332,37 +1316,38 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>Mykistä 1 tunniksi</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>Mykistä 8 tunniksi</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>Mykistä 1 päiväksi</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>Mykistä 7 päiväksi</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Mykistä ikuisesti</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>Mykistä ilmoitukset</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>Mykistä</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 tunniksi</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 tunniksi</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 päiväksi</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 päiväksi</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Pysyvästi</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Saat silti ilmoituksen, kun joku tässä ryhmässä vastaa johonkin viestiisi.</translation>
     </message>
 </context>
 <context>

@@ -1543,6 +1543,7 @@ async fn offline_round_trip_against_real_core() {
         "summaryStatus",
         "isPinned",
         "isMuted",
+        "chatType",
         "isContactRequest",
         "isSelfTalk",
         "isDeviceTalk",

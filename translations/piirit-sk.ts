@@ -772,14 +772,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Naposledy videný(á) dávno</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Zrušiť stlmenie</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Stlmiť</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1134,14 +1126,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Zmeniť obrázok</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Zrušiť stlmenie</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Stlmiť</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1341,37 +1325,38 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>Stlmiť na 1 hodinu</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>Stlmiť na 8 hodín</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>Stlmiť na 1 deň</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>Stlmiť na 7 dní</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Stlmiť navždy</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>Stlmiť upozornenia</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>Stlmiť</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Zrušiť</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>Na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>Na 8 hodín</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>Na 1 deň</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>Na 7 dní</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Navždy</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Upozornenie dostanete aj naďalej, keď niekto v tejto skupine odpovie na niektorú z vašich správ.</translation>
     </message>
 </context>
 <context>

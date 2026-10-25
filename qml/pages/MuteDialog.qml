@@ -6,12 +6,18 @@ import Sailfish.Silica 1.0
  * forever. Unmute needs no dialog: menus do it at once, as theirs. Nothing
  * preset: blind swipe mutes nothing; back edge mutes nothing. Caller
  * connects to `picked`.
+ *
+ * No title: accept text says what accepting does. Options say only how
+ * long.
  */
 Dialog {
     id: dialog
 
     /// Seconds picked; -1 forever, 0 until picked.
     property int seconds: 0
+    /// Group with mention setting on: replies to reader still notify
+    /// (ChatList `notify_mentions`). Caller decides; note says so.
+    property bool mentionsStillNotify: false
 
     /// Reader swiped forward on one.
     signal picked(int seconds)
@@ -22,19 +28,20 @@ Dialog {
     canAccept: dialog.seconds !== 0
     onAccepted: dialog.picked(dialog.seconds)
 
-    /// Delta Chat's words, whole: translations come along.
     function labelFor(value) {
         switch (value) {
         case 3600:
-            return qsTr("Mute for 1 hour")
+            //: How long a chat stays muted; one of five choices under the
+            //: dialog's Mute button.
+            return qsTr("For 1 hour")
         case 28800:
-            return qsTr("Mute for 8 hours")
+            return qsTr("For 8 hours")
         case 86400:
-            return qsTr("Mute for 1 day")
+            return qsTr("For 1 day")
         case 604800:
-            return qsTr("Mute for 7 days")
+            return qsTr("For 7 days")
         default:
-            return qsTr("Mute forever")
+            return qsTr("Forever")
         }
     }
 
@@ -48,8 +55,6 @@ Dialog {
 
         DialogHeader {
             objectName: "muteHeader"
-            //: Title of the page that asks how long to mute a chat.
-            title: qsTr("Mute notifications")
             acceptText: qsTr("Mute")
             cancelText: qsTr("Cancel")
         }
@@ -66,6 +71,26 @@ Dialog {
                 checked: dialog.seconds === modelData
                 onClicked: dialog.choose(modelData)
             }
+        }
+
+        Item {
+            width: 1
+            height: Theme.paddingLarge
+            visible: dialog.mentionsStillNotify
+        }
+
+        // What still gets through, said before muting.
+        Label {
+            objectName: "mentionsNote"
+            visible: dialog.mentionsStillNotify
+            x: Theme.horizontalPageMargin
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.fontSizeExtraSmall
+            color: Theme.secondaryColor
+            //: Under the mute choices of a group, while "Mentions" is on
+            //: in the notification settings.
+            text: qsTr("You still get a notification when someone in this group replies to one of your messages.")
         }
     }
 }

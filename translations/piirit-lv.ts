@@ -772,14 +772,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Pēdējo reizi redzēts sen</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Ieslēgt skaņu</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Izslēgt skaņu</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1134,14 +1126,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Mainīt attēlu</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Ieslēgt skaņu</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Izslēgt skaņu</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1341,37 +1325,38 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>Izslēgt skaņu uz 1 stundu</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>Izslēgt skaņu uz 8 stundām</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>Izslēgt skaņu uz 1 dienu</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>Izslēgt skaņu uz 7 dienām</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Izslēgt skaņu uz visiem laikiem</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>Izslēgt paziņojumu skaņu</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>Izslēgt skaņu</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>Uz 1 stundu</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>Uz 8 stundām</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>Uz 1 dienu</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>Uz 7 dienām</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Uz visiem laikiem</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Jūs joprojām saņemsiet paziņojumu, kad kāds šajā grupā atbildēs uz kādu no jūsu ziņām.</translation>
     </message>
 </context>
 <context>

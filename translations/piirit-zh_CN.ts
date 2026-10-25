@@ -768,14 +768,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>很久以前在线</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>取消静音</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>静音</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1124,14 +1116,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>更改图片</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>取消静音</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>静音</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1331,37 +1315,38 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>静音 1 小时</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>静音 8 小时</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>静音 1 天</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>静音 7 天</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>永久静音</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>通知静音</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>静音</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 小时</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 小时</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 天</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 天</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>永久</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>当此群组中有人回复你的消息时，你仍会收到通知。</translation>
     </message>
 </context>
 <context>

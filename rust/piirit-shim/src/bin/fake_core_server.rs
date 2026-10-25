@@ -2314,6 +2314,13 @@ async fn serve() {
                                 "isEncrypted": true,
                                 "isMuted": u32::try_from(chat)
                                     .is_ok_and(|chat| state.muted.contains(&chat)),
+                                "chatType": if u32::try_from(chat)
+                                    .is_ok_and(|chat| state.is_group(chat))
+                                {
+                                    "Group"
+                                } else {
+                                    "Single"
+                                },
                                 // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),

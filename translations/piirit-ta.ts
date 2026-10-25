@@ -766,14 +766,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>நீண்ட காலத்துக்கு முன் பார்க்கப்பட்டது</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>ஒலியை இயக்கு</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>ஒலியடக்கு</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1125,14 +1117,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>படத்தை மாற்று</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>ஒலியை இயக்கு</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>ஒலியடக்கு</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1332,37 +1316,38 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>1 மணி இதற்காக ஊமையாக்கு</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>8 மணிகள் இதற்காக ஊமையாக்கு</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>1 நாள் இதற்காக ஊமையாக்கு</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>7 நாட்கள் இதற்காக ஊமையாக்கு</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>எப்போதுமே ஊமையாக்கு</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>அறிவிப்புகளை ஊமையாக்கு</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>ஒலியடக்கு</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 மணி நேரத்திற்கு</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 மணி நேரத்திற்கு</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 நாளுக்கு</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 நாட்களுக்கு</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>எப்போதும்</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>இந்தக் குழுவில் யாராவது உங்கள் செய்தி ஒன்றுக்குப் பதிலளித்தால் உங்களுக்கு இன்னும் அறிவிப்பு வரும்.</translation>
     </message>
 </context>
 <context>

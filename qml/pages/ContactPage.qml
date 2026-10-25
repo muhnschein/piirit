@@ -173,18 +173,6 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        PullDownMenu {
-            objectName: "contactMenu"
-            visible: chat.loaded
-
-            // Mute asks how long; unmute at once (chat list's entry).
-            MenuItem {
-                objectName: "muteItem"
-                text: chat.is_muted ? qsTr("Unmute") : qsTr("Mute")
-                onClicked: page.toggleMute()
-            }
-        }
-
         Column {
             id: column
             width: parent.width

@@ -74,9 +74,14 @@ Page {
         prefetch.start(chatId, messageId ? messageId : 0)
     }
 
-    /// Mute dialog; picked length to core. Id, not row: arrivals recreate rows.
-    function askMute(chatId) {
-        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"))
+    /// Mute dialog; picked length to core. Id, not row: arrivals recreate rows. Note on what
+    /// still notifies: groups, mentions and notifications on (`=== true`: dconf undefined till
+    /// read).
+    function askMute(chatId, isGroup) {
+        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"), {
+            mentionsStillNotify: isGroup && Settings.notificationsEnabled === true
+                                 && Settings.mentionNotifications === true
+        })
         if (dialog) {
             dialog.picked.connect(function(seconds) {
                 chats.set_mute_duration(chatId, seconds)
@@ -741,7 +746,7 @@ Page {
                                 if (model.is_muted) {
                                     chats.set_mute_duration(model.chat_id, 0)
                                 } else {
-                                    page.askMute(model.chat_id)
+                                    page.askMute(model.chat_id, model.is_group)
                                 }
                             }
                         }

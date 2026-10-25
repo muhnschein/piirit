@@ -286,9 +286,8 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("single-readonly", get!("groupNameField", "readOnly"));
         record!("single-add", get!("addMembersButton", "visible"));
         record!("single-leave", get!("leaveButton", "visible"));
-        // Mute still applies: menu stays for it alone.
+        // Nothing applies: menu absent (empty pull-down does nothing).
         record!("single-menu", get!("groupMenu", "visible"));
-        record!("single-mute", get!("muteItem", "visible"));
         record!("single-change-picture", get!("changePicture", "visible"));
         // Nothing to show or add: no field.
         record!("single-desc", get!("descriptionField", "visible"));
@@ -557,13 +556,12 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "true",
         "a one-to-one chat offers renaming, which the core refuses. {context}"
     );
-    assert_eq!(
-        (value("single-menu"), value("single-mute")),
-        ("true".to_string(), "true".to_string()),
-        "a chat that is not a group lost its pull-down, the one way to mute \
-         it from here. {context}"
-    );
-    for label in ["single-add", "single-leave", "single-change-picture"] {
+    for label in [
+        "single-add",
+        "single-leave",
+        "single-menu",
+        "single-change-picture",
+    ] {
         assert_eq!(
             value(label),
             "false",

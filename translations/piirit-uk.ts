@@ -772,14 +772,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Був(-ла) у мережі дуже давно</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Увімкнути сповіщення</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Вимкнути сповіщення</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1134,14 +1126,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Змінити зображення</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Увімкнути сповіщення</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Вимкнути сповіщення</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1341,37 +1325,38 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>Вимкнути сповіщення на&#xa0;годину</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>Вимкнути сповіщення на&#xa0;8&#xa0;годин</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>Вимкнути сповіщення на&#xa0;добу</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>Вимкнути сповіщення на&#xa0;7&#xa0;днів</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Вимкнути сповіщення назавжди</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>Вимкнути сповіщення</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>Вимкнути сповіщення</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>На 1 годину</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>На 8 годин</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>На 1 день</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>На 7 днів</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Назавжди</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Ви все одно отримаєте сповіщення, коли хтось у цій групі відповість на одне з ваших повідомлень.</translation>
     </message>
 </context>
 <context>

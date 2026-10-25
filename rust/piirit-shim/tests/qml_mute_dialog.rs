@@ -1,8 +1,9 @@
 //! Page asking how long to mute a chat.
 //!
-//! Reference clients' five lengths in their order, their words. Nothing preset: accept does nothing
-//! until one is picked. One at a time; tap again clears. Accept hands over seconds, -1 for forever.
-//! Menus calling it: `qml_mute_flow.rs`.
+//! Reference clients' five lengths in their order, each saying only how long; no title repeating
+//! accept's "Mute". Nothing preset: accept does nothing until one is picked. One at a time; tap again
+//! clears. Accept hands over seconds, -1 for forever. Note on mentions only when caller says they
+//! still notify. Menus calling it: `qml_mute_flow.rs`.
 
 // Qt harness: see qml_pages.rs.
 #![allow(clippy::expect_used)]
@@ -16,8 +17,9 @@ const PROBE_QML: &str = r"
     Item {
         property var picked: []
         Loader { id: loader }
-        function load(url) {
-            loader.setSource(url, {})
+        function load(url, mentions) {
+            loader.setSource('', {})
+            loader.setSource(url, { mentionsStillNotify: mentions })
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.picked.connect(function(seconds) { picked.push(seconds) })
             return 'ok'
@@ -66,6 +68,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
     // SAFETY: single-threaded; set pre-Qt.
     #[allow(unsafe_code, unused_unsafe)]
@@ -87,17 +90,46 @@ fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
     };
     let option = |name: &str| -> [QVariant; 1] { [QString::from(name).into()] };
 
-    let load = call(
-        "load",
-        &[QString::from(common::page_url("MuteDialog.qml")).into()],
-    );
+    let url = || -> QVariant { QString::from(common::page_url("MuteDialog.qml")).into() };
+    let load = call("load", &[url(), false.into()]);
     assert_eq!(load, "ok", "the dialog did not load");
+    assert_eq!(
+        (
+            call(
+                "get",
+                &[
+                    QString::from("muteHeader").into(),
+                    QString::from("title").into()
+                ]
+            ),
+            call(
+                "get",
+                &[
+                    QString::from("muteHeader").into(),
+                    QString::from("acceptText").into()
+                ]
+            ),
+        ),
+        (String::new(), "Mute".to_string()),
+        "the dialog repeats its accept text as a title"
+    );
+    assert_eq!(
+        call(
+            "get",
+            &[
+                QString::from("mentionsNote").into(),
+                QString::from("visible").into()
+            ]
+        ),
+        "false",
+        "the mentions note shows though the caller said nothing still notifies"
+    );
 
     assert_eq!(
         call("labels", &[]),
-        "Mute for 1 hour|Mute for 8 hours|Mute for 1 day|Mute for 7 days|Mute forever",
+        "For 1 hour|For 8 hours|For 1 day|For 7 days|Forever",
         "the dialog does not offer the reference clients' lengths, in their \
-         words and order"
+         order, saying only how long"
     );
     assert_eq!(
         call("options", &[]),
@@ -148,5 +180,19 @@ fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
         call("accept", &[]),
         "-1,604800",
         "accepting 7 days did not hand over its seconds"
+    );
+
+    // Group with mentions on: note says what still gets through.
+    assert_eq!(call("load", &[url(), true.into()]), "ok");
+    assert_eq!(
+        call(
+            "get",
+            &[
+                QString::from("mentionsNote").into(),
+                QString::from("visible").into()
+            ]
+        ),
+        "true",
+        "the mentions note is missing though replies still notify"
     );
 }

@@ -226,10 +226,10 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Mute for all; rest for members only (hidden once left/removed).
+        // Both entries for members: hidden for left/removed reader (empty pull-down).
         PullDownMenu {
             objectName: "groupMenu"
-            visible: chat.loaded
+            visible: chat.can_edit
 
             MenuItem {
                 objectName: "leaveButton"
@@ -252,12 +252,6 @@ Page {
                 //: pick a new picture for the group.
                 text: qsTr("Change picture")
                 onClicked: page.pickPicture()
-            }
-            // Mute asks how long; unmute at once (chat list's entry).
-            MenuItem {
-                objectName: "muteItem"
-                text: chat.is_muted ? qsTr("Unmute") : qsTr("Mute")
-                onClicked: page.toggleMute()
             }
         }
 

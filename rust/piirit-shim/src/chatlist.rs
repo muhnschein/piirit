@@ -10,7 +10,7 @@ use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 use serde_json::json;
 
-use crate::chat::chat_is_group;
+use crate::chat::{chat_is_group, is_group_info};
 use crate::core::connection;
 use crate::json;
 use crate::models::{ChatListItem, ChatListModel};
@@ -870,6 +870,7 @@ pub(crate) async fn chat_items(
                     is_encrypted: json::flag(&item, "isEncrypted"),
                     is_pinned: json::flag(&item, "isPinned"),
                     is_muted: json::flag(&item, "isMuted"),
+                    is_group: is_group_info(&item),
                     is_contact_request: json::flag(&item, "isContactRequest"),
                     is_self_talk: json::flag(&item, "isSelfTalk"),
                     is_device_talk: json::flag(&item, "isDeviceTalk"),

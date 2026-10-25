@@ -770,14 +770,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>অনেক আগে দেখা গেছে</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>আনমিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>মিউট করুন</translation>
-    </message>
 </context>
 <context>
     <name>ConversationList</name>
@@ -1129,14 +1121,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>ছবি পরিবর্তন করুন</translation>
     </message>
-    <message>
-        <source>Unmute</source>
-        <translation>আনমিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>মিউট করুন</translation>
-    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1336,37 +1320,38 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>MuteDialog</name>
     <message>
-        <source>Mute for 1 hour</source>
-        <translation>1 ঘণ্টার জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute for 8 hours</source>
-        <translation>8 ঘণ্টার জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute for 1 day</source>
-        <translation>1 দিনের জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute for 7 days</source>
-        <translation>7 দিনের জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>সবসময়ের জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute notifications</source>
-        <extracomment>Title of the page that asks how long to mute a chat.</extracomment>
-        <translation>বিজ্ঞপ্তি মিউট করুন</translation>
-    </message>
-    <message>
         <source>Mute</source>
         <translation>মিউট করুন</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>বাতিল</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 দিনের জন্য</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 দিনের জন্য</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>সবসময়ের জন্য</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>এই গ্রুপে কেউ আপনার কোনো বার্তার উত্তর দিলে আপনি তবুও বিজ্ঞপ্তি পাবেন।</translation>
     </message>
 </context>
 <context>
