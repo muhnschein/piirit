@@ -869,6 +869,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kontakto prašymas</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Pradinė žinutė nerasta</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2125,8 +2130,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Jokių detalių</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Grupėse, kuriose išjungti pranešimai, pranešti apie jums adresuotas žinutes, tokias kaip atsakymai ar reakcijos</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Rodyti pranešimus apie atsakymus į jūsų žinutes nutildytose grupėse</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

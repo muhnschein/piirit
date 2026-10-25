@@ -65,9 +65,9 @@ const PROBE_QML: &str = r"
 /// `<img>` of shipped picture for `size` px font, grey toward `tint` (`#rrggbb`), as name drawn.
 fn img(picture: &str, size: f64, tint: &str) -> String {
     let file = common::art_dir()
-        .join(format!("emoji/{picture}.png"))
+        .join(format!("emoji/{picture}.svg"))
         .canonicalize()
-        .unwrap_or_else(|err| panic!("{picture}.png is not shipped ({err})"));
+        .unwrap_or_else(|err| panic!("{picture}.svg is not shipped ({err})"));
     #[allow(clippy::cast_possible_truncation)]
     let edge = (size * 1.15).round() as i64;
     format!(

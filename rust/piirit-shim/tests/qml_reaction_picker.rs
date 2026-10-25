@@ -291,17 +291,17 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
     // Pictures wherever shipped, same one however emoji is spelled; text only for ones with none.
     assert_eq!(
         value("glyph-thumbs"),
-        "picture:1f44d.png",
+        "picture:1f44d.svg",
         "a thumbs-up is not drawn as its picture. {context}"
     );
     assert_eq!(
         value("glyph-bare-heart"),
-        "picture:2764.png",
+        "picture:2764.svg",
         "a heart sent without its variation selector is not drawn as the heart. {context}"
     );
     assert_eq!(
         value("glyph-toned"),
-        "picture:1f44d.png",
+        "picture:1f44d.svg",
         "a toned thumbs-up is not drawn as the untoned picture. {context}"
     );
     assert_eq!(

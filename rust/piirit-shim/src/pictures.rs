@@ -64,8 +64,9 @@ cpp! {{
         if (natural.isValid() && !natural.isEmpty()) {
             QSize decode = natural.scaled(piirit_want(kind, natural, requested),
                                           Qt::KeepAspectRatioByExpanding);
-            if (!decode.isEmpty() && decode.width() < natural.width()
-                    && decode.height() < natural.height()) {
+            // Emoji are SVG: rendered at drawn size, above natural too, so stay sharp.
+            if (!decode.isEmpty() && (kind == 3 || (decode.width() < natural.width()
+                                                    && decode.height() < natural.height()))) {
                 reader.setScaledSize(decode);
             }
         }

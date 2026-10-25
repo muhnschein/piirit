@@ -876,6 +876,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Prošnja za stik</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Izvirnega sporočila ni mogoče najti</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2136,8 +2141,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Brez podrobnosti</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>V utišanih skupinah obvesti o sporočilih, namenjenih tebi, kot so odgovori ali odzivi</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Prikaži obvestila o odgovorih na tvoja sporočila v utišanih skupinah</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

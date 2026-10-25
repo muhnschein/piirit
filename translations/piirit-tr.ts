@@ -867,6 +867,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kişi isteği</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Özgün ileti bulunamadı</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2115,8 +2120,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Ayrıntı yok</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Sessize alınan gruplarda, yanıtlar ya da tepkiler gibi size yönlendirilen iletileri bildirin</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Sessize alınan gruplarda iletilerinize gelen yanıtların bildirimlerini göster</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

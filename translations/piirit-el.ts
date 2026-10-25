@@ -866,6 +866,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Αίτημα επαφής</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Το αρχικό μήνυμα δεν βρέθηκε</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2118,8 +2123,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Χωρίς λεπτομέρειες</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Σε σιωπηλές ομάδες, ειδοποίηση για μηνύματα που απευθύνονται σε εσένα, όπως απαντήσεις ή αντιδράσεις</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Εμφάνιση ειδοποιήσεων για απαντήσεις στα μηνύματά σου σε σιωπηλές ομάδες</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

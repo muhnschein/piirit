@@ -343,9 +343,9 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
 
     let grey = |picture: &str| {
         let file = common::art_dir()
-            .join(format!("emoji/{picture}.png"))
+            .join(format!("emoji/{picture}.svg"))
             .canonicalize()
-            .unwrap_or_else(|err| panic!("{picture}.png is not shipped ({err})"));
+            .unwrap_or_else(|err| panic!("{picture}.svg is not shipped ({err})"));
         format!(
             "<img src=\"image://piirit/emoji?file={}&tint=%23a0a0a0&strength=0.5\" \
              width=\"12\" height=\"12\" align=\"middle\">",
