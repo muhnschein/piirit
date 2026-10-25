@@ -873,6 +873,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Žádost o kontakt</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Původní zpráva nenalezena</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
