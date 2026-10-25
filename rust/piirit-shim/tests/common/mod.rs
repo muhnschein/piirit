@@ -10,8 +10,9 @@ use std::ffi::CString;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::Once;
+use std::time::Duration;
 
-use qmetaobject::{qml_register_enum, QEnum, QString};
+use qmetaobject::{qml_register_enum, single_shot, QEnum, QString};
 use serde_json::Value;
 
 /// `DBus.SystemBus`, named by `NetworkWatch.qml`. Stub `.qml` can't say it; registered enum
@@ -233,4 +234,30 @@ pub fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
         .iter()
         .find(|(name, _)| name == label)
         .map_or("<step did not run>", |(_, value)| value.as_str())
+}
+
+/// Steps run in turn, each some seconds after last one ended, not at fixed time from start:
+/// stalled loop on busy machine then can't run two back to back with no events between.
+#[derive(Default)]
+pub struct Plan(Vec<(u64, Box<dyn FnOnce()>)>);
+
+impl Plan {
+    /// `step` `wait` s after one before ended.
+    pub fn after(&mut self, wait: u64, step: impl FnOnce() + 'static) {
+        self.0.push((wait, Box::new(step)));
+    }
+
+    pub fn run(mut self) {
+        if self.0.is_empty() {
+            return;
+        }
+        let (wait, step) = self.0.remove(0);
+        let mut pending = Some((step, self));
+        single_shot(Duration::from_secs(wait), move || {
+            if let Some((step, rest)) = pending.take() {
+                step();
+                rest.run();
+            }
+        });
+    }
 }
