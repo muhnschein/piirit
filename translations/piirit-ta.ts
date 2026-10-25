@@ -716,6 +716,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>அறிவிப்புகள்</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>ஒலியடக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>இயக்கத்தில்</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1348,6 +1364,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>இந்தக் குழுவில் யாராவது உங்கள் செய்தி ஒன்றுக்குப் பதிலளித்தால் உங்களுக்கு இன்னும் அறிவிப்பு வரும்.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>ஒலியை இயக்கு</translation>
     </message>
 </context>
 <context>

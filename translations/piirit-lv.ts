@@ -722,6 +722,22 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Paziņojumi</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Apklusināts</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Ieslēgts</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1357,6 +1373,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Jūs joprojām saņemsiet paziņojumu, kad kāds šajā grupā atbildēs uz kādu no jūsu ziņām.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Ieslēgt skaņu</translation>
     </message>
 </context>
 <context>

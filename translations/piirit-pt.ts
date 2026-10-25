@@ -720,6 +720,22 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Notificações</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Silenciado</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Ligado</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1352,6 +1368,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Continuará a receber uma notificação quando alguém neste grupo responder a uma das suas mensagens.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Reativar notificações</translation>
     </message>
 </context>
 <context>

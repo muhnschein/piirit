@@ -3,7 +3,8 @@
 //! Reference clients' five lengths in their order, each saying only how long; no title repeating
 //! accept's "Mute". Nothing preset: accept does nothing until one is picked. One at a time; tap again
 //! clears. Accept hands over seconds, -1 for forever. Note on mentions only when caller says they
-//! still notify. Menus calling it: `qml_mute_flow.rs`.
+//! still notify. Chat already muted: Unmute first, accept then says Unmute, hands over 0. Callers:
+//! `qml_mute_flow.rs`.
 
 // Qt harness: see qml_pages.rs.
 #![allow(clippy::expect_used)]
@@ -17,9 +18,10 @@ const PROBE_QML: &str = r"
     Item {
         property var picked: []
         Loader { id: loader }
-        function load(url, mentions) {
+        function load(url, mentions, muted) {
+            picked = []
             loader.setSource('', {})
-            loader.setSource(url, { mentionsStillNotify: mentions })
+            loader.setSource(url, { mentionsStillNotify: mentions, muted: muted })
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.picked.connect(function(seconds) { picked.push(seconds) })
             return 'ok'
@@ -89,9 +91,15 @@ fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
             .unwrap_or_default()
     };
     let option = |name: &str| -> [QVariant; 1] { [QString::from(name).into()] };
+    let header = |property: &str| -> [QVariant; 2] {
+        [
+            QString::from("muteHeader").into(),
+            QString::from(property).into(),
+        ]
+    };
 
     let url = || -> QVariant { QString::from(common::page_url("MuteDialog.qml")).into() };
-    let load = call("load", &[url(), false.into()]);
+    let load = call("load", &[url(), false.into(), false.into()]);
     assert_eq!(load, "ok", "the dialog did not load");
     assert_eq!(
         (
@@ -183,7 +191,7 @@ fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
     );
 
     // Group with mentions on: note says what still gets through.
-    assert_eq!(call("load", &[url(), true.into()]), "ok");
+    assert_eq!(call("load", &[url(), true.into(), false.into()]), "ok");
     assert_eq!(
         call(
             "get",
@@ -194,5 +202,34 @@ fn the_dialog_offers_the_reference_lengths_and_hands_over_the_one_picked() {
         ),
         "true",
         "the mentions note is missing though replies still notify"
+    );
+
+    // Muted (contact/group page row): Unmute first, accept says so, hands over 0.
+    assert_eq!(call("load", &[url(), false.into(), true.into()]), "ok");
+    assert_eq!(
+        (call("labels", &[]), call("options", &[])),
+        (
+            "Unmute|For 1 hour|For 8 hours|For 1 day|For 7 days|Forever".to_string(),
+            "0=false,3600=false,28800=false,86400=false,604800=false,-1=false".to_string()
+        ),
+        "a muted chat's dialog does not offer Unmute before the lengths, nothing preset"
+    );
+    assert_eq!(call("click", &option("muteOption0")), "ok");
+    assert_eq!(
+        (call("get", &header("acceptText")), call("canAccept", &[])),
+        ("Unmute".to_string(), "true".to_string()),
+        "picking Unmute did not make accept say Unmute"
+    );
+    assert_eq!(
+        call("accept", &[]),
+        "0",
+        "accepting Unmute did not hand over 0"
+    );
+    // Still muted, picking a new length: accept says Mute again.
+    assert_eq!(call("click", &option("muteOption86400")), "ok");
+    assert_eq!(
+        (call("get", &header("acceptText")), call("accept", &[])),
+        ("Mute".to_string(), "0,86400".to_string()),
+        "a new length on a muted chat did not mute for it"
     );
 }

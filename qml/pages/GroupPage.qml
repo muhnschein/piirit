@@ -196,20 +196,6 @@ Page {
         })
     }
 
-    /// Muted: unmute at once. Else ask how long (MuteDialog.qml).
-    function toggleMute() {
-        if (chat.is_muted) {
-            chat.set_mute_duration(0)
-            return
-        }
-        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"))
-        if (dialog) {
-            dialog.picked.connect(function(seconds) {
-                chat.set_mute_duration(seconds)
-            })
-        }
-    }
-
     // Own page with platform accept, not countdown: no way back unless re-added,
     // and pull-down countdown easy to miss.
     function confirmLeave() {
@@ -336,6 +322,15 @@ Page {
                 seconds: chat.ephemeral_timer
                 canChange: chat.can_send
                 onChosen: chat.set_ephemeral_timer(seconds)
+            }
+
+            ChatNotifications {
+                objectName: "notifications"
+                muted: chat.is_muted
+                // `=== true`: dconf gives `undefined` until key read.
+                mentionsStillNotify: Settings.notificationsEnabled === true
+                                     && Settings.mentionNotifications === true
+                onPicked: chat.set_mute_duration(seconds)
             }
 
             SectionHeader {

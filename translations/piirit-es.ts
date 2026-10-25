@@ -716,6 +716,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Notificaciones</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Silenciado</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Activado</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1348,6 +1364,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Seguirás recibiendo una notificación cuando alguien de este grupo responda a uno de tus mensajes.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Activar sonido</translation>
     </message>
 </context>
 <context>

@@ -133,20 +133,6 @@ Page {
         })
     }
 
-    /// Muted: unmute at once. Else ask how long (MuteDialog.qml).
-    function toggleMute() {
-        if (chat.is_muted) {
-            chat.set_mute_duration(0)
-            return
-        }
-        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"))
-        if (dialog) {
-            dialog.picked.connect(function(seconds) {
-                chat.set_mute_duration(seconds)
-            })
-        }
-    }
-
     // The contact's one row, read into page (Repeater is how QML reads rows).
     // Draws nothing: reload after save rebuilds nothing on screen.
     Repeater {
@@ -276,6 +262,12 @@ Page {
                 seconds: chat.ephemeral_timer
                 canChange: chat.can_send
                 onChosen: chat.set_ephemeral_timer(seconds)
+            }
+
+            ChatNotifications {
+                objectName: "notifications"
+                muted: chat.is_muted
+                onPicked: chat.set_mute_duration(seconds)
             }
         }
     }

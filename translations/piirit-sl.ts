@@ -724,6 +724,22 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Obvestila</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Utišano</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Vklopljeno</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1362,6 +1378,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Obvestilo boste še vedno prejeli, ko nekdo v tej skupini odgovori na eno od vaših sporočil.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Vklopi obvestila</translation>
     </message>
 </context>
 <context>

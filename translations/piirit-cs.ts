@@ -722,6 +722,22 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Oznámení</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Ztlumeno</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Zapnuto</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1357,6 +1373,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Upozornění dostanete i nadále, když někdo v této skupině odpoví na některou z vašich zpráv.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušit ztlumení</translation>
     </message>
 </context>
 <context>

@@ -718,6 +718,22 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Bildirimler</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Sessize alındı</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Açık</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1347,6 +1363,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Bu gruptaki biri mesajlarınızdan birine yanıt verdiğinde yine de bildirim alırsınız.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Sesi aç</translation>
     </message>
 </context>
 <context>

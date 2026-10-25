@@ -1,9 +1,10 @@
-//! Muting from every menu offering it, tap to core.
+//! Muting from every place offering it, tap to core.
 //!
-//! Chat list row menu, group page pull-down, contact page pull-down: Mute opens the length dialog,
-//! sends nothing until a length comes back (each entry picks another, so none stands in for
-//! another); Unmute sends at once, no dialog. Each entry then reads core's answer back (label
-//! flips). Dialog itself: `qml_mute_dialog.rs`.
+//! Chat list row menu: Mute opens the length dialog, sends nothing until a length comes back;
+//! Unmute sends at once, no dialog. Group and contact page Notifications row: opens the dialog
+//! either way, told whether muted (Unmute offered), sends the pick. Each entry picks another
+//! length, so none stands in for another; each reads core's answer back (label or value flips).
+//! Dialog itself: `qml_mute_dialog.rs`.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -142,6 +143,19 @@ fn probe_qml() -> String {
             record(prefix + '-unmute-pushed', stack.pushed)
         }}
 
+        /// Page's Notifications row: tap, see what opened and was said, pick `seconds`.
+        function rowVia(prefix, seconds) {{
+            stack.pushed = ''
+            stack.props = null
+            record(prefix + '-value', get('notifications', 'value'))
+            record(prefix + '-click', click('notifications'))
+            record(prefix + '-pushed', stack.pushed)
+            record(prefix + '-muted', stack.props ? stack.props.muted : 'none')
+            record(prefix + '-note', stack.props ? stack.props.mentionsStillNotify : 'none')
+            stack.dialog.picked(seconds)
+        }}
+        function rowValue() {{ return get('notifications', 'value') }}
+
         property int step: 0
         property bool finished: false
         readonly property var script: [
@@ -168,8 +182,29 @@ fn probe_qml() -> String {
                    openOnly('quiet0')
                    row = 1
                    openOnly('quiet1')
-                   finished = true
-               }} }}
+                   Settings.mentionNotifications = true
+                   record('group-load', load('{group}', {{ accountId: 1, chatId: 2, chatName: 'Group' }}))
+               }} }},
+            {{ until: function() {{ return rowValue() === 'On' }},
+               run: function() {{ rowVia('group', 86400) }} }},
+            {{ until: function() {{ return rowValue() === 'Muted' }},
+               run: function() {{ rowVia('group-muted', 0) }} }},
+            {{ until: function() {{ return rowValue() === 'On' }},
+               run: function() {{
+                   // Mentions off: no note. Backed out: nothing sent.
+                   Settings.mentionNotifications = false
+                   stack.props = null
+                   click('notifications')
+                   record('group-quiet-note', stack.props ? stack.props.mentionsStillNotify : 'none')
+                   Settings.mentionNotifications = true
+                   record('contact-load', load('{contact}', {{ accountId: 1, chatId: 1, chatName: 'Contact' }}))
+               }} }},
+            {{ until: function() {{ return rowValue() === 'On' }},
+               run: function() {{ rowVia('contact', 604800) }} }},
+            {{ until: function() {{ return rowValue() === 'Muted' }},
+               run: function() {{ rowVia('contact-muted', 0) }} }},
+            {{ until: function() {{ return rowValue() === 'On' }},
+               run: function() {{ finished = true }} }}
         ]
         Timer {{
             interval: 50; running: !finished; repeat: true
@@ -189,6 +224,8 @@ fn probe_qml() -> String {
             .join("../../qml/components")
             .display(),
         list = common::page_url("ChatListPage.qml"),
+        group = common::page_url("GroupPage.qml"),
+        contact = common::page_url("ContactPage.qml"),
     )
 }
 
@@ -197,7 +234,7 @@ const PATIENCE_SECONDS: u32 = 40;
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn every_mute_entry_asks_how_long_and_every_unmute_entry_does_not() {
+fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
     let temp = std::env::temp_dir().join(format!("piirit-mute-flow-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -283,9 +320,51 @@ fn every_mute_entry_asks_how_long_and_every_unmute_entry_does_not() {
             json!([1, first, {"kind": "NotMuted"}]),
             json!([1, second, {"kind": "Until", "duration": 3600}]),
             json!([1, second, {"kind": "NotMuted"}]),
+            json!([1, 2, {"kind": "Until", "duration": 86400}]),
+            json!([1, 2, {"kind": "NotMuted"}]),
+            json!([1, 1, {"kind": "Until", "duration": 604800}]),
+            json!([1, 1, {"kind": "NotMuted"}]),
         ],
-        "the menus did not send exactly the reader's picks to the core. {context}"
+        "the menus and rows did not send exactly the reader's picks to the core. {context}"
     );
+
+    // Page rows: value says core's state, dialog told whether muted. Group with mentions on gets
+    // the note; contact never.
+    assert_eq!(
+        value("group-quiet-note"),
+        "false",
+        "the group page's note shows though Mentions is off. {context}"
+    );
+    for (page, note) in [("group", "true"), ("contact", "false")] {
+        assert_eq!(
+            value(&format!("{page}-load")),
+            "ok",
+            "the {page} page did not load. {context}"
+        );
+        for (prefix, shown, muted) in [
+            (page.to_string(), "On", "false"),
+            (format!("{page}-muted"), "Muted", "true"),
+        ] {
+            assert_eq!(
+                (
+                    value(&format!("{prefix}-value")),
+                    value(&format!("{prefix}-click")),
+                    value(&format!("{prefix}-pushed")),
+                    value(&format!("{prefix}-muted")),
+                    value(&format!("{prefix}-note")),
+                ),
+                (
+                    shown.to_string(),
+                    "ok".to_string(),
+                    "MuteDialog.qml".to_string(),
+                    muted.to_string(),
+                    note.to_string()
+                ),
+                "the {page} page's Notifications row ({prefix}) did not show core's state \
+                 and open the dialog told so. {context}"
+            );
+        }
+    }
     assert_ne!(first, second, "both picks went to one chat. {context}");
 
     // Chat 2 is the group: only its dialog says replies still notify, and only while the
