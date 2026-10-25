@@ -73,6 +73,17 @@ const PROBE_QML: &str = r"
             item.hideClicked()
             return 'ok'
         }
+        // Every text, hint placeholder shows from here on, '|'-joined: stub has no
+        // frames, so a flash shows only as a text change.
+        property var shown: []
+        function watch(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.textChanged.connect(function () { shown.push(item.text) })
+            item.hintTextChanged.connect(function () { shown.push(item.hintText) })
+            return 'ok'
+        }
+        function seen() { return shown.join('|') }
         function setText(name, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -170,6 +181,10 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         record!("placeholder-text", get!("chatListPlaceholder", "text"));
         record!("placeholder-hint", get!("chatListPlaceholder", "hintText"));
         record!(
+            "watched",
+            call!("watch", QString::from("chatListPlaceholder"))
+        );
+        record!(
             "typed",
             call!(
                 "setText",
@@ -205,6 +220,8 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
 
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("count-after", get!("chats", "count"));
+        record!("placeholder-off", get!("chatListPlaceholder", "enabled"));
+        record!("placeholder-seen", call!("seen"));
         record!("field-opened", get!("chatSearchField", "visible"));
         record!("pill-opened", get!("chatSearchPill", "visible"));
         record!("hidden", call!("hide", QString::from("chatSearchField")));
@@ -356,6 +373,24 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         value("count-after"),
         "2",
         "turning the filter off did not bring the chats back. {context}"
+    );
+    assert_eq!(
+        value("watched"),
+        "ok",
+        "the placeholder could not be watched, so what follows proves \
+         nothing. {context}"
+    );
+    assert_eq!(
+        value("placeholder-off"),
+        "false",
+        "the placeholder stayed over the chats that came back. {context}"
+    );
+    assert_eq!(
+        value("placeholder-seen"),
+        "",
+        "the placeholder changed its words while the filter went off: it \
+         reads \"No chats yet\" until it has faded from over the returning \
+         chats. {context}"
     );
     assert_eq!(
         value("archived"),
