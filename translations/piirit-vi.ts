@@ -574,10 +574,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Cuộc trò chuyện đã lưu trữ</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Cuộc trò chuyện mới</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Đã lưu trữ</translation>
     </message>
@@ -659,10 +655,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mã QR</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nhóm mới</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Đánh dấu chưa đọc</translation>
     </message>
@@ -698,6 +690,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Gửi tới</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Mới</translation>
     </message>
 </context>
 <context>
@@ -1130,6 +1127,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Đổi ảnh</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>Mã mời QR</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kênh</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1350,6 +1357,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Tiếp</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Cuộc trò chuyện mới</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Bạn nhắn tin với một người.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nhóm mới</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Nhiều người nhắn tin với nhau.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Kênh mới</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kênh là công cụ một-tới-nhiều để phát tin nhắn của bạn.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1389,6 +1430,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Tạo nhóm</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Hãy đặt tên cho kênh</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Tạo kênh</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Kênh mới</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Tên kênh</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Mọi người trong kênh đều thấy tên</translation>
     </message>
 </context>
 <context>
@@ -1614,6 +1677,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Sao chép liên kết mời</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>Mã mời QR</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Quét để tham gia kênh &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

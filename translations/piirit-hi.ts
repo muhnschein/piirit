@@ -580,10 +580,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>संग्रहित चैट</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>नई चैट</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>संग्रहित</translation>
     </message>
@@ -665,10 +661,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR कोड</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>नया समूह</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>अपठित चिह्नित करें</translation>
     </message>
@@ -704,6 +696,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>इसे भेजें</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>नया</translation>
     </message>
 </context>
 <context>
@@ -1139,6 +1136,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>चित्र बदलें</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR आमंत्रण कोड</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>चैनल</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1359,6 +1366,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>आगे</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>नई चैट</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>आप एक व्यक्ति को लिखते हैं।</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>नया समूह</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>कई लोग एक-दूसरे को लिखते हैं।</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>नया चैनल</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>चैनल आपके संदेशों को कई लोगों तक प्रसारित करने का साधन हैं।</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1399,6 +1440,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>समूह बनाएँ</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>कृपया चैनल का नाम रखें</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>चैनल बनाएँ</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>नया चैनल</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>चैनल का नाम</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>चैनल में सभी नाम देखते हैं</translation>
     </message>
 </context>
 <context>
@@ -1625,6 +1688,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>आमंत्रण लिंक कॉपी करें</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR आमंत्रण कोड</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>चैनल &quot;%1&quot; से जुड़ने के लिए स्कैन करें</translation>
     </message>
 </context>
 <context>

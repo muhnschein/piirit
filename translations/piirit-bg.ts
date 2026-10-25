@@ -576,10 +576,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Архивирани чатове</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Нов чат</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Архивирани</translation>
     </message>
@@ -661,10 +657,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR код</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Нова група</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Отбелязване като непрочетено</translation>
     </message>
@@ -700,6 +692,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Изпращане към</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Ново</translation>
     </message>
 </context>
 <context>
@@ -1135,6 +1132,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Промяна на изображението</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR код за покана</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Канал</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1355,6 +1362,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Напред</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Нов чат</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Пишете на един човек.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Нова група</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Няколко души си пишат.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Нов канал</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Каналите са инструмент за разпространение на вашите съобщения до много хора.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1395,6 +1436,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Създаване на група</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Дайте име на канала</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Създаване на канал</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Нов канал</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Име на канала</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Всички в канала виждат името</translation>
     </message>
 </context>
 <context>
@@ -1621,6 +1684,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Копиране на връзката за покана</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR код за покана</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Сканирайте, за да се присъедините към канала „%1“</translation>
     </message>
 </context>
 <context>

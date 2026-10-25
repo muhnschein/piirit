@@ -580,10 +580,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Chat archiviate</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Nuova chat</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Archiviate</translation>
     </message>
@@ -665,10 +661,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Codice QR</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nuovo gruppo</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Segna come non letta</translation>
     </message>
@@ -704,6 +696,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Invia a</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Nuovo</translation>
     </message>
 </context>
 <context>
@@ -1139,6 +1136,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Cambia immagine</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>Codice QR di invito</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Canale</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1359,6 +1366,40 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Avanti</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nuova chat</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Scrivi a una persona.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nuovo gruppo</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Più persone si scrivono a vicenda.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nuovo canale</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>I canali sono uno strumento uno-a-molti per trasmettere i tuoi messaggi.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1399,6 +1440,28 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Create group</source>
         <translation>Crea gruppo</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Dai un nome al canale</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Crea canale</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nuovo canale</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Nome del canale</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Tutti nel canale vedono il nome</translation>
     </message>
 </context>
 <context>
@@ -1625,6 +1688,15 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Copy invite link</source>
         <translation>Copia link di invito</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>Codice QR di invito</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Scansiona per unirti al canale &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

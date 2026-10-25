@@ -757,7 +757,7 @@ Page {
         id: inputRow
         objectName: "inputRow"
         // Not `visible` in sizes: false under another page too.
-        visible: !messages.is_contact_request
+        visible: offered
         anchors {
             left: parent.left
             right: parent.right
@@ -765,12 +765,16 @@ Page {
             rightMargin: Theme.horizontalPageMargin
             bottom: requestBar.top
             // Off screen edge: TextArea has no room under text, recording less.
-            bottomMargin: messages.is_contact_request ? 0 : Theme.paddingLarge
+            bottomMargin: inputRow.offered ? Theme.paddingLarge : 0
         }
         spacing: Theme.paddingSmall
 
+        /// Field offered: not request (bar instead), not channel reader (only owner posts).
+        readonly property bool offered: !messages.is_contact_request
+                                        && !messages.is_channel_reader
+
         // Field plus lifted buttons: Row ignores child anchors. Hidden: none.
-        height: messages.is_contact_request ? 0
+        height: !inputRow.offered ? 0
                 : Math.max(textField.visible ? textField.height : 0,
                            voiceBar.visible ? voiceBar.height : 0,
                            sendButton.height + inputRow.buttonLift)
