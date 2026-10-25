@@ -882,6 +882,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kontaktanmodning</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Oprindelig besked ikke fundet</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

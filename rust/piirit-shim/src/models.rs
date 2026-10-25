@@ -77,6 +77,8 @@ pub struct MessageListItem {
     pub quote_text: QString,
     /// Quoted author.
     pub quote_author: QString,
+    /// Quoted message (`WithMessage` quote); 0 if core has none (deleted, never here).
+    pub quote_message_id: u32,
     /// Absolute attachment path in blob dir.
     pub file_path: QString,
     /// Attachment name.

@@ -8,8 +8,10 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 - **Mute a chat for a while.** Mute in a chat's long-press menu in the chat list now asks for how long: 1 hour, 8 hours, 1 day, 7 days or forever, as in the other Delta Chat apps; Unmute there works at once. A contact's or group's page has a Notifications row that says On or Muted and offers the same choices, plus Unmute. In a group, a note says that replies to you still notify while Mentions is on in the notification settings.
+- Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
 
 ## 2.2.0 — 2026-10-23
 

@@ -883,6 +883,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kişi isteği</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Özgün ileti bulunamadı</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

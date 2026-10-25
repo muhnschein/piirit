@@ -889,6 +889,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Prośba o kontakt</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Nie znaleziono oryginalnej wiadomości</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

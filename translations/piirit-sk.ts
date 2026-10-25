@@ -889,6 +889,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Žiadosť o kontakt</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Pôvodná správa sa nenašla</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

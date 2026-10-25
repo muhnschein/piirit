@@ -1,10 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "../js/Marks.js" as Marks
 import "."
 
 /*
- * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml).
+ * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml),
+ * or escaped StyledText with search marks (Marks.js).
  */
 Item {
     id: root
@@ -15,6 +17,15 @@ Item {
     property string picturePath
     /// Unix s; 0 = no time (contacts).
     property int timestamp: 0
+    /// Search text marked in title, subtitle; "" where core didn't match there.
+    property string titleMatch
+    property string subtitleMatch
+
+    /// Marked StyledText, or "" for plain.
+    readonly property string markedTitle: Marks.marked(root.title, root.titleMatch,
+                                                       Theme.highlightColor)
+    readonly property string markedSubtitle: Marks.marked(root.subtitle, root.subtitleMatch,
+                                                          Theme.highlightColor)
 
     height: Math.max(avatar.height, subtitleLabel.y + subtitleLabel.height)
             + 2 * Theme.paddingMedium
@@ -53,8 +64,8 @@ Item {
         width: (timeLabel.visible ? timeLabel.x : root.width - Theme.horizontalPageMargin)
                - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
-        text: root.title
+        textFormat: root.markedTitle.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.markedTitle.length > 0 ? root.markedTitle : root.title
     }
 
     Label {
@@ -67,9 +78,9 @@ Item {
         wrapMode: Text.Wrap
         maximumLineCount: 2
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
+        textFormat: root.markedSubtitle.length > 0 ? Text.StyledText : Text.PlainText
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: root.subtitle
+        text: root.markedSubtitle.length > 0 ? root.markedSubtitle : root.subtitle
     }
 }

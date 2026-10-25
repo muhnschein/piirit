@@ -282,6 +282,15 @@ impl State {
             // Chat 2 group: self + one contact; test adds other, removes this one.
             self.group_members.insert(2, vec![SELF, 10]);
             self.next_chat_id = 500;
+            // Received replies, on request: `PIIRIT_FAKE_QUOTES=120:1,119:10` (message:quoted).
+            if let Ok(pairs) = std::env::var("PIIRIT_FAKE_QUOTES") {
+                for pair in pairs.split(',') {
+                    let mut ids = pair.split(':').filter_map(|id| id.parse::<u32>().ok());
+                    if let (Some(message), Some(quoted)) = (ids.next(), ids.next()) {
+                        self.quotes.insert(message, quoted);
+                    }
+                }
+            }
             // Others' reaction on first message, on request: non-own chip, ours counts up.
             if std::env::var_os("PIIRIT_FAKE_REACTED").is_some() {
                 self.reactions
@@ -441,10 +450,11 @@ impl State {
             }
         }
         if let Some(quoted) = self.quotes.get(&id) {
-            // Core's `WithMessage` quote: id, text, author.
+            // Core's `WithMessage` quote: id, chat, text, author.
             message["quote"] = json!({
                 "kind": "WithMessage",
                 "messageId": quoted,
+                "chatId": self.chat_of(*quoted),
                 "text": wordy(u64::from(*quoted)),
                 "authorDisplayName": "Ada Lovelace",
             });
