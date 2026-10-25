@@ -3,15 +3,7 @@
 //! blank writes empty name, core's way back to what contact calls themselves.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -147,8 +139,10 @@ fn the_contact_page_names_the_contact_and_no_address() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Chat 1 is with Ada, who has written an about line.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -159,7 +153,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", get!("chat", "loaded"));
         record!("name", get!("contactNameField", "placeholderText"));
         record!("initial", get!("avatarInitial", "text"));
@@ -190,7 +184,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
         record!("leave", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         // Core reloaded behind save: field shows given name.
         record!("renamed", get!("contactNameField", "text"));
         record!("hint-after-leave", get!("nameHint", "visible"));
@@ -206,11 +200,12 @@ fn the_contact_page_names_the_contact_and_no_address() {
         record!("leave-again", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("theirs-again", get!("contactNameField", "placeholderText"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_page(&steps);

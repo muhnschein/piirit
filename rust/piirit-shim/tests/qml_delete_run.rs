@@ -11,15 +11,7 @@
 //! on it puts back only the one it covers.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -217,7 +209,9 @@ fn every_delete_in_a_run_arrives() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -230,7 +224,7 @@ fn every_delete_in_a_run_arrives() {
 
     // Run: three deletes in one wait, list changing mid-way: what first delete does to rows
     // rest wait on.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("box-1-before", call!("rowBox", 1));
         record!("box-2-before", call!("rowBox", 2));
         record!("delete-1", call!("deleteRow", 1));
@@ -246,7 +240,7 @@ fn every_delete_in_a_run_arrives() {
         call!("removeRow", 0);
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("after-removal", call!("sentSoFar"));
         record!("delete-3", call!("deleteRow", 3));
         // One the reader changes mind about, same run.
@@ -257,7 +251,7 @@ fn every_delete_in_a_run_arrives() {
     });
 
     // Past wait: all asked for gone, only that.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("sent", call!("sentSoFar"));
         record!("back-4", call!("goingOut", 4));
         // Reader asks one more, leaves chat before wait ends.
@@ -268,6 +262,7 @@ fn every_delete_in_a_run_arrives() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

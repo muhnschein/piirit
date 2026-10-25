@@ -13,15 +13,7 @@
 //! left profiles page missing it until restart.
 
 // Qt harness: see restore.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -93,34 +85,37 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // 1s: unknown backup read in. 3s: list knows unasked; copy offered.
     // 5s: first backup again. 7s: outcome.
     // SAFETY: fire only while `exec()` runs on this thread; boxes outlive it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*core_ptr)
             .pinned()
             .borrow_mut()
             .restore_from_file(QString::from("/tmp/holiday-backup.tar"));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("listed", ask!("profiles")));
         (*core_ptr)
             .pinned()
             .borrow_mut()
             .restore_from_file(QString::from("/tmp/Summer-Backup.tar"));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*core_ptr)
             .pinned()
             .borrow_mut()
             .restore_from_file(QString::from("/tmp/holiday-backup.tar"));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("after", ask!("profiles")));
         (*steps_ptr).push(("summary", ask!("summary")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

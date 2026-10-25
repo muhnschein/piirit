@@ -2,16 +2,8 @@
 //!
 //! Calls had no caller before: app never created chats.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -106,13 +98,15 @@ fn a_chat_can_be_started_three_ways() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: these fire only while `exec()` runs on this
     // thread, and `engine` outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(5, move || unsafe {
         let value = (*engine_ptr).invoke_method("names".into(), &[]);
         *listed_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -124,6 +118,7 @@ fn a_chat_can_be_started_three_ways() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_routes(&common::calls(&journal), &listed, &report);

@@ -7,15 +7,7 @@
 //! asked, not assumed: stopped host refuses connection.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -200,7 +192,9 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!(
@@ -225,7 +219,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "url",
             call!("get", QString::from("webxdcView"), QString::from("url"))
@@ -296,7 +290,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         record!("cover", call!("cover"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         // Covered: app still there and served; app that asked for picker awaits its answer.
         record!(
             "after-cover",
@@ -309,7 +303,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         record!("deleted", call!("deleted"));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         // Not popped while covered: a pop would take the page on top.
         record!(
             "popped-covered",
@@ -320,7 +314,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         record!("leave", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         // Left: page and its host gone.
         record!(
             "after-leave",
@@ -330,6 +324,7 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

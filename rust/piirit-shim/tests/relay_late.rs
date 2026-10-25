@@ -5,15 +5,7 @@
 //! not removed as for a cancelled signup. Nothing signalled.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -138,7 +130,9 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -151,7 +145,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
     });
 
     // 2s: deaf relay asked; given up at once.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("before", call!("listed"));
         record!(
             "typed",
@@ -169,7 +163,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
     });
 
     // 7s: relay answered at 5s, to nobody.
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(5, move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "late-error",
@@ -179,12 +173,13 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         record!("reload", call!("refresh"));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("after", call!("listed"));
         record!("navigation", call!("navigation"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

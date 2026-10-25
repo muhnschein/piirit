@@ -8,15 +8,7 @@
 //! that matter stay above. Nothing on cover drawn by its own shader meanwhile.
 
 // Qt harness: see qml_cover.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -213,8 +205,10 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         // dconf outlives a phone run; stub values don't, but clear anyway: nothing set at start.
         record!("clear-left", set!("left", "", 0, 0, ""));
         record!("clear-right", set!("right", "", 0, 0, ""));
@@ -275,18 +269,19 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
     });
 
     // Once lists are in, someone writes under each profile.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("mark-first", call!("markUnread", 0, 1));
         record!("mark-second", call!("markUnread", 1, 2));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("lit-places", call!("litPlaces"));
         record!("lit-shaders", call!("drawnThrough"));
         record!("final-lists", call!("lists"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

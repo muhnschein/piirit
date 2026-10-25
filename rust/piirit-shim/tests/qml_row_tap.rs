@@ -5,15 +5,7 @@
 //! press to row. A picture taking press itself would block row menu on long press.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -147,7 +139,9 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -156,20 +150,20 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("picture-tap", call!("tapRow"));
         record!("menu-before", call!("menuOpen"));
         show!("Video", "/tmp/clip.mp4", "Done");
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("video-tap", call!("tapRow"));
         show!("File", "/tmp/report.pdf", "Done");
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("file-tap", call!("tapRow"));
         show!("Voice", "/tmp/note.ogg", "Done");
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         // Sound plays where it sits: tap on row opens nothing;
         // long press on its play button is still the menu.
         record!("voice-tap", call!("tapRow"));
@@ -179,27 +173,28 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         );
         show!("Text", "", "Available");
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         // Message limit held back: whole row asks for rest.
         record!("held-tap", call!("tapRow"));
         show!("Text", "", "Done");
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("text-tap", call!("tapRow"));
         // Webxdc app, apps off: nothing to run, so row hands the .xdc on like any file. Every
         // probe row is called holiday.png, this one too.
         show!("Webxdc", "/tmp/checkers.xdc", "Done");
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("xdc-tap-off", call!("tapRow"));
         record!("apps-on", call!("setApps", true));
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         // Apps on: run here, not handed to whatever system thinks opens .xdc.
         record!("xdc-tap-on", call!("tapRow"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

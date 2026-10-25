@@ -4,15 +4,7 @@
 //! "Downloading…". Re-read row on that event.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -84,8 +76,10 @@ fn a_finished_download_reaches_the_row_without_reopening_the_chat() {
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
+    let mut plan = common::Plan::default();
+
     // Loaded once the core is up, so the model has something to load from.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
@@ -101,16 +95,17 @@ fn a_finished_download_reaches_the_row_without_reopening_the_chat() {
         }};
     }
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("loaded", call!("loaded")));
         (*steps_ptr).push(("before", call!("stateOf", HELD_BACK)));
         call!("download");
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("after", call!("stateOf", HELD_BACK)));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

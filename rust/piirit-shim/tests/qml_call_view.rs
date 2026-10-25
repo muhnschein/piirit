@@ -8,15 +8,7 @@
 //! is moved brings phone's sound server down when it is.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -83,8 +75,10 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
 
     // SAFETY for every block: fire only while `exec()` runs on this thread; all they
 
+    let mut plan = common::Plan::default();
+
     // point at outlives it.
-    single_shot(Duration::from_millis(500), move || unsafe {
+    plan.after(0, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!("load", QString::from(common::component_url("CallView.qml"))),
@@ -100,6 +94,7 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

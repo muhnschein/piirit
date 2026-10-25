@@ -7,15 +7,7 @@
 //! `deltachat-jsonrpc/tests/real_server.rs`.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -85,16 +77,19 @@ fn the_quality_is_written_to_each_account_when_set_and_when_the_list_is_read() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // Changed once the first write has had time to land. Balanced is the
     // default, so this is also the case a plain `0` has to survive: it is
     // handed over rather than left unsaid, and the core is told.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(4, move || unsafe {
         call!("change", 1);
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

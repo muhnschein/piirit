@@ -6,18 +6,15 @@
 //! `common::qml_tree_without_enter_key`.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -176,15 +173,17 @@ fn the_chat_info_page_is_attached_to_the_right() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Group, chat 2, loaded while arriving: nothing attachable yet.
     let group_url = common::page_url_in(&tree, "ConversationPage.qml");
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "load-group",
             call!("load", QString::from(group_url.clone()), 2)
         );
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("group-loaded", call!("loaded"));
         record!(
             "before-active",
@@ -192,7 +191,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
         );
         record!("settle-group", call!("settle"));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "group-attached",
             (*stack_ptr).pinned().borrow().attached.to_string()
@@ -205,16 +204,16 @@ fn the_chat_info_page_is_attached_to_the_right() {
         (*stack_ptr).pinned().borrow_mut().attached = QString::default();
     });
     let single_url = common::page_url_in(&tree, "ConversationPage.qml");
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-single",
             call!("load", QString::from(single_url.clone()), 1)
         );
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("settle-single", call!("settle"));
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "single-attached",
             (*stack_ptr).pinned().borrow().attached.to_string()
@@ -222,6 +221,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_attached(&steps);

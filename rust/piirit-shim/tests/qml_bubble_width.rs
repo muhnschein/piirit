@@ -11,15 +11,7 @@
 //! every kind.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 use serde_json::{json, Value};
@@ -197,7 +189,9 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
     ];
     let attachments_ptr = std::ptr::addr_of!(attachments);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         let url = common::component_url("MessageDelegate.qml");
         for (label, props) in &*bodies_ptr {
             record!(
@@ -238,6 +232,7 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

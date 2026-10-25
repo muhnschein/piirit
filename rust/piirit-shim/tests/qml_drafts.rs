@@ -6,15 +6,7 @@
 //! without waiting for the debounce.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -139,28 +131,31 @@ fn an_unsent_message_is_kept_and_the_chat_list_says_so() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("open", call!("open", QString::from(page.clone()), 1, 1)));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("typed", call!("type", QString::from(DRAFT))));
         // Leave inside debounce: must suffice.
         (*steps_ptr).push(("left", call!("leave")));
     });
     // Fresh page, same chat, as reopening from list builds one; soon enough that old page's
     // debounce cannot have written draft.
-    single_shot(Duration::from_millis(2400), move || unsafe {
+    plan.after(0, move || unsafe {
         (*steps_ptr).push(("reopen", call!("open", QString::from(reopen.clone()), 1, 1)));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("back", call!("typed")));
         (*steps_ptr).push(("listed", call!("refreshList")));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("row", call!("summaryOfChatOne")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

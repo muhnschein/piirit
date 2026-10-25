@@ -5,15 +5,7 @@
 //! Via `QtMultimedia` stubs, as `qml_capture.rs`: two back cameras, one front.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -122,7 +114,9 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // From conversation: still, back camera.
         record!("plain", load!("{}"));
         record!("plain-opened", call!("opened"));
@@ -184,6 +178,7 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

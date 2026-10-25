@@ -6,15 +6,7 @@
 //! to newest after close.
 
 // Qt harness: see qml_conversation_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -172,7 +164,9 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("rows", call!("append", 60)));
         (*steps_ptr).push((
             "load",
@@ -183,10 +177,10 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         ));
     });
     // Down at newest, following: start state.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("following", call!("settleAtEnd")));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("pressed", call!("topIndex")));
     });
     // Pressed row read from steps: top row known only mid-run.
@@ -199,56 +193,56 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
                 .unwrap_or(-1.0)
         };
     }
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         let index = pressed!();
         (*steps_ptr).push(("before", call!("place", index)));
         (*steps_ptr).push(("opened", call!("openMenu", index)));
     });
     // Grown row measured, then a whole event loop: follow runs off a zero-length timer, so if it
     // would throw view to newest, it has by now.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("settle");
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after-opening", call!("place", pressed!())));
         // Message arrives while menu up: other follow mover.
         (*steps_ptr).push(("arrival", call!("append", 1)));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after-arrival", call!("place", pressed!())));
         (*steps_ptr).push(("still-open", call!("closeMenu", pressed!())));
     });
     // Closed: following view back on newest, arrivals included.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("closed-at-end", call!("ended")));
         (*steps_ptr).push(("closed-following", call!("following")));
         // Other mover: row held in place, as coming back from a picture leaves it, menu opened on
         // it.
         (*steps_ptr).push(("held", call!("hold", 12.0, 40.0)));
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("held-place", call!("place", 12.0)));
         (*steps_ptr).push(("held-opened", call!("openMenu", 12.0)));
     });
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("settle");
     });
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("hold-let-go", call!("holding")));
         (*steps_ptr).push(("held-after", call!("place", 12.0)));
         // Menu still up, tap newest button: it's over list, so tap never reaches row and Silica
         // leaves menu open.
         (*steps_ptr).push(("jumped", call!("jump")));
     });
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("settle");
     });
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("jumped-end", call!("ended")));
         (*steps_ptr).push(("jumped-menu", call!("menuUp")));
         (*steps_ptr).push(("pressed-again", call!("topIndex")));
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(1, move || unsafe {
         let index = (*steps_ptr)
             .iter()
             .find(|(name, _)| *name == "pressed-again")
@@ -258,14 +252,15 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         // Row goes while menu open: nothing says menu closed.
         (*steps_ptr).push(("row-gone", call!("removeRow", index)));
     });
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("settle");
     });
-    single_shot(Duration::from_secs(16), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("gone-menu", call!("menuUp")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

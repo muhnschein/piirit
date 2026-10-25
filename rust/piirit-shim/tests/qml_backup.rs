@@ -16,13 +16,10 @@
     // `pushAttached` is Silica's own name; probe answers to it.
     non_snake_case,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` decls must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -197,9 +194,11 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Refused, stopped, then written: written one ends page, so button asks come first.
     let refused_path = refused.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -225,7 +224,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     });
 
     let slow_path = slow.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // Whose backup: profile drawn as invite page draws it. Address not asked: unconfigured
         // account has none.
         record!("colour", call!("profileShows", QString::from("ownColor")));
@@ -243,7 +242,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         record!("write-slow", call!("click", QString::from("writeButton")));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         // Mid-write: bar up, button gone, no way off. Asked of slow write: only one with a
         // middle (core reports export as it goes; write done before first poll says nothing).
         record!("running", get!("backup", "running"));
@@ -259,7 +258,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
 
     // Past slow write's answer, which arrives after cancel.
     let good_path = good.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(4, move || unsafe {
         record!("after-cancel", get!("errorLabel", "text"));
         record!("idle", get!("backup", "running"));
         record!(
@@ -273,7 +272,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         record!("write", call!("click", QString::from("writeButton")));
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "written",
             call!("pageProperty", QString::from("writtenPath"))
@@ -290,6 +289,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let popped = stack_box.pinned().borrow().log.to_string();

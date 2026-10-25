@@ -6,13 +6,7 @@
 //! Page loaded from QML tree copy with `EnterKey` taken out, as in `qml_send_file.rs`.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
@@ -151,9 +145,11 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     let page = common::page_url_in(&tree, "ConversationPage.qml");
     let exists = |path: &PathBuf| path.exists().to_string();
 
+    let mut plan = common::Plan::default();
+
     // Capture on bar, chat closed.
     let (url, path) = (page.clone(), closed.clone());
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("load", call!("load", QString::from(url.clone()))));
         (*steps_ptr).push((
             "attached",
@@ -162,7 +158,7 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     });
 
     let (old, video, young) = (old_capture, old_video, young_capture);
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         // Sweep has had a second on its thread.
         (*steps_ptr).push(("old-capture", exists(&old)));
         (*steps_ptr).push(("old-video", exists(&video)));
@@ -172,7 +168,7 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
 
     // Capture sent, chat closed before core answered.
     let (url, gone, path) = (page, closed.clone(), sending.clone());
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("closed-capture", exists(&gone)));
         (*steps_ptr).push(("load-again", call!("load", QString::from(url.clone()))));
         (*steps_ptr).push((
@@ -181,7 +177,7 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
         ));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("send", call!("send")));
         (*steps_ptr).push((
             "sending",
@@ -191,11 +187,12 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     });
 
     let path = sending;
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("sending-capture", exists(&path)));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

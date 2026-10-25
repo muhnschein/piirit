@@ -3,15 +3,7 @@
 //! Unresolved ids only warn; zero-height row passes other checks. Hence geometry test.
 
 // Qt harness: see qml_conversation.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -105,8 +97,10 @@ fn a_long_result_stays_inside_the_screen() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Too long to fit, with a time label: title must make room.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -135,7 +129,7 @@ fn a_long_result_stays_inside_the_screen() {
         call!("set", QString::from("timestamp"), 1_700_000_000);
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "title-overhang",
             call!("overhang", QString::from("resultTitle"))
@@ -162,6 +156,7 @@ fn a_long_result_stays_inside_the_screen() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

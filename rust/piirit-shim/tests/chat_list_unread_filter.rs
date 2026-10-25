@@ -2,15 +2,7 @@
 //! filter is told to let go, so a reader back from that chat finds the row where they left it.
 
 // Qt harness: see chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -73,41 +65,44 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     // Two chats, neither unread.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("all", call!("count"));
         record!("filtered-on", call!("filter", true));
     });
 
-    single_shot(Duration::from_millis(4000), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("nothing-unread", call!("count"));
         record!("marked-unread", call!("markUnread", 2u32));
     });
 
-    single_shot(Duration::from_millis(5500), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("one-unread", call!("count"));
         record!("marked-read", call!("markRead", 2u32));
     });
 
-    single_shot(Duration::from_millis(7000), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("read-meanwhile", call!("count"));
         record!("forgot", call!("forget"));
     });
 
-    single_shot(Duration::from_millis(8000), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("after-forgetting", call!("count"));
         record!("filtered-off", call!("filter", false));
     });
 
-    single_shot(Duration::from_millis(9000), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("all-again", call!("count"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

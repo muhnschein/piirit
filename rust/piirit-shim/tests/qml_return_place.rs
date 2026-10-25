@@ -9,15 +9,7 @@
 //! put back to the pixel, not nearest row's centre.
 
 // Qt harness: see qml_conversation_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -185,7 +177,9 @@ fn coming_back(spread: i32, follow: bool) {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         call!("setSpread", spread);
         (*steps_ptr).push(("rows", call!("append", 60)));
         (*steps_ptr).push((
@@ -196,31 +190,31 @@ fn coming_back(spread: i32, follow: bool) {
             ),
         ));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("settle", call!("settleMidway")));
     });
     // Away and back, nothing moved: plain swipe back.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("before", call!("position")));
         (*steps_ptr).push(("leave", call!("leave")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("back", call!("comeBack")));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after", call!("position")));
         // Away again; list loses place while under the other page.
         (*steps_ptr).push(("leave-again", call!("leave")));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("lose", call!("lose")));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("built-away", call!("built")));
         (*steps_ptr).push(("while-away", call!("position")));
         (*steps_ptr).push(("back-again", call!("comeBack")));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after-losing", call!("position")));
         if !follow {
             (*engine_ptr).quit();
@@ -231,34 +225,35 @@ fn coming_back(spread: i32, follow: bool) {
     // Twice, a moment apart. First stop short brings one more row into view's buffer above,
     // changing content measure; following view is taken back to end for that. Second finds
     // those rows there and stays.
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("stopJustShort", 12.0);
     });
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("following", call!("stopJustShort", 12.0)));
     });
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("short-ended", call!("ended")));
         (*steps_ptr).push(("short-before", call!("position")));
         (*steps_ptr).push(("leave-short", call!("leave")));
     });
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("back-short", call!("comeBack")));
     });
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("short-after", call!("position")));
         // Away once more; a message arrives meanwhile.
         (*steps_ptr).push(("leave-following", call!("leave")));
         (*steps_ptr).push(("arrival", call!("append", 1)));
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("back-following", call!("comeBack")));
     });
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("at-end", call!("ended")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -5,15 +5,7 @@
 //! whole stack with that profile's list, then opens from it.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -181,8 +173,10 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     let list = common::page_url("ChatListPage.qml");
     let other = list.clone();
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -229,17 +223,17 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("chat", act!("chat", 1, 2));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("chat-stack", call!("stackLog"));
         record!("delete", call!("deleteChat", 1));
     });
 
     // Chat deleted since: said, not opened.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("gone", act!("chat", 1, 1));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("gone-stack", call!("stackLog"));
         record!(
             "gone-banner",
@@ -249,7 +243,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("elsewhere", act!("chat", 2, 2));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("elsewhere-stack", call!("stackLog"));
         // List that replaced stack, arriving with chat to open.
         record!(
@@ -266,7 +260,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("arrived", call!("arrive"));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("arrived-stack", call!("stackLog"));
 
         // Page up mid-work (backup being written) under a tap: app comes forward; nothing popped.
@@ -291,11 +285,12 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         call!("detach");
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("detached-registered", call!("registered"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

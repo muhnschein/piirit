@@ -6,15 +6,7 @@
 //! true).
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -137,8 +129,10 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
 
     // SAFETY for every block: fire only while `exec()` runs on this thread; all they
 
+    let mut plan = common::Plan::default();
+
     // point at outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -147,44 +141,45 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("completed", call!("says"));
         record!("completed-tap", call!("tapRow"));
         show!(true, "Completed", false, 30);
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("short", call!("says"));
         show!(false, "Missed", false, 0);
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("missed", call!("says"));
         record!("missed-tap", call!("tapRow"));
         show!(false, "Alerting", false, 0);
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("ringing-here", call!("says"));
         record!("ringing-tap", call!("tapRow"));
         show!(true, "Alerting", false, 0);
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("ringing-there", call!("says"));
         show!(true, "Declined", true, 0);
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("declined-video", call!("says"));
         show!(true, "Canceled", false, 0);
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("canceled", call!("says"));
         // No state from core: sentence stands.
         show!(true, "", false, 0);
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("unknown", call!("says"));
         record!("unknown-tap", call!("tapRow"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

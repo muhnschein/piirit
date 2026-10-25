@@ -9,15 +9,7 @@
 //! Picture and video: no menu offers; their page's pull-down already has Open and Save.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -222,7 +214,9 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -232,7 +226,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("file-open", call!("offered", 0, QString::from("openItem")));
         record!("file-save", call!("offered", 0, QString::from("saveItem")));
         record!("open-label", call!("labelOf", 0, QString::from("openItem")));
@@ -253,7 +247,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         record!("apps-on", call!("setApps", true));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         // Apps on: still keepable, no Open; tap on row runs it.
         record!(
             "xdc-open-on",
@@ -278,6 +272,7 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

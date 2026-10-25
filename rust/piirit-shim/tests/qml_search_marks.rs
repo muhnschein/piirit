@@ -3,18 +3,10 @@
 //! (not `StyledText`) when nothing found.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -188,7 +180,9 @@ fn search_results_mark_what_was_found() {
     ];
     let cases_ptr = std::ptr::addr_of!(cases);
 
-    single_shot(Duration::from_secs(0), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(0, move || unsafe {
         for (label, text, query) in &*cases_ptr {
             record!(
                 *label,
@@ -197,7 +191,7 @@ fn search_results_mark_what_was_found() {
         }
     });
 
-    single_shot(Duration::from_secs(0), move || unsafe {
+    plan.after(0, move || unsafe {
         // Search result row: title and subtitle each own query.
         record!(
             "result-load",
@@ -275,6 +269,7 @@ fn search_results_mark_what_was_found() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

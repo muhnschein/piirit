@@ -3,16 +3,8 @@
 //! Gallery asks core for its three kinds in one call. Empty kind = loaded, not loading.
 //! Voice sent while open lands on audio list without re-reading.
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -152,13 +144,15 @@ fn a_chats_media_is_read_by_kind_newest_first() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; `engine` outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     // Backstop: reads reached steps, quits.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(7, move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -166,6 +160,7 @@ fn a_chats_media_is_read_by_kind_newest_first() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_media(&common::calls(&journal), &report);

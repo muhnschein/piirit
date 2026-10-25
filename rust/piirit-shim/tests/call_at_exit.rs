@@ -5,13 +5,7 @@
 //! closing isn't a decline; another device may answer.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::time::{Duration, Instant};
 
@@ -90,20 +84,23 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()` on this
     // thread; pointees outlive it.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("ringing", call!("state"));
         record!("answer", call!("answer"));
         record!("other", call!("ring"));
     });
 
     // Page up, reader closes app.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("url", call!("url"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     // What app does on window close.

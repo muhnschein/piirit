@@ -6,15 +6,7 @@
 //! this read asks for it.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -106,9 +98,11 @@ fn a_burst_of_connection_changes_is_one_read() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread; all they point at outlives it.
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &loading,
             "load",
@@ -123,7 +117,7 @@ fn a_burst_of_connection_changes_is_one_read() {
 
     let bursting = steps.clone();
     let opened = journal.clone();
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&bursting, "on-open", sizings(&opened).to_string().into());
         common::record(&bursting, "burst", call!("burst").into());
     });
@@ -131,11 +125,12 @@ fn a_burst_of_connection_changes_is_one_read() {
     // Long enough after burst for the owed read to return.
     let settled = steps.clone();
     let after = journal.clone();
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         common::record(&settled, "after-burst", sizings(&after).to_string().into());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

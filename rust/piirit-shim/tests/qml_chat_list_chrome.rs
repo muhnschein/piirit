@@ -4,15 +4,7 @@
 //! comes back the moment something is typed, or clearing it would be impossible.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -124,7 +116,9 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "ordinary",
             call!(
@@ -136,7 +130,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("profiles", get!("profilesMenuItem", "visible"));
         record!("settings", get!("settingsMenuItem", "visible"));
         record!("new-group", get!("newGroupMenuItem", "visible"));
@@ -157,7 +151,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("archived-count", get!("chats", "count"));
         record!(
             "archived-laid-out",
@@ -176,6 +170,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

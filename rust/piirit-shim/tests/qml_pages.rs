@@ -5,26 +5,23 @@
 //! `objectName` (production-safe), not test hooks in pages.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
+use piirit_shim::DeltaChatCore;
+use qmetaobject::*;
+use serde_json::Value;
 use std::cell::RefCell;
 use std::ffi::CString;
 use std::path::PathBuf;
 use std::rc::Rc;
-use std::time::Duration;
-
-use piirit_shim::DeltaChatCore;
-use qmetaobject::*;
-use serde_json::Value;
 
 mod common;
 
@@ -289,9 +286,11 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // One step per tick; whole seconds (clippy.toml).
     let s = steps.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "welcome-load",
@@ -300,14 +299,14 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     });
 
     let s = steps.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         common::record(&s, "welcome-probing", call!("pageProperty", "probing"));
         common::record(&s, "welcome-click", call!("click", "setupTile"));
     });
 
     // Two ways into profile: existing-profile lookup, or relay dialog.
     let s = steps.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "start-load",
@@ -319,7 +318,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 
     // Dialog: nothing accepted unnamed; relays left to core; choice hidden under "Advanced".
     let s = steps.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "dialog-load",
@@ -427,7 +426,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 
     // Setup page built before on screen, as Silica does; core asked only once on screen.
     let s = steps.clone();
-    single_shot(Duration::from_secs(5), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "setup-load",
@@ -441,7 +440,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 
     let s = steps.clone();
     let journal_early = journal.clone();
-    single_shot(Duration::from_secs(6), move || {
+    plan.after(1, move || {
         let asked_early = common::records(&journal_early).iter().any(|call| {
             call.get("method").and_then(Value::as_str) == Some("add_transport_from_qr")
         });
@@ -450,16 +449,17 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     });
 
     let s = steps.clone();
-    single_shot(Duration::from_secs(8), move || {
+    plan.after(2, move || {
         common::record(&s, "setup-permille", call!("pageProperty", "permille"));
         common::record(&s, "setup-error", call!("pageProperty", "errorMessage"));
         common::record(&s, "setup-busy", call!("pageProperty", "busy"));
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow();

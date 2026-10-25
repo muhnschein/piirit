@@ -239,24 +239,54 @@ pub fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
 /// Steps run in turn, each some seconds after last one ended, not at fixed time from start:
 /// stalled loop on busy machine then can't run two back to back with no events between.
 #[derive(Default)]
-pub struct Plan(Vec<(u64, Box<dyn FnOnce()>)>);
+pub struct Plan(Vec<(u64, u32, Check)>);
+
+/// One step's work. Told whether it is last try; says whether done.
+type Check = Box<dyn FnMut(bool) -> bool>;
 
 impl Plan {
     /// `step` `wait` s after one before ended.
     pub fn after(&mut self, wait: u64, step: impl FnOnce() + 'static) {
-        self.0.push((wait, Box::new(step)));
+        let mut step = Some(step);
+        self.0.push((
+            wait,
+            1,
+            Box::new(move |_| {
+                if let Some(step) = step.take() {
+                    step();
+                }
+                true
+            }),
+        ));
+    }
+
+    /// `check` every `every` s, first `every` s after one before ended, till it says done or
+    /// `tries` ran; last try told so (record what is there). Waits on condition, not clock: loaded
+    /// runner may take seconds.
+    pub fn until(&mut self, every: u64, tries: u32, check: impl FnMut(bool) -> bool + 'static) {
+        self.0.push((every, tries.max(1), Box::new(check)));
     }
 
     pub fn run(mut self) {
         if self.0.is_empty() {
             return;
         }
-        let (wait, step) = self.0.remove(0);
-        let mut pending = Some((step, self));
+        let (wait, tries, check) = self.0.remove(0);
+        self.fire(wait, tries, check);
+    }
+
+    /// Plan's one `single_shot`: each schedules next only once it ran.
+    #[allow(clippy::disallowed_methods)] // Whole seconds only.
+    fn fire(self, wait: u64, tries: u32, check: Check) {
+        let mut pending = Some((check, self));
         single_shot(Duration::from_secs(wait), move || {
-            if let Some((step, rest)) = pending.take() {
-                step();
-                rest.run();
+            if let Some((mut check, rest)) = pending.take() {
+                let last = tries <= 1;
+                if check(last) || last {
+                    rest.run();
+                } else {
+                    rest.fire(wait, tries - 1, check);
+                }
             }
         });
     }

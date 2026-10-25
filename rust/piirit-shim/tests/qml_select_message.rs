@@ -5,15 +5,7 @@
 //! Stub has no handles: select by asking field.
 
 // Qt harness: see chat_actions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -123,17 +115,19 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     let page = common::page_url("MessagePage.qml");
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("page", call!("openPage", QString::from(page.clone()), 11));
     });
 
     // Text in: label shows it; field waits empty until asked, so not laid out again unseen.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("label-before", shown!("bodyLabel", "visible"));
         record!("field-before", shown!("selectableBody", "visible"));
         record!("field-text-before", shown!("selectableBody", "text"));
@@ -172,6 +166,7 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -7,19 +7,11 @@
 //! `qml_auto_delete_flow.rs`.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -176,7 +168,9 @@ fn the_settings_page_writes_what_the_app_reads() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // Keys under app's own path.
         record!(
             "app-markdown-key",
@@ -458,11 +452,12 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!("detail-usable-again", get!("notificationCombo", "enabled"));
     });
     // Core refusal arrives a turn later.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("deletion-error", get!("errorBanner", "text"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -3,12 +3,11 @@
 //! on chat list pull-down.
 
 // Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe`
-// (edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
+// (edition 2024+), `borrow_as_ptr`.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher's by-value ones; derive transmutes a QVariant
     // field: piirit-shim/src/lib.rs.
@@ -16,11 +15,9 @@
     clippy::useless_transmute
 )]
 
-use std::path::Path;
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::Path;
 
 mod common;
 
@@ -173,7 +170,9 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -194,13 +193,13 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         ));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // First known contact; tap opens chat with them.
         (*steps_ptr).push(("tap-contact", call!("click", QString::from("contactRow"))));
         (*steps_ptr).push(("search", call!("searchForNothing")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push((
             "after-contact",
             (*stack_ptr).pinned().borrow().log.to_string(),
@@ -224,6 +223,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(

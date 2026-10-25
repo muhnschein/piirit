@@ -4,15 +4,7 @@
 //! reader's choice (lock screen shows it). Tap returns to its chat.
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -137,7 +129,9 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::component_url("Notifier.qml")))
@@ -202,6 +196,7 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

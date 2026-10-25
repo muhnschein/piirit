@@ -3,18 +3,15 @@
 //! Picker greys members already in, narrows list to search, adds ticked people to the group it was
 //! handed, returns to its page. Says nobody to add only once core has said so.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` decls must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -160,8 +157,10 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Loaded once group is, so rows know who's in it.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!(
@@ -173,7 +172,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         record!("placeholder-fresh", get!("contactsPlaceholder", "enabled"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         // Ada already in; Grace not.
         record!("in-greyed", get!("memberRow10", "enabled"));
         record!("out-offered", get!("memberRow11", "enabled"));
@@ -192,7 +191,7 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("ada-hidden", get!("memberRow10", "enabled"));
         record!("grace-found", get!("memberRow11", "enabled"));
         record!("tap-out", call!("click", QString::from("memberRow11")));
@@ -210,11 +209,12 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
     });
 
     // Core answered, nobody to show: placeholder is the only thing on list.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("placeholder-empty", get!("contactsPlaceholder", "enabled"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(
