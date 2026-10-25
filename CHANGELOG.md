@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Emoji are sharp at every size, in messages, reactions and the emoji picker.
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
