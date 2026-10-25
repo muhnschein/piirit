@@ -2127,8 +2127,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Nessun dettaglio</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Nei gruppi silenziati notifica i messaggi indirizzati a te, come risposte o reazioni</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Mostra le notifiche delle risposte ai tuoi messaggi nei gruppi silenziati</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

@@ -2134,8 +2134,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Bez szczegółów</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>W wyciszonych grupach powiadamiaj o wiadomościach skierowanych do ciebie, takich jak odpowiedzi lub reakcje</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

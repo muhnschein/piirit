@@ -2134,8 +2134,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Bez podrobností</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Ve ztlumených skupinách oznamovat zprávy směřované na vás, např. odpovědi či reakce</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Zobrazovat oznámení o odpovědích na vaše zprávy ve ztlumených skupinách</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

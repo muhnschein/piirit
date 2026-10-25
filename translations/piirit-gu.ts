@@ -2127,8 +2127,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કોઈ વિગત નહીં</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>શાંત કરેલા જૂથોમાં તમને ઉદ્દેશીને આવેલા સંદેશા, જેમ કે જવાબ કે પ્રતિક્રિયા, જણાવો</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>શાંત કરેલા જૂથોમાં તમારા સંદેશાના જવાબોની સૂચનાઓ બતાવો</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

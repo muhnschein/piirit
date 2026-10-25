@@ -2127,8 +2127,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Aucun détail</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Dans les groupes mis en sourdine, notifier les messages qui vous sont adressés, tels que les réponses ou les réactions</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Afficher les notifications des réponses à vos messages dans les groupes mis en sourdine</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

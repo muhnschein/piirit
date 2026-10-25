@@ -2120,8 +2120,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Тәфсилләрсез</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Тавышсыз төркемнәрдә сезгә юнәлтелгән хәбәрләр, җаваплар яки реакцияләр кебек, турында хәбәр итү</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Тавышсыз төркемнәрдә сезнең хәбәрләргә килгән җаваплар турында белдерүләр күрсәтү</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

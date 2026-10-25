@@ -2127,8 +2127,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Keine Details</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>In stummgeschalteten Gruppen, über an dich gerichtete Nachrichten, wie Antworten oder Reaktionen, benachrichtigen</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Benachrichtigungen für Antworten auf deine Nachrichten in stummgeschalteten Gruppen anzeigen</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

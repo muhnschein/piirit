@@ -2130,8 +2130,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fără detalii</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>În grupurile amuțite, notifică mesajele adresate ție, precum răspunsuri sau reacții</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Afișează notificări pentru răspunsurile la mesajele tale în grupurile amuțite</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

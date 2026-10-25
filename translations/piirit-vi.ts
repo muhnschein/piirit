@@ -2116,8 +2116,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Không chi tiết</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Trong các nhóm đã tắt tiếng, thông báo tin nhắn gửi đến bạn, như trả lời hoặc biểu cảm</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Hiện thông báo về các trả lời cho tin nhắn của bạn trong các nhóm đã tắt tiếng</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

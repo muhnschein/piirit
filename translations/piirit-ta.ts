@@ -2123,8 +2123,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>விவரங்கள் இல்லை</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>ஒலியடக்கிய குழுக்களில் உங்களுக்கு நேராக வந்த செய்திகளை, பதில்கள் அல்லது எதிர்வினைகள் போன்றவற்றை, அறிவி</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>ஒலியடக்கிய குழுக்களில் உங்கள் செய்திகளுக்கு வந்த பதில்களுக்கான அறிவிப்புகளைக் காட்டு</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>
