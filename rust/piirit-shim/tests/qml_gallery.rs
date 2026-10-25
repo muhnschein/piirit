@@ -21,8 +21,6 @@
     clippy::expect_used
 )]
 
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 
@@ -235,14 +233,28 @@ const PROBE_QML: &str = r"
             media().delete_message(messageId)
             return 'ok'
         }
+        /// Some call to core, any.
+        function poke() {
+            core.check_health()
+            return 'ok'
+        }
     }
 ";
+
+/// Pictures, a line each (`quiet`: events lost), land in fake core before next call it gets.
+/// Renamed in whole: fake never reads half.
+fn arrive(arrivals: &std::path::Path, pictures: &str) {
+    let dropping = arrivals.with_extension("part");
+    std::fs::write(&dropping, pictures).expect("write arrivals");
+    std::fs::rename(&dropping, arrivals).expect("drop arrivals");
+}
 
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     let temp = std::env::temp_dir().join(format!("piirit-gallery-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
+    let arrivals = temp.join("arrivals");
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
     // SAFETY: single thread; pre-Qt.
@@ -250,17 +262,8 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_FAKE_MEDIA", "1");
-        // First unannounced: only restart finds it. Three more while reader on grid's picture.
-        // Counted from here, not from fake's start (which lags by a varying while).
-        std::env::set_var("PIIRIT_FAKE_PICTURES", "5500:quiet,7300,7400,7500");
-        std::env::set_var(
-            "PIIRIT_FAKE_EPOCH_MS",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("clock after 1970")
-                .as_millis()
-                .to_string(),
-        );
+        // Pictures arrive when a step drops them here: on steps' clock.
+        std::env::set_var("PIIRIT_FAKE_ARRIVALS", &arrivals);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
     }
 
@@ -307,9 +310,13 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
 
     let gallery = common::page_url("GalleryPage.qml");
 
+    // SAFETY for every step: runs only while `exec()` runs on this thread; all it points at
+    // outlives it.
+    let mut plan = common::Plan::default();
+
     // From conversation: picture 10 tapped. Before ids: alone.
     let page = gallery.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-chat",
             call!(
@@ -333,7 +340,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("chat-placed", call!("page", s!("placed")));
         record!("chat-seed-gone", call!("get", s!("seed"), s!("active")));
         record!("chat-count", call!("list", s!("count")));
@@ -427,7 +434,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("flick-on", call!("flickBy", -2000.0));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("flick-on-moved", call!("watched", s!("sawMoving")));
         record!("flick-on-current", call!("watched", s!("movingCurrent")));
         record!("flick-on-played", call!("watched", s!("playedMidSwipe")));
@@ -453,7 +460,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("flick-off", call!("flickBy", 2000.0));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("flick-off-moved", call!("watched", s!("sawMoving")));
         record!("flick-off-played", call!("watched", s!("playedMidSwipe")));
         record!("flick-off-dropped", call!("watched", s!("droppedMidSwipe")));
@@ -475,7 +482,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
 
     // From grid (newest first): video 15 tapped, page still arriving.
     let page = gallery.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-grid",
             call!(
@@ -494,7 +501,8 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    let quiet = arrivals.clone();
+    plan.after(1, move || unsafe {
         record!("grid-placed", call!("page", s!("placed")));
         record!("grid-index", call!("list", s!("currentIndex")));
         record!(
@@ -506,21 +514,29 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
             "grid-video-arrived",
             call!("current", s!("player"), s!("playbackState"))
         );
-        // Older: the picture. Model starts over, finds unannounced picture above.
+        // Older: the picture. One arrives unannounced; model starts over, finds it above.
         record!("grid-swipe", call!("swipeBy", 1));
+        arrive(&quiet, "quiet");
         record!("overflow", call!("overflow"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("restart-current", call!("current", s!(""), s!("messageId")));
         record!("restart-shown", call!("page", s!("shownId")));
         record!("restart-index", call!("list", s!("currentIndex")));
-        // Zoomed, then the video deleted, a picture arrives.
+        // Zoomed, then the video deleted, three pictures arrive.
         record!("grid-zoom", call!("zoomCurrent"));
         record!("delete-video", call!("remove", 15));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    let announced = arrivals;
+    plan.after(1, move || unsafe {
+        arrive(&announced, "picture\npicture\npicture");
+        // Any call lands them.
+        (*engine_ptr).invoke_method("poke".into(), &[]);
+    });
+
+    plan.after(1, move || unsafe {
         record!("after-delete-count", call!("list", s!("count")));
         record!("after-delete-index", call!("list", s!("currentIndex")));
         record!(
@@ -538,7 +554,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         record!("flick-near", call!("flickFar", 2900.0, s!("slide103")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("near-moved", call!("watched", s!("sawMoving")));
         record!("near-seen-off", call!("watched", s!("farSeenOffScreen")));
         record!("near-built-off", call!("watched", s!("farBuiltOffScreen")));
@@ -551,7 +567,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
 
     let page = gallery.clone();
     let gallery_again = gallery;
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("far-moved", call!("watched", s!("sawMoving")));
         record!("far-seen-off", call!("watched", s!("farSeenOffScreen")));
         record!("far-built-off", call!("watched", s!("farBuiltOffScreen")));
@@ -575,7 +591,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
     });
 
     let page = gallery_again;
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("sticker-placed", call!("page", s!("placed")));
         record!(
             "sticker-seed",
@@ -608,6 +624,7 @@ fn a_tapped_picture_or_video_swipes_through_the_whole_gallery() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let methods = common::methods(&journal);
