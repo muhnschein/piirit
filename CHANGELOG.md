@@ -8,7 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- A message of nothing but emoji, up to five of them, shows them twice as big.
+- A message of nothing but emoji, up to five of them, shows them big.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 
 ## 2.2.0 — 2026-10-23

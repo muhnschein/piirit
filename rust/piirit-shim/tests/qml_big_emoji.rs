@@ -1,6 +1,8 @@
-//! Message of few emoji, nothing else, drawn twice text size (Emoji.js `onlyEmoji`), as other
-//! messengers do. Pinned: what counts (whitespace between ok, at most `bigLimit`, only emoji with
-//! pictures, not text-style signs), and that body label and its pictures grow, caption doesn't.
+//! Message of few emoji, nothing else, drawn big (Emoji.js `onlyEmoji`), as other messengers
+//! do. Pinned: what counts (whitespace between ok, at most `bigLimit`, only emoji with pictures,
+//! not text-style signs); big ones laid out by hand (`bigLayout`): pictures near touching, sender's
+//! space shows, line break kept, wrap at width, bubble as wide as pictures; caption and mixed text
+//! stay inline at text size.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -43,7 +45,11 @@ fn probe_qml() -> String {
             }}
             return null
         }}
-        // Fresh row, props as JSON: body font px, then picture edge in body ('-' if none).
+        function layout(text, edge, max) {{
+            return JSON.stringify(Emoji.bigLayout(text, edge, max))
+        }}
+        // Fresh row, props as JSON. Big: each picture 'x,y,edge', label text, label height,
+        // body width. Else inline: font px, picture edge in text ('-' if none).
         function body(url, json) {{
             var props = JSON.parse(json)
             props.width = 540
@@ -52,8 +58,19 @@ fn probe_qml() -> String {
             if (delegate.status !== Loader.Ready) {{ return 'load-failed' }}
             var label = findIn(delegate.item, 'messageLabel')
             if (!label) {{ return 'missing:messageLabel' }}
+            var bigs = []
+            for (var i = 0; i < label.children.length; i++) {{
+                var kid = label.children[i]
+                if (kid.objectName === 'bigEmoji') {{
+                    bigs.push(Math.round(kid.x) + ',' + Math.round(kid.y) + ',' + kid.width)
+                }}
+            }}
+            if (bigs.length > 0) {{
+                return 'big:' + bigs.join(';') + ':' + label.text + ':'
+                       + Math.round(label.height) + ':' + Math.round(delegate.item.bodyWidth)
+            }}
             var edge = /width=.(\d+)/.exec(label.text)
-            return label.font.pixelSize + '/' + (edge ? edge[1] : '-')
+            return 'inline:' + label.font.pixelSize + ':' + (edge ? edge[1] : '-')
         }}
     }}
 ",
@@ -63,7 +80,7 @@ fn probe_qml() -> String {
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn few_emoji_alone_are_drawn_twice_as_big() {
+fn few_emoji_alone_are_drawn_big() {
     // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -111,15 +128,26 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
     ];
     let texts_ptr = std::ptr::addr_of!(texts);
 
-    // Big: 2 x stub fontSizeMedium 18; picture edge 1.15 x font px (Emoji.js `inText`). Else
-    // Label's own size, untouched: "normal".
+    // Stub fontSizeMedium 18: edge round(18 x 2.875) = 52, gap 4, sender's space 13, line 56.
+    // Inline: "normal", label's own size, picture 1.15 x it.
     let rows: Vec<(&'static str, Value, &'static str)> = vec![
-        ("big", json!({ "messageText": "👍👍" }), "36/41"),
-        // Shim's rendering joins lines with `<br>`: judged on text as sent.
+        // Bubble exactly as wide as pictures: 52 + 4 + 52.
+        (
+            "big",
+            json!({ "messageText": "👏👏" }),
+            "big:0,0,52;56,0,52::52:108",
+        ),
+        (
+            "big-spaced",
+            json!({ "messageText": "👏 👏" }),
+            "big:0,0,52;69,0,52::52:121",
+        ),
+        // Shim's rendering joins lines with `<br>`: judged on text as sent. Narrower than
+        // bubble's least width (itemSizeSmall 60).
         (
             "big-styled",
             json!({ "markdownMode": 0, "messageText": "🔥\n🔥", "styledText": "🔥<br>🔥" }),
-            "36/41",
+            "big:0,0,52;0,56,52::108:60",
         ),
         ("mixed", json!({ "messageText": "hi 👍" }), "normal"),
         ("text", json!({ "messageText": "hi there" }), "normal"),
@@ -131,11 +159,34 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
     ];
     let rows_ptr = std::ptr::addr_of!(rows);
 
+    // Edge 100: gap 8, space 25, line 108. Wraps past width given; spaces and breaks as sent.
+    let layouts: Vec<(&'static str, &'static str, f64, &'static str)> = vec![
+        (
+            "wrap",
+            "😀😀😀",
+            250.0,
+            r#"{"pictures":[{"picture":"1f600","x":0,"y":0},{"picture":"1f600","x":108,"y":0},{"picture":"1f600","x":0,"y":108}],"width":208,"height":208}"#,
+        ),
+        (
+            "spaces",
+            " 😀  😀\n\n😀 ",
+            1000.0,
+            r#"{"pictures":[{"picture":"1f600","x":0,"y":0},{"picture":"1f600","x":158,"y":0},{"picture":"1f600","x":0,"y":216}],"width":258,"height":316}"#,
+        ),
+    ];
+    let layouts_ptr = std::ptr::addr_of!(layouts);
+
     single_shot(Duration::from_secs(1), move || unsafe {
         for (label, text, _) in &*texts_ptr {
             (*steps_ptr).push((
                 (*label).to_string(),
                 call!("onlyEmoji", QString::from(*text)),
+            ));
+        }
+        for (label, text, width, _) in &*layouts_ptr {
+            (*steps_ptr).push((
+                (*label).to_string(),
+                call!("layout", QString::from(*text), 100.0, *width),
             ));
         }
         for (label, props, _) in &*rows_ptr {
@@ -161,13 +212,21 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
             "{label}: is {text:?} only a few emoji? {context}"
         );
     }
+    for (label, text, _, expected) in &layouts {
+        assert_eq!(
+            common::value_of(&steps, label),
+            *expected,
+            "{label}: {text:?} laid out big. {context}"
+        );
+    }
     // Label's own size, from row without emoji.
     let normal = common::value_of(&steps, "text")
-        .split_once('/')
+        .strip_prefix("inline:")
+        .and_then(|rest| rest.split_once(':'))
         .and_then(|(px, _)| px.parse::<f64>().ok())
         .unwrap_or(0.0);
     assert!(
-        normal > 0.0 && normal < 36.0,
+        normal > 0.0,
         "plain text row's font is {normal} px. {context}"
     );
     for (label, props, expected) in &rows {
@@ -176,7 +235,7 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
             #[allow(clippy::cast_possible_truncation)]
             let edge = (normal * 1.15).round() as i64;
             format!(
-                "{normal}/{}",
+                "inline:{normal}:{}",
                 if has_emoji {
                     edge.to_string()
                 } else {
@@ -189,7 +248,7 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
         assert_eq!(
             common::value_of(&steps, label),
             wanted,
-            "{label}: body font px / picture edge. {context}"
+            "{label}: big pictures, or inline font px / picture edge. {context}"
         );
     }
 }
