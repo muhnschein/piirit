@@ -149,10 +149,18 @@ Page {
         })
     }
 
-    // Common chat in this one's place, as Delta Chat apps; back goes to list. This one: back to it.
+    /// Common chats listed here; rest behind Show all.
+    readonly property int commonChatsShown: 5
+
+    // Common chat in this one's place, as Delta Chat apps; back goes to list. This one: back to it,
+    // from all-chats page too. Called by that page.
     function openChat(chatId, chatName) {
         if (chatId === page.chatId) {
-            pageStack.navigateBack()
+            if (pageStack.currentPage === page) {
+                pageStack.navigateBack()
+            } else {
+                pageStack.pop(pageStack.previousPage(page))
+            }
             return
         }
         // List page: it knows which chat is open (notifications). None, or other profile's: over.
@@ -310,42 +318,57 @@ Page {
                 onChosen: chat.set_ephemeral_timer(seconds)
             }
 
-            // None: no heading, as Delta Chat apps.
+            // None: no heading, as Delta Chat apps. Count as search results' headings.
             SectionHeader {
                 objectName: "commonChatsHeader"
                 visible: commonChats.count > 0
                 //: Over the list of chats on a contact's page that the
-                //: contact is in too. Delta Chat's "Chats in Common".
-                text: qsTr("Chats in common")
+                //: contact is in too, with how many. Delta Chat's "Chats in
+                //: Common".
+                text: qsTr("Chats in common (%1)").arg(commonChats.count)
             }
 
-            // Rows as chat list's, no menu.
+            // Picture and name only, as member rows; first few, rest on own page.
             Repeater {
                 model: commonChats.rows
 
                 delegate: ListItem {
                     objectName: "commonChatRow" + model.chat_id
                     width: column.width
+                    visible: index < page.commonChatsShown
                     contentHeight: body.height
 
-                    ChatListDelegate {
+                    ContactRow {
                         id: body
                         width: parent.width
-                        chatName: model.name
-                        preview: model.preview
-                        previewSender: model.preview_sender
-                        unreadCount: model.unread_count
-                        lastUpdated: model.last_updated
-                        isEncrypted: model.is_encrypted
-                        isPinned: model.is_pinned
-                        isMuted: model.is_muted
-                        isContactRequest: model.is_contact_request
-                        chatColor: model.color
-                        avatarPath: model.avatar_path
-                        summaryState: model.summary_state
+                        displayName: model.name
+                        ownColor: model.color
+                        picturePath: model.avatar_path
+                        isKeyContact: model.is_encrypted
                     }
 
                     onClicked: page.openChat(model.chat_id, model.name)
+                }
+            }
+
+            BackgroundItem {
+                objectName: "commonChatsAll"
+                visible: commonChats.count > page.commonChatsShown
+                width: parent.width
+                onClicked: pageStack.push(Qt.resolvedUrl("CommonChatsPage.qml"), {
+                    chats: commonChats,
+                    contactPage: page
+                })
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //: Under the first few chats in common on a contact's page:
+                    //: opens the list of all of them.
+                    text: qsTr("Show all")
                 }
             }
         }

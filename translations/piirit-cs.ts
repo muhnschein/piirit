@@ -742,6 +742,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>CommonChatsPage</name>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Sdílené chaty</translation>
+    </message>
+</context>
+<context>
     <name>ContactPage</name>
     <message>
         <source>Saved</source>
@@ -773,9 +781,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Naposledy viděn(a) před dlouhou dobou</translation>
     </message>
     <message>
-        <source>Chats in common</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>Sdílené chaty</translation>
+        <source>Chats in common (%1)</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Sdílené chaty (%1)</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
+        <translation>Zobrazit vše</translation>
     </message>
 </context>
 <context>

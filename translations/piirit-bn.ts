@@ -740,6 +740,14 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CommonChatsPage</name>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>যৌথ চ্যাট</translation>
+    </message>
+</context>
+<context>
     <name>ContactPage</name>
     <message>
         <source>Saved</source>
@@ -771,9 +779,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>অনেক আগে দেখা গেছে</translation>
     </message>
     <message>
-        <source>Chats in common</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>যৌথ চ্যাট</translation>
+        <source>Chats in common (%1)</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>যৌথ চ্যাট (%1)</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
+        <translation>সব দেখান</translation>
     </message>
 </context>
 <context>
