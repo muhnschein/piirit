@@ -5,19 +5,11 @@
 //! stay inline at text size.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 use serde_json::{json, Value};
+use std::path::PathBuf;
 
 mod common;
 
@@ -178,7 +170,9 @@ fn few_emoji_alone_are_drawn_big() {
     ];
     let layouts_ptr = std::ptr::addr_of!(layouts);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         for (label, text, _) in &*texts_ptr {
             (*steps_ptr).push((
                 (*label).to_string(),
@@ -204,6 +198,7 @@ fn few_emoji_alone_are_drawn_big() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let context = format!("steps: {steps:?}");

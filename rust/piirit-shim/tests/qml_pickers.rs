@@ -5,15 +5,7 @@
 //! left without choice. Silica types existing is a device question.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -70,7 +62,9 @@ fn each_picker_reports_the_file_that_was_chosen() {
     let mut heard: Vec<(&str, String)> = Vec::new();
     let heard_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(heard);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         for (page, path) in PICKERS {
             let result = (*engine_ptr).invoke_method(
                 "pick".into(),
@@ -89,6 +83,7 @@ fn each_picker_reports_the_file_that_was_chosen() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_eq!(

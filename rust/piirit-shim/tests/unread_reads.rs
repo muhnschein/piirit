@@ -8,15 +8,7 @@
 //! Fake core holds reads back half a second, so burst is all in before first read.
 
 // Qt harness: see download_limit.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -72,16 +64,19 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
     let mut after_burst: Vec<Value> = Vec::new();
     let after_burst_ptr: *mut Vec<Value> = std::ptr::addr_of_mut!(after_burst);
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for both blocks: fire only while `exec()` runs on this thread; all they point
     // at outlives it.
     let seen = journal.clone();
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(3, move || unsafe {
         *after_burst_ptr = reads(&seen);
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::methods(&journal);

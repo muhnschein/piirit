@@ -1,16 +1,8 @@
 //! Small pieces of conversation page, loaded alone (page can't load: no `EnterKey` stub).
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -134,7 +126,9 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "bar-load",
             call!("load", QString::from(common::component_url("ReplyBar.qml")))
@@ -143,7 +137,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         call!("set", QString::from("body"), QString::from(LONG_BODY));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "bar-lines",
             call!(
@@ -171,7 +165,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "jump-opaque",
             call!("alphaOf", QString::from("jumpDisc"), QString::from("color"))
@@ -214,7 +208,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         call!("set", QString::from("count"), 3.0);
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "badge-shown",
             call!("get", QString::from("jumpBadge"), QString::from("visible"))
@@ -245,7 +239,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         call!("set", QString::from("tone"), QString::from("info"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "notice-text",
             call!("get", QString::from("errorLabel"), QString::from("text"))
@@ -272,7 +266,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
 
     // Tick later: child of tray still fading in reads invisible (`visible` includes parent's; tray
     // follows 150ms opacity animation).
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "tray-app-hidden",
             call!("get", QString::from("attachApp"), QString::from("visible"))
@@ -288,6 +282,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

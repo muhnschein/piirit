@@ -6,15 +6,7 @@
 //! while second still waits -- shape a shared countdown can't produce.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -151,8 +143,10 @@ fn a_delete_goes_when_its_own_wait_is_up() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // 1.5 s: a delete a second after another lands between the two deadlines.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -165,13 +159,13 @@ fn a_delete_goes_when_its_own_wait_is_up() {
     });
 
     // First, due at 3.5 s.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("ask-first", call!("deleteRow", 1));
         record!("waiting-after-first", call!("stillWaiting"));
     });
 
     // Second, 1 s later, due at 4.5 s. Must not touch first's deadline.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("nothing-sent-yet", call!("sentSoFar"));
         record!("ask-second", call!("deleteRow", 2));
         record!("waiting-after-second", call!("stillWaiting"));
@@ -179,18 +173,19 @@ fn a_delete_goes_when_its_own_wait_is_up() {
 
     // Between deadlines: first gone, second not. Shared countdown restarted on second ask would
     // send neither yet, both at 4.5 s.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("between", call!("sentSoFar"));
         record!("waiting-between", call!("stillWaiting"));
     });
 
     // Past second deadline: both.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("after-both", call!("sentSoFar"));
         record!("waiting-after-both", call!("stillWaiting"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

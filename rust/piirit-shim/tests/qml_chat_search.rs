@@ -12,15 +12,7 @@
 //! children, unreachable from probe. Rests on review and `qml-lint`.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -108,7 +100,9 @@ fn typing_in_the_search_field_reaches_the_model() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -121,7 +115,7 @@ fn typing_in_the_search_field_reaches_the_model() {
     });
 
     // Both chats there before typing.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "before",
             call!("get", QString::from("chats"), QString::from("count")),
@@ -137,7 +131,7 @@ fn typing_in_the_search_field_reaches_the_model() {
     });
 
     // Past 250ms debounce and round trip.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "query",
             call!("get", QString::from("search"), QString::from("query")),
@@ -161,7 +155,7 @@ fn typing_in_the_search_field_reaches_the_model() {
         ));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "pulley",
             call!(
@@ -173,6 +167,7 @@ fn typing_in_the_search_field_reaches_the_model() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

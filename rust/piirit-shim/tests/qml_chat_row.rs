@@ -1,16 +1,8 @@
 //! Chat-list row: unread badge, last message time, sender, filing, contact request tag.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -97,7 +89,9 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -114,7 +108,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         set!("lastUpdated", today.parse::<f64>().unwrap_or_default());
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("no-badge", get!("unreadBadge", "visible"));
         record!("today", get!("timeLabel", "text"));
         record!("preview", get!("previewLabel", "text"));
@@ -129,7 +123,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         set!("lastUpdated", recent.parse::<f64>().unwrap_or_default());
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("badge", get!("unreadBadge", "visible"));
         record!("badge-text", get!("unreadLabel", "text"));
         record!("this-week", get!("timeLabel", "text"));
@@ -143,7 +137,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         set!("previewSender", QString::from("Ada"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("badge-capped", get!("unreadLabel", "text"));
         record!("marked-name", get!("nameLabel", "text"));
         record!("pinned-mark", get!("pinMark", "visible"));
@@ -156,7 +150,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         set!("isContactRequest", true);
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("older", get!("timeLabel", "text"));
         record!("request-tag", get!("requestTag", "visible"));
         record!("request-text", get!("requestLabel", "text"));
@@ -166,6 +160,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

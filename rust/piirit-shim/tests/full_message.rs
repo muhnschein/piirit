@@ -5,15 +5,7 @@
 //! second call.
 
 // Qt harness: see chat_actions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -106,17 +98,19 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     // The message the fake seeds as one the sending core cut.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("ask", call!("read", 11));
         record!("asking", call!("busy"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("cut", call!("text"));
         record!("cut-styled", call!("styled"));
         record!("cut-done", call!("done"));
@@ -124,16 +118,16 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         record!("ask-short", call!("read", 1));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("short", call!("text"));
     });
 
     let page = common::page_url("MessagePage.qml");
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("page", call!("openPage", QString::from(page.clone()), 11));
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "page-body",
             call!("shown", QString::from("bodyLabel"), QString::from("text"))
@@ -161,6 +155,7 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

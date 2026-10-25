@@ -4,15 +4,7 @@
 //! `common::qml_tree_without_enter_key` for why shipped file can't load headlessly.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -115,7 +107,9 @@ fn a_contact_request_opens_with_its_answer_where_the_field_would_be() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!(
@@ -125,7 +119,7 @@ fn a_contact_request_opens_with_its_answer_where_the_field_would_be() {
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("bar", get!("requestBar", "visible"));
         record!("field", get!("inputRow", "visible"));
         record!("field-height", get!("inputRow", "height"));
@@ -133,13 +127,14 @@ fn a_contact_request_opens_with_its_answer_where_the_field_would_be() {
         record!("accept", call!("tap", QString::from("acceptButton")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("accepted-bar", get!("requestBar", "visible"));
         record!("accepted-field", get!("inputRow", "visible"));
         record!("accepted-subtitle", get!("conversationHeader", "subtitle"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

@@ -5,19 +5,11 @@
 //! anything is sent. Drives all vs fake core; test accepts dialogs (as `qml_auto_delete_flow`).
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -182,9 +174,11 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // The settings page: the row is there, between the notifications and
     // the links, and it opens the block list of the profile it was given.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "load-settings",
             call!(
@@ -210,7 +204,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
 
     // Nobody blocked yet. Plus is the way to change that, once core has answered (not while list
     // is empty for want of an answer).
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "load-blocked",
             call!(
@@ -228,7 +222,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             )
         );
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "blocked-empty",
             call!("get", QString::from("blocked"), QString::from("count"))
@@ -262,7 +256,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     });
 
     // Tap asks first; nothing sent until answered.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "contacts-before",
             call!("get", QString::from("contacts"), QString::from("count"))
@@ -275,7 +269,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         );
         record!("accept-block", call!("acceptDialog"));
     });
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         // Core keeps blocked contact out of list: row goes by itself once block lands.
         record!(
             "contacts-after",
@@ -292,7 +286,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     });
     // Plus stays under last row. Rereading list leaves rows put: rebuilt rows would jump view to
     // top, away from plus.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "blocked-count",
             call!("get", QString::from("blocked"), QString::from("count"))
@@ -316,13 +310,13 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!("keep-row", call!("keep", QString::from("blockedRow10")));
         record!("reload-blocked", call!("reload", QString::from("blocked")));
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("row-kept", call!("same", QString::from("blockedRow10")));
         record!("tap-blocked", call!("click", QString::from("blockedRow10")));
         record!("pushed-unblock", call!("pushed"));
         record!("accept-unblock", call!("acceptDialog"));
     });
-    single_shot(Duration::from_secs(16), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "blocked-after",
             call!("get", QString::from("blocked"), QString::from("count"))
@@ -341,7 +335,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             )
         );
     });
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "unreadable-error",
             call!("get", QString::from("errorBanner"), QString::from("text"))
@@ -365,6 +359,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

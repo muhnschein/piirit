@@ -5,15 +5,7 @@
 //! Must not stay wrong: whatever it missed is there once looked at. Both halves checked.
 
 // Qt harness: see qml_cover.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -109,8 +101,10 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &loading,
             "load",
@@ -120,7 +114,7 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
 
     // Everything arrived; nothing looking.
     let asleep = steps.clone();
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         common::record(&asleep, "lists", call!("lists").into());
         common::record(&asleep, "known", call!("known").into());
         common::record(&asleep, "drawn-asleep", call!("planned").into());
@@ -129,12 +123,13 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
     });
 
     let awake = steps.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(&awake, "drawn-awake", call!("planned").into());
         common::record(&awake, "stale-awake", call!("stale").into());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

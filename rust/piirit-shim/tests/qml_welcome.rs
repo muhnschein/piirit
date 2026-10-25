@@ -4,23 +4,20 @@
 //! instead. Look: manual check (docs/HARBOUR.md).
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// edition 2024), `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // Match dispatcher's by-value params (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
-use std::ffi::CString;
-use std::path::PathBuf;
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::ffi::CString;
+use std::path::PathBuf;
 
 mod common;
 
@@ -214,8 +211,10 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
         }
     };
 
+    let mut plan = common::Plan::default();
+
     let r = record.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         // dconf outlives binary: old state would decide.
         r("fresh", call!("rememberProfile", "0"));
         r("load", call!("load", common::page_url("WelcomePage.qml")));
@@ -229,7 +228,7 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
 
     // A second is plenty for picture load.
     let r = record.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         r("logo", call!("get", "logo", "status"));
         r("logo-over-title", call!("logoOverTitle"));
         r("title", call!("get", "title", "text"));
@@ -242,7 +241,7 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
     // 3s: stack refusing, as real one does mid-push of this page. Page must neither record a
     // hand-over that didn't happen nor draw itself because refused; core's answer must reach it.
     let r = record.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         r("refuse", call!("refuseNavigation", "true"));
         r("remember", call!("rememberProfile", "7"));
         r(
@@ -261,7 +260,7 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
     // Then same page on phone remembering a profile, over accepting stack. Not told core is
     // ready, and should not wait: dconf is enough to leave on.
     let r = record.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(1, move || {
         r("refused-gave-up", call!("pageProperty", "probing"));
         r("accept", call!("refuseNavigation", "false"));
         r("remember", call!("rememberProfile", "7"));
@@ -271,14 +270,15 @@ fn the_welcome_page_leads_with_the_mark_and_the_name() {
     // 5s: did it leave? Read a beat later: offer made from a timer (so it can repeat), whose
     // first turn comes after page build.
     let r = record.clone();
-    single_shot(Duration::from_secs(5), move || {
+    plan.after(1, move || {
         r("left", call!("pageProperty", "leaving"));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();

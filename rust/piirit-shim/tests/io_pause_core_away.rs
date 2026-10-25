@@ -10,19 +10,11 @@
 //! for 6.5 s ran at 6 s, beside the edge of the away window, and saw `ready`.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -150,8 +142,9 @@ const READINGS: [&str; 7] = [
     "starts-after-restart",
 ];
 
-/// Fourth away due ~9 s; slack for a slow runner, under nextest's 30 s warning.
-const GIVE_UP_SECS: u64 = 25;
+/// Checks, a second apart, before readings taken anyway. Fourth away due ~9 s; slack for a slow
+/// runner, under nextest's 30 s warning.
+const PATIENCE: u32 = 24;
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -210,9 +203,11 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     // Window starts core; the rest runs off core's restarts, in the probe.
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &loading,
             "load",
@@ -221,21 +216,21 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
     });
 
     // Once a second: done, or out of time.
-    for second in 2..=GIVE_UP_SECS {
-        let done = steps.clone();
-        single_shot(Duration::from_secs(second), move || unsafe {
-            if second < GIVE_UP_SECS && call!("finished") != "yes" {
-                return;
+    let done = steps.clone();
+    plan.until(1, PATIENCE, move |last| unsafe {
+        if !last && call!("finished") != "yes" {
+            return false;
+        }
+        if !done.borrow().iter().any(|(label, _)| label == "hurry") {
+            for label in READINGS {
+                common::record(&done, label, call!("reading", QString::from(label)).into());
             }
-            if !done.borrow().iter().any(|(label, _)| label == "hurry") {
-                for label in READINGS {
-                    common::record(&done, label, call!("reading", QString::from(label)).into());
-                }
-            }
-            (*engine_ptr).quit();
-        });
-    }
+        }
+        (*engine_ptr).quit();
+        true
+    });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

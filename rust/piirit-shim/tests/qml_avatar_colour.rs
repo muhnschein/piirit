@@ -4,15 +4,7 @@
 //! asked for, not what ambience makes of it (`qml_pictures.rs` checks picture colours).
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -101,7 +93,9 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::component_url("Avatar.qml")))
@@ -131,7 +125,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "lit-visible",
             call!(
@@ -156,6 +150,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

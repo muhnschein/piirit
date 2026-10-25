@@ -6,15 +6,7 @@
 //! until chat loaded, and sent message lands on rows page shows.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -122,8 +114,10 @@ fn a_capture_sent_at_once_shows_in_a_chat_that_was_still_loading() {
     let page = common::page_url_in(&tree, "ConversationPage.qml");
     let photo_path = photo.to_string_lossy().into_owned();
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: the callbacks fire only while `exec()` runs on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -143,13 +137,14 @@ fn a_capture_sent_at_once_shows_in_a_chat_that_was_still_loading() {
     });
 
     // Sent and answered by now.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(7, move || unsafe {
         probe!("loaded", "messages", "loaded");
         probe!("rows", "messages", "count");
         probe!("bar", "attachmentBar", "visible");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

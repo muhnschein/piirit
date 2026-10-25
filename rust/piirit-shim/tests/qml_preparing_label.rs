@@ -9,19 +9,11 @@
 //! Text in `DejaVu Sans`, wider than Sailfish face: fits here, fits there.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::fs;
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::fs;
+use std::path::PathBuf;
 
 mod common;
 
@@ -145,7 +137,9 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
     let bars_ptr: *mut Vec<String> = std::ptr::addr_of_mut!(bars);
     let texts = wanted;
 
-    single_shot(Duration::from_millis(200), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(0, move || unsafe {
         for (language, text) in &texts {
             // Widest the number gets.
             let shown = text.replace("%1", "100");
@@ -174,6 +168,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
         }
         (*engine_ptr).quit();
     });
+    plan.run();
     engine.exec();
 
     let too_long: Vec<&(String, String)> = measured

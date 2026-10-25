@@ -7,15 +7,7 @@
 //! `every_name_draws_its_emoji_as_pictures`.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -150,7 +142,9 @@ fn names_draw_their_emoji_as_twemoji() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         let component = |name: &str| common::component_url(name);
 
         // Unencrypted chat, searched: mark, marks, picture, sender's markup text.
@@ -225,10 +219,11 @@ fn names_draw_their_emoji_as_twemoji() {
         });
         label!("request-text", "requestText");
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| common::value_of(&steps, label).to_string();

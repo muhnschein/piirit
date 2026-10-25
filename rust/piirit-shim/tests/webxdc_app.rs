@@ -12,13 +12,7 @@
 //! signal carries file on disk; app can't write outside cache.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::io::{Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -218,12 +212,14 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: fire only while `exec()` runs; `engine` outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         let url = call!("url");
         record!("url", url.clone());
         record!("info", call!("info"));
@@ -374,7 +370,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     });
 
     // Send's event had a loop turn to arrive; woken request answered by then.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "woken",
             waited_rx
@@ -393,6 +389,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

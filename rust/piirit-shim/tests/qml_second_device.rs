@@ -24,13 +24,10 @@
     // `pushAttached` is Silica's name; probe must answer to it.
     non_snake_case,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // Must match dispatcher's by-value params (piirit-shim/src/lib.rs).
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -213,9 +210,11 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // No code; chats on other profile: offering isn't switching.
     // Offers start with a press; nothing goes up alone.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-no-code",
             call!(
@@ -231,7 +230,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("first-press", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "no-code-said",
             call!("pageProperty", QString::from("errorMessage"))
@@ -253,7 +252,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-refused", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "refused-said",
             call!("pageProperty", QString::from("errorMessage"))
@@ -273,7 +272,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-waiting", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         // Drawn like invite code, account colour.
         record!("colour", call!("profileShows", QString::from("ownColor")));
         record!("waiting-code", get!("device", "code"));
@@ -289,7 +288,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("cancel", call!("click", QString::from("cancelButton")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("cancelled-idle", get!("device", "running"));
         record!("cancelled-code", get!("device", "code"));
         record!(
@@ -316,7 +315,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-leaving", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("leaving-code", get!("device", "code"));
         // Covered, not left: offer stays up under page.
         call!("cover", true);
@@ -326,7 +325,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("leave", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(2, move || unsafe {
         // Device turns up and stays.
         record!(
             "load-taken",
@@ -340,7 +339,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-taken", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(17), move || unsafe {
+    plan.after(4, move || unsafe {
         // Mid-transfer: bar up, no way off.
         record!("transfer-permille", get!("device", "permille"));
         record!("transfer-bar", get!("transferProgress", "visible"));
@@ -351,7 +350,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
     });
 
-    single_shot(Duration::from_secs(21), move || unsafe {
+    plan.after(4, move || unsafe {
         record!("taken", call!("pageProperty", QString::from("taken")));
         record!("taken-said", get!("takenLabel", "visible"));
         record!("taken-idle", get!("device", "running"));
@@ -375,7 +374,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-stalled", call!("click", QString::from("showButton")));
     });
 
-    single_shot(Duration::from_secs(26), move || unsafe {
+    plan.after(5, move || unsafe {
         record!(
             "stalled-taken",
             call!("pageProperty", QString::from("taken"))
@@ -390,6 +389,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let popped = stack_box.pinned().borrow().log.to_string();

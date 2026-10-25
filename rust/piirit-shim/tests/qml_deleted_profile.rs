@@ -8,15 +8,7 @@
 //! close before move is made.
 
 // Qt harness: see qml_startup.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -163,9 +155,11 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
+    let mut plan = common::Plan::default();
+
     // 1s: app on profile 1; a quick action into each profile's chats, and one not a chat's.
     // SAFETY: callbacks run only inside `exec()`.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("load", call!("load", root.clone())));
         (*steps_ptr).push(("on-1", call!("onProfile", "1")));
         (*steps_ptr).push(("left", call!("setAction", "left", "chat", "1")));
@@ -175,7 +169,7 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
 
     // 3s: both there, nothing moved. Profile 1 deleted with stack busy (as swipe back off profiles
     // page leaves it).
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("kept", call!("stackLog")));
         (*steps_ptr).push(("left-kept", call!("holds", "left")));
         (*steps_ptr).push(("transition", call!("transition", "true")));
@@ -183,7 +177,7 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
     });
 
     // 5s: move held; next-launch read not.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("held", call!("stackLog")));
         (*steps_ptr).push(("remembered", call!("remembered")));
         (*steps_ptr).push(("window", call!("onScreen")));
@@ -193,18 +187,19 @@ fn the_app_leaves_a_deleted_profile_for_one_there_is() {
     });
 
     // 6s: it lands. Then launch resumes onto profile core lacks (stale or deleted elsewhere).
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("landed", call!("stackLog")));
         (*steps_ptr).push(("stale", call!("onProfile", "9")));
         (*steps_ptr).push(("stale-refresh", call!("refresh")));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("stale-landed", call!("stackLog")));
         (*steps_ptr).push(("stale-remembered", call!("remembered")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

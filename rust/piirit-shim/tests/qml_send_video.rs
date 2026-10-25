@@ -9,15 +9,7 @@
 //! size, so bar warns nothing about a file that fits once shrunk.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -166,7 +158,9 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
             .count()
     };
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -179,7 +173,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("settle", call!("settle")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("attach", call!("attach", QString::from(clip_path.as_str()))));
         // Shrink started on pick.
         probe!("preparing", "messages", "preparing");
@@ -194,7 +188,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     });
 
     // Shrunk by now: few seconds of small video is quick even unoptimised.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(9, move || unsafe {
         probe!("preparing-done", "messages", "preparing");
         probe!("send-enabled-done", "sendButton", "enabled");
         probe!("bar-done", "attachmentBar", "visible");
@@ -215,7 +209,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send", call!("send")));
     });
 
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(6, move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
         // Picked again; bar's button pressed straight away.
         (*steps_ptr).push((
@@ -240,7 +234,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send-kept", call!("send")));
     });
 
-    single_shot(Duration::from_secs(24), move || unsafe {
+    plan.after(6, move || unsafe {
         probe!("bar-sent-kept", "attachmentBar", "visible");
         // Video not on bar: model shrinks it, sends nothing; stopped, puts work away.
         (*steps_ptr).push((
@@ -259,7 +253,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("preparing-switched", "messages", "preparing");
     });
 
-    single_shot(Duration::from_secs(26), move || unsafe {
+    plan.after(2, move || unsafe {
         // Stopped, then dropped: same button, twice.
         for step in ["stop-switched", "drop-switched"] {
             (*steps_ptr).push((
@@ -279,12 +273,13 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         }
     });
 
-    single_shot(Duration::from_secs(28), move || unsafe {
+    plan.after(2, move || unsafe {
         probe!("preparing-end", "messages", "preparing");
         probe!("bar-end", "attachmentBar", "visible");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

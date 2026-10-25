@@ -5,15 +5,7 @@
 //! marked read: badge stayed, as later code marks only arriving messages.
 
 // Qt harness: see chat_actions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -63,7 +55,9 @@ fn a_chat_opened_before_its_page_settles_is_still_marked_read() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
@@ -71,7 +65,7 @@ fn a_chat_opened_before_its_page_settles_is_still_marked_read() {
     // as far as the app knows nobody is looking yet.
     let mut during_load = Vec::new();
     let during_ptr: *mut Vec<String> = std::ptr::addr_of_mut!(during_load);
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         *during_ptr = common::methods(std::path::Path::new(
             &std::env::var("PIIRIT_FAKE_JOURNAL").unwrap_or_default(),
         ));
@@ -79,10 +73,11 @@ fn a_chat_opened_before_its_page_settles_is_still_marked_read() {
         (*engine_ptr).invoke_method("arrive".into(), &[]);
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

@@ -5,13 +5,8 @@
 //! Also: qmetaobject writes Rust identifiers verbatim, so handler params are `snake_case`
 //! (`context_id`, not `contextId`).
 
-// Qt harness: `unsafe` env::set_var; `borrow_as_ptr`; whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods
-)]
+// Qt harness: `unsafe` env::set_var; `borrow_as_ptr`.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;

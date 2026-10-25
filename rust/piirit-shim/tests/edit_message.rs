@@ -4,15 +4,7 @@
 //! hears `edited`. Refusal leaves row as was. Model's flag decides if Edit is offered.
 
 // Qt harness: see message_actions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -101,28 +93,31 @@ fn an_edit_reaches_the_core_and_the_row_shows_the_change() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", call!("count"));
         record!("shape", call!("shape"));
         record!("before", call!("rowOf"));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("edit", call!("edit"));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard", call!("heard"));
         record!("after", call!("rowOf"));
         record!("edit-fail", call!("editAndFail"));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-after-failure", call!("heard"));
         record!("error", call!("error"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&common::calls(&journal), &steps);

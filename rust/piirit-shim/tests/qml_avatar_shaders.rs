@@ -12,15 +12,7 @@
 //! `Image`. `qml_syntax.rs` holds rest of app to it; `qml_quick_actions_cover.rs` the cover.
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -121,7 +113,9 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::component_url("Avatar.qml")))
@@ -138,7 +132,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "picture-status",
             call!("get", QString::from("avatarImage"), QString::from("status"))
@@ -176,6 +170,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
