@@ -47,7 +47,10 @@ says true "an empty list runs them" ""
 # can make it run everything.
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-git_() { git -C "$work" -c user.name=t -c user.email=t@t "$@" >/dev/null 2>&1; }
+git_() {
+    git -C "$work" -c user.name=t -c user.email=t@t "$@" >/dev/null 2>&1
+    return $?
+}
 git_ init -q
 echo a >"$work/main.rs"
 git_ add . && git_ commit -qm code

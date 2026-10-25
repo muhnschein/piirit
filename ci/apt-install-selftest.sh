@@ -165,15 +165,17 @@ chmod +x "$work/apt-get"
 
 # run_install <down mode>: script with stand-in apt, staged lists.
 run_install() {
+    local mode=$1
     stage
     printf 'deb http://de.archive.ubuntu.com/ubuntu jammy main\n' >"$work/sources.list"
     rm -f "$work/apt.log" "$work/down"
-    if [[ -n "$1" ]]; then
-        echo "$1" >"$work/down"
+    if [[ -n "$mode" ]]; then
+        echo "$mode" >"$work/down"
     fi
     APT_SOURCES_DIR="$work/sources" APT_SOURCES_LIST="$work/sources.list" \
         APT_GET="$work/apt-get" APT_LOG="$work/apt.log" APT_DOWN="$work/down" \
         "$script" qtbase5-dev >"$work/out" 2>&1
+    return $?
 }
 
 # check <why> <command...>: one case, passes when command does.
@@ -214,12 +216,13 @@ check "the download retry goes to archive.ubuntu.com" \
 
 # fails <mode> <why>: archive no better, job must fail.
 fails() {
+    local mode=$1 why=$2
     cases=$((cases + 1))
-    if run_install "$1"; then
-        echo "selftest: FAIL $2 should not exit 0" >&2
+    if run_install "$mode"; then
+        echo "selftest: FAIL $why should not exit 0" >&2
         status=1
     else
-        echo "selftest: ok   $2"
+        echo "selftest: ok   $why"
     fi
     return 0
 }
