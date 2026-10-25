@@ -16,6 +16,8 @@ docs/BUILDING.md, "Cutting a release").
 - Emoji in names show as pictures, as they do in messages, with their colours muted: in the chat list, the chat header, contact and group pages, search results, contact lists and calls. In message previews and the reply bar they are grey like the text, so lists stay calm.
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
 - The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
+- **Join a channel** by scanning its QR code or pasting its invite link on the QR code page, as for a contact or a group. The channel opens right away; it is read-only, and new posts arrive in it from then on.
+- **Make your own channel.** "New" in the chat list's pull-down menu opens a dialog to pick a new chat, group or channel, each with a line on what it is; back from the page you picked returns to it. A channel has a name and a picture but no members: from its page, "QR invite code" shows the code and link others scan to join it. Only you post in it.
 
 ## 2.2.0 — 2026-10-23
 

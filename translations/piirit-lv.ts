@@ -569,10 +569,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Arhivētās sarunas</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Jauna saruna</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arhivētās</translation>
     </message>
@@ -654,10 +650,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>QR kods</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Jauna grupa</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Atzīmēt kā nelasītu</translation>
     </message>
@@ -693,6 +685,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Sūtīt uz</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Jauns</translation>
     </message>
 </context>
 <context>
@@ -1131,6 +1128,16 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Mainīt attēlu</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR uzaicinājuma kods</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanāls</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1351,6 +1358,40 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Tālāk</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Jauna saruna</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Jūs rakstāt vienam cilvēkam.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Jauna grupa</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Vairāki cilvēki raksta cits citam.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Jauns kanāls</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanāli ir rīks jūsu ziņu pārraidīšanai daudziem saņēmējiem.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1392,6 +1433,28 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Create group</source>
         <translation>Izveidot grupu</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Lūdzu, nosauciet kanālu</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Izveidot kanālu</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Jauns kanāls</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanāla nosaukums</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Nosaukumu redz visi kanālā</translation>
     </message>
 </context>
 <context>
@@ -1619,6 +1682,15 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Copy invite link</source>
         <translation>Kopēt ielūguma saiti</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR uzaicinājuma kods</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Noskenējiet, lai pievienotos kanālam &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

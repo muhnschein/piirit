@@ -16,6 +16,9 @@ import Piirit 1.0
  *
  * Scanned invite followed: chat replaces page (above opener). Relay codes (dcaccount:,
  * dclogin:): add-relay page replaces it, asks first.
+ *
+ * `chatId` set: own channel's invite only (from its page), no scanner. Only way subscribers
+ * join: core takes no members added to channel.
  */
 Page {
     id: page
@@ -37,6 +40,11 @@ Page {
     property bool joining: false
     /// Side showing: 0 this profile's code, 1 scanner.
     property int mode: 0
+    /// Channel whose invite shows; 0 = profile's own, both sides.
+    property int chatId: 0
+    /// Channel's name, for line over code.
+    property string chatName: ""
+    readonly property bool forChat: chatId !== 0
     /// App in front. Writable: tests (no app in front) set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
@@ -70,14 +78,22 @@ Page {
         }
     }
 
-    Component.onCompleted: contacts.fetch_invite()
+    function fetchInvite() {
+        if (page.forChat) {
+            contacts.fetch_chat_invite(page.chatId)
+        } else {
+            contacts.fetch_invite()
+        }
+    }
+
+    Component.onCompleted: page.fetchInvite()
 
     Connections {
         target: core
         // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
-                contacts.fetch_invite()
+                page.fetchInvite()
             }
         }
     }
@@ -114,15 +130,17 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: qsTr("QR code")
+                objectName: "pageHeader"
+                title: page.forChat ? qsTr("QR invite code") : qsTr("QR code")
             }
 
             // Drawn like Silica tab bar; chosen highlighted.
             Item {
                 id: switcher
                 objectName: "viewSwitcher"
+                visible: !page.forChat
                 width: parent.width
-                height: Theme.itemSizeSmall
+                height: visible ? Theme.itemSizeSmall : 0
 
                 Row {
                     anchors.fill: parent
@@ -177,9 +195,10 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                // Profile code belongs to.
+                // Profile code belongs to; channel's code names channel instead (intro).
                 ContactRow {
                     objectName: "profileRow"
+                    visible: !page.forChat
                     width: parent.width
                     displayName: profile.display_name.length > 0
                                  ? profile.display_name : profile.address
@@ -197,7 +216,10 @@ Page {
                     wrapMode: Text.Wrap
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
-                    text: qsTr("Let someone scan this code, or send them the link.")
+                    textFormat: Text.PlainText
+                    //: Delta Chat's "qrshow_join_channel_hint". %1 is the channel's name.
+                    text: page.forChat ? qsTr("Scan to join channel \"%1\"").arg(page.chatName)
+                                       : qsTr("Let someone scan this code, or send them the link.")
                 }
 
                 // White whatever ambience: codes read by contrast. Unsmoothed: modules keep square
