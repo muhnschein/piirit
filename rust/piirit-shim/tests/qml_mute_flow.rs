@@ -322,7 +322,7 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
             json!([1, second, {"kind": "NotMuted"}]),
             json!([1, 2, {"kind": "Until", "duration": 86400}]),
             json!([1, 2, {"kind": "NotMuted"}]),
-            json!([1, 1, {"kind": "Until", "duration": 604800}]),
+            json!([1, 1, {"kind": "Until", "duration": 604_800}]),
             json!([1, 1, {"kind": "NotMuted"}]),
         ],
         "the menus and rows did not send exactly the reader's picks to the core. {context}"
