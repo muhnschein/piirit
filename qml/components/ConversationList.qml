@@ -100,6 +100,8 @@ SilicaListView {
     signal reactionRequested(int messageId, string emoji)
     /// Non-quick emoji: picker page. `current`: own reaction, "" none.
     signal reactionPickerRequested(int messageId, string current)
+    /// Quote tapped. `quotedId` 0: core has no original (deleted, never here).
+    signal quoteRequested(int quotedId)
 
     /// Delete wait, ms; tests lower it.
     property alias pendingDelay: doomedMessages.delay
@@ -821,6 +823,8 @@ SilicaListView {
                                                     model.call_has_video)
                 onDownloadRequested: root.downloadRequested(model.message_id)
                 onReactionRequested: root.reactionRequested(model.message_id, emoji)
+                // Read on tap, not bound: rows without role (tests' `ListModel`) stay quiet.
+                onQuoteRequested: root.quoteRequested(model.quote_message_id || 0)
                 // Long press on chip, download or play: row menu.
                 onMenuRequested: messageRow.openMenu()
             }

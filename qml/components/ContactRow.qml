@@ -1,9 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Marks.js" as Marks
 
 /*
  * Contact row, looks as chat-list row. Peer-supplied name, address:
- * PlainText, see MessageDelegate.qml.
+ * PlainText, see MessageDelegate.qml; or escaped StyledText with search marks
+ * (Marks.js).
  */
 Item {
     id: root
@@ -19,6 +21,16 @@ Item {
     property bool isKeyContact: true
     /// Right space for overlays (badge); text fades first.
     property real trailingSpace: 0
+    /// List's search text; occurrences marked.
+    property string match
+
+    // Mail icon: not encryptable.
+    readonly property string nameText: (root.isKeyContact ? "" : "✉ ") + root.displayName
+    /// Marked StyledText, or "" for plain.
+    readonly property string markedName: Marks.marked(root.nameText, root.match,
+                                                      Theme.highlightColor)
+    readonly property string markedAddress: Marks.marked(root.address, root.match,
+                                                         Theme.highlightColor)
 
     height: Math.max(avatar.height,
                      (root.showAddress ? addressLabel.y + addressLabel.height
@@ -44,9 +56,8 @@ Item {
                             : avatar.y + (avatar.height - height) / 2
         width: root.width - x - Theme.horizontalPageMargin - root.trailingSpace
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
-        // Mail icon: not encryptable.
-        text: (root.isKeyContact ? "" : "✉ ") + root.displayName
+        textFormat: root.markedName.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.markedName.length > 0 ? root.markedName : root.nameText
     }
 
     Label {
@@ -57,9 +68,9 @@ Item {
         y: nameLabel.y + nameLabel.height
         width: nameLabel.width
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
+        textFormat: root.markedAddress.length > 0 ? Text.StyledText : Text.PlainText
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: root.address
+        text: root.markedAddress.length > 0 ? root.markedAddress : root.address
     }
 }
