@@ -63,6 +63,7 @@ jobs:
             qml-module-qtquick2 \
             qml-module-qtquick-window2 \
             qttools5-dev-tools \
+            libqt5svg5 \
             libpulse-dev \
             pulseaudio \
             pulseaudio-utils

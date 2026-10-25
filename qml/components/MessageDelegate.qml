@@ -601,7 +601,7 @@ Item {
                     sourceSize.height: root.bigEdge
                     // Not asynchronous: five at most; would pop in as rows scroll in.
                     smooth: true
-                    source: Emoji.artBase + modelData.picture + ".png"
+                    source: Emoji.artBase + modelData.picture + ".svg"
                 }
             }
         }

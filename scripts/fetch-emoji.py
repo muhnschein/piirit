@@ -12,7 +12,7 @@ Two inputs, both pinned:
 
 - emojibase-data, from npm: which emoji there are, in Unicode's order and
   groups, with their CLDR names and keywords for search.
-- Twemoji, from git: one 72x72 PNG per emoji.
+- Twemoji, from git: one SVG per emoji, drawn sharp at any size.
 
 Three outputs, all committed so a build needs no network:
 
@@ -20,7 +20,7 @@ Three outputs, all committed so a build needs no network:
 - qml/js/EmojiPictures.js, the part of that list drawing an emoji needs,
   as lookup tables built ahead: a message is drawn long before anyone
   opens the picker, and Qt 5.6 parses a script afresh on every launch.
-- qml/art/emoji/<codepoints>.png, one per emoji in that list.
+- qml/art/emoji/<codepoints>.svg, one per emoji in that list.
 
     scripts/fetch-emoji.py             fetch, verify, write them all
     scripts/fetch-emoji.py --check     fetch, verify, and require the
@@ -65,6 +65,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_JS = os.path.join("qml", "js", "EmojiData.js")
 PICTURES_JS = os.path.join("qml", "js", "EmojiPictures.js")
 ART_DIR = os.path.join("qml", "art", "emoji")
+# Pictures' file type: SVG, sharp at any drawn size.
+PICTURE = ".svg"
 
 
 def fail(message):
@@ -86,7 +88,7 @@ def fetch_emojibase():
 
 
 def fetch_twemoji(workdir):
-    """The 72x72 PNGs, from a checkout that must be the pinned commit."""
+    """The SVGs, from a checkout that must be the pinned commit."""
     checkout = os.path.join(workdir, "twemoji")
     git = ["git", "-c", "advice.detachedHead=false"]
     subprocess.run(
@@ -94,14 +96,14 @@ def fetch_twemoji(workdir):
                "--filter=blob:none", "--sparse", TWEMOJI_REPO, checkout],
         check=True,
     )
-    subprocess.run(git + ["-C", checkout, "sparse-checkout", "set", "assets/72x72"], check=True)
+    subprocess.run(git + ["-C", checkout, "sparse-checkout", "set", "assets/svg"], check=True)
     head = subprocess.run(
         git + ["-C", checkout, "rev-parse", "HEAD"],
         check=True, capture_output=True, text=True,
     ).stdout.strip()
     if head != TWEMOJI_COMMIT:
         fail("twemoji " + TWEMOJI_TAG + " is " + head + ", not " + TWEMOJI_COMMIT + "; refusing it")
-    return os.path.join(checkout, "assets", "72x72")
+    return os.path.join(checkout, "assets", "svg")
 
 
 def picture_for(emoji, pictures):
@@ -146,7 +148,7 @@ def search_text(entry):
 
 
 def build(data, picture_dir):
-    pictures = {name[:-4] for name in os.listdir(picture_dir) if name.endswith(".png")}
+    pictures = {name[:-4] for name in os.listdir(picture_dir) if name.endswith(PICTURE)}
     entries = [e for e in data if e.get("group") in GROUPS and "order" in e]
     entries.sort(key=lambda e: (GROUPS.index(e["group"]), e["order"]))
 
@@ -174,7 +176,7 @@ def data_js(rows):
         "// Do not edit: run the script. See vendor/emoji/SOURCE.md.",
         "//",
         "// One entry per emoji the picker offers, in Unicode's order:",
-        "// [emoji, picture under qml/art/emoji/ without .png, group, search words].",
+        "// [emoji, picture under qml/art/emoji/ without " + PICTURE + ", group, search words].",
         "// Groups: 0 smileys, 1 people, 2 animals and nature, 3 food and drink,",
         "// 4 travel and places, 5 activities, 6 objects, 7 symbols, 8 flags.",
         ".pragma library",
@@ -288,7 +290,7 @@ def write_tree(out, rows, used, picture_dir):
     os.makedirs(art, exist_ok=True)
     write_scripts(out, rows)
     for name in used:
-        shutil.copyfile(os.path.join(picture_dir, name + ".png"), os.path.join(art, name + ".png"))
+        shutil.copyfile(os.path.join(picture_dir, name + PICTURE), os.path.join(art, name + PICTURE))
 
 
 def same_tree(left, right):

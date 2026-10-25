@@ -123,7 +123,7 @@ function inText(text, styled, size) {
     for (var k = 0; k < cuts.length; k += 3) {
         var before = text.substring(from, cuts[k])
         out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+        out += "<img src=\"" + artBase + cuts[k + 2] + ".svg\" width=\"" + edge
                + "\" height=\"" + edge + "\" align=\"middle\">"
         from = cuts[k + 1]
     }

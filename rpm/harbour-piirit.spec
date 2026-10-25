@@ -72,6 +72,9 @@ Requires:   libkeepalive
 Requires:   sailfish-components-webview-qt5
 Requires:   sailfish-components-webview-qt5-popups
 Requires:   sailfish-components-webview-qt5-pickers
+# Qt's SVG image plugin: emoji pictures are SVG (qml/art/emoji/), drawn sharp at any size.
+# Missing: emoji pictures fail to load.
+Requires:   qt5-qtsvg-plugin-imageformat-svg
 
 # Harbour allows no Provides:, and rpm generates one from any packaged shared library (e.g.
 # libpiirit.so under %%{appdatadir}/lib). Exclude both private dirs.
@@ -206,8 +209,8 @@ install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
 
 # QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
 # source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
-# qml/art/ .png files: first-screen mark and intro pictures.
-(cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name qmldir \) -exec \
+# qml/art/ .png files: first-screen mark and intro pictures; .svg: emoji.
+(cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name '*.svg' -o -name qmldir \) -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/qml/{}" \; )
 
 # Compiled .qm beside QML, where piirit-app looks; .ts stay in tree.

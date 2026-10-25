@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Emoji are sharp at every size, in messages, reactions and the emoji picker.
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
 - A message of nothing but emoji, up to five of them, shows them big.
 - Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.

@@ -6,11 +6,11 @@
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
 #               qtdeclarative5-dev-tools qml-module-qtquick2 \
 #               qml-module-qtquick-window2 qttools5-dev-tools \
-#               libpulse-dev pulseaudio pulseaudio-utils
+#               libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
 #
 # qml-module-qtquick2: QtQuick runtime (-dev omits it). -window2: QtQuick.Window
-# (tests). qttools5-dev-tools: lupdate/lrelease. Rest: multimedia, pulse (mic,
-# test server).
+# (tests). qttools5-dev-tools: lupdate/lrelease. libqt5svg5: SVG image plugin
+# (emoji pictures). Rest: multimedia, pulse (mic, test server).
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
