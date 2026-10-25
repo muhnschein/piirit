@@ -2,7 +2,7 @@
 // Do not edit: run the script. See vendor/emoji/SOURCE.md.
 //
 // One entry per emoji the picker offers, in Unicode's order:
-// [emoji, picture under qml/art/emoji/ without .png, group, search words].
+// [emoji, picture under qml/art/emoji/ without .svg, group, search words].
 // Groups: 0 smileys, 1 people, 2 animals and nature, 3 food and drink,
 // 4 travel and places, 5 activities, 6 objects, 7 symbols, 8 flags.
 .pragma library

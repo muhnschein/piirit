@@ -863,6 +863,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kontaktförfrågan</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Original meddelandet hittas inte</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2190,8 +2195,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Inga detaljer</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Avisera meddelanden som riktas till dig, i tystade grupper, såsom svar eller reaktioner</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Visa aviseringar om svar på dina meddelanden i tystade grupper</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

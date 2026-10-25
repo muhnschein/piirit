@@ -870,6 +870,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kontakta pieprasījums</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Sākotnējā ziņa nav atrasta</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2201,8 +2206,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Bez detaļām</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Apklusinātās grupās paziņot par ziņām, kas adresētas tev, piemēram, atbildēm vai reakcijām</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Rādīt paziņojumus par atbildēm uz tavām ziņām apklusinātās grupās</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

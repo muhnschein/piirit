@@ -867,6 +867,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>ಸಂಪರ್ಕ ವಿನಂತಿ</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>ಮೂಲ ಸಂದೇಶ ಕಂಡುಬಂದಿಲ್ಲ</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2194,8 +2199,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ವಿವರಗಳಿಲ್ಲ</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>ಮೌನಗೊಳಿಸಿದ ಗುಂಪುಗಳಲ್ಲಿ ನಿಮಗೆ ಉದ್ದೇಶಿಸಿದ ಸಂದೇಶಗಳನ್ನು, ಉತ್ತರಗಳು ಅಥವಾ ಪ್ರತಿಕ್ರಿಯೆಗಳಂತೆ, ತಿಳಿಸಿ</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>ಮೌನಗೊಳಿಸಿದ ಗುಂಪುಗಳಲ್ಲಿ ನಿಮ್ಮ ಸಂದೇಶಗಳಿಗೆ ಬಂದ ಉತ್ತರಗಳ ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

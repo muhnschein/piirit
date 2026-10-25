@@ -32,14 +32,14 @@ Item {
         width: root.size
         height: root.size
         visible: root.drawn
-        // 72px, decoded at drawn size off UI thread: pickers hold hundreds.
+        // SVG drawn at drawn size off UI thread: pickers hold hundreds.
         asynchronous: true
         sourceSize.width: Math.ceil(root.size)
         sourceSize.height: Math.ceil(root.size)
         smooth: true
         fillMode: Image.PreserveAspectFit
         source: root.picture.length > 0
-                ? Qt.resolvedUrl("../art/emoji/" + root.picture + ".png") : ""
+                ? Qt.resolvedUrl("../art/emoji/" + root.picture + ".svg") : ""
     }
 
     Label {

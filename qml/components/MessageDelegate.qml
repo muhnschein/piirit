@@ -34,6 +34,8 @@ Item {
     signal callRequested()
     /// Long press on a control: row menu.
     signal menuRequested()
+    /// Quote tapped: page goes to quoted message.
+    signal quoteRequested()
 
     /// One surface: tap opens, long press menu. Attachments take no tap of own.
     function tapped() {
@@ -142,13 +144,23 @@ Item {
                                         ? root.styledText
                                         : root.messageText
 
+    /// Few emoji, nothing else: drawn big, own layout (Emoji.js `bigLayout`). Not a file's
+    /// caption.
+    readonly property bool bigEmoji: !root.hasFile && Emoji.onlyEmoji(root.messageText)
+    /// Big emoji's edge, px.
+    readonly property real bigEdge: Math.round(Theme.fontSizeMedium * Emoji.bigScale)
+    /// Big emoji's pictures and extent; empty when not big.
+    readonly property var bigPictures: root.bigEmoji
+        ? Emoji.bigLayout(root.messageText, root.bigEdge, root.maxWidth)
+        : ({ pictures: [], width: 0, height: 0 })
     /// Body with emoji pictures (EmojiGlyph), or "" for as written.
-    readonly property string emojiBody: !root.isCall
+    readonly property string emojiBody: !root.isCall && !root.bigEmoji
                                         ? Emoji.inText(root.shownText, root.drawsStyled,
                                                        messageLabel.font.pixelSize)
                                         : ""
     /// Body as drawn, and whether StyledText.
-    readonly property string bodyText: root.emojiBody.length > 0
+    readonly property string bodyText: root.bigEmoji ? ""
+                                       : root.emojiBody.length > 0
                                        ? root.emojiBody : root.shownText
     readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
     /// Quote: as written.
@@ -199,6 +211,7 @@ Item {
     property real bodyWidth: Math.min(
         root.maxWidth,
         Math.max(textMetric.implicitWidth,
+                 root.bigPictures.width,
                  attachmentMetric.implicitWidth,
                  root.isCall ? callRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
@@ -376,7 +389,7 @@ Item {
             text: qsTr("Forwarded")
         }
 
-        // Quote, bar down left.
+        // Quote, bar down left. Own tap: goes to original, not message's own (file, call).
         Item {
             id: quoteRow
             objectName: "quoteRow"
@@ -386,6 +399,22 @@ Item {
             y: root.below(forwardedLabel, quoteRow.shown)
             width: root.contentWidth
             height: quoteRow.shown ? quoteLabel.y + quoteLabel.height : 0
+
+            // Press lit as Silica's: own area takes press from row, row's highlight stays off.
+            Rectangle {
+                anchors.fill: parent
+                visible: quoteArea.pressed
+                color: Theme.rgba(Theme.highlightBackgroundColor,
+                                  Theme.highlightBackgroundOpacity)
+            }
+
+            MouseArea {
+                id: quoteArea
+                objectName: "quoteArea"
+                anchors.fill: parent
+                onClicked: root.quoteRequested()
+                onPressAndHold: root.menuRequested()
+            }
 
             Rectangle {
                 width: 2
@@ -535,7 +564,8 @@ Item {
             objectName: "messageLabel"
             readonly property bool shown: root.messageText.length > 0 && !root.isCall
             visible: messageLabel.shown
-            height: messageLabel.shown ? implicitHeight : 0
+            height: !messageLabel.shown ? 0
+                    : root.bigEmoji ? root.bigPictures.height : implicitHeight
             x: Theme.paddingMedium
             // Under call, else attachment; rows below chain from here.
             y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
@@ -557,6 +587,23 @@ Item {
             text: root.bodyText
             // Link followed on tap only.
             onLinkActivated: Qt.openUrlExternally(link)
+
+            // Big emoji in place of text.
+            Repeater {
+                model: root.bigPictures.pictures
+                Image {
+                    objectName: "bigEmoji"
+                    x: modelData.x
+                    y: modelData.y
+                    width: root.bigEdge
+                    height: root.bigEdge
+                    sourceSize.width: root.bigEdge
+                    sourceSize.height: root.bigEdge
+                    // Not asynchronous: five at most; would pop in as rows scroll in.
+                    smooth: true
+                    source: Emoji.artBase + modelData.picture + ".svg"
+                }
+            }
         }
 
         // Body not fitting: two-word tap in download offer's colour.

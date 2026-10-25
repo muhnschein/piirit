@@ -8,7 +8,13 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Emoji are sharp at every size, in messages, reactions and the emoji picker.
+- A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
+- A message of nothing but emoji, up to five of them, shows them big.
+- Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
+- The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
 - **Join a channel** by scanning its QR code or pasting its invite link on the QR code page, as for a contact or a group. The channel opens right away; it is read-only, and new posts arrive in it from then on.
 - **Make your own channel.** "New" in the chat list's pull-down menu opens a page to pick a new chat, group or channel, each with a line on what it is. A channel has a name and a picture but no members: from its page, "QR invite code" shows the code and link others scan to join it. Only you post in it.
 

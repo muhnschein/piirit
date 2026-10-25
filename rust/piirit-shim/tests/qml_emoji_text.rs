@@ -46,7 +46,7 @@ fn probe_qml() -> String {
             for (var i = 0; i < Data.list.length; i++) {{
                 var emoji = Data.list[i][0]
                 var picture = Data.list[i][1]
-                var img = '/' + picture + '.png'
+                var img = '/' + picture + '.svg'
                 if (Emoji.pictureFor(emoji) !== picture
                         || Emoji.inText(emoji, false, 18).indexOf(img) < 0
                         || Emoji.inText('a ' + emoji + ' b', true, 18).indexOf(img) < 0) {{
@@ -68,11 +68,19 @@ fn probe_qml() -> String {
         }}
         Loader {{ id: glyph }}
         function loadGlyph(url) {{
-            glyph.setSource(url, {{ emoji: '👍', size: 40 }})
+            // Big, as a message of only emoji draws them.
+            glyph.setSource(url, {{ emoji: '👍', size: 120 }})
             return glyph.status === Loader.Ready ? 'ok' : 'load-failed'
         }}
         function glyphText() {{
             return glyph.item.drawn ? 'picture' : 'text:' + glyph.item.emoji
+        }}
+        // Pixels the picture was drawn at, once loaded.
+        function glyphPixels() {{
+            var image = findIn(glyph.item, 'emojiImage')
+            if (!image) {{ return 'missing:emojiImage' }}
+            return image.status === Image.Ready
+                ? image.implicitWidth + 'x' + image.implicitHeight : 'status:' + image.status
         }}
         function findIn(node, name) {{
             if (!node) {{ return null }}
@@ -98,12 +106,12 @@ fn probe_qml() -> String {
 
 /// `<img>` from `inText` for picture under `base`, 18 px font, if picture exists.
 fn img(base: &str, picture: &str) -> String {
-    let file = format!("{}{picture}.png", base.trim_start_matches("file://"));
+    let file = format!("{}{picture}.svg", base.trim_start_matches("file://"));
     assert!(
         PathBuf::from(&file).is_file(),
         "{file} is not shipped where the text looks for it"
     );
-    format!("<img src=\"{base}{picture}.png\" width=\"21\" height=\"21\" align=\"middle\">")
+    format!("<img src=\"{base}{picture}.svg\" width=\"21\" height=\"21\" align=\"middle\">")
 }
 
 #[test]
@@ -203,6 +211,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         record!("body-on", call!("label", QString::from("messageLabel")));
         record!("quote-on", call!("label", QString::from("quoteLabel")));
         record!("glyph-on", call!("glyphText"));
+        record!("glyph-pixels", call!("glyphPixels"));
         (*engine_ptr).quit();
     });
 
@@ -295,16 +304,22 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     );
     assert!(
         value("body-on").starts_with("styled:hi <img ")
-            && value("body-on").contains("/1f44d.png")
+            && value("body-on").contains("/1f44d.svg")
             && value("body-on").ends_with("> there"),
         "the body's emoji is not drawn as its picture. {context}"
     );
     assert!(
         value("quote-on").starts_with("styled:was <img ")
-            && value("quote-on").contains("/1f525.png"),
+            && value("quote-on").contains("/1f525.svg"),
         "the quote's emoji is not drawn as its picture. {context}"
     );
     assert_eq!(value("glyph-on"), "picture", "{context}");
+    // status: SVG not loaded (no Qt SVG image plugin?).
+    assert_eq!(
+        value("glyph-pixels"),
+        "120x120",
+        "the emoji is not drawn at the size it is shown. {context}"
+    );
 }
 
 /// Only picker loads whole list. Chat drawing needs a third of it; reparsed each launch,

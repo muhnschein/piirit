@@ -870,6 +870,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Prośba o kontakt</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Nie znaleziono oryginalnej wiadomości</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2201,8 +2206,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Bez szczegółów</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>W wyciszonych grupach powiadamiaj o wiadomościach skierowanych do ciebie, takich jak odpowiedzi lub reakcje</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

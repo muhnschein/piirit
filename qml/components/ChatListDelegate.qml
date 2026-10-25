@@ -1,11 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "../js/Marks.js" as Marks
 import "."
 
 /*
- * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml). Own
- * component, loads and measures alone; bindings, not positioner (ditto).
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml); name
+ * searched: escaped StyledText with marks (Marks.js). Own component, loads and
+ * measures alone; bindings, not positioner (ditto).
  */
 Item {
     id: root
@@ -27,7 +29,16 @@ Item {
     // DC_STATE_* of last message; >= 20 means we sent it.
     property int summaryState: 0
 
+    /// List's search text; marked in name, core's only match field.
+    property string match
+
     readonly property bool summaryIsOurs: summaryState >= 20
+
+    // Mail icon: unencryptable. Pin/mute on right: placement, not name.
+    readonly property string nameText: (root.isEncrypted ? "" : "✉ ") + root.chatName
+    /// Marked StyledText, or "" for plain.
+    readonly property string markedName: Marks.marked(root.nameText, root.match,
+                                                      Theme.highlightColor)
 
     height: Math.max(avatar.height, previewLabel.y + previewLabel.height)
             + 2 * Theme.paddingMedium
@@ -82,9 +93,8 @@ Item {
         y: Theme.paddingMedium
         width: marks.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
-        // Mail icon: unencryptable. Pin/mute on right: placement, not name.
-        text: (root.isEncrypted ? "" : "✉ ") + root.chatName
+        textFormat: root.markedName.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.markedName.length > 0 ? root.markedName : root.nameText
     }
 
     // Contact request: tagged before preview (Accept or Block waits in the chat).

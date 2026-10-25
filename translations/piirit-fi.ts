@@ -863,6 +863,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Yhteyspyyntö</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Alkuperäistä viestiä ei löydy</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2190,8 +2195,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ei tietoja</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Mykistetyissä ryhmissä, ilmoita minulle osoitetuista viesteistä, kuten vastauksista tai reaktioista</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Näytä ilmoitukset vastauksista viesteihisi mykistetyissä ryhmissä</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

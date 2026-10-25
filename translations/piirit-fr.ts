@@ -867,6 +867,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Demande de contact</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Le message original n&apos;a pas été trouvé</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2194,8 +2199,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Aucun détail</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Dans les groupes mis en sourdine, notifier les messages qui vous sont adressés, tels que les réponses ou les réactions</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Afficher les notifications des réponses à vos messages dans les groupes mis en sourdine</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

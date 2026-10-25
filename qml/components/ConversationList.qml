@@ -100,6 +100,8 @@ SilicaListView {
     signal reactionRequested(int messageId, string emoji)
     /// Non-quick emoji: picker page. `current`: own reaction, "" none.
     signal reactionPickerRequested(int messageId, string current)
+    /// Quote tapped. `quotedId` 0: core has no original (deleted, never here).
+    signal quoteRequested(int quotedId)
 
     /// Delete wait, ms; tests lower it.
     property alias pendingDelay: doomedMessages.delay
@@ -241,14 +243,10 @@ SilicaListView {
     onContentYChanged: {
         var movedUp = root.contentY < root.lastContentY
         root.lastContentY = root.contentY
-        // Page away: any move is list losing place; restore this turn.
+        // Page away: any move is list losing place; restore before return.
         if (root.away) {
-            if (root.pendingRow >= 0) {
-                root.putBack()
-            } else if (root.stickToBottom && !root.restoring) {
-                root.restoring = true
-                root.positionViewAtEnd()
-                root.restoring = false
+            if (!root.restoring) {
+                awayRestore.start()
             }
             return
         }
@@ -377,6 +375,25 @@ SilicaListView {
     /// Page away: row held, no deadline.
     property bool away: false
 
+    // Away restore after handler returns: `positionViewAtIndex` from inside `contentYChanged`
+    // drops view's rows without building new ones (blank list, held row never found).
+    Timer {
+        id: awayRestore
+        interval: 0
+        onTriggered: {
+            if (!root.away) {
+                return
+            }
+            if (root.pendingRow >= 0) {
+                root.putBack()
+            } else if (root.stickToBottom) {
+                root.restoring = true
+                root.positionViewAtEnd()
+                root.restoring = false
+            }
+        }
+    }
+
     function rememberPlace() {
         root.rememberedFollowing = root.stickToBottom
         root.rememberedRow = -1
@@ -392,7 +409,7 @@ SilicaListView {
             }
         }
         // Hold armed now, not on return: lost place would paint top for a frame; armed, undone
-        // same turn.
+        // while away.
         root.away = true
         if (root.rememberedRow >= 0 && !root.rememberedFollowing) {
             root.pendingRow = root.rememberedRow
@@ -821,6 +838,8 @@ SilicaListView {
                                                     model.call_has_video)
                 onDownloadRequested: root.downloadRequested(model.message_id)
                 onReactionRequested: root.reactionRequested(model.message_id, emoji)
+                // Read on tap, not bound: rows without role (tests' `ListModel`) stay quiet.
+                onQuoteRequested: root.quoteRequested(model.quote_message_id || 0)
                 // Long press on chip, download or play: row menu.
                 onMenuRequested: messageRow.openMenu()
             }

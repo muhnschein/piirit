@@ -860,6 +860,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>聯絡人請求</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>找不到原始訊息</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2183,8 +2188,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>不顯示詳細資料</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>在勿擾的群組中，通知傳送給您的訊息，例如回復或回應</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>在勿擾的群組中顯示回覆您訊息的通知</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

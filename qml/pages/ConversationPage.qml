@@ -153,6 +153,9 @@ Page {
         }
     }
 
+    //: Shown when a reply's quoted message was tapped but is no longer there.
+    readonly property string quoteMissingText: qsTr("Original message not found")
+
     /// Ask model where message is, once rows in; answer in `onRevealed`.
     function revealIfAsked() {
         if (page.findMessageId !== 0 && messages.loaded) {
@@ -233,6 +236,19 @@ Page {
         }
         // Page at a time; asks again on finish until nothing left.
         onHydrating_changed: if (!messages.hydrating) listView.askForRows()
+        onQuote_missing: notice.show(page.quoteMissingText)
+        // Answer after reader left: not pushed over another page.
+        onQuote_elsewhere: {
+            if (page.status !== PageStatus.Active) {
+                return
+            }
+            pageStack.push(Qt.resolvedUrl("ConversationPage.qml"), {
+                accountId: page.accountId,
+                chatId: chat_id,
+                chatName: chat_name,
+                findMessageId: message_id
+            })
+        }
     }
 
     // Flash, then gone.
@@ -561,6 +577,9 @@ Page {
             }
         }
         onResendRequested: messages.resend_message(messageId)
+        // Original lit here as search hit (older rows fill as view gets there); another chat's
+        // opens over this one, Back returns; gone: said so. As reference clients.
+        onQuoteRequested: messages.show_quoted(quotedId)
         onForwardRequested: {
             // Message id captured here for picker's report.
             var travelling = messageId

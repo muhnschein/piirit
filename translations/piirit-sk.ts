@@ -870,6 +870,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Žiadosť o kontakt</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Pôvodná správa sa nenašla</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -2201,8 +2206,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Bez podrobností</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>V stlmených skupinách upozorňovať na správy adresované vám, ako sú odpovede alebo reakcie</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Zobrazovať upozornenia na odpovede na vaše správy v stlmených skupinách</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

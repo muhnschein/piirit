@@ -692,6 +692,8 @@ Page {
                     chatColor: model.color
                     avatarPath: model.avatar_path
                     summaryState: model.summary_state
+                    // Archived list filters itself; ordinary query stays empty.
+                    match: chats.query
                 }
 
                 // Built on first open: nine items per chat is waste.
