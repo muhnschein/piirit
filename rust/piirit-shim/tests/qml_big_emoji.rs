@@ -62,6 +62,8 @@ fn probe_qml() -> String {
             for (var i = 0; i < label.children.length; i++) {{
                 var kid = label.children[i]
                 if (kid.objectName === 'bigEmoji') {{
+                    // Picture shipped and drawn (SVG plugin there), not just placed.
+                    if (kid.status !== Image.Ready) {{ return 'not-loaded:' + kid.source }}
                     bigs.push(Math.round(kid.x) + ',' + Math.round(kid.y) + ',' + kid.width)
                 }}
             }}
