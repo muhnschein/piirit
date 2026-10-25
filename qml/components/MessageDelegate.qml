@@ -34,6 +34,8 @@ Item {
     signal callRequested()
     /// Long press on a control: row menu.
     signal menuRequested()
+    /// Quote tapped: page goes to quoted message.
+    signal quoteRequested()
 
     /// One surface: tap opens, long press menu. Attachments take no tap of own.
     function tapped() {
@@ -376,7 +378,7 @@ Item {
             text: qsTr("Forwarded")
         }
 
-        // Quote, bar down left.
+        // Quote, bar down left. Own tap: goes to original, not message's own (file, call).
         Item {
             id: quoteRow
             objectName: "quoteRow"
@@ -386,6 +388,22 @@ Item {
             y: root.below(forwardedLabel, quoteRow.shown)
             width: root.contentWidth
             height: quoteRow.shown ? quoteLabel.y + quoteLabel.height : 0
+
+            // Press lit as Silica's: own area takes press from row, row's highlight stays off.
+            Rectangle {
+                anchors.fill: parent
+                visible: quoteArea.pressed
+                color: Theme.rgba(Theme.highlightBackgroundColor,
+                                  Theme.highlightBackgroundOpacity)
+            }
+
+            MouseArea {
+                id: quoteArea
+                objectName: "quoteArea"
+                anchors.fill: parent
+                onClicked: root.quoteRequested()
+                onPressAndHold: root.menuRequested()
+            }
 
             Rectangle {
                 width: 2

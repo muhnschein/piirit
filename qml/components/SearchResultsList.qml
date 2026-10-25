@@ -47,6 +47,9 @@ SilicaListView {
             ownColor: model.color
             picturePath: model.avatar_path
             timestamp: model.timestamp
+            // Marks where core matched: chat name; contact name, address; message text.
+            titleMatch: model.kind !== "message" ? root.search.query : ""
+            subtitleMatch: model.kind !== "chat" ? root.search.query : ""
         }
 
         onClicked: {

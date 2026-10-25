@@ -314,6 +314,50 @@ fn the_new_chat_list_clips_away_from_its_search_field() {
     );
 }
 
+/// Every row on a page with search field marks search (Marks.js): one list without
+/// marks reads as different app. Rows: `match:`, set or not, whatever they list.
+#[test]
+fn every_searchable_list_marks_what_was_found() {
+    const ROWS: [&str; 2] = ["ContactRow {", "ChatListDelegate {"];
+    let mut searchable = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let text = fs::read_to_string(&file).expect("read qml");
+        if !text.contains("SearchField {") {
+            continue;
+        }
+        let lines: Vec<&str> = text.lines().collect();
+        for (number, line) in lines.iter().enumerate() {
+            let trimmed = line.trim();
+            if !ROWS.contains(&trimmed) {
+                continue;
+            }
+            searchable += 1;
+            // Element body: to `}` at element's own indent.
+            let indent = line.len() - line.trim_start().len();
+            let marks = lines[number + 1..]
+                .iter()
+                .take_while(|next| {
+                    !(next.trim() == "}" && next.len() - next.trim_start().len() == indent)
+                })
+                .any(|next| next.trim_start().starts_with("match:"));
+            if !marks {
+                offenders.push(format!("{}:{}: {trimmed}", file.display(), number + 1));
+            }
+        }
+    }
+    assert!(
+        searchable >= 5,
+        "found only {searchable} rows on searchable pages; scan lost them"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these rows sit under a search field but do not mark what it found \
+         (`match:`):\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
 /// Time label positions off row, not off label its width decides.
 /// `SearchResultRow` had a cycle (title width minus time label's; time label anchored to
 /// title): on device title kept natural width, long names ran off edge.
@@ -513,9 +557,12 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
 #[test]
 fn text_from_the_other_end_is_pinned_to_plain() {
     // Bindings core fills from message, contact or chat: remote input.
-    const REMOTE: [&str; 29] = [
+    const REMOTE: [&str; 31] = [
         "model.",
         "root.messageText",
+        // Composed or search-marked name, preview (Marks.js).
+        "root.nameText",
+        "root.marked",
         "root.quoteText",
         "root.quoteAuthor",
         "root.senderName",

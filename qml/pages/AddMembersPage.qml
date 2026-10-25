@@ -148,6 +148,7 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
+                    match: contacts.query
                     opacity: addable ? 1.0 : 0.4
                 }
 

@@ -875,6 +875,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Demande de contact</translation>
     </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Le message original n&apos;a pas été trouvé</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
