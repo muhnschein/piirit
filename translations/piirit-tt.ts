@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Профиль өстәргә</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Алга</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Профиль ясарга</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Сез яңа адрес белән һәм чатларсыз башлыйсыз.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Резерв күчермәдән торгызырга</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Сез профильне резерв күчермә файлыннан импортлыйсыз.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Икенче җиһаз итеп өстәргә</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Сез бер үк профильне бу телефонда һәм башка җиһазда кулланасыз.</translation>
     </message>
 </context>
 <context>

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Thêm hồ sơ</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Tiếp</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Tạo hồ sơ</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Bạn bắt đầu với một địa chỉ mới và không có cuộc trò chuyện nào.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Khôi phục từ bản sao lưu</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Bạn nhập một hồ sơ từ tệp sao lưu.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Thêm làm thiết bị thứ hai</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Bạn dùng cùng một hồ sơ trên điện thoại này và một thiết bị khác.</translation>
     </message>
 </context>
 <context>

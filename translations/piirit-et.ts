@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Lisa profiil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Edasi</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Loo profiil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Alustad uue aadressiga ja ilma vestlusteta.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Taasta varukoopiast</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Impordid profiili varukoopiafailist.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Lisa teise seadmena</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Kasutad sama profiili selles telefonis ja teises seadmes.</translation>
     </message>
 </context>
 <context>

@@ -305,7 +305,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         "no plus under the profile list, so no way to add a profile. {context}"
     );
     assert!(
-        value("added").ends_with(",AddProfilePage.qml"),
+        value("added").ends_with(",AddProfileWaysDialog.qml"),
         "the plus did not ask which of the three ways in the reader \
          wants: {}. {context}",
         value("added")

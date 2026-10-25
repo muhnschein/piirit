@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Lägg till profil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Nästa</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Skapa en profil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Du börjar med en ny adress och inga chattar.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Återställ från en säkerhetskopia</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Du importerar en profil från en säkerhetskopiefil.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Du använder samma profil på den här telefonen och en annan enhet.</translation>
     </message>
 </context>
 <context>

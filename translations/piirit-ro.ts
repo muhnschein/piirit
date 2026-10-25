@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Adaugă profil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Înainte</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Creează un profil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Începi cu o adresă nouă și fără conversații.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Restaurează dintr-o copie de siguranță</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Imporți un profil dintr-un fișier de copie de rezervă.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Adaugă ca al doilea dispozitiv</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Folosești același profil pe acest telefon și pe alt dispozitiv.</translation>
     </message>
 </context>
 <context>

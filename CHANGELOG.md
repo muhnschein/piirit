@@ -15,6 +15,7 @@ docs/BUILDING.md, "Cutting a release").
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
 - The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
+- "Add profile" under the profiles list opens a dialog to pick creating a profile, restoring a backup or adding this phone as a second device, each with a line on what it means; back from the page you picked returns to it.
 
 ## 2.2.0 — 2026-10-23
 

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Aggiungi profilo</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Avanti</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Crea un profilo</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Inizi con un nuovo indirizzo e nessuna chat.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Ripristina da un backup</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Importi un profilo da un file di backup.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Aggiungi come secondo dispositivo</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Usi lo stesso profilo su questo telefono e su un altro dispositivo.</translation>
     </message>
 </context>
 <context>

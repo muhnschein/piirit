@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Profil ekle</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>İleri</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Profil oluştur</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Yeni bir adresle ve hiç sohbet olmadan başlarsınız.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Yedekten geri yükle</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Bir yedek dosyasından profil içe aktarırsınız.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>İkinci cihaz olarak ekle</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Aynı profili bu telefonda ve başka bir cihazda kullanırsınız.</translation>
     </message>
 </context>
 <context>

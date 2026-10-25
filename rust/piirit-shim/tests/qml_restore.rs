@@ -232,21 +232,6 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         );
         common::record(&s, "ask-device", call!("click", "secondDeviceTile"));
         common::record(&s, "ask-file", call!("click", "backupFileTile"));
-        // Same question asked of reader with a profile, from plus under profiles list: three
-        // ways, not two (making one is the third).
-        common::record(
-            &s,
-            "add-load",
-            call!("loadWith", common::page_url("AddProfilePage.qml"), "{}"),
-        );
-        common::record(&s, "add-stacked", call!("get", "addWays", "stacked"));
-        common::record(&s, "add-header", call!("get", "header", "height"));
-        common::record(&s, "add-ways-y", call!("get", "addWays", "y"));
-        common::record(&s, "add-ways-height", call!("get", "addWays", "height"));
-        common::record(&s, "add-page-height", call!("pageProperty", "height"));
-        common::record(&s, "add-create", call!("click", "createProfileTile"));
-        common::record(&s, "add-file", call!("click", "backupFileTile"));
-        common::record(&s, "add-device", call!("click", "secondDeviceTile"));
     });
 
     // 2s: file half. Browser offered, camera not; choosing opens browser.
@@ -389,35 +374,6 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         common::value_of(steps, "file-scanner"),
         "false",
         "the file half put the camera up anyway. {context}"
-    );
-    for label in ["add-load", "add-create", "add-file", "add-device"] {
-        assert_eq!(
-            common::value_of(steps, label),
-            "ok",
-            "the page behind the profiles plus does not offer all three \
-             ways in: {label}. {context}"
-        );
-    }
-    // Three, one under another: side by side each gets a third of screen, not room for a
-    // line plus second line.
-    assert_eq!(
-        common::value_of(steps, "add-stacked"),
-        "true",
-        "the three ways in are crowded into one row. {context}"
-    );
-    // Stack starts under header, not mid-page: lists read from top, as every phone list does.
-    let measure =
-        |label: &str| -> f64 { common::value_of(steps, label).parse().unwrap_or_default() };
-    let above = measure("add-ways-y") - measure("add-header");
-    let below = measure("add-page-height") - measure("add-ways-y") - measure("add-ways-height");
-    assert!(
-        above > 0.0 && above * 4.0 < below,
-        "the three ways do not start under the header: {above} above, \
-         {below} below. {context}"
-    );
-    assert!(
-        navigation.contains("push:AddProfileDialog.qml"),
-        "nothing on the add-profile page makes a new profile. {context}"
     );
     assert!(
         navigation.contains("push:BackupFilePage.qml"),

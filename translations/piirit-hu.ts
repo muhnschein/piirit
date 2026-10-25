@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Profil hozzáadása</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Tovább</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Profil létrehozása</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Új címmel, csevegések nélkül kezd.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Visszaállítás mentésből</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Profilt importál egy biztonsági mentésfájlból.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Hozzáadás második eszközként</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Ugyanazt a profilt használja ezen a telefonon és egy másik eszközön.</translation>
     </message>
 </context>
 <context>
