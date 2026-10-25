@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
 
 ## 2.2.0 — 2026-10-23

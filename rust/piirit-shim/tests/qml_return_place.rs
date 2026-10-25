@@ -32,16 +32,19 @@ const PROBE_QML: &str = r"
         height: 400
 
         ListModel { id: rows }
+        /// Rows' heights cycle over this many line counts.
+        property int spread: 4
 
         Loader {
             id: loader
             anchors.fill: parent
         }
 
+        function setSpread(lines) { holder.spread = lines; return 'ok' }
         function append(count) {
             for (var i = 0; i < count; i++) {
                 var text = 'message number ' + rows.count
-                for (var line = 0; line < rows.count % 4; line++) {
+                for (var line = 0; line < rows.count % holder.spread; line++) {
                     text += ', and another line of it to make this row '
                           + 'a different height from the ones around it'
                 }
@@ -100,6 +103,16 @@ const PROBE_QML: &str = r"
             holder.visible = false
             return 'ok'
         }
+        /// Rows the view has built on screen, as it stands: no relayout
+        /// asked, so a list left blank reads 0.
+        function built() {
+            var view = loader.item
+            var rows = 0
+            for (var y = 0; y < view.height; y += 16) {
+                if (view.indexAt(view.width / 2, view.contentY + y) >= 0) { rows++ }
+            }
+            return '' + rows
+        }
         /// The list losing its place under the other page.
         function lose() {
             var view = loader.item
@@ -130,8 +143,20 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
-#[allow(clippy::too_many_lines)]
 fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
+    coming_back(4);
+}
+
+/// Other row heights: lost place under a hidden list came back on its own for some heights
+/// (luck of view's estimate), so one mix can pass a broken restore.
+#[test]
+fn coming_back_puts_the_view_back_with_other_row_heights() {
+    coming_back(3);
+}
+
+/// Whole scenario, rows' heights cycling over `spread` line counts.
+#[allow(clippy::too_many_lines)]
+fn coming_back(spread: i32) {
     // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -160,6 +185,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     }
 
     single_shot(Duration::from_secs(1), move || unsafe {
+        call!("setSpread", spread);
         (*steps_ptr).push(("rows", call!("append", 60)));
         (*steps_ptr).push((
             "load",
@@ -187,9 +213,10 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     });
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("lose", call!("lose")));
-        (*steps_ptr).push(("while-away", call!("position")));
     });
     single_shot(Duration::from_secs(7), move || unsafe {
+        (*steps_ptr).push(("built-away", call!("built")));
+        (*steps_ptr).push(("while-away", call!("position")));
         (*steps_ptr).push(("back-again", call!("comeBack")));
     });
     single_shot(Duration::from_secs(8), move || unsafe {
@@ -256,7 +283,14 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          the moment the swipe back finishes. {context}"
     );
 
-    // Lost place while away, put back at once; coming back changed nothing more. Judged by
+    // Put back in list's own scroll handler, rows were dropped and none built: blank list.
+    assert_ne!(
+        value("built-away"),
+        "0",
+        "the list lost its place under the other page and was left blank. {context}"
+    );
+
+    // Lost place while away, put back before return; coming back changed nothing more. Judged by
     // top row and its top, not view position: a list jumped to beginning and back
     // re-estimates content start, reads different position for same rows.
     let row_at_top = |label: &str| {
@@ -269,7 +303,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
         row_at_top("while-away"),
         before_row,
         "the list lost its place under the other page and was not put \
-         back in the same turn. {context}"
+         back while away. {context}"
     );
     assert_eq!(
         row_at_top("after-losing"),
