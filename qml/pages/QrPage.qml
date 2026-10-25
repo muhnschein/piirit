@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/Emoji.js" as Emoji
 import Piirit 1.0
 
 /*
@@ -216,10 +217,16 @@ Page {
                     wrapMode: Text.Wrap
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
-                    textFormat: Text.PlainText
-                    //: Delta Chat's "qrshow_join_channel_hint". %1 is the channel's name.
-                    text: page.forChat ? qsTr("Scan to join channel \"%1\"").arg(page.chatName)
-                                       : qsTr("Let someone scan this code, or send them the link.")
+                    readonly property string sentence: page.forChat
+                        //: Delta Chat's "qrshow_join_channel_hint". %1 is the channel's name.
+                        ? qsTr("Scan to join channel \"%1\"").arg(page.chatName)
+                        : qsTr("Let someone scan this code, or send them the link.")
+                    /// Same, channel name's emoji as Twemoji; "" for plain.
+                    readonly property string pictured: Emoji.inText(sentence, false,
+                                                                    Theme.fontSizeSmall, "",
+                                                                    Emoji.nameSaturation)
+                    textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: pictured.length > 0 ? pictured : sentence
                 }
 
                 // White whatever ambience: codes read by contrast. Unsmoothed: modules keep square

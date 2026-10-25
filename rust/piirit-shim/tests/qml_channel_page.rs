@@ -25,7 +25,7 @@ mod common;
 const GIVE_UP_SECS: u64 = 60;
 
 /// Readings probe takes, by label.
-const READINGS: [&str; 12] = [
+const READINGS: [&str; 13] = [
     "channel-title",
     "channel-menu",
     "channel-invite",
@@ -35,6 +35,7 @@ const READINGS: [&str; 12] = [
     "code-switcher",
     "code-profile",
     "code-intro",
+    "code-intro-styled",
     "code-link",
     "group-title",
     "group-invite",
@@ -107,7 +108,7 @@ const PROBE_QML: &str = r"
                     // What the push hands QR page.
                     loader.setSource('', {})
                     loader.setSource(probe.qrUrl, {
-                        accountId: 1, chatId: 1, chatName: 'News', appActive: true
+                        accountId: 1, chatId: 1, chatName: 'News 📢', appActive: true
                     })
                     probe.step = 1
                 } else if (probe.step === 1) {
@@ -117,6 +118,8 @@ const PROBE_QML: &str = r"
                     probe.readings['code-switcher'] = read('viewSwitcher', 'visible')
                     probe.readings['code-profile'] = read('profileRow', 'visible')
                     probe.readings['code-intro'] = read('intro', 'text')
+                    probe.readings['code-intro-styled'] =
+                        '' + (findIn(loader.item, 'intro').textFormat === Text.StyledText)
                     probe.readings['code-link'] = link
                     probe.openGroup(2)
                     probe.step = 2
@@ -253,10 +256,23 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
             "the channel's code page shows the profile's side ({label}). {context}"
         );
     }
+    // Name's emoji as Twemoji, as every name label draws it (qml_emoji_names.rs).
+    let intro = value("code-intro");
+    assert!(
+        intro.starts_with("Scan to join channel \"News <img src=\"image://piirit/emoji?file=")
+            && intro.contains("1f4e2.svg")
+            && intro.ends_with("align=\"middle\">\""),
+        "the channel's code is not named as Delta Chat names it, emoji drawn as a picture. \
+         {context}"
+    );
+    assert!(
+        !intro.contains('\u{1f4e2}'),
+        "the channel name's emoji is left to Sailfish's font. {context}"
+    );
     assert_eq!(
-        value("code-intro"),
-        "Scan to join channel \"News\"",
-        "the channel's code is not named as Delta Chat names it. {context}"
+        value("code-intro-styled"),
+        "true",
+        "the pictured name is shown as plain text, tags and all. {context}"
     );
     assert!(
         value("code-link").contains("&b="),
