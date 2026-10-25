@@ -14,6 +14,10 @@ Item {
     property int horizontalAlignment: 0
     property bool labelVisible: true
     property int textTopMargin: 0
+    property real textLeftMargin: 0
+    property real textRightMargin: 0
+    // Read-only in Silica.
+    property real textVerticalCenterOffset: implicitHeight / 2
     property font font
     // Silica draws text and placeholder in own colours; name fields ask for
     // others.

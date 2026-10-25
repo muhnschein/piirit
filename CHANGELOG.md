@@ -13,6 +13,7 @@ docs/BUILDING.md, "Cutting a release").
 - A message of nothing but emoji, up to five of them, shows them big.
 - Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- Emoji in names show as pictures, as they do in messages, with their colours muted: in the chat list, the chat header, contact and group pages, search results, contact lists and calls. In message previews and the reply bar they are grey like the text, so lists stay calm.
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
 - The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
 
