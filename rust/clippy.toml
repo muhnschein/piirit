@@ -1,13 +1,13 @@
-# Device-only failures, encoded to stay fixed.
+# Failures once hit, encoded to stay fixed.
 
 disallowed-methods = [
     # Tokio runtime on Qt main thread panics on Sailfish aarch64: use `CoreRuntime`.
     # `Builder::build` ok: macros expand to it.
     { path = "tokio::runtime::Runtime::new", reason = "use CoreRuntime (piirit-shim/src/runtime.rs)" },
 
-    # qmetaobject 0.2.10: sub-second Duration becomes 0. Whole seconds only. Tests: steps via
-    # `common::Plan` (docs/BUILDING.md "Testing").
-    { path = "qmetaobject::single_shot", reason = "pass whole-second Durations only; in tests use common::Plan" },
+    # Fixed times from start flaked on loaded runners. Tests: steps via `common::Plan`
+    # (docs/BUILDING.md "Testing").
+    { path = "qmetaobject::single_shot", reason = "in tests use common::Plan" },
 ]
 
 allow-unwrap-in-tests = true
