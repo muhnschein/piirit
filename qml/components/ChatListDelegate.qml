@@ -1,10 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 import "../js/Format.js" as Format
 import "."
 
 /*
- * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml). Own
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml);
+ * preview with emoji: escaped StyledText, Twemoji muted (Emoji.js). Own
  * component, loads and measures alone; bindings, not positioner (ditto).
  */
 Item {
@@ -28,6 +30,16 @@ Item {
     property int summaryState: 0
 
     readonly property bool summaryIsOurs: summaryState >= 20
+    /// Preview line as written. Ours: delivery mark. Others: sender name, if set.
+    readonly property string previewText: (root.summaryIsOurs
+                                           ? Format.stateMark(root.summaryState) + " " : "")
+                                          + (root.previewSender.length > 0 && !root.summaryIsOurs
+                                             ? root.previewSender + ": " : "")
+                                          + root.preview
+    /// Same with emoji pictures, or "" for as written.
+    readonly property string emojiPreview: Emoji.inText(root.previewText, false,
+                                                        Theme.fontSizeExtraSmall,
+                                                        Emoji.previewSaturation)
 
     height: Math.max(avatar.height, previewLabel.y + previewLabel.height)
             + 2 * Theme.paddingMedium
@@ -123,12 +135,8 @@ Item {
         truncationMode: TruncationMode.Fade
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        textFormat: Text.PlainText
-        // Ours: delivery mark. Others: sender name, if set.
-        text: (root.summaryIsOurs ? Format.stateMark(root.summaryState) + " " : "")
-              + (root.previewSender.length > 0 && !root.summaryIsOurs
-                 ? root.previewSender + ": " : "")
-              + root.preview
+        textFormat: root.emojiPreview.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.emojiPreview.length > 0 ? root.emojiPreview : root.previewText
     }
 
     // Unread count; muted still counted, dimmed.

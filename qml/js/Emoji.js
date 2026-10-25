@@ -105,25 +105,32 @@ function escaped(text, lineStart) {
 
 /// `text` with each shipped emoji as `<img>`, as StyledText; "" if none.
 /// `styled`: already StyledText (shim's Markdown, sender chars escaped, tags
-/// untouched); else escaped here. Only added tag: `<img>` under qml/art/emoji/,
-/// so a message can load nothing. `size`: font px; pictures a bit taller.
+/// untouched); else escaped here. Only added tag: `<img>` of picture under
+/// qml/art/emoji/, so a message can load nothing. `size`: font px; pictures a
+/// bit taller. `saturation` below 1: colour turned down that far by app's
+/// picture provider (`image://piirit/emoji`, shim's pictures.rs).
 ///
 /// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
 /// from one value: Sailfish's ARM64 JIT could clobber it between the two
 /// copies, so some launches showed a leading emoji twice (picture + char).
 /// Each pass sets each variable from its own value.
-function inText(text, styled, size) {
+function inText(text, styled, size, saturation) {
     var cuts = emojiCuts(text, styled)
     if (cuts.length === 0) {
         return ""
     }
     var edge = Math.round(size * 1.15)
+    // StyledText reads attribute raw: `&` stays `&`.
+    var muted = saturation < 1 ? "&saturation=" + saturation : ""
     var out = ""
     var from = 0
     for (var k = 0; k < cuts.length; k += 3) {
         var before = text.substring(from, cuts[k])
+        var file = artBase + cuts[k + 2] + ".png"
         out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+        out += "<img src=\"" + (muted ? "image://piirit/emoji?file="
+                                       + encodeURIComponent(file) + muted : file)
+               + "\" width=\"" + edge
                + "\" height=\"" + edge + "\" align=\"middle\">"
         from = cuts[k + 1]
     }
@@ -174,6 +181,10 @@ function emojiCuts(text, styled) {
 /// Pictures' path for `<img>`. art/ is sibling of js/, components/, pages/:
 /// same from any.
 var artBase = Qt.resolvedUrl("../art/emoji/")
+
+/// Emoji colour kept in previews (chat list, search, reply bar): beside
+/// secondary text, full colour pulls eye off names.
+var previewSaturation = 0.4
 
 /// Recent-emoji cap.
 var recentLimit = 40

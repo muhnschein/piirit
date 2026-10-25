@@ -1,10 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 import "../js/Format.js" as Format
 import "."
 
 /*
- * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml).
+ * Search result, laid out as chat-list row. Others' text: PlainText (MessageDelegate.qml);
+ * with emoji: escaped StyledText, Twemoji muted (ChatListDelegate).
  */
 Item {
     id: root
@@ -15,6 +17,11 @@ Item {
     property string picturePath
     /// Unix s; 0 = no time (contacts).
     property int timestamp: 0
+
+    /// Subtitle with emoji pictures, or "" for as written.
+    readonly property string emojiSubtitle: Emoji.inText(root.subtitle, false,
+                                                         Theme.fontSizeExtraSmall,
+                                                         Emoji.previewSaturation)
 
     height: Math.max(avatar.height, subtitleLabel.y + subtitleLabel.height)
             + 2 * Theme.paddingMedium
@@ -67,9 +74,9 @@ Item {
         wrapMode: Text.Wrap
         maximumLineCount: 2
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
+        textFormat: root.emojiSubtitle.length > 0 ? Text.StyledText : Text.PlainText
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: root.subtitle
+        text: root.emojiSubtitle.length > 0 ? root.emojiSubtitle : root.subtitle
     }
 }

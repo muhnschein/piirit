@@ -1,5 +1,6 @@
-//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop), drawn
-//! by QML as plain `Image` of `image://piirit/<kind>?<recipe>` ([`Recipe`]).
+//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop, muted
+//! emoji), drawn by QML as plain `Image` (or `StyledText` `<img>`) of
+//! `image://piirit/<kind>?<recipe>` ([`Recipe`]).
 //!
 //! Not `ShaderEffect`: Sailfish Qt 5.6 (fixed 5.15) hiding a persistent-scene-graph window
 //! (cover, each return to front) runs `cleanupMaterialCache()`, freeing material types while
@@ -186,6 +187,8 @@ pub enum Kind {
     Ink = 1,
     /// Call backdrop.
     Blur = 2,
+    /// Emoji picture, colour turned down.
+    Emoji = 3,
 }
 
 /// Colour as straight channels.
@@ -230,6 +233,7 @@ impl Colour {
 ///   between.
 /// - `ink`, `lit`, `inkStrength`, `litStrength`: drawing colours, strengths.
 /// - `radius`: blur reach, in pixels of the 64-pixel copy.
+/// - `saturation`: emoji colour kept, 0 grey to 1 as drawn.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Recipe {
     /// Picture kind.
@@ -246,6 +250,8 @@ pub struct Recipe {
     pub ink: Option<((Colour, f64), (Colour, f64))>,
     /// Blur reach, pixels.
     pub radius: usize,
+    /// Emoji colour kept, 0 to 1.
+    pub saturation: f64,
 }
 
 impl Recipe {
@@ -257,6 +263,7 @@ impl Recipe {
             "face" => Kind::Face,
             "ink" => Kind::Ink,
             "blur" => Kind::Blur,
+            "emoji" => Kind::Emoji,
             _ => return None,
         };
         let mut pairs = Vec::new();
@@ -304,6 +311,7 @@ impl Recipe {
             fade,
             ink,
             radius,
+            saturation: number("saturation").map_or(1.0, |kept| kept.clamp(0.0, 1.0)),
         })
     }
 
@@ -317,6 +325,7 @@ impl Recipe {
             Kind::Face => self.face(pixels, width, height, stride),
             Kind::Ink => self.colour_ink(pixels, width, height, stride),
             Kind::Blur => blur(pixels, width, height, stride, self.radius),
+            Kind::Emoji => desaturate(pixels, width, height, stride, self.saturation),
         }
     }
 
@@ -397,6 +406,19 @@ impl Recipe {
 fn eased(across: f64, from: f64, to: f64) -> f64 {
     let sink = ((to - across) / (to - from)).clamp(0.0, 1.0);
     sink * sink
+}
+
+/// Each pixel `kept` of the way from its luma (Rec. 601) back to its colour: luma, not mean, so
+/// yellow face stays light.
+fn desaturate(pixels: &mut [u32], width: usize, height: usize, stride: usize, kept: f64) {
+    for line in pixels.chunks_mut(stride).take(height) {
+        for pixel in line.iter_mut().take(width) {
+            let [alpha, red, green, blue] = unpack(*pixel);
+            let luma = 0.299 * red + 0.587 * green + 0.114 * blue;
+            let toward = |channel: f64| luma + (channel - luma) * kept;
+            *pixel = pack([alpha, toward(red), toward(green), toward(blue)]);
+        }
+    }
 }
 
 /// Three box passes each way: close to Gaussian for a backdrop.
@@ -627,6 +649,23 @@ mod tests {
             .unwrap()
             .bake(&mut plain, 1, 1, 1);
         assert_eq!(plain[0].to_be_bytes(), [255, 255, 255, 255]);
+    }
+
+    #[test]
+    fn an_emoji_keeps_the_colour_asked_for_its_light_and_its_alpha() {
+        let yellow = u32::from_be_bytes([200, 255, 204, 0]);
+        let muted = |id: &str| {
+            let mut pixels = vec![yellow];
+            Recipe::parse(id).unwrap().bake(&mut pixels, 1, 1, 1);
+            pixels[0].to_be_bytes()
+        };
+        // Luma: 0.299 * 255 + 0.587 * 204 = 196.0.
+        assert_eq!(muted("emoji?file=a&saturation=0"), [200, 196, 196, 196]);
+        // Two fifths back toward colour: 196 + 0.4 * (255 - 196), (204 - 196), (0 - 196).
+        assert_eq!(muted("emoji?file=a&saturation=0.4"), [200, 220, 199, 118]);
+        assert_eq!(muted("emoji?file=a"), yellow.to_be_bytes());
+        assert_eq!(muted("emoji?file=a&saturation=7"), yellow.to_be_bytes());
+        assert_eq!(muted("emoji?file=a&saturation=-1"), [200, 196, 196, 196]);
     }
 
     #[test]

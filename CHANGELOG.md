@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- Emoji in the chat list, search results and the reply bar show as pictures, as they do in messages, with their colours toned down so the list stays calm.
 
 ## 2.2.0 — 2026-10-23
 
