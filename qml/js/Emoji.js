@@ -196,15 +196,6 @@ var artBase = Qt.resolvedUrl("../art/emoji/")
 /// dark and light ambience both.
 var tintStrength = 0.5
 
-/// Names (chat, contact, sender) tinted to own colour too: else full colour.
-/// Previews always tinted: beside secondary text, colour pulls eye off names.
-var tintNames = false
-
-/// `tint` for a name drawn in `color`: "" unless `tintNames`.
-function nameTint(color) {
-    return tintNames ? color : ""
-}
-
 /// Recent-emoji cap.
 var recentLimit = 40
 

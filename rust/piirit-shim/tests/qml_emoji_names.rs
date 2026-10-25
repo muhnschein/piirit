@@ -1,6 +1,6 @@
 //! Emoji in names (chat list, contact rows, search hit titles, chat header, contact and group
-//! page name, sender in bubble and quote, contact request bar) drawn as Twemoji in full colour,
-//! as bubbles draw them: Sailfish's font has few. Pinned per component: name with emoji is
+//! page name, sender in bubble and quote, contact request bar) drawn as Twemoji,
+//! as bubbles draw them, grey toward name's own colour: Sailfish's font has few. Pinned per component: name with emoji is
 //! escaped `StyledText` with `<img>` of shipped picture, search marks kept, app's own mail mark
 //! left the font's; name without stays plain. Name field (`TextField`, no pictures) drawn by a
 //! label over it while not edited. Every other name label: `qml_syntax.rs`
@@ -62,8 +62,8 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// `<img>` of shipped picture, full colour, for `size` px font.
-fn img(picture: &str, size: f64) -> String {
+/// `<img>` of shipped picture for `size` px font, grey toward `tint` (`#rrggbb`), as name drawn.
+fn img(picture: &str, size: f64, tint: &str) -> String {
     let file = common::art_dir()
         .join(format!("emoji/{picture}.png"))
         .canonicalize()
@@ -71,11 +71,30 @@ fn img(picture: &str, size: f64) -> String {
     #[allow(clippy::cast_possible_truncation)]
     let edge = (size * 1.15).round() as i64;
     format!(
-        "<img src=\"file://{}\" width=\"{edge}\" height=\"{edge}\" align=\"middle\">",
-        file.display()
+        "<img src=\"image://piirit/emoji?file={}&tint=%23{}&strength=0.5\" width=\"{edge}\" \
+         height=\"{edge}\" align=\"middle\">",
+        encode(&format!("file://{}", file.display())),
+        tint.trim_start_matches('#')
     )
 }
 
+/// `encodeURIComponent`, for paths: ASCII letters, digits, `-_.!~*'()` kept.
+fn encode(text: &str) -> String {
+    text.bytes()
+        .map(|byte| {
+            if byte.is_ascii_alphanumeric() || b"-_.!~*'()".contains(&byte) {
+                char::from(byte).to_string()
+            } else {
+                format!("%{byte:02X}")
+            }
+        })
+        .collect()
+}
+
+/// Stub `Theme.primaryColor`: Label's default.
+const PRIMARY: &str = "#ffffff";
+/// Stub `Theme.secondaryHighlightColor`: empty name field's fallback.
+const SECONDARY_HIGHLIGHT: &str = "#6090c0";
 /// Stub `Theme.highlightColor`, as Qt writes a colour.
 const HIGHLIGHT: &str = "#80c0ff";
 
@@ -201,7 +220,7 @@ fn names_draw_their_emoji_as_twemoji() {
 
         load!("bubble", component("MessageDelegate.qml"), {
             "messageText": "hi", "senderName": "Bo 🐝", "showSender": true,
-            "quoteText": "earlier", "quoteAuthor": "Cy 🌵"
+            "senderColor": "#d07030", "quoteText": "earlier", "quoteAuthor": "Cy 🌵"
         });
         label!("bubble-sender", "senderLabel");
         label!("bubble-quote-author", "quoteAuthor");
@@ -233,7 +252,7 @@ fn names_draw_their_emoji_as_twemoji() {
         value("chat-name"),
         format!(
             "styled:✉ Climbers {} &lt;{}&gt;",
-            img("1f9d7", 18.0),
+            img("1f9d7", 18.0, PRIMARY),
             mark("crew")
         ),
         "a chat name's emoji is not a picture, its search mark or mail mark got lost, or its \
@@ -246,17 +265,21 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("contact-name"),
-        format!("styled:✉ Ada {}", img("1f680", 18.0)),
+        format!("styled:✉ Ada {}", img("1f680", 18.0, PRIMARY)),
         "a contact row's emoji is not a picture. {context}"
     );
     assert_eq!(
         value("result-title"),
-        format!("styled:{} {} Lovelace", mark("Ada"), img("1f680", 18.0)),
+        format!(
+            "styled:{} {} Lovelace",
+            mark("Ada"),
+            img("1f680", 18.0, PRIMARY)
+        ),
         "a search hit's title loses its marks or its pictures. {context}"
     );
     assert_eq!(
         value("header-title"),
-        format!("styled:Family {}", img("1f3e1", 24.0)),
+        format!("styled:Family {}", img("1f3e1", 24.0, HIGHLIGHT)),
         "the chat header's emoji is not a picture. {context}"
     );
     assert_eq!(
@@ -266,7 +289,7 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("field-shown"),
-        format!("styled:Team {}", img("1f33b", 24.0)),
+        format!("styled:Team {}", img("1f33b", 24.0, HIGHLIGHT)),
         "a name field's emoji is not drawn as a picture over it. {context}"
     );
     assert_eq!(
@@ -287,7 +310,7 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("fallback-shown"),
-        format!("styled:Ada {}", img("1f680", 24.0)),
+        format!("styled:Ada {}", img("1f680", 24.0, SECONDARY_HIGHLIGHT)),
         "an empty name field's fallback name loses its pictures. {context}"
     );
     assert_eq!(
@@ -297,16 +320,17 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("bubble-sender"),
-        format!("styled:Bo {}", img("1f41d", 10.0)),
+        format!("styled:Bo {}", img("1f41d", 10.0, "#d07030")),
         "a sender's name in a bubble loses its pictures. {context}"
     );
     assert_eq!(
         value("bubble-quote-author"),
-        format!("styled:Cy {}", img("1f335", 10.0)),
+        format!("styled:Cy {}", img("1f335", 10.0, HIGHLIGHT)),
         "a quote's author loses its pictures. {context}"
     );
     assert!(
-        value("request-text").starts_with(&format!("styled:Dee {} isn", img("1f98a", 12.0))),
+        value("request-text")
+            .starts_with(&format!("styled:Dee {} isn", img("1f98a", 12.0, HIGHLIGHT))),
         "the contact request bar's name loses its pictures. {context}"
     );
 }

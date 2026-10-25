@@ -33,7 +33,7 @@ Item {
     /// tinted as its text.
     readonly property string shownTitle: Emoji.drawn(root.title, root.markedTitle,
                                                      Theme.fontSizeMedium,
-                                                     Emoji.nameTint(titleLabel.color))
+                                                     titleLabel.color)
     readonly property string shownSubtitle: Emoji.drawn(root.subtitle, root.markedSubtitle,
                                                         Theme.fontSizeExtraSmall,
                                                         Theme.secondaryColor)

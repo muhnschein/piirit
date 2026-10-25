@@ -29,7 +29,7 @@ Item {
           .arg(root.chatName)
     /// Same, name's emoji as Twemoji; "" for plain.
     readonly property string pictured: Emoji.inText(root.sentence, false, Theme.fontSizeSmall,
-                                                    Emoji.nameTint(Theme.highlightColor))
+                                                    Theme.highlightColor)
     signal acceptClicked()
     signal declineClicked()
 

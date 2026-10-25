@@ -528,7 +528,7 @@ CoverBackground {
             readonly property string namePlain: cover.callUp ? cover.call.peer_name : ""
             readonly property string namePictured: Emoji.inText(callBody.namePlain, false,
                                                                 callBody.nameSize,
-                                                                Emoji.nameTint(Theme.primaryColor))
+                                                                Theme.primaryColor)
 
             // Hidden one-line name: width sets size.
             Label {
@@ -574,7 +574,7 @@ CoverBackground {
                     // (MessageDelegate body).
                     readonly property string pictured: Emoji.inText(callBody.namePlain, false,
                                                                     callBody.nameFont,
-                                                                    Emoji.nameTint(color))
+                                                                    color)
                     truncationMode: callName.pictured.length > 0 ? TruncationMode.None
                                                                  : TruncationMode.Elide
                     font.pixelSize: callBody.nameFont

@@ -55,7 +55,7 @@ Item {
     /// Name as drawn, marks and emoji pictures, after mark; "" for plain.
     readonly property string drawnName: Emoji.drawn(root.chatName, root.markedName,
                                                     Theme.fontSizeMedium,
-                                                    Emoji.nameTint(nameLabel.color))
+                                                    nameLabel.color)
     readonly property string shownName: root.drawnName.length > 0
                                         ? root.mailMark + root.drawnName : ""
 

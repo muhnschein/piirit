@@ -39,7 +39,7 @@ Dialog {
             color: Theme.highlightColor
             // Contact's own name, or given one; emoji as Twemoji (Emoji.js).
             readonly property string pictured: Emoji.inText(dialog.contactName, false,
-                                                            font.pixelSize, Emoji.nameTint(color))
+                                                            font.pixelSize, color)
             textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
             text: pictured.length > 0 ? pictured : dialog.contactName
         }

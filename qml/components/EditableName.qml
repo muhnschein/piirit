@@ -33,7 +33,10 @@ Item {
     /// Name or fallback with emoji pictures, while not editing; "" when field draws it.
     readonly property string emojiName: root.editing ? ""
         : Emoji.inText(field.text.length > 0 ? field.text : field.placeholderText, false,
-                       field.font.pixelSize, Emoji.nameTint(Theme.highlightColor))
+                       field.font.pixelSize, root.emojiColor)
+    /// Overlay's colour, as field's text or fallback.
+    readonly property color emojiColor: field.text.length > 0 ? Theme.highlightColor
+                                                              : Theme.secondaryHighlightColor
 
     width: parent ? parent.width : 0
     height: column.height
@@ -92,7 +95,7 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         truncationMode: TruncationMode.Fade
         font.pixelSize: field.font.pixelSize
-        color: field.text.length > 0 ? Theme.highlightColor : Theme.secondaryHighlightColor
+        color: root.emojiColor
         textFormat: Text.StyledText
         text: root.emojiName
     }
