@@ -6,15 +6,7 @@
 //! 4s, making the window reads below land in wide, not a race.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -104,7 +96,9 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -115,7 +109,7 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
         ));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(4, move || unsafe {
         probe!("away-shown", "errorLabel", "text");
         probe!("away-timeout", "errorBanner", "timeout");
         // Page opened while core away never saw it go.
@@ -129,11 +123,12 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
         ));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         probe!("reopened-shown", "errorLabel", "text");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

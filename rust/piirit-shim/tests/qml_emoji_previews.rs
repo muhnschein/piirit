@@ -7,18 +7,10 @@
 //! draws it has.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -121,20 +113,6 @@ fn colour_in(file: &str) -> (i32, usize) {
     (most, lit)
 }
 
-/// Each second: both labels grabbed, or patience spent? Then quit.
-fn wait_for_shots(engine: *mut QmlEngine, patience: u32) {
-    single_shot(Duration::from_secs(1), move || unsafe {
-        let saved = QString::from_qvariant((*engine).invoke_method("savedShots".into(), &[]))
-            .map(|value| value.to_string())
-            .unwrap_or_default();
-        if saved.split(';').filter(|name| !name.is_empty()).count() == 2 || patience == 0 {
-            (*engine).quit();
-        } else {
-            wait_for_shots(engine, patience - 1);
-        }
-    });
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn previews_draw_their_emoji_as_grey_twemoji() {
@@ -184,7 +162,9 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         let row_url = QString::from(common::component_url("ChatListDelegate.qml"));
         // Sender's markup stays text; sender name escaped too.
         record!(
@@ -319,16 +299,27 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
         );
         record!("message", call!("asMessage", QString::from("🔥🔥🔥")));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         for (name, path) in [("previewLabel", &row_path), ("messageLabel", &message_path)] {
             record!(
                 format!("{name}-shot"),
                 call!("shoot", QString::from(name), QString::from(path.as_str()))
             );
         }
-        wait_for_shots(engine_ptr, 5);
+    });
+    // Each second: both labels grabbed, or patience spent? Then quit.
+    plan.until(1, 6, move |last| unsafe {
+        let saved = QString::from_qvariant((*engine_ptr).invoke_method("savedShots".into(), &[]))
+            .map(|value| value.to_string())
+            .unwrap_or_default();
+        if saved.split(';').filter(|name| !name.is_empty()).count() < 2 && !last {
+            return false;
+        }
+        (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| common::value_of(&steps, label).to_string();

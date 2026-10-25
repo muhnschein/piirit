@@ -2,16 +2,8 @@
 //!
 //! Two instances at once: old shared model reset the first on second open.
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -94,8 +86,10 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let mut counts_after_load = String::new();
     let counts_ptr: *mut String = std::ptr::addr_of_mut!(counts_after_load);
 
+    let mut plan = common::Plan::default();
+
     // Models load once QML sets ids: load probe a tick after core is up.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
@@ -103,7 +97,7 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let sent_ptr: *mut String = std::ptr::addr_of_mut!(counts_after_send);
     let mut ever_sent = String::new();
     let ever_ptr: *mut String = std::ptr::addr_of_mut!(ever_sent);
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(7, move || unsafe {
         let read = |name: &str| {
             QString::from_qvariant((*engine_ptr).invoke_method(name.into(), &[]))
                 .map(|text| text.to_string())
@@ -115,6 +109,7 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     // Send never happened: rest would show as count mismatch, not cause.

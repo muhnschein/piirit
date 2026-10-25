@@ -3,17 +3,8 @@
 //! Count arrives with chat shape: group opens with count set, no flicker. Follows join/leave
 //! (this or other device) on same events as name. One-to-one has no count: "2" would be wrong.
 
-// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr, single_shot whole-second
-// Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -101,23 +92,26 @@ fn the_header_over_a_group_counts_its_members_and_follows_a_joiner() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!("open", call!("open"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("group", call!("groupness"));
         record!("counted", call!("count"));
         record!("one-to-one", call!("oneToOneCount"));
         record!("add", call!("add", 11));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("after-joining", call!("count"));
         record!("announced", call!("announced"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

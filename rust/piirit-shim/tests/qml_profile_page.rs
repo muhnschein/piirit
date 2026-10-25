@@ -13,13 +13,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -205,7 +202,9 @@ fn the_profile_page_round_trips_the_profile() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -217,7 +216,7 @@ fn the_profile_page_round_trips_the_profile() {
         record!("listed", call!("listProfiles"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // Row before anything typed.
         record!("listed-before", listed!());
         // Relay and phone status, as parla's dialog shows. Address: first relay row's.
@@ -257,13 +256,13 @@ fn the_profile_page_round_trips_the_profile() {
     });
 
     // Pause after typing is the mechanism: wait it out, nothing tapped.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("autosaved", call!("pageProperty", QString::from("edited")));
         record!("receipts-before", get!("profile", "read_receipts"));
         record!("toggled", call!("toggleReceipts"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("saved-name", get!("profile", "display_name"));
         record!("saved-bio", get!("profile", "status"));
         // Profiles page under this one: its row, not reopened.
@@ -281,7 +280,7 @@ fn the_profile_page_round_trips_the_profile() {
     });
 
     // Picker hands URL; core wants path.
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("receipts-after", get!("profile", "read_receipts"));
         record!("refilled", get!("profileNameField", "text"));
         // Reopened page holds saved name.
@@ -297,18 +296,19 @@ fn the_profile_page_round_trips_the_profile() {
         );
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("picture", get!("profile", "avatar_path"));
         record!("listed-picture", listed!());
         record!("unpicked", call!("unpick"));
     });
 
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("picture-gone", get!("profile", "avatar_path"));
         record!("listed-picture-gone", listed!());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

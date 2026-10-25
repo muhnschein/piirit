@@ -5,15 +5,7 @@
 //! Reported after camera left: thrown away without asking.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -185,8 +177,10 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
 
     let list = common::page_url("ChatListPage.qml");
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -268,6 +262,7 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -4,15 +4,7 @@
 //! asked: no choice; forward/share send from starting profile.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -139,12 +131,14 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
 
     // SAFETY for every block: fire only while `exec()` runs on this thread; all they
 
+    let mut plan = common::Plan::default();
+
     // point at outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("read-profiles", call!("readProfiles"));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         // Asked for: choice, on profile picker opened on.
         record!(
             "load-choice",
@@ -162,7 +156,7 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         record!("turned-says", get!("pickerProfileCombo", "value"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("turned-loaded", call!("page", QString::from("chatsLoaded")));
         record!("turned-count", get!("pickerChats", "count"));
 
@@ -178,7 +172,7 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         );
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("gone-on", call!("page", QString::from("accountId")));
         record!("gone-list", get!("pickerChats", "account_id"));
         record!("gone-loaded", call!("page", QString::from("chatsLoaded")));
@@ -190,11 +184,12 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("gone-first-on", call!("page", QString::from("accountId")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

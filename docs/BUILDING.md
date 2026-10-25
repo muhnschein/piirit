@@ -41,6 +41,8 @@ cargo install --locked cargo-nextest
 1. **Transport unit**: fake stdio server.
 2. **Protocol-contract**: recording double journals requests; pins call sequence per onboarding action.
 3. **Qt event-loop**: `QT_QPA_PLATFORM=offscreen`.
+   - Steps scheduled by `common::Plan` (`rust/piirit-shim/tests/common/mod.rs`): each a set wait after one before *ended*; `until` polls a condition. Fixed times from start let an overrunning step pull next one in right behind it, before async answer lands (flaked on loaded runners).
+   - Bare `single_shot` denied in tests (clippy ban below, no file-wide allow); only `Plan` and two self-rescheduling waits allow it.
 4. **QML load**: stub Silica (`tests/silica-stubs/`), real pages, driven by `objectName`. Stubs have no layout: nothing proves page *looks* right.
    - Silica `EnterKey` attached prop unstubbable (QML forbids capitalised property names; `qmetaobject` can't register attached types): pages using it can't load. Put shown content in loadable component.
    - Lay that out with bindings, not `Column`: positioner sizes in polish pass, never runs windowless; geometry reads zero.

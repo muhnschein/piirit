@@ -5,8 +5,9 @@ disallowed-methods = [
     # `Builder::build` ok: macros expand to it.
     { path = "tokio::runtime::Runtime::new", reason = "use CoreRuntime (piirit-shim/src/runtime.rs)" },
 
-    # qmetaobject 0.2.10: sub-second Duration becomes 0. Whole seconds only.
-    { path = "qmetaobject::single_shot", reason = "pass whole-second Durations only" },
+    # qmetaobject 0.2.10: sub-second Duration becomes 0. Whole seconds only. Tests: steps via
+    # `common::Plan` (docs/BUILDING.md "Testing").
+    { path = "qmetaobject::single_shot", reason = "pass whole-second Durations only; in tests use common::Plan" },
 ]
 
 allow-unwrap-in-tests = true

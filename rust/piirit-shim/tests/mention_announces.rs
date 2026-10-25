@@ -6,15 +6,7 @@
 //! `PIIRIT_FAKE_SELF_SENT` makes sends the account's own; every send announced as arrival.
 
 // Qt harness: see chat_list_announces.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -119,26 +111,28 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Something of the reader's own in the group, while it is still
     // loud, so there is a message to reply to.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", call!("loaded"));
         record!("say", call!("say", QString::from("mine")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-loud", call!("heard"));
         record!("mute", call!("mute", 2u32));
     });
     // Muted: reply gets through, plain message doesn't.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("reply", call!("replyTo", QString::from("answering you")));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-reply", call!("heard"));
         record!("plain", call!("say", QString::from("to everyone")));
     });
     // Setting off: not even the reply.
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-plain", call!("heard"));
         record!("mentions-off", call!("setMentions", false));
         record!(
@@ -147,26 +141,27 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
         );
     });
     // One-to-one isn't a group: muted is muted.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-off", call!("heard"));
         record!("mentions-on", call!("setMentions", true));
         record!("say-alone", call!("sayAlone", QString::from("just us")));
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-alone", call!("heard"));
         record!("mute-alone", call!("mute", 1u32));
     });
-    single_shot(Duration::from_secs(16), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "reply-alone",
             call!("replyAlone", QString::from("still us"))
         );
     });
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("heard-end", call!("heard"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

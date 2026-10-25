@@ -4,15 +4,7 @@
 //! one encoded value; measure: picture under such name found and drawn.
 
 // Qt harness: see qml_avatar.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -94,7 +86,9 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "attachment-load",
             call!(
@@ -110,7 +104,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "avatar-load",
             call!(
@@ -127,7 +121,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
     });
 
     // Loaded off main thread.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "avatar-status",
             call!("get", QString::from("avatarImage"), QString::from("status"))
@@ -135,6 +129,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -8,15 +8,7 @@
 //! test a tag is a file carrying it.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -115,7 +107,9 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
         }};
     }
 
-    single_shot(Duration::from_millis(200), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(0, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -126,7 +120,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
         ));
     });
     // Decoded off Qt thread: own size unknown in the asking pass.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "status",
             call!(
@@ -155,6 +149,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

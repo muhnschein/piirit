@@ -8,20 +8,12 @@
 //! a push mid-transition, so the dialog waits for the page back on screen, stack idle.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::{Path, PathBuf};
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 use serde_json::Value;
+use std::path::{Path, PathBuf};
 
 mod common;
 
@@ -228,8 +220,27 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut steps_json = String::new();
     let steps_ptr: *mut String = std::ptr::addr_of_mut!(steps_json);
-    wait_for_steps(engine_ptr, steps_ptr, journal.clone(), PATIENCE_SECONDS);
+    // Each second: probe's steps done and last write landed, or patience spent? Then take the
+    // steps and quit.
+    let mut plan = common::Plan::default();
+    let written = journal.clone();
+    plan.until(1, PATIENCE_SECONDS, move |last| unsafe {
+        let finished =
+            QString::from_qvariant((*engine_ptr).invoke_method("isFinished".into(), &[]))
+                .map(|value| value.to_string())
+                .unwrap_or_default();
+        let ready = finished == "true" && second_choice_written(&written);
+        if !(ready || last) {
+            return false;
+        }
+        *steps_ptr = QString::from_qvariant((*engine_ptr).invoke_method("stepsJson".into(), &[]))
+            .map(|value| value.to_string())
+            .unwrap_or_default();
+        (*engine_ptr).quit();
+        true
+    });
 
+    plan.run();
     engine.exec();
 
     let steps: Vec<(String, String)> = serde_json::from_str(&steps_json).unwrap_or_default();
@@ -322,22 +333,4 @@ fn second_choice_written(journal: &Path) -> bool {
     common::calls(journal).iter().any(|(method, params)| {
         method == "set_config" && *params == serde_json::json!([1, "delete_device_after", "86400"])
     })
-}
-
-/// Each second: probe's steps done and last write landed, or patience spent? Then take the
-/// steps and quit. Whole seconds: vendored `single_shot` drops fraction.
-fn wait_for_steps(engine: *mut QmlEngine, steps: *mut String, journal: PathBuf, patience: u32) {
-    single_shot(Duration::from_secs(1), move || unsafe {
-        let finished = QString::from_qvariant((*engine).invoke_method("isFinished".into(), &[]))
-            .map(|value| value.to_string())
-            .unwrap_or_default();
-        if (finished == "true" && second_choice_written(&journal)) || patience == 0 {
-            *steps = QString::from_qvariant((*engine).invoke_method("stepsJson".into(), &[]))
-                .map(|value| value.to_string())
-                .unwrap_or_default();
-            (*engine).quit();
-        } else {
-            wait_for_steps(engine, steps, journal.clone(), patience - 1);
-        }
-    });
 }

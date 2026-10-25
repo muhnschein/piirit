@@ -7,15 +7,7 @@
 //! counts movie going round.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -166,8 +158,10 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     let png_for_load = png;
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -182,7 +176,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     });
 
     let gif_for_show = gif.clone();
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("image-showing", call!("showing")));
         (*steps_ptr).push(("image-height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("image-wide", call!("get", QString::from("wantsFullWidth"))));
@@ -191,7 +185,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("gif", show!("Gif", gif_for_show.as_str(), "dot.gif")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         // Old GIF: still and mark, no movie.
         (*steps_ptr).push(("gif-showing", call!("showing")));
         (*steps_ptr).push(("gif-marked", call!("marked")));
@@ -230,14 +224,14 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         ));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         // Three 80 ms runs long over: movie gone, mark back.
         (*steps_ptr).push(("gif-ran-showing", call!("showing")));
         (*steps_ptr).push(("gif-ran-marked", call!("marked")));
         (*steps_ptr).push(("video", show!("Video", "/tmp/clip.mp4", "clip.mp4")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("video-showing", call!("showing")));
         (*steps_ptr).push(("video-height", call!("get", QString::from("height"))));
         // Video's shape (taken upright) given: box stands up.
@@ -251,7 +245,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("voice", show!("Voice", "/tmp/note.mp3", "note.mp3")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("voice-showing", call!("showing")));
         (*steps_ptr).push((
             "voice-name",
@@ -303,7 +297,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         ));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("card-showing", call!("showing")));
         (*steps_ptr).push((
             "card-label",
@@ -317,7 +311,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     });
 
     let gif_for_new = gif;
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("xdc-showing", call!("showing")));
         (*steps_ptr).push((
             "xdc-label",
@@ -348,7 +342,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("new-gif-marked", call!("marked")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         // And stops by itself.
         (*steps_ptr).push(("new-gif-ran-showing", call!("showing")));
         (*steps_ptr).push(("new-gif-ran-marked", call!("marked")));
@@ -368,13 +362,13 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         );
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("app-off-showing", call!("showing")));
         (*steps_ptr).push(("app-off-is-app", call!("get", QString::from("isApp"))));
         call!("set", QString::from("appsEnabled"), true);
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("app-showing", call!("showing")));
         (*steps_ptr).push((
             "app-name",
@@ -393,6 +387,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

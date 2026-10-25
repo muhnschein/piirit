@@ -4,15 +4,7 @@
 //! account-list read, so later profiles get it (as download limit).
 
 // Qt harness: see download_limit.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -88,17 +80,20 @@ fn the_period_is_written_to_each_account_and_the_core_counts_first() {
         }};
     }
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(4, move || unsafe {
         call!("estimate", 3600u32);
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("change", 3600u32);
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         *heard_ptr = call!("heard");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

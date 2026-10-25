@@ -9,12 +9,9 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -160,7 +157,9 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!(
@@ -212,7 +211,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("picked", call!("picked"));
         record!("popped", (*stack_ptr).pinned().borrow().log.to_string());
         record!(
@@ -231,11 +230,12 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
         record!("tap-phone", call!("tap", QString::from("fromPhoneButton")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("pushed", (*stack_ptr).pinned().borrow().log.to_string());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

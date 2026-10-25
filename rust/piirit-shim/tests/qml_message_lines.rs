@@ -5,15 +5,7 @@
 //! (renderer emits these shapes); together, whole chain.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -117,7 +109,9 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
 
     let long = a_long_styled_body();
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // Newline-joined body and `<br>`-joined body.
         record!("newlines", call!("lines", QString::from("one\ntwo\nthree")));
         record!(
@@ -141,7 +135,7 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         // Forty-line body from rendering: fold must see forty lines.
         call!("set", QString::from("markdownMode"), 0);
         call!(
@@ -149,14 +143,10 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
             QString::from("messageText"),
             QString::from("the 1st thing to do today")
         );
-        call!(
-            "set",
-            QString::from("styledText"),
-            QString::from(long.clone())
-        );
+        call!("set", QString::from("styledText"), QString::from(long));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "styled-truncated",
             call!(
@@ -184,6 +174,7 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

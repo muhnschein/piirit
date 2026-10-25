@@ -14,20 +14,12 @@
 //! (`restore_duplicate.rs`), without reader asking twice.
 
 // Qt harness: see qml_restore.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 mod common;
 
@@ -131,10 +123,12 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
 
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
 
+    let mut plan = common::Plan::default();
+
     // 1s: page, and file chosen on it, browser still animating away (stack busy). Chosen
     // twice, as a picker reporting one choice twice would.
     let s = steps.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "load",
@@ -152,7 +146,7 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
 
     // 3s: core answered. Transfer over; move not made yet; page holds back gesture over it.
     let s = steps.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(2, move || {
         common::record(&s, "transferring", call!("pageProperty", "busy"));
         common::record(&s, "said", call!("pageProperty", "errorMessage"));
         common::record(&s, "held", call!("stackLog"));
@@ -166,15 +160,16 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
 
     // 4s: stack free: held move made.
     let s = steps.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(1, move || {
         common::record(&s, "landed", call!("stackLog"));
         common::record(&s, "backAgain", call!("pageProperty", "backNavigation"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow();

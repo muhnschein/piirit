@@ -11,15 +11,7 @@
 //! already on, from under reader's first tap.
 
 // Qt harness: see qml_startup.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -149,44 +141,47 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
+    let mut plan = common::Plan::default();
+
     // 1s: phone never had profile. dconf outlives binary, so key set, not assumed.
     // SAFETY: callbacks run only inside `exec()`.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("forget", call!("remember", "0")));
         (*steps_ptr).push(("load", call!("load", root.clone())));
         (*steps_ptr).push(("refresh", call!("refresh")));
     });
 
     // 3s: nothing moved for empty start; a profile is made.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("fresh", call!("stackLog")));
         (*steps_ptr).push(("make", call!("makeProfile")));
     });
 
     // 5s: list read again, as every chat-list arrival reads it: window learns phone has profile.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("reread", call!("refresh")));
     });
 
     // 6s: deleted with stack busy, as swipe back off profiles page leaves.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("before", call!("stackLog")));
         (*steps_ptr).push(("transition", call!("transition", "true")));
         (*steps_ptr).push(("delete", call!("deleteProfile", "1")));
     });
 
     // 8s: move not made, not lost either.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("held", call!("stackLog")));
         (*steps_ptr).push(("settled", call!("transition", "false")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("landed", call!("stackLog")));
         (*steps_ptr).push(("remembered", call!("remembered")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -9,13 +9,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use qmetaobject::*;
 
@@ -159,7 +156,9 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
@@ -189,7 +188,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         record!("still-stopped", call!("running"));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "reload",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
@@ -216,7 +215,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         // Recorder ignoring stop: camera stop finishes file.
         record!(
             "reload-stubborn",
@@ -231,7 +230,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         record!("stubborn-early", call!("pickedPath"));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("stubborn-picked", call!("pickedPath"));
         record!(
             "stubborn-pops",
@@ -266,6 +265,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

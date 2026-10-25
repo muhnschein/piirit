@@ -12,12 +12,9 @@
     unused_unsafe,
     non_snake_case,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -220,16 +217,18 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("seed", call!("seed"));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("picture", call!("givePicture"));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("refresh");
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!(
@@ -239,12 +238,12 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
             )
         );
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         // Nothing unread; then chat marked unread: core announces, row follows.
         record!("badge-before", call!("badgeOf", 1));
         record!("mark-unread", call!("markUnread"));
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("badge-after", call!("badgeOf", 1));
         record!(
             "avatar-path",
@@ -267,7 +266,7 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
         // Read while waiting: the state reader sees for those seconds.
         record!("going-1", call!("goingOut", 1));
     });
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("row-2-after", call!("stillThere", 2));
         record!("rows-after", call!("rowCount"));
         record!(
@@ -275,10 +274,11 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
             call!("clickIn", 2, QString::from("deleteProfileItem"))
         );
     });
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();

@@ -6,15 +6,7 @@
 //! Decoding itself: `qml_scan.rs`. This is what is around it.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 use serde_json::{json, Value};
@@ -172,11 +164,13 @@ fn the_scanner_zooms_and_lights_with_only_the_torch_and_link_button() {
     let probe = PROBE_QML.replace("__COMPONENTS__", &components.display().to_string());
     engine.load_data(QByteArray::from(probe.as_str()));
 
+    let mut plan = common::Plan::default();
+
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut answer = String::new();
     let answer_ptr: *mut String = std::ptr::addr_of_mut!(answer);
     let url = common::component_url("ScanView.qml");
-    single_shot(Duration::from_millis(500), move || unsafe {
+    plan.after(0, move || unsafe {
         let result = (*engine_ptr)
             .invoke_method("run".into(), &[QVariant::from(QString::from(url.as_str()))]);
         *answer_ptr = QString::from_qvariant(result)
@@ -184,6 +178,7 @@ fn the_scanner_zooms_and_lights_with_only_the_torch_and_link_button() {
             .unwrap_or_default();
         (*engine_ptr).quit();
     });
+    plan.run();
     engine.exec();
 
     let out: Value = serde_json::from_str(&answer)

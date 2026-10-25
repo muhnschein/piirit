@@ -8,15 +8,7 @@
 //! checks names against a real `Call` so the two can't drift.
 
 // Qt harness: see qml_cover.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -417,8 +409,10 @@ fn the_cover_shows_the_call_while_one_is_up() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()`.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("names", call!("missingNames"));
         // Own quick action: goes, comes back.
         record!("count", call!("count", 1));
@@ -437,7 +431,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     });
 
     // Lists in. Video call rings, from someone without picture.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("idle-grid", call!("grid"));
         record!("ring", state!("ringing", "Alice", "", -1, "true", "true"));
         record!("ring-mode", call!("mode"));
@@ -451,7 +445,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("mark", call!("markUnread", 0, 1));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("ring-grid", call!("grid"));
 
         // Voice call placed: ringing, then set up.
@@ -524,20 +518,20 @@ fn the_cover_shows_the_call_while_one_is_up() {
     });
 
     // Their picture loads off main thread.
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("pictured-backdrop", call!("backdrop"));
         record!("pictured-shaders", call!("drawnThrough"));
         record!("pictured-name", text!("callName"));
     });
 
     // Clock ticked since; then nobody looks a while.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("later-time", text!("callTime"));
         record!("asleep", call!("look", 0));
         record!("asleep-time", text!("callTime"));
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("still-asleep-time", text!("callTime"));
         record!("awake", call!("look", 2));
         record!("awake-time", text!("callTime"));
@@ -556,7 +550,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("broken-backdrop", call!("backdrop"));
 
         // Over: grid and action back, arrivals included.
@@ -587,7 +581,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     }
 
     let to_file = picture_at.clone();
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("phone-theme", call!("phoneTheme"));
         record!("large", call!("size", 234, 374));
         // Unconnected, ringing: nothing to switch.
@@ -620,7 +614,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
     });
 
     let to_file = picture_at.clone();
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(1, move || unsafe {
         case!(
             "fit-short-bare-both",
             short_name,
@@ -637,7 +631,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
 
     let to_file = picture_at.clone();
     let pictured = common::a_real_picture();
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("small", call!("size", 148, 237));
         case!(
             "fit-small-short-bare",
@@ -662,13 +656,13 @@ fn the_cover_shows_the_call_while_one_is_up() {
     });
 
     // Back to large cover; their picture, off main thread.
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("size", 234, 374);
-        state!("connected", long_name, pictured.clone(), 12, "true", "true");
+        state!("connected", long_name, pictured, 12, "true", "true");
     });
 
     let to_file = picture_at.clone();
-    single_shot(Duration::from_secs(16), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("fit-long-pictured-both", call!("layout"));
         record!(
             "shot-long-pictured",
@@ -678,7 +672,7 @@ fn the_cover_shows_the_call_while_one_is_up() {
 
     // Voice call, mic off: same picture stays loaded.
     let to_file = picture_at;
-    single_shot(Duration::from_secs(17), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("setName", QString::from(short_name));
         call!("setCamera", QString::from("false"));
         record!("fit-voice-pictured", call!("layout"));
@@ -688,11 +682,12 @@ fn the_cover_shows_the_call_while_one_is_up() {
         );
     });
 
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("saved", call!("savedShots"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

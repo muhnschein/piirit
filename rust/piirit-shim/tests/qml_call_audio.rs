@@ -20,15 +20,7 @@
 //! return in between. Not asked again for a ring manager refused.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -229,9 +221,11 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
 
     let url = common::component_url("CallAudio.qml");
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only while `exec()` runs on this thread; all they point at
     // outlives it.
-    single_shot(Duration::from_millis(300), move || unsafe {
+    plan.after(0, move || unsafe {
         let load = |app: &str| call!("load", QString::from(url.as_str()), QString::from(app));
         record!("load", load("1234"));
         record!("start", call!("said"));
@@ -580,6 +574,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

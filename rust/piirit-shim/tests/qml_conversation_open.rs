@@ -14,15 +14,7 @@
 //! `common::qml_tree_without_enter_key` for why shipped file can't load headlessly.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -138,12 +130,14 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // Tap: load chat, then push page.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("prefetch", call!("prefetchChat", 1)));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("prefetched", call!("prefetched")));
         (*steps_ptr).push((
             "load",
@@ -162,11 +156,12 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
         (*steps_ptr).push(("settle", call!("settle")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("rows-after-arriving", call!("rowsOfModel")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

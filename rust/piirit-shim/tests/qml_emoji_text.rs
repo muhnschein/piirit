@@ -4,18 +4,10 @@
 //! must match picker list. Plain text skipped fast.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -173,14 +165,16 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     // Plain text, no char of any emoji: not read char by char. Digit, #, * among them: they start
     // keycaps, but are in far more text than any keycap is.
-    let plain: Vec<&'static str> = vec![
+    let unmarked: Vec<&'static str> = vec![
         "no emoji at all, 1 # * 2",
         "Täällä on lunta -- 3 cm, ja \"pakkasta\" (10°C) <b>&amp;</b>\n  OK?",
         "Встретимся в 19:30 у входа №2.",
     ];
-    let plain_ptr = std::ptr::addr_of!(plain);
+    let plain_ptr = std::ptr::addr_of!(unmarked);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("every", call!("everyEmoji"));
         for text in &*plain_ptr {
             record!(
@@ -207,7 +201,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("body-on", call!("label", QString::from("messageLabel")));
         record!("quote-on", call!("label", QString::from("quoteLabel")));
         record!("glyph-on", call!("glyphText"));
@@ -215,6 +209,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
@@ -235,7 +230,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
          EmojiPictures.js is built from EmojiData.js by \
          scripts/fetch-emoji.py --pictures. {context}"
     );
-    for text in &plain {
+    for text in &unmarked {
         assert_eq!(
             value(&format!("plain:{text}")),
             "false",

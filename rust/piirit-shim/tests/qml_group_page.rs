@@ -10,13 +10,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher: piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -186,8 +183,10 @@ fn the_group_page_shows_the_group_and_renames_it() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Group: chat 2, account and one contact, off-screen.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -198,7 +197,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", get!("chat", "loaded"));
         // Loaded, counted in heading; no rows until page on way in.
         record!("unseen-members", get!("membersHeader", "text"));
@@ -246,7 +245,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("leave", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         // Sent value comes back trimmed; field shows that.
         record!("desc-saved", get!("descriptionField", "text"));
         // Cleared: field blanked, page left.
@@ -281,7 +280,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         );
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("single-loaded", get!("chat", "loaded"));
         record!("single-readonly", get!("groupNameField", "readOnly"));
         record!("single-add", get!("addMembersButton", "visible"));
@@ -298,7 +297,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         );
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         // Group again, description empty: field present to write one.
         record!("empty-visible", get!("descriptionField", "visible"));
         record!("empty-text", get!("descriptionField", "text"));
@@ -314,7 +313,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("leave-again", call!("leave"));
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(2, move || unsafe {
         // After leaving, description readable, not writable.
         record!(
             "leave-group",
@@ -322,13 +321,14 @@ fn the_group_page_shows_the_group_and_renames_it() {
         );
     });
 
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("left-visible", get!("descriptionField", "visible"));
         record!("left-text", get!("descriptionField", "text"));
         record!("left-readonly", get!("descriptionField", "readOnly"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();
