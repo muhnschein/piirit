@@ -15,8 +15,6 @@
     clippy::expect_used
 )]
 
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 
@@ -181,33 +179,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Steps run in turn, each some seconds after last one ended, not at fixed time from start:
-/// stalled loop on busy machine then can't run two back to back with no events between
-/// (dropped page goes only then).
-#[derive(Default)]
-struct Plan(Vec<(u64, Box<dyn FnOnce()>)>);
-
-impl Plan {
-    /// `step` `wait` s after one before ended.
-    fn after(&mut self, wait: u64, step: impl FnOnce() + 'static) {
-        self.0.push((wait, Box::new(step)));
-    }
-
-    fn run(mut self) {
-        if self.0.is_empty() {
-            return;
-        }
-        let (wait, step) = self.0.remove(0);
-        let mut pending = Some((step, self));
-        single_shot(Duration::from_secs(wait), move || {
-            if let Some((step, rest)) = pending.take() {
-                step();
-                rest.run();
-            }
-        });
-    }
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
@@ -267,7 +238,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
 
     // SAFETY for every step: runs only while `exec()` runs on this thread; all it points at
     // outlives it.
-    let mut plan = Plan::default();
+    let mut plan = common::Plan::default();
     plan.after(1, move || unsafe {
         record!(
             "load",
