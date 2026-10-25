@@ -144,19 +144,20 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
-    coming_back(4);
+    coming_back(4, true);
 }
 
 /// Other row heights: lost place under a hidden list came back on its own for some heights
-/// (luck of view's estimate), so one mix can pass a broken restore.
+/// (luck of view's estimate), so one mix can pass a broken restore. Lost place only: how many
+/// stops short it takes to stay short depends on row heights.
 #[test]
 fn coming_back_puts_the_view_back_with_other_row_heights() {
-    coming_back(3);
+    coming_back(3, false);
 }
 
-/// Whole scenario, rows' heights cycling over `spread` line counts.
+/// Scenario, rows' heights cycling over `spread` line counts; `follow`: also following parts.
 #[allow(clippy::too_many_lines)]
-fn coming_back(spread: i32) {
+fn coming_back(spread: i32, follow: bool) {
     // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -221,6 +222,9 @@ fn coming_back(spread: i32) {
     });
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("after-losing", call!("position")));
+        if !follow {
+            (*engine_ptr).quit();
+        }
         // Down to newest message: lets go of held row.
         call!("jump");
     });
@@ -312,6 +316,9 @@ fn coming_back(spread: i32) {
          back where they were, to the pixel. {context}"
     );
 
+    if !follow {
+        return;
+    }
     // Reader a line short of end, following: must not be sent to end on return (same jump,
     // always downwards).
     assert_eq!(
