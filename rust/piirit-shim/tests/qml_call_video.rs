@@ -7,15 +7,7 @@
 //! while there are any, lines over them put away by a tap, screen lit and ear shield off while up.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -175,18 +167,6 @@ const PROBE_QML: &str = r"
         function reset() { centerLoader.item.call.reset(); return 'ok' }
     }
 ";
-
-/// Run `steps` in order: first after `first`, rest `gap` apart.
-fn run_steps(mut steps: Vec<Box<dyn FnMut()>>, first: Duration, gap: Duration) {
-    if steps.is_empty() {
-        return;
-    }
-    let mut step = steps.remove(0);
-    single_shot(first, move || {
-        step();
-        run_steps(std::mem::take(&mut steps), gap, gap);
-    });
-}
 
 fn report(url: &str, route: &str, body: &str) -> String {
     let answer = post(&authority_of(url), &format!("{}{route}", api_of(url)), body);
@@ -597,8 +577,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             (*engine_ptr).quit();
         }),
     ];
-    // Whole seconds: vendored `single_shot` drops fraction.
-    run_steps(script, Duration::from_secs(2), Duration::from_secs(1));
+    let mut plan = common::Plan::default();
+    for (at, step) in script.into_iter().enumerate() {
+        plan.after(if at == 0 { 2 } else { 1 }, step);
+    }
+    plan.run();
 
     engine.exec();
 

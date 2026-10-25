@@ -6,15 +6,7 @@
 //! Never stop IO for backgrounding: background is the only way messages arrive here.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -129,8 +121,10 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &loading,
             "load",
@@ -141,7 +135,7 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
     // Backgrounded: where app spends most life and does its only useful work. IO must survive.
     let backgrounded = steps.clone();
     let background_journal = journal.clone();
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         common::record(&backgrounded, "status", call!("coreStatus").into());
         common::record(&backgrounded, "hurry", call!("hurry").into());
         call!("away");
@@ -161,7 +155,7 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
 
     let lost = steps.clone();
     let lost_journal = journal.clone();
-    single_shot(Duration::from_millis(6000), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(
             &lost,
             "stops-after-loss",
@@ -178,11 +172,12 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
     });
 
     let back = steps.clone();
-    single_shot(Duration::from_millis(8500), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&back, "paused-after-return", call!("paused").into());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

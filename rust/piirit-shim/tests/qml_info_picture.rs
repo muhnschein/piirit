@@ -4,15 +4,7 @@
 //! picture.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -157,8 +149,10 @@ fn a_tap_on_the_picture_shows_it_larger() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Ada: chat 1, one member with picture.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-contact",
             call!(
@@ -169,7 +163,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("contact-picture", get!("contactAvatar", "picturePath"));
         record!("contact-tappable", get!("pictureTap", "enabled"));
         record!("contact-tap", call!("tap", QString::from("pictureTap")));
@@ -181,7 +175,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         );
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("group-loaded", get!("chat", "loaded"));
         record!("group-badge", get!("editBadge", "visible"));
         record!("group-tappable", get!("pictureTap", "enabled"));
@@ -194,7 +188,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("pick", call!("pick", QString::from(GROUP_PICTURE)));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("group-picture", get!("groupAvatar", "picturePath"));
         record!("group-tappable-now", get!("pictureTap", "enabled"));
         record!("group-tap-now", call!("tap", QString::from("pictureTap")));
@@ -206,12 +200,13 @@ fn a_tap_on_the_picture_shows_it_larger() {
         );
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("single-loaded", get!("chat", "loaded"));
         record!("single-change", get!("changePicture", "visible"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_taps(&steps);

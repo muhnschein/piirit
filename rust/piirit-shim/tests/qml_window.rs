@@ -3,15 +3,7 @@
 //! reader up. Reaching chat start is `qml_paging`'s.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -115,6 +107,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_search_result_is_on_the_page_the_moment_it_is_built() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-window-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -159,13 +152,15 @@ fn a_search_result_is_on_the_page_the_moment_it_is_built() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "prefetch",
             call!("prefetchAt", 1, i32::try_from(FOUND).unwrap_or(0)),
         ));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("prefetched", call!("prefetched")));
         (*steps_ptr).push((
             "load",
@@ -182,16 +177,17 @@ fn a_search_result_is_on_the_page_the_moment_it_is_built() {
         (*steps_ptr).push(("rows-while-arriving", call!("rowCount")));
         (*steps_ptr).push(("settle", call!("settle")));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("landed", call!("middleId")));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         // Rows settle late; keep reader on the message.
         (*steps_ptr).push(("relayout", call!("relayout")));
         (*steps_ptr).push(("landed-after", call!("middleId")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

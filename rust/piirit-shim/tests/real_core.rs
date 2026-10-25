@@ -7,18 +7,13 @@
 //! Gated on `DELTACHAT_RPC_SERVER`.
 
 // Qt harness: `unsafe` `set_var` pre-Qt (`unused_unsafe`: edition 2024 only);
-// `borrow_as_ptr`; whole-second `single_shot`.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr`.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+
+mod common;
 
 /// Serde's message for wrong param shape.
 const SHAPE_ERRORS: &[&str] = &[
@@ -129,9 +124,11 @@ fn the_real_core_accepts_the_shapes_we_send() {
     core_box.pinned().borrow_mut().start(QString::from(server));
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
+    let mut plan = common::Plan::default();
+
     // Whole seconds only (qmetaobject 0.2.10; clippy.toml).
     let email = core_ptr.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         if let Some(this) = email.as_pinned() {
             this.borrow_mut().create_profile_with_email(
                 QString::from("Ada"),
@@ -143,7 +140,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
     });
 
     let qr = core_ptr.clone();
-    single_shot(Duration::from_secs(9), move || {
+    plan.after(8, move || {
         if let Some(this) = qr.as_pinned() {
             // Account 1 exists by now.
             this.borrow_mut()
@@ -156,7 +153,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
     // needs a second device offering a profile, so fake core and the code check
     // cover it.
     let backup = core_ptr.clone();
-    single_shot(Duration::from_secs(11), move || {
+    plan.after(2, move || {
         if let Some(this) = backup.as_pinned() {
             this.borrow_mut()
                 .restore_from_file(QString::from("/nonexistent/piirit-test.tar"));
@@ -166,7 +163,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
     // Another relay for account 1, same unreachable host: core fails to reach
     // it, not complaining about shape.
     let relay = core_ptr;
-    single_shot(Duration::from_secs(13), move || {
+    plan.after(2, move || {
         if let Some(this) = relay.as_pinned() {
             this.borrow_mut()
                 .add_relay(1, QString::from("dcaccount:piirit-test.invalid"));
@@ -178,7 +175,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
     // behavior is fake core's (`qml_second_device.rs`); this checks what real core
     // makes of the call.
     let offer_ptr = std::ptr::addr_of_mut!(engine);
-    single_shot(Duration::from_secs(15), move || {
+    plan.after(2, move || {
         // SAFETY: see tests/smoke.rs.
         unsafe {
             (*offer_ptr).invoke_method("offerToASecondDevice".into(), &[]);
@@ -186,13 +183,14 @@ fn the_real_core_accepts_the_shapes_we_send() {
     });
 
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(20), move || {
+    plan.after(5, move || {
         // SAFETY: see tests/smoke.rs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let report = QString::from_qvariant(engine.invoke_method("report".into(), &[]))

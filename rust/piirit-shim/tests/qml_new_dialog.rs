@@ -3,15 +3,7 @@
 //! to open chat over. Channel is group page in channel mode.
 
 // Qt harness: see qml_new_group.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -117,10 +109,12 @@ fn the_new_dialog_offers_chat_group_and_channel() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     let steps: common::Steps = common::Steps::default();
     let taken = steps.clone();
     // Loads, builds switches, taps, accepts: all synchronous once loop runs.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         let record = |label: &str, value: String| common::record(&taken, label, value.into());
         record(
             "load",
@@ -155,6 +149,7 @@ fn the_new_dialog_offers_chat_group_and_channel() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

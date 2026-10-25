@@ -6,15 +6,7 @@
 //! Slow fake server makes window reproducible.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -87,25 +79,28 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("text-taps", call!("hammerText")));
     });
     // Still in first send.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("busy-during", call!("busy")));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("busy-after", call!("busy")));
         (*steps_ptr).push(("file-taps", call!("hammerFile")));
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("trail", call!("seen")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

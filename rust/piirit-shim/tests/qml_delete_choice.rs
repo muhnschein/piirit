@@ -5,15 +5,7 @@
 //! (`qml_delete_run`); dialog left by back edge says nothing.
 
 // Qt harness: see qml_conversation.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -121,8 +113,10 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Own encrypted message: both ways open.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("load-own", call!("load", QString::from(own.clone()), true));
         record!("picked-on-open", call!("switches"));
         record!("accept-on-open", call!("canAccept"));
@@ -157,14 +151,14 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("answer-so-far", call!("answered"));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("tap", QString::from("forEveryoneSwitch"));
         record!("swipe", call!("swipeForward"));
         record!("answer-everyone", call!("answered"));
     });
 
     // Other's message, or unencrypted: core deletes here only, one way open.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-theirs",
             call!("load", QString::from(theirs.clone()), false)
@@ -177,10 +171,11 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("answer-me", call!("answered"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

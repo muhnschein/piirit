@@ -7,15 +7,7 @@
 //! way, proving nothing.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -125,7 +117,9 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "ordinary",
             call!(
@@ -137,7 +131,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("laid-out", call!("layout", QString::from("chatList")));
         record!("both-kinds-heading", get!("chatSection", "visible"));
         record!("heading-slot", get!("chatSectionSlot", "height"));
@@ -155,7 +149,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("archived-count", get!("chats", "count"));
         record!(
             "archived-laid-out",
@@ -166,6 +160,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

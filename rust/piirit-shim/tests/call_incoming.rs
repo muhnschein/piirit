@@ -6,15 +6,7 @@
 //! Answer played page-side over real socket. Call taken on another device first: not ended here.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -136,8 +128,10 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("ringing", call!("state"));
         // Second call while one rings: rings nowhere.
         record!("second", call!("ring", 9000));
@@ -151,7 +145,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         record!("answer", call!("answer"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("picked-up", call!("lateState"));
         let url = call!("url");
         record!("url", url.clone());
@@ -170,7 +164,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         );
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("accepted", call!("state"));
         let first: u32 = call!("state")
             .split('|')
@@ -199,7 +193,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     });
 
     // Reason for rang-out call waits on core.
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("missed", call!("state"));
         record!("said", call!("said"));
         call!("reset");
@@ -209,7 +203,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         record!("answer-5", call!("answer"));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("elsewhere-5", call!("takenElsewhere", 9005));
         call!("reset");
 
@@ -220,10 +214,11 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     });
 
     // Long enough for host still coming up to come and go.
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

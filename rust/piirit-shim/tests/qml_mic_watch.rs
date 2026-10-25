@@ -4,13 +4,8 @@
 //! and `open` change together or not at all, as far as a binding can tell.
 
 // Qt harness: needs `unsafe` for `env::set_var` pre-Qt and libpulse server lookup
-// (`unused_unsafe`: edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods
-)]
+// (`unused_unsafe`: edition 2024+), `borrow_as_ptr`.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -18,6 +13,7 @@ use std::time::Duration;
 
 use qmetaobject::*;
 
+mod common;
 #[path = "common/pulse.rs"]
 mod pulse;
 
@@ -76,21 +72,23 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     let daemon = Rc::new(daemon);
     let recording: Rc<RefCell<Option<pulse::Recording>>> = Rc::default();
 
+    let mut plan = common::Plan::default();
+
     let s = Rc::clone(&steps);
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         s.borrow_mut().push(("inactive", call!("state")));
         call!("activate", true);
     });
 
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         s.borrow_mut().push(("active", call!("state")));
         s.borrow_mut().push(("declared", call!("declaredState")));
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
     });
 
     let (s, r) = (Rc::clone(&steps), Rc::clone(&recording));
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         s.borrow_mut().push(("recording", call!("state")));
         if let Some(recording) = r.borrow_mut().take() {
             recording.kill();
@@ -98,7 +96,7 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     });
 
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         s.borrow_mut().push(("stopped", call!("state")));
         s.borrow_mut().push(("forged-open", call!("forge")));
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
@@ -107,7 +105,7 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     // Stale report from stopped watcher must not count. Stream's end held behind busy
     // Qt thread during restart: taken, says "free" with stream open.
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         s.borrow_mut().push(("recording-again", call!("state")));
         if let Some(recording) = r.borrow_mut().take() {
             recording.kill();
@@ -122,13 +120,14 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     });
 
     let (s, r) = (Rc::clone(&steps), Rc::clone(&recording));
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         s.borrow_mut().push(("reactivated", call!("state")));
         s.borrow_mut().push(("changes", call!("changes")));
         drop(r.borrow_mut().take());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

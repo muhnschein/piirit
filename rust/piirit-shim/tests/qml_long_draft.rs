@@ -3,15 +3,7 @@
 //! with field, beside last line.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -139,28 +131,30 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
 
     let long = a_long_draft();
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("open", call!("open", QString::from(page.clone())));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("one-line-height", call!("fieldHeight"));
         // Paragraph: three lines; old field held none.
         record!("typed", call!("type", QString::from("one\ntwo\nthree")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("three-line-height", call!("fieldHeight"));
         record!("long", call!("type", QString::from(long.clone())));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("capped-height", call!("fieldHeight"));
         // Back to short draft: row below measured at ordinary height, not cap.
         record!("shortened", call!("type", QString::from("never mind")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("field-lift", call!("liftOf", QString::from("messageField")));
         record!("send-lift", call!("liftOf", QString::from("sendButton")));
         record!(
@@ -172,6 +166,7 @@ fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -6,15 +6,7 @@
 //! once). Unknown kind: goes nowhere.
 
 // Qt harness: see qml_startup.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -184,8 +176,10 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("room-for-two", call!("count", 2));
         record!("set-left", set!("left", "search", 0, 0));
         record!("set-right", set!("right", "chat", 2, 7));
@@ -238,6 +232,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

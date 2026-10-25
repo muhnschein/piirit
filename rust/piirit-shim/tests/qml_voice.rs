@@ -5,15 +5,7 @@
 //! media quality strip is handed; strip time says nothing of it.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -93,7 +85,9 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!("load", QString::from(common::component_url("VoiceBar.qml"))),
@@ -109,11 +103,12 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         (*steps_ptr).push(("limit-less-data", call!("limit", 22_806_528.0_f64, 1_i32)));
         (*steps_ptr).push(("time", call!("timeText")));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("heard", call!("heardText")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -4,15 +4,7 @@
 //! is drawn with falls back to text only for emoji with no picture shipped.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -207,7 +199,9 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -220,7 +214,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         glyph!("glyph-toned", "👍🏽");
         glyph!("glyph-text", "hi");
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("columns", call!("page", QString::from("columns")));
         record!("rows", call!("rows", 4));
         record!("row-count", call!("rowCount"));
@@ -232,7 +226,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         );
         record!("jump", call!("jump", 8));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("top-group", call!("page", QString::from("topGroup")));
         record!(
             "scrolled",
@@ -240,7 +234,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         );
         record!("search", call!("search", QString::from("hot pepp")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("found", call!("results"));
         record!(
             "strip-searching",
@@ -256,7 +250,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         );
         call!("search", QString::from("qqqqzz"));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "placeholder-none",
             call!(
@@ -267,7 +261,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         );
         call!("search", QString::from(""));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("tap-fire", call!("tap", QString::from("🔥")));
         record!("tap-mine", call!("tap", QString::from("\u{2764}\u{fe0f}")));
         record!("raised", call!("raisedSignal"));
@@ -275,6 +269,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

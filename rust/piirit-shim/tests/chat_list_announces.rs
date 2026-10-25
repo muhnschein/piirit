@@ -5,15 +5,7 @@
 //! reader sees nothing. Fake sends pair.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -93,17 +85,20 @@ fn an_arrival_is_announced_once_the_list_has_settled() {
         }};
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("loaded", call!("loaded")));
         (*steps_ptr).push(("quiet", call!("heard")));
         (*steps_ptr).push(("land", call!("land")));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("heard", call!("heard")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

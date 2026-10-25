@@ -4,15 +4,7 @@
 //! server starts in English, so the table goes first, as to the first one.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -58,11 +50,14 @@ fn every_server_is_handed_the_stock_strings_before_anything_else() {
         .borrow_mut()
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
+    let mut plan = common::Plan::default();
+
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     // SAFETY: fires only while `exec()` runs.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(5, move || unsafe {
         (*engine_ptr).quit();
     });
+    plan.run();
     engine.exec();
 
     // Each server's one call is the table: one per server, >1 server.

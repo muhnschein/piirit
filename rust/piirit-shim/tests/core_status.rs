@@ -1,15 +1,7 @@
 //! Core failure reaches app: `Error` event is a typed QML signal; dead server replaced.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -68,19 +60,21 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).invoke_method("resumeIo".into(), &[]);
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).invoke_method("fail".into(), &[]);
     });
 
     let mut before_death = String::new();
     let before_ptr: *mut String = std::ptr::addr_of_mut!(before_death);
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *before_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -91,7 +85,7 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
     let after_ptr: *mut String = std::ptr::addr_of_mut!(after_restart);
     let mut trail = String::new();
     let trail_ptr: *mut String = std::ptr::addr_of_mut!(trail);
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(4, move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *after_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -103,6 +97,7 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_eq!(

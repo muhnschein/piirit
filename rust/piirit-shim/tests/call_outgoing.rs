@@ -3,15 +3,7 @@
 //! Call row watched too: state read off core.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -119,12 +111,14 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         // No call, no mic to switch.
         record!("mute-idle", call!("mute", true));
         record!("place", call!("place"));
@@ -138,7 +132,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     });
 
     // Page up: what it is served, what it may reach.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         let url = call!("url");
         record!("url", url.clone());
         *url_ptr = url.clone();
@@ -205,7 +199,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     });
 
     // Other end's answer, delivered to page as hash command.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("answered", call!("state"));
         record!("row-ringing", call!("lastRow"));
         let authority = (*served_ptr).clone();
@@ -245,12 +239,12 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("in-call", call!("state"));
         record!("hang-up", call!("hangUp"));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("after", call!("state"));
         let authority = (*served_ptr).clone();
         record!(
@@ -266,6 +260,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

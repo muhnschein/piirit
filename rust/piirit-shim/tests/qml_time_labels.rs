@@ -6,16 +6,8 @@
 //! ticking while app is on screen. Test drives it by hand and checks every relative-time row.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// edition 2024), `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -123,7 +115,9 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("load", call!("load"));
         // Off screen: only the test moves the clock.
         call!("shown", false);
@@ -145,18 +139,19 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
     });
 
     // Off screen 1s: would be 20 ticks at 50ms.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("off-screen", call!("behind"));
         call!("shown", true);
         call!("stale");
         // Stale after on-screen: only timer moves it.
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("ticking", call!("behind"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
