@@ -33,7 +33,7 @@ Item {
     /// Name or fallback with emoji pictures, while not editing; "" when field draws it.
     readonly property string emojiName: root.editing ? ""
         : Emoji.inText(field.text.length > 0 ? field.text : field.placeholderText, false,
-                       field.font.pixelSize, root.emojiColor)
+                       field.font.pixelSize, root.emojiColor, true)
     /// Overlay's colour, as field's text or fallback.
     readonly property color emojiColor: field.text.length > 0 ? Theme.highlightColor
                                                               : Theme.secondaryHighlightColor

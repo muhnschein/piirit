@@ -1,9 +1,9 @@
 //! Emoji in names (chat list, contact rows, search hit titles, chat header, contact and group
-//! page name, sender in bubble and quote, contact request bar) drawn as Twemoji,
-//! as bubbles draw them, grey toward name's own colour: Sailfish's font has few. Pinned per component: name with emoji is
-//! escaped `StyledText` with `<img>` of shipped picture, search marks kept, app's own mail mark
-//! left the font's; name without stays plain. Name field (`TextField`, no pictures) drawn by a
-//! label over it while not edited. Every other name label: `qml_syntax.rs`
+//! page name, sender in bubble and quote, contact request bar) drawn as Twemoji, as bubbles
+//! draw them, in name's own colour (darker parts away from it): Sailfish's font has few. Pinned per
+//! component: name with emoji is escaped `StyledText` with `<img>` of shipped picture, search
+//! marks kept, app's own mail mark left the font's; name without stays plain. Name field
+//! (`TextField`, no pictures) drawn by a label over it while not edited. Every other name label: `qml_syntax.rs`
 //! `every_name_draws_its_emoji_as_pictures`.
 
 // Qt harness: see qml_pages.rs.
@@ -62,7 +62,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// `<img>` of shipped picture for `size` px font, grey toward `tint` (`#rrggbb`), as name drawn.
+/// `<img>` of shipped picture for `size` px font, lit in `tint` (`#rrggbb`), as name drawn.
 fn img(picture: &str, size: f64, tint: &str) -> String {
     let file = common::art_dir()
         .join(format!("emoji/{picture}.svg"))
@@ -71,7 +71,7 @@ fn img(picture: &str, size: f64, tint: &str) -> String {
     #[allow(clippy::cast_possible_truncation)]
     let edge = (size * 1.15).round() as i64;
     format!(
-        "<img src=\"image://piirit/emoji?file={}&tint=%23{}&strength=0.5\" width=\"{edge}\" \
+        "<img src=\"image://piirit/emoji?file={}&tint=%23{}&level=0.8\" width=\"{edge}\" \
          height=\"{edge}\" align=\"middle\">",
         encode(&format!("file://{}", file.display())),
         tint.trim_start_matches('#')

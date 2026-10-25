@@ -265,6 +265,8 @@ pub struct Recipe {
     pub radius: usize,
     /// Tint's alpha, 0 to 1; 1 without tint.
     pub opacity: f64,
+    /// Emoji: luma drawn as full tint, darker away from it; `None`: `strength` toward tint.
+    pub level: Option<f64>,
 }
 
 impl Recipe {
@@ -325,6 +327,9 @@ impl Recipe {
             ink,
             radius,
             opacity: get("tint").and_then(Colour::alpha).unwrap_or(1.0),
+            level: number("level")
+                .filter(|level| *level > 0.0)
+                .map(|level| level.min(1.0)),
         })
     }
 
@@ -371,12 +376,30 @@ impl Recipe {
     }
 
     /// Emoji: each pixel its luma (Rec. 601: yellow face stays light, unlike mean), then
-    /// `strength` toward tint; alpha times tint's, as text in that colour.
+    /// `strength` toward tint, or with `level` tint where luma reaches it, darker parts away
+    /// from tint by their share of it; alpha times tint's, as text in that colour.
     fn grey_emoji(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
         for line in pixels.chunks_mut(stride).take(height) {
             for pixel in line.iter_mut().take(width) {
                 let [alpha, red, green, blue] = unpack(*pixel);
                 let luma = 0.299 * red + 0.587 * green + 0.114 * blue;
+                if let (Some(level), Some((tint, _))) = (self.level, self.tint) {
+                    // Darker parts away from tint: to black under light text, white under dark.
+                    let away = if 0.299 * tint.red + 0.587 * tint.green + 0.114 * tint.blue > 0.5 {
+                        0.0
+                    } else {
+                        1.0
+                    };
+                    let share = (luma / level).min(1.0);
+                    let lit = |tint: f64| away + (tint - away) * share;
+                    *pixel = pack([
+                        alpha * self.opacity,
+                        lit(tint.red),
+                        lit(tint.green),
+                        lit(tint.blue),
+                    ]);
+                    continue;
+                }
                 let toward = |tint: f64| {
                     self.tint
                         .map_or(luma, |(_, strength)| luma + (tint - luma) * strength)
@@ -698,6 +721,48 @@ mod tests {
         );
         // Not a colour: grey only.
         assert_eq!(made("emoji?file=a&tint=grey"), [200, 196, 196, 196]);
+    }
+
+    #[test]
+    fn a_lit_emoji_is_its_tint_where_its_face_is_and_away_from_it_where_darker() {
+        let made = |argb: [u8; 4], id: &str| {
+            let mut pixels = vec![u32::from_be_bytes(argb)];
+            Recipe::parse(id).unwrap().bake(&mut pixels, 1, 1, 1);
+            pixels[0].to_be_bytes()
+        };
+        // Twemoji face #ffcc4d, luma 204.7 (0.803): past level, so tint itself.
+        let face = [200, 255, 204, 77];
+        assert_eq!(
+            made(face, "emoji?file=a&tint=ffffff&level=0.8"),
+            [200, 255, 255, 255]
+        );
+        assert_eq!(
+            made(face, "emoji?file=a&tint=%2399ffffff&level=0.8"),
+            [120, 255, 255, 255]
+        );
+        assert_eq!(
+            made(face, "emoji?file=a&tint=0000ff&level=0.8"),
+            [200, 0, 0, 255]
+        );
+        // Mouth #664500, luma 71.0 (0.278): 0.348 of way from black to white, 88.75.
+        assert_eq!(
+            made([255, 102, 69, 0], "emoji?file=a&tint=ffffff&level=0.8"),
+            [255, 89, 89, 89]
+        );
+        // Dark tint (light ambience): face black, mouth 0.348 of way from white, 166.25.
+        assert_eq!(
+            made(face, "emoji?file=a&tint=000000&level=0.8"),
+            [200, 0, 0, 0]
+        );
+        assert_eq!(
+            made([255, 102, 69, 0], "emoji?file=a&tint=000000&level=0.8"),
+            [255, 166, 166, 166]
+        );
+        // No tint: level alone changes nothing.
+        assert_eq!(
+            made(face, "emoji?file=a&level=0.8"),
+            made(face, "emoji?file=a")
+        );
     }
 
     #[test]

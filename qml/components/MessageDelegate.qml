@@ -368,7 +368,7 @@ Item {
             color: root.senderColor.length > 0 ? root.senderColor : Theme.highlightColor
             // Emoji as Twemoji, as body's.
             readonly property string pictured: Emoji.inText(root.senderName, false,
-                                                            font.pixelSize, color)
+                                                            font.pixelSize, color, true)
             textFormat: senderLabel.pictured.length > 0 ? Text.StyledText : Text.PlainText
             text: senderLabel.pictured.length > 0 ? senderLabel.pictured : root.senderName
         }
@@ -435,7 +435,7 @@ Item {
                 color: Theme.highlightColor
                 readonly property string pictured: Emoji.inText(root.quoteAuthor, false,
                                                                 font.pixelSize,
-                                                                color)
+                                                                color, true)
                 textFormat: quoteAuthorLabel.pictured.length > 0 ? Text.StyledText
                                                                  : Text.PlainText
                 text: quoteAuthorLabel.pictured.length > 0 ? quoteAuthorLabel.pictured

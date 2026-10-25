@@ -158,7 +158,7 @@ Page {
                     readonly property string plain: qsTr("Call %1").arg(page.contactName)
                     readonly property string pictured: Emoji.inText(plain, false,
                                                                     Theme.fontSizeMedium,
-                                                                    color)
+                                                                    color, true)
                     textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
                     text: pictured.length > 0 ? pictured : plain
                 }
@@ -204,7 +204,7 @@ Page {
                     readonly property string plain: qsTr("Video call %1").arg(page.contactName)
                     readonly property string pictured: Emoji.inText(plain, false,
                                                                     Theme.fontSizeMedium,
-                                                                    color)
+                                                                    color, true)
                     textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
                     text: pictured.length > 0 ? pictured : plain
                 }

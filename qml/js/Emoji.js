@@ -109,21 +109,23 @@ function escaped(text, lineStart) {
 /// qml/art/emoji/, so a message can load nothing. `size`: font px; pictures a
 /// bit taller. `tint` (colour, e.g. label's): pictures grey, shaded toward it,
 /// as faint, by app's picture provider (`image://piirit/emoji`, shim's
-/// pictures.rs); "" or none: as drawn.
+/// pictures.rs); "" or none: as drawn. `lit` (names): tint's own colour, not
+/// grey; darker parts away from it, so faces keep their features.
 ///
 /// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
 /// from one value: Sailfish's ARM64 JIT could clobber it between the two
 /// copies, so some launches showed a leading emoji twice (picture + char).
 /// Each pass sets each variable from its own value.
-function inText(text, styled, size, tint) {
+function inText(text, styled, size, tint, lit) {
     var cuts = emojiCuts(text, styled)
     if (cuts.length === 0) {
         return ""
     }
     var edge = Math.round(size * 1.15)
     // StyledText reads attribute raw: `&` stays `&`.
-    var muted = tint ? "&tint=" + encodeURIComponent("" + tint) + "&strength=" + tintStrength
-                     : ""
+    var muted = !tint ? ""
+        : "&tint=" + encodeURIComponent("" + tint)
+          + (lit ? "&level=" + litLevel : "&strength=" + tintStrength)
     var out = ""
     var from = 0
     for (var k = 0; k < cuts.length; k += 3) {
@@ -142,9 +144,9 @@ function inText(text, styled, size, tint) {
 
 /// Label's StyledText: `marked` (Marks.js, or "") else plain `text`, with
 /// pictures (`inText`); "" when neither: draw `text` plain.
-function drawn(text, marked, size, tint) {
+function drawn(text, marked, size, tint, lit) {
     var styled = marked.length > 0
-    var pictured = inText(styled ? marked : text, styled, size, tint)
+    var pictured = inText(styled ? marked : text, styled, size, tint, lit)
     return pictured.length > 0 ? pictured : marked
 }
 
@@ -260,6 +262,10 @@ var artBase = Qt.resolvedUrl("../art/emoji/")
 /// Tinted pictures' way from grey toward tint: half keeps faces readable on
 /// dark and light ambience both.
 var tintStrength = 0.5
+
+/// Lit pictures' luma drawn as full tint: Twemoji's yellow (0.8), so a face is
+/// name's colour; darker parts away from it by their share.
+var litLevel = 0.8
 
 /// Recent-emoji cap.
 var recentLimit = 40
