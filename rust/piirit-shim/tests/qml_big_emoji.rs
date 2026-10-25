@@ -111,7 +111,8 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
     ];
     let texts_ptr = std::ptr::addr_of!(texts);
 
-    // Picture edge: 1.15 x font px (Emoji.js `inText`); stub fontSizeMedium 18.
+    // Big: 2 x stub fontSizeMedium 18; picture edge 1.15 x font px (Emoji.js `inText`). Else
+    // Label's own size, untouched: "normal".
     let rows: Vec<(&'static str, Value, &'static str)> = vec![
         ("big", json!({ "messageText": "👍👍" }), "36/41"),
         // Shim's rendering joins lines with `<br>`: judged on text as sent.
@@ -120,12 +121,12 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
             json!({ "markdownMode": 0, "messageText": "🔥\n🔥", "styledText": "🔥<br>🔥" }),
             "36/41",
         ),
-        ("mixed", json!({ "messageText": "hi 👍" }), "18/21"),
-        ("text", json!({ "messageText": "hi there" }), "18/-"),
+        ("mixed", json!({ "messageText": "hi 👍" }), "normal"),
+        ("text", json!({ "messageText": "hi there" }), "normal"),
         (
             "caption",
             json!({ "messageText": "👍", "viewType": "File", "filePath": "/nonexistent/a.txt" }),
-            "18/21",
+            "normal",
         ),
     ];
     let rows_ptr = std::ptr::addr_of!(rows);
@@ -160,10 +161,34 @@ fn few_emoji_alone_are_drawn_twice_as_big() {
             "{label}: is {text:?} only a few emoji? {context}"
         );
     }
-    for (label, _, expected) in &rows {
+    // Label's own size, from row without emoji.
+    let normal = common::value_of(&steps, "text")
+        .split_once('/')
+        .and_then(|(px, _)| px.parse::<f64>().ok())
+        .unwrap_or(0.0);
+    assert!(
+        normal > 0.0 && normal < 36.0,
+        "plain text row's font is {normal} px. {context}"
+    );
+    for (label, props, expected) in &rows {
+        let wanted = if *expected == "normal" {
+            let has_emoji = props["messageText"] != "hi there";
+            #[allow(clippy::cast_possible_truncation)]
+            let edge = (normal * 1.15).round() as i64;
+            format!(
+                "{normal}/{}",
+                if has_emoji {
+                    edge.to_string()
+                } else {
+                    "-".into()
+                }
+            )
+        } else {
+            (*expected).to_string()
+        };
         assert_eq!(
             common::value_of(&steps, label),
-            *expected,
+            wanted,
             "{label}: body font px / picture edge. {context}"
         );
     }

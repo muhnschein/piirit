@@ -543,7 +543,6 @@ Item {
             y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
             // Body width, not bubble's: differ only when offer widened it.
             width: root.bodyWidth
-            font.pixelSize: root.bigEmoji ? 2 * Theme.fontSizeMedium : Theme.fontSizeMedium
             wrapMode: Text.Wrap
             // Long body cut to a few lines; rest on page (row taller than view can't be scrolled
             // past). Line cap, not text cut: slicing a rendering could leave tag open.
@@ -560,6 +559,14 @@ Item {
             text: root.bodyText
             // Link followed on tap only.
             onLinkActivated: Qt.openUrlExternally(link)
+        }
+
+        // Only while big: else Label's own size stays.
+        Binding {
+            target: messageLabel
+            property: "font.pixelSize"
+            value: 2 * Theme.fontSizeMedium
+            when: root.bigEmoji
         }
 
         // Body not fitting: two-word tap in download offer's colour.
