@@ -131,6 +131,101 @@ else
     echo "selftest: ok   naming no packages is refused"
 fi
 
+# Mirror down: stand-in apt fails `update` while $APT_DOWN holds "once" (first
+# call) or "always"; `install` alike with "install-once", "install-always"
+# (index fine, package download fails). Logs every call.
+cat >"$work/apt-get" <<'EOF'
+#!/usr/bin/env bash
+echo "$*" >>"$APT_LOG"
+case " $* " in
+*" update "*)
+    mode=$(cat "$APT_DOWN" 2>/dev/null || true)
+    if [[ "$mode" = once ]]; then
+        rm -f "$APT_DOWN"
+        exit 100
+    fi
+    if [[ "$mode" = always ]]; then
+        exit 100
+    fi
+    ;;
+*" install "*)
+    mode=$(cat "$APT_DOWN" 2>/dev/null || true)
+    if [[ "$mode" = install-once ]]; then
+        rm -f "$APT_DOWN"
+        exit 100
+    fi
+    if [[ "$mode" = install-always ]]; then
+        exit 100
+    fi
+    ;;
+esac
+exit 0
+EOF
+chmod +x "$work/apt-get"
+
+# run_install <down mode>: script with stand-in apt, staged lists.
+run_install() {
+    stage
+    printf 'deb http://de.archive.ubuntu.com/ubuntu jammy main\n' >"$work/sources.list"
+    rm -f "$work/apt.log" "$work/down"
+    if [[ -n "$1" ]]; then
+        echo "$1" >"$work/down"
+    fi
+    APT_SOURCES_DIR="$work/sources" APT_SOURCES_LIST="$work/sources.list" \
+        APT_GET="$work/apt-get" APT_LOG="$work/apt.log" APT_DOWN="$work/down" \
+        "$script" qtbase5-dev >"$work/out" 2>&1
+}
+
+# check <why> <command...>: one case, passes when command does.
+check() {
+    local why=$1
+    shift
+    cases=$((cases + 1))
+    if "$@"; then
+        echo "selftest: ok   $why"
+    else
+        echo "selftest: FAIL $why" >&2
+        cat "$work/out" >&2
+        status=1
+    fi
+    return 0
+}
+
+run_install ""
+check "a working mirror installs at once" test "$(grep -c '' "$work/apt.log")" -eq 2
+check "apt retries each file and gives up on a stalled one" \
+    grep -q 'Acquire::Retries=3 -o Acquire::http::Timeout=30' "$work/apt.log"
+check "a working mirror is left as it is" \
+    grep -q 'azure.archive.ubuntu.com' "$work/sources/ubuntu.sources"
+
+run_install once
+check "a failed mirror is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 3
+check "the retry goes to archive.ubuntu.com (deb822)" \
+    grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
+check "the retry goes to archive.ubuntu.com (sources.list)" \
+    grep -q 'deb http://archive.ubuntu.com/ubuntu jammy' "$work/sources.list"
+check "the log says the mirror was switched" \
+    grep -q 'now uses archive.ubuntu.com' "$work/out"
+
+run_install install-once
+check "a failed download is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 4
+check "the download retry goes to archive.ubuntu.com" \
+    grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
+
+# fails <mode> <why>: archive no better, job must fail.
+fails() {
+    cases=$((cases + 1))
+    if run_install "$1"; then
+        echo "selftest: FAIL $2 should not exit 0" >&2
+        status=1
+    else
+        echo "selftest: ok   $2"
+    fi
+    return 0
+}
+fails always "index from the archive failing too fails the job"
+fails install-always "download from the archive failing too fails the job"
+
 echo "selftest: $cases case(s)"
 if [[ "$status" -ne 0 ]]; then
     echo "selftest: FAILED" >&2
