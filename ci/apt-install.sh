@@ -91,9 +91,9 @@ fi
 apt_get() {
     local options=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30
         -o Acquire::https::Timeout=30)
-    local cap=()
-    if [[ "$1" = --within ]]; then
-        cap=(timeout "$2")
+    local cap=() flag=${1-} seconds=${2-}
+    if [[ "$flag" = --within ]]; then
+        cap=(timeout "$seconds")
         shift 2
     fi
     if [[ -n "$apt_stub" ]]; then
