@@ -71,6 +71,8 @@ jobs:
       # scratchbox2 often enough to cost more than parallelism saves.
       # docs/BUILDING.md.
       CARGO_JOBS: "1"
+      # FFmpeg/x264's make inside it: parallel there is fine (spec).
+      MAKE_JOBS: "4"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # Submodules: FFmpeg, x264 for piirit-video (docs/BUILDING.md).
@@ -214,6 +216,7 @@ jobs:
           PIIRIT_ENGINE: docker
           PIIRIT_SDK_IMAGE: ${{ env.SDK_IMAGE }}
           PIIRIT_CARGO_JOBS: ${{ env.CARGO_JOBS }}
+          PIIRIT_MAKE_JOBS: ${{ env.MAKE_JOBS }}
         run: PIIRIT_CARGO_HOME=~/.cache/piirit-cargo ./scripts/build-in-container.sh "$SFOS"
 
       # `|| true`: runs under `bash -e`; missing .mb2 would hide logs.

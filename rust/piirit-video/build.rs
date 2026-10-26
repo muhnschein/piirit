@@ -49,6 +49,7 @@ fn main() {
     }
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=build_reuse.rs");
+    println!("cargo:rerun-if-env-changed=PIIRIT_MAKE_JOBS");
     println!("cargo:rerun-if-changed=csrc");
     println!("cargo:rerun-if-changed={GMP_CHECK}");
     println!("cargo:rerun-if-changed={}", root.join("gmp-api").display());
@@ -325,7 +326,8 @@ struct Target {
     arch: String,
     /// Target triple, if not build machine.
     cross: Option<String>,
-    /// Jobs cargo allows this build script.
+    /// make jobs: `PIIRIT_MAKE_JOBS` (spec sets it under scratchbox2, where cargo
+    /// runs one), else what cargo allows this build script.
     jobs: String,
     /// First line of compiler's `--version`, for reuse stamp; `None` if it
     /// won't say.
@@ -360,7 +362,9 @@ impl Target {
             ranlib: build.get_ranlib().get_program().into(),
             arch: env("CARGO_CFG_TARGET_ARCH"),
             cross: (target != host).then_some(target),
-            jobs: std::env::var("NUM_JOBS").unwrap_or_else(|_| "1".into()),
+            jobs: std::env::var("PIIRIT_MAKE_JOBS")
+                .or_else(|_| std::env::var("NUM_JOBS"))
+                .unwrap_or_else(|_| "1".into()),
             version,
         }
     }
@@ -488,7 +492,7 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
     prefix
 }
 
-/// `make <goal>` in `build` with the jobs cargo allows.
+/// `make <goal>` in `build` with `Target::jobs`.
 fn make(build: &Path, target: &Target, goal: &str) -> Command {
     let mut make = Command::new("make");
     make.current_dir(build)

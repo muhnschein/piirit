@@ -173,7 +173,7 @@ Measured 2026-10-26, `ubuntu-latest`, one cargo job (runs 309-324):
 | Step | Warm (cache, libs kept) | Cold (release, or C libs changed) |
 |---|---|---|
 | Pull the SDK image | ~90 s | ~90 s |
-| FFmpeg + x264 | 3 s | 12-16 min |
+| FFmpeg + x264 | 3 s | 3-7 min (four make jobs) |
 | Rest of build (deps, app, LTO link) | ~2.5 min | ~5 min |
 | Validate against Harbour | ~30 s | ~30 s |
 | **The whole run** | **~6 min** | **~20 min** |
@@ -218,6 +218,7 @@ LTO: build 5.5 → 6.5 min at one cargo job.
 In `rpm/harbour-piirit.spec`:
 
 - **Cargo jobs under sb2 = define, 1.** At `-j2`/`-j4` cargo stalls in sb2 (futex-waiting forever on unreaped child during qmetaobject C++ glue), so `%{jobs}` defaults **1**; `rpm.yml` always passes `mb2 build --define "jobs 1"`. sb2 only; native OBS worker lets cargo pick. Build temporaries kept in build dir: parallel link via shared `/tmp` under sb2 can lose fresh object file. `--define "jobs N"` for local trial.
+- **FFmpeg/x264 make jobs = define, 4.** `%{make_jobs}` → `PIIRIT_MAKE_JOBS` → `build.rs`'s `make -jN`, sb2 only; cargo's stall not seen there (10 of 10 runs; 6:05 median vs 15:38 at one). Matters only when they're built (release, submodule or recipe change). `rpm.yml` passes 4, `build-in-container.sh` defaults to it.
 - **No `--target` for cargo.** Jolla's cargo pins build scripts to tooling host triple; `--target` makes whole build cross. `SB2_RUST_TARGET_TRIPLE` already sets rustc output. Whisperfish's spec passes none either.
 - **`CARGO_TARGET_<HOST>_LINKER=host-gcc` inside sb2.** rustc links build scripts via `cc`, sb2 rewrites to *cross* compiler (`aarch64-meego-linux-gnu-cc: unrecognized option '-m32'`); sb2's native = `host-gcc`. Tooling gcc by absolute path fails: sb2 still rewrites its `ld` (`cannot find /lib/libgcc_s.so.1`).
 - **`QT_INCLUDE_PATH`/`QT_LIBRARY_PATH` exported in `%build`**: qttypes can't exec target `qmake` in sb2. `QT_LIBRARY_PATH` = `%{_libdir}` (Qt in `/usr/lib64` on aarch64, not `/usr/lib`).
