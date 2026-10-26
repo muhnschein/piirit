@@ -65,7 +65,7 @@ jobs:
       - run: cd rust && cargo fmt --all --check
       # `--locked`: lockfile committed; a manifest change without it fails here.
       - run: cd rust && cargo clippy --locked --workspace --all-targets -- -D warnings
-      # nextest: one process per test, ~10 min down to ~2.5 (Qt timers).
+      # nextest: one process per test, 32 at once, ~10 min down to ~2 (Qt timers).
       # Profiles: rust/.config/nextest.toml.
       - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
         with:

@@ -30,7 +30,7 @@ check: fmt lint test integration doc-lint msrv qml-lint lockfile-lint packaging-
 
 ## Unit, integration, Qt event-loop tests.
 ##
-## nextest if installed (one process per test: ~10 min down to ~2.5; see
+## nextest if installed (one process per test, 32 at once: ~10 min down to ~2; see
 ## rust/.config/nextest.toml), else `cargo test` (check must work on a bare
 ## laptop).
 ##   cargo install --locked cargo-nextest
