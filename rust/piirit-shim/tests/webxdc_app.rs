@@ -145,7 +145,8 @@ fn api_of(bridge: &str) -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
-    let temp = std::env::temp_dir().join(format!("piirit-webxdc-{}", std::process::id()));
+    // Removed at end: test posts 100 MB video into it.
+    let temp = common::temp_tree("webxdc");
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let cache = temp.join("cache");
@@ -621,5 +622,12 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     assert!(
         icons.join("1-5.png").exists(),
         "the app's icon was not cached for its row to draw. {context}"
+    );
+
+    let dir = temp.to_path_buf();
+    drop(temp);
+    assert!(
+        !dir.exists(),
+        "the test's temp dir, 100 MB video and all, was left behind"
     );
 }
