@@ -52,6 +52,7 @@ cargo install --locked cargo-nextest
 8. **Report-script** (`ci/sonar-report-selftest.sh`): only script talking outside GitHub; run vs stub of SonarQube's four endpoints (no analysis at test time; CI can't reach `sonarcloud.io`, why script exists).
 9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror pick and fallback proved against stand-in apt (down, trickling) and curl (mirrors of set speed).
 10. **Change-filter** (`ci/changes-selftest.sh`): which PR skips Rust jobs. Most cases guard costly side: code read as docs = green without tests.
+11. **Crash stacks** (`ci/core-backtraces-selftest.sh`): real core (gdb-written) named as CI names one, read back to a stack. Missing gdb = SKIP locally, FAIL in CI.
 
 Aspiration, tracked not gated: test volume > source volume.
 
@@ -85,6 +86,7 @@ make sonar-reports
 - **Rust jobs cache `target/`** (`Swatinem/rust-cache`, `rust` workspace). `msrv` own key (builds `+1.75.0`; action keys on default toolchain; shared slot = both miss). `CARGO_INCREMENTAL: 0`: incremental state never reused.
 - Cache helps less than it looks: warm clippy ~20 s; `test` cost = suite waiting on timers, not compile.
 - **Test job installs `cargo-nextest`**, `ci` profile: `fail-fast` off (report all), failures inline and repeated at end (summary is what's read in 200-line log).
+- **Test killed by a signal leaves its core** (#239): test job points `kernel.core_pattern` at `$RUNNER_TEMP/cores`, proves a core lands, then on failure `ci/core-backtraces.sh` prints every thread's stack and keeps core, binary, stacks as `test-cores` artifact (7 days). Rare crash, no local repro: next one comes with its stack.
 
 ## Translations
 
