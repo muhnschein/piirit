@@ -3,6 +3,9 @@
 //! Each choice reads account list, then writes. First one's list read or write held back: later
 //! choice must still write last, else core keeps older one (seen as `qml_auto_delete_flow`
 //! flake). Restarted core: writes go to new one, not still queued for dead one.
+//!
+//! List reads look alike: unordered, held one is either choice's. Three rounds, so unordered
+//! reads slip through 1 in 8; write held by value, always first one's.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -98,13 +101,16 @@ fn a_later_choice_is_written_last_even_when_the_first_one_is_answered_late() {
     let landed = journal.clone();
     plan.until(1, 30, move |_| !limits(&landed).is_empty());
     // Two at once, first one's request held back: account list read, then write.
-    for (method, first, second, count) in [
-        ("get_all_accounts", 0, 262_144, 3),
-        ("set_config", 524_288, 1024, 5),
-    ] {
+    let rounds = [
+        ("\"get_all_accounts\"", 0, 262_144),
+        ("\"get_all_accounts\"", 65_536, 131_072),
+        ("\"get_all_accounts\"", 16_384, 32_768),
+        ("\"524288\"", 524_288, 1024),
+    ];
+    for (count, (held, first, second)) in (1..).step_by(2).skip(1).zip(rounds) {
         let slow = slow.clone();
         plan.after(1, move || {
-            std::fs::write(&slow, method).expect("drop slow-once file");
+            std::fs::write(&slow, held).expect("drop slow-once file");
             change(first);
             change(second);
         });
@@ -130,9 +136,13 @@ fn a_later_choice_is_written_last_even_when_the_first_one_is_answered_late() {
     engine.exec();
 
     let limits = limits(&journal);
+    let in_order = [
+        "1048576", "0", "262144", "65536", "131072", "16384", "32768", "524288", "1024",
+    ]
+    .map(String::from);
     assert_eq!(
-        limits.get(..5),
-        Some(&["1048576", "0", "262144", "524288", "1024"].map(String::from)[..]),
+        limits.get(..in_order.len()),
+        Some(&in_order[..]),
         "expected each second choice written after the first, so the core keeps it, \
          even with the first one's account list or write answered late: {:?}",
         common::calls(&journal)
