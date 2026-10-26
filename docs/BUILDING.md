@@ -50,7 +50,7 @@ cargo install --locked cargo-nextest
 6. **Real-core integration** (`real_server`, `real_core`): gated on `DELTACHAT_RPC_SERVER`, offline. `make test` skips them; `make integration` (in `check`, CI `integration`) sets it. `real_core.rs` tells undecodable request from undeliverable.
 7. **Packaging** (`ci/packaging-lint.sh`): spec parses, desktop entry validates, shell scripts clean, catalogs current, `lrelease`-clean, every `docs/*.md` a comment names exists. Missing tool = SKIP locally; CI `PACKAGING_LINT_STRICT=1` fails (as `HARBOUR_CHECK_STRICT=1`).
 8. **Report-script** (`ci/sonar-report-selftest.sh`): only script talking outside GitHub; run vs stub of SonarQube's four endpoints (no analysis at test time; CI can't reach `sonarcloud.io`, why script exists).
-9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror fallback proved against stand-in apt, down or trickling.
+9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror pick and fallback proved against stand-in apt (down, trickling) and curl (mirrors of set speed).
 10. **Change-filter** (`ci/changes-selftest.sh`): which PR skips Rust jobs. Most cases guard costly side: code read as docs = green without tests.
 
 Aspiration, tracked not gated: test volume > source volume.
@@ -79,7 +79,8 @@ make sonar-reports
 `ci.yml` = gate, runs what `make check` runs.
 
 - **Packages via `ci/apt-install.sh`**, not bare `apt-get`: `apt-get update` fails if *any* repo fails; image ships unused ones. Script drops third-party lists, keeps Ubuntu's wherever they are (list kept only if it names `ubuntu.com` host), so archive it installs from survives.
-- Runner's mirror (`azure.archive.ubuntu.com`) slow or down: apt retries each file 3 times, drops one stalled 30 s; update or install still failing = lists switched to `archive.ubuntu.com`, tried once more. Selftest drives a stand-in apt that fails.
+- **Mirror timed per job**: runner's `azure.archive.ubuntu.com` trickles debs on some runners (seen 26 kB/s, 1 h; neighbours in same run 16 s), indexes fast even then. apt moves to next mirror only on error, never on slow. So after index, script reads 2 MiB of biggest deb from each mirror in `/etc/apt/apt-mirrors.txt` plus `mirrors.edge.kernel.org` (≤5 s each), writes list fastest first; `security.ubuntu.com` stays last. Log line per mirror: `apt-install: <url> <n> kB/s`.
+- Runner's mirror (`azure.archive.ubuntu.com`) slow or down: apt retries each file 3 times, drops one stalled 30 s; update or install still failing = next mirror in list first (older image's lists: `archive.ubuntu.com`), tried once more. Selftest drives a stand-in apt that fails.
 - **Docs-only PR skips Rust jobs** (`test`, `msrv`, `integration`, `harbour`): `changes` job runs `ci/changes.sh` on merge commit's diff vs base. Only `*.md` outside `vendor/`, `third_party/` (tests read those). Skipped job passes required check. Push to `main`, dispatch: everything. `packaging`, `deny`, `zizmor` always; Sonar (`build.yml`) too.
 - **Rust jobs cache `target/`** (`Swatinem/rust-cache`, `rust` workspace). `msrv` own key (builds `+1.75.0`; action keys on default toolchain; shared slot = both miss). `CARGO_INCREMENTAL: 0`: incremental state never reused.
 - Cache helps less than it looks: warm clippy ~20 s; `test` cost = suite waiting on timers, not compile.
