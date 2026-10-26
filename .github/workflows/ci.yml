@@ -23,8 +23,28 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  # Docs-only PR (`*.md` outside vendor/, third_party/): Rust jobs skipped. A
+  # job skipped by `if:` passes as a required check. Rules: ci/changes.sh.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Merge commit and its base parent.
+          fetch-depth: 2
+      - id: diff
+        run: ./ci/changes.sh >>"$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+
   # Lints, unit and Qt event-loop tests. Toolchain from rust-toolchain.toml.
   test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -61,6 +81,8 @@ jobs:
 
   # Device toolchain floor: Sailfish ships Rust 1.75.0; no newer available.
   msrv:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -83,6 +105,8 @@ jobs:
 
   # What no fake server proves: our shapes match the real core. Pinned binary.
   integration:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -123,11 +147,15 @@ jobs:
       - run: ./ci/sonar-report-selftest.sh
       # ci/apt-install.sh: wrong rule deletes the archive; proved on own dir.
       - run: ./ci/apt-install-selftest.sh
+      # ci/changes.sh: wrong rule = code PR green without tests.
+      - run: ./ci/changes-selftest.sh
 
   # Harbour rejects, caught from sources before intake. Authority: `sfdk check
   # -s harbour` on real RPM (rpm.yml). Mandatory: fixes only get dearer.
   # docs/HARBOUR.md.
   harbour:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
