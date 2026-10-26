@@ -8,7 +8,11 @@
 #
 # aarch64 only (project target; SDK image carries no other arch). Kept short
 # by: own derived one-arch SDK image (sdk-image.yml); rust/target and crates
-# carried between runs.
+# carried between runs, FFmpeg/x264 in it reused when unchanged
+# (rust/piirit-video/build_reuse.rs).
+#
+# Push to main: an RPM of each main commit, and cache every branch starts
+# from (caches: own branch + main only) stays current.
 name: rpm
 
 on:
@@ -35,6 +39,9 @@ on:
   push:
     # `v*` for release. `build-*`: throwaway; dispatch needs workflow on main.
     tags: ["v*", "build-*"]
+    branches: [main]
+    # Docs only: nothing packaged changes. Tags ignore path filters.
+    paths-ignore: ["docs/**", "*.md"]
 
 # Workflow needs tree read only; each job adds its own extra permissions, so
 # neither holds the other's.
@@ -151,8 +158,18 @@ jobs:
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
           echo "RPM_RELEASE=$release" >> "$GITHUB_ENV"
 
+      # Submodule commits FFmpeg/x264 build from, for the cache key below.
+      - name: Name the C libraries' sources
+        run: |
+          libs=$(git ls-tree HEAD third_party/ffmpeg third_party/x264 | sha256sum | cut -c1-16)
+          echo "C_LIBS=$libs" >> "$GITHUB_ENV"
+
       # ~56 crates (4 ours); deps rely only on lockfile + image toolchain: ~4
-      # min cold, ~1 warm. Keyed on image too (one target triple, its rust).
+      # min cold, ~1 warm. FFmpeg/x264: ~8-12 min at one job, kept when stamp
+      # matches (rust/piirit-video/build_reuse.rs). Exact hit never re-saves, so
+      # key holds everything worth saving anew: image (one target triple, its
+      # rust), lockfile, C lib sources and recipe. Stamp, not key, decides
+      # reuse: an older fallback is safe.
       # Not for release (binary from tagged commit only), here and crates below;
       # zizmor can't read `if`, so its cache-poisoning finding ignored on both.
       - name: Restore the cross-compiled dependencies
@@ -160,8 +177,9 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: rust/target
-          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}
+          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-${{ env.C_LIBS }}-${{ hashFiles('rust/piirit-video/build.rs', 'rust/piirit-video/build_reuse.rs') }}
           restore-keys: |
+            rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-
             rpm-target-${{ env.ARCH }}-
 
@@ -177,7 +195,10 @@ jobs:
       # Same script as local build, so the two can't drift (its comments say
       # why). Image named above; crates go where cache keeps them. Docker here;
       # `reproduce` rebuilds with Podman.
+      # Normal: ~3 min warm, ~20 cold. A stall in scratchbox2 hangs, never
+      # fails: cut off here, not at job's 120 min.
       - name: Build the RPM
+        timeout-minutes: 45
         env:
           PIIRIT_ENGINE: docker
           PIIRIT_SDK_IMAGE: ${{ env.SDK_IMAGE }}
@@ -245,7 +266,9 @@ jobs:
       - name: Fetch the package the release build made
         run: gh run download "$GITHUB_RUN_ID" --dir rpms
 
+      # Fresh clone, cold build: ~25 min. Cut off a stall (see rpm job).
       - name: Rebuild and compare
+        timeout-minutes: 60
         env:
           PIIRIT_ENGINE: podman
           TZ: Pacific/Chatham

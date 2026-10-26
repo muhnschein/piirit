@@ -119,7 +119,8 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
   - `build.rs` builds `csrc/gmp_h264.cpp` → `libpiirit.so`, target C++ compiler, vs Gecko plugin headers `third_party/gmp-api` (BSD, Apache-2.0; `SOURCE.md` there).
   - Laid out as Gecko looks: `gmp-piirit/1.0/libpiirit.so` beside `piirit.info`, in `OUT_DIR` and beside binary (spec installs from there).
   - Only three entry points exported; x264 hidden. `gmp-check` (`tests/gmp_check.cpp`) = Gecko stand-in, run by `tests/gmp_h264.rs`.
-- Cost: binary few MB heavier; plugin ≈ x264; clean build +couple min (cached in `target/`). C glue `rust/piirit-video/csrc`, small; Rust tests (`rust/piirit-video/tests`) vs clips made by same libs, no binary fixtures. Dependabot moves submodules along branches.
+- Cost: binary few MB heavier; plugin ≈ x264; clean build ~1 min native at 4 jobs, ~8-12 min in SDK at one.
+- Kept across builds when unchanged (`rust/piirit-video/build_reuse.rs`). Cargo reruns `build.rs` on any newer mtime under `third_party/`, and fresh checkout (every CI run) makes all new: configure + make from zero, cached libs unused. Stamp beside each install instead: submodule commit, configure and make command, configure's env, compiler `--version`. Same = kept. No commit readable (tarball) = built every time. Edit inside submodule without commit unseen: `cargo clean -p piirit-video`. C glue `rust/piirit-video/csrc`, small; Rust tests (`rust/piirit-video/tests`) vs clips made by same libs, no binary fixtures. Dependabot moves submodules along branches.
 - `tokio` `net`: webxdc host loopback socket; adds only `socket2` (tokio's socket platform layer). Alternative was zip reader + inflate for archive core already reads. Call host (`call_host.rs`) same socket, adds nothing: calls-webapp committed as one released file, compiled in (`vendor/calls-webapp/`); no node toolchain.
 
 ## Comments
@@ -132,7 +133,7 @@ Comments, docs: caveman-full.
 
 ## Packaging: the supported path
 
-`.github/workflows/rpm.yml` builds device RPM unattended on `ubuntu-latest`, `docker run` of Sailfish SDK, via `scripts/build-in-container.sh` (anyone with Podman or Docker same way). Reproducible: a release rebuilds byte for byte, checked before publishing (`docs/VERIFYING.md`). Dispatch from Actions tab (inputs: SDK version, cargo jobs) or push `v*` tag. **aarch64** only: only arch targeted or built.
+`.github/workflows/rpm.yml` builds device RPM unattended on `ubuntu-latest`, `docker run` of Sailfish SDK, via `scripts/build-in-container.sh` (anyone with Podman or Docker same way). Reproducible: a release rebuilds byte for byte, checked before publishing (`docs/VERIFYING.md`). Dispatch from Actions tab (inputs: SDK version, release) or push `v*` tag. Push to `main` builds too: RPM per `main` commit, and `main`'s cache (where every new branch starts) stays current. **aarch64** only: only arch targeted or built.
 
 ```sh
 ./scripts/fetch-rpc-server.sh                        # bundled server binaries
@@ -177,7 +178,8 @@ Harbour intake by hand: upload release RPM; `docs/HARBOUR.md` = what validator w
 Payoffs, in order:
 
 - **Derived SDK image.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest → one arch not three, `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`; flattened (deleted files in layers still weigh). 5.04 GB pull → ~2.3 GB; `zypper` off critical path.
-- `rust/target`, crates carried between runs.
+- **FFmpeg/x264 kept when unchanged** (Making a video smaller): most of a build was them, rebuilt every run.
+- `rust/target`, crates carried between runs. Key: image, `Cargo.lock`, C lib sources and recipe; exact hit never re-saves, so key moves when there's something new to save.
 
 ## What a package weighs
 
