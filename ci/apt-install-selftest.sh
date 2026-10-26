@@ -133,13 +133,18 @@ fi
 
 # Mirror down: stand-in apt fails `update` while $APT_DOWN holds "once" (first
 # call) or "always"; `install` alike with "install-once", "install-always"
-# (index fine, package download fails). Logs every call.
+# (index fine, package download fails). Trickling mirror: "update-slow",
+# "download-slow" hang that call once. Logs every call.
 cat >"$work/apt-get" <<'EOF'
 #!/usr/bin/env bash
 echo "$*" >>"$APT_LOG"
+mode=$(cat "$APT_DOWN" 2>/dev/null || true)
 case " $* " in
 *" update "*)
-    mode=$(cat "$APT_DOWN" 2>/dev/null || true)
+    if [[ "$mode" = update-slow ]]; then
+        rm -f "$APT_DOWN"
+        exec sleep 60
+    fi
     if [[ "$mode" = once ]]; then
         rm -f "$APT_DOWN"
         exit 100
@@ -149,7 +154,10 @@ case " $* " in
     fi
     ;;
 *" install "*)
-    mode=$(cat "$APT_DOWN" 2>/dev/null || true)
+    if [[ "$mode" = download-slow ]] && [[ " $* " = *" --download-only "* ]]; then
+        rm -f "$APT_DOWN"
+        exec sleep 60
+    fi
     if [[ "$mode" = install-once ]]; then
         rm -f "$APT_DOWN"
         exit 100
@@ -168,12 +176,17 @@ run_install() {
     local mode=$1
     stage
     printf 'deb http://de.archive.ubuntu.com/ubuntu jammy main\n' >"$work/sources.list"
+    # Current image: ubuntu.sources names `mirror+file:` this; azure first.
+    printf '%s\tpriority:%s\n' http://azure.archive.ubuntu.com/ubuntu/ 1 \
+        https://archive.ubuntu.com/ubuntu/ 2 \
+        http://security.ubuntu.com/ubuntu/ 3 >"$work/apt-mirrors.txt"
     rm -f "$work/apt.log" "$work/down"
     if [[ -n "$mode" ]]; then
         echo "$mode" >"$work/down"
     fi
     APT_SOURCES_DIR="$work/sources" APT_SOURCES_LIST="$work/sources.list" \
-        APT_GET="$work/apt-get" APT_LOG="$work/apt.log" APT_DOWN="$work/down" \
+        APT_MIRROR_LIST="$work/apt-mirrors.txt" APT_GET="$work/apt-get" \
+        APT_LOG="$work/apt.log" APT_DOWN="$work/down" APT_FIRST_TRY_SECONDS=1 \
         "$script" qtbase5-dev >"$work/out" 2>&1
     return $?
 }
@@ -194,11 +207,15 @@ check() {
 }
 
 run_install ""
-check "a working mirror installs at once" test "$(grep -c '' "$work/apt.log")" -eq 2
+check "a working mirror installs at once" test "$(grep -c '' "$work/apt.log")" -eq 3
+check "the capped first try only downloads, so a kill never leaves dpkg half done" \
+    test "$(grep -c -- '--download-only' "$work/apt.log")" -eq 1
 check "apt retries each file and gives up on a stalled one" \
     grep -q 'Acquire::Retries=3 -o Acquire::http::Timeout=30' "$work/apt.log"
 check "a working mirror is left as it is" \
     grep -q 'azure.archive.ubuntu.com' "$work/sources/ubuntu.sources"
+check "a working mirror stays first in the image's mirror list" \
+    grep -q '^http://azure.archive.ubuntu.com/' "$work/apt-mirrors.txt"
 
 run_install once
 check "a failed mirror is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 3
@@ -206,6 +223,10 @@ check "the retry goes to archive.ubuntu.com (deb822)" \
     grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
 check "the retry goes to archive.ubuntu.com (sources.list)" \
     grep -q 'deb http://archive.ubuntu.com/ubuntu jammy' "$work/sources.list"
+check "the retry goes to archive.ubuntu.com (image's mirror list)" \
+    test "$(grep -c 'azure' "$work/apt-mirrors.txt")" -eq 0
+check "the mirror list keeps security.ubuntu.com" \
+    grep -q '^http://security.ubuntu.com/' "$work/apt-mirrors.txt"
 check "the log says the mirror was switched" \
     grep -q 'now uses archive.ubuntu.com' "$work/out"
 
@@ -213,6 +234,20 @@ run_install install-once
 check "a failed download is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 4
 check "the download retry goes to archive.ubuntu.com" \
     grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
+
+# slow <mode> <why>: trickling call cut at cap, rest from archive, well before
+# stand-in's 60 s.
+slow() {
+    local mode=$1 why=$2 began=$SECONDS
+    run_install "$mode"
+    local rc=$?
+    check "$why" test "$rc" -eq 0 -a $((SECONDS - began)) -lt 30
+    check "$why, from archive.ubuntu.com" \
+        grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
+    return 0
+}
+slow update-slow "a trickling index is cut short and fetched again"
+slow download-slow "a trickling download is cut short and fetched again"
 
 # fails <mode> <why>: archive no better, job must fail.
 fails() {
