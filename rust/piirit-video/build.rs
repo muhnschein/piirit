@@ -412,32 +412,16 @@ fn build_x264(src: &Path, out: &Path, target: &Target) -> PathBuf {
     if let Some(triple) = &target.cross {
         configure.arg(format!("--host={triple}"));
     }
-    let mut make = Command::new("make");
-    make.current_dir(&build)
-        .arg(format!("-j{}", target.jobs))
-        .arg("install-lib-static");
-    let inputs = reuse::inputs(
+    let make = make(&build, target, "install-lib-static");
+    configure_and_make(
+        "x264",
         src,
-        &[&configure, &make],
-        target.version.as_deref(),
-        &|key| std::env::var_os(key),
-    );
-    if inputs
-        .as_deref()
-        .is_some_and(|inputs| reuse::is_current(&prefix, inputs))
-    {
-        return prefix;
-    }
-    reuse::forget(&prefix);
-    run(
-        &mut configure,
-        "x264's configure",
+        &prefix,
+        configure,
+        make,
         &build.join("config.log"),
+        target,
     );
-    run(&mut make, "x264's make", &build.join("config.log"));
-    if let Some(inputs) = inputs {
-        reuse::record(&prefix, &inputs);
-    }
     prefix
 }
 
@@ -491,10 +475,39 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
             .arg(format!("--arch={}", target.arch))
             .arg(format!("--cross-prefix={triple}-"));
     }
+    let make = make(&build, target, "install");
+    configure_and_make(
+        "FFmpeg",
+        src,
+        &prefix,
+        configure,
+        make,
+        &build.join("ffbuild/config.log"),
+        target,
+    );
+    prefix
+}
+
+/// `make <goal>` in `build` with the jobs cargo allows.
+fn make(build: &Path, target: &Target, goal: &str) -> Command {
     let mut make = Command::new("make");
-    make.current_dir(&build)
+    make.current_dir(build)
         .arg(format!("-j{}", target.jobs))
-        .arg("install");
+        .arg(goal);
+    make
+}
+
+/// Runs `configure` then `make` into `prefix`, unless an install from the same
+/// inputs is already there (`build_reuse.rs`).
+fn configure_and_make(
+    name: &str,
+    src: &Path,
+    prefix: &Path,
+    mut configure: Command,
+    mut make: Command,
+    log: &Path,
+    target: &Target,
+) {
     let inputs = reuse::inputs(
         src,
         &[&configure, &make],
@@ -503,25 +516,16 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
     );
     if inputs
         .as_deref()
-        .is_some_and(|inputs| reuse::is_current(&prefix, inputs))
+        .is_some_and(|inputs| reuse::is_current(prefix, inputs))
     {
-        return prefix;
+        return;
     }
-    reuse::forget(&prefix);
-    run(
-        &mut configure,
-        "FFmpeg's configure",
-        &build.join("ffbuild/config.log"),
-    );
-    run(
-        &mut make,
-        "FFmpeg's make",
-        &build.join("ffbuild/config.log"),
-    );
+    reuse::forget(prefix);
+    run(&mut configure, &format!("{name}'s configure"), log);
+    run(&mut make, &format!("{name}'s make"), log);
     if let Some(inputs) = inputs {
-        reuse::record(&prefix, &inputs);
+        reuse::record(prefix, &inputs);
     }
-    prefix
 }
 
 /// Runs a step; on failure, names it and its log.
