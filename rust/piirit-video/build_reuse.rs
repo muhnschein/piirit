@@ -14,7 +14,7 @@
 //!
 //! Own file: build.rs and `tests/build_reuse.rs` both include it.
 
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::fmt::Write as _;
 use std::path::Path;
 use std::process::Command;
@@ -62,7 +62,7 @@ pub fn inputs(
             }
         }
         for (key, value) in step.get_envs() {
-            let value = value.map_or_else(|| "(removed)".into(), |v| v.to_string_lossy());
+            let value = value.map_or_else(|| "(removed)".into(), OsStr::to_string_lossy);
             let _ = writeln!(text, "  env {}={value}", key.to_string_lossy());
         }
     }

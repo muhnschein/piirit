@@ -168,12 +168,17 @@ Harbour intake by hand: upload release RPM; `docs/HARBOUR.md` = what validator w
 
 ## What a device build costs
 
-| Step | One job | Four jobs |
+Measured 2026-10-26, `ubuntu-latest`, one cargo job (runs 309-324):
+
+| Step | Warm (cache, libs kept) | Cold (release, or C libs changed) |
 |---|---|---|
-| Pull the SDK image | 105 s | 80 s |
-| Build the RPM | 142 s | 82 s |
-| Validate against Harbour | 10 s | 10 s |
-| **The whole run** | **284 s** | **190 s** |
+| Pull the SDK image | ~90 s | ~90 s |
+| FFmpeg + x264 | 3 s | 12-16 min |
+| Rest of build (deps, app, LTO link) | ~2.5 min | ~5 min |
+| Validate against Harbour | ~30 s | ~30 s |
+| **The whole run** | **~6 min** | **~20 min** |
+
+Release: build and rebuild side by side, then `compare`: ~26 min. Runner speed varies by up to 1.5x between runs.
 
 `rpm.yml` runs one job: at 2 or 4 cargo stalls in sb2 often enough to cost more than it saves (Spec constraints).
 
