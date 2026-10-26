@@ -1275,6 +1275,12 @@ async fn serve() {
             });
         }
     }
+    // One request handled late: test drops `PIIRIT_FAKE_SLOW_ONCE` file naming method; next such
+    // request takes it (here, in order read), waits 1 s, then journaled and done. Later ones
+    // overtake it.
+    let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Server dies on next request once test drops `PIIRIT_FAKE_EXIT_ONCE` file; replacement lives.
+    let exit_once = std::env::var_os("PIIRIT_FAKE_EXIT_ONCE").map(std::path::PathBuf::from);
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
 
     while let Ok(Some(line)) = lines.next_line().await {
@@ -1284,6 +1290,18 @@ async fn serve() {
         if let Some(path) = &arrivals {
             land_pictures(&mut *state.lock().await, path);
         }
+        if exit_once
+            .as_ref()
+            .is_some_and(|path| std::fs::remove_file(path).is_ok())
+        {
+            std::process::exit(0);
+        }
+        let slow = slow_once.as_ref().is_some_and(|path| {
+            std::fs::read_to_string(path).is_ok_and(|method| {
+                line.contains(&format!("\"{}\"", method.trim()))
+                    && std::fs::remove_file(path).is_ok()
+            })
+        });
         let state = state.clone();
         let stdout = stdout.clone();
         tokio::spawn(async move {
@@ -1299,6 +1317,9 @@ async fn serve() {
                 .unwrap_or_default()
                 .to_string();
             let params = request.get("params").cloned().unwrap_or(Value::Null);
+            if slow {
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            }
             journal(&method, &params);
 
             let positional = |index: usize| -> Value {
