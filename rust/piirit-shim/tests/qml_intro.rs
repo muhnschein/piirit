@@ -224,15 +224,19 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
         r("first-picture", call!("picture", "slideArt0"));
     });
 
-    // Pictures load off main thread.
+    // Pictures load off main thread: read once in, however slow the load.
     let r = record.clone();
-    plan.after(1, move || {
+    plan.until(1, 30, move |last| {
+        if call!("get", "slideArt0", "ready").to_string() != "true" && !last {
+            return false;
+        }
         r("drawn", call!("get", "slideArt0", "ready"));
         r("title", call!("get", "slideTitle0", "text"));
         r("body", call!("get", "slideBody0", "text"));
         r("hint-early", call!("get", "swipeHint", "visible"));
         r("swipe", call!("swipeTo", "4"));
         r("hint-late", call!("get", "swipeHint", "visible"));
+        true
     });
 
     // Last fact read only now (views make delegates near). Past-end: phone turn is no request,

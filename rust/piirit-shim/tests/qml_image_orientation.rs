@@ -119,8 +119,17 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
             ),
         ));
     });
-    // Decoded off Qt thread: own size unknown in the asking pass.
-    plan.after(2, move || unsafe {
+    // Decoded off Qt thread: own size unknown in the asking pass. Read once in, however slow the
+    // decode (`Image.Ready` is 1).
+    plan.until(1, 30, move |last| unsafe {
+        let status = call!(
+            "get",
+            QString::from("attachmentImage"),
+            QString::from("status")
+        );
+        if status != "1" && !last {
+            return false;
+        }
         (*steps_ptr).push((
             "status",
             call!(
@@ -147,6 +156,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
         ));
         (*steps_ptr).push(("row-height", call!("heightOfRow")));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

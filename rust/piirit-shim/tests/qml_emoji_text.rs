@@ -201,12 +201,17 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
             )
         );
     });
-    plan.after(1, move || unsafe {
+    // Glyph's picture loaded off main thread: read once in, however slow the load.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("glyphPixels").starts_with("status:") && !last {
+            return false;
+        }
         record!("body-on", call!("label", QString::from("messageLabel")));
         record!("quote-on", call!("label", QString::from("quoteLabel")));
         record!("glyph-on", call!("glyphText"));
         record!("glyph-pixels", call!("glyphPixels"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
