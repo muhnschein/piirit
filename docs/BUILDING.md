@@ -130,6 +130,8 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 
 Comments, docs: caveman-full.
 
+- Default: no comment. One only for constraint, external quirk, invariant code can't show; one line where possible, four max.
+- Don't restate names or signatures, narrate steps, explain fix just made: PR carries that.
 - Terse fragments. What is true now, why; keep constraints.
 - No changelog, bug report, history, story (git's job). Delete comment rather than turn it into history.
 - Identifiers, paths, flags exact. Item doc comments stay (`missing_docs` denied).
