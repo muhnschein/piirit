@@ -102,7 +102,9 @@ static int open_streams(struct clip *clip, const struct piirit_clip *made)
     int size = 0;
     uint8_t *extradata;
 
-    if (x264_param_default_preset(&param, "medium", NULL) < 0) {
+    /* superfast: keeps B-frames and CABAC, as phones make. medium (no x86 asm)
+     * took ~20 frames/s: video tests starved under 32 at once. */
+    if (x264_param_default_preset(&param, "superfast", NULL) < 0) {
         return -1;
     }
     param.i_log_level = X264_LOG_NONE;

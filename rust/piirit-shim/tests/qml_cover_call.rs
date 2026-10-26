@@ -517,11 +517,15 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("camera-off-notes", call!("notes"));
     });
 
-    // Their picture loads off main thread.
-    plan.after(1, move || unsafe {
+    // Their picture loads off main thread: read once in, however slow the load.
+    plan.until(1, 30, move |last| unsafe {
+        if !call!("backdrop").starts_with("true|") && !last {
+            return false;
+        }
         record!("pictured-backdrop", call!("backdrop"));
         record!("pictured-shaders", call!("drawnThrough"));
         record!("pictured-name", text!("callName"));
+        true
     });
 
     // Clock ticked since; then nobody looks a while.
@@ -661,13 +665,19 @@ fn the_cover_shows_the_call_while_one_is_up() {
         state!("connected", long_name, pictured, 12, "true", "true");
     });
 
+    // Read once in, however slow the load.
     let to_file = picture_at.clone();
-    plan.after(1, move || unsafe {
-        record!("fit-long-pictured-both", call!("layout"));
+    plan.until(1, 30, move |last| unsafe {
+        let layout = call!("layout");
+        if !layout.contains("|picture=true") && !last {
+            return false;
+        }
+        record!("fit-long-pictured-both", layout);
         record!(
             "shot-long-pictured",
             call!("shoot", to_file("long-pictured-both.png"))
         );
+        true
     });
 
     // Voice call, mic off: same picture stays loaded.

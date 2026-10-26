@@ -119,8 +119,11 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         record!("loading-picture", get!("avatarImage", "visible"));
     });
 
-    // A second later: picture loaded, drawn.
-    plan.after(1, move || unsafe {
+    // Picture loaded, however slow the load (`Image.Ready` is 1), drawn.
+    plan.until(1, 30, move |last| unsafe {
+        if get!("avatarImage", "status") != "1" && !last {
+            return false;
+        }
         record!("picture-status", get!("avatarImage", "status"));
         record!("picture-shown", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
@@ -132,6 +135,7 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         record!("face-height", get!("avatarImage", "height"));
 
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
