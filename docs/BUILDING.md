@@ -58,9 +58,9 @@ Aspiration, tracked not gated: test volume > source volume.
 
 ## Static analysis
 
-SonarQube Cloud reads every PR (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides. Separate workflow: green `make check` on laptop = green CI, no hosted service.
+SonarQube Cloud reads every PR but docs-only (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides. Separate workflow: green `make check` on laptop = green CI, no hosted service.
 
-- Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed (else llvm-cov's `cargo test`, ~10 min instrumented).
+- Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed, profile `ci` as CI's `test` (else llvm-cov's `cargo test`, ~10 min instrumented).
 
 ```
 rustup component add llvm-tools-preview
@@ -82,7 +82,7 @@ make sonar-reports
 - **Packages via `ci/apt-install.sh`**, not bare `apt-get`: `apt-get update` fails if *any* repo fails; image ships unused ones. Script drops third-party lists, keeps Ubuntu's wherever they are (list kept only if it names `ubuntu.com` host), so archive it installs from survives.
 - **Mirror timed per job**: runner's `azure.archive.ubuntu.com` trickles debs on some runners (seen 26 kB/s, 1 h; neighbours in same run 16 s), indexes fast even then. apt moves to next mirror only on error, never on slow. So after index, script reads 2 MiB of biggest deb from each mirror in `/etc/apt/apt-mirrors.txt` plus `mirrors.edge.kernel.org` (≤5 s each), writes list fastest first; `security.ubuntu.com` stays last. Log line per mirror: `apt-install: <url> <n> kB/s`.
 - Runner's mirror (`azure.archive.ubuntu.com`) slow or down: apt retries each file 3 times, drops one stalled 30 s; update or install still failing = next mirror in list first (older image's lists: `archive.ubuntu.com`), tried once more. Selftest drives a stand-in apt that fails.
-- **Docs-only PR skips Rust jobs** (`test`, `msrv`, `integration`, `harbour`): `changes` job runs `ci/changes.sh` on merge commit's diff vs base. Only `*.md` outside `vendor/`, `third_party/` (tests read those). Skipped job passes required check. Push to `main`, dispatch: everything. `packaging`, `deny`, `zizmor` always; Sonar (`build.yml`) too.
+- **Docs-only PR skips Rust jobs** (`test`, `msrv`, `integration`, `harbour`): `changes` job runs `ci/changes.sh` on merge commit's diff vs base. Only `*.md` outside `vendor/`, `third_party/` (tests read those). Skipped job passes required check. Push to `main`, dispatch: everything. Sonar (`build.yml`) skipped too: own `changes` job, same script; markdown's only Sonar finding would be a secret, GitHub's secret scanning reads it anyway. `packaging`, `deny`, `zizmor` always (seconds each).
 - **Rust jobs cache `target/`** (`Swatinem/rust-cache`, `rust` workspace). `msrv` own key (builds `+1.75.0`; action keys on default toolchain; shared slot = both miss). `CARGO_INCREMENTAL: 0`: incremental state never reused.
 - Cache helps less than it looks: warm clippy ~20 s; `test` cost = suite waiting on timers, not compile.
 - **Test job installs `cargo-nextest`**, `ci` profile: `fail-fast` off (report all), failures inline and repeated at end (summary is what's read in 200-line log).

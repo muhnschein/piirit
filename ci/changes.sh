@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Does this change need the Rust jobs? Prints `code=true` or `code=false` for
-# $GITHUB_OUTPUT (ci.yml `changes`).
+# $GITHUB_OUTPUT (`changes` job in ci.yml, build.yml).
 #
 # false only for a PR touching nothing but `*.md` outside vendor/ and
 # third_party/: tests read vendor/deltachat-rpc-server/SOURCE.md,
