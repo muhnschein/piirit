@@ -160,7 +160,9 @@ Release = `rpm.yml` run for a version, on `main`:
 1. Bump `rpm/harbour-piirit.spec` `Version:` + three crates' `Cargo.toml`; refresh `Cargo.lock` (`cargo check`); write version's `CHANGELOG.md` section. Merge.
 2. Dispatch `rpm.yml` on `main`, version in `release` input (tags `v<version>` itself); or push `v<version>` tag on merge commit.
 
-Builds with spec's `Release: 1`, not run-number stamp. Refuses version ≠ spec, dispatch off `main`. Publishes GitHub release `v<version>`: device RPM, `SHA256SUMS`, `CHANGELOG.md` section as text (`scripts/release-notes.sh`; missing fails run). Debug/source RPMs stay run artifacts.
+Builds with spec's `Release: 1`, not run-number stamp. Refuses version ≠ spec, dispatch off `main`. Second runner rebuilds same commit meanwhile, as `docs/VERIFYING.md` tells users (`verify-release.sh`, Podman, other TZ, umask); `compare` job: not byte-identical = no release.
+
+Rehearsal: dispatch with `rehearse` ticked, any branch. Same cold build, rebuild, compare; tags and publishes nothing. Use when release path changed. Publishes GitHub release `v<version>`: device RPM, `SHA256SUMS`, `CHANGELOG.md` section as text (`scripts/release-notes.sh`; missing fails run). Debug/source RPMs stay run artifacts.
 
 Harbour intake by hand: upload release RPM; `docs/HARBOUR.md` = what validator will say.
 
