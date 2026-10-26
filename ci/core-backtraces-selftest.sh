@@ -47,6 +47,7 @@ core_of() {
     local core="$dir/core.4242.${binary//\//!}"
     gdb -batch -nx -ex starti -ex "generate-core-file $core" --args "$binary" 5 >/dev/null 2>&1
     echo "$core"
+    return 0
 }
 
 empty="$work/empty"
