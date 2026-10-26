@@ -68,7 +68,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
-    // Whole seconds only (clippy.toml); one step per tick.
+    // One step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
     let mut plan = common::Plan::default();

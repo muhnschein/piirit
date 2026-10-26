@@ -29,7 +29,6 @@ fn health_check_round_trips_through_qt_event_loop() {
     let mut plan = common::Plan::default();
 
     let health_check_ptr = core_ptr;
-    // Whole seconds only (clippy.toml).
     plan.after(1, move || {
         if let Some(this) = health_check_ptr.as_pinned() {
             this.borrow_mut().check_health();

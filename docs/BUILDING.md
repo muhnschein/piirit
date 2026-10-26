@@ -19,9 +19,9 @@ git submodule update --init --depth 1
 - `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for `QTranslator` install, voice recording (`QAudioRecorder`), QML pictures (`QQuickImageProvider`), call mic watch (libpulse).
 - Hence four `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`; each crate's `build.rs` C++ step exists only for them. Each exception narrowest scope, reason stated, short enough to verify by reading.
 - Recorder: host `qtmultimedia5-dev` (`Makefile` lists packages), spec `pkgconfig(Qt5Multimedia)`, links `libQt5Multimedia`. Mic watch: host `libpulse-dev`, spec `pkgconfig(libpulse)`, links `libpulse.so.0`. Both Harbour-allowed. Mic-watch test runs own sound server: needs `pulseaudio`, `pulseaudio-utils`; skipped if absent, except CI fails.
-- `rust/clippy.toml` bans (both caused device-only failures):
-  - `tokio::runtime::Runtime::new`: use `CoreRuntime`
-  - `qmetaobject::single_shot`: truncates sub-second `Duration`s
+- `rust/clippy.toml` bans:
+  - `tokio::runtime::Runtime::new`: use `CoreRuntime` (device-only panic)
+  - `qmetaobject::single_shot`: tests step via `common::Plan` (see Testing). Sub-second waits work: vendored copy patched (`third_party/qmetaobject.patch`; 0.2.10 zeroed fraction)
 
 ## Testing
 

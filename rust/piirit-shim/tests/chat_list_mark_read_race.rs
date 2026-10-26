@@ -47,7 +47,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         // Longer than mark-read-to-other-change gap, so first answer is still in flight at the
-        // second question; short enough both land first. `single_shot` counts whole seconds.
+        // second question; short enough both land first. `Plan` waits whole seconds.
         std::env::set_var("PIIRIT_FAKE_CHATLIST_DELAY_MS", "1500");
     }
 
