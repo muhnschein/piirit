@@ -27,7 +27,7 @@ git submodule update --init --depth 1
 
 Piirit parses almost nothing (protocol, crypto = core's; subprocess ours). Failure mode: misread core JSON or wrong call, unnoticed till phone. Tests aim there.
 
-- `make check`: everything from clean checkout, no phone/account/SDK. Not quite offline: `msrv` fetches 1.75 first time; `deny` wants advisory DB.
+- `make check`: everything from clean checkout, no phone/account/SDK. Not quite offline: `msrv` fetches 1.75 first time; `integration` fetches pinned `deltachat-rpc-server` first time; `deny` wants advisory DB.
 - **Runner `cargo nextest`**, process per test. 100+ test binaries, most start Qt, wait on real timers: `cargo test` ~10 min serialised, mostly idle; nextest 207 tests ~2.5 min on 4 cores. Parallel-safe: webxdc, call hosts bind port 0; QML probes copy tree into pid-named dir.
 
 ```
@@ -47,10 +47,11 @@ cargo install --locked cargo-nextest
    - Silica `EnterKey` attached prop unstubbable (QML forbids capitalised property names; `qmetaobject` can't register attached types): pages using it can't load. Put shown content in loadable component.
    - Lay that out with bindings, not `Column`: positioner sizes in polish pass, never runs windowless; geometry reads zero.
 5. **Static QML** (`tests/qml_syntax.rs`): Qt 5.6 rules Qt 5.15 accepts silently, plus tree rules: every peer-chosen string drawn as plain text (Silica headers can't, hence `ConversationHeader`); file URLs encoded per segment; only picker pages import `Sailfish.Pickers`; every delegate `model.<role>` exists in its model.
-6. **Real-core integration** (`real_server`, `real_core`): gated on `DELTACHAT_RPC_SERVER`, offline. `real_core.rs` tells undecodable request from undeliverable.
+6. **Real-core integration** (`real_server`, `real_core`): gated on `DELTACHAT_RPC_SERVER`, offline. `make test` skips them; `make integration` (in `check`, CI `integration`) sets it. `real_core.rs` tells undecodable request from undeliverable.
 7. **Packaging** (`ci/packaging-lint.sh`): spec parses, desktop entry validates, shell scripts clean, catalogs current, `lrelease`-clean, every `docs/*.md` a comment names exists. Missing tool = SKIP locally; CI `PACKAGING_LINT_STRICT=1` fails (as `HARBOUR_CHECK_STRICT=1`).
 8. **Report-script** (`ci/sonar-report-selftest.sh`): only script talking outside GitHub; run vs stub of SonarQube's four endpoints (no analysis at test time; CI can't reach `sonarcloud.io`, why script exists).
-9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything.
+9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror fallback proved against stand-in apt.
+10. **Change-filter** (`ci/changes-selftest.sh`): which PR skips Rust jobs. Most cases guard costly side: code read as docs = green without tests.
 
 Aspiration, tracked not gated: test volume > source volume.
 
@@ -78,6 +79,8 @@ make sonar-reports
 `ci.yml` = gate, runs what `make check` runs.
 
 - **Packages via `ci/apt-install.sh`**, not bare `apt-get`: `apt-get update` fails if *any* repo fails; image ships unused ones. Script drops third-party lists, keeps Ubuntu's wherever they are (list kept only if it names `ubuntu.com` host), so archive it installs from survives.
+- Runner's mirror (`azure.archive.ubuntu.com`) slow or down: apt retries each file 3 times, drops one stalled 30 s; update or install still failing = lists switched to `archive.ubuntu.com`, tried once more. Selftest drives a stand-in apt that fails.
+- **Docs-only PR skips Rust jobs** (`test`, `msrv`, `integration`, `harbour`): `changes` job runs `ci/changes.sh` on merge commit's diff vs base. Only `*.md` outside `vendor/`, `third_party/` (tests read those). Skipped job passes required check. Push to `main`, dispatch: everything. `packaging`, `deny`, `zizmor` always; Sonar (`build.yml`) too.
 - **Rust jobs cache `target/`** (`Swatinem/rust-cache`, `rust` workspace). `msrv` own key (builds `+1.75.0`; action keys on default toolchain; shared slot = both miss). `CARGO_INCREMENTAL: 0`: incremental state never reused.
 - Cache helps less than it looks: warm clippy ~20 s; `test` cost = suite waiting on timers, not compile.
 - **Test job installs `cargo-nextest`**, `ci` profile: `fail-fast` off (report all), failures inline and repeated at end (summary is what's read in 200-line log).
