@@ -28,7 +28,7 @@ git submodule update --init --depth 1
 Piirit parses almost nothing (protocol, crypto = core's; subprocess ours). Failure mode: misread core JSON or wrong call, unnoticed till phone. Tests aim there.
 
 - `make check`: everything from clean checkout, no phone/account/SDK. Not quite offline: `msrv` fetches 1.75 first time; `integration` fetches pinned `deltachat-rpc-server` first time; `deny` wants advisory DB.
-- **Runner `cargo nextest`**, process per test. 100+ test binaries, most start Qt, wait on real timers: `cargo test` ~10 min serialised, mostly idle; nextest 207 tests ~2.5 min on 4 cores. Parallel-safe: webxdc, call hosts bind port 0; QML probes copy tree into pid-named dir.
+- **Runner `cargo nextest`**, process per test. 100+ test binaries, most start Qt, wait on real timers: `cargo test` ~10 min serialised, mostly idle; nextest 207 tests ~2.5 min on 4 cores. Parallel-safe: webxdc, call hosts bind port 0; QML probes copy tree into pid-named dir (`.qml` only, rest linked; removed at test end).
 
 ```
 cargo install --locked cargo-nextest
