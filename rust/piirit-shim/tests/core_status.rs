@@ -36,15 +36,15 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
     let temp = std::env::temp_dir().join(format!("piirit-core-status-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    let exit = temp.join("exit-once");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Server exits after failing send answered, early enough before last read for restart to
-        // land. Replacement inherits it: reads stop at 8s (second server dies ~10).
-        std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "4500");
+        // Server dies on next request once error seen; replacement lives.
+        std::env::set_var("PIIRIT_FAKE_EXIT_ONCE", &exit);
     }
 
     piirit_shim::register_qml_types();
@@ -62,39 +62,54 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
 
     let mut plan = common::Plan::default();
 
+    let report = move || unsafe {
+        let value = (*engine_ptr).invoke_method("report".into(), &[]);
+        QString::from_qvariant(value)
+            .map(|text| text.to_string())
+            .unwrap_or_default()
+    };
+
     plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| report().ends_with("#ready"));
+    plan.after(0, move || unsafe {
         (*engine_ptr).invoke_method("resumeIo".into(), &[]);
-    });
-    plan.after(1, move || unsafe {
         (*engine_ptr).invoke_method("fail".into(), &[]);
     });
 
+    // Error in, then server dies on next request: resume asks one.
     let mut before_death = String::new();
     let before_ptr: *mut String = std::ptr::addr_of_mut!(before_death);
-    plan.after(1, move || unsafe {
-        let value = (*engine_ptr).invoke_method("report".into(), &[]);
-        *before_ptr = QString::from_qvariant(value)
-            .map(|text| text.to_string())
-            .unwrap_or_default();
+    plan.until(1, 30, move |last| unsafe {
+        let now = report();
+        if !now.starts_with("could not send") && !last {
+            return false;
+        }
+        *before_ptr = now;
+        std::fs::write(&exit, "").expect("drop exit-once file");
+        (*engine_ptr).invoke_method("resumeIo".into(), &[]);
+        true
     });
 
     let mut after_restart = String::new();
     let after_ptr: *mut String = std::ptr::addr_of_mut!(after_restart);
     let mut trail = String::new();
     let trail_ptr: *mut String = std::ptr::addr_of_mut!(trail);
-    plan.after(4, move || unsafe {
-        let value = (*engine_ptr).invoke_method("report".into(), &[]);
-        *after_ptr = QString::from_qvariant(value)
-            .map(|text| text.to_string())
-            .unwrap_or_default();
+    plan.until(1, 30, move |last| unsafe {
         let seen = (*engine_ptr).invoke_method("seen".into(), &[]);
-        *trail_ptr = QString::from_qvariant(seen)
+        let seen = QString::from_qvariant(seen)
             .map(|text| text.to_string())
             .unwrap_or_default();
+        let now = report();
+        let back = seen.contains("reconnecting") && now.ends_with("#ready");
+        if !back && !last {
+            return false;
+        }
+        *after_ptr = now;
+        *trail_ptr = seen;
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

@@ -124,7 +124,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         call!("set", QString::from("ownColor"), QString::from("#ff0000"));
         record!("no-picture", call!("owned"));
         record!("plain-fill", call!("fill"));
-        // Loaded off main thread: read a second later.
+        // Loaded off main thread: read once loaded.
         call!(
             "set",
             QString::from("picturePath"),
@@ -132,7 +132,12 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         );
     });
 
-    plan.after(1, move || unsafe {
+    // However slow the load (`Image.Ready` is 1).
+    plan.until(1, 30, move |last| unsafe {
+        let status = call!("get", QString::from("avatarImage"), QString::from("status"));
+        if status != "1" && !last {
+            return false;
+        }
         record!(
             "picture-status",
             call!("get", QString::from("avatarImage"), QString::from("status"))
@@ -168,6 +173,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         record!("cover-disc-fill", call!("fill"));
 
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

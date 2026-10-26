@@ -131,9 +131,12 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         record!("again", call!("again"));
     });
 
-    // Page up: what it is served, what it may reach.
-    plan.after(1, move || unsafe {
+    // Page up: what it is served, what it may reach. Host starts off Qt thread: read once up.
+    plan.until(1, 30, move |last| unsafe {
         let url = call!("url");
+        if url.is_empty() && !last {
+            return false;
+        }
         record!("url", url.clone());
         *url_ptr = url.clone();
         let authority = authority_of(&url);
@@ -196,6 +199,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
             "start-again",
             status_of(&post(&authority, &format!("{api}/start"), "v=0 other")).to_string()
         );
+        true
     });
 
     // Other end's answer, delivered to page as hash command.

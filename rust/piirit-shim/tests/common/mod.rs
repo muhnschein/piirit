@@ -141,18 +141,27 @@ pub fn page_url(name: &str) -> String {
 ///
 /// Copy keyed by pid, rebuilt each run: never stale. Only `.qml` files copied; rest linked
 /// (`art/`: 11 MB). Removed when dropped, panic too: 30 tests, one copy each, filled `/tmp`.
-pub fn qml_tree_without_enter_key() -> QmlTree {
+pub fn qml_tree_without_enter_key() -> TempTree {
     let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     let target = std::env::temp_dir().join(format!("piirit-qml-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&target);
     copy_qml_without_enter_key(&source, &target);
-    QmlTree(target)
+    TempTree(target)
 }
 
-/// [`qml_tree_without_enter_key`]'s copy; derefs to its root. Keep alive while engine loads.
-pub struct QmlTree(PathBuf);
+/// Test's own empty `piirit-<name>-<pid>` temp dir, removed when dropped (panic too): some tests
+/// write 100 MB there.
+pub fn temp_tree(name: &str) -> TempTree {
+    let path = std::env::temp_dir().join(format!("piirit-{name}-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&path);
+    std::fs::create_dir_all(&path).expect("create the test's temp dir");
+    TempTree(path)
+}
 
-impl std::ops::Deref for QmlTree {
+/// Temp dir, removed when dropped; derefs to its root. Keep alive while app uses it.
+pub struct TempTree(PathBuf);
+
+impl std::ops::Deref for TempTree {
     type Target = Path;
 
     fn deref(&self) -> &Path {
@@ -160,9 +169,9 @@ impl std::ops::Deref for QmlTree {
     }
 }
 
-impl Drop for QmlTree {
+impl Drop for TempTree {
     fn drop(&mut self) {
-        // Links removed, not followed: app tree stays.
+        // Links removed, not followed: what they point at stays.
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }

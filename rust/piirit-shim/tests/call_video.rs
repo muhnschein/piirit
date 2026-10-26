@@ -210,8 +210,19 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
     ];
     // The core first has to come up.
     let mut plan = common::Plan::default();
-    for (at, step) in script.into_iter().enumerate() {
-        plan.after(if at == 0 { 2 } else { 1 }, step);
+    for (at, mut step) in script.into_iter().enumerate() {
+        if at > 0 {
+            // Each later step runs in a call whose host starts off Qt thread: once its page is up.
+            plan.until(1, 30, move |last| unsafe {
+                if call!("url").is_empty() && !last {
+                    return false;
+                }
+                step();
+                true
+            });
+        } else {
+            plan.after(2, step);
+        }
     }
     plan.run();
 

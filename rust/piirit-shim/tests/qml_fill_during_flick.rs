@@ -137,10 +137,15 @@ fn a_flicking_view_asks_for_rows_while_it_moves() {
     plan.after(1, move || unsafe {
         (*steps_ptr).push(("flick", call!("startFlick")));
     });
-    plan.after(1, move || unsafe {
+    // Flick over and its last ask in, however slow the frames came.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("afterCount") == "0" && !last {
+            return false;
+        }
         (*steps_ptr).push(("during", call!("duringCount")));
         (*steps_ptr).push(("after", call!("afterCount")));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

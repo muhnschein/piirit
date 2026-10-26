@@ -120,13 +120,15 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         );
     });
 
-    // Loaded off main thread.
-    plan.after(1, move || unsafe {
-        record!(
-            "avatar-status",
-            call!("get", QString::from("avatarImage"), QString::from("status"))
-        );
+    // Loaded off main thread: read once in, however slow the load (`Image.Ready` is 1).
+    plan.until(1, 30, move |last| unsafe {
+        let status = call!("get", QString::from("avatarImage"), QString::from("status"));
+        if status != "1" && !last {
+            return false;
+        }
+        record!("avatar-status", status);
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

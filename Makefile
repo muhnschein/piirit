@@ -15,7 +15,7 @@
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
-        sonar-report-test apt-install-test changes-test sonar-reports translations \
+        sonar-report-test apt-install-test changes-test core-backtraces-test sonar-reports translations \
         cover-icons clean
 
 CARGO ?= cargo
@@ -25,11 +25,12 @@ export QT_QPA_PLATFORM = offscreen
 ## CI's steps, same order; keep in step with ci.yml. `msrv` fetches toolchain
 ## first time, `deny` needs advisory DB.
 check: fmt lint test integration doc-lint msrv qml-lint lockfile-lint packaging-lint \
-       harbour sonar-report-test apt-install-test changes-test vendor-check deny workflow-lint
+       harbour sonar-report-test apt-install-test changes-test core-backtraces-test vendor-check \
+       deny workflow-lint
 
 ## Unit, integration, Qt event-loop tests.
 ##
-## nextest if installed (one process per test: ~10 min down to ~2.5; see
+## nextest if installed (one process per test, 32 at once: ~10 min down to ~2; see
 ## rust/.config/nextest.toml), else `cargo test` (check must work on a bare
 ## laptop).
 ##   cargo install --locked cargo-nextest
@@ -138,6 +139,10 @@ apt-install-test:
 ## ci/changes.sh skips Rust jobs for docs alone; wrong = code PR untested.
 changes-test:
 	./ci/changes-selftest.sh
+
+## ci/core-backtraces.sh reads a crashed test's core; wrong = crash with no stack.
+core-backtraces-test:
+	./ci/core-backtraces-selftest.sh
 
 # sonar-reports: workspace minus third_party/, vendor/
 # (sonar-project.properties).
