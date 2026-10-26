@@ -116,8 +116,8 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         record!("lit", call!("root", QString::from("color")));
 
         // A picture goes through the same colour rather than showing its
-        // own. Set here and read a second later: it is loaded off the
-        // main thread, and an avatar draws the disc until it is there.
+        // own. Set here, read once loaded: loaded off the main thread, and
+        // an avatar draws the disc until it is there.
         call!(
             "set",
             QString::from("picturePath"),
@@ -125,7 +125,12 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         );
     });
 
-    plan.after(1, move || unsafe {
+    // Loaded, however slow the load (`Image.Ready` is 1).
+    plan.until(1, 30, move |last| unsafe {
+        let status = call!("get", QString::from("avatarImage"), QString::from("status"));
+        if status != "1" && !last {
+            return false;
+        }
         record!(
             "lit-visible",
             call!(
@@ -148,6 +153,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         record!("own-face", call!("face"));
 
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
