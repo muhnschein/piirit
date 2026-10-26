@@ -50,7 +50,7 @@ cargo install --locked cargo-nextest
 6. **Real-core integration** (`real_server`, `real_core`): gated on `DELTACHAT_RPC_SERVER`, offline. `make test` skips them; `make integration` (in `check`, CI `integration`) sets it. `real_core.rs` tells undecodable request from undeliverable.
 7. **Packaging** (`ci/packaging-lint.sh`): spec parses, desktop entry validates, shell scripts clean, catalogs current, `lrelease`-clean, every `docs/*.md` a comment names exists. Missing tool = SKIP locally; CI `PACKAGING_LINT_STRICT=1` fails (as `HARBOUR_CHECK_STRICT=1`).
 8. **Report-script** (`ci/sonar-report-selftest.sh`): only script talking outside GitHub; run vs stub of SonarQube's four endpoints (no analysis at test time; CI can't reach `sonarcloud.io`, why script exists).
-9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror fallback proved against stand-in apt.
+9. **Runner-setup** (`ci/apt-install-selftest.sh`): apt-source keep rule proved on test's own dir. Inverted = deletes install archive, fails everything. Mirror fallback proved against stand-in apt, down or trickling.
 10. **Change-filter** (`ci/changes-selftest.sh`): which PR skips Rust jobs. Most cases guard costly side: code read as docs = green without tests.
 
 Aspiration, tracked not gated: test volume > source volume.
