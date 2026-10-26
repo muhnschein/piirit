@@ -78,7 +78,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // 3s at 4 Mbit/s, ~1.5 MB: over ceiling below; planned size under it.
+    // 3s at 4 Mbit/s, ~2 MB: over ceiling below; planned size under it.
     let clip = temp.join("lake at dusk.mov");
     piirit_video::synth(&clip, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
     let clip_bytes = std::fs::metadata(&clip).expect("measure the clip").len();
@@ -187,8 +187,12 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send-early", call!("send")));
     });
 
-    // Shrunk by now: few seconds of small video is quick even unoptimised.
-    plan.after(9, move || unsafe {
+    // Shrunk: read once done, however slow the recode (CPU-bound: a minute, under load).
+    plan.until(1, 60, move |last| unsafe {
+        let preparing = call!("get", QString::from("messages"), QString::from("preparing"));
+        if preparing != "false" && !last {
+            return false;
+        }
         probe!("preparing-done", "messages", "preparing");
         probe!("send-enabled-done", "sendButton", "enabled");
         probe!("bar-done", "attachmentBar", "visible");
@@ -207,6 +211,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("made-on-disk", format!("{made:?}")));
         // Only now does reader send.
         (*steps_ptr).push(("send", call!("send")));
+        true
     });
 
     plan.after(6, move || unsafe {
