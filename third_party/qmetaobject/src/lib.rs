@@ -873,7 +873,8 @@ where
     let func_box: Box<dyn FnMut()> = Box::new(func);
     let mut func_raw = Box::into_raw(func_box);
 
-    let interval_ms: u32 = interval.as_secs() as u32 * 1000 + interval.subsec_nanos() * 1e-6 as u32;
+    // QTimer takes int milliseconds: saturate instead of wrapping.
+    let interval_ms = interval.as_millis().min(i32::MAX as u128) as i32;
 
     cpp!(unsafe [interval_ms as "int", mut func_raw as "FnBoxWrapper"] {
         QTimer::singleShot(interval_ms, std::move(func_raw));

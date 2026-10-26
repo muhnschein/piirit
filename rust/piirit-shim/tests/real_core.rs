@@ -126,7 +126,6 @@ fn the_real_core_accepts_the_shapes_we_send() {
 
     let mut plan = common::Plan::default();
 
-    // Whole seconds only (qmetaobject 0.2.10; clippy.toml).
     let email = core_ptr.clone();
     plan.after(1, move || {
         if let Some(this) = email.as_pinned() {

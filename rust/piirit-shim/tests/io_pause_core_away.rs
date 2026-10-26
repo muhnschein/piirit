@@ -6,8 +6,8 @@
 //! Required: window stop still asked; shim forgets IO; restarted core starts none.
 //!
 //! Steps hang on core's own restarts, not the clock. Fixed reads raced spawn time: each restart
-//! lands a little later under load (coverage), and `single_shot` drops sub-seconds, so a read meant
-//! for 6.5 s ran at 6 s, beside the edge of the away window, and saw `ready`.
+//! lands a little later under load (coverage), and `single_shot` then dropped sub-seconds, so a
+//! read meant for 6.5 s ran at 6 s, beside the edge of the away window, and saw `ready`.
 
 // Qt harness: see qml_share.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]

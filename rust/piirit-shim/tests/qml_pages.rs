@@ -288,7 +288,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 
     let mut plan = common::Plan::default();
 
-    // One step per tick; whole seconds (clippy.toml).
+    // One step per tick.
     let s = steps.clone();
     plan.after(1, move || {
         common::record(

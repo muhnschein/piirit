@@ -252,8 +252,7 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
-/// Each step's recorded result. One step per tick: shim answers async; `single_shot` is whole
-/// seconds.
+/// Each step's recorded result. One step per tick: shim answers async.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
 /// Push one step's result onto [`Steps`].
@@ -313,7 +312,7 @@ impl Plan {
     }
 
     /// Plan's one `single_shot`: each schedules next only once it ran.
-    #[allow(clippy::disallowed_methods)] // Whole seconds only.
+    #[allow(clippy::disallowed_methods)] // Plan's own timer.
     fn fire(self, wait: u64, tries: u32, check: Check) {
         let mut pending = Some((check, self));
         single_shot(Duration::from_secs(wait), move || {
