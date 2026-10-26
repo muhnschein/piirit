@@ -149,7 +149,8 @@ SONAR_COV_ARGS = --workspace \
 ## Without it coverage reads 0.0%.
 ##
 ## nextest if installed, as `test` (cargo-llvm-cov otherwise runs one binary at
-## a time). No `--doc`: cargo-llvm-cov skips doctests. `test` runs them.
+## a time). Profile `ci` via env: llvm-cov's `--profile` is cargo's. No `--doc`:
+## cargo-llvm-cov skips doctests. `test` runs them.
 ##
 ## Also writes compile DB (piirit-video build.rs) for scanner's C analysis.
 ##
@@ -174,7 +175,7 @@ sonar-reports:
 (cargo install --locked cargo-nextest)"
 	@mkdir -p rust/target/sonar
 	@if command -v cargo-nextest >/dev/null 2>&1; then \
-		cd rust && $(CARGO) llvm-cov nextest $(SONAR_COV_ARGS); \
+		cd rust && NEXTEST_PROFILE=ci $(CARGO) llvm-cov nextest $(SONAR_COV_ARGS); \
 	else \
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi

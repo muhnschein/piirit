@@ -59,7 +59,7 @@ Aspiration, tracked not gated: test volume > source volume.
 
 SonarQube Cloud reads every PR (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides. Separate workflow: green `make check` on laptop = green CI, no hosted service.
 
-- Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed (else llvm-cov's `cargo test`, ~10 min instrumented).
+- Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed, profile `ci` as CI's `test` (else llvm-cov's `cargo test`, ~10 min instrumented).
 
 ```
 rustup component add llvm-tools-preview

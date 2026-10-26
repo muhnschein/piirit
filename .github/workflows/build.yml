@@ -34,6 +34,8 @@ jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
+    # Hung step stops here, not at GitHub's 6 h.
+    timeout-minutes: 30
     # Fork PRs have no secrets: SONAR_TOKEN empty, auth error. Skip; main's
     # analysis runs on merge.
     if: >-
@@ -68,14 +70,10 @@ jobs:
             pulseaudio \
             pulseaudio-utils
 
-      # `toolchain` passed explicitly: the action reads it from the ref name,
-      # and a SHA has none. Pin the `v1` tag, not `stable` (rebuilt each
-      # release; a commit from it stops belonging to the repo). v1 only moves
-      # forward.
-      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
-        with:
-          toolchain: stable
-          components: clippy, llvm-tools-preview
+      # Pinned toolchain only (rust-toolchain.toml), as ci.yml. llvm-tools:
+      # cargo-llvm-cov reads profiles with them.
+      - name: Install llvm-tools for the pinned toolchain
+        run: rustup component add llvm-tools-preview
 
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
