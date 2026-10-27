@@ -8,16 +8,8 @@
 //! contact has no row at all rather than a hidden one.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -32,7 +24,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
         property QtObject pageStack: QtObject {
-            /// `push:Foo.qml|replace:Bar.qml|...`
+            /// `push:Foo.qml|replaceAbove:Bar.qml|...`
             property string log: ''
             /// The chat the conversation was opened on.
             property int chatId: 0
@@ -43,8 +35,15 @@ const PROBE_QML: &str = r"
                     chatId = properties.chatId
                 }
             }
+            /// Page the conversation was opened over.
+            property string landedOn: ''
             function push(page, properties) { note('push', page, properties) }
-            function replace(page, properties) { note('replace', page, properties) }
+            function replaceAbove(target, page, properties) {
+                landedOn = '' + target
+                note('replaceAbove', page, properties)
+            }
+            // Stand-in for page under this one: chat list.
+            function previousPage(page) { return 'chat-list' }
         }
         Loader { id: loader }
         function load(url, accountId) {
@@ -107,6 +106,7 @@ const PROBE_QML: &str = r"
         }
         function navigation() { return pageStack.log }
         function openedChat() { return '' + pageStack.chatId }
+        function landedOn() { return pageStack.landedOn }
     }
 ";
 
@@ -165,7 +165,9 @@ fn the_new_group_page_makes_the_group_it_shows() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -176,7 +178,7 @@ fn the_new_group_page_makes_the_group_it_shows() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // Nothing typed: create refused.
         record!("empty", get!("createButton", "enabled"));
         // Reader is member from start.
@@ -211,18 +213,20 @@ fn the_new_group_page_makes_the_group_it_shows() {
         record!("add-members-row", get!("addMembersButton", "visible"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("named", get!("createButton", "enabled"));
         record!("create", call!("click", QString::from("createButton")));
         record!("creating", get!("createButton", "enabled"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("navigation", call!("navigation"));
         record!("opened", call!("openedChat"));
+        record!("landed-on", call!("landedOn"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps, &common::calls(&journal));
@@ -366,7 +370,12 @@ fn assert_outcome(steps: &[(&str, String)], calls: &[(String, Value)]) {
         "the chosen picture was not put on the group once it existed. {context}"
     );
     assert!(
-        navigation.ends_with("replace:ConversationPage.qml|"),
+        navigation.ends_with("replaceAbove:ConversationPage.qml|"),
         "making the group did not open it in place of this page. {context}"
+    );
+    assert_eq!(
+        value("landed-on"),
+        "chat-list",
+        "the group opened over something other than the page under this one. {context}"
     );
 }

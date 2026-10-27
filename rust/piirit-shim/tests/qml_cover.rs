@@ -4,16 +4,8 @@
 //! profiles. Third state (nobody yet) is `qml_cover_empty.rs`: needs a core seeded differently.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -286,11 +278,13 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("load", call!("load", QString::from(cover_url())));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("lists", call!("lists"));
         record!("pill-quiet", get!("unreadPill", "visible"));
         record!("people", call!("people"));
@@ -309,7 +303,7 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         record!("mark-second", call!("markUnread", 1, 2));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count-loud", get!("unreadTotal", "text"));
         record!("pill-loud", get!("unreadPill", "visible"));
         record!("pill-place", call!("pillPlace"));
@@ -325,6 +319,7 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

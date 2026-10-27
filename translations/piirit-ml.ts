@@ -567,10 +567,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ആർക്കൈവ് ചെയ്ത ചാറ്റുകൾ</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>പുതിയ ചാറ്റ്</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>ആർക്കൈവ് ചെയ്തവ</translation>
     </message>
@@ -652,10 +648,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR കോഡ്</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>പുതിയ ഗ്രൂപ്പ്</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>വായിക്കാത്തതായി അടയാളപ്പെടുത്തുക</translation>
     </message>
@@ -691,6 +683,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>ഇതിലേക്ക് അയയ്ക്കുക</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>പുതിയത്</translation>
     </message>
 </context>
 <context>
@@ -869,6 +866,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Contact request</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>കോൺടാക്റ്റ് അഭ്യർത്ഥന</translation>
+    </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>യഥാർത്ഥ സന്ദേശം കണ്ടെത്തിയില്ല</translation>
     </message>
 </context>
 <context>
@@ -1121,6 +1123,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>ചിത്രം മാറ്റുക</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR ക്ഷണ കോഡ്</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>ചാനൽ</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1341,6 +1353,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>അടുത്തത്</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>പുതിയ ചാറ്റ്</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>നിങ്ങൾ ഒരാൾക്ക് എഴുതുന്നു.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>പുതിയ ഗ്രൂപ്പ്</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>പലരും പരസ്പരം എഴുതുന്നു.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>പുതിയ ചാനൽ</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>നിങ്ങളുടെ സന്ദേശങ്ങൾ പലരിലേക്ക് പ്രക്ഷേപണം ചെയ്യാനുള്ള ഉപാധിയാണ് ചാനലുകൾ.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1381,6 +1427,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>ഗ്രൂപ്പ് സൃഷ്ടിക്കുക</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>ദയവായി ചാനലിന് പേര് നൽകുക</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>ചാനൽ സൃഷ്ടിക്കുക</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>പുതിയ ചാനൽ</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>ചാനലിന്റെ പേര്</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>ചാനലിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
     </message>
 </context>
 <context>
@@ -1607,6 +1675,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>ക്ഷണ ലിങ്ക് പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR ക്ഷണ കോഡ്</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; ചാനലിൽ ചേരാൻ സ്കാൻ ചെയ്യുക</translation>
     </message>
 </context>
 <context>
@@ -2122,8 +2199,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>വിശദാംശങ്ങളില്ല</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങൾക്കായുള്ള സന്ദേശങ്ങൾ, മറുപടികളോ പ്രതികരണങ്ങളോ പോലെ, അറിയിക്കുക</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങളുടെ സന്ദേശങ്ങൾക്കുള്ള മറുപടികളുടെ അറിയിപ്പുകൾ കാണിക്കുക</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

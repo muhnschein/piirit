@@ -31,14 +31,38 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  # Docs-only PR (`*.md` outside vendor/, third_party/): no scan, as ci.yml's
+  # Rust jobs. Markdown has no rules here but secrets; GitHub's secret
+  # scanning reads it anyway. Rules: ci/changes.sh.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Merge commit and its base parent.
+          fetch-depth: 2
+      - id: diff
+        run: ./ci/changes.sh >>"$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+
   sonarqube:
     name: SonarQube
+    needs: changes
     runs-on: ubuntu-latest
+    # Hung step stops here, not at GitHub's 6 h.
+    timeout-minutes: 30
     # Fork PRs have no secrets: SONAR_TOKEN empty, auth error. Skip; main's
     # analysis runs on merge.
     if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      needs.changes.outputs.code == 'true' && (
+        github.event_name != 'pull_request' ||
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -63,18 +87,15 @@ jobs:
             qml-module-qtquick2 \
             qml-module-qtquick-window2 \
             qttools5-dev-tools \
+            libqt5svg5 \
             libpulse-dev \
             pulseaudio \
             pulseaudio-utils
 
-      # `toolchain` passed explicitly: the action reads it from the ref name,
-      # and a SHA has none. Pin the `v1` tag, not `stable` (rebuilt each
-      # release; a commit from it stops belonging to the repo). v1 only moves
-      # forward.
-      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
-        with:
-          toolchain: stable
-          components: clippy, llvm-tools-preview
+      # Pinned toolchain only (rust-toolchain.toml), as ci.yml. llvm-tools:
+      # cargo-llvm-cov reads profiles with them.
+      - name: Install llvm-tools for the pinned toolchain
+        run: rustup component add llvm-tools-preview
 
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:

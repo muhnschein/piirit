@@ -10,15 +10,7 @@
 //! checks catalogs.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -110,13 +102,15 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: fire only while `exec()` runs on this thread; all they point at outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
-        assert_eq!(call!("loadWindow", QString::from(window.clone())), "ok");
+    plan.after(1, move || unsafe {
+        assert_eq!(call!("loadWindow", QString::from(window)), "ok");
     });
 
     // Core up: first asked, then non-table, then table.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         let methods = common::methods(&first);
         (*steps_ptr).push(("first", methods.first().cloned().unwrap_or_default()));
         call!("hand", QString::from("[\"not a table\"]"));
@@ -124,11 +118,12 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
         call!("hand", QString::from("{\"3\": \"Entwurf\"}"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("errors", call!("heard")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

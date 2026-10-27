@@ -1,20 +1,21 @@
 # piirit developer targets.
 #
-# `make check` = CI minus SDK/phone needs. Not fully offline (msrv, deny).
+# `make check` = CI minus SDK/phone needs. Not fully offline (msrv, integration,
+# deny).
 #
 # Qt5 packages (Debian/Ubuntu):
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
 #               qtdeclarative5-dev-tools qml-module-qtquick2 \
 #               qml-module-qtquick-window2 qttools5-dev-tools \
-#               libpulse-dev pulseaudio pulseaudio-utils
+#               libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
 #
 # qml-module-qtquick2: QtQuick runtime (-dev omits it). -window2: QtQuick.Window
-# (tests). qttools5-dev-tools: lupdate/lrelease. Rest: multimedia, pulse (mic,
-# test server).
+# (tests). qttools5-dev-tools: lupdate/lrelease. libqt5svg5: SVG image plugin
+# (emoji pictures). Rest: multimedia, pulse (mic, test server).
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
-        sonar-report-test apt-install-test sonar-reports translations \
+        sonar-report-test apt-install-test changes-test core-backtraces-test sonar-reports translations \
         cover-icons clean
 
 CARGO ?= cargo
@@ -23,12 +24,13 @@ export QT_QPA_PLATFORM = offscreen
 
 ## CI's steps, same order; keep in step with ci.yml. `msrv` fetches toolchain
 ## first time, `deny` needs advisory DB.
-check: fmt lint test doc-lint msrv qml-lint lockfile-lint packaging-lint harbour \
-       sonar-report-test apt-install-test vendor-check deny workflow-lint
+check: fmt lint test integration doc-lint msrv qml-lint lockfile-lint packaging-lint \
+       harbour sonar-report-test apt-install-test changes-test core-backtraces-test vendor-check \
+       deny workflow-lint
 
 ## Unit, integration, Qt event-loop tests.
 ##
-## nextest if installed (one process per test: ~10 min down to ~2.5; see
+## nextest if installed (one process per test, 32 at once: ~10 min down to ~2; see
 ## rust/.config/nextest.toml), else `cargo test` (check must work on a bare
 ## laptop).
 ##   cargo install --locked cargo-nextest
@@ -134,6 +136,14 @@ sonar-report-test:
 apt-install-test:
 	./ci/apt-install-selftest.sh
 
+## ci/changes.sh skips Rust jobs for docs alone; wrong = code PR untested.
+changes-test:
+	./ci/changes-selftest.sh
+
+## ci/core-backtraces.sh reads a crashed test's core; wrong = crash with no stack.
+core-backtraces-test:
+	./ci/core-backtraces-selftest.sh
+
 # sonar-reports: workspace minus third_party/, vendor/
 # (sonar-project.properties).
 SONAR_COV_ARGS = --workspace \
@@ -144,7 +154,8 @@ SONAR_COV_ARGS = --workspace \
 ## Without it coverage reads 0.0%.
 ##
 ## nextest if installed, as `test` (cargo-llvm-cov otherwise runs one binary at
-## a time). No `--doc`: cargo-llvm-cov skips doctests. `test` runs them.
+## a time). Profile `ci` via env: llvm-cov's `--profile` is cargo's. No `--doc`:
+## cargo-llvm-cov skips doctests. `test` runs them.
 ##
 ## Also writes compile DB (piirit-video build.rs) for scanner's C analysis.
 ##
@@ -169,7 +180,7 @@ sonar-reports:
 (cargo install --locked cargo-nextest)"
 	@mkdir -p rust/target/sonar
 	@if command -v cargo-nextest >/dev/null 2>&1; then \
-		cd rust && $(CARGO) llvm-cov nextest $(SONAR_COV_ARGS); \
+		cd rust && NEXTEST_PROFILE=ci $(CARGO) llvm-cov nextest $(SONAR_COV_ARGS); \
 	else \
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi
@@ -187,10 +198,16 @@ sonar-reports:
 		tests/js/*.test.js
 	@echo "== wrote rust/target/sonar/js-lcov.info =="
 
-## Real-core tests, offline. Needs `make fetch-server`.
+## Real-core tests (CI `integration`), offline; part of `check`. Without
+## `DELTACHAT_RPC_SERVER`, `test` skips them: here they run. Pinned binary fetched
+## first time, or when not the pinned one (network).
+RPC_SERVER = vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server
 integration:
-	cd rust && DELTACHAT_RPC_SERVER=vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server \
-		$(CARGO) test -p deltachat-jsonrpc --test real_server -- --nocapture
+	@if [ ! -x $(RPC_SERVER) ] || ! ./scripts/fetch-rpc-server.sh --check >/dev/null; then \
+		./scripts/fetch-rpc-server.sh; \
+	fi
+	cd rust && DELTACHAT_RPC_SERVER=$(RPC_SERVER) $(CARGO) test --locked -p deltachat-jsonrpc --test real_server
+	cd rust && DELTACHAT_RPC_SERVER=$(RPC_SERVER) $(CARGO) test --locked -p piirit-shim --test real_core
 
 clean:
 	cd rust && $(CARGO) clean

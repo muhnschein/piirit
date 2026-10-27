@@ -11,15 +11,7 @@
 //! gallery opened.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -245,8 +237,10 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     let grid = common::page_url("ChatMediaPage.qml");
     let held = common::component_url("HeldBackView.qml");
 
+    let mut plan = common::Plan::default();
+
     // Model read; second reader, viewer from chat at picture 10.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("oldest", call!("oldestList"));
         record!("oldest-said", call!("oldestText", 1));
         record!("make-newest", call!("makeNewest"));
@@ -254,7 +248,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     });
 
     // Viewer: swipe to not-yet-downloaded picture, Download.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("newest", call!("newestList"));
         record!("gallery-placed", call!("page", s!("placed")));
         record!("gallery-place", call!("place"));
@@ -280,7 +274,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     });
 
     // Fetched: same slide now the picture. Then grid.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("fetched-shown", call!("page", s!("shownId")));
         record!("fetched-place", call!("place"));
         record!("fetched-bar", call!("get", s!("iconBar"), s!("visible")));
@@ -300,7 +294,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     });
 
     // Fetch under way: still the video's slide, saying so. Then grid.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "fetching-state",
             call!("current", s!("heldView"), s!("downloadState"))
@@ -321,7 +315,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     // Grid tiles; tap opens viewer there. Then Download's words per state.
     let held_url = held;
     let gallery_again = common::page_url("GalleryPage.qml");
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "tile-held",
             call!("onTile", 17, s!("heldMark"), s!("visible"))
@@ -365,7 +359,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
         record!("at-held-seed", call!("get", s!("seed"), s!("active")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("at-held-placed", call!("page", s!("placed")));
         record!(
             "at-held-state",
@@ -376,6 +370,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

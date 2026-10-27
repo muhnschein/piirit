@@ -565,10 +565,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Arşivlenmiş sohbetler</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Yeni sohbet</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arşivlenmiş</translation>
     </message>
@@ -650,10 +646,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>QR kodu</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Yeni grup</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Okunmadı olarak işaretle</translation>
     </message>
@@ -689,6 +681,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Şuraya gönder</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Yeni</translation>
     </message>
 </context>
 <context>
@@ -866,6 +863,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Contact request</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kişi isteği</translation>
+    </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Özgün ileti bulunamadı</translation>
     </message>
 </context>
 <context>
@@ -1116,6 +1118,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Resmi değiştir</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR çağrı kodu</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1336,6 +1348,40 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>İleri</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Yeni sohbet</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Bir kişiyle yazışırsınız.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Yeni grup</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Birkaç kişi birbiriyle yazışır.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Yeni kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanallar, iletilerinizi yayınlamak için birden çoğa bir araçtır.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1375,6 +1421,28 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Create group</source>
         <translation>Grup oluştur</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Lütfen kanala bir ad verin</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Kanal oluştur</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Yeni kanal</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanal adı</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Adı kanaldaki herkes görür</translation>
     </message>
 </context>
 <context>
@@ -1600,6 +1668,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Copy invite link</source>
         <translation>Davet bağlantısını kopyala</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR çağrı kodu</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>“%1” kanalına katılmak için tarayın</translation>
     </message>
 </context>
 <context>
@@ -2115,8 +2192,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Ayrıntı yok</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Sessize alınan gruplarda, yanıtlar ya da tepkiler gibi size yönlendirilen iletileri bildirin</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Sessize alınan gruplarda iletilerinize gelen yanıtların bildirimlerini göster</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

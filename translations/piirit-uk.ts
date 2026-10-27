@@ -569,10 +569,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Архівні чати</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Новий чат</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>В архіві</translation>
     </message>
@@ -654,10 +650,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-код</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Нова група</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Позначити непрочитаним</translation>
     </message>
@@ -693,6 +685,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Надіслати в</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Створити</translation>
     </message>
 </context>
 <context>
@@ -872,6 +869,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Contact request</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Запит на контакт</translation>
+    </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Первісне повідомлення не знайдено</translation>
     </message>
 </context>
 <context>
@@ -1126,6 +1128,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Змінити зображення</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR-код запрошення</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Канал</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1346,6 +1358,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Далі</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Новий чат</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Ви пишете одній людині.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Нова група</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Кілька людей пишуть одне одному.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Новий канал</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Канали - це інструмент &quot;один до багатьох&quot; для трансляції ваших повідомлень.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1387,6 +1433,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Створити групу</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Дайте каналу назву</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Створити канал</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Новий канал</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Назва каналу</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Назву бачать усі в каналі</translation>
     </message>
 </context>
 <context>
@@ -1614,6 +1682,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Копіювати посилання-запрошення</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR-код запрошення</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Відскануйте, щоб приєднатися до каналу &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -2129,8 +2206,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Без подробиць</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>У приглушених групах сповіщати про повідомлення, адресовані вам, наприклад, відповіді або реакції</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Показувати сповіщення про відповіді на ваші повідомлення в приглушених групах</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

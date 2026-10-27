@@ -13,12 +13,11 @@
 //! on its point in plain autofocus, released after hold.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, and `single_shot`.
+// edition 2024), `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
@@ -151,9 +150,12 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Run `then` once `idle` says so, polling every 100 ms; at `deadline`, runs it whatever
+/// Run `then` once `idle` says so, asked each event-loop turn; at `deadline`, runs it whatever
 /// `idle` says. Step reading what an async call left waits on the call, not a time guess: 2s
 /// was one, and under coverage the decoder outran it.
+// Zero wait: next event-loop turn. Rechecks only once last check ran, so no fixed time to
+// overrun.
+#[allow(clippy::disallowed_methods)]
 fn when_idle<I, T>(idle: I, deadline: Instant, then: T)
 where
     I: Fn() -> bool + 'static,
@@ -164,7 +166,7 @@ where
         return;
     }
     let mut pending = Some((idle, then));
-    single_shot(Duration::from_millis(100), move || {
+    single_shot(Duration::ZERO, move || {
         if let Some((idle, then)) = pending.take() {
             when_idle(idle, deadline, then);
         }
@@ -248,8 +250,10 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     let frame_path = frame;
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         // The picture: page's own encoder, drawn into a file.
         let encoded = call!("encode", QString::from(INVITE));
         record!(
@@ -281,7 +285,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
     });
 
     // Decode over: read while running, `heard` is empty.
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(2, move || {
         when_idle(
             move || unsafe { get!("scanner", "busy") } != "true",
             Instant::now() + Duration::from_secs(20),
@@ -349,6 +353,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         );
     });
 
+    plan.run();
     engine.exec();
 
     assert_scan(&steps);

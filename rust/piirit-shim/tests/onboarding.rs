@@ -3,20 +3,12 @@
 //! Contract tests: Qt event loop vs recording double (`src/bin/fake_core_server.rs`), asserting on
 //! its JSON-RPC journal. One process: Qt allows one `QGuiApplication`.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 use serde_json::Value;
@@ -107,11 +99,13 @@ fn onboarding_speaks_the_current_transport_api() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
-    // Whole seconds only (clippy.toml); one step per tick.
+    // One step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
+    let mut plan = common::Plan::default();
+
     let chatmail = core_ptr.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         if let Some(this) = chatmail.as_pinned() {
             let provider = this.borrow_mut().default_provider_qr();
             this.borrow_mut()
@@ -120,7 +114,7 @@ fn onboarding_speaks_the_current_transport_api() {
     });
 
     let failing = core_ptr.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(2, move || {
         if let Some(this) = failing.as_pinned() {
             // Double treats `fail` as unreachable server.
             this.borrow_mut().create_profile(
@@ -131,7 +125,7 @@ fn onboarding_speaks_the_current_transport_api() {
     });
 
     let email = core_ptr;
-    single_shot(Duration::from_secs(5), move || {
+    plan.after(2, move || {
         if let Some(this) = email.as_pinned() {
             this.borrow_mut().create_profile_with_email(
                 QString::from("Grace"),
@@ -142,13 +136,14 @@ fn onboarding_speaks_the_current_transport_api() {
     });
 
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(7), move || {
+    plan.after(2, move || {
         // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let calls = read_journal(&journal);

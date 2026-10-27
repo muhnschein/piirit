@@ -6,15 +6,7 @@
 //! List vs reader: `event_kinds.rs`. Here: 4 sent, 2 read, only those arrive.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -81,8 +73,10 @@ fn only_the_kinds_something_reads_are_handed_out() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     let starting = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &starting,
             "begin",
@@ -91,11 +85,12 @@ fn only_the_kinds_something_reads_are_handed_out() {
     });
 
     let heard = steps.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(4, move || unsafe {
         common::record(&heard, "seen", call!("heard").into());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

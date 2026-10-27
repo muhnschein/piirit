@@ -3,16 +3,8 @@
 //! Header name comes from chat list at open; a rename heard only from group page would leave
 //! contact- or other-device-renamed chat stale. Says so only when changed.
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -90,22 +82,25 @@ fn the_name_over_the_messages_follows_a_rename() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!("open", call!("open"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", call!("name"));
         record!("changes-loaded", call!("changed"));
         record!("rename", call!("rename", QString::from("Hikers")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("renamed", call!("name"));
         record!("changes-renamed", call!("changed"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

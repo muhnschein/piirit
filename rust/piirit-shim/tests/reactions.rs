@@ -2,16 +2,8 @@
 //! Same emoji removes; other replaces (one per person). Fake seeds other end's reaction.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// edition 2024), `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -104,10 +96,12 @@ fn a_tap_reacts_a_second_takes_it_off_and_another_emoji_replaces_it() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("loaded", call!("count"));
         record!("theirs", call!("chipsOf", 0));
         record!("mine-before", call!("mineOn", 0));
@@ -115,24 +109,25 @@ fn a_tap_reacts_a_second_takes_it_off_and_another_emoji_replaces_it() {
         call!("nothing");
         call!("thumbsUp");
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("joined", call!("chipsOf", 0));
         record!("mine-after", call!("mineOn", 0));
         // Same emoji again.
         call!("thumbsUp");
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("taken-off", call!("chipsOf", 0));
         record!("mine-gone", call!("mineOn", 0));
         call!("heart");
     });
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("replaced", call!("chipsOf", 0));
         record!("mine-heart", call!("mineOn", 0));
         record!("error", call!("error"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&common::calls(&journal), &steps);

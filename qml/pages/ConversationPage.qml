@@ -153,6 +153,9 @@ Page {
         }
     }
 
+    //: Shown when a reply's quoted message was tapped but is no longer there.
+    readonly property string quoteMissingText: qsTr("Original message not found")
+
     /// Ask model where message is, once rows in; answer in `onRevealed`.
     function revealIfAsked() {
         if (page.findMessageId !== 0 && messages.loaded) {
@@ -233,6 +236,19 @@ Page {
         }
         // Page at a time; asks again on finish until nothing left.
         onHydrating_changed: if (!messages.hydrating) listView.askForRows()
+        onQuote_missing: notice.show(page.quoteMissingText)
+        // Answer after reader left: not pushed over another page.
+        onQuote_elsewhere: {
+            if (page.status !== PageStatus.Active) {
+                return
+            }
+            pageStack.push(Qt.resolvedUrl("ConversationPage.qml"), {
+                accountId: page.accountId,
+                chatId: chat_id,
+                chatName: chat_name,
+                findMessageId: message_id
+            })
+        }
     }
 
     // Flash, then gone.
@@ -561,6 +577,9 @@ Page {
             }
         }
         onResendRequested: messages.resend_message(messageId)
+        // Original lit here as search hit (older rows fill as view gets there); another chat's
+        // opens over this one, Back returns; gone: said so. As reference clients.
+        onQuoteRequested: messages.show_quoted(quotedId)
         onForwardRequested: {
             // Message id captured here for picker's report.
             var travelling = messageId
@@ -738,7 +757,7 @@ Page {
         id: inputRow
         objectName: "inputRow"
         // Not `visible` in sizes: false under another page too.
-        visible: !messages.is_contact_request
+        visible: offered
         anchors {
             left: parent.left
             right: parent.right
@@ -746,12 +765,16 @@ Page {
             rightMargin: Theme.horizontalPageMargin
             bottom: requestBar.top
             // Off screen edge: TextArea has no room under text, recording less.
-            bottomMargin: messages.is_contact_request ? 0 : Theme.paddingLarge
+            bottomMargin: inputRow.offered ? Theme.paddingLarge : 0
         }
         spacing: Theme.paddingSmall
 
+        /// Field offered: not request (bar instead), not channel reader (only owner posts).
+        readonly property bool offered: !messages.is_contact_request
+                                        && !messages.is_channel_reader
+
         // Field plus lifted buttons: Row ignores child anchors. Hidden: none.
-        height: messages.is_contact_request ? 0
+        height: !inputRow.offered ? 0
                 : Math.max(textField.visible ? textField.height : 0,
                            voiceBar.visible ? voiceBar.height : 0,
                            sendButton.height + inputRow.buttonLift)

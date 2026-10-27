@@ -5,15 +5,7 @@
 //! with cleared badge discarded; badge returns. Fake answers listing slowly so both are in flight.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -55,7 +47,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         // Longer than mark-read-to-other-change gap, so first answer is still in flight at the
-        // second question; short enough both land first. `single_shot` counts whole seconds.
+        // second question; short enough both land first. `Plan` waits whole seconds.
         std::env::set_var("PIIRIT_FAKE_CHATLIST_DELAY_MS", "1500");
     }
 
@@ -82,29 +74,32 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("makeUnread");
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("unread", call!("unread")));
         call!("markRead");
     });
 
     // While re-read of marked chat is still out.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("otherChatChanged");
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("after", call!("unread")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

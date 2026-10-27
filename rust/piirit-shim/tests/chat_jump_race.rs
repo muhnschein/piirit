@@ -6,15 +6,7 @@
 //! Fetches slowed so events land mid-flight.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -93,28 +85,36 @@ fn the_first_message_stays_row_zero_however_much_the_core_talks() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    // Opened once core up and rows in, however slow.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("edges") == "empty" && !last {
+            return false;
+        }
         (*steps_ptr).push(("opened", call!("edges")));
         // Top of chat read, core talking over it.
         (*steps_ptr).push(("read-top", call!("readTop")));
         (*steps_ptr).push(("stir-1", call!("stir")));
+        true
     });
-    single_shot(Duration::from_millis(4300), move || unsafe {
+    plan.after(0, move || unsafe {
         (*steps_ptr).push(("stir-2", call!("stir")));
     });
-    single_shot(Duration::from_millis(4600), move || unsafe {
+    plan.after(0, move || unsafe {
         (*steps_ptr).push(("stir-3", call!("stir")));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(4, move || unsafe {
         (*steps_ptr).push(("first", call!("firstRow")));
         (*steps_ptr).push(("count", call!("count")));
         (*steps_ptr).push(("edges", call!("edges")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

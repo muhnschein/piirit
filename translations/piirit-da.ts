@@ -563,10 +563,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Arkiverede chats</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Ny chat</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arkiveret</translation>
     </message>
@@ -648,10 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-kode</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Ny gruppe</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Markér som ulæst</translation>
     </message>
@@ -687,6 +679,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Send til</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Ny</translation>
     </message>
 </context>
 <context>
@@ -865,6 +862,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Contact request</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Kontaktanmodning</translation>
+    </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Oprindelig besked ikke fundet</translation>
     </message>
 </context>
 <context>
@@ -1117,6 +1119,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Skift billede</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR-invitationskode</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1337,6 +1349,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Næste</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Ny chat</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Du skriver med én person.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Ny gruppe</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Flere personer skriver med hinanden.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Ny kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanaler er et en-til-mange-værktøj til at udsende dine beskeder.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1377,6 +1423,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Opret gruppe</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Giv kanalen et navn</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Opret kanal</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Ny kanal</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanalnavn</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Alle i kanalen ser navnet</translation>
     </message>
 </context>
 <context>
@@ -1603,6 +1671,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Kopiér invitationslink</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR-invitationskode</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Scan for at deltage i kanalen &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -2118,8 +2195,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen detaljer</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>I dæmpede grupper, giv besked om beskeder rettet til dig, som svar eller reaktioner</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Vis notifikationer om svar på dine beskeder i dæmpede grupper</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

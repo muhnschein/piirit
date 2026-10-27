@@ -5,15 +5,7 @@
 //! to field, since search covers every chat.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -73,6 +65,17 @@ const PROBE_QML: &str = r"
             item.hideClicked()
             return 'ok'
         }
+        // Every text, hint placeholder shows from here on, '|'-joined: stub has no
+        // frames, so a flash shows only as a text change.
+        property var shown: []
+        function watch(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.textChanged.connect(function () { shown.push(item.text) })
+            item.hintTextChanged.connect(function () { shown.push(item.hintText) })
+            return 'ok'
+        }
+        function seen() { return shown.join('|') }
         function setText(name, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -135,7 +138,9 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "ordinary",
             call!(
@@ -147,7 +152,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("switch", get!("unreadFilterButton", "visible"));
         record!("search-pill", get!("chatSearchPill", "visible"));
         record!("field-before", get!("chatSearchField", "visible"));
@@ -161,7 +166,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
     });
 
     // Fake's chats have nothing unread: filtered list empty.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("on-checked", get!("unreadFilterButton", "checked"));
         record!("on-description", get!("chatListHeader", "description"));
         record!("on-count", get!("chats", "count"));
@@ -169,6 +174,10 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         record!("placeholder", get!("chatListPlaceholder", "enabled"));
         record!("placeholder-text", get!("chatListPlaceholder", "text"));
         record!("placeholder-hint", get!("chatListPlaceholder", "hintText"));
+        record!(
+            "watched",
+            call!("watch", QString::from("chatListPlaceholder"))
+        );
         record!(
             "typed",
             call!(
@@ -180,7 +189,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
     });
 
     // Pills fade before going: each look a step later.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("while-searching", get!("unreadFilterButton", "visible"));
         record!("field-while", get!("chatSearchField", "visible"));
         record!(
@@ -193,7 +202,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("after-search", get!("unreadFilterButton", "visible"));
         record!("field-after", get!("chatSearchField", "visible"));
         record!(
@@ -203,14 +212,16 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         record!("opened", call!("click", QString::from("chatSearchPill")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("count-after", get!("chats", "count"));
+        record!("placeholder-off", get!("chatListPlaceholder", "enabled"));
+        record!("placeholder-seen", call!("seen"));
         record!("field-opened", get!("chatSearchField", "visible"));
         record!("pill-opened", get!("chatSearchPill", "visible"));
         record!("hidden", call!("hide", QString::from("chatSearchField")));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("pill-closed", get!("chatSearchPill", "visible"));
         record!("field-closed", get!("chatSearchField", "visible"));
         record!(
@@ -224,12 +235,13 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         );
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("archived-switch", get!("unreadFilterButton", "visible"));
         record!("archived-search-pill", get!("chatSearchPill", "visible"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
@@ -356,6 +368,24 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         value("count-after"),
         "2",
         "turning the filter off did not bring the chats back. {context}"
+    );
+    assert_eq!(
+        value("watched"),
+        "ok",
+        "the placeholder could not be watched, so what follows proves \
+         nothing. {context}"
+    );
+    assert_eq!(
+        value("placeholder-off"),
+        "false",
+        "the placeholder stayed over the chats that came back. {context}"
+    );
+    assert_eq!(
+        value("placeholder-seen"),
+        "",
+        "the placeholder changed its words while the filter went off: it \
+         reads \"No chats yet\" until it has faded from over the returning \
+         chats. {context}"
     );
     assert_eq!(
         value("archived"),

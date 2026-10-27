@@ -9,12 +9,9 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -202,7 +199,9 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
     let target = format!("file://{}", tree.join("share/ShareTarget.qml").display());
     let window = format!("file://{}", tree.join("piirit.qml").display());
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load-target",
             call!("loadTarget", QString::from(target.clone()))
@@ -224,7 +223,7 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // No profile yet: no chat to ask about.
         record!(
             "no-profile",
@@ -261,6 +260,7 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

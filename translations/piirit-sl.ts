@@ -571,10 +571,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Arhivirani klepeti</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Nov klepet</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arhivirano</translation>
     </message>
@@ -656,10 +652,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Koda QR</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nova skupina</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Označi kot neprebrano</translation>
     </message>
@@ -695,6 +687,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Pošlji v</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Novo</translation>
     </message>
 </context>
 <context>
@@ -875,6 +872,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Contact request</source>
         <extracomment>Under the name of a chat that is an unanswered contact request.</extracomment>
         <translation>Prošnja za stik</translation>
+    </message>
+    <message>
+        <source>Original message not found</source>
+        <extracomment>Shown when a reply&apos;s quoted message was tapped but is no longer there.</extracomment>
+        <translation>Izvirnega sporočila ni mogoče najti</translation>
     </message>
 </context>
 <context>
@@ -1131,6 +1133,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Spremeni sliko</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>Koda QR za povabilo</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1351,6 +1363,40 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Naprej</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nov klepet</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Pišete eni osebi.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nova skupina</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Več ljudi si piše med seboj.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nov kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanali so orodje ena-za-mnoge za oddajanje vaših sporočil.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1393,6 +1439,28 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Create group</source>
         <translation>Ustvari skupino</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Poimenujte kanal</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Ustvari kanal</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nov kanal</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Ime kanala</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Ime vidijo vsi v kanalu</translation>
     </message>
 </context>
 <context>
@@ -1621,6 +1689,15 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Copy invite link</source>
         <translation>Kopiraj povezavo povabila</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>Koda QR za povabilo</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Skenirajte, da se pridružite kanalu »%1«</translation>
     </message>
 </context>
 <context>
@@ -2136,8 +2213,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Brez podrobnosti</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>V utišanih skupinah obvesti o sporočilih, namenjenih tebi, kot so odgovori ali odzivi</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Prikaži obvestila o odgovorih na tvoja sporočila v utišanih skupinah</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

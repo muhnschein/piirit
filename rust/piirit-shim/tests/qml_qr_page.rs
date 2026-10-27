@@ -5,19 +5,16 @@
 //! replacing this page above its opener. Nothing pushed: scanner is a side of this page.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// edition 2024), `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params match dispatcher; derive transmutes a QVariant field.
     clippy::needless_pass_by_value,
     clippy::useless_transmute
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -182,14 +179,16 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::page_url("QrPage.qml")))
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         // Code side up first; invite arrived and drawn.
         record!("mode", call!("pageProperty", QString::from("mode")));
         record!("code-side", get!("codeView", "visible"));
@@ -231,11 +230,12 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
         record!("acting", get!("acting", "running"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("navigation", (*stack_ptr).pinned().borrow().log.to_string());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_page(&steps, &common::methods(&journal));

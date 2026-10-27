@@ -4,15 +4,7 @@
 //! Pinned: hiding changes neither content measure nor row count.
 
 // Qt harness: see qml_conversation_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -100,7 +92,9 @@ fn hiding_the_list_leaves_its_rows_as_they_were() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("rows", call!("append", 60)));
         (*steps_ptr).push((
             "load",
@@ -110,22 +104,23 @@ fn hiding_the_list_leaves_its_rows_as_they_were() {
             ),
         ));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("end", call!("toEnd")));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("before", call!("measure")));
         (*steps_ptr).push(("hide", call!("hide")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("hidden", call!("measure")));
         (*steps_ptr).push(("show", call!("show")));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("shown", call!("measure")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

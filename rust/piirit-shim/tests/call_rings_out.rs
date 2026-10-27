@@ -5,15 +5,7 @@
 //! hand; fake never ends these calls, the case guarded against.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -122,29 +114,32 @@ fn a_call_the_core_never_ends_stops_ringing_by_itself() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("start", call!("start"));
     });
 
     // Past first call's count (due 3.5 s); call ringing now is due 4.5 s.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("next", call!("next"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("unanswered", call!("state", QString::from("unanswered")));
         record!("answered", call!("state", QString::from("answered")));
         record!("again-ringing", call!("state", QString::from("again")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("again-out", call!("state", QString::from("again")));
         record!("hang-up", call!("hangUp"));
         record!("said", call!("said"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

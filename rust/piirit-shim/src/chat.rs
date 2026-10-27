@@ -129,6 +129,11 @@ pub struct ChatMessages {
     pub is_contact_request: qt_property!(bool; NOTIFY is_contact_request_changed),
     /// Emitted once request-ness known, and when accepted (here or other device).
     pub is_contact_request_changed: qt_signal!(),
+    /// Channel joined (core's `InBroadcast`): owner posts, reader only reads. Page offers no
+    /// field, as reference clients.
+    pub is_channel_reader: qt_property!(bool; NOTIFY is_channel_reader_changed),
+    /// Emitted once channel-ness known.
+    pub is_channel_reader_changed: qt_signal!(),
     /// Accept request: core makes it ordinary chat; shape re-read (field comes back).
     pub accept_chat: qt_method!(fn(&mut self)),
     /// Block request's sender: core hides chat, contact goes on block list. Answers `closed`.
@@ -167,6 +172,13 @@ pub struct ChatMessages {
     pub reveal: qt_method!(fn(&mut self, message_id: u32)),
     /// `message_id` at `row`, or -1 if not in this chat.
     pub revealed: qt_signal!(message_id: u32, row: i32),
+    /// Go to quoted message: here (`revealed`), its own chat (`quote_elsewhere`), else
+    /// `quote_missing`.
+    pub show_quoted: qt_method!(fn(&mut self, message_id: u32)),
+    /// Quoted message in another chat (private reply to group message): open there.
+    pub quote_elsewhere: qt_signal!(chat_id: u32, message_id: u32, chat_name: QString),
+    /// Quoted message gone: deleted, or never on this device.
+    pub quote_missing: qt_signal!(),
 
     /// Unsent text, kept by core: survives app close, in chat list summary.
     pub draft: qt_property!(QString; NOTIFY draft_changed),
@@ -795,12 +807,14 @@ impl ChatMessages {
         self.can_call = shape.can_call;
         self.member_count = shape.member_count;
         self.is_contact_request = shape.is_contact_request;
+        self.is_channel_reader = shape.is_channel_reader;
         self.is_group_changed();
         self.can_send_changed();
         self.is_encrypted_changed();
         self.can_call_changed();
         self.member_count_changed();
         self.is_contact_request_changed();
+        self.is_channel_reader_changed();
     }
 
     /// Accept contact request; see `accept_chat` property.
@@ -880,6 +894,43 @@ impl ChatMessages {
     pub fn reveal(&mut self, message_id: u32) {
         let row = self.row_of(message_id);
         self.revealed(message_id, row);
+    }
+
+    /// Go to quoted message; see `show_quoted` property. Row here: every chat message has one,
+    /// fetched or not. Else core asked where it is (fresh: row's quote may be stale).
+    pub fn show_quoted(&mut self, message_id: u32) {
+        let row = self.row_of(message_id);
+        if row >= 0 {
+            self.revealed(message_id, row);
+            return;
+        }
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if message_id == 0 || chat_id == 0 {
+            self.quote_missing();
+            return;
+        }
+        // Core away: banner says so; "not found" would be wrong.
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |found: Option<(u32, String)>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answer for a chat already left.
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            match found {
+                Some((elsewhere, name)) => {
+                    this.borrow()
+                        .quote_elsewhere(elsewhere, message_id, name.into());
+                }
+                None => this.borrow().quote_missing(),
+            }
+        });
+        runtime.spawn(async move {
+            done(chat_elsewhere(&rpc, account_id, chat_id, message_id).await);
+        });
     }
 
     /// Fill rows `first..=last` plus `MARGIN` each side, skipping filled/asked. Up to
@@ -2178,6 +2229,31 @@ pub(crate) async fn chat_is_group(rpc: &RpcClient, account_id: u32, chat_id: u32
         .is_some_and(|info| is_group_info(&info))
 }
 
+/// Chat holding `message_id` and its name, if not `here`. `None`: gone (core loads no deleted
+/// message, errs) or here after all (not in list: deleted since).
+async fn chat_elsewhere(
+    rpc: &RpcClient,
+    account_id: u32,
+    here: u32,
+    message_id: u32,
+) -> Option<(u32, String)> {
+    let message: serde_json::Value = rpc
+        .call("get_message", (account_id, message_id))
+        .await
+        .ok()?;
+    let chat_id = other_chat(&message, here)?;
+    let name = basic_chat_info(rpc, account_id, chat_id)
+        .await
+        .map(|info| json::str_at(&info, "name").to_string())
+        .unwrap_or_default();
+    Some((chat_id, name))
+}
+
+/// Message's chat if a real one other than `here`.
+fn other_chat(message: &serde_json::Value, here: u32) -> Option<u32> {
+    Some(json::u32_at(message, "chatId")).filter(|chat_id| *chat_id != 0 && *chat_id != here)
+}
+
 /// Core's `get_basic_chat_info`; nothing if undescribable.
 async fn basic_chat_info(
     rpc: &RpcClient,
@@ -2194,9 +2270,9 @@ fn is_group_info(info: &serde_json::Value) -> bool {
     !matches!(json::str_at(info, "chatType"), "Single" | "")
 }
 
-/// Chat facts beside messages: sender shown, writable, encrypted, calls, request.
+/// Chat facts beside messages: sender shown, writable, encrypted, calls, request, channel.
 #[derive(Clone, Copy, Default)]
-// Five facts, each bound on its own; see `ChatMessages`.
+// Six facts, each bound on its own; see `ChatMessages`.
 #[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ChatShape {
     /// Group, mailing list or broadcast.
@@ -2211,6 +2287,8 @@ pub(crate) struct ChatShape {
     pub member_count: u32,
     /// Unaccepted contact request.
     pub is_contact_request: bool,
+    /// Channel joined; see `ChatMessages::is_channel_reader`.
+    pub is_channel_reader: bool,
 }
 
 /// What a whole-chat call leaves: same chat, new shape (accepted), or nothing (blocked, deleted).
@@ -2280,6 +2358,7 @@ async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> Chat
         can_call: takes_calls(&info, is_group, can_send),
         member_count,
         is_contact_request: json::flag(&info, "isContactRequest"),
+        is_channel_reader: json::str_at(&info, "chatType") == "InBroadcast",
     }
 }
 
@@ -2377,6 +2456,8 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         is_forwarded: json::flag(message, "isForwarded"),
         quote_text: json::text(message, "/quote/text"),
         quote_author: json::text(message, "/quote/authorDisplayName"),
+        // `JustText` quote has none.
+        quote_message_id: json::u32_at(message, "/quote/messageId"),
         file_path: file_path.into(),
         file_name: json::text(message, "/fileName"),
         view_type: view_type.into(),
@@ -2632,8 +2713,8 @@ fn file_name_of(path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        file_name_of, fill_order, gif_dimensions, local_path, own_reaction, place_arrivals,
-        reactions_json, video_dimensions, Entry, RowDiff, MARGIN,
+        file_name_of, fill_order, gif_dimensions, local_path, other_chat, own_reaction,
+        place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff, MARGIN,
     };
     use crate::models::MessageListModel;
     use serde_json::json;
@@ -2790,6 +2871,31 @@ mod tests {
             None
         );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_quote_knows_its_message_only_while_core_has_it() {
+        // Core 2.65 shapes: `WithMessage` while original loads, `JustText` once deleted.
+        let with_message = json!({
+            "text": "re",
+            "quote": {"kind": "WithMessage", "messageId": 42, "chatId": 7,
+                      "text": "first", "authorDisplayName": "Ada"},
+        });
+        let just_text = json!({"text": "re", "quote": {"kind": "JustText", "text": "first"}});
+        let unquoted = json!({"text": "re", "quote": null});
+        assert_eq!(row_from(5, &with_message).quote_message_id, 42);
+        assert_eq!(row_from(5, &just_text).quote_message_id, 0);
+        assert_eq!(row_from(5, &unquoted).quote_message_id, 0);
+    }
+
+    #[test]
+    fn only_another_real_chat_is_elsewhere() {
+        assert_eq!(other_chat(&json!({"chatId": 2}), 1), Some(2));
+        // Here after all: row deleted since.
+        assert_eq!(other_chat(&json!({"chatId": 1}), 1), None);
+        // No chat said: nowhere to go.
+        assert_eq!(other_chat(&json!({"chatId": 0}), 1), None);
+        assert_eq!(other_chat(&json!({}), 1), None);
     }
 
     #[test]

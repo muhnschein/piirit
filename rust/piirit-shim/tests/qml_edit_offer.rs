@@ -4,15 +4,7 @@
 //! Offer carries text to fill field.
 
 // Qt harness: see qml_attachment_menu.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -153,7 +145,9 @@ fn edit_is_offered_on_what_the_core_would_take_an_edit_of() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -163,7 +157,7 @@ fn edit_is_offered_on_what_the_core_would_take_an_edit_of() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("offers", call!("offers"));
         record!("label", call!("labelOf"));
         record!("picked", call!("pick"));
@@ -171,11 +165,12 @@ fn edit_is_offered_on_what_the_core_would_take_an_edit_of() {
         record!("chat-closed", call!("setCanEdit", false));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("offers-closed", call!("offers"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

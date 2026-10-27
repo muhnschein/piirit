@@ -5,15 +5,7 @@
 //! Page side played over real socket.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -68,18 +60,6 @@ fn commands(url: &str) -> String {
 fn report(url: &str, body: &str) -> String {
     let answer = post(&authority_of(url), &format!("{}/video", api_of(url)), body);
     status_of(&answer).to_string()
-}
-
-/// Run `steps` in order: first after `first`, each next `gap` after previous ends.
-fn run_steps(mut steps: Vec<Box<dyn FnMut()>>, first: Duration, gap: Duration) {
-    if steps.is_empty() {
-        return;
-    }
-    let mut step = steps.remove(0);
-    single_shot(first, move || {
-        step();
-        run_steps(std::mem::take(&mut steps), gap, gap);
-    });
 }
 
 #[test]
@@ -229,8 +209,22 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
         }),
     ];
     // The core first has to come up.
-    // Whole seconds: vendored `single_shot` drops fraction.
-    run_steps(script, Duration::from_secs(2), Duration::from_secs(1));
+    let mut plan = common::Plan::default();
+    for (at, mut step) in script.into_iter().enumerate() {
+        if at > 0 {
+            // Each later step runs in a call whose host starts off Qt thread: once its page is up.
+            plan.until(1, 30, move |last| unsafe {
+                if call!("url").is_empty() && !last {
+                    return false;
+                }
+                step();
+                true
+            });
+        } else {
+            plan.after(2, step);
+        }
+    }
+    plan.run();
 
     engine.exec();
 

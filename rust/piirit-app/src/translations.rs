@@ -46,7 +46,8 @@ pub fn install(dir: &str, locale: &str) -> bool {
 }
 
 // Qt harness, as shim tests: `unused_unsafe` (`set_var` unsafe from edition 2024),
-// `borrow_as_ptr` (engine pointer), `disallowed_methods` (`single_shot` Duration), `expect_used`.
+// `borrow_as_ptr` (engine pointer), `disallowed_methods` (bare `single_shot`: shim's `Plan` out
+// of reach), `expect_used`.
 #[cfg(test)]
 #[allow(
     unused_unsafe,

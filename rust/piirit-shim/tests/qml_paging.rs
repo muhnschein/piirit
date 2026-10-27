@@ -6,15 +6,7 @@
 //! is scrolling: nothing to fetch or replace. Filling rows around reader moves nothing.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -182,7 +174,9 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -193,10 +187,10 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
             ),
         ));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("settle", call!("settle")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("opened-rows", call!("rowCount")));
         // Straight to top: no control, fetch or window move.
         (*steps_ptr).push(("scrolled", call!("toTop")));
@@ -204,7 +198,7 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
         (*steps_ptr).push(("top", call!("topId")));
         (*steps_ptr).push(("fill", call!("fillTop")));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         // Visible rows gain text and grow; must not take reader with them.
         (*steps_ptr).push(("relayout", call!("relayout")));
         (*steps_ptr).push(("geometry", call!("geometry")));
@@ -213,6 +207,7 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

@@ -329,7 +329,8 @@ Page {
             }
 
             // Mentions: only thing through a muted group. Calls: from a contact.
-            // Both reference clients' name, words, default.
+            // Both reference clients' name, default. Mentions' words not theirs: theirs
+            // promise reactions; only quoted replies pass (`is_mention`, chatlist.rs).
             TextSwitch {
                 objectName: "callsRingSwitch"
                 //: Whether calls ring. A plural noun, not a verb.
@@ -345,7 +346,7 @@ Page {
                 //: A reply to one of the reader's own messages, arriving
                 //: in a group they have muted.
                 text: qsTr("Mentions")
-                description: qsTr("In muted groups, notify messages directed to you, like replies or reactions")
+                description: qsTr("Show notifications for replies to your messages in muted groups")
                 enabled: Settings.notificationsEnabled === true
                 automaticCheck: false
                 checked: Settings.mentionNotifications === true

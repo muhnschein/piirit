@@ -16,13 +16,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -279,9 +276,11 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let tiles = common::component_url("MediaKinds.qml");
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
 
+    let mut plan = common::Plan::default();
+
     // Group gallery: picture, video.
     let page = media_page.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load-gallery",
             call!(
@@ -293,7 +292,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("gallery-loaded", get!("media", "loaded"));
         record!("gallery-count", get!("media", "count"));
         record!("gallery-busy", get!("mediaBusy", "running"));
@@ -336,7 +335,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count-after-delete", get!("media", "count"));
         record!("video-still-there", get!("mediaTile15", "objectName"));
         // Files list: document, named, sized.
@@ -352,7 +351,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let folder = downloads_for_probe;
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("files-count", get!("media", "count"));
         record!("file-name", get!("fileName", "text"));
         record!("file-size", get!("fileDetail", "text"));
@@ -365,7 +364,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     // Copy made off Qt thread; notice comes at least a loop turn later, so read here, not right
     // after tap. Before next list loads, which takes down page that would show it.
     let page = media_page.clone();
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("saved-notice", get!("noticeLabel", "text"));
         record!(
             "load-audio",
@@ -379,7 +378,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page.clone();
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("audio-count", get!("media", "count"));
         record!("audio-row", get!("mediaRow13", "objectName"));
         record!("audio-label", get!("audioLabel", "text"));
@@ -396,7 +395,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page;
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("apps-count", get!("media", "count"));
         record!("app-name", get!("webxdcName", "text"));
         record!("open-app", call!("click", QString::from("mediaRow14")));
@@ -413,7 +412,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = contact_page;
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("empty-loaded", get!("media", "loaded"));
         record!("empty-count", get!("media", "count"));
         record!("empty-placeholder", get!("placeholder", "enabled"));
@@ -427,7 +426,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
 
     let tiles_url = tiles;
     let page = group_page;
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("contact-tiles", get!("mediaKinds", "visible"));
         record!("contact-apps", get!("appsTile", "objectName"));
         record!("contact-gallery", get!("galleryTile", "objectName"));
@@ -446,12 +445,13 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    single_shot(Duration::from_secs(17), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("group-tiles", get!("mediaKinds", "visible"));
         record!("open-files", call!("click", QString::from("filesTile")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();

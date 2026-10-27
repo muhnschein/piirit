@@ -8,21 +8,16 @@
 //! unsaid.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 use serde_json::Value;
 
 mod common;
+
+/// Checks, a second apart, before offline reading counts as stuck.
+const PATIENCE: u32 = 48;
 
 /// Address `misname` asks core to remove; no relay has it.
 const MISNAMED: &str = "nobody@nowhere.example";
@@ -131,10 +126,21 @@ const PROBE_QML: &str = r"
             item.currentIndex = parseInt(index)
             return 'ok'
         }
-        // No network long enough for the window to stop IO; relays read again.
+        // No network long enough for the window to stop IO; relays read again once core says
+        // IO stopped (asked earlier: read could beat stop).
+        property bool goingOffline: false
+        Connections {
+            target: core
+            onIo_stopped: {
+                if (probe.goingOffline) {
+                    probe.goingOffline = false
+                    findIn(loader.item, 'transports').reload()
+                }
+            }
+        }
         function offline() {
+            probe.goingOffline = true
             core.stop_all_account_io()
-            findIn(loader.item, 'transports').reload()
             return 'ok'
         }
         function pageProperty(property) { return '' + loader.item[property] }
@@ -223,7 +229,9 @@ fn the_relays_are_listed_removed_and_added() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -237,7 +245,7 @@ fn the_relays_are_listed_removed_and_added() {
 
     // List as core has it: address holder first, own mailbox each. No row
     // claims mail leaves through it.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count", get!("transports", "count"));
         record!("first", get!("relayRow0", "addr"));
         record!("first-detail", get!("relayDetail", "objectName"));
@@ -286,7 +294,7 @@ fn the_relays_are_listed_removed_and_added() {
     });
 
     // Refusal shown. Address holder asked to go; reader thinks better.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "refused",
             call!("pageProperty", QString::from("errorMessage"))
@@ -306,7 +314,7 @@ fn the_relays_are_listed_removed_and_added() {
     });
 
     // Still two; asked again, let go.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("spared-count", get!("transports", "count"));
         record!(
             "remove-again",
@@ -320,7 +328,7 @@ fn the_relays_are_listed_removed_and_added() {
 
     // One relay, can't go. Address moved with its relay to the one left; page
     // and report follow.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("removed-count", get!("transports", "count"));
         record!("remaining", get!("relayRow0", "addr"));
         record!("moved-address", get!("profile", "address"));
@@ -339,7 +347,7 @@ fn the_relays_are_listed_removed_and_added() {
     });
 
     // Plus: nothing to add until a relay is picked, then core is asked.
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("plus", call!("click", QString::from("addRelayButton")));
         record!(
             "sub-load",
@@ -377,7 +385,7 @@ fn the_relays_are_listed_removed_and_added() {
     });
 
     // Relay on profile: add page gone; list has new row with new relay's mailbox.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("sub-busy", call!("subProperty", QString::from("busy")));
         record!("added-count", get!("transports", "count"));
         record!("added-first", get!("relayRow0", "addr"));
@@ -395,16 +403,20 @@ fn the_relays_are_listed_removed_and_added() {
         record!("offline", call!("offline"));
     });
 
-    // Offline: core's report has no relay.
-    single_shot(Duration::from_secs(13), move || unsafe {
-        record!(
-            "offline-status",
-            get_in!("relayReport0", "reportStatus", "text")
-        );
+    // Offline: core's report has no relay. Read until it says so or out of time; loaded runner
+    // may take seconds.
+    plan.until(1, PATIENCE, move |last| unsafe {
+        let status = get_in!("relayReport0", "reportStatus", "text");
+        if !last && status != "Not connected" {
+            return false;
+        }
+        record!("offline-status", status);
         record!("offline-dot", get_in!("relayReport1", "reportDot", "color"));
         (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

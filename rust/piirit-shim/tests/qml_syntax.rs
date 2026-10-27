@@ -309,6 +309,50 @@ fn the_new_chat_list_clips_away_from_its_search_field() {
     );
 }
 
+/// Every row on a page with search field marks search (Marks.js): one list without
+/// marks reads as different app. Rows: `match:`, set or not, whatever they list.
+#[test]
+fn every_searchable_list_marks_what_was_found() {
+    const ROWS: [&str; 2] = ["ContactRow {", "ChatListDelegate {"];
+    let mut searchable = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let text = fs::read_to_string(&file).expect("read qml");
+        if !text.contains("SearchField {") {
+            continue;
+        }
+        let lines: Vec<&str> = text.lines().collect();
+        for (number, line) in lines.iter().enumerate() {
+            let trimmed = line.trim();
+            if !ROWS.contains(&trimmed) {
+                continue;
+            }
+            searchable += 1;
+            // Element body: to `}` at element's own indent.
+            let indent = line.len() - line.trim_start().len();
+            let marks = lines[number + 1..]
+                .iter()
+                .take_while(|next| {
+                    !(next.trim() == "}" && next.len() - next.trim_start().len() == indent)
+                })
+                .any(|next| next.trim_start().starts_with("match:"));
+            if !marks {
+                offenders.push(format!("{}:{}: {trimmed}", file.display(), number + 1));
+            }
+        }
+    }
+    assert!(
+        searchable >= 5,
+        "found only {searchable} rows on searchable pages; scan lost them"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these rows sit under a search field but do not mark what it found \
+         (`match:`):\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
 /// Time label positions off row, not off label its width decides.
 /// `SearchResultRow` had a cycle (title width minus time label's; time label anchored to
 /// title): on device title kept natural width, long names ran off edge.
@@ -508,9 +552,12 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
 #[test]
 fn text_from_the_other_end_is_pinned_to_plain() {
     // Bindings core fills from message, contact or chat: remote input.
-    const REMOTE: [&str; 29] = [
+    const REMOTE: [&str; 31] = [
         "model.",
         "root.messageText",
+        // Composed or search-marked name, preview (Marks.js).
+        "root.nameText",
+        "root.marked",
         "root.quoteText",
         "root.quoteAuthor",
         "root.senderName",
@@ -611,6 +658,131 @@ fn text_from_the_other_end_is_pinned_to_plain() {
         offenders.is_empty(),
         "these show text the other end chose without saying it is plain, so \
          Qt decides for itself whether it is markup:\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
+/// Binding from `lines[at]` on, continuation lines (indented past it) joined.
+fn binding(lines: &[&str], at: usize) -> String {
+    let indent = lines[at].len() - lines[at].trim_start().len();
+    let mut value = lines[at].trim().to_string();
+    for next in &lines[at + 1..] {
+        if next.trim().is_empty() || next.len() - next.trim_start().len() <= indent {
+            break;
+        }
+        value.push(' ');
+        value.push_str(next.trim());
+    }
+    value
+}
+
+/// Identifiers and words of `text`.
+fn words(text: &str) -> impl Iterator<Item = &str> {
+    text.split(|c: char| !c.is_alphanumeric() && c != '_')
+}
+
+/// `value` without what it only compares (`a === name ? …`: name not drawn).
+fn uncompared(value: &str) -> String {
+    const COMPARES: [&str; 4] = ["===", "!==", "==", "!="];
+    let tokens: Vec<&str> = value.split_whitespace().collect();
+    let compares = |at: Option<usize>| {
+        at.and_then(|at| tokens.get(at))
+            .is_some_and(|token| COMPARES.contains(token))
+    };
+    tokens
+        .iter()
+        .enumerate()
+        .filter(|(at, _)| !compares(Some(at + 1)) && !compares(at.checked_sub(1)))
+        .map(|(_, token)| *token)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// Every label drawing someone's name draws its emoji as Twemoji (Emoji.js `inText` or
+/// `drawn`): Sailfish's font has few, so a name shows boxes on one page, pictures on next.
+/// Label's text binding must name a property its file builds from `Emoji.`.
+#[test]
+fn every_name_draws_its_emoji_as_pictures() {
+    // Bindings naming a peer, chat or contact.
+    const NAMES: [&str; 8] = [
+        "peer_name",
+        "senderName",
+        "quoteAuthor",
+        "chatName",
+        "displayName",
+        "contactName",
+        "vcardName",
+        "nameText",
+    ];
+    let mut names = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let text = fs::read_to_string(&file).expect("read qml");
+        let lines: Vec<&str> = text.lines().collect();
+        // `readonly property string x: …` definitions, name and value.
+        let properties: Vec<(&str, String)> = (0..lines.len())
+            .filter_map(|at| {
+                let rest = lines[at].trim().strip_prefix("readonly property string ")?;
+                let (name, _) = rest.split_once(':')?;
+                Some((name.trim(), binding(&lines, at)))
+            })
+            .collect();
+        // Built from Emoji.js, or from one that is; names held under another name (e.g.
+        // `plain`) too.
+        let mut pictured: Vec<&str> = Vec::new();
+        loop {
+            let more: Vec<&str> = properties
+                .iter()
+                .filter(|(name, value)| {
+                    !pictured.contains(name)
+                        && (value.contains("Emoji.")
+                            || words(value).any(|word| pictured.contains(&word)))
+                })
+                .map(|(name, _)| *name)
+                .collect();
+            if more.is_empty() {
+                break;
+            }
+            pictured.extend(more);
+        }
+        let mut held: Vec<&str> = NAMES.to_vec();
+        held.extend(
+            properties
+                .iter()
+                .filter(|(name, value)| {
+                    !pictured.contains(name) && words(value).any(|word| NAMES.contains(&word))
+                })
+                .map(|(name, _)| *name),
+        );
+        for (number, line) in lines.iter().enumerate() {
+            if !line.trim_start().starts_with("text:") {
+                continue;
+            }
+            let value = binding(&lines, number);
+            let drawn = uncompared(&value);
+            if !words(&drawn).any(|word| held.contains(&word)) {
+                continue;
+            }
+            // Own-text elements only; nearest `Foo {` above (capitalised: `anchors {` is a group).
+            let element = lines[..number]
+                .iter()
+                .rev()
+                .filter_map(|above| above.trim().strip_suffix('{').map(str::trim))
+                .find(|name| name.starts_with(char::is_uppercase))
+                .unwrap_or_default();
+            if element != "Label" && element != "Text" {
+                continue;
+            }
+            names += 1;
+            if !words(&value).any(|word| pictured.contains(&word)) {
+                offenders.push(format!("{}:{}: {value}", file.display(), number + 1));
+            }
+        }
+    }
+    assert!(names >= 8, "found only {names} name labels; scan lost them");
+    assert!(
+        offenders.is_empty(),
+        "these draw a name without its emoji as pictures (Emoji.js `inText`):\n  {}",
         offenders.join("\n  ")
     );
 }

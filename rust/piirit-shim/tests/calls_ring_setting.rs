@@ -5,14 +5,9 @@
 //! Piirit profile never rang. Ringing is a setting; calls are not (#119).
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
+use std::path::PathBuf;
 use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
@@ -45,8 +40,90 @@ const PROBE_QML: &str = r"
         // the settings to each profile the core has.
         function refresh() { core.refresh_accounts(); return 'ok' }
         function ring(on) { Settings.callsRing = on === 'true'; return 'ok' }
+        function status() { return core.status }
     }
 ";
+
+/// Label, then ringing set after it; last quits. "fresh": core up and told, nothing set yet.
+const PLAN: &[(&str, Option<&str>)] = &[
+    ("fresh", Some("false")),
+    ("silent", Some("true")),
+    ("ringing-again", None),
+];
+
+/// `who_can_call_me` values written by each step, labelled.
+type Steps = Vec<(&'static str, Vec<String>)>;
+
+/// Probe method's answer as text.
+///
+/// # Safety
+/// `engine` live; called inside `exec()`.
+unsafe fn call(engine: *mut QmlEngine, name: &str, args: &[QVariant]) -> String {
+    let result = (*engine).invoke_method(name.into(), args);
+    QString::from_qvariant(result)
+        .map(|value| value.to_string())
+        .unwrap_or_default()
+}
+
+/// Once one write per profile past `told` lands: record first step of `plan`, set its
+/// ringing, go on to rest.
+///
+/// # Safety
+/// `engine`, `steps` live till `exec()` returns.
+unsafe fn step(
+    engine: *mut QmlEngine,
+    steps: *mut Steps,
+    journal: PathBuf,
+    plan: &'static [(&'static str, Option<&'static str>)],
+    told: usize,
+) {
+    let probe = journal.clone();
+    when(
+        move || written(&probe).len() >= told + PROFILES,
+        PATIENCE,
+        move || unsafe {
+            let Some(((label, ring), rest)) = plan.split_first() else {
+                return;
+            };
+            let seen = written(&journal);
+            let told = seen.len();
+            (*steps).push((label, seen));
+            match ring {
+                Some(on) => {
+                    call(engine, "ring", &[QString::from(*on).into()]);
+                    step(engine, steps, journal, rest, told);
+                }
+                None => (*engine).quit(),
+            }
+        },
+    );
+}
+
+/// Profiles fake core lists; each change writes once per profile.
+const PROFILES: usize = 2;
+
+/// Checks a step waits for its condition; then runs anyway, asserts say what was missing.
+const PATIENCE: u32 = 30;
+
+/// Run `then` once `ready` holds, checked each second, or when `patience` checks run out.
+// Inside a step, so not a `common::Plan`; rechecks only once last check ran.
+#[allow(clippy::disallowed_methods)]
+fn when<R, T>(ready: R, patience: u32, then: T)
+where
+    R: Fn() -> bool + 'static,
+    T: FnOnce() + 'static,
+{
+    if ready() || patience == 0 {
+        then();
+        return;
+    }
+    let mut pending = Some((ready, then));
+    single_shot(Duration::from_secs(1), move || {
+        if let Some((ready, then)) = pending.take() {
+            when(ready, patience - 1, then);
+        }
+    });
+}
 
 /// Every `who_can_call_me` value set, in order.
 fn written(journal: &std::path::Path) -> Vec<String> {
@@ -71,7 +148,7 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         // Two profiles, each told.
-        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2"); // `PROFILES`
     }
 
     piirit_shim::register_qml_types();
@@ -95,50 +172,28 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let window = format!("file://{}", tree.join("piirit.qml").display());
-    let mut steps: Vec<(&str, Vec<String>)> = Vec::new();
-    let steps_ptr: *mut Vec<(&str, Vec<String>)> = std::ptr::addr_of_mut!(steps);
-    let seen = journal;
+    let mut steps: Steps = Vec::new();
+    let steps_ptr: *mut Steps = std::ptr::addr_of_mut!(steps);
 
-    macro_rules! call {
-        ($name:expr $(, $arg:expr)*) => {{
-            let result = (*engine_ptr).invoke_method(
-                $name.into(),
-                &[$(QVariant::from($arg)),*],
-            );
-            QString::from_qvariant(result)
-                .map(|value| value.to_string())
-                .unwrap_or_default()
-        }};
-    }
+    let mut plan = common::Plan::default();
 
+    // Each step waits on what it needs, not clock: under coverage, core answers seconds late.
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    single_shot(Duration::from_secs(1), move || unsafe {
-        assert_eq!(call!("loadWindow", QString::from(window.clone())), "ok");
+    plan.after(1, move || unsafe {
+        let window = QString::from(window.clone());
+        assert_eq!(call(engine_ptr, "loadWindow", &[window.into()]), "ok");
+        let journal = journal.clone();
+        when(
+            move || unsafe { call(engine_ptr, "status", &[]) == "ready" },
+            PATIENCE,
+            move || unsafe {
+                call(engine_ptr, "refresh", &[]);
+                step(engine_ptr, steps_ptr, journal, PLAN, 0);
+            },
+        );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
-        call!("refresh");
-    });
-
-    // Core up and told; nothing set yet.
-    let fresh = seen.clone();
-    single_shot(Duration::from_secs(3), move || unsafe {
-        (*steps_ptr).push(("fresh", written(&fresh)));
-        call!("ring", QString::from("false"));
-    });
-
-    // Ringing off, then on.
-    let silent = seen.clone();
-    single_shot(Duration::from_secs(4), move || unsafe {
-        (*steps_ptr).push(("silent", written(&silent)));
-        call!("ring", QString::from("true"));
-    });
-
-    single_shot(Duration::from_secs(5), move || unsafe {
-        (*steps_ptr).push(("ringing-again", written(&seen)));
-        (*engine_ptr).quit();
-    });
-
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
