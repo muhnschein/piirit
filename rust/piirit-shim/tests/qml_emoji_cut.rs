@@ -5,18 +5,10 @@
 //! first line only, across body and quote both cut.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -93,6 +85,7 @@ fn coloured_rows(file: &str) -> (Vec<u32>, u32) {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_cut_message_draws_its_first_emoji_on_its_first_line() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-emoji-cut-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
@@ -141,7 +134,9 @@ fn a_cut_message_draws_its_first_emoji_on_its_first_line() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -152,7 +147,7 @@ fn a_cut_message_draws_its_first_emoji_on_its_first_line() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         for (name, path) in [("messageLabel", &body_path), ("quoteLabel", &quote_path)] {
             record!(format!("{name}-shape"), call!("shape", QString::from(name)));
             record!(
@@ -161,11 +156,12 @@ fn a_cut_message_draws_its_first_emoji_on_its_first_line() {
             );
         }
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("saved", call!("savedShots"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| common::value_of(&steps, label).to_string();

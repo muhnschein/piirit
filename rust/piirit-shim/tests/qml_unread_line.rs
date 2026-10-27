@@ -4,15 +4,7 @@
 //! row it lands on must grow by it. Line drawn over message below is worse than none.
 
 // Qt harness: see qml_conversation_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -140,8 +132,10 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     let list = common::component_url("ConversationList.qml");
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("load", call!("load", QString::from(list.clone()), 3));
         // Nothing unread: no line, every row same height.
         record!("quiet", call!("pattern"));
@@ -149,7 +143,7 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
         record!("mark", call!("setMark", 2));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("marked", call!("pattern"));
         record!("marked-heights", call!("heights"));
         record!("said", call!("said"));
@@ -157,11 +151,12 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
         call!("setMark", 3);
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("moved", call!("pattern"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

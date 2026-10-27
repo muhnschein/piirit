@@ -12,13 +12,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use qmetaobject::*;
 use serde_json::{json, Value};
@@ -341,15 +338,18 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     let first = url;
-    single_shot(Duration::from_millis(500), move || unsafe {
+    plan.after(0, move || unsafe {
         (*answers_ptr).push(call!("run", QString::from(first.as_str())));
         (*answers_ptr).push(call!("arm", QString::from(first.as_str())));
     });
-    single_shot(Duration::from_millis(4500), move || unsafe {
+    plan.after(4, move || unsafe {
         (*answers_ptr).push(call!("fired"));
         (*engine_ptr).quit();
     });
+    plan.run();
     engine.exec();
 
     let parse = |index: usize| -> Value {

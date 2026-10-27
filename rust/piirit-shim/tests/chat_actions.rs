@@ -1,15 +1,7 @@
 //! Chat-list context menu calls, with parameter shapes core accepts (pinned by `real_server.rs`).
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -70,16 +62,18 @@ fn the_context_menu_sends_what_the_core_expects() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("act".into(), &[]);
     });
 
     let mut before_delete = String::new();
     let before_ptr: *mut String = std::ptr::addr_of_mut!(before_delete);
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         let value = (*engine_ptr).invoke_method("count".into(), &[]);
         *before_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -89,7 +83,7 @@ fn the_context_menu_sends_what_the_core_expects() {
 
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         let count = (*engine_ptr).invoke_method("count".into(), &[]);
         let error = (*engine_ptr).invoke_method("error".into(), &[]);
         *report_ptr = format!(
@@ -104,6 +98,7 @@ fn the_context_menu_sends_what_the_core_expects() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&common::calls(&journal), &before_delete, &report);

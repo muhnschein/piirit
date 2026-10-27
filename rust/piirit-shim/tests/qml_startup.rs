@@ -5,15 +5,7 @@
 //! it: handler capitalises signal (`onShowChats`). Loading the file does.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -129,7 +121,9 @@ fn the_application_window_and_what_it_holds_all_load() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // Used phone. dconf outlives test binary: both cases set, not assumed.
         (*steps_ptr).push(("remember", call!("remember", QString::from("7"))));
         (*steps_ptr).push(("resumed-load", call!("load", QString::from(root.clone()))));
@@ -143,6 +137,7 @@ fn the_application_window_and_what_it_holds_all_load() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

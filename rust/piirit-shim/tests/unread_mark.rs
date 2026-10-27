@@ -5,15 +5,7 @@
 //! asked, answer reaches QML, reading chat leaves line put.
 
 // Qt harness: see chat_actions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -78,31 +70,34 @@ fn the_line_is_read_once_when_a_chat_opens_and_stays_where_it_was() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("opened", call!("mark"));
         // Reading would move a line tracking unread state, not reader.
         record!("read", call!("readIt"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("after-reading", call!("mark"));
         record!("leave", call!("other"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("elsewhere", call!("mark"));
         record!("return", call!("back"));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("returned", call!("mark"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -3,15 +3,7 @@
 //! Seeded via fake core, so own binary.
 
 // Qt harness: see qml_cover.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -125,7 +117,9 @@ fn a_cover_with_only_oneself_and_the_device_is_a_grid_of_empty_circles() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         let url = format!(
             "file://{}",
             std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -135,7 +129,7 @@ fn a_cover_with_only_oneself_and_the_device_is_a_grid_of_empty_circles() {
         record!("load", call!("load", QString::from(url)));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("rows", call!("rows"));
         record!("grid", call!("count", QString::from("gridCell")));
         record!("faces", call!("faces"));
@@ -143,6 +137,7 @@ fn a_cover_with_only_oneself_and_the_device_is_a_grid_of_empty_circles() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

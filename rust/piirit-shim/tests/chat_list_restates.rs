@@ -3,15 +3,7 @@
 //! Edit = `MsgsChanged`, delete = `MsgDeleted`; neither is arrival, so neither announced.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -87,7 +79,9 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
         }};
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("loaded", call!("loaded")));
         // Other list traffic: nothing to restate.
         (*steps_ptr).push((
@@ -97,7 +91,7 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
         (*steps_ptr).push(("noticed", call!("feed", "MsgsNoticed", r#"{"chatId":2}"#)));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("quiet", call!("heard")));
         (*steps_ptr).push((
             "edit",
@@ -109,11 +103,12 @@ fn an_edit_or_a_deletion_is_restated_and_nothing_else_is() {
         ));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("heard", call!("heard")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

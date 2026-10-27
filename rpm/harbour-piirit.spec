@@ -72,6 +72,9 @@ Requires:   libkeepalive
 Requires:   sailfish-components-webview-qt5
 Requires:   sailfish-components-webview-qt5-popups
 Requires:   sailfish-components-webview-qt5-pickers
+# Qt's SVG image plugin: emoji pictures are SVG (qml/art/emoji/), drawn sharp at any size.
+# Missing: emoji pictures fail to load.
+Requires:   qt5-qtsvg-plugin-imageformat-svg
 
 # Harbour allows no Provides:, and rpm generates one from any packaged shared library (e.g.
 # libpiirit.so under %%{appdatadir}/lib). Exclude both private dirs.
@@ -119,6 +122,11 @@ BuildRequires:  qt5-qttools-linguist
 # overrides; rpm.yml passes one every run (numbers: docs/BUILDING.md).
 %{!?jobs: %global jobs 1}
 
+# make jobs for FFmpeg/x264, which piirit-video's build.rs builds, apart from cargo's: parallel
+# make doesn't hit cargo's stall (10 of 10 runs at four; ~6 min, not ~15). Under sb2 only, as
+# above. `--define "make_jobs N"` overrides.
+%{!?make_jobs: %global make_jobs 4}
+
 # Binary dir: under sb2 target/<triple>/release (SB2_RUST_TARGET_TRIPLE, %%build); native
 # target/release. Checked at install.
 %define builddir rust/target/%{rusttarget}/release
@@ -157,12 +165,13 @@ export SB2_RUST_TARGET_TRIPLE=%{rusttarget}
 export QT_INCLUDE_PATH=%{_includedir}/qt5
 export QT_LIBRARY_PATH=%{_libdir}
 
-# SBOX_SESSION_DIR: set by sb2 in sessions; marks cross build. Gates job count and linker override.
+# SBOX_SESSION_DIR: set by sb2 in sessions; marks cross build. Gates job counts and linker override.
 # Build scripts/proc-macros link with `cc`, which sb2 maps to the cross compiler ("-m32" fails).
 # Point host linker at `host-gcc` (SBOX_HOST_GCC_NAME). Outside sb2: no override.
 if [ -n "${SBOX_SESSION_DIR:-}" ]; then
     host_triple=$(rustc -vV | sed -n 's/^host: //p')
     export "CARGO_TARGET_$(echo "$host_triple" | tr 'a-z-' 'A-Z_')_LINKER"=host-gcc
+    export PIIRIT_MAKE_JOBS=%{make_jobs}
 fi
 
 # Parallel link under sb2 can lose objects via shared /tmp: temporaries in build dir.
@@ -206,8 +215,8 @@ install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
 
 # QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
 # source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
-# qml/art/ .png files: first-screen mark and intro pictures.
-(cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name qmldir \) -exec \
+# qml/art/ .png files: first-screen mark and intro pictures; .svg: emoji.
+(cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name '*.svg' -o -name qmldir \) -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/qml/{}" \; )
 
 # Compiled .qm beside QML, where piirit-app looks; .ts stay in tree.

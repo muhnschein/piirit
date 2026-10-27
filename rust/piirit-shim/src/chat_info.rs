@@ -29,6 +29,8 @@ struct Loaded {
     is_muted: bool,
     description: String,
     can_edit_description: bool,
+    is_channel: bool,
+    is_own_channel: bool,
     members: Vec<ContactItem>,
 }
 
@@ -79,6 +81,10 @@ pub struct ChatInfo {
     /// Description editable: group/channel still in. Narrower than `can_edit`: core refuses other
     /// kinds (mailing list).
     pub can_edit_description: qt_property!(bool; NOTIFY loaded_changed),
+    /// Channel, own or joined (core's `OutBroadcast`, `InBroadcast`): page says so.
+    pub is_channel: qt_property!(bool; NOTIFY loaded_changed),
+    /// Own channel: page offers its invite, only way subscribers join.
+    pub is_own_channel: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds until messages disappear; 0 = never. Core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
     /// Muted now. Core's `isMuted`; no end time given, none shown.
@@ -202,6 +208,8 @@ impl ChatInfo {
                         this_mut.is_muted = found.is_muted;
                         this_mut.description = found.description.into();
                         this_mut.can_edit_description = found.can_edit_description;
+                        this_mut.is_channel = found.is_channel;
+                        this_mut.is_own_channel = found.is_own_channel;
                         // In place: runs on every contact change in account, mostly no member
                         // change; reset rebuilt every row.
                         reconcile_rows(&mut this_mut.members.borrow_mut(), found.members, |item| {
@@ -573,6 +581,8 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         is_muted: json::flag(&chat, "isMuted"),
         description,
         can_edit_description: matches!(chat_type, "Group" | "OutBroadcast") && self_in_group,
+        is_channel: matches!(chat_type, "OutBroadcast" | "InBroadcast"),
+        is_own_channel: chat_type == "OutBroadcast",
         members,
     })
 }

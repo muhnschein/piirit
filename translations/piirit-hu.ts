@@ -561,10 +561,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Archivált csevegések</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Új csevegés</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Archivált</translation>
     </message>
@@ -646,10 +642,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-kód</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Új csoport</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Megjelölés olvasatlanként</translation>
     </message>
@@ -685,6 +677,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Küldés ide</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Új</translation>
     </message>
 </context>
 <context>
@@ -1133,6 +1130,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Kép módosítása</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR-kód-meghívó</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Csatorna</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1394,6 +1401,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Tovább</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Új csevegés</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Egy emberrel ír.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Új csoport</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Többen írnak egymásnak.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Új csatorna</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>A csatornák egy blogszerű eszköz az üzenetek megosztására a közönséggel.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1433,6 +1474,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Csoport létrehozása</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Adjon nevet a csatornának</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Csatorna létrehozása</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Új csatorna</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Csatorna neve</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>A nevet a csatorna minden tagja látja</translation>
     </message>
 </context>
 <context>
@@ -1658,6 +1721,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Meghívó hivatkozás másolása</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR-kód-meghívó</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>QR-kód beolvasás a(z) „%1” nevű csatornához való csatlakozáshoz</translation>
     </message>
 </context>
 <context>
@@ -2173,8 +2245,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nincsenek részletek</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>A némított csoportokban csak az Önnek címzett üzenetek, (például válaszok vagy reakciók) esetén küld értesítést.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Értesítések megjelenítése az Ön üzeneteire érkező válaszokról a némított csoportokban</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

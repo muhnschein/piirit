@@ -4,18 +4,10 @@
 //! must match picker list. Plain text skipped fast.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -46,7 +38,7 @@ fn probe_qml() -> String {
             for (var i = 0; i < Data.list.length; i++) {{
                 var emoji = Data.list[i][0]
                 var picture = Data.list[i][1]
-                var img = '/' + picture + '.png'
+                var img = '/' + picture + '.svg'
                 if (Emoji.pictureFor(emoji) !== picture
                         || Emoji.inText(emoji, false, 18).indexOf(img) < 0
                         || Emoji.inText('a ' + emoji + ' b', true, 18).indexOf(img) < 0) {{
@@ -68,11 +60,19 @@ fn probe_qml() -> String {
         }}
         Loader {{ id: glyph }}
         function loadGlyph(url) {{
-            glyph.setSource(url, {{ emoji: '👍', size: 40 }})
+            // Big, as a message of only emoji draws them.
+            glyph.setSource(url, {{ emoji: '👍', size: 120 }})
             return glyph.status === Loader.Ready ? 'ok' : 'load-failed'
         }}
         function glyphText() {{
             return glyph.item.drawn ? 'picture' : 'text:' + glyph.item.emoji
+        }}
+        // Pixels the picture was drawn at, once loaded.
+        function glyphPixels() {{
+            var image = findIn(glyph.item, 'emojiImage')
+            if (!image) {{ return 'missing:emojiImage' }}
+            return image.status === Image.Ready
+                ? image.implicitWidth + 'x' + image.implicitHeight : 'status:' + image.status
         }}
         function findIn(node, name) {{
             if (!node) {{ return null }}
@@ -98,12 +98,12 @@ fn probe_qml() -> String {
 
 /// `<img>` from `inText` for picture under `base`, 18 px font, if picture exists.
 fn img(base: &str, picture: &str) -> String {
-    let file = format!("{}{picture}.png", base.trim_start_matches("file://"));
+    let file = format!("{}{picture}.svg", base.trim_start_matches("file://"));
     assert!(
         PathBuf::from(&file).is_file(),
         "{file} is not shipped where the text looks for it"
     );
-    format!("<img src=\"{base}{picture}.png\" width=\"21\" height=\"21\" align=\"middle\">")
+    format!("<img src=\"{base}{picture}.svg\" width=\"21\" height=\"21\" align=\"middle\">")
 }
 
 #[test]
@@ -165,14 +165,16 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     // Plain text, no char of any emoji: not read char by char. Digit, #, * among them: they start
     // keycaps, but are in far more text than any keycap is.
-    let plain: Vec<&'static str> = vec![
+    let unmarked: Vec<&'static str> = vec![
         "no emoji at all, 1 # * 2",
         "Täällä on lunta -- 3 cm, ja \"pakkasta\" (10°C) <b>&amp;</b>\n  OK?",
         "Встретимся в 19:30 у входа №2.",
     ];
-    let plain_ptr = std::ptr::addr_of!(plain);
+    let plain_ptr = std::ptr::addr_of!(unmarked);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!("every", call!("everyEmoji"));
         for text in &*plain_ptr {
             record!(
@@ -199,13 +201,20 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    // Glyph's picture loaded off main thread: read once in, however slow the load.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("glyphPixels").starts_with("status:") && !last {
+            return false;
+        }
         record!("body-on", call!("label", QString::from("messageLabel")));
         record!("quote-on", call!("label", QString::from("quoteLabel")));
         record!("glyph-on", call!("glyphText"));
+        record!("glyph-pixels", call!("glyphPixels"));
         (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
@@ -226,7 +235,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
          EmojiPictures.js is built from EmojiData.js by \
          scripts/fetch-emoji.py --pictures. {context}"
     );
-    for text in &plain {
+    for text in &unmarked {
         assert_eq!(
             value(&format!("plain:{text}")),
             "false",
@@ -295,16 +304,22 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     );
     assert!(
         value("body-on").starts_with("styled:hi <img ")
-            && value("body-on").contains("/1f44d.png")
+            && value("body-on").contains("/1f44d.svg")
             && value("body-on").ends_with("> there"),
         "the body's emoji is not drawn as its picture. {context}"
     );
     assert!(
         value("quote-on").starts_with("styled:was <img ")
-            && value("quote-on").contains("/1f525.png"),
+            && value("quote-on").contains("/1f525.svg"),
         "the quote's emoji is not drawn as its picture. {context}"
     );
     assert_eq!(value("glyph-on"), "picture", "{context}");
+    // status: SVG not loaded (no Qt SVG image plugin?).
+    assert_eq!(
+        value("glyph-pixels"),
+        "120x120",
+        "the emoji is not drawn at the size it is shown. {context}"
+    );
 }
 
 /// Only picker loads whole list. Chat drawing needs a third of it; reparsed each launch,

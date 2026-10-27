@@ -1,15 +1,7 @@
 //! Chat list search: chats, contacts, messages, under counted headings.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -142,7 +134,9 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -155,7 +149,7 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
 
     // "a" is in every seeded chat name, both contact addresses and word "message": one
     // query reaches all three groups.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("bind", call!("bind"));
         record!(
             "typed",
@@ -167,7 +161,7 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("rows", call!("listed"));
         record!(
             "message-subtitles",
@@ -189,12 +183,13 @@ fn a_search_finds_chats_contacts_and_messages_separately() {
         );
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("after-clearing", call!("listed"));
         record!("list-back", get!("chatList", "visible"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

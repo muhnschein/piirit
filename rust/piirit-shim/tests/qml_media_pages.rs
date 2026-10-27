@@ -6,15 +6,7 @@
 //! viewer's overlay (`qml_gallery_turn.rs`).
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -207,6 +199,8 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // Kind to page.
     let conversation = common::page_url_in(&tree, "ConversationPage.qml");
     // Closures take what they need by value.
@@ -215,7 +209,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     let row_page = picture_page.clone();
     // Gallery's video slide.
     let video_page = common::component_url("VideoView.qml");
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "conversation",
             call!("loadConversation", QString::from(conversation.clone())),
@@ -227,7 +221,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
 
     // Picture page, on a still.
     let still = png_url.clone();
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         let mut properties = QVariantMap::default();
         properties.insert("fileUrl".into(), QString::from(still.clone()).into());
         properties.insert("fileName".into(), QString::from("dot.png").into());
@@ -239,7 +233,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     });
     let downloads = temp.join("Downloads");
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "picture-shown",
             call!(
@@ -324,7 +318,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
 
     // GIF: only kind with animation over still.
     let animated = png_url.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         // Save answered by now: read before page goes, notice with it.
         (*steps_ptr).push((
             "saved-notice",
@@ -369,7 +363,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
 
     // Opened from row mid-transition: row decodes at row width; full picture waits for page.
     let from_row = png_url;
-    single_shot(Duration::from_millis(5500), move || unsafe {
+    plan.after(0, move || unsafe {
         let mut properties = QVariantMap::default();
         properties.insert("fileUrl".into(), QString::from(from_row.clone()).into());
         properties.insert("viewType".into(), QString::from("Image").into());
@@ -412,7 +406,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     });
 
     // Video page.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         let mut properties = QVariantMap::default();
         properties.insert(
             "fileUrl".into(),
@@ -470,6 +464,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();

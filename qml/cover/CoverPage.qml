@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../components"
+import "../js/Emoji.js" as Emoji
 import "../js/QuickActions.js" as QuickActions
 import "../js/Media.js" as Media
 
@@ -523,13 +524,20 @@ CoverBackground {
                    ? callBody.height / callBody.needed : 1
             transformOrigin: Item.Top
 
+            /// Their name; emoji as Twemoji (Emoji.js), "" when none.
+            readonly property string namePlain: cover.callUp ? cover.call.peer_name : ""
+            readonly property string namePictured: Emoji.inText(callBody.namePlain, false,
+                                                                callBody.nameSize,
+                                                                "", Emoji.nameSaturation)
+
             // Hidden one-line name: width sets size.
             Label {
                 id: nameRuler
                 visible: false
                 font.pixelSize: callBody.nameSize
-                textFormat: Text.PlainText
-                text: cover.callUp ? cover.call.peer_name : ""
+                textFormat: callBody.namePictured.length > 0 ? Text.StyledText : Text.PlainText
+                text: callBody.namePictured.length > 0 ? callBody.namePictured
+                                                       : callBody.namePlain
             }
 
             // Who, at top; avatar over name when no picture.
@@ -562,12 +570,18 @@ CoverBackground {
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
                     maximumLineCount: callBody.nameLines
-                    truncationMode: TruncationMode.Elide
+                    // Cut, not elided, with pictures: elided last line misplaces them
+                    // (MessageDelegate body).
+                    readonly property string pictured: Emoji.inText(callBody.namePlain, false,
+                                                                    callBody.nameFont,
+                                                                    "", Emoji.nameSaturation)
+                    truncationMode: callName.pictured.length > 0 ? TruncationMode.None
+                                                                 : TruncationMode.Elide
                     font.pixelSize: callBody.nameFont
                     color: Theme.primaryColor
                     // Their self-chosen name.
-                    textFormat: Text.PlainText
-                    text: cover.callUp ? cover.call.peer_name : ""
+                    textFormat: callName.pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: callName.pictured.length > 0 ? callName.pictured : callBody.namePlain
                 }
 
                 Label {

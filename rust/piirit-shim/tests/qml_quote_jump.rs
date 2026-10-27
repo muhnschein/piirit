@@ -6,15 +6,7 @@
 //! `common::qml_tree_without_enter_key`. Steps wait on what they need, not on time.
 
 // Qt harness: see qml_chat_info_attached.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -218,17 +210,34 @@ fn a_tap_on_a_quote_goes_to_the_quoted_message() {
     let mut steps = String::new();
     let steps_ptr: *mut String = std::ptr::addr_of_mut!(steps);
 
+    let mut plan = common::Plan::default();
+
     let url = common::page_url_in(&tree, "ConversationPage.qml");
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         *loaded_ptr = QString::from_qvariant(
             (*engine_ptr)
                 .invoke_method("load".into(), &[QVariant::from(QString::from(url.clone()))]),
         )
         .map(|value| value.to_string())
         .unwrap_or_default();
-        wait_for_steps(engine_ptr, steps_ptr, 60);
     });
 
+    // Each second: probe done, or patience spent? Then take steps and quit.
+    plan.until(1, 60, move |last| unsafe {
+        let ask = |method: &str| {
+            QString::from_qvariant((*engine_ptr).invoke_method(method.into(), &[]))
+                .map(|value| value.to_string())
+                .unwrap_or_default()
+        };
+        if ask("isFinished") != "true" && !last {
+            return false;
+        }
+        *steps_ptr = ask("stepsJson");
+        (*engine_ptr).quit();
+        true
+    });
+
+    plan.run();
     engine.exec();
 
     assert_eq!(loaded, "ok", "the conversation page did not load");
@@ -308,22 +317,4 @@ fn a_tap_on_a_quote_goes_to_the_quoted_message() {
     ] {
         assert_eq!(step(label), expected, "{complaint}. {context}");
     }
-}
-
-/// Each second: probe done, or patience spent? Then take steps and quit. Whole seconds: vendored
-/// `single_shot` drops fraction.
-fn wait_for_steps(engine: *mut QmlEngine, steps: *mut String, patience: u32) {
-    single_shot(Duration::from_secs(1), move || unsafe {
-        let ask = |method: &str| {
-            QString::from_qvariant((*engine).invoke_method(method.into(), &[]))
-                .map(|value| value.to_string())
-                .unwrap_or_default()
-        };
-        if ask("isFinished") == "true" || patience == 0 {
-            *steps = ask("stepsJson");
-            (*engine).quit();
-        } else {
-            wait_for_steps(engine, steps, patience - 1);
-        }
-    });
 }

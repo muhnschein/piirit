@@ -3,12 +3,11 @@
 //! on chat list pull-down.
 
 // Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe`
-// (edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
+// (edition 2024+), `borrow_as_ptr`.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher's by-value ones; derive transmutes a QVariant
     // field: piirit-shim/src/lib.rs.
@@ -16,11 +15,9 @@
     clippy::useless_transmute
 )]
 
-use std::path::Path;
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::Path;
 
 mod common;
 
@@ -35,6 +32,8 @@ struct PageStackProbe {
     log_changed: qt_signal!(),
     /// Chat id of last navigation, or 0.
     chat_id: qt_property!(u32; NOTIFY log_changed),
+    /// Page chat opened over, as handed in (probe passes a name).
+    landed_on: qt_property!(QString; NOTIFY log_changed),
 
     push: qt_method!(fn(&mut self, page: QString) -> QVariant),
     replaceAbove:
@@ -58,7 +57,8 @@ impl PageStackProbe {
         QVariant::default()
     }
 
-    fn replaceAbove(&mut self, _target: QVariant, page: QString, properties: QVariantMap) {
+    fn replaceAbove(&mut self, target: QVariant, page: QString, properties: QVariantMap) {
+        self.landed_on = QString::from_qvariant(target).unwrap_or_default();
         if let Some(chat_id) =
             i32::from_qvariant(properties.value(QString::from("chatId"), QVariant::default()))
         {
@@ -85,7 +85,8 @@ const PROBE_QML: &str = r"
     Item {
         Loader { id: loader }
         function load(url, accountId) {
-            loader.setSource(url, { accountId: accountId })
+            // Chat list as New dialog hands it in; a name stands in for the page.
+            loader.setSource(url, { accountId: accountId, landOn: 'chat-list' })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
         function findIn(node, name) {
@@ -173,7 +174,9 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -194,16 +197,20 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         ));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // First known contact; tap opens chat with them.
         (*steps_ptr).push(("tap-contact", call!("click", QString::from("contactRow"))));
         (*steps_ptr).push(("search", call!("searchForNothing")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push((
             "after-contact",
             (*stack_ptr).pinned().borrow().log.to_string(),
+        ));
+        (*steps_ptr).push((
+            "landed-on",
+            (*stack_ptr).pinned().borrow().landed_on.to_string(),
         ));
         // Core answered, nobody to show: placeholder should be the only item.
         (*steps_ptr).push((
@@ -224,6 +231,7 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(
@@ -243,6 +251,12 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str, chat_id: u32, jour
             "after-contact" => assert_eq!(
                 value, "replaceAbove:ConversationPage.qml|",
                 "tapping a contact did not replace the picker with the chat. {context}"
+            ),
+            // Over chat list, not over New dialog: back from chat skips both.
+            "landed-on" => assert_eq!(
+                value, "chat-list",
+                "the chat opened over the page under the picker rather than the one \
+                 handed in. {context}"
             ),
             "new-contact" | "new-group" => assert!(
                 value.starts_with("missing:"),

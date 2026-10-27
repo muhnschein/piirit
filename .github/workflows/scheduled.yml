@@ -78,7 +78,7 @@ jobs:
           df -h / | tail -1
       # Same packages as ci.yml's test (same tests). llvm for llvm-symbolizer:
       # lsan.supp matches function names, present only once symbolized.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libpulse-dev pulseaudio pulseaudio-utils llvm
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils llvm
       # Nightly named in ci/leak-check.sh. No rust-cache: nothing shared with
       # other jobs; a week-old cache is gigabytes for little.
       - run: rustup toolchain install nightly-2026-10-12 --profile minimal --component rust-src

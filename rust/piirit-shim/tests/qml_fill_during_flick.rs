@@ -5,15 +5,7 @@
 //! at stop.
 
 // Qt harness: see qml_conversation_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -127,7 +119,9 @@ fn a_flicking_view_asks_for_rows_while_it_moves() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -137,18 +131,24 @@ fn a_flicking_view_asks_for_rows_while_it_moves() {
         ));
         (*steps_ptr).push(("rows", call!("append", 300)));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("end", call!("toEnd")));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("flick", call!("startFlick")));
     });
-    single_shot(Duration::from_millis(4500), move || unsafe {
+    // Flick over and its last ask in, however slow the frames came.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("afterCount") == "0" && !last {
+            return false;
+        }
         (*steps_ptr).push(("during", call!("duringCount")));
         (*steps_ptr).push(("after", call!("afterCount")));
         (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

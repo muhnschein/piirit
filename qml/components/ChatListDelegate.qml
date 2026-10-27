@@ -1,13 +1,15 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 import "../js/Format.js" as Format
 import "../js/Marks.js" as Marks
 import "."
 
 /*
- * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml); name
- * searched: escaped StyledText with marks (Marks.js). Own component, loads and
- * measures alone; bindings, not positioner (ditto).
+ * Chat-list row. Peer-sent name, preview: PlainText (MessageDelegate.qml); with
+ * search marks (Marks.js) or emoji: escaped StyledText, Twemoji (Emoji.js),
+ * preview's grey as its text. Own component, loads and measures alone;
+ * bindings, not positioner (ditto).
  */
 Item {
     id: root
@@ -33,12 +35,29 @@ Item {
     property string match
 
     readonly property bool summaryIsOurs: summaryState >= 20
+    /// Preview line as written. Ours: delivery mark. Others: sender name, if set.
+    readonly property string previewText: (root.summaryIsOurs
+                                           ? Format.stateMark(root.summaryState) + " " : "")
+                                          + (root.previewSender.length > 0 && !root.summaryIsOurs
+                                             ? root.previewSender + ": " : "")
+                                          + root.preview
+    /// Same with emoji pictures, grey as its text; "" for as written.
+    readonly property string emojiPreview: Emoji.inText(root.previewText, false,
+                                                        Theme.fontSizeExtraSmall,
+                                                        Theme.secondaryColor)
 
     // Mail icon: unencryptable. Pin/mute on right: placement, not name.
-    readonly property string nameText: (root.isEncrypted ? "" : "✉ ") + root.chatName
-    /// Marked StyledText, or "" for plain.
-    readonly property string markedName: Marks.marked(root.nameText, root.match,
+    readonly property string mailMark: root.isEncrypted ? "" : "✉ "
+    readonly property string nameText: root.mailMark + root.chatName
+    /// Marked StyledText, or "" for plain. Name only: mark stays font's glyph.
+    readonly property string markedName: Marks.marked(root.chatName, root.match,
                                                       Theme.highlightColor)
+    /// Name as drawn, marks and emoji pictures, after mark; "" for plain.
+    readonly property string drawnName: Emoji.drawn(root.chatName, root.markedName,
+                                                    Theme.fontSizeMedium,
+                                                    "", Emoji.nameSaturation)
+    readonly property string shownName: root.drawnName.length > 0
+                                        ? root.mailMark + root.drawnName : ""
 
     height: Math.max(avatar.height, previewLabel.y + previewLabel.height)
             + 2 * Theme.paddingMedium
@@ -93,8 +112,8 @@ Item {
         y: Theme.paddingMedium
         width: marks.x - x - Theme.paddingMedium
         truncationMode: TruncationMode.Fade
-        textFormat: root.markedName.length > 0 ? Text.StyledText : Text.PlainText
-        text: root.markedName.length > 0 ? root.markedName : root.nameText
+        textFormat: root.shownName.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.shownName.length > 0 ? root.shownName : root.nameText
     }
 
     // Contact request: tagged before preview (Accept or Block waits in the chat).
@@ -133,12 +152,8 @@ Item {
         truncationMode: TruncationMode.Fade
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        textFormat: Text.PlainText
-        // Ours: delivery mark. Others: sender name, if set.
-        text: (root.summaryIsOurs ? Format.stateMark(root.summaryState) + " " : "")
-              + (root.previewSender.length > 0 && !root.summaryIsOurs
-                 ? root.previewSender + ": " : "")
-              + root.preview
+        textFormat: root.emojiPreview.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.emojiPreview.length > 0 ? root.emojiPreview : root.previewText
     }
 
     // Unread count; muted still counted, dimmed.

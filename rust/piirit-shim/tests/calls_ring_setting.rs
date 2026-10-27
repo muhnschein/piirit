@@ -5,13 +5,7 @@
 //! Piirit profile never rang. Ringing is a setting; calls are not (#119).
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::path::PathBuf;
 use std::time::Duration;
@@ -112,6 +106,8 @@ const PROFILES: usize = 2;
 const PATIENCE: u32 = 30;
 
 /// Run `then` once `ready` holds, checked each second, or when `patience` checks run out.
+// Inside a step, so not a `common::Plan`; rechecks only once last check ran.
+#[allow(clippy::disallowed_methods)]
 fn when<R, T>(ready: R, patience: u32, then: T)
 where
     R: Fn() -> bool + 'static,
@@ -179,9 +175,11 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
     let mut steps: Steps = Vec::new();
     let steps_ptr: *mut Steps = std::ptr::addr_of_mut!(steps);
 
+    let mut plan = common::Plan::default();
+
     // Each step waits on what it needs, not clock: under coverage, core answers seconds late.
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         let window = QString::from(window.clone());
         assert_eq!(call(engine_ptr, "loadWindow", &[window.into()]), "ok");
         let journal = journal.clone();
@@ -195,6 +193,7 @@ fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
         );
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

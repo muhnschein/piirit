@@ -15,15 +15,7 @@
 //! after leaving chat and coming back. Delegate and list loaded alone, as other QML tests.
 
 // Qt harness: see qml_reactions.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -183,7 +175,9 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
     let long = a_long_message();
     let long_for_list = long.clone();
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -199,7 +193,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "short-actions",
             call!(
@@ -209,14 +203,10 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
             )
         );
         record!("short-height", call!("ask", QString::from("height")));
-        call!(
-            "set",
-            QString::from("messageText"),
-            QString::from(long.clone())
-        );
+        call!("set", QString::from("messageText"), QString::from(long));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("long-inset", call!("offerInset"));
         record!("long-bubble", call!("bubbleWidth"));
         record!(
@@ -257,7 +247,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         call!("set", QString::from("hasHtml"), true);
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "cut-full",
             call!("get", QString::from("fullButton"), QString::from("visible"))
@@ -272,7 +262,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("narrow-inset", call!("offerInset"));
         record!("narrow-bubble", call!("bubbleWidth"));
         record!(
@@ -285,7 +275,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("row-full", call!("tapFull"));
         record!("row-raised", call!("raisedSignal"));
 
@@ -305,7 +295,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "file-actions",
             call!(
@@ -329,7 +319,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "held-actions",
             call!(
@@ -356,7 +346,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         call!("set", QString::from("hasHtml"), true);
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "mail-actions",
             call!(
@@ -382,7 +372,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "paragraph-actions",
             call!(
@@ -398,6 +388,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

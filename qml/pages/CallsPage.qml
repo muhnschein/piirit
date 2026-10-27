@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import "../components"
 import "../js/Media.js" as Media
 import "../js/Calls.js" as Calls
+import "../js/Emoji.js" as Emoji
 import Piirit 1.0
 
 /*
@@ -152,10 +153,14 @@ Page {
                     }
                     truncationMode: TruncationMode.Fade
                     color: callAction.tint
-                    // Their name in our line.
-                    textFormat: Text.PlainText
+                    // Their name in our line; emoji as Twemoji (Emoji.js).
                     //: Places a call. %1 is the name of whoever is called.
-                    text: qsTr("Call %1").arg(page.contactName)
+                    readonly property string plain: qsTr("Call %1").arg(page.contactName)
+                    readonly property string pictured: Emoji.inText(plain, false,
+                                                                    Theme.fontSizeMedium,
+                                                                    "", Emoji.nameSaturation)
+                    textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: pictured.length > 0 ? pictured : plain
                 }
             }
 
@@ -195,9 +200,13 @@ Page {
                     }
                     truncationMode: TruncationMode.Fade
                     color: videoAction.tint
-                    textFormat: Text.PlainText
                     //: Places a video call. %1 is the name of whoever is called.
-                    text: qsTr("Video call %1").arg(page.contactName)
+                    readonly property string plain: qsTr("Video call %1").arg(page.contactName)
+                    readonly property string pictured: Emoji.inText(plain, false,
+                                                                    Theme.fontSizeMedium,
+                                                                    "", Emoji.nameSaturation)
+                    textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: pictured.length > 0 ? pictured : plain
                 }
             }
         }

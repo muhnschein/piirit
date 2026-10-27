@@ -7,15 +7,7 @@
 //! relay's mailbox.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -80,7 +72,9 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         call!("refresh");
         call!("watch", 1);
     });
@@ -90,7 +84,7 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
     let listed_at_end = listed.clone();
     let answers_at_end = answers.clone();
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         *listed.borrow_mut() = (*core_ptr)
             .pinned()
             .borrow()
@@ -105,6 +99,7 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let listed = listed_at_end.borrow().clone();

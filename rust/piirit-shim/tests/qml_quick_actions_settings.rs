@@ -10,15 +10,7 @@
 //! action hidden and kept.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -297,8 +289,10 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("clear", call!("clear"));
         record!(
             "load-settings",
@@ -499,7 +493,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("unpicked-on", call!("onKind", QString::from("left")));
     });
 
-    single_shot(Duration::from_millis(1500), move || unsafe {
+    plan.after(0, move || unsafe {
         call!("setActive", QString::from("true"));
         record!("asked", call!("stackLog"));
         record!("unpicked", call!("holds", QString::from("left")));
@@ -530,25 +524,25 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     });
 
     // Chat by the name core has for it, in the choice; then it goes.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("chat-says", get!("leftActionChoice", "value"));
         record!("delete", call!("deleteChat", 1));
     });
 
     // Chosen again, "Chat" picks again: one that has gone.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "change-chat",
             call!("tapKind", QString::from("left"), QString::from("chat"))
         );
     });
 
-    single_shot(Duration::from_millis(4500), move || unsafe {
+    plan.after(0, move || unsafe {
         record!("asked-again", call!("stackLog"));
         record!("picked-gone", call!("pick", 1, QString::from("chat 1")));
     });
 
-    single_shot(Duration::from_millis(5500), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("gone-says", get!("leftActionChoice", "value"));
         record!("left-gone", call!("holds", QString::from("left")));
 
@@ -561,7 +555,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("asked-while-busy", call!("stackLog"));
         call!("setBusy", QString::from("false"));
         record!("asked-here", call!("stackLog"));
@@ -573,7 +567,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     });
 
     // By the name other profile has; picked again, picker opens on that profile.
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("elsewhere-says", get!("leftActionChoice", "value"));
         record!(
             "pick-again",
@@ -581,7 +575,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
     });
 
-    single_shot(Duration::from_millis(7500), move || unsafe {
+    plan.after(0, move || unsafe {
         record!("asked-there", call!("stackLog"));
 
         // Its profile deleted since: picker opens on one there is.
@@ -592,7 +586,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("asked-orphan", call!("stackLog"));
 
         // Back to room for one: right hidden and kept.
@@ -604,6 +598,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

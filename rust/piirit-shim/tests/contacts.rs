@@ -1,17 +1,10 @@
-//! Starting a conversation: the three ways in.
+//! Starting a conversation: the three ways in. Invite way also joins channels; own channel made
+//! beside group.
 //!
 //! Calls had no caller before: app never created chats.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -42,7 +35,9 @@ const PROBE_QML: &str = r"
                     started = true
                     contacts.open_chat_with(rows.itemAt(0).cid)
                     contacts.create_group('Team', [rows.itemAt(0).cid, rows.itemAt(1).cid], '')
+                    contacts.create_channel('News', '')
                     contacts.join_by_invite('https://i.delta.chat/#ABC&a=them%40example.org')
+                    contacts.join_by_invite('https://i.delta.chat/#DEF&a=owner%40example.org&b=News')
                     contacts.join_by_invite('just some text')
                     contacts.join_by_invite('OPENPGP4FPR:0123456789ABCDEF0123456789ABCDEF01234567')
                     contacts.join_by_invite('DCACCOUNT:https://chat.example.org/new')
@@ -106,13 +101,15 @@ fn a_chat_can_be_started_three_ways() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: these fire only while `exec()` runs on this
     // thread, and `engine` outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(5, move || unsafe {
         let value = (*engine_ptr).invoke_method("names".into(), &[]);
         *listed_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -124,6 +121,7 @@ fn a_chat_can_be_started_three_ways() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_routes(&common::calls(&journal), &listed, &report);
@@ -146,8 +144,9 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     let invite = parts.next().unwrap_or_default();
     assert_eq!(
         opened.split(',').filter(|part| !part.is_empty()).count(),
-        3,
-        "expected a chat from each of the three ways in, got {opened:?}"
+        5,
+        "expected a chat from each of the three ways in, plus the channels joined and made, got \
+         {opened:?}"
     );
 
     // Invite flow: classify, then join. Plain text and invite-less fingerprint codes refused
@@ -156,10 +155,20 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         names.contains(&"secure_join"),
         "the invite link was never followed: {names:?}"
     );
+    // Channel joined as contact: same call, link passed whole.
+    let mut joined: Vec<&str> = calls
+        .iter()
+        .filter(|(name, _)| name == "secure_join")
+        .filter_map(|(_, params)| params.pointer("/1").and_then(Value::as_str))
+        .collect();
+    joined.sort_unstable();
     assert_eq!(
-        names.iter().filter(|name| **name == "secure_join").count(),
-        1,
-        "only the invite should have been sent to secure_join: {names:?}"
+        joined,
+        vec![
+            "https://i.delta.chat/#ABC&a=them%40example.org",
+            "https://i.delta.chat/#DEF&a=owner%40example.org&b=News",
+        ],
+        "only the contact and channel invites should have been sent to secure_join: {names:?}"
     );
     let refusals: Vec<&str> = errors.split(';').filter(|part| !part.is_empty()).collect();
     assert_eq!(
@@ -170,7 +179,8 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     assert!(
         refusals
             .iter()
-            .all(|refusal| refusal.starts_with("that link is not a contact or group invite")),
+            .all(|refusal| refusal
+                .starts_with("that link is not a contact, group or channel invite")),
         "a refusal did not say that what was pasted is not an invite, got {refusals:?}"
     );
     // Relay code: neither invite nor refused. Offered back with its relay; added only when
@@ -200,6 +210,11 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         "tapping a contact did not open a chat: {names:?}"
     );
 
+    assert_made(calls, &names);
+}
+
+/// Group and channel made: right core call each, members only on group.
+fn assert_made(calls: &[(String, Value)], names: &[&str]) {
     // Group encrypted (method's choice). Third arg: deprecated `protect`; upstream says pass
     // `false`, ignores it.
     let group = calls
@@ -222,6 +237,20 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
             .filter(|name| **name == "add_contact_to_chat")
             .count(),
         2,
-        "both members should have been added: {names:?}"
+        "both members should have been added, and nobody to the channel: {names:?}"
+    );
+
+    // Channel: core's broadcast, named; no members (core refuses), no picture asked.
+    let channel = calls
+        .iter()
+        .find(|(name, _)| name == "create_broadcast")
+        .expect("the channel must be created");
+    assert_eq!(
+        channel.1.pointer("/1").and_then(Value::as_str),
+        Some("News")
+    );
+    assert!(
+        !names.contains(&"set_chat_profile_image"),
+        "a picture was set though none was chosen: {names:?}"
     );
 }

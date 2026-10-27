@@ -5,15 +5,7 @@
 //! vs stub `Nemo.DBus`.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -76,10 +68,12 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
 
     let steps: common::Steps = common::Steps::default();
 
+    let mut plan = common::Plan::default();
+
     // One handover: old connection goes, new up, reaches internet. Three announcements,
     // one change.
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         common::record(
             &loading,
             "load",
@@ -93,7 +87,7 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
     });
 
     let settled = steps.clone();
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&settled, "after-handover", call!("count").into());
         // Network goes; connman changes kind of nothing: must not delay announcement.
         call!("say", QString::from("offline"));
@@ -103,7 +97,7 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
     });
 
     let lost = steps.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&lost, "after-loss", call!("count").into());
         // Back, then connman repeats itself.
         call!("say", QString::from("online"));
@@ -111,22 +105,23 @@ fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
     });
 
     let back = steps.clone();
-    single_shot(Duration::from_millis(7000), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&back, "after-return", call!("count").into());
         // Blink: gone and back inside wait. Handover looks like this; nothing should follow.
         call!("say", QString::from("offline"));
     });
 
-    single_shot(Duration::from_millis(7150), move || unsafe {
+    plan.after(0, move || unsafe {
         call!("say", QString::from("online"));
     });
 
     let blinked = steps.clone();
-    single_shot(Duration::from_millis(9500), move || unsafe {
+    plan.after(2, move || unsafe {
         common::record(&blinked, "after-blink", call!("count").into());
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

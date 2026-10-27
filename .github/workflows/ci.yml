@@ -23,8 +23,28 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  # Docs-only PR (`*.md` outside vendor/, third_party/): Rust jobs skipped. A
+  # job skipped by `if:` passes as a required check. Rules: ci/changes.sh.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Merge commit and its base parent.
+          fetch-depth: 2
+      - id: diff
+        run: ./ci/changes.sh >>"$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+
   # Lints, unit and Qt event-loop tests. Toolchain from rust-toolchain.toml.
   test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -37,7 +57,7 @@ jobs:
       # QtQuick runtime plugin (-dev omits it), lrelease (translation test),
       # QAudioRecorder (voice recorder), QtQuick.Window (chat search test),
       # libpulse (mic watch), pulseaudio + utils (its test's sound server).
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libpulse-dev pulseaudio pulseaudio-utils
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -45,22 +65,42 @@ jobs:
       - run: cd rust && cargo fmt --all --check
       # `--locked`: lockfile committed; a manifest change without it fails here.
       - run: cd rust && cargo clippy --locked --workspace --all-targets -- -D warnings
-      # nextest: one process per test, ~10 min down to ~2.5 (Qt timers).
+      # nextest: one process per test, 32 at once, ~10 min down to ~2 (Qt timers).
       # Profiles: rust/.config/nextest.toml.
       - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
         with:
           tool: cargo-nextest
+      # Test killed by a signal leaves its core here (#239); read below on failure.
+      # Proved each run: a shell that crashes itself must leave one, else step fails.
+      - run: |
+          mkdir -p "$RUNNER_TEMP/cores"
+          echo "$RUNNER_TEMP/cores/core.%p.%E" | sudo tee /proc/sys/kernel/core_pattern
+          ulimit -c unlimited
+          ! bash -c 'kill -SEGV $$'
+          rm "$RUNNER_TEMP"/cores/core.*bash
       # Also set by tests; here so failure is never a missing display.
-      - run: cd rust && cargo nextest run --locked --workspace --profile ci
+      - run: cd rust && ulimit -c unlimited && cargo nextest run --locked --workspace --profile ci
         env:
           QT_QPA_PLATFORM: offscreen
       # nextest skips doctests; none today, so one added would never run.
       - run: cd rust && cargo test --locked --workspace --doc
       # Broken intra-doc links are errors.
       - run: cd rust && RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --no-deps
+      # Crashed test: stacks in the log; core, its binary, stacks kept a week.
+      - if: failure()
+        run: ./ci/core-backtraces.sh "$RUNNER_TEMP/cores"
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-cores
+          path: ${{ runner.temp }}/cores
+          if-no-files-found: ignore
+          retention-days: 7
 
   # Device toolchain floor: Sailfish ships Rust 1.75.0; no newer available.
   msrv:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -83,6 +123,8 @@ jobs:
 
   # What no fake server proves: our shapes match the real core. Pinned binary.
   integration:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -113,7 +155,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools rpm desktop-file-utils shellcheck
+      - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools rpm desktop-file-utils shellcheck gdb
       - run: ./ci/qml-lint.sh
       # Strict: missing checker fails; job can't quietly stop.
       - run: ./ci/packaging-lint.sh
@@ -123,11 +165,17 @@ jobs:
       - run: ./ci/sonar-report-selftest.sh
       # ci/apt-install.sh: wrong rule deletes the archive; proved on own dir.
       - run: ./ci/apt-install-selftest.sh
+      # ci/changes.sh: wrong rule = code PR green without tests.
+      - run: ./ci/changes-selftest.sh
+      # ci/core-backtraces.sh: wrong = a crashed test leaves no stack.
+      - run: ./ci/core-backtraces-selftest.sh
 
   # Harbour rejects, caught from sources before intake. Authority: `sfdk check
   # -s harbour` on real RPM (rpm.yml). Mandatory: fixes only get dearer.
   # docs/HARBOUR.md.
   harbour:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

@@ -2,16 +2,8 @@
 //! Was untouchable once made: `add_contact_to_chat` reachable only from `create_group`.
 //! Each call asserted on wire; model reads back core state.
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -169,13 +161,15 @@ fn a_group_can_be_changed_after_it_is_made() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; `engine` outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     // Backstop: reads reached steps, quits.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(11, move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -183,6 +177,7 @@ fn a_group_can_be_changed_after_it_is_made() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_changes(&common::calls(&journal), &report);

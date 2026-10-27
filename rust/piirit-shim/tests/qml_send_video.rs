@@ -9,15 +9,7 @@
 //! size, so bar warns nothing about a file that fits once shrunk.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -86,7 +78,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // 3s at 4 Mbit/s, ~1.5 MB: over ceiling below; planned size under it.
+    // 3s at 4 Mbit/s, ~2 MB: over ceiling below; planned size under it.
     let clip = temp.join("lake at dusk.mov");
     piirit_video::synth(&clip, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
     let clip_bytes = std::fs::metadata(&clip).expect("measure the clip").len();
@@ -166,7 +158,9 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
             .count()
     };
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -179,7 +173,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("settle", call!("settle")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("attach", call!("attach", QString::from(clip_path.as_str()))));
         // Shrink started on pick.
         probe!("preparing", "messages", "preparing");
@@ -193,8 +187,12 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send-early", call!("send")));
     });
 
-    // Shrunk by now: few seconds of small video is quick even unoptimised.
-    single_shot(Duration::from_secs(12), move || unsafe {
+    // Shrunk: read once done, however slow the recode (CPU-bound: a minute, under load).
+    plan.until(1, 60, move |last| unsafe {
+        let preparing = call!("get", QString::from("messages"), QString::from("preparing"));
+        if preparing != "false" && !last {
+            return false;
+        }
         probe!("preparing-done", "messages", "preparing");
         probe!("send-enabled-done", "sendButton", "enabled");
         probe!("bar-done", "attachmentBar", "visible");
@@ -213,9 +211,10 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("made-on-disk", format!("{made:?}")));
         // Only now does reader send.
         (*steps_ptr).push(("send", call!("send")));
+        true
     });
 
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(6, move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
         // Picked again; bar's button pressed straight away.
         (*steps_ptr).push((
@@ -240,7 +239,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send-kept", call!("send")));
     });
 
-    single_shot(Duration::from_secs(24), move || unsafe {
+    plan.after(6, move || unsafe {
         probe!("bar-sent-kept", "attachmentBar", "visible");
         // Video not on bar: model shrinks it, sends nothing; stopped, puts work away.
         (*steps_ptr).push((
@@ -259,7 +258,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("preparing-switched", "messages", "preparing");
     });
 
-    single_shot(Duration::from_secs(26), move || unsafe {
+    plan.after(2, move || unsafe {
         // Stopped, then dropped: same button, twice.
         for step in ["stop-switched", "drop-switched"] {
             (*steps_ptr).push((
@@ -279,12 +278,13 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         }
     });
 
-    single_shot(Duration::from_secs(28), move || unsafe {
+    plan.after(2, move || unsafe {
         probe!("preparing-end", "messages", "preparing");
         probe!("bar-end", "attachmentBar", "visible");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

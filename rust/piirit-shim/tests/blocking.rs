@@ -4,17 +4,8 @@
 //! `get_blocked_contacts` only. Block = row moves between lists.
 //! Checks both calls and other list hearing via core event.
 
-// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr,
-// single_shot with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var` pre-Qt, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -134,22 +125,25 @@ fn blocking_moves_a_contact_between_the_two_lists() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
     // Block done by now.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("ordinary-after-block", call!("ordinaryIds"));
         record!("blocked-after-block", call!("blockedIds"));
         record!("unblock", call!("letBackIn"));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         record!("ordinary-after-unblock", call!("ordinaryIds"));
         record!("blocked-after-unblock", call!("blockedIds"));
         record!("report", call!("report"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

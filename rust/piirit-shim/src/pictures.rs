@@ -1,5 +1,6 @@
-//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop), drawn
-//! by QML as plain `Image` of `image://piirit/<kind>?<recipe>` ([`Recipe`]).
+//! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop, grey
+//! emoji), drawn by QML as plain `Image` (or `StyledText` `<img>`) of
+//! `image://piirit/<kind>?<recipe>` ([`Recipe`]).
 //!
 //! Not `ShaderEffect`: Sailfish Qt 5.6 (fixed 5.15) hiding a persistent-scene-graph window
 //! (cover, each return to front) runs `cleanupMaterialCache()`, freeing material types while
@@ -63,8 +64,9 @@ cpp! {{
         if (natural.isValid() && !natural.isEmpty()) {
             QSize decode = natural.scaled(piirit_want(kind, natural, requested),
                                           Qt::KeepAspectRatioByExpanding);
-            if (!decode.isEmpty() && decode.width() < natural.width()
-                    && decode.height() < natural.height()) {
+            // Emoji are SVG: rendered at drawn size, above natural too, so stay sharp.
+            if (!decode.isEmpty() && (kind == 3 || (decode.width() < natural.width()
+                                                    && decode.height() < natural.height()))) {
                 reader.setScaledSize(decode);
             }
         }
@@ -186,6 +188,8 @@ pub enum Kind {
     Ink = 1,
     /// Call backdrop.
     Blur = 2,
+    /// Emoji picture, grey, shaded toward text colour.
+    Emoji = 3,
 }
 
 /// Colour as straight channels.
@@ -200,6 +204,18 @@ pub struct Colour {
 }
 
 impl Colour {
+    /// Alpha of `aarrggbb` or `#aarrggbb`, 0 to 1; `rrggbb` opaque.
+    fn alpha(text: &str) -> Option<f64> {
+        let hex = text.trim_start_matches('#');
+        match hex.len() {
+            6 => Self::parse(text).map(|_| 1.0),
+            8 => Self::parse(text)
+                .and(u8::from_str_radix(hex.get(..2)?, 16).ok())
+                .map(|alpha| f64::from(alpha) / 255.0),
+            _ => None,
+        }
+    }
+
     /// `rrggbb` or `#rrggbb`; `aarrggbb` drops its alpha.
     fn parse(text: &str) -> Option<Self> {
         let hex = text.trim_start_matches('#');
@@ -225,7 +241,9 @@ impl Colour {
 ///
 /// - `file`: path or `file:` URL.
 /// - `grey=1`: colour removed (a face).
-/// - `tint`, `strength`: tint over the face, part of the way.
+/// - `tint`, `strength`: tint over the face or grey emoji, part of the way. Emoji also takes
+///   tint's alpha (`#aarrggbb`, as QML writes a see-through colour): drawn as faint as text.
+/// - `saturation`: emoji without tint, colour kept: 0 grey (default) to 1 as drawn.
 /// - `from`, `to`: face fade, height fractions from top: whole above `from`, gone by `to`, eased
 ///   between.
 /// - `ink`, `lit`, `inkStrength`, `litStrength`: drawing colours, strengths.
@@ -246,6 +264,10 @@ pub struct Recipe {
     pub ink: Option<((Colour, f64), (Colour, f64))>,
     /// Blur reach, pixels.
     pub radius: usize,
+    /// Tint's alpha, 0 to 1; 1 without tint.
+    pub opacity: f64,
+    /// Emoji without tint: colour kept, 0 to 1.
+    pub saturation: f64,
 }
 
 impl Recipe {
@@ -257,6 +279,7 @@ impl Recipe {
             "face" => Kind::Face,
             "ink" => Kind::Ink,
             "blur" => Kind::Blur,
+            "emoji" => Kind::Emoji,
             _ => return None,
         };
         let mut pairs = Vec::new();
@@ -304,6 +327,8 @@ impl Recipe {
             fade,
             ink,
             radius,
+            opacity: get("tint").and_then(Colour::alpha).unwrap_or(1.0),
+            saturation: number("saturation").map_or(0.0, |kept| kept.clamp(0.0, 1.0)),
         })
     }
 
@@ -317,6 +342,7 @@ impl Recipe {
             Kind::Face => self.face(pixels, width, height, stride),
             Kind::Ink => self.colour_ink(pixels, width, height, stride),
             Kind::Blur => blur(pixels, width, height, stride, self.radius),
+            Kind::Emoji => self.grey_emoji(pixels, width, height, stride),
         }
     }
 
@@ -344,6 +370,34 @@ impl Recipe {
                 let dy = to_f64(y) + 0.5 - middle_y;
                 let rim = (diameter / 2.0 - dx.hypot(dy) + 0.5).clamp(0.0, 1.0);
                 *pixel = pack([alpha * rim * kept, red, green, blue]);
+            }
+        }
+    }
+
+    /// Emoji: each pixel its luma (Rec. 601: yellow face stays light, unlike mean), then
+    /// `strength` toward tint; alpha times tint's, as text in that colour. No tint:
+    /// `saturation` of way back to own colour.
+    fn grey_emoji(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
+        for line in pixels.chunks_mut(stride).take(height) {
+            for pixel in line.iter_mut().take(width) {
+                let [alpha, red, green, blue] = unpack(*pixel);
+                let luma = 0.299 * red + 0.587 * green + 0.114 * blue;
+                let toward = |tint: f64| {
+                    self.tint
+                        .map_or(luma + (tint - luma) * self.saturation, |(_, strength)| {
+                            luma + (tint - luma) * strength
+                        })
+                };
+                let (tint_red, tint_green, tint_blue) =
+                    self.tint.map_or((red, green, blue), |(tint, _)| {
+                        (tint.red, tint.green, tint.blue)
+                    });
+                *pixel = pack([
+                    alpha * self.opacity,
+                    toward(tint_red),
+                    toward(tint_green),
+                    toward(tint_blue),
+                ]);
             }
         }
     }
@@ -627,6 +681,50 @@ mod tests {
             .unwrap()
             .bake(&mut plain, 1, 1, 1);
         assert_eq!(plain[0].to_be_bytes(), [255, 255, 255, 255]);
+    }
+
+    #[test]
+    fn an_emoji_turns_grey_toward_its_tint_and_as_faint() {
+        let yellow = u32::from_be_bytes([200, 255, 204, 0]);
+        let made = |id: &str| {
+            let mut pixels = vec![yellow];
+            Recipe::parse(id).unwrap().bake(&mut pixels, 1, 1, 1);
+            pixels[0].to_be_bytes()
+        };
+        // Luma: 0.299 * 255 + 0.587 * 204 = 196.0.
+        assert_eq!(made("emoji?file=a"), [200, 196, 196, 196]);
+        // Half way to white, at 0x99 (0.6) alpha: (195.99 + 255) / 2 = 225.5 less a hair; 200 * 0.6.
+        assert_eq!(
+            made("emoji?file=a&tint=%2399ffffff&strength=0.5"),
+            [120, 225, 225, 225]
+        );
+        // Opaque blue tint, all the way: blue, alpha kept.
+        assert_eq!(
+            made("emoji?file=a&tint=0000ff&strength=1"),
+            [200, 0, 0, 255]
+        );
+        // Not a colour: grey only.
+        assert_eq!(made("emoji?file=a&tint=grey"), [200, 196, 196, 196]);
+    }
+
+    #[test]
+    fn a_muted_emoji_keeps_part_of_its_colour() {
+        let yellow = u32::from_be_bytes([200, 255, 204, 0]);
+        let made = |id: &str| {
+            let mut pixels = vec![yellow];
+            Recipe::parse(id).unwrap().bake(&mut pixels, 1, 1, 1);
+            pixels[0].to_be_bytes()
+        };
+        // 40% back from luma 196.0: 196 + 0.4 * (255 - 196), 196 + 0.4 * 8, 196 * 0.6.
+        assert_eq!(made("emoji?file=a&saturation=0.4"), [200, 220, 199, 118]);
+        assert_eq!(made("emoji?file=a&saturation=1"), yellow.to_be_bytes());
+        assert_eq!(made("emoji?file=a&saturation=7"), yellow.to_be_bytes());
+        assert_eq!(made("emoji?file=a&saturation=-1"), [200, 196, 196, 196]);
+        // Tint wins: subtitle grey whatever saturation says.
+        assert_eq!(
+            made("emoji?file=a&tint=0000ff&strength=1&saturation=0.4"),
+            [200, 0, 0, 255]
+        );
     }
 
     #[test]

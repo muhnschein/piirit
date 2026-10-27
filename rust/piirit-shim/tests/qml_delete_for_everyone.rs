@@ -5,15 +5,7 @@
 //! Which messages get the offer: `qml_delete_choice`. What the wait does: `qml_delete_run`.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -210,17 +202,19 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!("open", call!("open", QString::from(page.clone()), 1, 1));
         record!("hurry", call!("hurry", 300));
         record!("watch", call!("watch"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("send", call!("send", QString::from("on my way")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count-before", call!("count"));
         record!("delete", call!("deleteRow", SENT_ID));
         // Tap asks; nothing waits until page answers.
@@ -230,16 +224,17 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
         record!("countdown-after-pick", call!("goingOut", SENT_ID));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count-after", call!("count"));
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("count-later", call!("count"));
         record!("ids-later", call!("ids"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

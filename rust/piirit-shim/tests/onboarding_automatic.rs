@@ -4,15 +4,7 @@
 //! relay named is that relay alone: empty payload must become neither default nor refusal.
 
 // Qt harness: see onboarding.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -61,8 +53,10 @@ fn no_relay_named_leaves_the_relays_to_the_core() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
+    let mut plan = common::Plan::default();
+
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         if let Some(this) = core_ptr.as_pinned() {
             this.borrow_mut()
                 .create_profile(QString::from("Ada"), QString::default());
@@ -70,13 +64,14 @@ fn no_relay_named_leaves_the_relays_to_the_core() {
     });
 
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(2, move || {
         // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

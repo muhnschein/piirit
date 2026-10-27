@@ -6,5 +6,7 @@ import Sailfish.Silica 1.0
 // screen).
 Text {
     property int truncationMode: TruncationMode.None
+    // Silica's default; Qt's is black.
+    color: Theme.primaryColor
     elide: truncationMode === TruncationMode.None ? Text.ElideNone : Text.ElideRight
 }

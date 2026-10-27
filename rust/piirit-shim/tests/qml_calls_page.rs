@@ -6,15 +6,7 @@
 //! text and places call through window; tap on a still-ringing call takes it up, not calls back.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -152,8 +144,10 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
 
     // SAFETY for every block: fire only while `exec()` runs on this thread; all they
 
+    let mut plan = common::Plan::default();
+
     // point at outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         let tiles = common::component_url("MediaKinds.qml");
         record!(
             "tiles-off",
@@ -167,7 +161,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "title",
             call!("get", QString::from("callList"), QString::from("count"))
@@ -207,6 +201,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

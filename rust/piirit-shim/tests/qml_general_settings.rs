@@ -7,19 +7,11 @@
 //! `qml_auto_delete_flow.rs`.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -176,7 +168,9 @@ fn the_settings_page_writes_what_the_app_reads() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // Keys under app's own path.
         record!(
             "app-markdown-key",
@@ -273,6 +267,10 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("mentionNotifications"))
         );
         record!("mentions-switch", get!("mentionsSwitch", "checked"));
+        record!(
+            "mentions-description",
+            get!("mentionsSwitch", "description")
+        );
         record!(
             "apps-default",
             call!("appReads", QString::from("webxdcEnabled"))
@@ -454,11 +452,12 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!("detail-usable-again", get!("notificationCombo", "enabled"));
     });
     // Core refusal arrives a turn later.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("deletion-error", get!("errorBanner", "text"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
@@ -567,6 +566,13 @@ fn the_settings_page_writes_what_the_app_reads() {
     ] {
         assert_eq!(value(label), expected, "{label} is wrong. {context}");
     }
+    // Only quoted replies pass a mute (`is_mention`); reactions never notify. Words promised both.
+    let mentions = value("mentions-description");
+    assert!(
+        mentions.contains("replies") && !mentions.contains("reaction"),
+        "the Mentions switch promised what muted groups do not let through, got {mentions:?}. \
+         {context}"
+    );
     assert!(
         value("deletion-error").contains("not started"),
         "the page did not say why the period was not set, got {:?}. {context}",
