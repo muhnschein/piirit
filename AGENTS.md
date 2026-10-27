@@ -28,10 +28,10 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 ## Device tests
 
-- Test phone: OnePlus 6, SFOS 5.1, via `muhnschein-sfos-harness` workflow `do` (helpers: its README, `scripts/lib.sh`). Test accounts only. Never run fork or others' PR code there: any job can root phone.
+- Test phone: OnePlus 6, SFOS 5.1, via `muhnschein-sfos-harness` workflow `do`. Its AGENTS.md rules every phone run (baseline, no blind taps, reboot, language, `clean_slate`); helpers: its README, `scripts/lib.sh`. Test accounts only. Never run fork or others' PR code there: any job can root phone.
 - Every run starts from named state; `state.txt` records it plus RPM name and sha256:
-  - `clean`: `reset`: quit app, drop sailjail grant, `rpm -e`, delete `~/.local/share/piirit/piirit`, `~/.config/piirit/piirit`, `~/.cache/piirit/piirit` (and unsandboxed `harbour-piirit` dirs); install.
-  - `fixture:NAME`: `clean`, then restore data snapshot saved with `fixture_save`.
+  - `clean`: `reset`: quit app, drop sailjail grant, `rpm -e`, reset dconf `/apps/harbour-piirit/`, delete `~/.local/share/piirit/piirit`, `~/.config/piirit/piirit`, `~/.cache/piirit/piirit` (and unsandboxed `harbour-piirit` dirs); install.
+  - `fixture:NAME`: `clean`, then restore data snapshot (dirs plus dconf) saved with `fixture_save`.
   - `upgrade:FROM`: release FROM plus fixture, then install build over it. Required when change touches stored data or settings.
 - Footprint check (`fs_mark`, `footprint`): file app touched outside known dirs → add to reset or fail run. Leftovers taint results.
 - Before/after: same start state, same steps.
