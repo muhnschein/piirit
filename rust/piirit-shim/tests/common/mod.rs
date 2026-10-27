@@ -139,23 +139,55 @@ pub fn page_url(name: &str) -> String {
 /// `qmetaobject` passes null attached-properties fn). Page using it fails headless: "Non-existent
 /// attached object". Dropping its two lines leaves page as shipped.
 ///
-/// Copy keyed by pid, rebuilt each run: never stale.
-pub fn qml_tree_without_enter_key() -> PathBuf {
+/// Copy keyed by pid, rebuilt each run: never stale. Only `.qml` files copied; rest linked
+/// (`art/`: 11 MB). Removed when dropped, panic too: 30 tests, one copy each, filled `/tmp`.
+pub fn qml_tree_without_enter_key() -> TempTree {
     let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     let target = std::env::temp_dir().join(format!("piirit-qml-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&target);
     copy_qml_without_enter_key(&source, &target);
-    target
+    TempTree(target)
 }
 
-/// Recursive half of [`qml_tree_without_enter_key`].
+/// Test's own empty `piirit-<name>-<pid>` temp dir, removed when dropped (panic too): some tests
+/// write 100 MB there.
+pub fn temp_tree(name: &str) -> TempTree {
+    let path = std::env::temp_dir().join(format!("piirit-{name}-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&path);
+    std::fs::create_dir_all(&path).expect("create the test's temp dir");
+    TempTree(path)
+}
+
+/// Temp dir, removed when dropped; derefs to its root. Keep alive while app uses it.
+pub struct TempTree(PathBuf);
+
+impl std::ops::Deref for TempTree {
+    type Target = Path;
+
+    fn deref(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for TempTree {
+    fn drop(&mut self) {
+        // Links removed, not followed: what they point at stays.
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Recursive half of [`qml_tree_without_enter_key`]. Directory without `.qml` below: one link.
 fn copy_qml_without_enter_key(source: &Path, target: &Path) {
     std::fs::create_dir_all(target).expect("create the QML copy");
     for entry in std::fs::read_dir(source).expect("read the QML tree") {
         let entry = entry.expect("read a QML tree entry");
         let (from, to) = (entry.path(), target.join(entry.file_name()));
         if entry.file_type().expect("stat a QML tree entry").is_dir() {
-            copy_qml_without_enter_key(&from, &to);
+            if holds_qml(&from) {
+                copy_qml_without_enter_key(&from, &to);
+            } else {
+                std::os::unix::fs::symlink(&from, &to).expect("link a QML tree directory");
+            }
         } else if from.extension().is_some_and(|kind| kind == "qml") {
             let text = std::fs::read_to_string(&from).expect("read a QML file");
             let kept: Vec<&str> = text
@@ -164,9 +196,23 @@ fn copy_qml_without_enter_key(source: &Path, target: &Path) {
                 .collect();
             std::fs::write(&to, kept.join("\n")).expect("write a QML file");
         } else {
-            std::fs::copy(&from, &to).expect("copy a QML file");
+            std::os::unix::fs::symlink(&from, &to).expect("link a QML tree file");
         }
     }
+}
+
+/// Any `.qml` file in `dir` or below.
+fn holds_qml(dir: &Path) -> bool {
+    std::fs::read_dir(dir)
+        .expect("read the QML tree")
+        .map(|entry| entry.expect("read a QML tree entry").path())
+        .any(|path| {
+            if path.is_dir() {
+                holds_qml(&path)
+            } else {
+                path.extension().is_some_and(|kind| kind == "qml")
+            }
+        })
 }
 
 /// `file://` URL for page in copied tree.
@@ -215,8 +261,7 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
-/// Each step's recorded result. One step per tick: shim answers async; `single_shot` is whole
-/// seconds.
+/// Each step's recorded result. One step per tick: shim answers async.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
 /// Push one step's result onto [`Steps`].
@@ -276,7 +321,7 @@ impl Plan {
     }
 
     /// Plan's one `single_shot`: each schedules next only once it ran.
-    #[allow(clippy::disallowed_methods)] // Whole seconds only.
+    #[allow(clippy::disallowed_methods)] // Plan's own timer.
     fn fire(self, wait: u64, tries: u32, check: Check) {
         let mut pending = Some((check, self));
         single_shot(Duration::from_secs(wait), move || {

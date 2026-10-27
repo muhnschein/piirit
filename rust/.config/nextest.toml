@@ -1,7 +1,7 @@
 # How cargo-nextest runs this suite.
 #
 # `cargo test` runs one binary at a time; 100+, each idle on Qt/timers. nextest runs each
-# test in own process, in parallel: 207 tests, ~10 min to ~2.5 min on 4 cores.
+# test in own process, in parallel.
 #
 # Tests share nothing (port 0 binding, per-pid QML dirs, fake-server /tmp strings).
 #
@@ -14,6 +14,20 @@ slow-timeout = { period = "30s", terminate-after = 4 }
 # No retries: a pass-on-retry is a defect to see (phone delete run looked like a flake).
 retries = 0
 
+# 32 at once, whatever the cores: tests mostly sleep on Qt timers (4 cores ~15% busy at
+# 4). ~485 tests on 4 cores: ~7 min at 4, ~2 min at 32; peak ~1.2 GB.
+test-threads = 32
+
+# Slowest first, so the run doesn't wait on one started last: video recodes (CPU), the
+# send-at-once poll, a whole call.
+[[profile.default.overrides]]
+filter = """\
+    test(=a_picked_video_is_made_smaller_and_waits_for_the_reader) \
+    | test(=a_capture_set_to_send_at_once_goes_once_it_is_ready) \
+    | test(=a_large_video_comes_out_smaller_and_plays_the_same_way) \
+    | test(=a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told)"""
+priority = 100
+
 [profile.ci]
 # One failure should not hide others.
 fail-fast = false
@@ -22,7 +36,8 @@ fail-fast = false
 failure-output = "immediate-final"
 
 [profile.leak-check]
-# ci/leak-check.sh: ASan runs 2-3x slower. Same reasoning as `ci`.
+# ci/leak-check.sh: ASan runs 2-3x slower and heavier: one per core. Same reasoning as `ci`.
+test-threads = "num-cpus"
 fail-fast = false
 failure-output = "immediate-final"
 slow-timeout = { period = "60s", terminate-after = 4 }

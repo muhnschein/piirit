@@ -153,8 +153,8 @@ const PROBE_QML: &str = r"
 /// Run `then` once `idle` says so, asked each event-loop turn; at `deadline`, runs it whatever
 /// `idle` says. Step reading what an async call left waits on the call, not a time guess: 2s
 /// was one, and under coverage the decoder outran it.
-// Zero wait: vendored `single_shot` drops sub-seconds anyway (`rust/clippy.toml`). Rechecks only
-// once last check ran, so no fixed time to overrun.
+// Zero wait: next event-loop turn. Rechecks only once last check ran, so no fixed time to
+// overrun.
 #[allow(clippy::disallowed_methods)]
 fn when_idle<I, T>(idle: I, deadline: Instant, then: T)
 where

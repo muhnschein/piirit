@@ -59,7 +59,7 @@ Check IDs = Jolla's.
 ## QtWidgets, and the vendored qmetaobject
 
 - `qmetaobject-rs` builds QML engine on `QApplication` (QtWidgets, Harbour-banned; Silica uses `QGuiApplication`); no upstream off switch. App needs only `exec()`, `quit()`: `QGuiApplication` has both.
-- `third_party/qmetaobject` = upstream 0.2.10 + `third_party/qmetaobject.patch` (3 lines: include, member type, constructor). Upstream fix: feature flag picking app class, would serve every Sailfish qmetaobject app; until then fork rebases clean.
+- `third_party/qmetaobject` = upstream 0.2.10 + `third_party/qmetaobject.patch`: 3 lines for this (include, member type, constructor), plus `single_shot` keeping sub-second waits (BUILDING.md Lints). Upstream fix: feature flag picking app class, would serve every Sailfish qmetaobject app; until then fork rebases clean.
 - `qttypes` always passes `-lQt5Widgets`; no second fork: `rust/piirit-app/build.rs` links `--as-needed` (drops unreferenced libs), works only since patch removed last reference.
 - `ci/vendor-check.sh`: crates.io tarball + patch must equal vendored tree exactly. Crate `tests/` not vendored, dropped both sides: 1,200 lines cargo never builds; CodeQL would flag high-severity in uncompiled code.
 - **Each `#[derive(QObject)]` a PR adds = high-severity CodeQL "Access of invalid pointer"** on derive line: macro's dispatcher, destructor call Qt via raw pointers, attributed to macro. Existing `src/` derives silent (CodeQL comments changed lines only). No code fix: test `pageStack` stand-in must be QObject (lone page reads `pageStack` from QML context); moving test costs more than alert. Dismiss in Security tab, or CodeQL advanced setup excluding `rust/piirit-shim/tests/`.

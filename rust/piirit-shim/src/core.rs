@@ -396,6 +396,10 @@ pub struct DeltaChatCore {
     /// (writes cost; `delete_device_after` starts deletion pass). Cleared with server: old writes
     /// may not have landed.
     written_config: RefCell<BTreeMap<(u32, &'static str), String>>,
+    /// Settings writes, one at a time in order asked: as separate tasks a later choice could
+    /// land first and core keep older (two runtime threads; server answers out of order).
+    /// Dropped with server.
+    config_lane: RefCell<Option<ConfigLane>>,
     /// Profiles with unread read running, each with 'asked since' flag. One at a time: a message
     /// is 3-4 events; each read returns every unread id.
     unread_reads: RefCell<BTreeMap<u32, bool>>,
@@ -530,6 +534,7 @@ impl DeltaChatCore {
             this_mut.rpc = None;
             // In-flight work died with server; next starts clean.
             this_mut.written_config.get_mut().clear();
+            *this_mut.config_lane.get_mut() = None;
             this_mut.unread_reads.get_mut().clear();
             // Nothing to restart: `start` never called, or gave up.
             let Some(runtime) = this_mut.runtime.clone() else {
@@ -865,9 +870,6 @@ impl DeltaChatCore {
 
     /// Write one setting to current accounts. Before core up: `refresh_accounts`.
     fn spread(&self, key: &'static str, value: String) {
-        let Some((rpc, runtime)) = self.connection() else {
-            return;
-        };
         let ptr: QPointer<Self> = QPointer::from(self);
         let done = queued_callback(move |result: Result<Vec<u32>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
@@ -876,9 +878,33 @@ impl DeltaChatCore {
                 Err(err) => this.borrow().core_error(err.into()),
             }
         });
-        runtime.spawn(async move {
-            done(account_ids(&rpc).await);
-        });
+        // In lane: callbacks queue in order asked, so their writes do too.
+        self.in_config_lane(Box::new(move |rpc| {
+            Box::pin(async move {
+                done(account_ids(&rpc).await);
+            })
+        }));
+    }
+
+    /// Run `job` after every settings job asked before it has finished. No server: dropped.
+    fn in_config_lane(&self, job: ConfigJob) {
+        let mut lane = self.config_lane.borrow_mut();
+        if lane.is_none() {
+            let Some((rpc, runtime)) = self.connection() else {
+                return;
+            };
+            let (sender, mut jobs) = tokio::sync::mpsc::unbounded_channel::<ConfigJob>();
+            runtime.spawn(async move {
+                while let Some(job) = jobs.recv().await {
+                    job(rpc.clone()).await;
+                }
+            });
+            *lane = Some(sender);
+        }
+        if let Some(sender) = lane.as_ref() {
+            // Closed only with runtime gone: nothing left to write to.
+            sender.send(job).ok();
+        }
     }
 
     /// Write settings to accounts lacking them. `ids`: whole list; gone ones forgotten.
@@ -907,9 +933,9 @@ impl DeltaChatCore {
     /// Write value to each account not last given it; failure reported, others written, failed one
     /// retried next time. Remembered, not `get_config`: per-key reads would eat the saving.
     fn write_config(&self, ids: &[u32], key: &'static str, value: String) {
-        let Some((rpc, runtime)) = self.connection() else {
+        if self.connection().is_none() {
             return;
-        };
+        }
         let ids: Vec<u32> = {
             let mut written = self.written_config.borrow_mut();
             ids.iter()
@@ -940,16 +966,18 @@ impl DeltaChatCore {
             }
             this_ref.core_error(err.into());
         });
-        runtime.spawn(async move {
-            for account_id in ids {
-                if let Err(err) = rpc
-                    .call::<_, ()>("set_config", (account_id, key, Some(value.clone())))
-                    .await
-                {
-                    failed((account_id, format!("could not set {key}: {err}")));
+        self.in_config_lane(Box::new(move |rpc| {
+            Box::pin(async move {
+                for account_id in ids {
+                    if let Err(err) = rpc
+                        .call::<_, ()>("set_config", (account_id, key, Some(value.clone())))
+                        .await
+                    {
+                        failed((account_id, format!("could not set {key}: {err}")));
+                    }
                 }
-            }
-        });
+            })
+        }));
     }
 
     /// Count what deletion period would delete now, all accounts.
@@ -1510,6 +1538,15 @@ async fn send_stock_strings(rpc: &RpcClient, stock: &StockStrings) {
         eprintln!("piirit: the core refused the stock strings: {err}");
     }
 }
+
+/// One settings job: runs with server's client, finished before next starts.
+type ConfigJob = Box<
+    dyn FnOnce(Arc<RpcClient>) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send>>
+        + Send,
+>;
+
+/// Feeds the task running [`ConfigJob`]s in order. Dropped: task ends after jobs queued.
+type ConfigLane = tokio::sync::mpsc::UnboundedSender<ConfigJob>;
 
 /// Id of every account core has, configured or not.
 async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {

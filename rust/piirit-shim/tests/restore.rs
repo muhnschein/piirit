@@ -76,7 +76,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
-    // Whole seconds only (clippy.toml); one step per tick.
+    // One step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
     let mut plan = common::Plan::default();

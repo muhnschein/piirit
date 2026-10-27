@@ -267,6 +267,15 @@ fn starting_and_stopping_at_any_moment_is_safe() {
     let server = daemon.server();
     let me = std::process::id();
     let recording = daemon.record(Some(me));
+    // Stream up before churn. Daemon's listen backlog is 5: starved daemon, churn fills it, and
+    // parec still starting is refused (no retry); settled then sees nothing open.
+    let mut up = Watch::start("up", me, Some(&server));
+    up.wait(
+        KNOWN_OPEN,
+        RECONNECT,
+        "the recording stream did not come up",
+    );
+    drop(up);
     // Dropped at once: mid-connection, mid-listing, after answer.
     for round in 0..40_u64 {
         let watch = Watch::start("churn", me, Some(&server));
