@@ -4,15 +4,7 @@
 //! rows ahead (blank screen on fast scroll). Pinned: second ask goes out while first is in air; both land.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -86,26 +78,41 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    // Open: every row there, newest page filled.
+    plan.until(1, 30, move |last| unsafe {
+        let open = call!("count") == MESSAGES.to_string()
+            && call!("filledAt", i32::try_from(MESSAGES - 1).unwrap_or(0)) == "true";
+        if !open && !last {
+            return false;
+        }
         (*steps_ptr).push(("opened", call!("count")));
         // Chat top, then a page further down, before first ask can be answered.
         (*steps_ptr).push(("ask-top", call!("ask", 0, 10)));
         (*steps_ptr).push(("ask-far", call!("ask", 70, 80)));
+        true
     });
-    single_shot(Duration::from_millis(4400), move || unsafe {
+    plan.after(0, move || unsafe {
         (*steps_ptr).push(("busy", call!("busy")));
     });
-    single_shot(Duration::from_millis(6500), move || unsafe {
+    // Both answers in, however slow the machine.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("busy") == "yes" && !last {
+            return false;
+        }
         (*steps_ptr).push(("top-filled", call!("filledAt", 0)));
         (*steps_ptr).push(("far-filled", call!("filledAt", 70)));
         (*steps_ptr).push(("idle", call!("busy")));
         (*steps_ptr).push(("still-whole", call!("count")));
         (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps, &journal);

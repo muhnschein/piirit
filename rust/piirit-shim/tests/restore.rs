@@ -11,16 +11,8 @@
 //! - transfer given up answers nobody; core's process stopped on held account.
 
 // Qt harness: `unsafe` `set_var` pre-Qt (`unused_unsafe`: edition 2024 only);
-// `borrow_as_ptr`; whole-second `single_shot`.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr`.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -84,12 +76,14 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
-    // Whole seconds only (clippy.toml); one step per tick.
+    // One step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
+
+    let mut plan = common::Plan::default();
 
     // 1s: code another device shows while offering profile.
     let device = core_ptr.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         if let Some(this) = device.as_pinned() {
             this.borrow_mut()
                 .restore_from_device(QString::from("DCBACKUP2:one.example"));
@@ -98,7 +92,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
 
     // 2s: code from newer device than this core reads. Refused before transfer.
     let too_new = core_ptr.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         if let Some(this) = too_new.as_pinned() {
             this.borrow_mut()
                 .restore_from_device(QString::from("DCBACKUP2:toonew.example"));
@@ -107,7 +101,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
 
     // 3s: file core cannot read.
     let bad_file = core_ptr.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         if let Some(this) = bad_file.as_pinned() {
             this.borrow_mut()
                 .restore_from_file(QString::from("/tmp/fail-backup.tar"));
@@ -116,7 +110,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
 
     // 4s: one it can.
     let good_file = core_ptr.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(1, move || {
         if let Some(this) = good_file.as_pinned() {
             this.borrow_mut()
                 .restore_from_file(QString::from("/tmp/holiday-backup.tar"));
@@ -125,27 +119,28 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
 
     // 5s: slow transfer; 6s: reader gives up. Late answer is nobody's.
     let slow = core_ptr.clone();
-    single_shot(Duration::from_secs(5), move || {
+    plan.after(1, move || {
         if let Some(this) = slow.as_pinned() {
             this.borrow_mut()
                 .restore_from_device(QString::from("DCBACKUP2:slow.example"));
         }
     });
     let cancel = core_ptr;
-    single_shot(Duration::from_secs(6), move || {
+    plan.after(1, move || {
         if let Some(this) = cancel.as_pinned() {
             this.borrow_mut().cancel_ongoing();
         }
     });
 
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(10), move || {
+    plan.after(4, move || {
         // SAFETY: see tests/smoke.rs; fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let summary = QString::from_qvariant(engine.invoke_method("summary".into(), &[]))

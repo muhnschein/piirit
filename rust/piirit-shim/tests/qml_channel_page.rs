@@ -5,15 +5,7 @@
 //! Steps run in probe off pages' own loads, not clock.
 
 // Qt harness: see qml_new_group.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -21,8 +13,8 @@ use serde_json::Value;
 
 mod common;
 
-/// Seconds before probe counts as stuck.
-const GIVE_UP_SECS: u64 = 60;
+/// Checks, a second apart, before probe counts as stuck.
+const PATIENCE: u32 = 59;
 
 /// Readings probe takes, by label.
 const READINGS: [&str; 13] = [
@@ -183,9 +175,11 @@ fn an_own_channel_offers_the_code_subscribers_join_by() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     let steps: common::Steps = common::Steps::default();
     let loading = steps.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         let started = call!(
             "start",
             QString::from(common::page_url("GroupPage.qml")),
@@ -195,19 +189,19 @@ fn an_own_channel_offers_the_code_subscribers_join_by() {
     });
 
     // Once a second: done, or out of time.
-    for second in 2..=GIVE_UP_SECS {
-        let done = steps.clone();
-        single_shot(Duration::from_secs(second), move || unsafe {
-            if second < GIVE_UP_SECS && call!("finished") != "yes" {
-                return;
-            }
-            for label in READINGS {
-                common::record(&done, label, call!("reading", QString::from(label)).into());
-            }
-            (*engine_ptr).quit();
-        });
-    }
+    let done = steps.clone();
+    plan.until(1, PATIENCE, move |last| unsafe {
+        if !last && call!("finished") != "yes" {
+            return false;
+        }
+        for label in READINGS {
+            common::record(&done, label, call!("reading", QString::from(label)).into());
+        }
+        (*engine_ptr).quit();
+        true
+    });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow().clone();

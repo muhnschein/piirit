@@ -5,15 +5,7 @@
 //! to first usable.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -80,29 +72,32 @@ fn the_list_names_the_selected_profile_as_the_one_to_resume() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // None selected: first profile.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("refresh");
     });
     // Chat list on profile 2; app restarted.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("select", 2);
         call!("resumeAll");
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("refresh");
     });
     // Selection core has no profile for.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("select", 7);
     });
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("refresh");
     });
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let seen = QString::from_qvariant(engine.invoke_method("seen".into(), &[]))

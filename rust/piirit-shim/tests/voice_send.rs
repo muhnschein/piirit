@@ -2,15 +2,7 @@
 //! must be told); row shown is the one core holds.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -95,17 +87,19 @@ fn a_recording_is_sent_as_a_voice_message() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // Recorder's path as handed over: plain path in captures dir.
         call!(
             "send",
             QString::from("/tmp/piirit-fake/captures/voice-20260904-151212.mp3")
         );
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("sent", call!("sent")));
         (*steps_ptr).push(("error", call!("error")));
         let sent = call!("sent").parse::<i32>().unwrap_or(0);
@@ -113,6 +107,7 @@ fn a_recording_is_sent_as_a_voice_message() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

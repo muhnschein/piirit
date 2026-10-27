@@ -8,15 +8,7 @@
 //! Video made by `piirit_video::synth`; fake core given a ceiling it nears, so it shrinks first.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -186,14 +178,16 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     let video_path = video.to_string_lossy().into_owned();
     let (journal_b, journal_c) = (journal.clone(), journal.clone());
 
+    let mut plan = common::Plan::default();
+
     // Picture at once, reader's words in field.
     let page_a = page.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         open!("photo-load", page_a, photo_path, true);
         (*steps_ptr).push(("photo-type", call!("type", QString::from("half a thought"))));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("photo-sends", sends_in(&journal_b).len().to_string()));
         probe!("photo-bar", "attachmentBar", "visible");
         probe!("photo-field", "messageField", "text");
@@ -201,14 +195,14 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
 
     // Not at once: waits for reader.
     let page_b = page.clone();
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         open!("waiting-load", page_b, waiting_path, false);
     });
 
     // Asked while page open: page replacing it discards what was left on its bar, as a closed
     // chat does.
     let waiting_c = waiting;
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("waiting-sends", sends_in(&journal_c).len().to_string()));
         probe!("waiting-bar", "attachmentBar", "visible");
         probe!("waiting-send-enabled", "sendButton", "enabled");
@@ -221,7 +215,7 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     let swapped_path = swapped.to_string_lossy().into_owned();
     let instead_path = instead.to_string_lossy().into_owned();
     let journal_e = journal.clone();
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         open!("swapped-load", page_d, swapped_path, true);
         (*steps_ptr).push((
             "swapped-attach",
@@ -229,7 +223,7 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         ));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("swapped-sends", sends_in(&journal_e).len().to_string()));
         probe!("swapped-bar", "attachmentBar", "visible");
     });
@@ -238,75 +232,66 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     let page_e = page.clone();
     let replied_path = replied.to_string_lossy().into_owned();
     let journal_f = journal.clone();
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         open!("replied-load", page_e, replied_path, true);
         (*steps_ptr).push(("replied-reply", call!("reply")));
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("replied-sends", sends_in(&journal_f).len().to_string()));
         probe!("replied-bar", "attachmentBar", "visible");
     });
 
-    // Stopped mid-shrink: goes as-is when reader sends it, not alone. Polled 4x/s up to 3s
-    // for shrink to start: coverage-instrumented machine starts slowly.
+    // Stopped mid-shrink: goes as-is when reader sends it, not alone. Asked at once, then each
+    // second up to 3s, for shrink to start: coverage-instrumented machine starts slowly.
     let page_f = page.clone();
     let stopped_path = stopped.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(13), move || unsafe {
-        open!("stopped-load", page_f, stopped_path, true);
+    let stop = std::rc::Rc::new(move |last: bool| unsafe {
+        let preparing = call!("get", QString::from("messages"), QString::from("preparing"));
+        if preparing != "true" && !last {
+            return false;
+        }
+        (*steps_ptr).push(("stopped-preparing", preparing));
+        (*steps_ptr).push((
+            "stopped-stop",
+            call!("click", QString::from("cancelAttachmentButton")),
+        ));
+        true
     });
-
     let stopped_done = std::rc::Rc::new(std::cell::Cell::new(false));
-    for quarter in 1..=12 {
-        let stopped_done = stopped_done.clone();
-        single_shot(
-            Duration::from_millis(13_000 + quarter * 250),
-            move || unsafe {
-                if stopped_done.get() {
-                    return;
-                }
-                let preparing = call!("get", QString::from("messages"), QString::from("preparing"));
-                if preparing != "true" && quarter < 12 {
-                    return;
-                }
-                stopped_done.set(true);
-                (*steps_ptr).push(("stopped-preparing", preparing));
-                (*steps_ptr).push((
-                    "stopped-stop",
-                    call!("click", QString::from("cancelAttachmentButton")),
-                ));
-            },
-        );
-    }
+    let (stop_now, done_now) = (stop.clone(), stopped_done.clone());
+    plan.after(1, move || unsafe {
+        open!("stopped-load", page_f, stopped_path, true);
+        done_now.set(stop_now(false));
+    });
+    plan.until(1, 3, move |last| stopped_done.get() || stop(last));
 
     let journal_g = journal.clone();
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("stopped-sends", sends_in(&journal_g).len().to_string()));
         probe!("stopped-bar", "attachmentBar", "visible");
     });
 
     // Video at once: shrunk then sent. Judged by what core is handed; shrink time is machine's.
     let page_c = page;
-    single_shot(Duration::from_secs(19), move || unsafe {
+    plan.after(1, move || unsafe {
         open!("video-load", page_c, video_path, true);
     });
 
     // Asked 1x/s until sent, or as long as slow machine needs for 3s video; within nextest's
     // 2 min.
-    let done = std::rc::Rc::new(std::cell::Cell::new(false));
-    for second in 20..=75 {
-        let (done, journal) = (done.clone(), journal.clone());
-        single_shot(Duration::from_secs(second), move || unsafe {
-            if done.get() || (sends_in(&journal).len() < 2 && second < 75) {
-                return;
-            }
-            done.set(true);
-            probe!("video-preparing-done", "messages", "preparing");
-            probe!("video-bar", "attachmentBar", "visible");
-            (*engine_ptr).quit();
-        });
-    }
+    let journal_h = journal.clone();
+    plan.until(1, 56, move |last| unsafe {
+        if sends_in(&journal_h).len() < 2 && !last {
+            return false;
+        }
+        probe!("video-preparing-done", "messages", "preparing");
+        probe!("video-bar", "attachmentBar", "visible");
+        (*engine_ptr).quit();
+        true
+    });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

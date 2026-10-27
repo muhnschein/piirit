@@ -7,15 +7,7 @@
 //! first message.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -116,9 +108,11 @@ fn the_header_is_laid_out_as_a_page_header() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     let header = common::component_url("ConversationHeader.qml");
     let long = "a very long name that would run the whole way across the header and further";
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(header.clone()), QString::from(long))
@@ -141,6 +135,7 @@ fn the_header_is_laid_out_as_a_page_header() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_layout(&steps);

@@ -6,15 +6,7 @@
 //! unreachable relay refused in core's words.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -136,8 +128,10 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // 1s: typed relay; core asked.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -164,20 +158,20 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     });
 
     // 2s: waiting, nothing said yet.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("early-hint", get!("slowHint", "visible"));
         record!("early-label", get!("progressBar", "label"));
         record!("early-cancel", get!("cancelButton", "visible"));
     });
 
     // 6s: fourth second passed.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(4, move || unsafe {
         record!("hint", get!("slowHint", "visible"));
         record!("still-busy", call!("pageProperty", QString::from("busy")));
     });
 
     // 8s: deadline passed at 7s.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "late-error",
@@ -191,7 +185,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     });
 
     // 10s: refused (one process per profile); then unreachable relay.
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("again-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "again-error",
@@ -208,7 +202,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         record!("unreachable", call!("click", QString::from("addButton")));
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         record!(
             "unreachable-busy",
             call!("pageProperty", QString::from("busy"))
@@ -221,6 +215,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -3,16 +3,8 @@
 //! Delete is two calls: this account's devices, or other ends too. Reader's choice must reach core
 //! intact. Choice made on page (`qml_delete_choice`).
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -110,43 +102,46 @@ fn a_reply_carries_its_quote_and_the_rest_name_their_message() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("loaded", call!("count")));
         call!("reply");
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         // Read after send answered: quote clears only when message gone; failed send keeps
         // reply.
         (*steps_ptr).push(("quote-cleared", call!("stillQuoting")));
         (*steps_ptr).push(("after-reply", call!("count")));
         call!("replyAndFail");
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("quote-after-failure", call!("stillQuoting")));
         call!("remove");
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("after-delete", call!("count")));
         call!("retry");
         call!("arrive");
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("forceReload");
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("catchUp");
         call!("removeEverywhere");
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("error", call!("error")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&common::calls(&journal), &steps);

@@ -7,15 +7,7 @@
 //! stop it: `cancel` saw no running offer.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -97,28 +89,31 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: fire only while `exec()` runs; all they point at outlives it.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("offer", call!("offer"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("first", call!("state"));
         record!("cancel", call!("cancelAndAgain"));
     });
 
     // Past the held second.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("second", call!("state"));
         record!("said", call!("said"));
         // Second offer still stoppable.
         record!("cancel-second", call!("cancel"));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -4,15 +4,7 @@
 //! every read. Nothing written before QML sets a value.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -85,22 +77,25 @@ fn the_limit_is_written_to_each_account_when_set_and_when_the_list_is_read() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // The list read again, with the limit already written: nothing new.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(3, move || unsafe {
         call!("refresh");
     });
     // Changed once first write has landed.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("change", 0);
     });
     // Read after change: already written.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         call!("refresh");
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

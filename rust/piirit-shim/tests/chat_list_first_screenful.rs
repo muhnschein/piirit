@@ -1,16 +1,8 @@
 //! First load: screen's rows come first. Core builds items one by one; a long list at once
 //! leaves page empty until the last is built.
 
-// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -72,21 +64,24 @@ fn a_long_list_shows_its_first_screenful_before_the_rest() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY for every block: fire only inside `exec()`; `engine` and `steps` outlive it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
     // First batch lands ~2 s after load; second 2 s after that.
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("early-count", call!("count")));
         (*steps_ptr).push(("early-first", call!("first")));
     });
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("count", call!("count")));
         (*steps_ptr).push(("first", call!("first")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let calls = common::calls(&journal);

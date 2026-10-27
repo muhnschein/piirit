@@ -7,16 +7,8 @@
 //!
 //! Contract tests as `onboarding.rs`.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -76,12 +68,14 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
     core_box.pinned().borrow_mut().start(server);
 
-    // Whole seconds only (clippy.toml); one step per tick.
+    // One step per tick.
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
+
+    let mut plan = common::Plan::default();
 
     // 1s: a relay that will not answer for a while.
     let slow = core_ptr.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         if let Some(this) = slow.as_pinned() {
             this.borrow_mut().create_profile(
                 QString::from("Ada"),
@@ -92,7 +86,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
 
     // 2s: reader gives up on it.
     let cancel = core_ptr.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         if let Some(this) = cancel.as_pinned() {
             this.borrow_mut().cancel_ongoing();
         }
@@ -100,7 +94,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
 
     // 3s: tries another, while core still on first.
     let retry = core_ptr.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         if let Some(this) = retry.as_pinned() {
             let provider = this.borrow_mut().default_provider_qr();
             this.borrow_mut()
@@ -110,7 +104,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
 
     // 6s: relay answers late, after the two seconds given, deaf to the stop.
     let deaf = core_ptr;
-    single_shot(Duration::from_secs(6), move || {
+    plan.after(3, move || {
         if let Some(this) = deaf.as_pinned() {
             this.borrow_mut().profile_timeout = 2;
             this.borrow_mut().create_profile(
@@ -121,13 +115,14 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     });
 
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(11), move || {
+    plan.after(5, move || {
         // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let summary = QString::from_qvariant(engine.invoke_method("summary".into(), &[]))

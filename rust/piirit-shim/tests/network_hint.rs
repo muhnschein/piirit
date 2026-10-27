@@ -11,15 +11,7 @@
 //! core.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -118,9 +110,11 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     let mut loaded = String::new();
     let loaded_ptr: *mut String = std::ptr::addr_of_mut!(loaded);
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         *loaded_ptr = call!("loadWindow", QString::from(window.clone()));
     });
 
@@ -132,7 +126,7 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     let away_journal = journal.clone();
     let mut reached = String::new();
     let reached_ptr: *mut String = std::ptr::addr_of_mut!(reached);
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(3, move || unsafe {
         *status_ptr = call!("coreStatus");
         call!("away");
         *away_ptr = common::methods(&away_journal)
@@ -147,7 +141,7 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     let mut while_off_screen = 0usize;
     let off_screen_ptr: *mut usize = std::ptr::addr_of_mut!(while_off_screen);
     let off_screen_journal = journal.clone();
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(3, move || unsafe {
         *off_screen_ptr = common::methods(&off_screen_journal)
             .into_iter()
             .filter(|method| method == "maybe_network")
@@ -155,10 +149,11 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
         call!("back");
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_eq!(loaded, "ok", "the window did not load");

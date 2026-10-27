@@ -120,12 +120,21 @@ Page {
     /// Core answered. Empty = no chats or no answer yet (on resume): no "No chats yet" till set.
     property bool chatsLoaded: false
 
+    /// Placeholder words follow rows, not the filter flag: flag flips before rows, and the
+    /// placeholder fades out over them.
+    property bool emptyUnreadOnly: false
+
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
         onMessage_restated: notifier.restated(chat_id, chat_name, sender, preview, unread)
         // Emitted once rows set.
-        onRows_changed: page.chatsLoaded = true
+        onRows_changed: {
+            page.chatsLoaded = true
+            if (chats.count === 0) {
+                page.emptyUnreadOnly = chats.unread_only
+            }
+        }
     }
 
     /// Bring list to front as outside tap does: raise window (lipstick only calls app), pop
@@ -774,15 +783,15 @@ Page {
                 text: page.archived ? qsTr("No archived chats")
                                     //: The unread filter is on and every
                                     //: chat has been read.
-                                    : chats.unread_only ? qsTr("No unread chats")
-                                                        : qsTr("No chats yet")
+                                    : page.emptyUnreadOnly ? qsTr("No unread chats")
+                                                           : qsTr("No chats yet")
                 // Archiving happens in ordinary list.
                 hintText: page.archived ? ""
                                         //: %1 is the label of the unread
                                         //: filter, a button at the right of
                                         //: the search field.
-                                        : chats.unread_only ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
-                                                            : qsTr("Pull down to start one")
+                                        : page.emptyUnreadOnly ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
+                                                               : qsTr("Pull down to start one")
             }
         }
 

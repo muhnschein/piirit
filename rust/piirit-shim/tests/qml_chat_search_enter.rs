@@ -7,19 +7,11 @@
 //! `page.dismissKeyboard()`. The function itself is exercised via probe.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::path::PathBuf;
 
 mod common;
 
@@ -128,7 +120,9 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -141,7 +135,7 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
     });
 
     // Text in field; field holds keyboard.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "typed",
             call!(
@@ -154,7 +148,7 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
     });
 
     // Past 250ms debounce; Enter pressed; result read after.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "focus-before",
             call!(
@@ -190,10 +184,11 @@ fn enter_closes_the_keyboard_and_keeps_the_search() {
         ));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

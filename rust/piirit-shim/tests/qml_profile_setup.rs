@@ -5,25 +5,22 @@
 //! Cancel on a second attempt (begun while core on first) stops and goes back.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// edition 2024), `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params match dispatcher; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
-use std::cell::RefCell;
-use std::ffi::CString;
-use std::rc::Rc;
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 use serde_json::Value;
+use std::cell::RefCell;
+use std::ffi::CString;
+use std::rc::Rc;
 
 mod common;
 
@@ -180,9 +177,11 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // 1s: page on screen asks slow relay.
     let s = steps.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "load",
@@ -197,7 +196,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 2s: waiting, nothing said yet.
     let s = steps.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         common::record(&s, "early-busy", call!("pageProperty", "busy"));
         common::record(&s, "early-hint", call!("get", "slowHint", "visible"));
         common::record(&s, "early-label", call!("get", "progressBar", "label"));
@@ -205,14 +204,14 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 6s: fourth second passed.
     let s = steps.clone();
-    single_shot(Duration::from_secs(6), move || {
+    plan.after(4, move || {
         common::record(&s, "hint", call!("get", "slowHint", "visible"));
         common::record(&s, "still-busy", call!("pageProperty", "busy"));
     });
 
     // 8s: deadline passed at seven.
     let s = steps.clone();
-    single_shot(Duration::from_secs(8), move || {
+    plan.after(2, move || {
         common::record(&s, "late-busy", call!("pageProperty", "busy"));
         common::record(&s, "late-error", call!("pageProperty", "errorMessage"));
         common::record(&s, "late-hint", call!("get", "slowHint", "visible"));
@@ -222,7 +221,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 9s: second attempt, core still on first.
     let s = steps.clone();
-    single_shot(Duration::from_secs(9), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "reload",
@@ -237,15 +236,16 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 10s: cancelled.
     let s = steps.clone();
-    single_shot(Duration::from_secs(10), move || {
+    plan.after(1, move || {
         common::record(&s, "cancel", call!("click", "cancelButton"));
         common::record(&s, "cancelled-busy", call!("pageProperty", "busy"));
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let steps = steps.borrow();

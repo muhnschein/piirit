@@ -8,16 +8,8 @@
 //! contact has no row at all rather than a hidden one.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -173,7 +165,9 @@ fn the_new_group_page_makes_the_group_it_shows() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -184,7 +178,7 @@ fn the_new_group_page_makes_the_group_it_shows() {
         );
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         // Nothing typed: create refused.
         record!("empty", get!("createButton", "enabled"));
         // Reader is member from start.
@@ -219,19 +213,20 @@ fn the_new_group_page_makes_the_group_it_shows() {
         record!("add-members-row", get!("addMembersButton", "visible"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("named", get!("createButton", "enabled"));
         record!("create", call!("click", QString::from("createButton")));
         record!("creating", get!("createButton", "enabled"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("navigation", call!("navigation"));
         record!("opened", call!("openedChat"));
         record!("landed-on", call!("landedOn"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps, &common::calls(&journal));

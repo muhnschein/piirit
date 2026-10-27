@@ -21,6 +21,7 @@
 #   PIIRIT_SDK_IMAGE   image to use instead of the pinned one
 #   PIIRIT_CARGO_HOME  host dir for crate downloads
 #   PIIRIT_CARGO_JOBS  cargo jobs in scratchbox2; 1, see rpm/harbour-piirit.spec
+#   PIIRIT_MAKE_JOBS   make jobs for FFmpeg/x264 in scratchbox2; 4, same spec
 #
 # Rootless Podman: no root anywhere, tree stays yours. Docker: tree chowned to
 # the image's user for the build, back after (root in container, no host sudo).
@@ -39,6 +40,7 @@ sfos=${1:-5.2.0.15}
 arch=aarch64
 cargo_home=${PIIRIT_CARGO_HOME:-}
 jobs=${PIIRIT_CARGO_JOBS:-1}
+make_jobs=${PIIRIT_MAKE_JOBS:-4}
 
 case "$sfos" in
     *[!0-9.]* | '') echo "$prog: '$sfos' is not a dotted SDK version" >&2; exit 2 ;;
@@ -176,13 +178,14 @@ fi
 echo ">> building in $image, target $target"
 # shellcheck disable=SC2016 # expanded by the container's shell.
 in_image --privileged --hostname piirit-build -w "$builddir" \
-    -e TARGET="$target" -e JOBS="$jobs" \
+    -e TARGET="$target" -e JOBS="$jobs" -e MAKE_JOBS="$make_jobs" \
     ${SOURCE_DATE_EPOCH:+-e SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH"} "$image" \
     /bin/bash -c 'set -e
         mb2 -t "$TARGET" -X build-init
         mb2 -t "$TARGET" -X build-requires ||
             echo "build-in-container: mb2 build-requires failed; the SDK image may be behind the spec" >&2
-        mb2 -t "$TARGET" -X build --no-check --define "jobs $JOBS"'
+        mb2 -t "$TARGET" -X build --no-check --define "jobs $JOBS" \
+            --define "make_jobs $MAKE_JOBS"'
 
 if [ "$keep_id" = 0 ]; then
     give_back

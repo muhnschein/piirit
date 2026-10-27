@@ -4,15 +4,7 @@
 //! call, so all after choosing is covered.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -80,36 +72,31 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Last second a send may still clear the pending file. Reached only by a page that never
-/// clears it: the regression this test exists for. nextest warns at 30s.
-const SETTLE_BY: u64 = 12;
+/// Checks, a second apart from a second after send, before a page still holding the file is
+/// recorded: the regression this test exists for. nextest warns at 30s.
+const PATIENCE: u32 = 8;
 
 /// Records pending file once cleared; stops engine.
-/// Polled once a second from 6s, not read once: send delay is wide so earlier reads land
-/// mid-send, and a fixed read 2s later left 0.5s margin a busy runner ate (false
-/// regression). Prompt page still finishes at 6s; never-clearing page recorded at
-/// `SETTLE_BY` and fails same assertion.
-///
-/// Whole seconds: qmetaobject 0.2.10 zeroes sub-second Durations (`rust/clippy.toml`).
-unsafe fn settle_pending(engine: *mut QmlEngine, steps: *mut Vec<(&'static str, String)>) {
-    for second in 6..=SETTLE_BY {
-        single_shot(Duration::from_secs(second), move || unsafe {
-            let done = (*steps)
-                .iter()
-                .any(|(label, _)| *label == "pending-after-send");
-            if done {
-                return;
-            }
-            let answer = (*engine).invoke_method("pending".into(), &[]);
-            let pending = QString::from_qvariant(answer)
-                .map(|value| value.to_string())
-                .unwrap_or_default();
-            if pending.is_empty() || second == SETTLE_BY {
-                (*steps).push(("pending-after-send", pending));
-                (*engine).quit();
-            }
-        });
-    }
+/// Polled once a second, not read once: send delay is wide so earlier reads land mid-send, and a
+/// fixed read 2s later left 0.5s margin a busy runner ate (false regression). Never-clearing page
+/// recorded on last check and fails same assertion.
+unsafe fn settle_pending(
+    plan: &mut common::Plan,
+    engine: *mut QmlEngine,
+    steps: *mut Vec<(&'static str, String)>,
+) {
+    plan.until(1, PATIENCE, move |last| unsafe {
+        let answer = (*engine).invoke_method("pending".into(), &[]);
+        let pending = QString::from_qvariant(answer)
+            .map(|value| value.to_string())
+            .unwrap_or_default();
+        if !pending.is_empty() && !last {
+            return false;
+        }
+        (*steps).push(("pending-after-send", pending));
+        (*engine).quit();
+        true
+    });
 }
 
 #[test]
@@ -169,7 +156,9 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -191,7 +180,7 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
         (*steps_ptr).push(("settle", call!("settle")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push((
             "attach",
             call!(
@@ -201,7 +190,7 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
         ));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
         probe!("bar-text", "pendingAttachmentLabel", "text");
         // A file with no caption is still a message.
@@ -213,8 +202,9 @@ fn a_picked_file_shows_above_the_field_and_leaves_with_the_message() {
         probe!("busy-during", "sendBusy", "running");
     });
 
-    unsafe { settle_pending(engine_ptr, steps_ptr) };
+    unsafe { settle_pending(&mut plan, engine_ptr, steps_ptr) };
 
+    plan.run();
     engine.exec();
 
     assert_tray(&steps);

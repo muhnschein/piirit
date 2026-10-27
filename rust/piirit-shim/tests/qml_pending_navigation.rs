@@ -5,15 +5,7 @@
 //! bounds only the busy-stack wait, not call length.
 
 // Qt harness: see qml_share.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -87,8 +79,10 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread; all they point at outlives it.
-    single_shot(Duration::from_millis(0), move || unsafe {
+    plan.after(0, move || unsafe {
         record!("load", call!("load", QString::from(navigation.clone())));
         // Relay added while call page over owner.
         record!("asked", call!("pop"));
@@ -96,7 +90,7 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     });
 
     // Past `patience`: call still up, nothing moved.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("waited", call!("log"));
         // Call over, page gone: owner on screen.
         record!("on-screen", call!("ready", true));
@@ -107,7 +101,7 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         record!("replace-asked", call!("replace"));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("replace-on-screen", call!("ready", true));
 
         // Stack still animating: the wait `patience` bounds.
@@ -115,11 +109,12 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         record!("busy-asked", call!("replaceAbove"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("busy-done", call!("log"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
