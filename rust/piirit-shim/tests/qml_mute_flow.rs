@@ -7,16 +7,9 @@
 //! Dialog itself: `qml_mute_dialog.rs`.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use std::path::PathBuf;
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -390,20 +383,21 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
     }
 }
 
-/// Each second: steps done or patience spent? Then take steps and quit. Whole seconds: vendored
-/// `single_shot` drops fraction.
+/// Steps done, or patience spent: take steps, quit.
 fn wait_for_steps(engine: *mut QmlEngine, outcome: *mut (String, String), patience: u32) {
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+    plan.until(1, patience, move |last| unsafe {
         let read = |method: &str| {
             QString::from_qvariant((*engine).invoke_method(method.into(), &[]))
                 .map(|value| value.to_string())
                 .unwrap_or_default()
         };
-        if read("isFinished") == "true" || patience == 0 {
+        let done = read("isFinished") == "true";
+        if done || last {
             *outcome = (read("stepsJson"), read("stepReached"));
             (*engine).quit();
-        } else {
-            wait_for_steps(engine, outcome, patience - 1);
         }
+        done
     });
+    plan.run();
 }

@@ -1,29 +1,17 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-/*
- * How long a chat stays muted: reference clients' five, one hour to
- * forever. Chat list menu unmutes at once, as theirs; contact/group page
- * row opens this for both, so muted chat gets Unmute first. Nothing preset:
- * blind swipe changes nothing; back edge changes nothing. Caller connects to
- * `picked`.
- *
- * No title: accept text says what accepting does. Options say only how
- * long.
- */
+// Nothing preset: blind swipe mutes nothing. No title: accept text says it.
 Dialog {
     id: dialog
 
-    /// Chat muted now: Unmute offered (0 seconds).
     property bool muted: false
-    /// Seconds picked; -1 forever, 0 unmute. Meaningful once `chosen`.
+    // -1 forever, 0 unmute. Meaningful once `chosen`.
     property int seconds: 0
     property bool chosen: false
-    /// Group with mention setting on: replies to reader still notify
-    /// (ChatList `notify_mentions`). Caller decides; note says so.
+    // Core's `notify_mentions`: replies still notify. Caller decides.
     property bool mentionsStillNotify: false
 
-    /// Reader swiped forward on one.
     signal picked(int seconds)
 
     // Reference clients' order and values (deltachat-android `MuteDialog`).
@@ -52,7 +40,6 @@ Dialog {
         }
     }
 
-    /// Turn one on, rest off. Tap again clears.
     function choose(value) {
         if (dialog.chosen && dialog.seconds === value) {
             dialog.chosen = false
@@ -71,8 +58,7 @@ Dialog {
             cancelText: qsTr("Cancel")
         }
 
-        // `automaticCheck: false`: Silica switch self-flips; one answer,
-        // dialog decides.
+        // Silica switch self-flips; dialog decides.
         Repeater {
             model: dialog.choices
 
@@ -91,7 +77,6 @@ Dialog {
             visible: dialog.mentionsStillNotify
         }
 
-        // What still gets through, said before muting.
         Label {
             objectName: "mentionsNote"
             visible: dialog.mentionsStillNotify

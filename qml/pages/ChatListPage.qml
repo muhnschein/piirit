@@ -74,9 +74,7 @@ Page {
         prefetch.start(chatId, messageId ? messageId : 0)
     }
 
-    /// Mute dialog; picked length to core. Id, not row: arrivals recreate rows. Note on what
-    /// still notifies: groups, mentions and notifications on (`=== true`: dconf undefined till
-    /// read).
+    // Id, not row: arrivals recreate rows. `=== true`: dconf undefined till read.
     function askMute(chatId, isGroup) {
         var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"), {
             mentionsStillNotify: isGroup && Settings.notificationsEnabled === true
@@ -734,7 +732,6 @@ Page {
                             text: model.is_pinned ? qsTr("Unpin") : qsTr("Pin")
                             onClicked: chats.set_pinned(model.chat_id, !model.is_pinned)
                         }
-                        // Mute asks how long; unmute at once.
                         MenuItem {
                             objectName: "muteItem"
                             visible: !page.archived

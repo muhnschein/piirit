@@ -645,8 +645,7 @@ impl ChatList {
     }
 }
 
-/// Core's tagged `MuteDuration`: -1 (any negative) forever, 0 unmuted, else `seconds` from now
-/// (core counts from its own clock).
+/// Core's tagged `MuteDuration`: negative forever, 0 unmuted, else seconds from now.
 pub(crate) fn mute_duration(seconds: i32) -> serde_json::Value {
     match seconds {
         0 => json!({"kind": "NotMuted"}),

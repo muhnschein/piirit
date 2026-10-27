@@ -1,21 +1,15 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-/*
- * Contact/group page row: notifications On or Muted. Tap opens
- * MuteDialog.qml for both; muted chat gets Unmute there. Core keeps no
- * mute end time readable here, so value says only Muted.
- */
+// Core gives no mute end time: value says only Muted.
 ValueButton {
     id: root
 
-    /// Chat muted now (core's `isMuted`).
     property bool muted: false
-    /// Replies to reader still notify while muted: group with mention
-    /// setting on. Caller decides.
+    // Group with Mentions on: replies to reader still notify. Caller decides.
     property bool mentionsStillNotify: false
 
-    /// Reader picked; -1 forever, 0 unmute.
+    // -1 forever, 0 unmute.
     signal picked(int seconds)
 
     label: qsTr("Notifications")
