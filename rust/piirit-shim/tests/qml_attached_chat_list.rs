@@ -1,20 +1,8 @@
-//! Chat list attached beside finished page (backup, handover) ends that flow.
-//!
-//! Swiped to, it hands over to window's list of same profile: stack pops down to that one at
-//! once (no slide), finished pages go with it, so swipe back can't reopen them. Stack still
-//! moving or page over list: move waits, back closed meanwhile. Window's own list, archived
-//! list, list of other profile: arriving moves nothing.
+//! Attached chat list (after backup, handover), swiped to: stack pops at once to window's
+//! list of same profile; finished pages can't be swiped back into (#201).
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -140,8 +128,10 @@ fn swiping_to_the_attached_chat_list_leaves_the_finished_flow_behind() {
     let list = common::page_url("ChatListPage.qml");
     let other = list.clone();
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread; all they point at outlives it.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(0, move || unsafe {
         let url = || QString::from(list.clone());
         record!(
             "window",
@@ -194,7 +184,7 @@ fn swiping_to_the_attached_chat_list_leaves_the_finished_flow_behind() {
     });
 
     // Retry timer 50 ms: a second covered is many retries.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("covered", call!("stackLog"));
         call!("uncover");
         record!("uncovered", call!("stackLog"));
@@ -211,6 +201,7 @@ fn swiping_to_the_attached_chat_list_leaves_the_finished_flow_behind() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -344,8 +344,8 @@ Page {
         page.openSearch()
     }
 
-    // Attached list arriving ends flow: window's list (same profile, built, filled) comes up
-    // in its place, no slide; flow pages above it go. Else swipe back reopens finished page.
+    // Attached list arriving: pop to window's list (built, filled), else swipe back reopens
+    // finished page.
     PendingNavigation {
         id: flowEnd
         stack: pageStack

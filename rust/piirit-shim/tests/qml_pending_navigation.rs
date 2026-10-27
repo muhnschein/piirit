@@ -124,12 +124,6 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
 
     plan.after(1, move || unsafe {
         record!("busy-done", call!("log"));
-
-        // Pop down to page under: at once, no slide back over same screen.
-        call!("busy", false);
-        call!("ready", false);
-        record!("pop-to-asked", call!("popTo"));
-        record!("pop-to-on-screen", call!("ready", true));
         (*engine_ptr).quit();
     });
 
@@ -176,11 +170,36 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         "pop;replace:Next.qml;replaceAbove:null:Chats.qml;",
         "a stack that never went quiet held a move for ever. {context}"
     );
-    let before_pop_to = value("busy-done");
-    assert_eq!(value("pop-to-asked"), before_pop_to, "{context}");
+}
+
+/// Pop down to page under: at once, no slide back over same screen.
+#[test]
+fn a_pop_down_waits_for_its_page_then_goes_at_once() {
+    // SAFETY: single-threaded; set before Qt starts.
+    unsafe {
+        std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+    }
+
+    let mut engine = QmlEngine::new();
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
+    engine.load_data(QByteArray::from(PROBE_QML));
+    let navigation = common::component_url("PendingNavigation.qml");
+    let call = |engine: &mut QmlEngine, name: &str, args: &[QVariant]| {
+        QString::from_qvariant(engine.invoke_method(name.into(), args))
+            .map(|value| value.to_string())
+            .unwrap_or_default()
+    };
+
+    let load = call(&mut engine, "load", &[QString::from(navigation).into()]);
+    let asked = call(&mut engine, "popTo", &[]);
+    let on_screen = call(&mut engine, "ready", &[true.into()]);
+
+    assert_eq!(load, "ok");
+    assert_eq!(asked, "", "a pop down was made over a call's page");
     assert_eq!(
-        value("pop-to-on-screen"),
-        format!("{before_pop_to}pop:Chats.qml:immediate;"),
-        "a pop down was not made at once to the page asked for. {context}"
+        on_screen, "pop:Chats.qml:immediate;",
+        "a pop down was not made at once to the page asked for"
     );
 }
