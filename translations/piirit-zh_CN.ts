@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>添加个人资料</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>下一步</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>创建个人资料</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>你从一个新地址开始，没有任何聊天。</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>从备份恢复</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>你从备份文件导入个人资料。</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>添加为第二台设备</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>你在这部手机和另一台设备上使用同一个人资料。</translation>
     </message>
 </context>
 <context>

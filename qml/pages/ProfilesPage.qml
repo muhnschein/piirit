@@ -10,7 +10,7 @@ import "../components"
  * code and backup here so showing code needs no settings.
  *
  * One plus under last row (three would read as profiles); ways asked on
- * AddProfilePage.qml.
+ * AddProfileWaysDialog.qml.
  *
  * Delete countdown outside rows (PendingRemoval): reload killed it with row
  * (second quick delete never ran). List refreshed in place (core.rs).
@@ -231,7 +231,7 @@ Page {
             objectName: "addProfileButton"
             width: listView.width
             text: qsTr("Add profile")
-            onClicked: pageStack.push(Qt.resolvedUrl("AddProfilePage.qml"), {})
+            onClicked: pageStack.push(Qt.resolvedUrl("AddProfileWaysDialog.qml"), {})
         }
 
         // Plus outside model: kept on empty list.

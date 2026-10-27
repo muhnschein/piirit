@@ -21,6 +21,7 @@ docs/BUILDING.md, "Cutting a release").
 - **Make your own channel.** "New" in the chat list's pull-down menu opens a dialog to pick a new chat, group or channel, each with a line on what it is; back from the page you picked returns to it. A channel has a name and a picture but no members: from its page, "QR invite code" shows the code and link others scan to join it. Only you post in it.
 - Turning the unread filter off no longer flashes "No chats yet" before the chats come back.
 - After backing up a profile or handing it to a second device, swiping on to your chats ends there: swiping back no longer reopens the finished page.
+- "Add profile" under the profiles list opens a dialog to pick creating a profile, restoring a backup or adding this phone as a second device, each with a line on what it means; back from the page you picked returns to it.
 
 ## 2.2.0 — 2026-10-23
 

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Pievienot profilu</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Tālāk</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Izveidot profilu</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Jūs sākat ar jaunu adresi un bez tērzēšanām.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Atjaunot no rezerves kopijas</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Jūs importējat profilu no rezerves kopijas faila.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Pievienot kā otru ierīci</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Jūs izmantojat to pašu profilu šajā tālrunī un citā ierīcē.</translation>
     </message>
 </context>
 <context>

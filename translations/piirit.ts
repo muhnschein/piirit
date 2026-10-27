@@ -84,9 +84,10 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -94,11 +95,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add as second device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

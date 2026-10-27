@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>சுயவிவரத்தைச் சேர்</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>அடுத்து</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>சுயவிவரத்தை உருவாக்கு</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>நீங்கள் புதிய முகவரியுடன், அரட்டைகள் எதுவும் இல்லாமல் தொடங்குகிறீர்கள்.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>நீங்கள் காப்புப் பிரதி கோப்பிலிருந்து ஒரு சுயவிவரத்தை இறக்குமதி செய்கிறீர்கள்.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>இந்த ஃபோனிலும் வேறொரு சாதனத்திலும் நீங்கள் ஒரே சுயவிவரத்தைப் பயன்படுத்துகிறீர்கள்.</translation>
     </message>
 </context>
 <context>

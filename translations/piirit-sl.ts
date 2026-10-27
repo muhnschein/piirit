@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Dodaj profil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Naprej</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Ustvari profil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Začnete z novim naslovom in brez klepetov.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Obnovi iz varnostne kopije</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Profil uvozite iz datoteke varnostne kopije.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Dodaj kot drugo napravo</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Isti profil uporabljate na tem telefonu in na drugi napravi.</translation>
     </message>
 </context>
 <context>
