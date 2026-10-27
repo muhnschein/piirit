@@ -6,7 +6,8 @@ How to work on Piirit. What it is: `README.md`, `docs/`. Read `docs/BUILDING.md`
 
 - Don't know how to proceed → say "I don't know", stop, ask. Mark guesses as guesses. Unknown beats confident wrong.
 - Bugs: find root cause, state it. Symptom fix ≠ fix.
-- Good return on cost. No gold-plating, no unasked refactors.
+- Measure twice, cut once. YAGNI: fight scope creep; meet user's intent minimally, realistically. Good return on cost; no gold-plating, no unasked refactors.
+- Rule here fights task → say so loudly, get user's sign-off before breaking it.
 - Options → lay them out, recommend one with reasons. Implement nothing until user clearly picks.
 
 ## Done means
@@ -18,12 +19,24 @@ In this order; later step only once earlier ones hold:
 3. Tests proven to bite: each fails with change reverted or mutated. Report how (e.g. "22/22 mutations caught"); name what headless tests can't prove.
 4. `make check` green locally.
 5. PR CI green, SonarQube included (quality gate, new-code coverage).
-6. Device RPM: dispatch `.github/workflows/rpm.yml` on PR branch, give user the artifact link.
+6. Device: dispatch `.github/workflows/rpm.yml` on PR branch; run RPM on test phone (see "Device tests"); give user artifact link and evidence.
 7. With RPM: outline briefly what merging this PR risks and how you mitigated it.
 
 Feature reachable from several places (chat, contact/group page, cover, quick actions) → all of them.
 
 User tests RPM on phone; that test judges feel, lag, transitions. Say exactly what to check on device.
+
+## Device tests
+
+- Test phone: OnePlus 6, SFOS 5.1, via `muhnschein-sfos-harness` workflow `do` (helpers: its README, `scripts/lib.sh`). Test accounts only. Never run fork or others' PR code there: any job can root phone.
+- Every run starts from named state; `state.txt` records it plus RPM name and sha256:
+  - `clean`: `reset`: quit app, drop sailjail grant, `rpm -e`, delete `~/.local/share/piirit/piirit`, `~/.config/piirit/piirit`, `~/.cache/piirit/piirit` (and unsandboxed `harbour-piirit` dirs); install.
+  - `fixture:NAME`: `clean`, then restore data snapshot saved with `fixture_save`.
+  - `upgrade:FROM`: release FROM plus fixture, then install build over it. Required when change touches stored data or settings.
+- Footprint check (`fs_mark`, `footprint`): file app touched outside known dirs → add to reset or fail run. Leftovers taint results.
+- Before/after: same start state, same steps.
+- Motion or timing change: launch with `FRAMELOG`, report `frames` (fps, slow frames, worst gap per animation). Never measure frames while recording: recorder slows compositor.
+- Harness proves function and frame timing. Feel, lag, transitions stay user's call on device.
 
 ## Local checks
 
@@ -47,6 +60,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 - Caveman-full = drop articles, filler, pleasantries, hedging. Fragments OK, short words. Identifiers, paths, code, errors exact. E.g. "`rust/Cargo.lock` stays v3: SDK cargo 1.75 can't read v4."
 - Code comments, `docs/*.md`, this file: caveman-full, rules in BUILDING.md "Comments".
+- Default: no comment. One only for constraint, external quirk, invariant code can't show; one line where possible, four max. Applies to new and touched code; trim old long comments when changing that code anyway, no sweep.
 - `README.md`, `CHANGELOG.md`, release notes, forum posts: plain prose for users, as short and to the point as possible.
 - User-visible change → line in `CHANGELOG.md` under `## Unreleased` (create if missing), same PR.
 - No plans, research notes, scratch files in repo.
@@ -58,6 +72,8 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 - Commit and PR titles: Conventional Commits, plain language, say outcome: `fix(cover): faces no longer turn into white squares`. Types `feat` `fix` `perf` `refactor` `test` `docs` `ci` `build` `chore`; scope = app area or subsystem (`chat`, `calls`, `rpm`, …). Body says why, plain prose; brief, to the point.
 - PR body: the problem in a sentence or two, then how you fixed it. End with the model and harness that did the work.
 - Final diff: no debug logging, no leftovers.
+- UI change → before/after device screenshots in PR. Motion or timing → short video plus `frames` stats.
+- Evidence on GitHub, never in tree: push to orphan branch `evidence/pr-N`, embed by URL in PR, delete branch after merge. No PR-only screenshots or assets in `main` or PR branch.
 - Flaky test → find and fix cause. Never add retries (nextest runs none by design: pass on second try = defect). Never re-run CI until green and call it done. Never skip test or loosen assert. One re-run OK only for infra failure before any test ran (runner lost, apt mirror timeout); say so.
 - Merge only on user's explicit go. Merge commit, not squash/rebase.
 - Before asking for merge go: `main` moved since PR's last green run → merge `main` in, CI green again. Each PR green alone ≠ merge green (#211 + #216 broke `main`). GitHub enforces it too ("Require branches to be up to date").
