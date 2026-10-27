@@ -15,6 +15,9 @@ Page {
     /// Configured account count; switching offered if >1.
     property int accountCount: 0
 
+    // Finished flow can't be swiped back into: back closed until window's list takes over.
+    backNavigation: !flowEnd.pending
+
     // Not bound to field: core round trip per keystroke; only last answer wanted. Interval as
     // contact search.
     Timer {
@@ -341,9 +344,29 @@ Page {
         page.openSearch()
     }
 
+    // Attached list arriving: pop to window's list (built, filled), else swipe back reopens
+    // finished page.
+    PendingNavigation {
+        id: flowEnd
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
+    function endFinishedFlow() {
+        var windowList = typeof appWindow !== "undefined" ? appWindow.chatList : null
+        // Profiles page hands on window list's profile; other profile = not this flow, stays.
+        if (!windowList || windowList.accountId !== page.accountId) {
+            return
+        }
+        flowEnd.popTo(windowList)
+    }
+
     // Back on list: no chat open. Leaving: pending deletes go now (still wanted gone).
     onStatusChanged: {
         if (status === PageStatus.Active) {
+            if (page.attached) {
+                page.endFinishedFlow()
+            }
             notifier.viewingChatId = 0
             page.dropCapture()
             if (page.arrivingChatId !== 0) {
@@ -416,7 +439,7 @@ Page {
             // `appWindow`.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
-                // Quick actions land here, not on list beside backup (gone on swipe back).
+                // Quick actions land here, not on list beside backup (gone once swiped to).
                 if (!page.attached) {
                     appWindow.chatList = page
                 }

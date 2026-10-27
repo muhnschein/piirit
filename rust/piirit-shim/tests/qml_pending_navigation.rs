@@ -13,12 +13,20 @@ mod common;
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import Sailfish.Silica 1.0
     Item {
         // A stack that records what it was asked, and can be busy.
         property QtObject stack: QtObject {
             property bool busy: false
             property string log: ''
-            function pop() { log += 'pop;' }
+            function pop(target, operation) {
+                if (target === undefined) {
+                    log += 'pop;'
+                    return
+                }
+                log += 'pop:' + target + ':'
+                    + (operation === PageStackAction.Immediate ? 'immediate' : 'animated') + ';'
+            }
             function replace(page, properties) { log += 'replace:' + page + ';' }
             function replaceAbove(target, page, properties) {
                 log += 'replaceAbove:' + target + ':' + page + ';'
@@ -36,6 +44,7 @@ const PROBE_QML: &str = r"
         }
         function pop() { loader.item.pop(); return stack.log }
         function replace() { loader.item.replace('Next.qml', {}); return stack.log }
+        function popTo() { loader.item.popTo('Chats.qml'); return stack.log }
         function replaceAbove() {
             loader.item.replaceAbove(null, 'Chats.qml', {})
             return stack.log
@@ -55,6 +64,10 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     }
 
     let mut engine = QmlEngine::new();
+    // `PageStackAction` for pop down.
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
@@ -156,5 +169,37 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
         value("busy-done"),
         "pop;replace:Next.qml;replaceAbove:null:Chats.qml;",
         "a stack that never went quiet held a move for ever. {context}"
+    );
+}
+
+/// Pop down to page under: at once, no slide back over same screen.
+#[test]
+fn a_pop_down_waits_for_its_page_then_goes_at_once() {
+    // SAFETY: single-threaded; set before Qt starts.
+    unsafe {
+        std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+    }
+
+    let mut engine = QmlEngine::new();
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
+    engine.load_data(QByteArray::from(PROBE_QML));
+    let navigation = common::component_url("PendingNavigation.qml");
+    let call = |engine: &mut QmlEngine, name: &str, args: &[QVariant]| {
+        QString::from_qvariant(engine.invoke_method(name.into(), args))
+            .map(|value| value.to_string())
+            .unwrap_or_default()
+    };
+
+    let load = call(&mut engine, "load", &[QString::from(navigation).into()]);
+    let asked = call(&mut engine, "popTo", &[]);
+    let on_screen = call(&mut engine, "ready", &[true.into()]);
+
+    assert_eq!(load, "ok");
+    assert_eq!(asked, "", "a pop down was made over a call's page");
+    assert_eq!(
+        on_screen, "pop:Chats.qml:immediate;",
+        "a pop down was not made at once to the page asked for"
     );
 }
