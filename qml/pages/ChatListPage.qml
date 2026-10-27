@@ -120,9 +120,8 @@ Page {
     /// Core answered. Empty = no chats or no answer yet (on resume): no "No chats yet" till set.
     property bool chatsLoaded: false
 
-    /// Filter placeholder's words speak for: taken when rows land empty. Not `chats.unread_only`
-    /// itself: flips turn before rows; placeholder fades out over rows back. Would read
-    /// "No chats yet" meanwhile.
+    /// Placeholder words follow rows, not the filter flag: flag flips before rows, and the
+    /// placeholder fades out over them.
     property bool emptyUnreadOnly: false
 
     Connections {
