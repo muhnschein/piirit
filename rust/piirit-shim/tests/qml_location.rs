@@ -11,7 +11,6 @@ use std::rc::Rc;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
-use serde_json::{json, Value};
 
 mod common;
 
@@ -541,14 +540,16 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
     expect("feed-off", "false", "position still looked for after stop.");
     expect("feed-asleep", "false", "phone kept awake after stop.");
 
-    let positions: Vec<Value> = common::calls(&journal)
+    // Both fixes in one tick: sends race, order not kept (phone's come 30 s apart).
+    let mut positions: Vec<String> = common::calls(&journal)
         .into_iter()
         .filter(|(method, _)| method == "set_location")
-        .map(|(_, params)| params)
+        .map(|(_, params)| params.to_string())
         .collect();
+    positions.sort();
     assert_eq!(
         positions,
-        [json!([60.2, 25.0, 8.0]), json!([60.3, 25.1, 0.0])],
+        ["[60.2,25.0,8.0]", "[60.3,25.1,0.0]"],
         "the feed's positions did not reach core, or a lost fix did. {context}"
     );
 }
