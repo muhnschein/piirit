@@ -2,18 +2,13 @@
 //! on it, so pinned with a real load, not assumed.
 
 // Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe`
-// (edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods
-)]
-
-use std::time::Duration;
+// (edition 2024+), `borrow_as_ptr`.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+
+mod common;
 
 #[test]
 fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
@@ -53,14 +48,17 @@ fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
     ";
     engine.load_data(QByteArray::from(qml));
 
+    let mut plan = common::Plan::default();
+
     let engine_ptr: *const QmlEngine = &engine;
-    single_shot(Duration::from_secs(8), move || {
+    plan.after(8, move || {
         // SAFETY: same lifetime argument as tests/smoke.rs.
         unsafe {
             (*engine_ptr).quit();
         }
     });
 
+    plan.run();
     engine.exec();
 
     let system_info = core_box.pinned().borrow().system_info.to_string();

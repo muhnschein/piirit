@@ -5,15 +5,7 @@
 //! dies with the page. So page also flushes on destroy. Cost: flush of empty set.
 
 // Qt harness: see qml_profile_rows.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -126,20 +118,23 @@ fn a_deletion_asked_for_on_the_way_out_still_goes() {
         }};
     }
 
+    let mut plan = common::Plan::default();
+
     // SAFETY: callbacks run only inside `exec()` on this thread.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("refresh", call!("refresh")));
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("load", call!("load", common::page_url("ProfilesPage.qml"))));
         (*steps_ptr).push(("ask", call!("askDelete", "2")));
         // No Deactivating first: page simply gone.
         (*steps_ptr).push(("gone", call!("destroyPage")));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -4,15 +4,7 @@
 //! is opener's (`qml_general_settings.rs`, `qml_quick_actions_settings.rs`); this is page alone.
 
 // Qt harness: see qml_pages.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -78,8 +70,10 @@ fn the_dialog_says_the_one_thing_worth_stopping_for() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     let url = common::page_url("ExperimentalFeatureDialog.qml");
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "experimental",
             call!(
@@ -103,6 +97,7 @@ fn the_dialog_says_the_one_thing_worth_stopping_for() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

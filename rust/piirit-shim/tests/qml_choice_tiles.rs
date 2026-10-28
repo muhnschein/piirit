@@ -3,20 +3,12 @@
 //! (`qml_pages.rs`, `qml_restore.rs`).
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 mod common;
 
@@ -155,8 +147,10 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         }
     };
 
+    let mut plan = common::Plan::default();
+
     let r = record.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         r(
             "load",
             call!("load", common::component_url("ChoiceTiles.qml")),
@@ -166,7 +160,7 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
 
     // Tick later: tiles measured.
     let r = record.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         r(
             "about-icon",
             call!("partOf", "aboutTile", "tileIcon", "source"),
@@ -213,13 +207,13 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
 
     // 3s: three choices, stacked.
     let r = record.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         r("three", call!("offer", THREE));
         r("stack", call!("stack", "true"));
     });
 
     let r = record.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(1, move || {
         r("first-box", call!("boxOf", "createProfileTile"));
         r("second-box", call!("boxOf", "backupFileTile"));
         r("third-box", call!("boxOf", "secondDeviceTile"));
@@ -252,10 +246,11 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         );
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
     assert_row(&steps.borrow());
     assert_stack(&steps.borrow());

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Профиль өстәргә</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Алга</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Профиль ясарга</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Сез яңа адрес белән һәм чатларсыз башлыйсыз.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Резерв күчермәдән торгызырга</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Сез профильне резерв күчермә файлыннан импортлыйсыз.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Икенче җиһаз итеп өстәргә</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Сез бер үк профильне бу телефонда һәм башка җиһазда кулланасыз.</translation>
     </message>
 </context>
 <context>
@@ -565,10 +578,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Архивтагы чатлар</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Яңа чат</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Архивта</translation>
     </message>
@@ -650,10 +659,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-код</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Яңа төркем</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Укылмаган дип билгеләргә</translation>
     </message>
@@ -689,6 +694,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Чатка җибәрү</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Яңа</translation>
     </message>
 </context>
 <context>
@@ -1139,6 +1149,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Рәсемне үзгәртергә</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR чакыру коды</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Канал</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1359,6 +1379,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Алга</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Яңа чат</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Сез бер кешегә язасыз.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Яңа төркем</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Берничә кеше бер-берсенә яза.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Яңа канал</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Каналлар — хәбәрләрегезне күп кешегә тарату коралы.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1398,6 +1452,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Төркем булдырырга</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Каналга исем бирегез</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Канал булдырырга</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Яңа канал</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Канал исеме</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Исемне каналдагы һәркем күрә</translation>
     </message>
 </context>
 <context>
@@ -1623,6 +1699,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Чакыру сылтамасын күчереп алырга</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR чакыру коды</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; каналына кушылу өчен сканерлагыз</translation>
     </message>
 </context>
 <context>
@@ -2138,8 +2223,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Тәфсилләрсез</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Тавышсыз төркемнәрдә сезгә юнәлтелгән хәбәрләр, җаваплар яки реакцияләр кебек, турында хәбәр итү</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Тавышсыз төркемнәрдә сезнең хәбәрләргә килгән җаваплар турында белдерүләр күрсәтү</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

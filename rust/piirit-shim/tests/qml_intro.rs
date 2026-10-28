@@ -7,18 +7,15 @@
 //! asks now, so a turn (or any move reader didn't make) leaves walk where it is.
 
 // Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe` (edition 2024+),
-// `borrow_as_ptr`, `single_shot` whole secs.
+// `borrow_as_ptr`.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // `qt_method!` params match dispatcher: piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use qmetaobject::*;
 
@@ -218,28 +215,34 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
         }
     };
 
+    let mut plan = common::Plan::default();
+
     let r = record.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         r("load", call!("load", common::page_url("IntroPage.qml")));
         r("facts", call!("facts"));
         r("first-picture", call!("picture", "slideArt0"));
     });
 
-    // Pictures load off main thread.
+    // Pictures load off main thread: read once in, however slow the load.
     let r = record.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.until(1, 30, move |last| {
+        if call!("get", "slideArt0", "ready").to_string() != "true" && !last {
+            return false;
+        }
         r("drawn", call!("get", "slideArt0", "ready"));
         r("title", call!("get", "slideTitle0", "text"));
         r("body", call!("get", "slideBody0", "text"));
         r("hint-early", call!("get", "swipeHint", "visible"));
         r("swipe", call!("swipeTo", "4"));
         r("hint-late", call!("get", "swipeHint", "visible"));
+        true
     });
 
     // Last fact read only now (views make delegates near). Past-end: phone turn is no request,
     // drag is; second drag must not ask again.
     let r = record.clone();
-    single_shot(Duration::from_secs(3), move || {
+    plan.after(1, move || {
         r("last-picture", call!("picture", "slideArt4"));
         r("turn", call!("turn", "2520", "1080"));
         r("after-turn", call!("navigation"));
@@ -252,10 +255,11 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
         r("by-hand-again", call!("pullByHand"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();

@@ -3,6 +3,7 @@ import QtQuick 2.5
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import Nemo.Thumbnailer 1.0
+import "../js/Emoji.js" as Emoji
 import "../js/Format.js" as Format
 
 /*
@@ -457,8 +458,13 @@ Item {
                     }
                     truncationMode: TruncationMode.Fade
                     color: Theme.primaryColor
-                    textFormat: Text.PlainText
-                    text: root.vcardName
+                    // Card's name; emoji as Twemoji (Emoji.js).
+                    // Label's own size (Silica default).
+                    readonly property string pictured: Emoji.inText(root.vcardName, false,
+                                                                    Theme.fontSizeMedium,
+                                                                    "", Emoji.nameSaturation)
+                    textFormat: pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: pictured.length > 0 ? pictured : root.vcardName
                 }
 
                 Label {

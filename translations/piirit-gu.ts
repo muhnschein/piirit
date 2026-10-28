@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>પ્રોફાઇલ ઉમેરો</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>આગળ</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>પ્રોફાઇલ બનાવો</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>તમે નવા સરનામા સાથે અને કોઈ ચેટ વિના શરૂઆત કરો છો.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>તમે બેકઅપ ફાઇલમાંથી પ્રોફાઇલ આયાત કરો છો.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>તમે આ ફોન અને બીજા ઉપકરણ પર એક જ પ્રોફાઇલ વાપરો છો.</translation>
     </message>
 </context>
 <context>
@@ -567,10 +580,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>આર્કાઇવ કરેલ ચેટ</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>નવી ચેટ</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>આર્કાઇવ કરેલ</translation>
     </message>
@@ -652,10 +661,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR કોડ</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>નવું જૂથ</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>ન વાંચેલ તરીકે નિશાન કરો</translation>
     </message>
@@ -691,6 +696,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>આમાં મોકલો</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>નવું</translation>
     </message>
 </context>
 <context>
@@ -1144,6 +1154,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>ચિત્ર બદલો</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR આમંત્રણ કોડ</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>ચેનલ</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1364,6 +1384,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>આગળ</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>નવી ચેટ</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>તમે એક વ્યક્તિને લખો છો.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>નવું જૂથ</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>ઘણા લોકો એકબીજાને લખે છે.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>નવી ચેનલ</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>ચેનલો તમારા સંદેશા ઘણા લોકો સુધી પ્રસારિત કરવાનું સાધન છે.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1404,6 +1458,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>જૂથ બનાવો</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>કૃપા કરીને ચેનલને નામ આપો</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>ચેનલ બનાવો</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>નવી ચેનલ</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>ચેનલનું નામ</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>ચેનલમાં બધા નામ જુએ છે</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1706,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>આમંત્રણ લિંક કૉપિ કરો</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR આમંત્રણ કોડ</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; ચેનલમાં જોડાવા માટે સ્કૅન કરો</translation>
     </message>
 </context>
 <context>
@@ -2145,8 +2230,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કોઈ વિગત નહીં</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>શાંત કરેલા જૂથોમાં તમને ઉદ્દેશીને આવેલા સંદેશા, જેમ કે જવાબ કે પ્રતિક્રિયા, જણાવો</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>શાંત કરેલા જૂથોમાં તમારા સંદેશાના જવાબોની સૂચનાઓ બતાવો</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

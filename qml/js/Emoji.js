@@ -89,6 +89,15 @@ function emojiEnd(text, i) {
     return end
 }
 
+/// First char of `text` whole: emoji with its joins, else code point (never half a pair).
+function firstOf(text) {
+    if (!text) {
+        return ""
+    }
+    var end = emojiEnd(text, 0)
+    return text.substring(0, end > 0 ? end : (codeAt(text, 0) > 0xFFFF ? 2 : 1))
+}
+
 /// Message run as StyledText: escaped, breaks and space runs kept.
 function escaped(text, lineStart) {
     var out = text.replace(/\r/g, "").replace(/\t/g, " ")
@@ -105,30 +114,48 @@ function escaped(text, lineStart) {
 
 /// `text` with each shipped emoji as `<img>`, as StyledText; "" if none.
 /// `styled`: already StyledText (shim's Markdown, sender chars escaped, tags
-/// untouched); else escaped here. Only added tag: `<img>` under qml/art/emoji/,
-/// so a message can load nothing. `size`: font px; pictures a bit taller.
+/// untouched); else escaped here. Only added tag: `<img>` of picture under
+/// qml/art/emoji/, so a message can load nothing. `size`: font px; pictures a
+/// bit taller. `tint` (colour, e.g. label's): pictures grey, shaded toward it,
+/// as faint, by app's picture provider (`image://piirit/emoji`, shim's
+/// pictures.rs). Else `saturation` below 1: colour turned down that far, same
+/// provider. Neither: as drawn.
 ///
 /// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
 /// from one value: Sailfish's ARM64 JIT could clobber it between the two
 /// copies, so some launches showed a leading emoji twice (picture + char).
 /// Each pass sets each variable from its own value.
-function inText(text, styled, size) {
+function inText(text, styled, size, tint, saturation) {
     var cuts = emojiCuts(text, styled)
     if (cuts.length === 0) {
         return ""
     }
     var edge = Math.round(size * 1.15)
+    // StyledText reads attribute raw: `&` stays `&`.
+    var muted = tint ? "&tint=" + encodeURIComponent("" + tint) + "&strength=" + tintStrength
+                : saturation < 1 ? "&saturation=" + saturation : ""
     var out = ""
     var from = 0
     for (var k = 0; k < cuts.length; k += 3) {
         var before = text.substring(from, cuts[k])
+        var file = artBase + cuts[k + 2] + ".svg"
         out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+        out += "<img src=\"" + (muted ? "image://piirit/emoji?file="
+                                       + encodeURIComponent(file) + muted : file)
+               + "\" width=\"" + edge
                + "\" height=\"" + edge + "\" align=\"middle\">"
         from = cuts[k + 1]
     }
     var rest = text.substring(from)
     return out + (styled ? rest : escaped(rest, from === 0))
+}
+
+/// Label's StyledText: `marked` (Marks.js, or "") else plain `text`, with
+/// pictures (`inText`); "" when neither: draw `text` plain.
+function drawn(text, marked, size, tint, saturation) {
+    var styled = marked.length > 0
+    var pictured = inText(styled ? marked : text, styled, size, tint, saturation)
+    return pictured.length > 0 ? pictured : marked
 }
 
 /// Emoji `inText` draws: start, end, picture of each, flat list.
@@ -171,9 +198,82 @@ function emojiCuts(text, styled) {
     return cuts
 }
 
+/// Most emoji alone in a message drawn big (as Signal).
+var bigLimit = 5
+
+/// `text` only emoji with pictures, 1 to `bigLimit`, and whitespace: drawn big.
+/// Longest emoji 15 UTF-16 units (kiss, two tones): longer text not scanned.
+function onlyEmoji(text) {
+    var trimmed = text ? text.trim() : ""
+    if (trimmed.length === 0 || trimmed.length > 16 * bigLimit) {
+        return false
+    }
+    var cuts = emojiCuts(trimmed, false)
+    if (cuts.length > 3 * bigLimit) {
+        return false
+    }
+    var from = 0
+    for (var k = 0; k < cuts.length; k += 3) {
+        if (/\S/.test(trimmed.substring(from, cuts[k]))) {
+            return false
+        }
+        from = cuts[k + 1]
+    }
+    return from === trimmed.length
+}
+
+/// Big emoji per font px: 2.5x inline picture (`inText`: 1.15 x font px).
+var bigScale = 2.5 * 1.15
+
+/// Big emoji laid out by hand, not StyledText: Qt pads each `<img>` with a space either side
+/// at label font, swallows sender's space next to it (wide gaps, none for a space, margins).
+/// `text` passes `onlyEmoji`; `edge` picture px; wraps past `maxWidth`. Pictures touch but
+/// for a sliver; sender's space a quarter picture, line break a line.
+/// Returns {pictures: [{picture, x, y}], width, height}.
+function bigLayout(text, edge, maxWidth) {
+    var trimmed = text.trim()
+    var cuts = emojiCuts(trimmed, false)
+    var gap = Math.round(edge * 0.08)
+    var space = Math.round(edge * 0.25)
+    var line = edge + gap
+    var pictures = []
+    var x = 0
+    var y = 0
+    var width = 0
+    var from = 0
+    for (var k = 0; k < cuts.length; k += 3) {
+        var between = trimmed.substring(from, cuts[k]).replace(/\r/g, "")
+        for (var i = 0; i < between.length; i++) {
+            if (between.charAt(i) === "\n") {
+                x = 0
+                y += line
+            } else {
+                x += space
+            }
+        }
+        if (x > 0 && x + edge > maxWidth) {
+            x = 0
+            y += line
+        }
+        pictures.push({ picture: cuts[k + 2], x: x, y: y })
+        width = Math.max(width, x + edge)
+        x += edge + gap
+        from = cuts[k + 1]
+    }
+    return { pictures: pictures, width: width, height: pictures.length > 0 ? y + edge : 0 }
+}
+
 /// Pictures' path for `<img>`. art/ is sibling of js/, components/, pages/:
 /// same from any.
 var artBase = Qt.resolvedUrl("../art/emoji/")
+
+/// Tinted pictures' way from grey toward tint: half keeps faces readable on
+/// dark and light ambience both.
+var tintStrength = 0.5
+
+/// Names' (chat, contact, sender) emoji colour kept: muted beside name, not
+/// grey as subtitles.
+var nameSaturation = 0.4
 
 /// Recent-emoji cap.
 var recentLimit = 40

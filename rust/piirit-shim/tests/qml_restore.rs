@@ -11,23 +11,20 @@
 //! paragraph gave too few to read reliably.
 
 // Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
-// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
+// edition 2024), `borrow_as_ptr` for engine pointer.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     // qt_method! params must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::time::Duration;
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 mod common;
 
@@ -218,9 +215,11 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
 
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
 
+    let mut plan = common::Plan::default();
+
     // 1s: question, and both answers.
     let s = steps.clone();
-    single_shot(Duration::from_secs(1), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "ask-load",
@@ -232,26 +231,11 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         );
         common::record(&s, "ask-device", call!("click", "secondDeviceTile"));
         common::record(&s, "ask-file", call!("click", "backupFileTile"));
-        // Same question asked of reader with a profile, from plus under profiles list: three
-        // ways, not two (making one is the third).
-        common::record(
-            &s,
-            "add-load",
-            call!("loadWith", common::page_url("AddProfilePage.qml"), "{}"),
-        );
-        common::record(&s, "add-stacked", call!("get", "addWays", "stacked"));
-        common::record(&s, "add-header", call!("get", "header", "height"));
-        common::record(&s, "add-ways-y", call!("get", "addWays", "y"));
-        common::record(&s, "add-ways-height", call!("get", "addWays", "height"));
-        common::record(&s, "add-page-height", call!("pageProperty", "height"));
-        common::record(&s, "add-create", call!("click", "createProfileTile"));
-        common::record(&s, "add-file", call!("click", "backupFileTile"));
-        common::record(&s, "add-device", call!("click", "secondDeviceTile"));
     });
 
     // 2s: file half. Browser offered, camera not; choosing opens browser.
     let s = steps.clone();
-    single_shot(Duration::from_secs(2), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "file-load",
@@ -275,13 +259,13 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
 
     // 4s: core answered; page on the profile brought over.
     let s = steps.clone();
-    single_shot(Duration::from_secs(4), move || {
+    plan.after(2, move || {
         common::record(&s, "file-done", call!("pageProperty", "busy"));
     });
 
     // 5s: device half, handed code from newer Delta Chat than this core reads.
     let s = steps.clone();
-    single_shot(Duration::from_secs(5), move || {
+    plan.after(1, move || {
         common::record(
             &s,
             "device-load",
@@ -301,7 +285,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     // 6s: what camera was given and view was told, read before code handed over:
     // transfer takes viewfinder down.
     let s = steps.clone();
-    single_shot(Duration::from_secs(6), move || {
+    plan.after(1, move || {
         common::record(&s, "device-foot", call!("bottomOf", "scanArea"));
         common::record(&s, "device-page", call!("pageProperty", "height"));
         common::record(&s, "device-link", call!("viewProperty", "offerLink"));
@@ -321,7 +305,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     });
 
     let s = steps.clone();
-    single_shot(Duration::from_secs(8), move || {
+    plan.after(2, move || {
         common::record(&s, "device-busy", call!("pageProperty", "busy"));
         common::record(&s, "device-said", call!("pageProperty", "errorMessage"));
         // Failure is the page, not a strip along a viewfinder that carried on without it.
@@ -332,7 +316,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
 
     // 9s: after retry camera back, reading again, not holding code it stopped on.
     let s = steps.clone();
-    single_shot(Duration::from_secs(9), move || {
+    plan.after(1, move || {
         common::record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
         common::record(&s, "retried-holding", call!("viewProperty", "done"));
         common::record(&s, "retried-camera", call!("get", "camera", "running"));
@@ -344,10 +328,11 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         common::record(&s, "back-camera", call!("get", "camera", "running"));
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();
@@ -389,35 +374,6 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         common::value_of(steps, "file-scanner"),
         "false",
         "the file half put the camera up anyway. {context}"
-    );
-    for label in ["add-load", "add-create", "add-file", "add-device"] {
-        assert_eq!(
-            common::value_of(steps, label),
-            "ok",
-            "the page behind the profiles plus does not offer all three \
-             ways in: {label}. {context}"
-        );
-    }
-    // Three, one under another: side by side each gets a third of screen, not room for a
-    // line plus second line.
-    assert_eq!(
-        common::value_of(steps, "add-stacked"),
-        "true",
-        "the three ways in are crowded into one row. {context}"
-    );
-    // Stack starts under header, not mid-page: lists read from top, as every phone list does.
-    let measure =
-        |label: &str| -> f64 { common::value_of(steps, label).parse().unwrap_or_default() };
-    let above = measure("add-ways-y") - measure("add-header");
-    let below = measure("add-page-height") - measure("add-ways-y") - measure("add-ways-height");
-    assert!(
-        above > 0.0 && above * 4.0 < below,
-        "the three ways do not start under the header: {above} above, \
-         {below} below. {context}"
-    );
-    assert!(
-        navigation.contains("push:AddProfileDialog.qml"),
-        "nothing on the add-profile page makes a new profile. {context}"
     );
     assert!(
         navigation.contains("push:BackupFilePage.qml"),

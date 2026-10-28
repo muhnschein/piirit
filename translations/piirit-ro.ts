@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Adaugă profil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Înainte</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Creează un profil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Începi cu o adresă nouă și fără conversații.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Restaurează dintr-o copie de siguranță</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Imporți un profil dintr-un fișier de copie de rezervă.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Adaugă ca al doilea dispozitiv</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Folosești același profil pe acest telefon și pe alt dispozitiv.</translation>
     </message>
 </context>
 <context>
@@ -565,10 +578,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Conversații arhivate</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Conversație nouă</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arhivate</translation>
     </message>
@@ -650,10 +659,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Cod QR</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Grup nou</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Marchează ca necitit</translation>
     </message>
@@ -689,6 +694,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Trimite către</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Nou</translation>
     </message>
 </context>
 <context>
@@ -1145,6 +1155,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Schimbă imaginea</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>Cod QR de invitație</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Canal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1365,6 +1385,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Înainte</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Conversație nouă</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Scrii unei persoane.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Grup nou</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Mai multe persoane își scriu între ele.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Canal nou</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Canalele sunt un instrument unu-către-mulți pentru difuzarea mesajelor tale.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1406,6 +1460,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Creează grupul</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Dă un nume canalului</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Creează canalul</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Canal nou</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Numele canalului</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Toți cei din canal văd numele</translation>
     </message>
 </context>
 <context>
@@ -1633,6 +1709,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Copiază linkul de invitație</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>Cod QR de invitație</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Scanează pentru a intra în canalul „%1”</translation>
     </message>
 </context>
 <context>
@@ -2148,8 +2233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fără detalii</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>În grupurile amuțite, notifică mesajele adresate ție, precum răspunsuri sau reacții</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Afișează notificări pentru răspunsurile la mesajele tale în grupurile amuțite</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

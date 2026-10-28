@@ -12,12 +12,9 @@
     unused_unsafe,
     non_snake_case,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     clippy::needless_pass_by_value
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -212,15 +209,17 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         call!("seed");
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         call!("refresh");
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         // *Second* account is current: first row (the one findIn reaches) is one to switch to.
         (*steps_ptr).push((
             "load",
@@ -232,7 +231,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         ));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("seeded", (*stack_ptr).pinned().borrow().stack.to_string()));
         // Another profile made from plus under list, on top of this page.
         (*steps_ptr).push(("add", call!("addProfile")));
@@ -259,7 +258,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         (*steps_ptr).push(("tap", call!("tapFirstRow")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("after", (*stack_ptr).pinned().borrow().stack.to_string()));
         // Reload profiles page, delete from it. Two remain: not last-one case.
         call!(
@@ -269,15 +268,16 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         );
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("delete", call!("deleteFirstRow")));
     });
 
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(3, move || unsafe {
         (*steps_ptr).push(("deleted", call!("accountsLeft")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {
@@ -305,7 +305,7 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         "no plus under the profile list, so no way to add a profile. {context}"
     );
     assert!(
-        value("added").ends_with(",AddProfilePage.qml"),
+        value("added").ends_with(",AddProfileWaysDialog.qml"),
         "the plus did not ask which of the three ways in the reader \
          wants: {}. {context}",
         value("added")

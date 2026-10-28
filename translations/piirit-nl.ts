@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Profiel toevoegen</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Volgende</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Een profiel aanmaken</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Je begint met een nieuw adres en zonder chats.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Herstellen uit een back-up</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Je importeert een profiel uit een back-upbestand.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Toevoegen als tweede apparaat</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Je gebruikt hetzelfde profiel op deze telefoon en op een ander apparaat.</translation>
     </message>
 </context>
 <context>
@@ -563,10 +576,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Gearchiveerde chats</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Nieuwe chat</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Gearchiveerd</translation>
     </message>
@@ -648,10 +657,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>QR-code</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Nieuwe groep</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Markeren als ongelezen</translation>
     </message>
@@ -687,6 +692,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Versturen naar</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Nieuw</translation>
     </message>
 </context>
 <context>
@@ -1140,6 +1150,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Afbeelding wijzigen</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>QR-uitnodigingscode</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanaal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1360,6 +1380,40 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Volgende</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Nieuwe chat</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Je schrijft met één persoon.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Nieuwe groep</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Meerdere mensen schrijven elkaar.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nieuw kanaal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanalen zijn bedoeld om te gebruiken als verzendlijsten.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1400,6 +1454,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create group</source>
         <translation>Groep aanmaken</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Geef het kanaal een naam</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Kanaal aanmaken</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Nieuw kanaal</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanaalnaam</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Iedereen in het kanaal ziet de naam</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1702,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Copy invite link</source>
         <translation>Uitnodigingslink kopiëren</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>QR-uitnodigingscode</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Scan dit om deel te nemen aan het kanaal ‘%1’</translation>
     </message>
 </context>
 <context>
@@ -2141,8 +2226,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Geen details</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Toon berichten gericht aan jou in genegeerde groepen</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Toon meldingen voor antwoorden op je berichten in gedempte groepen</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

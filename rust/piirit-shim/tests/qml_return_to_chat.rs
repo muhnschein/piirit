@@ -14,15 +14,7 @@
 //! difference that offscreen Qt cannot paint. That half confirmed on device, where reported.
 
 // Qt harness: see qml_conversation_open.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -168,7 +160,9 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -179,14 +173,14 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
             ),
         ));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("active", call!("setStatus", 2)));
     });
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         // Back up history, where a picture worth opening is.
         (*steps_ptr).push(("scrolled", call!("scrollTo", 20)));
     });
-    single_shot(Duration::from_millis(6000), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("before", call!("middleId")));
         // Page goes over this one: Deactivating, view loses place, Active again on return.
         (*steps_ptr).push(("leaving", call!("setStatus", 3)));
@@ -198,7 +192,7 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
         (*steps_ptr).push(("returning", call!("setStatus", 2)));
         (*steps_ptr).push(("straight-back", call!("middleId")));
     });
-    single_shot(Duration::from_millis(6300), move || unsafe {
+    plan.after(0, move || unsafe {
         // Rows laid out again as page settles: moves reader off where put; hold answers it
         // in same turn.
         (*steps_ptr).push(("relayout", call!("relayout")));
@@ -206,6 +200,7 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

@@ -1,16 +1,8 @@
 //! Where conversation sits on return; when new message may move it.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -247,7 +239,9 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         // History longer than view, as on reopen.
         record!("filled", call!("append", 40));
         record!(
@@ -259,7 +253,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("opened-at-end", call!("ended"));
         record!(
             "opened-sticky",
@@ -269,7 +263,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 1);
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("followed", call!("ended"));
 
         // Reader scrolls up, stops there.
@@ -282,7 +276,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 1);
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("stayed-put", call!("ended"));
 
         // Reader scrolls back to newest.
@@ -295,7 +289,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 1);
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("resumed", call!("ended"));
 
         // Menu raises what page then acts on.
@@ -320,7 +314,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 2);
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("delete", call!("raisedSignal"));
         record!("missed", call!("get", QString::from("missedCount")));
 
@@ -334,7 +328,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("jump");
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("jumped", call!("ended"));
         record!("missed-cleared", call!("get", QString::from("missedCount")));
         record!("arrived", call!("arrivedCount"));
@@ -347,7 +341,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 1);
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("held-stayed", call!("ended"));
 
         // Away from newest, flick still gliding when jump tapped. Button isn't part of list, so
@@ -358,7 +352,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("jump");
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("jumped-mid-flick", call!("ended"));
 
         // Picked, then row destroyed before countdown ends (as reload, reorder, or earlier delete
@@ -370,14 +364,14 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("removeRow", 0);
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("delete-after-removal", call!("raisedSignal"));
 
         // Last: replaces model contents.
         call!("resetToState", 24);
     });
 
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("resend-when-failed", call!("resendVisible"));
         // Same row is account's own and encrypted: ask says core would take delete for everyone.
         call!("clearRaised");
@@ -386,7 +380,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("resetToState", 26);
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("resend-when-delivered", call!("resendVisible"));
         // Refill: `resetToState` left a handful of rows; list too short to scroll is near bottom by
         // definition, nothing to scroll away from.
@@ -396,7 +390,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("settle");
     });
 
-    single_shot(Duration::from_secs(13), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("away", call!("get", QString::from("stickToBottom")));
         call!("beginDrag");
         record!("short-atyend", call!("stopJustShort", 12.0));
@@ -404,25 +398,25 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("settle");
     });
 
-    single_shot(Duration::from_secs(14), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("short-sticks", call!("get", QString::from("stickToBottom")));
         // Empty, not-yet-loaded: as before messages arrive.
         call!("emptyModel");
         call!("setLoaded", false);
     });
 
-    single_shot(Duration::from_secs(15), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("placeholder-while-loading", call!("placeholderOn"));
         call!("setLoaded", true);
     });
 
-    single_shot(Duration::from_secs(16), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("placeholder-when-empty", call!("placeholderOn"));
         // Refilled for jumps below.
         call!("append", 40);
     });
 
-    single_shot(Duration::from_secs(17), move || unsafe {
+    plan.after(1, move || unsafe {
         // Back from a picture, held on a row up in history; jump tapped before hold runs out. Row
         // measured after jump would put reader straight back.
         call!("holdAt", 20);
@@ -430,7 +424,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("append", 1);
     });
 
-    single_shot(Duration::from_secs(18), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("jumped-from-hold", call!("ended"));
         record!(
             "sticky-from-hold",
@@ -445,7 +439,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("nudge", 50.0);
     });
 
-    single_shot(Duration::from_secs(19), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("jumped-despite-nudge", call!("ended"));
         record!(
             "sticky-despite-nudge",
@@ -457,12 +451,13 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         call!("growLast");
     });
 
-    single_shot(Duration::from_secs(20), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("grown-end", call!("ended"));
         record!("grown-sticky", call!("get", QString::from("stickToBottom")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

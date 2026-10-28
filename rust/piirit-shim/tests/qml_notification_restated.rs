@@ -2,15 +2,7 @@
 //! off, and once nothing there is unread it comes down. All in place, no banner: nothing arrived.
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -106,7 +98,9 @@ fn a_notification_follows_edits_and_deletions_in_its_chat() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::component_url("Notifier.qml")))
@@ -139,10 +133,11 @@ fn a_notification_follows_edits_and_deletions_in_its_chat() {
         record!("after-down", call!("state", 9));
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let context = format!("steps: {steps:?}");

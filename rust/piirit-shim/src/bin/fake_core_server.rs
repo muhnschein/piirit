@@ -113,6 +113,10 @@ struct State {
     deleted_chats: std::collections::BTreeSet<u32>,
     /// Contact requests accepted here; requests are `PIIRIT_FAKE_REQUESTS` chats.
     accepted_requests: std::collections::BTreeSet<u32>,
+    /// Channels joined here by invite; seeded ones are `PIIRIT_FAKE_CHANNELS` chats.
+    joined_channels: std::collections::BTreeSet<u32>,
+    /// Channels made here (core's `OutBroadcast`); seeded ones are `PIIRIT_FAKE_OWN_CHANNELS`.
+    own_channels: std::collections::BTreeSet<u32>,
     /// Accounts with unanswered transport call: core allows one, refuses second.
     configuring: std::collections::BTreeSet<u32>,
     /// Accounts asked to stop ongoing process.
@@ -344,10 +348,13 @@ impl State {
         self.group_members.contains_key(&chat)
     }
 
-    /// Member ids: group's; `PIIRIT_FAKE_SELF_TALK` chat self; other 1:1 Ada.
+    /// Member ids: group's; own channel none yet, reader not among them, as core;
+    /// `PIIRIT_FAKE_SELF_TALK` chat self; other 1:1 Ada.
     fn members(&self, chat: u32) -> Vec<u32> {
         if self.is_group(chat) {
             self.group_members.get(&chat).cloned().unwrap_or_default()
+        } else if self.is_own_channel(chat) {
+            Vec::new()
         } else if env_ids("PIIRIT_FAKE_SELF_TALK").contains(&u64::from(chat)) {
             vec![SELF]
         } else {
@@ -410,6 +417,31 @@ impl State {
     fn is_request(&self, chat: u32) -> bool {
         env_ids("PIIRIT_FAKE_REQUESTS").contains(&u64::from(chat))
             && !self.accepted_requests.contains(&chat)
+    }
+
+    /// Channel read here (core's `InBroadcast`): joined, or named in `PIIRIT_FAKE_CHANNELS`.
+    fn is_channel(&self, chat: u32) -> bool {
+        self.joined_channels.contains(&chat)
+            || env_ids("PIIRIT_FAKE_CHANNELS").contains(&u64::from(chat))
+    }
+
+    /// Own channel: made here, or named in `PIIRIT_FAKE_OWN_CHANNELS`.
+    fn is_own_channel(&self, chat: u32) -> bool {
+        self.own_channels.contains(&chat)
+            || env_ids("PIIRIT_FAKE_OWN_CHANNELS").contains(&u64::from(chat))
+    }
+
+    /// Core's `chatType`.
+    fn chat_type(&self, chat: u32) -> &'static str {
+        if self.is_channel(chat) {
+            "InBroadcast"
+        } else if self.is_own_channel(chat) {
+            "OutBroadcast"
+        } else if self.is_group(chat) {
+            "Group"
+        } else {
+            "Single"
+        }
     }
 
     /// Announce name, picture, member change, as core.
@@ -899,8 +931,8 @@ async fn add_transport_from_qr(
     ok(id, &Value::Null)
 }
 
-/// `check_qr`: invite, relay code, other (shim's distinctions). Relay as core reads it:
-/// `dcaccount:` domain, `dclogin:` address.
+/// `check_qr`: invite (contact, channel), relay code, other (shim's distinctions). Relay as core
+/// reads it: `dcaccount:` domain, `dclogin:` address.
 fn qr_kind(content: &str) -> Value {
     let lower = content.to_ascii_lowercase();
     if let Some(rest) = lower.strip_prefix("dcaccount:") {
@@ -918,6 +950,10 @@ fn qr_kind(content: &str) -> Value {
             .next()
             .unwrap_or_default();
         return json!({"kind": "login", "address": address});
+    }
+    // Channel link names channel in `b=`, as core writes it.
+    if content.contains("i.delta.chat") && content.contains("&b=") {
+        return json!({"kind": "askJoinBroadcast", "name": "News"});
     }
     let kind = if content.contains("i.delta.chat") || content.starts_with("OPENPGP4FPR:") {
         "askVerifyContact"
@@ -1157,6 +1193,31 @@ fn main() {
     runtime.block_on(serve());
 }
 
+/// Pictures test dropped in `path` (see `PIIRIT_FAKE_ARRIVALS`), each a new message in chat 2.
+fn land_pictures(state: &mut State, path: &std::path::Path) {
+    let Ok(arrivals) = std::fs::read_to_string(path) else {
+        return;
+    };
+    let _ = std::fs::remove_file(path);
+    for arrival in arrivals.lines().filter(|line| !line.trim().is_empty()) {
+        let id = state.add_message(1, 2);
+        state.sent_files.insert(
+            id,
+            Sent {
+                file: json!(format!("/tmp/piirit-fake/arrived-{id}.jpg")),
+                view_type: "Image".to_string(),
+                text: None,
+                file_name: None,
+            },
+        );
+        if arrival.trim() == "quiet" {
+            // `add_message`'s two.
+            state.events.pop_back();
+            state.events.pop_back();
+        }
+    }
+}
+
 #[allow(clippy::too_many_lines)]
 async fn serve() {
     // Seeded before first request for early profile asks.
@@ -1196,52 +1257,10 @@ async fn serve() {
             });
         }
     }
-    // Pictures arriving in gallery group (chat 2), each after its ms: `PIIRIT_FAKE_PICTURES=
-    // 1500:quiet,4500`. `quiet`: events lost (core's overflow case), only a reread finds it.
-    // Counted from `PIIRIT_FAKE_EPOCH_MS` (Unix ms, test's clock) if set, else from start: this
-    // process starts a varying while after test does (cold binary: half a second).
-    if let Ok(arrivals) = std::env::var("PIIRIT_FAKE_PICTURES") {
-        let started = std::env::var("PIIRIT_FAKE_EPOCH_MS")
-            .ok()
-            .and_then(|epoch| epoch.trim().parse::<u64>().ok())
-            .map_or(0, |epoch| {
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map_or(0, |since| {
-                        u64::try_from(since.as_millis()).unwrap_or(u64::MAX)
-                    });
-                now.saturating_sub(epoch)
-            });
-        for arrival in arrivals.split(',') {
-            let (millis, quiet) = arrival
-                .split_once(':')
-                .map_or((arrival, false), |(millis, mode)| (millis, mode == "quiet"));
-            let Ok(millis) = millis.trim().parse::<u64>() else {
-                continue;
-            };
-            let wait = millis.saturating_sub(started);
-            let state = state.clone();
-            tokio::spawn(async move {
-                tokio::time::sleep(std::time::Duration::from_millis(wait)).await;
-                let mut state = state.lock().await;
-                let id = state.add_message(1, 2);
-                state.sent_files.insert(
-                    id,
-                    Sent {
-                        file: json!(format!("/tmp/piirit-fake/arrived-{id}.jpg")),
-                        view_type: "Image".to_string(),
-                        text: None,
-                        file_name: None,
-                    },
-                );
-                if quiet {
-                    // `add_message`'s two.
-                    state.events.pop_back();
-                    state.events.pop_back();
-                }
-            });
-        }
-    }
+    // Pictures arriving in gallery group (chat 2) when test says: `PIIRIT_FAKE_ARRIVALS` = file
+    // test drops, a line per picture (`quiet`: events lost, core's overflow case; only reread
+    // finds it). Landed before next request read: on test's clock, not this process's.
+    let arrivals = std::env::var_os("PIIRIT_FAKE_ARRIVALS").map(std::path::PathBuf::from);
     // Call ringing after delay: first chat's peer, audio, offer page would answer. Core sends
     // `IncomingCall` and `MsgsChanged`.
     if let Ok(after) = std::env::var("PIIRIT_FAKE_INCOMING_CALL_MS") {
@@ -1270,11 +1289,31 @@ async fn serve() {
             });
         }
     }
+    // One request handled late: test drops `PIIRIT_FAKE_SLOW_ONCE` file with text (`"method"`,
+    // `"value"`); next request holding it takes it (here, in order read), waits 1 s, then
+    // journaled and done. Later ones overtake it.
+    let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Server dies on next request once test drops `PIIRIT_FAKE_EXIT_ONCE` file; replacement lives.
+    let exit_once = std::env::var_os("PIIRIT_FAKE_EXIT_ONCE").map(std::path::PathBuf::from);
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
 
     while let Ok(Some(line)) = lines.next_line().await {
         if line.trim().is_empty() {
             continue;
+        }
+        if let Some(path) = &arrivals {
+            land_pictures(&mut *state.lock().await, path);
+        }
+        if let Some(path) = &exit_once {
+            if tokio::fs::remove_file(path).await.is_ok() {
+                std::process::exit(0);
+            }
+        }
+        let mut slow = false;
+        if let Some(path) = &slow_once {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                slow = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
+            }
         }
         let state = state.clone();
         let stdout = stdout.clone();
@@ -1291,6 +1330,9 @@ async fn serve() {
                 .unwrap_or_default()
                 .to_string();
             let params = request.get("params").cloned().unwrap_or(Value::Null);
+            if slow {
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            }
             journal(&method, &params);
 
             let positional = |index: usize| -> Value {
@@ -1789,14 +1831,33 @@ async fn serve() {
                     }));
                     ok(&id, &json!(carrier))
                 }
-                // Join and 1:1: fresh chat at top.
+                // Join and 1:1: fresh chat at top. Channel link (`qr_kind`): read-only channel.
                 "create_chat_by_contact_id" | "secure_join" => {
+                    let channel = method.as_str() == "secure_join"
+                        && qr_kind(positional(1).as_str().unwrap_or_default())["kind"]
+                            == "askJoinBroadcast";
                     let mut state = state.lock().await;
                     state.seed_chats();
                     state.next_chat_id += 1;
                     let chat = state.next_chat_id;
                     state.chats.insert(chat, Vec::new());
                     state.chat_order.insert(0, chat);
+                    if channel {
+                        state.joined_channels.insert(chat);
+                    }
+                    ok(&id, &json!(chat))
+                }
+                // Own channel: named, no members; core refuses adding any.
+                "create_broadcast" => {
+                    let name = positional(1).as_str().unwrap_or_default().to_string();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    state.next_chat_id += 1;
+                    let chat = state.next_chat_id;
+                    state.chats.insert(chat, Vec::new());
+                    state.chat_order.insert(0, chat);
+                    state.own_channels.insert(chat);
+                    state.group_names.insert(chat, name);
                     ok(&id, &json!(chat))
                 }
                 "create_group_chat" => {
@@ -1820,12 +1881,20 @@ async fn serve() {
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
-                    let members = state.group_members.entry(chat).or_default();
-                    if !members.contains(&contact) {
-                        members.push(contact);
+                    // Core's words: subscribers join by invite only.
+                    if state.is_own_channel(chat) {
+                        err(
+                            &id,
+                            &format!("Chat#{chat} is not a group where one can add members"),
+                        )
+                    } else {
+                        let members = state.group_members.entry(chat).or_default();
+                        if !members.contains(&contact) {
+                            members.push(contact);
+                        }
+                        state.chat_modified(account, chat);
+                        ok(&id, &Value::Null)
                     }
-                    state.chat_modified(account, chat);
-                    ok(&id, &Value::Null)
                 }
                 // `ChatInfo` shape: member ids; contacts via `get_contacts_by_ids`, keyed by id
                 // string.
@@ -1837,7 +1906,8 @@ async fn serve() {
                     let mut state = state.lock().await;
                     state.seed_chats();
                     let is_group = state.is_group(chat);
-                    let left = state.left_groups.contains(&chat);
+                    // Channel subscriber: no writing, as left group.
+                    let left = state.left_groups.contains(&chat) || state.is_channel(chat);
                     let members = state.members(chat);
                     // Core's words for a missing chat.
                     if state.deleted_chats.contains(&chat) {
@@ -1850,7 +1920,7 @@ async fn serve() {
                             &id,
                             &json!({
                                 "id": chat,
-                                "chatType": if is_group { "Group" } else { "Single" },
+                                "chatType": state.chat_type(chat),
                                 "name": state.chat_name(chat),
                                 "profileImage": state.group_images.get(&chat),
                                 "color": "#0071c7",
@@ -2058,10 +2128,26 @@ async fn serve() {
                     let content = positional(1).as_str().unwrap_or_default().to_string();
                     ok(&id, &qr_kind(&content))
                 }
-                "get_chat_securejoin_qr_code" => ok(
-                    &id,
-                    &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
-                ),
+                // Own invite, or own channel's (names channel in `b=`, as core).
+                "get_chat_securejoin_qr_code" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok());
+                    let state = state.lock().await;
+                    match chat {
+                        Some(chat) if state.is_own_channel(chat) => ok(
+                            &id,
+                            &json!(format!(
+                                "https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me&b={}",
+                                state.chat_name(chat)
+                            )),
+                        ),
+                        _ => ok(
+                            &id,
+                            &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
+                        ),
+                    }
+                }
                 // Here, or everywhere (deletion request as own message). No delivery here: same to
                 // chat.
                 "delete_messages" | "delete_messages_for_all" => {
@@ -2111,7 +2197,7 @@ async fn serve() {
                         &id,
                         &json!({
                             "id": chat,
-                            "chatType": if state.is_group(chat) { "Group" } else { "Single" },
+                            "chatType": state.chat_type(chat),
                             "name": state.chat_name(chat),
                             "isEncrypted": true,
                             "isMuted": state.muted.contains(&chat),
@@ -2154,7 +2240,11 @@ async fn serve() {
                     let state = state.lock().await;
                     ok(
                         &id,
-                        &json!(!state.left_groups.contains(&chat) && !state.is_request(chat)),
+                        &json!(
+                            !state.left_groups.contains(&chat)
+                                && !state.is_request(chat)
+                                && !state.is_channel(chat)
+                        ),
                     )
                 }
                 // Edit own text. Core refuses empty and others' (menu offers neither): only empty

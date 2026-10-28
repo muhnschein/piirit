@@ -11,13 +11,10 @@
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
     clippy::expect_used,
     clippy::needless_pass_by_value,
     clippy::useless_transmute
 )]
-
-use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -200,14 +197,16 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
         };
     }
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(2, move || unsafe {
         record!(
             "load",
             call!("load", QString::from(common::page_url("QrPage.qml")))
         );
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("switch", call!("click", QString::from("viewOption1")));
         record!("open", call!("click", QString::from("typeLinkButton")));
         record!(
@@ -222,7 +221,7 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
     });
 
     // Page that replaced QR page, made from what it was handed.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         let stack = (*stack_ptr).pinned();
         record!("navigation", stack.borrow().log.to_string());
         let handed = stack.borrow().handed.to_string();
@@ -248,7 +247,7 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
         record!("add", call!("click", QString::from("addButton")));
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         let calls = common::calls(&*journal_ptr);
         let added = calls
             .iter()
@@ -266,6 +265,7 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let context = format!("steps: {steps:?}");

@@ -3,16 +3,8 @@
 //! does.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -103,8 +95,10 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         };
     }
 
+    let mut plan = common::Plan::default();
+
     // Incoming group message, 1970-01-02 03:04 UTC.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -119,7 +113,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("sentAt", 97_440.0);
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("sender-shown", get!("senderLabel", "visible"));
         record!("sender-name", get!("senderLabel", "text"));
         record!("footer", get!("footerLabel", "text"));
@@ -145,7 +139,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("deliveryState", 26);
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("sender-hidden", get!("senderLabel", "visible"));
         record!("delivered-footer", get!("footerLabel", "text"));
         record!("long-height", call!("height"));
@@ -157,7 +151,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("viewType", QString::from("File"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("quote-shown", get!("quoteRow", "visible"));
         record!("quote-text", get!("quoteLabel", "text"));
         record!("file-shown", get!("attachmentLabel", "visible"));
@@ -167,7 +161,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("viewType", QString::from("Image"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("image-shown", get!("attachmentImage", "visible"));
         record!("image-not-named", get!("attachmentLabel", "visible"));
 
@@ -175,7 +169,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("isInfo", true);
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("info-shown", get!("infoLabel", "visible"));
         record!("info-has-no-bubble", get!("bubble", "visible"));
         // Ordinary message again, marked forwarded. Own tick: `set` persists, and info flag hides
@@ -184,7 +178,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("isForwarded", true);
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("forwarded-shown", get!("forwardedLabel", "visible"));
         record!("forwarded-text", get!("forwardedLabel", "text"));
         // Sits above quote, not overlapping.
@@ -193,7 +187,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         set!("isForwarded", false);
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("plain-not-forwarded", get!("forwardedLabel", "visible"));
         // Markdown setting: 0 = shim's rendering as StyledText; anything else (incl. 2 an older
         // build stored) = as written.
@@ -231,6 +225,7 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

@@ -2,15 +2,7 @@
 //! lest they drift into looking like different apps.
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -81,7 +73,9 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -140,6 +134,7 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

@@ -5,15 +5,7 @@
 //! Pinned: arrival = one more row; nothing else moves or empties.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -102,19 +94,21 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("opened", call!("count")));
         (*steps_ptr).push(("opened-edges", call!("edges")));
         // Up in history, rows filled in.
         (*steps_ptr).push(("read-top", call!("readTop")));
     });
-    single_shot(Duration::from_millis(4500), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("top-filled", call!("filledAt", 0)));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(4, move || unsafe {
         (*steps_ptr).push(("arrived", call!("count")));
         (*steps_ptr).push(("arrived-edges", call!("edges")));
         (*steps_ptr).push((
@@ -129,6 +123,7 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps, &journal);

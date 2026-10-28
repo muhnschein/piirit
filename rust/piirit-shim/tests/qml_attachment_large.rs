@@ -7,15 +7,7 @@
 //! Fake ceiling 1 KB (`PIIRIT_FAKE_MSGSIZE_MAX`): test files stay small.
 
 // Qt harness: see qml_send_file.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -133,7 +125,9 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
     let video_file = video_path.clone();
     let picture_path = picture.to_string_lossy().into_owned();
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*steps_ptr).push((
             "load",
             call!(
@@ -146,7 +140,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         (*steps_ptr).push(("settle", call!("settle")));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         probe!("bar-before", "largeFileBar", "visible");
         (*steps_ptr).push((
             "attach-video",
@@ -154,7 +148,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         ));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         probe!("bar-after", "largeFileBar", "visible");
         probe!("bar-text", "largeFileLabel", "text");
         probe!("send-enabled", "sendButton", "enabled");
@@ -163,7 +157,7 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         (*steps_ptr).push(("send", call!("send")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         // Sent: bar and notice gone.
         probe!("bar-after-send", "largeFileBar", "visible");
         (*steps_ptr).push((
@@ -172,12 +166,13 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         ));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         probe!("bar-for-picture", "largeFileBar", "visible");
         probe!("send-enabled-for-picture", "sendButton", "enabled");
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

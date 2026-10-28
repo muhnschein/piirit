@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Lisa profiil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Edasi</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Loo profiil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Alustad uue aadressiga ja ilma vestlusteta.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Taasta varukoopiast</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Impordid profiili varukoopiafailist.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Lisa teise seadmena</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Kasutad sama profiili selles telefonis ja teises seadmes.</translation>
     </message>
 </context>
 <context>
@@ -567,10 +580,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Arhiveeritud vestlused</translation>
     </message>
     <message>
-        <source>New chat</source>
-        <translation>Uus vestlus</translation>
-    </message>
-    <message>
         <source>Archived</source>
         <translation>Arhiveeritud</translation>
     </message>
@@ -652,10 +661,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>QR-kood</translation>
     </message>
     <message>
-        <source>New group</source>
-        <translation>Uus grupp</translation>
-    </message>
-    <message>
         <source>Mark as unread</source>
         <translation>Märgi lugemata</translation>
     </message>
@@ -691,6 +696,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Send to</source>
         <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
         <translation>Saada vestlusesse</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
+        <translation>Uus</translation>
     </message>
 </context>
 <context>
@@ -1144,6 +1154,16 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation>Muuda pilti</translation>
     </message>
+    <message>
+        <source>QR invite code</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
+        <translation>Kutse QR-koodina</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
+        <translation>Kanal</translation>
+    </message>
 </context>
 <context>
     <name>HeldBackView</name>
@@ -1364,6 +1384,40 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>NewDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked chat, group or channel.</extracomment>
+        <translation>Edasi</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>Uus vestlus</translation>
+    </message>
+    <message>
+        <source>You write to one person.</source>
+        <translation>Kirjutad ühe inimesega.</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>Uus grupp</translation>
+    </message>
+    <message>
+        <source>Several people write to each other.</source>
+        <translation>Mitu inimest kirjutavad üksteisele.</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Uus kanal</translation>
+    </message>
+    <message>
+        <source>Channels are a one-to-many tool for broadcasting your messages.</source>
+        <extracomment>Delta Chat&apos;s &quot;chat_new_channel_hint&quot;.</extracomment>
+        <translation>Kanalid on üks-mitmele suhtlusviisid oma sõnumite levitamiseks.</translation>
+    </message>
+</context>
+<context>
     <name>NewGroupPage</name>
     <message>
         <source>Please name the group</source>
@@ -1404,6 +1458,28 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Create group</source>
         <translation>Loo grupp</translation>
+    </message>
+    <message>
+        <source>Please name the channel</source>
+        <translation>Pane kanalile nimi</translation>
+    </message>
+    <message>
+        <source>Create channel</source>
+        <translation>Loo kanal</translation>
+    </message>
+    <message>
+        <source>New channel</source>
+        <extracomment>Delta Chat&apos;s &quot;new_channel&quot;.</extracomment>
+        <translation>Uus kanal</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <extracomment>Delta Chat&apos;s &quot;channel_name&quot;.</extracomment>
+        <translation>Kanali nimi</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees the name</source>
+        <translation>Nime näevad kõik kanalis</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1706,15 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Copy invite link</source>
         <translation>Kopeeri kutselink</translation>
+    </message>
+    <message>
+        <source>QR invite code</source>
+        <translation>Kutse QR-koodina</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
+        <translation>Skaneeri liitumaks „%1“ kanaliga</translation>
     </message>
 </context>
 <context>
@@ -2145,8 +2230,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Üksikasjadeta</translation>
     </message>
     <message>
-        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
-        <translation>Summutatud gruppides teavita sinule suunatud sõnumitest, milleks võivad olla vastused või reageerimised</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Näita teavitusi vastustest sinu sõnumitele summutatud gruppides</translation>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>

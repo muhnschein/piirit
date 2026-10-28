@@ -5,15 +5,7 @@
 //! So model asks twice and intersects; this pins that.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -76,29 +68,32 @@ fn searching_the_archived_list_finds_archived_chats() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
         (*engine_ptr).invoke_method("open".into(), &[]);
     });
 
     // Archived list holds chat 3 only.
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("archived", call!("count")));
         call!("search", QString::from("chat 3"));
     });
 
     // Term matching archived chat keeps it.
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("hit", call!("count")));
         call!("search", QString::from("chat 1"));
     });
 
     // Term matching only ordinary chat empties list: archived page must not show it.
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("miss", call!("count")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

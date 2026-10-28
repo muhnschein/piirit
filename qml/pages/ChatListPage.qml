@@ -15,6 +15,9 @@ Page {
     /// Configured account count; switching offered if >1.
     property int accountCount: 0
 
+    // Finished flow can't be swiped back into: back closed until window's list takes over.
+    backNavigation: !flowEnd.pending
+
     // Not bound to field: core round trip per keystroke; only last answer wanted. Interval as
     // contact search.
     Timer {
@@ -120,12 +123,21 @@ Page {
     /// Core answered. Empty = no chats or no answer yet (on resume): no "No chats yet" till set.
     property bool chatsLoaded: false
 
+    /// Placeholder words follow rows, not the filter flag: flag flips before rows, and the
+    /// placeholder fades out over them.
+    property bool emptyUnreadOnly: false
+
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
         onMessage_restated: notifier.restated(chat_id, chat_name, sender, preview, unread)
         // Emitted once rows set.
-        onRows_changed: page.chatsLoaded = true
+        onRows_changed: {
+            page.chatsLoaded = true
+            if (chats.count === 0) {
+                page.emptyUnreadOnly = chats.unread_only
+            }
+        }
     }
 
     /// Bring list to front as outside tap does: raise window (lipstick only calls app), pop
@@ -343,9 +355,29 @@ Page {
         page.openSearch()
     }
 
+    // Attached list arriving: pop to window's list (built, filled), else swipe back reopens
+    // finished page.
+    PendingNavigation {
+        id: flowEnd
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
+    function endFinishedFlow() {
+        var windowList = typeof appWindow !== "undefined" ? appWindow.chatList : null
+        // Profiles page hands on window list's profile; other profile = not this flow, stays.
+        if (!windowList || windowList.accountId !== page.accountId) {
+            return
+        }
+        flowEnd.popTo(windowList)
+    }
+
     // Back on list: no chat open. Leaving: pending deletes go now (still wanted gone).
     onStatusChanged: {
         if (status === PageStatus.Active) {
+            if (page.attached) {
+                page.endFinishedFlow()
+            }
             notifier.viewingChatId = 0
             page.dropCapture()
             if (page.arrivingChatId !== 0) {
@@ -418,7 +450,7 @@ Page {
             // `appWindow`.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
-                // Quick actions land here, not on list beside backup (gone on swipe back).
+                // Quick actions land here, not on list beside backup (gone once swiped to).
                 if (!page.attached) {
                     appWindow.chatList = page
                 }
@@ -488,18 +520,13 @@ Page {
                                           { accountId: page.accountId })
             }
             MenuItem {
-                objectName: "newGroupMenuItem"
+                // Chat, group, channel: one item, choice in dialog (pulley stays short).
+                objectName: "newMenuItem"
                 visible: !page.archived
-                text: qsTr("New group")
-                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewGroupPage.qml"),
-                                          { accountId: page.accountId })
-            }
-            MenuItem {
-                objectName: "newChatMenuItem"
-                visible: !page.archived
-                text: qsTr("New chat")
-                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewChatPage.qml"),
-                                          { accountId: page.accountId })
+                //: Pull-down item. Opens a dialog to pick a new chat, group or channel.
+                text: qsTr("New")
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewDialog.qml"),
+                                          { accountId: page.accountId, landOn: page })
             }
         }
 
@@ -790,15 +817,15 @@ Page {
                 text: page.archived ? qsTr("No archived chats")
                                     //: The unread filter is on and every
                                     //: chat has been read.
-                                    : chats.unread_only ? qsTr("No unread chats")
-                                                        : qsTr("No chats yet")
+                                    : page.emptyUnreadOnly ? qsTr("No unread chats")
+                                                           : qsTr("No chats yet")
                 // Archiving happens in ordinary list.
                 hintText: page.archived ? ""
                                         //: %1 is the label of the unread
                                         //: filter, a button at the right of
                                         //: the search field.
-                                        : chats.unread_only ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
-                                                            : qsTr("Pull down to start one")
+                                        : page.emptyUnreadOnly ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
+                                                               : qsTr("Pull down to start one")
             }
         }
 

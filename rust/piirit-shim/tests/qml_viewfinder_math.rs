@@ -4,19 +4,11 @@
 //! A JS port would test the port.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::path::PathBuf;
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 use serde_json::Value;
+use std::path::PathBuf;
 
 mod common;
 
@@ -113,18 +105,21 @@ fn the_viewfinder_arithmetic_agrees_with_the_platform_camera() {
             .display()
     );
 
+    let mut plan = common::Plan::default();
+
     let mut engine = QmlEngine::new();
     engine.load_data(QByteArray::from(probe(&library).as_str()));
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut answer = String::new();
     let answer_ptr: *mut String = std::ptr::addr_of_mut!(answer);
-    single_shot(Duration::from_millis(100), move || unsafe {
+    plan.after(0, move || unsafe {
         let result = (*engine_ptr).invoke_method("run".into(), &[]);
         *answer_ptr = QString::from_qvariant(result)
             .map(|value| value.to_string())
             .unwrap_or_default();
         (*engine_ptr).quit();
     });
+    plan.run();
     engine.exec();
 
     let out: Value = serde_json::from_str(&answer)

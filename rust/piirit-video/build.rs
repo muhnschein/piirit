@@ -30,6 +30,9 @@ use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+#[path = "build_reuse.rs"]
+mod reuse;
+
 fn main() {
     let manifest = PathBuf::from(env("CARGO_MANIFEST_DIR"));
     let root = manifest.join("../../third_party");
@@ -45,6 +48,8 @@ fn main() {
         println!("cargo:rerun-if-changed={}", src.display());
     }
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=build_reuse.rs");
+    println!("cargo:rerun-if-env-changed=PIIRIT_MAKE_JOBS");
     println!("cargo:rerun-if-changed=csrc");
     println!("cargo:rerun-if-changed={GMP_CHECK}");
     println!("cargo:rerun-if-changed={}", root.join("gmp-api").display());
@@ -321,8 +326,12 @@ struct Target {
     arch: String,
     /// Target triple, if not build machine.
     cross: Option<String>,
-    /// Jobs cargo allows this build script.
+    /// make jobs: `PIIRIT_MAKE_JOBS` (spec sets it under scratchbox2, where cargo
+    /// runs one), else what cargo allows this build script.
     jobs: String,
+    /// First line of compiler's `--version`, for reuse stamp; `None` if it
+    /// won't say.
+    version: Option<String>,
 }
 
 impl Target {
@@ -337,6 +346,15 @@ impl Target {
             .collect();
         let target = env("TARGET");
         let host = env("HOST");
+        let version = Command::new(compiler.path())
+            .arg("--version")
+            .output()
+            .ok()
+            .filter(|output| output.status.success())
+            .and_then(|output| {
+                let text = String::from_utf8_lossy(&output.stdout);
+                text.lines().next().map(str::to_owned)
+            });
         Self {
             cc: compiler.path().to_path_buf(),
             cflags,
@@ -344,7 +362,10 @@ impl Target {
             ranlib: build.get_ranlib().get_program().into(),
             arch: env("CARGO_CFG_TARGET_ARCH"),
             cross: (target != host).then_some(target),
-            jobs: std::env::var("NUM_JOBS").unwrap_or_else(|_| "1".into()),
+            jobs: std::env::var("PIIRIT_MAKE_JOBS")
+                .or_else(|_| std::env::var("NUM_JOBS"))
+                .unwrap_or_else(|_| "1".into()),
+            version,
         }
     }
 
@@ -359,8 +380,8 @@ impl Target {
     }
 }
 
-/// Configures and builds x264 out of tree, installs under `OUT_DIR/x264`;
-/// returns prefix.
+/// Configures and builds x264 out of tree, installs under `OUT_DIR/x264`
+/// (kept if there from same inputs: `build_reuse.rs`); returns prefix.
 fn build_x264(src: &Path, out: &Path, target: &Target) -> PathBuf {
     let build = out.join("x264-build");
     let prefix = out.join("x264");
@@ -395,24 +416,21 @@ fn build_x264(src: &Path, out: &Path, target: &Target) -> PathBuf {
     if let Some(triple) = &target.cross {
         configure.arg(format!("--host={triple}"));
     }
-    run(
-        &mut configure,
-        "x264's configure",
+    let make = make(&build, target, "install-lib-static");
+    configure_and_make(
+        "x264",
+        src,
+        &prefix,
+        configure,
+        make,
         &build.join("config.log"),
-    );
-    run(
-        Command::new("make")
-            .current_dir(&build)
-            .arg(format!("-j{}", target.jobs))
-            .arg("install-lib-static"),
-        "x264's make",
-        &build.join("config.log"),
+        target,
     );
     prefix
 }
 
-/// Configures and builds FFmpeg out of tree, installs under `OUT_DIR/ffmpeg`;
-/// returns prefix.
+/// Configures and builds FFmpeg out of tree, installs under `OUT_DIR/ffmpeg`
+/// (kept if there from same inputs: `build_reuse.rs`); returns prefix.
 fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
     let build = out.join("ffmpeg-build");
     let prefix = out.join("ffmpeg");
@@ -461,20 +479,57 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
             .arg(format!("--arch={}", target.arch))
             .arg(format!("--cross-prefix={triple}-"));
     }
-    run(
-        &mut configure,
-        "FFmpeg's configure",
+    let make = make(&build, target, "install");
+    configure_and_make(
+        "FFmpeg",
+        src,
+        &prefix,
+        configure,
+        make,
         &build.join("ffbuild/config.log"),
-    );
-    run(
-        Command::new("make")
-            .current_dir(&build)
-            .arg(format!("-j{}", target.jobs))
-            .arg("install"),
-        "FFmpeg's make",
-        &build.join("ffbuild/config.log"),
+        target,
     );
     prefix
+}
+
+/// `make <goal>` in `build` with `Target::jobs`.
+fn make(build: &Path, target: &Target, goal: &str) -> Command {
+    let mut make = Command::new("make");
+    make.current_dir(build)
+        .arg(format!("-j{}", target.jobs))
+        .arg(goal);
+    make
+}
+
+/// Runs `configure` then `make` into `prefix`, unless an install from the same
+/// inputs is already there (`build_reuse.rs`).
+fn configure_and_make(
+    name: &str,
+    src: &Path,
+    prefix: &Path,
+    mut configure: Command,
+    mut make: Command,
+    log: &Path,
+    target: &Target,
+) {
+    let inputs = reuse::inputs(
+        src,
+        &[&configure, &make],
+        target.version.as_deref(),
+        &|key| std::env::var_os(key),
+    );
+    if inputs
+        .as_deref()
+        .is_some_and(|inputs| reuse::is_current(prefix, inputs))
+    {
+        return;
+    }
+    reuse::forget(prefix);
+    run(&mut configure, &format!("{name}'s configure"), log);
+    run(&mut make, &format!("{name}'s make"), log);
+    if let Some(inputs) = inputs {
+        reuse::record(prefix, &inputs);
+    }
 }
 
 /// Runs a step; on failure, names it and its log.

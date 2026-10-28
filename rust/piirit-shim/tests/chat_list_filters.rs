@@ -3,15 +3,7 @@
 //! Filtering loaded rows finds only on-screen chats; archived is a disjoint list.
 
 // Qt harness: see chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -81,29 +73,32 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("search".into(), &[QVariant::from(QString::from("anna"))]);
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("showArchived".into(), &[]);
         (*engine_ptr).invoke_method("accept".into(), &[QVariant::from(7u32)]);
         (*engine_ptr).invoke_method("block".into(), &[QVariant::from(9u32)]);
     });
 
     // Contact page's chats in common: set after account, as page sets it.
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         (*engine_ptr).invoke_method("byContact".into(), &[QVariant::from(10u32)]);
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(3, move || unsafe {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let entries = entry_calls(&journal);

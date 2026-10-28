@@ -8,15 +8,7 @@
 //! look before picture loads.
 
 // Qt harness: see qml_chat_row.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -94,7 +86,9 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -125,8 +119,11 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         record!("loading-picture", get!("avatarImage", "visible"));
     });
 
-    // A second later: picture loaded, drawn.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    // Picture loaded, however slow the load (`Image.Ready` is 1), drawn.
+    plan.until(1, 30, move |last| unsafe {
+        if get!("avatarImage", "status") != "1" && !last {
+            return false;
+        }
         record!("picture-status", get!("avatarImage", "status"));
         record!("picture-shown", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
@@ -138,8 +135,10 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         record!("face-height", get!("avatarImage", "height"));
 
         (*engine_ptr).quit();
+        true
     });
 
+    plan.run();
     engine.exec();
 
     assert_avatar(&steps);

@@ -3,15 +3,7 @@
 //! First message is row 0 always: going to start is a scroll, not a fetch.
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -126,10 +118,12 @@ fn every_message_has_a_row_and_only_what_is_looked_at_is_fetched() {
         }};
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("opened", call!("count")));
         (*steps_ptr).push(("opened-edges", call!("edges")));
         (*steps_ptr).push(("opened-filled", call!("filled")));
@@ -141,24 +135,25 @@ fn every_message_has_a_row_and_only_what_is_looked_at_is_fetched() {
         // Search result: lookup, not fetch.
         (*steps_ptr).push(("reveal", call!("reveal", 3)));
     });
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("revealed", call!("revealed")));
         // Scrolled to top: fill in what is there.
         (*steps_ptr).push(("scrolled", call!("hydrate", 0, 20)));
     });
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("first-filled", call!("filledAt", 0)));
         (*steps_ptr).push(("day-filled", call!("dayAt", 0)));
         (*steps_ptr).push(("still-whole", call!("count")));
         (*steps_ptr).push(("still-edges", call!("edges")));
         (*steps_ptr).push(("arrive", call!("arrive")));
     });
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(2, move || unsafe {
         (*steps_ptr).push(("arrived", call!("count")));
         (*steps_ptr).push(("arrived-edges", call!("edges")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps, &journal);

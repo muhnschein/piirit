@@ -2,7 +2,8 @@
 # Rebuilds a release from its source and checks it against the published RPM.
 #
 #     scripts/verify-release.sh [--podman | --docker] [--upstream-sdk] [--rpm <file>]
-#                               [--no-download] [--ref <ref>] [<version>]
+#                               [--no-download] [--ref <ref>] [--save <file>]
+#                               [--rebuilt <file>] [<version>]
 #
 #   <version>       release to check, e.g. 2.2.0; default: latest
 #   --rpm <file>    check this file too (e.g. one copied off a phone); version
@@ -13,6 +14,9 @@
 #   --upstream-sdk  derive the SDK image from upstream's, don't pull ours
 #                   (scripts/build-in-container.sh)
 #   --podman, --docker  engine to use; default: Docker if running, else Podman
+#   --save <file>   keep the rebuilt RPM there; with --no-download and no
+#                   --rpm, only rebuild (rpm.yml: rebuild beside the release)
+#   --rebuilt <file>  don't rebuild: compare against this earlier rebuild
 #
 # Needs git, curl, unzip, sha256sum, Podman or Docker. First run: ~2.3 GB pull, ~30
 # min build. Builds in a fresh clone under PIIRIT_WORKDIR, never in this tree;
@@ -38,7 +42,7 @@ repo=${PIIRIT_REPO:-https://github.com/$github.git}
 legacy_image=ghcr.io/muhnschein/piirit-sdk@sha256:842ff7b9ffefb95eabbd31fe1e64cf08e3cfddc4c39ab9cce2184d66653579e8
 
 usage() {
-    sed -n '4,16p' "$0" | sed 's/^# \{0,1\}//' >&2
+    sed -n '4,20p' "$0" | sed 's/^# \{0,1\}//' >&2
     exit 3
 }
 
@@ -47,6 +51,8 @@ rpm=""
 download=1
 ref=""
 version=""
+save=""
+rebuilt=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --upstream-sdk) upstream_sdk=--upstream-sdk ;;
@@ -54,6 +60,8 @@ while [ $# -gt 0 ]; do
         --rpm) [ $# -ge 2 ] || usage; rpm=$2; shift ;;
         --no-download) download=0 ;;
         --ref) [ $# -ge 2 ] || usage; ref=$2; shift ;;
+        --save) [ $# -ge 2 ] || usage; save=$2; shift ;;
+        --rebuilt) [ $# -ge 2 ] || usage; rebuilt=$2; shift ;;
         -h | --help) usage ;;
         -*) echo "$prog: unknown option $1" >&2; usage ;;
         *) [ -z "$version" ] || usage; version=$1 ;;
@@ -87,8 +95,11 @@ cleanup() {
 trap cleanup EXIT
 mkdir -p "$work/cmp"
 
-# What to check against: GitHub's copy, --rpm's, or both.
-[ "$download" = 1 ] || [ -n "$rpm" ] || fail "--no-download: nothing to check; give --rpm"
+# What to check against: GitHub's copy, --rpm's, or both; none: rebuild only.
+[ "$download" = 1 ] || [ -n "$rpm" ] || [ -n "$save" ] ||
+    fail "--no-download: nothing to check; give --rpm, or --save to only rebuild"
+[ -z "$rebuilt" ] || [ -f "$rebuilt" ] || fail "no such file: $rebuilt"
+[ -z "$rebuilt" ] || [ -z "$save" ] || fail "--rebuilt reuses a rebuild, --save keeps a new one; pick one"
 if [ -n "$rpm" ]; then
     [ -f "$rpm" ] || fail "no such file: $rpm"
     cp "$rpm" "$work/cmp/local.rpm"
@@ -118,68 +129,79 @@ if [ "$download" = 1 ]; then
     cp "$work/$name" "$work/cmp/github.rpm"
 fi
 ref=${ref:-v$version}
+[ "$ref" != v ] || fail "nothing names what to rebuild; give a version or --ref"
 
-# Fresh clone: nothing uncommitted from anywhere gets in.
-echo ">> cloning $ref"
-src="$work/harbour-piirit"
-if printf '%s\n' "$ref" | grep -Eq '^[0-9a-f]{7,40}$'; then
-    git clone --quiet "$repo" "$src"
-    git -C "$src" checkout --quiet --detach "$ref"
+if [ -n "$rebuilt" ]; then
+    echo ">> comparing against the rebuild in $rebuilt"
+    cp "$rebuilt" "$work/cmp/rebuilt.rpm"
+    # Image to unpack in: this tree's pin (rpm.yml: same commit).
+    src=$here
 else
-    git clone --quiet --depth 1 --branch "$ref" "$repo" "$src" 2>/dev/null ||
-        git clone --quiet --branch "$ref" "$repo" "$src" ||
-        fail "can't clone $ref from $repo"
-fi
+    # Fresh clone: nothing uncommitted from anywhere gets in.
+    echo ">> cloning $ref"
+    src="$work/harbour-piirit"
+    if printf '%s\n' "$ref" | grep -Eq '^[0-9a-f]{7,40}$'; then
+        git clone --quiet "$repo" "$src"
+        git -C "$src" checkout --quiet --detach "$ref"
+    else
+        git clone --quiet --depth 1 --branch "$ref" "$repo" "$src" 2>/dev/null ||
+            git clone --quiet --branch "$ref" "$repo" "$src" ||
+            fail "can't clone $ref from $repo"
+    fi
 
-# The source's own recipe. Releases from before it had one: this tree's,
-# against the image they were built in.
-if [ ! -f "$src/scripts/build-in-container.sh" ]; then
-    echo ">> $ref predates reproducible releases: expect same files inside," \
-         "different packaging"
-    cp "$here/scripts/build-in-container.sh" "$here/scripts/container-engine.sh" "$src/scripts/"
-    cp "$here/ci/build-sdk-image.sh" "$src/ci/"
-    # Its fetch-rpc-server.sh needs pip, lacks --check: this tree's, with its
-    # pins (VERSION, TABLE).
-    old="$src/scripts/fetch-rpc-server.sh"
-    awk -v old="$old" '
-        BEGIN {
-            while ((getline l < old) > 0) {
-                if (l ~ /^VERSION=/) ver = l
-                if (l ~ /^TABLE="/) intab = 1
-                if (intab) tab = tab l "\n"
-                if (intab && l == "\"") intab = 0
+    # The source's own recipe. Releases from before it had one: this tree's,
+    # against the image they were built in.
+    if [ ! -f "$src/scripts/build-in-container.sh" ]; then
+        echo ">> $ref predates reproducible releases: expect same files inside," \
+             "different packaging"
+        cp "$here/scripts/build-in-container.sh" "$here/scripts/container-engine.sh" "$src/scripts/"
+        cp "$here/ci/build-sdk-image.sh" "$src/ci/"
+        # Its fetch-rpc-server.sh needs pip, lacks --check: this tree's, with its
+        # pins (VERSION, TABLE).
+        old="$src/scripts/fetch-rpc-server.sh"
+        awk -v old="$old" '
+            BEGIN {
+                while ((getline l < old) > 0) {
+                    if (l ~ /^VERSION=/) ver = l
+                    if (l ~ /^TABLE="/) intab = 1
+                    if (intab) tab = tab l "\n"
+                    if (intab && l == "\"") intab = 0
+                }
             }
-        }
-        /^VERSION=/ { print ver; next }
-        /^TABLE="/ { printf "%s", tab; skip = 1; next }
-        skip { if ($0 == "\"") skip = 0; next }
-        { print }
-    ' "$here/scripts/fetch-rpc-server.sh" > "$work/fetch-rpc-server.sh" ||
-        fail "can't carry $ref's deltachat-rpc-server pins over"
-    mv "$work/fetch-rpc-server.sh" "$old"
-    # Build tooling, not packaged: hide from the uncommitted-changes warning.
-    for f in scripts/build-in-container.sh scripts/container-engine.sh \
-             ci/build-sdk-image.sh scripts/fetch-rpc-server.sh; do
-        if git -C "$src" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
-            git -C "$src" update-index --assume-unchanged "$f"
-        else
-            echo "/$f" >> "$src/.git/info/exclude"
-        fi
-    done
-    [ -n "$upstream_sdk" ] || [ -f "$src/ci/sdk-images" ] ||
-        PIIRIT_SDK_IMAGE=${PIIRIT_SDK_IMAGE:-$legacy_image}
-    export PIIRIT_SDK_IMAGE
+            /^VERSION=/ { print ver; next }
+            /^TABLE="/ { printf "%s", tab; skip = 1; next }
+            skip { if ($0 == "\"") skip = 0; next }
+            { print }
+        ' "$here/scripts/fetch-rpc-server.sh" > "$work/fetch-rpc-server.sh" ||
+            fail "can't carry $ref's deltachat-rpc-server pins over"
+        mv "$work/fetch-rpc-server.sh" "$old"
+        # Build tooling, not packaged: hide from the uncommitted-changes warning.
+        for f in scripts/build-in-container.sh scripts/container-engine.sh \
+                 ci/build-sdk-image.sh scripts/fetch-rpc-server.sh; do
+            if git -C "$src" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+                git -C "$src" update-index --assume-unchanged "$f"
+            else
+                echo "/$f" >> "$src/.git/info/exclude"
+            fi
+        done
+        [ -n "$upstream_sdk" ] || [ -f "$src/ci/sdk-images" ] ||
+            PIIRIT_SDK_IMAGE=${PIIRIT_SDK_IMAGE:-$legacy_image}
+        export PIIRIT_SDK_IMAGE
+    fi
+
+    # Commit time, from the clone: never the caller's.
+    unset SOURCE_DATE_EPOCH
+    # shellcheck disable=SC2086 # $upstream_sdk: one flag or none.
+    sh "$src/scripts/build-in-container.sh" $upstream_sdk ||
+        fail "the build failed"
+
+    built=$(find "$src/RPMS" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name '*.src.rpm' | head -1)
+    [ -n "$built" ] || fail "the build made no device RPM"
+    cp "$built" "$work/cmp/rebuilt.rpm"
+    if [ -n "$save" ]; then
+        cp "$built" "$save" || fail "can't save the rebuild to $save"
+    fi
 fi
-
-# Commit time, from the clone: never the caller's.
-unset SOURCE_DATE_EPOCH
-# shellcheck disable=SC2086 # $upstream_sdk: one flag or none.
-sh "$src/scripts/build-in-container.sh" $upstream_sdk ||
-    fail "the build failed"
-
-built=$(find "$src/RPMS" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name '*.src.rpm' | head -1)
-[ -n "$built" ] || fail "the build made no device RPM"
-cp "$built" "$work/cmp/rebuilt.rpm"
 
 sum() {
     f=$1
@@ -192,6 +214,10 @@ for c in github local; do
 done
 printf '%-8s %s\n' rebuilt "$ours"
 [ -z "$rpm" ] || echo "local    = $rpm"
+if [ ! -f "$work/cmp/github.rpm" ] && [ ! -f "$work/cmp/local.rpm" ]; then
+    echo "rebuilt  = $save; nothing to check it against here"
+    exit 0
+fi
 
 # Unpacked in the SDK image (rpm2cpio, cpio there, maybe not here). As root:
 # rootless, that's us; reads our files whatever the image's user.

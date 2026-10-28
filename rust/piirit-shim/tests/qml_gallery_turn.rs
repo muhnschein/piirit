@@ -9,19 +9,11 @@
 //! Share hands sheet file (video paused); Save copies; lone video seeks once length known.
 //!
 //! Headless vs stub Silica; group seeded with picture (10, Ada Lovelace) and video (15, 7 s).
-//! Turn = page's width and height swapped, as Silica does. Steps a second apart (`single_shot`
-//! counts whole seconds).
+//! Turn = page's width and height swapped, as Silica does. Steps a second apart, each after one
+//! before ended (`common::Plan`).
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -243,8 +235,12 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
     let gallery = common::page_url("GalleryPage.qml");
     let video = common::component_url("VideoView.qml");
 
+    // SAFETY for every step: runs only while `exec()` runs on this thread; all it points at
+    // outlives it.
+    let mut plan = common::Plan::default();
+
     let page = gallery.clone();
-    single_shot(Duration::from_secs(1), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -259,7 +255,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
 
     // Jolla's chrome: up or down closes, X, sender and day. Video: page turns it; seek bar's
     // length from row mid-swipe.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("allowed", call!("page", s!("allowedOrientations")));
         record!("back-way", call!("page", s!("navigationStyle")));
         record!("back-arrow", call!("page", s!("showNavigationIndicator")));
@@ -292,7 +288,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("turn", call!("turn", 960, 540));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "turned-index",
             call!("get", s!("slides"), s!("currentIndex"))
@@ -304,7 +300,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("turn-back", call!("turn", 540, 960));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "upright-index",
             call!("get", s!("slides"), s!("currentIndex"))
@@ -321,7 +317,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("controls-tapped-at-once", call!("controls"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-tapped", call!("controls"));
         record!("tappable", call!("get", s!("overlay"), s!("enabled")));
         // Swipes keep them as they are; video's play button stays (not playing).
@@ -336,14 +332,14 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("tap-again", call!("tapCurrent", s!("pictureTap")));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-tapped-again", call!("controls"));
         record!("double-tap", call!("doubleTapPicture"));
         record!("controls-zoomed", call!("controls"));
         record!("tap-zoomed", call!("tapCurrent", s!("pictureTap")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(1, move || unsafe {
         record!(
             "zoomed-after-tap",
             call!("current", s!("pictureView"), s!("zoomed"))
@@ -358,7 +354,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         );
     });
 
-    single_shot(Duration::from_secs(8), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-double-tapped", call!("controls"));
         // Play: controls away, list still, play button gone.
         record!("play", call!("click", s!("playButton"), true));
@@ -378,7 +374,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("tap-video", call!("tapCurrent", s!("videoTap")));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-video-tapped", call!("controls"));
         record!(
             "swipeable-tapped",
@@ -427,7 +423,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         );
     });
 
-    single_shot(Duration::from_secs(10), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-timed-out", call!("controls"));
         record!(
             "hide-later",
@@ -440,7 +436,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
     let page = gallery;
     let picture = png_url;
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(11), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("controls-back", call!("controls"));
         // Share: sheet gets video's file; video waits.
         record!(
@@ -486,11 +482,12 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         record!("save", call!("click", s!("saveButton"), false));
     });
 
-    single_shot(Duration::from_secs(12), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("saved", call!("get", s!("viewerNoticeLabel"), s!("text")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

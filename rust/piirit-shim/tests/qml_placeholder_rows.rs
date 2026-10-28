@@ -6,15 +6,7 @@
 //! holds its message once message arrives.
 
 // Qt harness: see qml_delete_run.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -126,7 +118,9 @@ fn a_placeholder_row_holds_no_message_until_it_has_one() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -135,17 +129,18 @@ fn a_placeholder_row_holds_no_message_until_it_has_one() {
             )
         );
     });
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("before", call!("rowsNow"));
         record!("tap", call!("tapLast"));
         // Fourth message arrives.
         record!("arrive", call!("arrive", 3));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("after", call!("rowsNow"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

@@ -1,22 +1,29 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Emoji.js" as Emoji
 
 /*
  * PageHeader layout, PlainText label, for peer-chosen titles: PageHeader lacks
- * textFormat, so `<img src=...>` in a name would fetch (a network tell). Keeps
- * PageHeader's height; second line (e.g. "7 members") only if it fits.
+ * textFormat, so `<img src=...>` in a name would fetch (a network tell). Emoji:
+ * escaped StyledText, Twemoji (Emoji.js). Keeps PageHeader's height; second
+ * line (e.g. "7 members") only if it fits.
  */
 Item {
     id: root
 
-    /// Shown as written.
-    property alias title: titleLabel.text
+    /// Shown as written, emoji as pictures.
+    property string title
 
     /// Line under title, as written; empty none.
     property alias subtitle: subtitleLabel.text
 
     /// Drawn like PageHeader's forward header.
     property bool interactive: false
+
+    /// Title with emoji pictures, or "" for plain.
+    readonly property string emojiTitle: Emoji.inText(root.title, false,
+                                                      titleLabel.font.pixelSize,
+                                                      "", Emoji.nameSaturation)
 
     /// Second line drawn: set, and room for it.
     readonly property bool showsSubtitle:
@@ -53,7 +60,8 @@ Item {
         font.pixelSize: Theme.fontSizeLarge
         font.family: Theme.fontFamilyHeading
         truncationMode: TruncationMode.Fade
-        textFormat: Text.PlainText
+        textFormat: root.emojiTitle.length > 0 ? Text.StyledText : Text.PlainText
+        text: root.emojiTitle.length > 0 ? root.emojiTitle : root.title
     }
 
     Label {

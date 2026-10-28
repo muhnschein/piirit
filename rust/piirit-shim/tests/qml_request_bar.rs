@@ -4,16 +4,8 @@
 //! page acts (`chat_contact_request.rs` covers model side). Hidden bar takes no room.
 
 // Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
-// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// `borrow_as_ptr` for engine pointer.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -100,7 +92,9 @@ fn a_request_bar_names_who_wrote_and_offers_the_right_turn_down() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -110,7 +104,7 @@ fn a_request_bar_names_who_wrote_and_offers_the_right_turn_down() {
         );
     });
 
-    single_shot(Duration::from_secs(2), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("single-text", get!("requestText", "text"));
         record!("single-decline", get!("declineButton", "text"));
         record!("accept", get!("acceptButton", "text"));
@@ -120,19 +114,20 @@ fn a_request_bar_names_who_wrote_and_offers_the_right_turn_down() {
         call!("set", QString::from("isGroup"), true);
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("group-text", get!("requestText", "text"));
         record!("group-decline", get!("declineButton", "text"));
         record!("heard", call!("heardSoFar"));
         call!("set", QString::from("shown"), false);
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    plan.after(1, move || unsafe {
         record!("hidden-height", call!("own", QString::from("height")));
         record!("hidden", call!("own", QString::from("visible")));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     assert_outcome(&steps);

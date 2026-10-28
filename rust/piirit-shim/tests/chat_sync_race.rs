@@ -1,16 +1,8 @@
 //! Reverse of `chat_send_race`: send reply lands during event's reconciliation; must not append row
 //! twice.
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -59,21 +51,24 @@ fn a_send_answered_mid_fetch_lands_once() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("send".into(), &[QVariant::from(QString::from("hello"))]);
     });
 
     let mut count_after_send = 0_u32;
     let count_ptr: *mut u32 = std::ptr::addr_of_mut!(count_after_send);
-    single_shot(Duration::from_secs(6), move || unsafe {
+    plan.after(3, move || unsafe {
         let value = (*engine_ptr).invoke_method("count".into(), &[]);
         *count_ptr = u32::from_qvariant(value).unwrap_or_default();
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let names = common::methods(&journal);

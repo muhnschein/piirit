@@ -4,15 +4,7 @@
 //! (`common::qml_tree_without_enter_key`).
 
 // Qt harness: see qml_chat_list.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -156,7 +148,9 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         };
     }
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         record!(
             "load",
             call!(
@@ -170,7 +164,7 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         record!("settle", call!("settle"));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(6, move || unsafe {
         record!("row", call!("rowOf", OLDER_MESSAGE));
         record!("found", call!("everFoundValue"));
         record!("lit", call!("everLitValue"));
@@ -199,11 +193,12 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         record!("return", call!("settle"));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    plan.after(2, move || unsafe {
         record!("found-on-return", call!("everFoundValue"));
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let value = |label: &str| {

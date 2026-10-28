@@ -212,10 +212,23 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Both entries for members: hidden for left/removed reader (empty pull-down).
+        // Both entries for members: hidden for left/removed reader (empty pull-down). Own channel:
+        // its invite, only way subscribers join (core takes no members added).
         PullDownMenu {
             objectName: "groupMenu"
-            visible: chat.can_edit
+            visible: chat.can_edit || chat.is_own_channel
+
+            MenuItem {
+                objectName: "channelInvite"
+                visible: chat.is_own_channel
+                //: Delta Chat's "qrshow_title". Opens the code others scan to join the channel.
+                text: qsTr("QR invite code")
+                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
+                    accountId: page.accountId,
+                    chatId: page.chatId,
+                    chatName: chat.name
+                })
+            }
 
             MenuItem {
                 objectName: "leaveButton"
@@ -247,7 +260,9 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: qsTr("Group")
+                objectName: "pageHeader"
+                //: Delta Chat's "channel". Heading of a channel's page.
+                title: chat.is_channel ? qsTr("Channel") : qsTr("Group")
             }
 
             // Tap enlarges; change via pull-down.

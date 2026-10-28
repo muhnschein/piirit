@@ -38,3 +38,26 @@ on the released crate and on master. See docs/HARBOUR.md.
              , engine(new QQmlApplicationEngine())
          {}
      };
+
+Keep the sub-second part of a single_shot interval.
+
+`interval.subsec_nanos() * 1e-6 as u32` parses as
+`subsec_nanos() * (1e-6 as u32)`, and `1e-6 as u32` is 0, so every
+interval lost its fraction: 1.5 s fired after 1 s, 200 ms at once.
+`as_millis()` keeps it. QTimer takes an int, so intervals past
+i32::MAX ms saturate rather than wrap to a negative one Qt refuses.
+
+Upstream master still carries the same line.
+
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -873,7 +873,8 @@
+     let func_box: Box<dyn FnMut()> = Box::new(func);
+     let mut func_raw = Box::into_raw(func_box);
+ 
+-    let interval_ms: u32 = interval.as_secs() as u32 * 1000 + interval.subsec_nanos() * 1e-6 as u32;
++    // QTimer takes int milliseconds: saturate instead of wrapping.
++    let interval_ms = interval.as_millis().min(i32::MAX as u128) as i32;
+ 
+     cpp!(unsafe [interval_ms as "int", mut func_raw as "FnBoxWrapper"] {
+         QTimer::singleShot(interval_ms, std::move(func_raw));

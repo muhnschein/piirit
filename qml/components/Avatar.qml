@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/QuickActions.js" as QuickActions
+import "../js/Emoji.js" as Emoji
 
 /*
  * Round avatar: colour and initial, or picture cut to circle (Image ignores parent
@@ -73,16 +74,29 @@ Rectangle {
         }
     }
 
+    /// Initial as drawn: emoji whole (picture), else letter.
+    readonly property string first: Emoji.firstOf(avatar.initial)
+    readonly property bool firstIsEmoji: Emoji.emojiEnd(avatar.first, 0) > 0
+
+    EmojiGlyph {
+        objectName: "avatarEmoji"
+        anchors.centerIn: parent
+        visible: !avatar.showsPicture && avatar.firstIsEmoji
+        opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
+        size: Theme.fontSizeLarge
+        emoji: avatar.firstIsEmoji ? avatar.first : ""
+    }
+
     Label {
         objectName: "avatarInitial"
         anchors.centerIn: parent
-        visible: !avatar.showsPicture
+        visible: !avatar.showsPicture && !avatar.firstIsEmoji
         // Letter fades whole: too small to fade across.
         opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
         color: Theme.primaryColor
         font.pixelSize: Theme.fontSizeLarge
         textFormat: Text.PlainText
-        text: avatar.initial.substring(0, 1).toUpperCase()
+        text: avatar.firstIsEmoji ? "" : avatar.first.toUpperCase()
     }
 
     Image {

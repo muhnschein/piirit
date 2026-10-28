@@ -6,16 +6,8 @@
 //! Pinned vs real core: `deltachat-jsonrpc/tests/real_server.rs`. Here: shim fills slots from
 //! picker, incl. `file://` (URL property core can't open).
 
-// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
@@ -79,16 +71,18 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+
+    plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    single_shot(Duration::from_secs(3), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("sendPhoto".into(), &[]);
     });
 
     let mut photo_row = String::new();
     let photo_ptr: *mut String = std::ptr::addr_of_mut!(photo_row);
-    single_shot(Duration::from_secs(5), move || unsafe {
+    plan.after(2, move || unsafe {
         let value = (*engine_ptr).invoke_method("newest".into(), &[]);
         *photo_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -98,7 +92,7 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
 
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
-    single_shot(Duration::from_secs(7), move || unsafe {
+    plan.after(2, move || unsafe {
         (*engine_ptr).invoke_method("sendNothing".into(), &[]);
         let error = (*engine_ptr).invoke_method("error".into(), &[]);
         *report_ptr = QString::from_qvariant(error)
@@ -107,6 +101,7 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
         (*engine_ptr).quit();
     });
 
+    plan.run();
     engine.exec();
 
     let sends: Vec<(String, Value)> = common::calls(&journal)

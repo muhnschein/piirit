@@ -20,6 +20,8 @@ Page {
     }
 
     property int accountId
+    /// Page chat opens over; null = page under this one (NewDialog.qml passes chat list).
+    property var landOn: null
     property string errorMessage: ""
 
     // Core has said who is in profile. Empty model: none, or no answer yet;
@@ -41,7 +43,7 @@ Page {
         // Emitted once rows set.
         onRows_changed: page.contactsLoaded = true
         // Open new chat above this page: job done.
-        onChat_ready: navigation.replaceAbove(pageStack.previousPage(page),
+        onChat_ready: navigation.replaceAbove(page.landOn || pageStack.previousPage(page),
                                               Qt.resolvedUrl("ConversationPage.qml"), {
             accountId: page.accountId,
             chatId: chat_id,
