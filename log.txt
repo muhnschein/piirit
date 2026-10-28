@@ -1,0 +1,21 @@
+close: harbour-piirit (17412)
+baseline: Home
+core before: 2.65.0
+Running as unit: harness-harbour-piirit.service
+shot: out/before-list.png
+core after: 2.66.0
+Running as unit: harness-harbour-piirit.service
+shot: out/after-list.png
+shot: out/after-profiles.png
+shot: out/after-menu.png
+shot: out/after-profile.png
+Running as unit: harness-harbour-piirit.service
+sent 358
+shot: out/chat-in.png
+alice got: Harness Bot | Harness Bot | 'outbound on core 2.66'
+shot: out/chat-out.png
+footprint: 4 files changed; naming harbour-piirit:
+  none
+bot addr: evjft4tgn@chat.adminforge.de
+peer core: 2.66.0
+alice addr: xpqiqa8z4@chat.adminforge.de

@@ -1,0 +1,4 @@
+rpm: harbour-piirit-2.2.0-1.aarch64.rpm sha256 c072530b3884682a6f997c2e512cd5e45855aa800fdbf5eba187ec25ecfe6d84
+rpm: harbour-piirit-2.2.0-1.350.aarch64.rpm sha256 32ac179f42463e9f339f3ff88fe128eb0ef659ee0c3121c5b78f2588beabb563
+source: muhnschein/piirit run 40768697036 artifact 12851318034
+state: upgrade:2.2.0 (fixture:kitchen-sink)
