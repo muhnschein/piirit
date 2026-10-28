@@ -2295,8 +2295,8 @@ async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
     chats_in_common_against(client, caller, contact, chat).await;
 }
 
-/// Contact page's chats in common (`ChatList.contact_id`): core lists contact's 1:1 and groups,
-/// archived too; not others. Own id lists every chat: why page asks nothing for saved messages.
+/// Core lists a contact's 1:1 and groups, archived too. Own id lists every chat, so the page
+/// asks nothing for saved messages.
 async fn chats_in_common_against(client: &RpcClient, account: u32, contact: u32, chat: u32) {
     let shared: u32 = client
         .call("create_group_chat", (account, "Shared Group", false))

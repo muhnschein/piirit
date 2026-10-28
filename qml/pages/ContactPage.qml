@@ -14,9 +14,6 @@ import Piirit 1.0
  *
  * Same ChatInfo as group page; one member, the contact. Row read into
  * properties: save's reload must not rebuild field under thumb.
- *
- * Chats in common at bottom, as Delta Chat apps: every chat core lists with
- * contact, this one too; tap opens it in this one's place.
  */
 Page {
     id: page
@@ -51,9 +48,8 @@ Page {
         }
     }
 
-    // Chats contact is in. Loaded once page first comes on screen: attached beside every 1:1
-    // chat, mostly never opened. Contact before account, each once: contact 0 lists every chat.
-    // Self, device (ids up to 9): none, as Delta Chat apps.
+    // Loaded on first show: most 1:1 chats are never opened. Contact before account: account
+    // alone lists every chat. Ids up to 9 (self, devices) have none.
     ChatList {
         id: commonChats
         objectName: "commonChats"
@@ -149,11 +145,9 @@ Page {
         })
     }
 
-    /// Common chats listed here; rest behind Show all.
     readonly property int commonChatsShown: 5
 
-    // Common chat in this one's place, as Delta Chat apps; back goes to list. This one: back to it,
-    // from all-chats page too. Called by that page.
+    // Own chat: back to it, also from the all-chats page.
     function openChat(chatId, chatName) {
         if (chatId === page.chatId) {
             if (pageStack.currentPage === page) {
@@ -163,7 +157,7 @@ Page {
             }
             return
         }
-        // List page: it knows which chat is open (notifications). None, or other profile's: over.
+        // Via the list page: it tracks the open chat for notifications.
         if (typeof appWindow !== "undefined" && appWindow.chatList !== null
                 && appWindow.chatList.accountId === page.accountId) {
             appWindow.chatList.openChatAbove(chatId, chatName)
@@ -318,7 +312,6 @@ Page {
                 onChosen: chat.set_ephemeral_timer(seconds)
             }
 
-            // None: no heading, as Delta Chat apps. Count as search results' headings.
             SectionHeader {
                 objectName: "commonChatsHeader"
                 visible: commonChats.count > 0
@@ -328,7 +321,6 @@ Page {
                 text: qsTr("Chats in common (%1)").arg(commonChats.count)
             }
 
-            // Picture and name only, as member rows; first few, rest on own page.
             Repeater {
                 model: commonChats.rows
 

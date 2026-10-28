@@ -1,10 +1,5 @@
-//! Contact page's "Chats in common": every chat core lists with contact, as Delta Chat apps.
-//!
-//! Asked of core by contact (filtering held rows would miss unloaded and archived chats), never
-//! as whole list: contact unknown till chat loads, and contact 0 means every chat. Not before page
-//! first shown. Rows: picture and name. Five shown, count in heading, Show all page for rest. Tap
-//! opens chat in contact chat's place via list page (it tracks open chat); own chat: back to it.
-//! Member leaves group: row goes. Saved messages: no section, nothing asked.
+//! Contact page's "Chats in common": asked of core by contact, never as the whole list.
+//! Tap opens the chat via the list page; the own chat goes back.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -32,7 +27,6 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
 
-        // Show all page loaded where pushed, as Silica would build it.
         property QtObject pageStack: QtObject {
             property string log: ''
             property var currentPage: null
@@ -60,12 +54,10 @@ const PROBE_QML: &str = r"
             property QtObject chatList: probe.listPage
         }
 
-        // Ada leaves group 2, as from another device.
         ChatInfo { id: group; account_id: 1; chat_id: 2 }
 
         Loader { id: loader }
         Loader { id: allLoader }
-        // Attached beside chat: off screen until swiped to.
         function load(chatId) {
             loader.setSource('', {})
             loader.setSource('__PAGE__', { accountId: 1, chatId: chatId, chatName: 'from the list',
@@ -105,7 +97,6 @@ const PROBE_QML: &str = r"
             var chats = findIn(loader.item, 'commonChats')
             return chats ? chats.count : -1
         }
-        // Shown rows' chat ids, top to bottom.
         function rows() {
             var header = findIn(loader.item, 'commonChatsHeader')
             var out = []
@@ -118,7 +109,6 @@ const PROBE_QML: &str = r"
             }
             return out.join(',')
         }
-        // Every string a row draws.
         function allText(node) {
             if (!node) { return '' }
             var out = node.text !== undefined ? node.text + '|' : ''
@@ -128,7 +118,6 @@ const PROBE_QML: &str = r"
             return out
         }
         function rowText(name) { return allText(findIn(loader.item, name)) }
-        // Show all page: rows built (no window lays a view out), each by chat id.
         function allRows() {
             var view = findIn(allLoader.item, 'commonChatsList')
             if (!view) { return 'missing:commonChatsList' }
@@ -153,7 +142,6 @@ const PROBE_QML: &str = r"
         property bool finished: false
         function isFinished() { return finished ? 'true' : 'false' }
 
-        // What each step waits for; steps run in order.
         property int step: 0
         Timer {
             interval: 100; running: !probe.finished; repeat: true
@@ -165,7 +153,6 @@ const PROBE_QML: &str = r"
                 step = 1
             } else if (step === 1 && get('chat', 'loaded') === 'true'
                        && loader.item.contactId === 10) {
-                // Contact known, page not shown: list has no account, asks nothing.
                 var chats = findIn(loader.item, 'commonChats')
                 record('unshown', chats.account_id + ':' + chats.contact_id)
                 record('show', show())
@@ -182,7 +169,6 @@ const PROBE_QML: &str = r"
                 record('tap-own', tap('commonChatRow1'))
                 record('stack-own', pageStack.log)
                 pageStack.log = ''
-                // Show all: every chat, on own page, tapped as here.
                 record('tap-all', tap('commonChatsAll'))
                 record('stack-all', pageStack.log)
                 record('all-rows', allRows())
@@ -194,7 +180,6 @@ const PROBE_QML: &str = r"
                 record('all-stack-own', pageStack.log)
                 pageStack.currentPage = loader.item
                 pageStack.log = ''
-                // List of another profile (switched meanwhile), then none: pushed over.
                 listPage.accountId = 2
                 record('tap-other-profile', tap('commonChatRow201'))
                 record('stack-other-profile', pageStack.log)
@@ -222,7 +207,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Ticks to wait for the steps; only a broken run spends them.
 const PATIENCE_SECONDS: u32 = 30;
 
 #[test]
@@ -232,8 +216,7 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded; set pre-Qt and before server inherits. Chat 7: saved messages;
-    // 201-203 more chats with Ada, six in all.
+    // SAFETY: single-threaded; set pre-Qt and before the server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -275,7 +258,6 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
         "ok",
         "the contact page did not load. {context}"
     );
-    // Ada: her chat, the group, three more 1:1, her archived chat; core's order. Five shown.
     assert_eq!(
         (
             value("header"),
@@ -404,8 +386,7 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
     let _ = std::fs::remove_dir_all(&temp);
 }
 
-/// Each second: probe done, or patience spent? Then take steps and quit. Whole seconds: vendored
-/// `single_shot` drops fraction.
+/// Whole seconds: vendored `single_shot` drops the fraction.
 fn wait_for_steps(engine: *mut QmlEngine, steps: *mut String, patience: u32) {
     single_shot(Duration::from_secs(1), move || unsafe {
         let finished = (*engine).invoke_method("isFinished".into(), &[]);

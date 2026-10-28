@@ -36,7 +36,6 @@ const PROBE_QML: &str = r"
                 log += 'push:' + name(page) + ':' + JSON.stringify(properties) + '|'
                 return null
             }
-            // Page replaced above, by `aboveWhom`.
             property var target: null
             function replaceAbove(above, page, properties) {
                 target = above
@@ -106,7 +105,6 @@ const PROBE_QML: &str = r"
             pageStack.log = ''
             return log
         }
-        // Contact page's chat in common, opened through list.
         function openAbove(chatId, chatName) {
             loader.item.openChatAbove(chatId, chatName)
             return 'ok'
@@ -299,8 +297,7 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     plan.after(1, move || unsafe {
         record!("detached-registered", call!("registered"));
 
-        // Chat in common, from contact page over a chat: one replace above list, which now
-        // counts it as open.
+        // replaceAbove sets the open chat, as openChatAbove does.
         call!("stackLog");
         record!("above", call!("openAbove", 5, QString::from("chat 5")));
         record!("above-stack", call!("stackLog"));

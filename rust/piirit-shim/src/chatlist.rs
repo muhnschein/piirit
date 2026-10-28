@@ -42,8 +42,8 @@ pub struct ChatList {
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
 
-    /// Chats this contact is in (contact page's "Chats in common"); 0: all. Core then lists
-    /// archived too, ignores `query`, `archived`, `for_forwarding`.
+    /// Chats this contact is in, archived too; 0: all.
+    /// Core ignores `query`, `archived` and `for_forwarding` then.
     pub contact_id: qt_property!(u32; WRITE set_contact_id NOTIFY contact_changed),
     /// Contact changed.
     pub contact_changed: qt_signal!(),
@@ -845,7 +845,7 @@ async fn chat_entries(
     .map_err(|err| err.to_string())
 }
 
-/// Chats `contact_id` is member of, core order: pinned first, then newest; archived among them.
+/// Chats the contact is in, in core's order.
 async fn contact_entries(
     rpc: &RpcClient,
     account_id: u32,

@@ -231,7 +231,6 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/CommonChatsPage.qml",
             names_of::<piirit_shim::ChatListItem>(),
         ),
-        // The contact, chats in common.
         (
             "qml/pages/ContactPage.qml",
             [

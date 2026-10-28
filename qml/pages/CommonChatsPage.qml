@@ -2,16 +2,10 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 
-/*
- * Every chat in common with a contact, from contact page's Show all. Its
- * list, not own: no second load, stays live by its events. Tap: as there.
- */
 Page {
     id: page
 
-    /// Contact page's ChatList.
     property QtObject chats
-    /// Contact page: opens tapped chat.
     property Item contactPage
 
     SilicaListView {
