@@ -227,6 +227,8 @@ fn the_profile_page_round_trips_the_profile() {
         record!("quota-words", get!("reportQuota", "label"));
         record!("quota-value", get!("reportQuota", "value"));
         record!("storage", get!("storageLabel", "text"));
+        // No picture yet: disc in core's colour, as profiles page row.
+        record!("disc", get!("profileAvatar", "discColor"));
         // Name: badge, and field with hint once badge tapped.
         record!("hint-before", get!("nameHint", "visible"));
         record!("field-before", get!("profileNameField", "visible"));
@@ -328,6 +330,12 @@ fn the_profile_page_round_trips_the_profile() {
         "the profile page did not load. {context}"
     );
     assert_page_says_what_the_relay_said(&steps, &context);
+    assert_eq!(
+        value("disc"),
+        "#00875a",
+        "the avatar without a picture is not in the profile's own colour, \
+         so it differs from the profiles list. {context}"
+    );
     assert_eq!(
         value("edited-after-typing"),
         "true",
