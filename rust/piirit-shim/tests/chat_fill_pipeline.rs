@@ -8,7 +8,6 @@
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
-use serde_json::Value;
 
 mod common;
 
@@ -40,6 +39,8 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
     let temp = std::env::temp_dir().join(format!("piirit-fill-pipeline-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Dropped once chat is open: holds both asks' answers till test lets go.
+    let hold = temp.join("hold");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
@@ -47,8 +48,7 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // Long enough: second ask made while first still answering.
-        std::env::set_var("PIIRIT_FAKE_FETCH_DELAY_MS", "700");
+        std::env::set_var("PIIRIT_FAKE_HOLD", &hold);
     }
 
     piirit_shim::register_qml_types();
@@ -78,12 +78,15 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
         }};
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
     let mut plan = common::Plan::default();
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
     // Open: every row there, newest page filled.
+    let dropped = hold.clone();
     plan.until(1, 30, move |last| unsafe {
         let open = call!("count") == MESSAGES.to_string()
             && call!("filledAt", i32::try_from(MESSAGES - 1).unwrap_or(0)) == "true";
@@ -91,15 +94,25 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
             return false;
         }
         (*steps_ptr).push(("opened", call!("count")));
-        // Chat top, then a page further down, before first ask can be answered.
+        std::fs::write(&dropped, r#""get_messages""#).expect("write the hold file");
+        // Chat top, then a page further down; neither answered yet.
         (*steps_ptr).push(("ask-top", call!("ask", 0, 10)));
         (*steps_ptr).push(("ask-far", call!("ask", 70, 80)));
         true
     });
-    plan.after(0, move || unsafe {
+    // Second ask reaches core while first is held: two in the air at once.
+    let asked = journal.clone();
+    plan.until(1, 30, move |last| unsafe {
+        let fetches = fetches(&asked);
+        if fetches < 3 && !last {
+            return false;
+        }
+        (*steps_ptr).push(("in-air", fetches.to_string()));
         (*steps_ptr).push(("busy", call!("busy")));
+        let _ = std::fs::remove_file(&hold);
+        true
     });
-    // Both answers in, however slow the machine.
+    // Both answers in.
     plan.until(1, 30, move |last| unsafe {
         if call!("busy") == "yes" && !last {
             return false;
@@ -116,6 +129,14 @@ fn a_second_ask_goes_out_while_the_first_is_still_in_the_air() {
     engine.exec();
 
     assert_outcome(&steps, &journal);
+}
+
+/// `get_messages` calls reaching fake so far.
+fn fetches(journal: &std::path::Path) -> usize {
+    common::methods(journal)
+        .iter()
+        .filter(|name| *name == "get_messages")
+        .count()
 }
 
 /// What run shows, out of test body.
@@ -135,28 +156,20 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the chat did not open with a row per message. {context}"
     );
 
-    // Fetch that opened chat, then both asks. Second waiting on first read off fake's clock:
-    // answer takes 700 ms; asks reaching it closer than that were in air at once.
-    let arrivals: Vec<u64> = common::records(journal)
-        .iter()
-        .filter(|call| call.get("method").and_then(Value::as_str) == Some("get_messages"))
-        .filter_map(|call| call.get("at").and_then(Value::as_u64))
-        .collect();
+    // Fetch that opened chat, then both asks.
     assert_eq!(
-        arrivals.len(),
-        3,
-        "{} fetches reached the core: the chat's opening page and then the \
-         two asks, and fewer means an ask was dropped while another was in \
-         the air. {context}",
-        arrivals.len()
+        value("in-air"),
+        "3",
+        "only the chat's opening page and one ask reached the core while \
+         the first ask's answer was held: the second waited for the first to \
+         land, and the rows in front of the reader stayed blank for a round \
+         trip they did not need to wait for. {context}"
     );
-    let gap = arrivals[2].saturating_sub(arrivals[1]);
-    assert!(
-        gap < 700,
-        "the second ask reached the core {gap}ms after the first, which is \
-         a whole answer later: it waited for the first to land, and the \
-         rows in front of the reader stayed blank for a round trip they did \
-         not need to wait for. {context}"
+    assert_eq!(
+        fetches(journal),
+        3,
+        "fetches reaching the core should be the chat's opening page and \
+         then the two asks; more means one was asked twice. {context}"
     );
     assert_eq!(
         value("busy"),

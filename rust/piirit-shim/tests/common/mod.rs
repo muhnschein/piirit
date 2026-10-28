@@ -261,6 +261,11 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
+/// Core answered `start`. Model made before fetches nothing (app waits on it too).
+pub fn ready(core: &qmetaobject::QObjectBox<piirit_shim::DeltaChatCore>) -> bool {
+    core.pinned().borrow().status.to_string() == "ready"
+}
+
 /// Each step's recorded result. One step per tick: shim answers async.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 

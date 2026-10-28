@@ -1164,6 +1164,13 @@ fn delay(var: &str) -> std::time::Duration {
     delay_or(var, 0)
 }
 
+/// Until `path` is there (`true`) or gone (`false`). Test's clock: dropped or removed file.
+async fn file_present(path: &std::path::Path, present: bool) {
+    while tokio::fs::metadata(path).await.is_ok() != present {
+        tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+    }
+}
+
 fn main() {
     // Not `#[tokio::main]`: needs `macros` (proc-macro crate app build lacks).
     let runtime = match tokio::runtime::Builder::new_multi_thread()
@@ -1243,6 +1250,14 @@ async fn serve() {
             });
         }
     }
+    // Same, once test drops `PIIRIT_FAKE_LATE_ARRIVAL` file.
+    if let Some(path) = std::env::var_os("PIIRIT_FAKE_LATE_ARRIVAL") {
+        let state = state.clone();
+        tokio::spawn(async move {
+            file_present(std::path::Path::new(&path), true).await;
+            state.lock().await.add_late_message(1, 1);
+        });
+    }
     // Pictures arriving in gallery group (chat 2) when test says: `PIIRIT_FAKE_ARRIVALS` = file
     // test drops, a line per picture (`quiet`: events lost, core's overflow case; only reread
     // finds it). Landed before next request read: on test's clock, not this process's.
@@ -1279,6 +1294,9 @@ async fn serve() {
     // `"value"`); next request holding it takes it (here, in order read), waits 1 s, then
     // journaled and done. Later ones overtake it.
     let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Answers held while `PIIRIT_FAKE_HOLD` file there: requests whose line holds its text
+    // (journaled on arrival) wait till test removes it.
+    let hold = std::env::var_os("PIIRIT_FAKE_HOLD").map(std::path::PathBuf::from);
     // Server dies on next request once test drops `PIIRIT_FAKE_EXIT_ONCE` file; replacement lives.
     let exit_once = std::env::var_os("PIIRIT_FAKE_EXIT_ONCE").map(std::path::PathBuf::from);
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
@@ -1301,6 +1319,14 @@ async fn serve() {
                 slow = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
             }
         }
+        let mut held_by = None;
+        if let Some(path) = &hold {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                if line.contains(text.trim()) {
+                    held_by = Some(path.clone());
+                }
+            }
+        }
         let state = state.clone();
         let stdout = stdout.clone();
         tokio::spawn(async move {
@@ -1320,6 +1346,9 @@ async fn serve() {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
             journal(&method, &params);
+            if let Some(path) = held_by {
+                file_present(&path, false).await;
+            }
 
             let positional = |index: usize| -> Value {
                 params
