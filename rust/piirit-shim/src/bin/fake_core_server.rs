@@ -348,6 +348,20 @@ impl State {
         self.group_members.contains_key(&chat)
     }
 
+    /// Member ids: group's; own channel none yet, reader not among them, as core;
+    /// `PIIRIT_FAKE_SELF_TALK` chat self; other 1:1 Ada.
+    fn members(&self, chat: u32) -> Vec<u32> {
+        if self.is_group(chat) {
+            self.group_members.get(&chat).cloned().unwrap_or_default()
+        } else if self.is_own_channel(chat) {
+            Vec::new()
+        } else if env_ids("PIIRIT_FAKE_SELF_TALK").contains(&u64::from(chat)) {
+            vec![SELF]
+        } else {
+            vec![10]
+        }
+    }
+
     /// Chat name: renamed, else seeded.
     fn chat_name(&self, chat: u32) -> String {
         self.group_names
@@ -1894,14 +1908,7 @@ async fn serve() {
                     let is_group = state.is_group(chat);
                     // Channel subscriber: no writing, as left group.
                     let left = state.left_groups.contains(&chat) || state.is_channel(chat);
-                    // Own channel: subscribers only, none yet; reader not among them, as core.
-                    let members = if is_group {
-                        state.group_members.get(&chat).cloned().unwrap_or_default()
-                    } else if state.is_own_channel(chat) {
-                        Vec::new()
-                    } else {
-                        vec![10]
-                    };
+                    let members = state.members(chat);
                     // Core's words for a missing chat.
                     if state.deleted_chats.contains(&chat) {
                         err(
@@ -1938,11 +1945,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    let members = if state.is_group(chat) {
-                        state.group_members.get(&chat).cloned().unwrap_or_default()
-                    } else {
-                        vec![10]
-                    };
+                    let members = state.members(chat);
                     ok(&id, &json!(members))
                 }
                 "get_contacts_by_ids" => {
@@ -2325,6 +2328,19 @@ async fn serve() {
                         Some(object) => ok(&id, &object),
                         None => err(&id, "contact not found"),
                     }
+                }
+                // Contact given: chats they're in, archived too; flags, query ignored (core).
+                "get_chatlist_entries" if positional(3).is_u64() => {
+                    let contact = positional(3)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let mut entries = state.chat_order.clone();
+                    entries.extend(state.archived_order.iter().copied());
+                    entries.retain(|chat| state.members(*chat).contains(&contact));
+                    ok(&id, &json!(entries))
                 }
                 "get_chatlist_entries" => {
                     let mut state = state.lock().await;

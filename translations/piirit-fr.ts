@@ -750,6 +750,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>CommonChatsPage</name>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Discussions en commun</translation>
+    </message>
+</context>
+<context>
     <name>ContactPage</name>
     <message>
         <source>Saved</source>
@@ -779,6 +787,16 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Vu il y a longtemps</translation>
+    </message>
+    <message>
+        <source>Chats in common (%1)</source>
+        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Discussions en commun (%1)</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
+        <translation>Tout afficher</translation>
     </message>
 </context>
 <context>

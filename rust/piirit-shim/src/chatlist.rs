@@ -42,6 +42,12 @@ pub struct ChatList {
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
 
+    /// Chats this contact is in, archived too; 0: all.
+    /// Core ignores `query`, `archived` and `for_forwarding` then.
+    pub contact_id: qt_property!(u32; WRITE set_contact_id NOTIFY contact_changed),
+    /// Contact changed.
+    pub contact_changed: qt_signal!(),
+
     /// Forwardable chats only. Core drops ones forward would refuse (device chat).
     pub for_forwarding: qt_property!(bool; WRITE set_for_forwarding NOTIFY for_forwarding_changed),
     /// Forwarding flag changed.
@@ -306,6 +312,15 @@ impl ChatList {
         }
     }
 
+    /// Only this contact's chats, or all.
+    pub fn set_contact_id(&mut self, contact_id: u32) {
+        if self.contact_id != contact_id {
+            self.contact_id = contact_id;
+            self.contact_changed();
+            self.refresh(Refresh::All);
+        }
+    }
+
     /// Only forwardable chats.
     pub fn set_for_forwarding(&mut self, for_forwarding: bool) {
         if self.for_forwarding != for_forwarding {
@@ -541,6 +556,7 @@ impl ChatList {
         let query = self.query.to_string();
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
+        let contact_id = self.contact_id;
         let cached: Vec<ChatListItem> = self.all_rows.clone();
         // Nothing held: app start, profile switch, archived page.
         let first_load = cached.is_empty();
@@ -596,8 +612,11 @@ impl ChatList {
 
         runtime.spawn(async move {
             let result = async {
-                let entries =
-                    chat_entries(&rpc, account_id, &query, archived, for_forwarding).await?;
+                let entries = if contact_id == 0 {
+                    chat_entries(&rpc, account_id, &query, archived, for_forwarding).await?
+                } else {
+                    contact_entries(&rpc, account_id, contact_id).await?
+                };
                 let wanted: Vec<u32> = entries
                     .iter()
                     .copied()
@@ -821,6 +840,25 @@ async fn chat_entries(
     rpc.call(
         "get_chatlist_entries",
         (account_id, flags, query, Option::<u32>::None),
+    )
+    .await
+    .map_err(|err| err.to_string())
+}
+
+/// Chats the contact is in, in core's order.
+async fn contact_entries(
+    rpc: &RpcClient,
+    account_id: u32,
+    contact_id: u32,
+) -> Result<Vec<u32>, String> {
+    rpc.call(
+        "get_chatlist_entries",
+        (
+            account_id,
+            Option::<u32>::None,
+            Option::<String>::None,
+            Some(contact_id),
+        ),
     )
     .await
     .map_err(|err| err.to_string())

@@ -36,13 +36,35 @@ Page {
     Connections {
         target: core
         // Name/picture changes arrive via contact; model reloads.
-        onCore_event: chat.handle_event(context_id, kind, payload_json)
+        onCore_event: {
+            chat.handle_event(context_id, kind, payload_json)
+            commonChats.handle_event(context_id, kind, payload_json)
+        }
         onStatus_changed: {
             if (core.status === "ready") {
                 chat.reload()
+                commonChats.reload()
             }
         }
     }
+
+    // Loaded on first show: most 1:1 chats are never opened. Contact before account: account
+    // alone lists every chat. Ids up to 9 (self, devices) have none.
+    ChatList {
+        id: commonChats
+        objectName: "commonChats"
+        onError: page.errorMessage = message
+    }
+
+    function loadCommonChats() {
+        var shown = page.status === PageStatus.Activating || page.status === PageStatus.Active
+        if (shown && page.contactId > 9 && commonChats.contact_id === 0) {
+            commonChats.contact_id = page.contactId
+            commonChats.account_id = page.accountId
+        }
+    }
+
+    onContactIdChanged: page.loadCommonChats()
 
     /// The one member, lifted from row.
     property int contactId: 0
@@ -99,6 +121,7 @@ Page {
 
     // Leaving saves too: back-swipe in pause would drop text. Cursor leaves first.
     onStatusChanged: {
+        page.loadCommonChats()
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             nameField.done()
@@ -119,6 +142,31 @@ Page {
             accountId: page.accountId,
             chatId: page.chatId,
             kind: kind
+        })
+    }
+
+    readonly property int commonChatsShown: 5
+
+    // Own chat: back to it, also from the all-chats page.
+    function openChat(chatId, chatName) {
+        if (chatId === page.chatId) {
+            if (pageStack.currentPage === page) {
+                pageStack.navigateBack()
+            } else {
+                pageStack.pop(pageStack.previousPage(page))
+            }
+            return
+        }
+        // Via the list page: it tracks the open chat for notifications.
+        if (typeof appWindow !== "undefined" && appWindow.chatList !== null
+                && appWindow.chatList.accountId === page.accountId) {
+            appWindow.chatList.openChatAbove(chatId, chatName)
+            return
+        }
+        pageStack.push(Qt.resolvedUrl("ConversationPage.qml"), {
+            accountId: page.accountId,
+            chatId: chatId,
+            chatName: chatName
         })
     }
 
@@ -262,6 +310,58 @@ Page {
                 seconds: chat.ephemeral_timer
                 canChange: chat.can_send
                 onChosen: chat.set_ephemeral_timer(seconds)
+            }
+
+            SectionHeader {
+                objectName: "commonChatsHeader"
+                visible: commonChats.count > 0
+                //: Over the list of chats on a contact's page that the
+                //: contact is in too, with how many. Delta Chat's "Chats in
+                //: Common".
+                text: qsTr("Chats in common (%1)").arg(commonChats.count)
+            }
+
+            Repeater {
+                model: commonChats.rows
+
+                delegate: ListItem {
+                    objectName: "commonChatRow" + model.chat_id
+                    width: column.width
+                    visible: index < page.commonChatsShown
+                    contentHeight: body.height
+
+                    ContactRow {
+                        id: body
+                        width: parent.width
+                        displayName: model.name
+                        ownColor: model.color
+                        picturePath: model.avatar_path
+                        isKeyContact: model.is_encrypted
+                    }
+
+                    onClicked: page.openChat(model.chat_id, model.name)
+                }
+            }
+
+            BackgroundItem {
+                objectName: "commonChatsAll"
+                visible: commonChats.count > page.commonChatsShown
+                width: parent.width
+                onClicked: pageStack.push(Qt.resolvedUrl("CommonChatsPage.qml"), {
+                    chats: commonChats,
+                    contactPage: page
+                })
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //: Under the first few chats in common on a contact's page:
+                    //: opens the list of all of them.
+                    text: qsTr("Show all")
+                }
             }
         }
     }

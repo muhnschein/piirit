@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
 - A chat whose name starts with an emoji shows that emoji as its picture, not a "?".
 - Emoji are sharp at every size, in messages, reactions and the emoji picker.
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
