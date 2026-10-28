@@ -89,6 +89,15 @@ function emojiEnd(text, i) {
     return end
 }
 
+/// First char of `text` whole: emoji with its joins, else code point (never half a pair).
+function firstOf(text) {
+    if (!text) {
+        return ""
+    }
+    var end = emojiEnd(text, 0)
+    return text.substring(0, end > 0 ? end : (codeAt(text, 0) > 0xFFFF ? 2 : 1))
+}
+
 /// Message run as StyledText: escaped, breaks and space runs kept.
 function escaped(text, lineStart) {
     var out = text.replace(/\r/g, "").replace(/\t/g, " ")
