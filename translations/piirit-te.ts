@@ -1232,6 +1232,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>చివరిసారి ఇక్కడ %1కి కనిపించారు</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>ఇంకా ఏ స్థానమూ రాలేదు.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>బ్రౌజర్‌లో తెరువు</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>షేర్ చేయి</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>ప్రస్తుత స్థానాన్ని పంపు</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>మీ స్థానం %n మీటర్ వరకు ఖచ్చితమైనది.</numerusform>
+            <numerusform>మీ స్థానం %n మీటర్ల వరకు ఖచ్చితమైనది.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>స్థానాన్ని పంపడానికి సెట్టింగ్‌లలో స్థానాన్ని ఆన్ చేయండి.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>మీ స్థానాన్ని కనుగొంటోంది…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>ప్రత్యక్ష స్థానాన్ని షేర్ చేయి</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit నేపథ్యంలో నడుస్తున్నప్పుడు కూడా మీ స్థానాన్ని పంపుతూనే ఉంటుంది.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 నిమిషాల పాటు</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 గంట పాటు</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 గంటల పాటు</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 గంటల పాటు</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 గంటల పాటు</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>స్థానాన్ని షేర్ చేయడం ఆపు</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1310,6 +1387,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>సవరించబడింది</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>స్థానం</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2336,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>సందేశంగా పంపు</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>మీరు మీ స్థానాన్ని షేర్ చేస్తున్నారు</translation>
     </message>
 </context>
 <context>

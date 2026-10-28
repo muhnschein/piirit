@@ -1236,6 +1236,83 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Viimati nähtud siin kell %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Asukohta pole veel saabunud.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Ava brauseris</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Jaga</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Saada praegune asukoht</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Sinu asukoha täpsus on %n meeter.</numerusform>
+            <numerusform>Sinu asukoha täpsus on %n meetrit.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Asukoha saatmiseks lülita asukoht seadetes sisse.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Sinu asukohta otsitakse…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Jaga asukohta reaalajas</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit saadab sinu asukohta edasi ka siis, kui see töötab taustal.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Kestusega 30 minutit</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Kestusega 1 tund</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Kestusega 2 tundi</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Kestusega 6 tundi</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Kestusega 24 tundi</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Lõpeta asukoha jagamine</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edited</source>
         <translation>Muudetud</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Asukoht</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Saada sõnumina</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sa jagad oma asukohta</translation>
     </message>
 </context>
 <context>

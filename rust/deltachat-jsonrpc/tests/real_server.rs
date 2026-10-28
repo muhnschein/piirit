@@ -2051,11 +2051,140 @@ async fn offline_round_trip_against_real_core() {
     relays_against(&client, mailbox).await;
     calls_against(&client, mailbox).await;
     channels_against(&client, mailbox).await;
+    locations_against(&client, sender_id, saved).await;
 
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
     client.shutdown().await.expect("shutdown");
     let _ = std::fs::remove_dir_all(&accounts_dir);
+}
+
+/// Location as shim reads it (`location.rs`, `chat.rs`): one-off point carried and found by
+/// its message, live sharing on and off with its notice typed, positions stored only while on.
+#[allow(clippy::too_many_lines)]
+async fn locations_against(client: &RpcClient, account: u32, chat: u32) {
+    let link =
+        "https://www.openstreetmap.org/?mlat=60.16952&mlon=24.93546#map=16/60.16952/24.93546";
+    let (point, sent): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                account,
+                chat,
+                Some(link),
+                Option::<String>::None,
+                Option::<String>::None,
+                Some((60.169_524_f64, 24.935_456_f64)),
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .unwrap_or_else(|err| panic!("misc_send_msg with a location: {err}"));
+    assert_eq!(
+        (sent.get("hasLocation"), sent.get("text")),
+        (Some(&Value::Bool(true)), Some(&Value::from(link))),
+        "a point sent once does not say it carries one: {sent:?}"
+    );
+
+    // Params: account, chat, contact, from, to (0: now). Newest first.
+    let mine = || async move {
+        client
+            .call::<_, Vec<Value>>("get_locations", (account, chat, 1u32, 0, 0))
+            .await
+            .unwrap_or_else(|err| panic!("get_locations: {err}"))
+    };
+    let found = mine().await;
+    let own = found
+        .iter()
+        .find(|location| location.get("msgId") == Some(&Value::from(point)))
+        .unwrap_or_else(|| panic!("the point sent is not among the chat's: {found:?}"));
+    for (field, wanted) in [
+        ("latitude", Value::from(60.169_524_f64)),
+        ("longitude", Value::from(24.935_456_f64)),
+        ("contactId", Value::from(1)),
+        ("isIndependent", Value::Bool(true)),
+    ] {
+        assert_eq!(own.get(field), Some(&wanted), "{field} of {own:?}");
+    }
+    assert!(
+        own.get("timestamp").and_then(Value::as_i64).is_some()
+            && own.get("accuracy").and_then(Value::as_f64).is_some(),
+        "a point has no time or accuracy: {own:?}"
+    );
+
+    let sharing = || async move {
+        let anywhere: bool = client
+            .call("is_sending_locations", (account,))
+            .await
+            .unwrap_or_else(|err| panic!("is_sending_locations: {err}"));
+        let here: bool = client
+            .call("is_sending_locations_to_chat", (account, chat))
+            .await
+            .unwrap_or_else(|err| panic!("is_sending_locations_to_chat: {err}"));
+        (anywhere, here)
+    };
+    assert_eq!(sharing().await, (false, false));
+    let accounts: Vec<u32> = client
+        .call_unit("get_all_account_ids")
+        .await
+        .unwrap_or_else(|err| panic!("get_all_account_ids: {err}"));
+    assert!(accounts.contains(&account), "{accounts:?} lacks {account}");
+
+    client
+        .call::<_, ()>("send_locations_to_chat", (account, chat, 1800_i64))
+        .await
+        .unwrap_or_else(|err| panic!("send_locations_to_chat: {err}"));
+    assert_eq!(sharing().await, (true, true), "live sharing did not start");
+    let wanted: bool = client
+        .call("set_location", (60.2_f64, 25.0_f64, 8.0_f64))
+        .await
+        .unwrap_or_else(|err| panic!("set_location: {err}"));
+    assert!(wanted, "the core did not want a position while sharing");
+    let found = mine().await;
+    assert_eq!(
+        found.first().map(|newest| (
+            newest.get("latitude").and_then(Value::as_f64),
+            newest.get("msgId").and_then(Value::as_u64),
+            newest.get("isIndependent").and_then(Value::as_bool),
+        )),
+        Some((Some(60.2), Some(0), Some(false))),
+        "the position fed is not the newest, or came with a message: {found:?}"
+    );
+
+    let ids: Vec<u32> = client
+        .call("get_message_ids", (account, chat, false, false))
+        .await
+        .unwrap_or_else(|err| panic!("get_message_ids: {err}"));
+    let messages: std::collections::HashMap<u32, Value> = client
+        .call("get_messages", (account, ids))
+        .await
+        .unwrap_or_else(|err| panic!("get_messages: {err}"));
+    let notice = messages
+        .values()
+        .find(|message| {
+            message.get("systemMessageType").and_then(Value::as_str)
+                == Some("LocationStreamingEnabled")
+        })
+        .unwrap_or_else(|| panic!("live sharing left no notice: {messages:?}"));
+    assert_eq!(
+        (notice.get("isInfo"), notice.get("fromId")),
+        (Some(&Value::Bool(true)), Some(&Value::from(1))),
+        "live sharing's notice is not a notice from its sharer: {notice:?}"
+    );
+
+    client
+        .call::<_, ()>("send_locations_to_chat", (account, chat, 0_i64))
+        .await
+        .unwrap_or_else(|err| panic!("send_locations_to_chat 0: {err}"));
+    assert_eq!(sharing().await, (false, false), "live sharing did not stop");
+    let wanted: bool = client
+        .call("set_location", (60.3_f64, 25.1_f64, 8.0_f64))
+        .await
+        .unwrap_or_else(|err| panic!("set_location after stop: {err}"));
+    assert!(
+        !wanted,
+        "the core still wants positions after sharing stopped"
+    );
 }
 
 /// Pinning a message, then unpinning it, as another Delta Chat app does in a chat

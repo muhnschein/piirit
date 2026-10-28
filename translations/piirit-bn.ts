@@ -1236,6 +1236,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>শেষবার এখানে দেখা গেছে %1-এ</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>এখনও কোনো অবস্থান আসেনি।</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>ব্রাউজারে খুলুন</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>শেয়ার করুন</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>বর্তমান অবস্থান পাঠান</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>আপনার অবস্থান %n মিটার পর্যন্ত নির্ভুল।</numerusform>
+            <numerusform>আপনার অবস্থান %n মিটার পর্যন্ত নির্ভুল।</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>অবস্থান পাঠাতে সেটিংসে অবস্থান চালু করুন।</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>আপনার অবস্থান খোঁজা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>লাইভ অবস্থান শেয়ার করুন</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit ব্যাকগ্রাউন্ডে চলার সময়ও আপনার অবস্থান পাঠাতে থাকে।</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>৩০ মিনিটের জন্য</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>১ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>২ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>৬ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>২৪ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>অবস্থান শেয়ার করা বন্ধ করুন</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>সম্পাদিত</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>অবস্থান</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>বার্তা হিসেবে পাঠান</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>আপনি আপনার অবস্থান শেয়ার করছেন</translation>
     </message>
 </context>
 <context>

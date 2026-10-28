@@ -54,6 +54,7 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "IncomingCall",
     "IncomingCallAccepted",
     "IncomingMsg",
+    "LocationChanged",
     "MsgDeleted",
     "MsgDelivered",
     "MsgFailed",

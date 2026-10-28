@@ -132,6 +132,12 @@ pub struct MessageListItem {
     pub call_has_video: bool,
     /// Call length, seconds; 0 if never connected.
     pub call_duration: i32,
+    /// `hasLocation`: carries a point (sent once, or streamed beside it).
+    pub has_location: bool,
+    /// Core's notice that sender shares location live; tap shows their newest.
+    pub starts_location: bool,
+    /// Sender's contact id (`fromId`); 1 = reader.
+    pub sender_id: u32,
 }
 
 /// Conversation model.

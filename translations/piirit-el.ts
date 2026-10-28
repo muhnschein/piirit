@@ -1232,6 +1232,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Τελευταία φορά εδώ στις %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Δεν έχει φτάσει ακόμη τοποθεσία.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Άνοιγμα στο πρόγραμμα περιήγησης</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Κοινή χρήση</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Αποστολή τρέχουσας τοποθεσίας</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Η τοποθεσία σας έχει ακρίβεια %n μέτρου.</numerusform>
+            <numerusform>Η τοποθεσία σας έχει ακρίβεια %n μέτρων.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Ενεργοποιήστε την τοποθεσία στις Ρυθμίσεις για να την στείλετε.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Εύρεση της τοποθεσίας σας…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Κοινή χρήση ζωντανής τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Το Piirit συνεχίζει να στέλνει την τοποθεσία σας όσο εκτελείται στο παρασκήνιο.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Για 30 λεπτά</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Για 1 ώρα</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Για 2 ώρες</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Για 6 ώρες</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Για 24 ώρες</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Διακοπή κοινής χρήσης τοποθεσίας</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1310,6 +1387,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Επεξεργασμένο</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Τοποθεσία</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2336,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Αποστολή ως μήνυμα</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Μοιράζεστε την τοποθεσία σας</translation>
     </message>
 </context>
 <context>

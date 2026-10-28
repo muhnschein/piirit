@@ -4,8 +4,8 @@ import Sailfish.Silica 1.0
 /*
  * "+" beside message field: tray above it, under the thumb (shape: Whisperfish
  * qml/components/ChatTextInput.qml). Nearest first: camera; paper clip (platform
- * picker over all indexed media and documents, not per kind); mic (where recording
- * works); apps grid (webxdc, if enabled). Opens nothing: page pushes pickers,
+ * picker over all indexed media and documents, not per kind); location; mic (where
+ * recording works); apps grid (webxdc, if enabled). Opens nothing: page pushes pickers,
  * records, closes tray on outside tap, so this loads and tests alone.
  */
 Item {
@@ -21,6 +21,8 @@ Item {
     signal cameraRequested()
     /// Indexed picture, video, song or document.
     signal libraryRequested()
+    /// Send location, or share it live.
+    signal locationRequested()
     /// Record voice message now.
     signal voiceRequested()
     /// .xdc file off phone, for chat.
@@ -84,6 +86,15 @@ Item {
                 onClicked: {
                     root.close()
                     root.libraryRequested()
+                }
+            }
+
+            IconButton {
+                objectName: "attachLocation"
+                icon.source: "image://theme/icon-m-location"
+                onClicked: {
+                    root.close()
+                    root.locationRequested()
                 }
             }
 

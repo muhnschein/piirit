@@ -1232,6 +1232,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Sist sett her kl. %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Ingen posisjon har kommet ennå.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Åpne i nettleser</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Del</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Send nåværende posisjon</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Posisjonen din er nøyaktig til %n meter.</numerusform>
+            <numerusform>Posisjonen din er nøyaktig til %n meter.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Slå på posisjon i Innstillinger for å sende den.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Finner posisjonen din…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Del posisjon direkte</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit fortsetter å sende posisjonen din mens den kjører i bakgrunnen.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>I 30 minutter</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>I 1 time</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>I 2 timer</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>I 6 timer</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>I 24 timer</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Stopp deling av posisjon</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1310,6 +1387,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigert</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Posisjon</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2336,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Send som melding</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Du deler posisjonen din</translation>
     </message>
 </context>
 <context>

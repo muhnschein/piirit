@@ -1236,6 +1236,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>शेवटचे येथे %1 वाजता दिसले</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>अद्याप कोणतेही स्थान आलेले नाही.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>ब्राउझरमध्ये उघडा</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>शेअर करा</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>सध्याचे स्थान पाठवा</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>तुमचे स्थान %n मीटरपर्यंत अचूक आहे.</numerusform>
+            <numerusform>तुमचे स्थान %n मीटरपर्यंत अचूक आहे.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>स्थान पाठवण्यासाठी सेटिंग्जमध्ये स्थान चालू करा.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>तुमचे स्थान शोधत आहे…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>थेट स्थान शेअर करा</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit पार्श्वभूमीत चालू असतानाही तुमचे स्थान पाठवत राहते.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 मिनिटांसाठी</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 तासासाठी</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>स्थान शेअर करणे थांबवा</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>संपादित</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>स्थान</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>संदेश म्हणून पाठवा</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>तुम्ही तुमचे स्थान शेअर करत आहात</translation>
     </message>
 </context>
 <context>

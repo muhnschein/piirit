@@ -1231,6 +1231,82 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Burada en son %1 saatinde görüldü</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Henüz konum gelmedi.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Tarayıcıda aç</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Paylaş</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Geçerli konumu gönder</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Konumunuz %n metre hassasiyetinde.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Göndermek için Ayarlar&apos;dan konumu açın.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Konumunuz bulunuyor…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Canlı konum paylaş</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit arka planda çalışırken konumunuzu göndermeye devam eder.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 dakikalığına</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 saatliğine</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Konum paylaşımını durdur</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1309,6 +1385,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edited</source>
         <translation>Düzenlendi</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Konum</translation>
     </message>
 </context>
 <context>
@@ -2251,6 +2332,13 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>İleti olarak gönder</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Konumunuzu paylaşıyorsunuz</translation>
     </message>
 </context>
 <context>

@@ -1232,6 +1232,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Senast sedd här kl. %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Ingen plats har kommit än.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Öppna i webbläsaren</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Dela</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Skicka nuvarande plats</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Din plats är exakt inom %n meter.</numerusform>
+            <numerusform>Din plats är exakt inom %n meter.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Slå på plats i Inställningar för att skicka den.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Letar efter din plats…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Dela plats live</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit fortsätter att skicka din plats medan det körs i bakgrunden.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>I 30 minuter</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>I 1 timme</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>I 2 timmar</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>I 6 timmar</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>I 24 timmar</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Sluta dela plats</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1310,6 +1387,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigerat</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Plats</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2336,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Skicka som meddelande</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Du delar din plats</translation>
     </message>
 </context>
 <context>

@@ -1241,6 +1241,84 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Pēdējo reizi šeit %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Atrašanās vieta vēl nav saņemta.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Atvērt pārlūkā</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Kopīgot</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Sūtīt pašreizējo atrašanās vietu</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Jūsu atrašanās vieta ir precīza līdz %n metram.</numerusform>
+            <numerusform>Jūsu atrašanās vieta ir precīza līdz %n metriem.</numerusform>
+            <numerusform>Jūsu atrašanās vieta ir precīza līdz %n metriem.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Lai to nosūtītu, ieslēdziet atrašanās vietu iestatījumos.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Meklē jūsu atrašanās vietu…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Kopīgot reāllaika atrašanās vietu</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit turpina sūtīt jūsu atrašanās vietu, kamēr darbojas fonā.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Uz 30 minūtēm</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Uz 1 stundu</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Uz 2 stundām</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Uz 6 stundām</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Uz 24 stundām</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Pārtraukt atrašanās vietas kopīgošanu</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1319,6 +1397,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Edited</source>
         <translation>Rediģēts</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Atrašanās vieta</translation>
     </message>
 </context>
 <context>
@@ -2265,6 +2348,13 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Sūtīt kā ziņu</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Jūs kopīgojat savu atrašanās vietu</translation>
     </message>
 </context>
 <context>

@@ -1,0 +1,554 @@
+//! Location's pieces on screen: tray entry, row pin, share dialog, sharing bar, map page, feed.
+//!
+//! Stubs: no layout, no position, no browser engine. What the map looks like, and whether the
+//! phone finds itself, are device questions.
+
+// Qt harness: see chat_actions.rs.
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
+
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use piirit_shim::DeltaChatCore;
+use qmetaobject::*;
+use serde_json::{json, Value};
+
+mod common;
+
+const PROBE_QML: &str = r"
+    import QtQuick 2.0
+    import Piirit 1.0
+    Item {
+        // Unsized: a sized loader sizes item, hiding its own height.
+        Loader { id: loader }
+        property string trail: ''
+        function load(url, properties) {
+            loader.setSource('', {})
+            trail = ''
+            var given = JSON.parse(properties)
+            given.width = 540
+            loader.setSource(url, given)
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        // Each emission of `signal` noted with its arguments.
+        function watch(signal) {
+            loader.item[signal].connect(function () {
+                var args = []
+                for (var i = 0; i < arguments.length; i++) { args.push(arguments[i]) }
+                trail += signal + '(' + args.join(',') + ');'
+            })
+            return 'ok'
+        }
+        function heard() { return trail }
+        function set(property, value) { loader.item[property] = value; return 'ok' }
+        function own(property) { return '' + loader.item[property] }
+        function run(name) { return '' + loader.item[name]() }
+        function findIn(node, name) {
+            if (!node) { return null }
+            if (node.objectName === name) { return node }
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) {
+                var hit = findIn(kids[i], name)
+                if (hit) { return hit }
+            }
+            return null
+        }
+        function findAll(node, name, out) {
+            if (!node) { return out }
+            if (node.objectName === name) { out.push(node) }
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) { findAll(kids[i], name, out) }
+            return out
+        }
+        function get(name, property) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            return '' + item[property]
+        }
+        function put(name, property, value) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item[property] = value
+            return 'ok'
+        }
+        function tap(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.clicked()
+            return 'ok'
+        }
+        // Live choices, their times, and which is on.
+        function live() {
+            var all = findAll(loader.item, 'liveSwitch', [])
+            var out = []
+            for (var i = 0; i < all.length; i++) {
+                out.push(all[i].text + '=' + all[i].seconds + (all[i].checked ? '*' : ''))
+            }
+            return out.join('|')
+        }
+        function pickLive(seconds) {
+            var all = findAll(loader.item, 'liveSwitch', [])
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].seconds === seconds) { all[i].clicked(); return 'ok' }
+            }
+            return 'missing:' + seconds
+        }
+        function fix(latitude, longitude, accuracy) {
+            findIn(loader.item, 'position').report(latitude, longitude, accuracy)
+            return 'ok'
+        }
+        function lose(code) { findIn(loader.item, 'position').fail(code); return 'ok' }
+        // Feed's position, as phone would hand it over.
+        function feedFix(latitude, longitude, accuracy) {
+            findIn(loader.item, 'livePosition').report(latitude, longitude, accuracy)
+            return 'ok'
+        }
+        function feedLost() { findIn(loader.item, 'livePosition').forget(); return 'ok' }
+        // Starts live sharing behind feed's back, as conversation page would.
+        ChatMessages { id: chat; account_id: 1; chat_id: 1 }
+        function share(seconds) { chat.share_location(seconds); return 'ok' }
+    }
+";
+
+#[test]
+#[allow(clippy::too_many_lines)]
+fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
+    let temp = std::env::temp_dir().join(format!("piirit-qml-location-{}", std::process::id()));
+    let journal = common::fresh_journal(&temp);
+    std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+
+    // SAFETY: single-threaded; set pre-Qt.
+    unsafe {
+        std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+        std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
+        std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
+        std::env::set_var("PIIRIT_FAKE_LOCATIONS", "1");
+    }
+
+    piirit_shim::register_qml_types();
+
+    let core_box = QObjectBox::new(DeltaChatCore::default());
+    let mut engine = QmlEngine::new();
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
+    engine.set_object_property("core".into(), core_box.pinned());
+    core_box
+        .pinned()
+        .borrow_mut()
+        .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
+
+    let engine_ptr = std::ptr::addr_of_mut!(engine);
+    let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
+
+    macro_rules! call {
+        ($name:expr $(, $arg:expr)*) => {{
+            let result = unsafe {
+                (*engine_ptr).invoke_method(
+                    $name.into(),
+                    &[$(QVariant::from(QString::from($arg))),*],
+                )
+            };
+            QString::from_qvariant(result).unwrap_or_default()
+        }};
+    }
+    macro_rules! fix {
+        ($name:expr, $latitude:expr, $longitude:expr, $accuracy:expr) => {{
+            unsafe {
+                (*engine_ptr).invoke_method(
+                    $name.into(),
+                    &[
+                        QVariant::from($latitude),
+                        QVariant::from($longitude),
+                        QVariant::from($accuracy),
+                    ],
+                );
+            }
+        }};
+    }
+
+    let mut plan = common::Plan::default();
+    plan.after(1, move || unsafe {
+        (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
+    });
+
+    // Tray: location entry asks, tray goes away.
+    let s = steps.clone();
+    plan.after(1, move || {
+        common::record(
+            &s,
+            "tray",
+            call!("load", common::component_url("AttachButton.qml"), "{}"),
+        );
+        call!("watch", "locationRequested");
+        call!("set", "open", "true");
+        call!("tap", "attachLocation");
+        common::record(&s, "tray-asked", call!("heard"));
+        common::record(&s, "tray-open", call!("own", "open"));
+    });
+
+    // Row with a point: pin and word, tap asks for map. Plain row: neither. Notice of live
+    // sharing: lit, tap asks too. Notice never draws pin row.
+    let s = steps.clone();
+    plan.after(1, move || {
+        let delegate = common::component_url("MessageDelegate.qml");
+        call!(
+            "load",
+            delegate.clone(),
+            r#"{"messageText": "https://www.openstreetmap.org/?mlat=1&mlon=2", "hasLocation": true}"#
+        );
+        call!("watch", "locationRequested");
+        common::record(&s, "pin-shown", call!("get", "locationRow", "visible"));
+        common::record(&s, "pin-word", call!("get", "locationLabel", "text"));
+        call!("run", "tapped");
+        common::record(&s, "pin-tap", call!("heard"));
+
+        call!("load", delegate.clone(), r#"{"messageText": "hello"}"#);
+        call!("watch", "locationRequested");
+        common::record(&s, "plain-pin", call!("get", "locationRow", "visible"));
+        common::record(&s, "plain-height", call!("get", "locationRow", "height"));
+        call!("run", "tapped");
+        common::record(&s, "plain-tap", call!("heard"));
+        common::record(&s, "plain-info", call!("get", "infoLabel", "color"));
+
+        call!(
+            "load",
+            delegate,
+            r#"{"messageText": "Location streaming enabled by Ada.", "isInfo": true,
+                "startsLocation": true, "hasLocation": true}"#
+        );
+        call!("watch", "locationRequested");
+        common::record(&s, "notice-pin", call!("get", "locationRow", "visible"));
+        common::record(&s, "notice-pin-height", call!("get", "locationRow", "height"));
+        common::record(&s, "notice-info", call!("get", "infoLabel", "color"));
+        call!("run", "tapped");
+        common::record(&s, "notice-tap", call!("heard"));
+    });
+
+    // Sharing bar: nothing unless sharing; stop asks.
+    let s = steps.clone();
+    plan.after(1, move || {
+        let bar = common::component_url("SharingBar.qml");
+        call!("load", bar.clone(), "{}");
+        common::record(&s, "bar-idle", call!("own", "visible"));
+        common::record(&s, "bar-idle-height", call!("own", "height"));
+        call!("load", bar, r#"{"sharing": true}"#);
+        call!("watch", "stopRequested");
+        common::record(&s, "bar-on", call!("own", "visible"));
+        common::record(&s, "bar-words", call!("get", "sharingLabel", "text"));
+        call!("tap", "stopSharingButton");
+        common::record(&s, "bar-stop", call!("heard"));
+    });
+
+    // Dialog: once waits for a fix; live times; stop only while sharing.
+    let s = steps.clone();
+    plan.after(1, move || {
+        let dialog = common::page_url("LocationShareDialog.qml");
+        common::record(&s, "dialog", call!("load", dialog, "{}"));
+        call!("watch", "locationPicked");
+        call!("watch", "sharingPicked");
+        common::record(&s, "dialog-times", call!("live"));
+        common::record(&s, "dialog-stop", call!("get", "stopSwitch", "visible"));
+        common::record(&s, "dialog-idle", call!("own", "canAccept"));
+        common::record(
+            &s,
+            "dialog-finding",
+            call!("get", "nowSwitch", "description"),
+        );
+        call!("tap", "nowSwitch");
+        common::record(&s, "dialog-nofix", call!("own", "canAccept"));
+        fix!("fix", 60.169_524_f64, 24.935_456_f64, 7.6_f64);
+        common::record(&s, "dialog-fix", call!("own", "canAccept"));
+        common::record(
+            &s,
+            "dialog-accuracy",
+            call!("get", "nowSwitch", "description"),
+        );
+        fix!("fix", 60.169_524_f64, 24.935_456_f64, 0.0_f64);
+        common::record(&s, "dialog-vague", call!("get", "nowSwitch", "description"));
+        call!("run", "accept");
+        common::record(&s, "dialog-once", call!("heard"));
+    });
+    let s = steps.clone();
+    plan.after(1, move || {
+        let dialog = common::page_url("LocationShareDialog.qml");
+        call!("load", dialog.clone(), r#"{"sharing": true}"#);
+        call!("watch", "locationPicked");
+        call!("watch", "sharingPicked");
+        common::record(&s, "sharing-stop", call!("get", "stopSwitch", "visible"));
+        call!("pickLive", "1800");
+        call!("pickLive", "86400");
+        common::record(&s, "sharing-times", call!("live"));
+        call!("run", "accept");
+        call!("tap", "stopSwitch");
+        common::record(&s, "sharing-now", call!("get", "nowSwitch", "checked"));
+        call!("run", "accept");
+        common::record(&s, "sharing-picked", call!("heard"));
+        call!("load", dialog, "{}");
+        call!("lose", "2");
+        common::record(&s, "dialog-off", call!("get", "nowSwitch", "description"));
+    });
+
+    // Map page: live notice shows sender's newest on osm.org's embed page.
+    let s = steps.clone();
+    plan.after(1, move || {
+        common::record(
+            &s,
+            "page",
+            call!(
+                "load",
+                common::page_url("LocationPage.qml"),
+                r#"{"accountId": 1, "chatId": 1, "contactId": 10, "messageId": 31,
+                    "senderName": "Ada Lovelace"}"#
+            ),
+        );
+    });
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        let done = !call!("get", "mapView", "url").to_string().is_empty();
+        if done || last {
+            common::record(&s, "page-title", call!("get", "locationHeader", "title"));
+            common::record(&s, "page-when", call!("get", "locationHeader", "subtitle"));
+            common::record(&s, "page-map", call!("get", "mapView", "url"));
+            common::record(&s, "page-browser", call!("get", "browserButton", "enabled"));
+            common::record(&s, "page-empty", call!("get", "mapEmpty", "visible"));
+            call!(
+                "load",
+                common::page_url("LocationPage.qml"),
+                r#"{"accountId": 1, "chatId": 1, "contactId": 12, "messageId": 0,
+                    "senderName": "Grace"}"#
+            );
+        }
+        done
+    });
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        let done = call!("get", "mapEmpty", "visible").to_string() == "true";
+        if done || last {
+            common::record(&s, "nowhere-shown", call!("get", "mapEmpty", "visible"));
+            common::record(&s, "nowhere-empty", call!("get", "mapEmpty", "text"));
+            common::record(&s, "nowhere-map", call!("get", "mapView", "visible"));
+            common::record(
+                &s,
+                "nowhere-browser",
+                call!("get", "browserButton", "enabled"),
+            );
+        }
+        done
+    });
+
+    // Feed: still until a chat shares; then position on, phone awake, positions to core.
+    let s = steps.clone();
+    plan.after(1, move || {
+        call!("load", common::component_url("LocationFeed.qml"), "{}");
+    });
+    let s2 = s.clone();
+    plan.after(1, move || {
+        common::record(&s2, "feed-idle", call!("get", "livePosition", "active"));
+        common::record(
+            &s2,
+            "feed-idle-awake",
+            call!("get", "locationKeepAlive", "enabled"),
+        );
+        call!("share", "1800");
+    });
+    plan.until(1, 10, move |last| {
+        let done = call!("get", "livePosition", "active").to_string() == "true";
+        if done || last {
+            common::record(&s, "feed-on", call!("get", "livePosition", "active"));
+            common::record(
+                &s,
+                "feed-awake",
+                call!("get", "locationKeepAlive", "enabled"),
+            );
+            fix!("feedFix", 60.2_f64, 25.0_f64, 8.0_f64);
+            // Accuracy unknown: 0 to core. Fix lost: nothing.
+            fix!("feedFix", 60.3_f64, 25.1_f64, 0.0_f64);
+            call!("feedLost");
+            call!("share", "0");
+        }
+        done
+    });
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        let done = call!("get", "livePosition", "active").to_string() == "false";
+        if done || last {
+            common::record(&s, "feed-off", call!("get", "livePosition", "active"));
+            common::record(
+                &s,
+                "feed-asleep",
+                call!("get", "locationKeepAlive", "enabled"),
+            );
+            unsafe { (*engine_ptr).quit() };
+        }
+        done
+    });
+
+    plan.run();
+    engine.exec();
+
+    let steps = steps.borrow();
+    let value = |label: &str| common::value_of(&steps, label).to_string();
+    let context = format!("steps: {steps:?}");
+    let expect = |label: &str, wanted: &str, why: &str| {
+        assert_eq!(value(label), wanted, "{label}: {why} {context}");
+    };
+
+    expect("tray", "ok", "tray did not load.");
+    expect(
+        "tray-asked",
+        "locationRequested();",
+        "tray's location entry asked nothing.",
+    );
+    expect(
+        "tray-open",
+        "false",
+        "tray stayed open over the dialog it opened.",
+    );
+
+    expect("pin-shown", "true", "a row with a point shows no pin.");
+    expect("pin-word", "Location", "");
+    expect(
+        "pin-tap",
+        "locationRequested();",
+        "tapping a row's point asked for no map.",
+    );
+    expect("plain-pin", "false", "a plain row shows a pin.");
+    expect("plain-height", "0", "a plain row keeps room for a pin.");
+    expect("plain-tap", "", "tapping a plain row asked for a map.");
+    expect("notice-pin", "false", "a core notice drew a pin row.");
+    expect(
+        "notice-pin-height",
+        "0",
+        "a core notice keeps room for a pin row.",
+    );
+    expect(
+        "notice-tap",
+        "locationRequested();",
+        "live sharing's notice opens no map.",
+    );
+    assert_ne!(
+        value("notice-info"),
+        value("plain-info"),
+        "live sharing's notice is not lit as tappable. {context}"
+    );
+
+    expect("bar-idle", "false", "bar shows while nothing is shared.");
+    expect(
+        "bar-idle-height",
+        "0",
+        "bar keeps room while nothing is shared.",
+    );
+    expect("bar-on", "true", "bar hides while sharing.");
+    expect("bar-words", "You are sharing your location", "");
+    expect("bar-stop", "stopRequested();", "bar's stop asked nothing.");
+
+    expect("dialog", "ok", "dialog did not load.");
+    expect(
+        "dialog-times",
+        "For 30 minutes=1800|For 1 hour=3600|For 2 hours=7200|For 6 hours=21600\
+         |For 24 hours=86400",
+        "live times are not the reference clients'.",
+    );
+    expect(
+        "dialog-stop",
+        "false",
+        "stop offered while nothing is shared.",
+    );
+    expect(
+        "dialog-idle",
+        "false",
+        "dialog accepts with nothing picked.",
+    );
+    expect("dialog-finding", "Finding your location…", "");
+    expect(
+        "dialog-nofix",
+        "false",
+        "once accepted before the phone knew where it is.",
+    );
+    expect("dialog-fix", "true", "once refused with a fix in hand.");
+    expect(
+        "dialog-accuracy",
+        "Your location is accurate to 8 metre(s).",
+        "accuracy not said in whole metres.",
+    );
+    expect(
+        "dialog-vague",
+        "",
+        "accuracy said though the phone gave none.",
+    );
+    expect(
+        "dialog-once",
+        "locationPicked(60.169524,24.935456);",
+        "accepting once did not hand over the fix.",
+    );
+    expect("sharing-stop", "true", "stop not offered while sharing.");
+    expect(
+        "sharing-times",
+        "For 30 minutes=1800|For 1 hour=3600|For 2 hours=7200|For 6 hours=21600\
+         |For 24 hours=86400*",
+        "more than one time on, or the last pick not.",
+    );
+    expect("sharing-now", "false", "two choices on at once.");
+    expect(
+        "sharing-picked",
+        "sharingPicked(86400);sharingPicked(0);",
+        "live time or stop not handed over.",
+    );
+    expect(
+        "dialog-off",
+        "Turn on location in Settings to send it.",
+        "a phone that cannot find itself says nothing.",
+    );
+
+    expect("page", "ok", "map page did not load.");
+    expect("page-title", "Ada Lovelace", "");
+    assert!(
+        value("page-when").starts_with("Last seen here at "),
+        "live place not marked as last seen. {context}"
+    );
+    expect(
+        "page-map",
+        "https://www.openstreetmap.org/export/embed.html\
+         ?bbox=24.99396%2C60.19700%2C25.00604%2C60.20300\
+         &layer=mapnik&marker=60.20000%2C25.00000",
+        "map not on sender's newest place.",
+    );
+    expect("page-browser", "true", "");
+    expect("page-empty", "false", "");
+    expect("nowhere-shown", "true", "no place, and nothing says so.");
+    expect("nowhere-empty", "No location has arrived yet.", "");
+    expect("nowhere-map", "false", "an empty map shows.");
+    expect("nowhere-browser", "false", "browser offered with no place.");
+
+    expect(
+        "feed-idle",
+        "false",
+        "position looked for while nothing is shared.",
+    );
+    expect(
+        "feed-idle-awake",
+        "false",
+        "phone kept awake while nothing is shared.",
+    );
+    expect("feed-on", "true", "position not looked for while sharing.");
+    expect(
+        "feed-awake",
+        "true",
+        "phone allowed to sleep while sharing.",
+    );
+    expect("feed-off", "false", "position still looked for after stop.");
+    expect("feed-asleep", "false", "phone kept awake after stop.");
+
+    let positions: Vec<Value> = common::calls(&journal)
+        .into_iter()
+        .filter(|(method, _)| method == "set_location")
+        .map(|(_, params)| params)
+        .collect();
+    assert_eq!(
+        positions,
+        [json!([60.2, 25.0, 8.0]), json!([60.3, 25.1, 0.0])],
+        "the feed's positions did not reach core, or a lost fix did. {context}"
+    );
+}

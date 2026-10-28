@@ -1236,6 +1236,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>ਆਖਰੀ ਵਾਰ ਇੱਥੇ %1 ਵਜੇ ਦੇਖਿਆ ਗਿਆ</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>ਹਾਲੇ ਤੱਕ ਕੋਈ ਟਿਕਾਣਾ ਨਹੀਂ ਆਇਆ।</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਖੋਲ੍ਹੋ</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>ਸਾਂਝਾ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>ਮੌਜੂਦਾ ਟਿਕਾਣਾ ਭੇਜੋ</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>ਤੁਹਾਡਾ ਟਿਕਾਣਾ %n ਮੀਟਰ ਤੱਕ ਸਹੀ ਹੈ।</numerusform>
+            <numerusform>ਤੁਹਾਡਾ ਟਿਕਾਣਾ %n ਮੀਟਰ ਤੱਕ ਸਹੀ ਹੈ।</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>ਟਿਕਾਣਾ ਭੇਜਣ ਲਈ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਟਿਕਾਣਾ ਚਾਲੂ ਕਰੋ।</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਲੱਭਿਆ ਜਾ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>ਲਾਈਵ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit ਪਿਛੋਕੜ ਵਿੱਚ ਚੱਲਦੇ ਸਮੇਂ ਵੀ ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਭੇਜਦਾ ਰਹਿੰਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 ਮਿੰਟਾਂ ਲਈ</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 ਘੰਟੇ ਲਈ</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 ਘੰਟਿਆਂ ਲਈ</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 ਘੰਟਿਆਂ ਲਈ</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 ਘੰਟਿਆਂ ਲਈ</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰਨਾ ਬੰਦ ਕਰੋ</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>ਸੋਧਿਆ</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>ਟਿਕਾਣਾ</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>ਸੁਨੇਹੇ ਵਜੋਂ ਭੇਜੋ</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>ਤੁਸੀਂ ਆਪਣਾ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰ ਰਹੇ ਹੋ</translation>
     </message>
 </context>
 <context>

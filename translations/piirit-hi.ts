@@ -1236,6 +1236,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>आख़िरी बार यहाँ %1 पर देखा गया</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>अभी तक कोई स्थान नहीं आया है।</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>ब्राउज़र में खोलें</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>साझा करें</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>वर्तमान स्थान भेजें</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>आपका स्थान %n मीटर तक सटीक है।</numerusform>
+            <numerusform>आपका स्थान %n मीटर तक सटीक है।</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>स्थान भेजने के लिए सेटिंग्स में स्थान चालू करें।</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>आपका स्थान खोजा जा रहा है…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>लाइव स्थान साझा करें</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit बैकग्राउंड में चलते समय भी आपका स्थान भेजता रहता है।</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 मिनट के लिए</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>स्थान साझा करना बंद करें</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>संपादित</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>स्थान</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>संदेश के रूप में भेजें</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>आप अपना स्थान साझा कर रहे हैं</translation>
     </message>
 </context>
 <context>

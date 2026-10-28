@@ -156,6 +156,13 @@ struct State {
     /// Transports per account, add order (core's `transports` table, `list_transports`).
     /// Own-address one is `configured_addr` in `config`, as core.
     transports: std::collections::BTreeMap<u32, Vec<String>>,
+    /// Chats getting reader's location live, per account.
+    sharing: std::collections::BTreeSet<(u32, u32)>,
+    /// Of those, ones asked for under a minute: run out unannounced by next position, as a
+    /// core whose `ChatModified` got lost.
+    expiring: std::collections::BTreeSet<(u32, u32)>,
+    /// Points sent here once, by message: latitude, longitude.
+    points: std::collections::BTreeMap<u32, (f64, f64)>,
 }
 
 impl State {
@@ -251,6 +258,10 @@ impl State {
                 long.map_or_else(|| vec![1, 2], |count| (1..=count).collect()),
             );
             self.chats.insert(2, vec![10]);
+            // Ada's point sent once, then her live sharing's start notice.
+            if std::env::var_os("PIIRIT_FAKE_LOCATIONS").is_some() {
+                self.chats.insert(1, vec![1, 2, 30, 31]);
+            }
             // Other media kinds on request: file, voice, app, video.
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
@@ -463,6 +474,10 @@ impl State {
             if let Some(file_name) = &sent.file_name {
                 message["fileName"] = json!(file_name);
             }
+        }
+        if self.points.contains_key(&id) {
+            message["hasLocation"] = json!(true);
+            message["fromId"] = json!(SELF);
         }
         if std::env::var_os("PIIRIT_FAKE_SELF_SENT").is_some() && self.sent.contains(&id) {
             message["fromId"] = json!(SELF);
@@ -743,6 +758,19 @@ fn message_object(msg: u64) -> Value {
         message["fileName"] = json!("photo.jpg");
         message["dimensionsWidth"] = json!(640);
         message["dimensionsHeight"] = json!(480);
+    }
+    // `PIIRIT_FAKE_LOCATIONS`: point sent once, live sharing's start notice. Ada's both.
+    let locations = std::env::var_os("PIIRIT_FAKE_LOCATIONS").is_some();
+    if locations && msg == 30 {
+        message["text"] = json!(
+            "https://www.openstreetmap.org/?mlat=60.10000&mlon=24.90000#map=16/60.10000/24.90000"
+        );
+        message["hasLocation"] = json!(true);
+    }
+    if locations && msg == 31 {
+        message["text"] = json!("Location streaming enabled by Ada Lovelace.");
+        message["isInfo"] = json!(true);
+        message["systemMessageType"] = json!("LocationStreamingEnabled");
     }
     // One of each other media kind, plus video second picture: in group under
     // `PIIRIT_FAKE_MEDIA`, by id always. Sizes/types as core.
@@ -1345,6 +1373,89 @@ async fn serve() {
                     }
                     let list = state.account_list();
                     ok(&id, &list)
+                }
+                "get_all_account_ids" => {
+                    let mut state = state.lock().await;
+                    if state.accounts.is_empty() {
+                        state.seed_accounts();
+                    }
+                    let ids: Vec<u32> = state.accounts.iter().map(|account| account.id).collect();
+                    ok(&id, &json!(ids))
+                }
+                // Live location, as core: chat on or off, `ChatModified` either way.
+                "send_locations_to_chat" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let seconds = positional(2).as_i64().unwrap_or_default();
+                    let mut state = state.lock().await;
+                    if seconds > 0 {
+                        state.sharing.insert((account, chat));
+                    } else {
+                        state.sharing.remove(&(account, chat));
+                    }
+                    if (1..60).contains(&seconds) {
+                        state.expiring.insert((account, chat));
+                    }
+                    state.events.push_back(json!({
+                        "contextId": account,
+                        "event": {"kind": "ChatModified", "chatId": chat},
+                    }));
+                    ok(&id, &Value::Null)
+                }
+                "is_sending_locations" => {
+                    let account = account_id();
+                    let sharing = state.lock().await.sharing.iter().any(|(on, _)| *on == account);
+                    ok(&id, &json!(sharing))
+                }
+                "is_sending_locations_to_chat" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let sharing = state.lock().await.sharing.contains(&(account, chat));
+                    ok(&id, &json!(sharing))
+                }
+                // Stored only while some chat shares; answers whether any does.
+                "set_location" => {
+                    let mut state = state.lock().await;
+                    let expired = std::mem::take(&mut state.expiring);
+                    state.sharing.retain(|on| !expired.contains(on));
+                    let accounts: std::collections::BTreeSet<u32> =
+                        state.sharing.iter().map(|(account, _)| *account).collect();
+                    for account in &accounts {
+                        state.events.push_back(json!({
+                            "contextId": account,
+                            "event": {"kind": "LocationChanged", "contactId": SELF},
+                        }));
+                    }
+                    ok(&id, &json!(!accounts.is_empty()))
+                }
+                // Newest first. Ada: streamed point after her one-off (message 30); own one-offs.
+                "get_locations" => {
+                    let contact = positional(2).as_u64().unwrap_or_default();
+                    let state = state.lock().await;
+                    let mut found = Vec::new();
+                    if contact == 10 {
+                        found.push(json!({"latitude": 60.2, "longitude": 25.0, "accuracy": 12.0,
+                                          "timestamp": 1_700_090_600, "contactId": 10,
+                                          "msgId": 0, "isIndependent": false}));
+                        found.push(json!({"latitude": 60.1, "longitude": 24.9, "accuracy": 0.0,
+                                          "timestamp": 1_700_090_000, "contactId": 10,
+                                          "msgId": 30, "isIndependent": true}));
+                    }
+                    if contact == u64::from(SELF) {
+                        for (msg, (latitude, longitude)) in state.points.iter().rev() {
+                            found.push(json!({"latitude": latitude, "longitude": longitude,
+                                              "accuracy": 0.0, "timestamp": 1_700_090_000,
+                                              "contactId": SELF, "msgId": msg,
+                                              "isIndependent": true}));
+                        }
+                    }
+                    ok(&id, &json!(found))
                 }
                 "remove_account" => {
                     let mut state = state.lock().await;
@@ -2551,6 +2662,7 @@ async fn serve() {
                     // Core picks view type from file; echoed to sender's row.
                     let file = positional(3);
                     let file_name = positional(4);
+                    let point = positional(5);
                     let quoted = positional(6);
                     if should_fail(&text) {
                         // Failed send also reports Error event.
@@ -2564,6 +2676,12 @@ async fn serve() {
                             let mut state = state.lock().await;
                             let msg = state.add_message(account, chat);
                             state.note_quote(msg, &quoted);
+                            if let (Some(latitude), Some(longitude)) = (
+                                point.get(0).and_then(Value::as_f64),
+                                point.get(1).and_then(Value::as_f64),
+                            ) {
+                                state.points.insert(msg, (latitude, longitude));
+                            }
                             msg
                         };
                         // Queued above: delay puts event before reply (core can); it duplicated a
@@ -2600,7 +2718,8 @@ async fn serve() {
                                 {"text": text, "fromId": 1, "timestamp": 0,
                                  "showPadlock": true, "state": 20,
                                  "file": file, "fileName": file_name,
-                                 "viewType": view_type}
+                                 "viewType": view_type,
+                                 "hasLocation": point.is_array()}
                             ]),
                         )
                     }

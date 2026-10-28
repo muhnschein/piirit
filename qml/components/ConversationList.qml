@@ -102,6 +102,8 @@ SilicaListView {
     signal reactionPickerRequested(int messageId, string current)
     /// Quote tapped. `quotedId` 0: core has no original (deleted, never here).
     signal quoteRequested(int quotedId)
+    /// Row's location tapped: map of it, or sender's newest.
+    signal locationRequested(int messageId, int senderId, string senderName)
 
     /// Delete wait, ms; tests lower it.
     property alias pendingDelay: doomedMessages.delay
@@ -826,6 +828,8 @@ SilicaListView {
                 callState: model.call_state
                 callHasVideo: model.call_has_video
                 callDuration: model.call_duration
+                hasLocation: model.has_location
+                startsLocation: model.starts_location
                 reactions: model.reactions
                 onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
                                                     previewWidth, model.message_id)
@@ -840,6 +844,8 @@ SilicaListView {
                 onReactionRequested: root.reactionRequested(model.message_id, emoji)
                 // Read on tap, not bound: rows without role (tests' `ListModel`) stay quiet.
                 onQuoteRequested: root.quoteRequested(model.quote_message_id || 0)
+                onLocationRequested: root.locationRequested(model.message_id, model.sender_id,
+                                                            model.sender_name)
                 // Long press on chip, download or play: row menu.
                 onMenuRequested: messageRow.openMenu()
             }

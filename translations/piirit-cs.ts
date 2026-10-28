@@ -1241,6 +1241,84 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Naposledy zde v %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Zatím nepřišla žádná poloha.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Otevřít v prohlížeči</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Sdílet</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Odeslat aktuální polohu</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Vaše poloha je přesná na %n metr.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metry.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metrů.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Pro odeslání polohy ji zapněte v Nastavení.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Zjišťování vaší polohy…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Sdílet polohu živě</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit odesílá vaši polohu i tehdy, když běží na pozadí.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Na 30 minut</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Na 2 hodiny</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Na 6 hodin</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Na 24 hodin</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Přestat sdílet polohu</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1319,6 +1397,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edited</source>
         <translation>Upraveno</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Poloha</translation>
     </message>
 </context>
 <context>
@@ -2265,6 +2348,13 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Odeslat jako zprávu</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sdílíte svou polohu</translation>
     </message>
 </context>
 <context>

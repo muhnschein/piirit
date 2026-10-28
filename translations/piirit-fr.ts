@@ -1236,6 +1236,83 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Vu ici pour la dernière fois à %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Aucune position n’est encore arrivée.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Ouvrir dans le navigateur</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Partager</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Envoyer la position actuelle</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Votre position est précise à %n mètre près.</numerusform>
+            <numerusform>Votre position est précise à %n mètres près.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Activez la localisation dans les Paramètres pour l’envoyer.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Recherche de votre position…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Partager la position en direct</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit continue d’envoyer votre position lorsqu’il tourne en arrière-plan.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Pour 30 minutes</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Pour 1 heure</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Pour 2 heures</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Pour 6 heures</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Pour 24 heures</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Arrêter de partager la position</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Edited</source>
         <translation>Modifié</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Position</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Envoyer comme message</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Vous partagez votre position</translation>
     </message>
 </context>
 <context>

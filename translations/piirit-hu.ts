@@ -1227,6 +1227,82 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>Utoljára itt: %1</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>Még nem érkezett hely.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Megnyitás böngészőben</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Megosztás</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Jelenlegi hely küldése</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>A helyed %n méter pontosságú.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>A küldéshez kapcsold be a helymeghatározást a Beállításokban.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Helyed meghatározása…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Élő hely megosztása</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>A Piirit a háttérben futva is küldi a helyedet.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 percre</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 órára</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 órára</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 órára</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 órára</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Helymegosztás leállítása</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1305,6 +1381,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Szerkesztve</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Hely</translation>
     </message>
 </context>
 <context>
@@ -2247,6 +2328,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Küldés üzenetként</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Megosztod a helyedet</translation>
     </message>
 </context>
 <context>

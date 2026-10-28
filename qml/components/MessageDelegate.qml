@@ -36,6 +36,8 @@ Item {
     signal menuRequested()
     /// Quote tapped: page goes to quoted message.
     signal quoteRequested()
+    /// Location tapped: page shows map.
+    signal locationRequested()
 
     /// One surface: tap opens, long press menu. Attachments take no tap of own.
     function tapped() {
@@ -51,6 +53,8 @@ Item {
         } else if (preview && preview.openable) {
             root.openRequested(preview.fileUrl, root.fileName, root.viewType,
                                preview.contentWidth)
+        } else if (root.showsLocation) {
+            root.locationRequested()
         } else if (root.canDownload) {
             root.downloadRequested()
         }
@@ -121,6 +125,12 @@ Item {
     property bool callHasVideo: false
     /// Seconds, completed call.
     property int callDuration: 0
+    /// Carries a point (`hasLocation`).
+    property bool hasLocation: false
+    /// Core's notice that sender shares location live.
+    property bool startsLocation: false
+    /// Tap shows a map.
+    readonly property bool showsLocation: root.hasLocation || root.startsLocation
 
     /// Row is a call.
     readonly property bool isCall: root.viewType === "Call"
@@ -214,6 +224,7 @@ Item {
                  root.bigPictures.width,
                  attachmentMetric.implicitWidth,
                  root.isCall ? callRow.wantedWidth : 0,
+                 locationRow.shown ? locationRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
                  footerMetric.implicitWidth,
                  root.attachmentFillsBubble ? root.maxWidth : 0,
@@ -328,7 +339,8 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
         font.pixelSize: Theme.fontSizeExtraSmall
-        color: Theme.secondaryColor
+        // Live sharing's notice opens map: lit as tappable.
+        color: root.startsLocation ? Theme.highlightColor : Theme.secondaryColor
         textFormat: Text.PlainText
         text: root.messageText
     }
@@ -569,6 +581,50 @@ Item {
             }
         }
 
+        // Pin and word: whole row opens map. No picture of the map (fetch would tell
+        // OpenStreetMap where reader's chats are).
+        Item {
+            id: locationRow
+            objectName: "locationRow"
+            readonly property bool shown: root.hasLocation && !root.isInfo
+            readonly property real wantedWidth: locationIcon.width + Theme.paddingSmall
+                                                + locationMetric.implicitWidth
+            visible: locationRow.shown
+            x: Theme.paddingMedium
+            y: root.below(callRow.shown ? callRow : attachment, locationRow.shown)
+            width: root.contentWidth
+            height: locationRow.shown ? Math.max(locationIcon.height, locationLabel.height) : 0
+
+            Text {
+                id: locationMetric
+                visible: false
+                font.pixelSize: Theme.fontSizeMedium
+                textFormat: Text.PlainText
+                text: locationLabel.text
+            }
+
+            Image {
+                id: locationIcon
+                width: Theme.iconSizeSmall
+                height: Theme.iconSizeSmall
+                anchors.verticalCenter: parent.verticalCenter
+                source: "image://theme/icon-m-location?" + Theme.highlightColor
+            }
+
+            Label {
+                id: locationLabel
+                objectName: "locationLabel"
+                x: locationIcon.width + Theme.paddingSmall
+                anchors.verticalCenter: parent.verticalCenter
+                width: locationRow.width - x
+                truncationMode: TruncationMode.Fade
+                color: Theme.highlightColor
+                textFormat: Text.PlainText
+                //: In a message that carries a place; tapping it shows the place on a map.
+                text: qsTr("Location")
+            }
+        }
+
         Label {
             id: messageLabel
             objectName: "messageLabel"
@@ -577,8 +633,9 @@ Item {
             height: !messageLabel.shown ? 0
                     : root.bigEmoji ? root.bigPictures.height : implicitHeight
             x: Theme.paddingMedium
-            // Under call, else attachment; rows below chain from here.
-            y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
+            // Under location, call, else attachment; rows below chain from here.
+            y: root.below(locationRow.shown ? locationRow
+                          : callRow.shown ? callRow : attachment, messageLabel.shown)
             // Body width, not bubble's: differ only when offer widened it.
             width: root.bodyWidth
             wrapMode: Text.Wrap

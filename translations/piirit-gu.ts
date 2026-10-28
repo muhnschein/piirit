@@ -1236,6 +1236,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationPage</name>
+    <message>
+        <source>Last seen here at %1</source>
+        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
+        <translation>છેલ્લે અહીં %1 વાગ્યે જોવા મળ્યા</translation>
+    </message>
+    <message>
+        <source>No location has arrived yet.</source>
+        <translation>હજી સુધી કોઈ સ્થાન આવ્યું નથી.</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>બ્રાઉઝરમાં ખોલો</translation>
+    </message>
+</context>
+<context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>શેર કરો</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>વર્તમાન સ્થાન મોકલો</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>તમારું સ્થાન %n મીટર સુધી ચોક્કસ છે.</numerusform>
+            <numerusform>તમારું સ્થાન %n મીટર સુધી ચોક્કસ છે.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>સ્થાન મોકલવા માટે સેટિંગ્સમાં સ્થાન ચાલુ કરો.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>તમારું સ્થાન શોધી રહ્યાં છીએ…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>લાઇવ સ્થાન શેર કરો</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit બેકગ્રાઉન્ડમાં ચાલતું હોય ત્યારે પણ તમારું સ્થાન મોકલતું રહે છે.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 મિનિટ માટે</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 કલાક માટે</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 કલાક માટે</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 કલાક માટે</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 કલાક માટે</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>સ્થાન શેર કરવાનું બંધ કરો</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1314,6 +1391,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>સંપાદિત</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>સ્થાન</translation>
     </message>
 </context>
 <context>
@@ -2258,6 +2340,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>સંદેશ તરીકે મોકલો</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>તમે તમારું સ્થાન શેર કરી રહ્યાં છો</translation>
     </message>
 </context>
 <context>

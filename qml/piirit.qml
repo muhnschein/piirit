@@ -144,6 +144,11 @@ ApplicationWindow {
         }
     }
 
+    /// Phone's position to core while a chat gets it live.
+    LocationFeed {
+        objectName: "locationFeed"
+    }
+
     /// Call under way: notifications, quick actions keep its page up.
     readonly property bool callBusy: callCenter.busy
 

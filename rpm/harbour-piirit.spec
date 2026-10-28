@@ -64,8 +64,11 @@ Requires:   nemo-qml-plugin-dbus-qt5
 # Nemo.Configuration: profile-less settings in dconf, so a change reaches every open page.
 Requires:   nemo-qml-plugin-configuration-qt5
 # Nemo.KeepAlive: phone awake during a call, screen on while ringing
-# (qml/components/CallCenter.qml). Package carries QML module beside the library.
+# (qml/components/CallCenter.qml), and while location shared live. Package carries QML
+# module beside the library.
 Requires:   libkeepalive
+# QtPositioning: phone's position for location sharing (qml/components/LocationFeed.qml).
+Requires:   qml(QtPositioning)
 # Sailfish.WebView: webxdc apps and store only (qml/pages/Webxdc*Page.qml); a device without
 # engine loses those alone.
 # Silica's WebView.qml imports Sailfish.WebView.Popups/.Pickers; unresolved, that page never loads.

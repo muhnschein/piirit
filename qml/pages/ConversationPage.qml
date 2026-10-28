@@ -580,6 +580,7 @@ Page {
         // Original lit here as search hit (older rows fill as view gets there); another chat's
         // opens over this one, Back returns; gone: said so. As reference clients.
         onQuoteRequested: messages.show_quoted(quotedId)
+        onLocationRequested: page.showLocation(messageId, senderId, senderName)
         onForwardRequested: {
             // Message id captured here for picker's report.
             var travelling = messageId
@@ -615,7 +616,7 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: notice.top
+            bottom: sharingBar.top
         }
         // Core state outranks earlier failure: read now, don't wait for change.
         text: page.coreStatusMessage.length > 0
@@ -623,6 +624,19 @@ Page {
         // Reconnect ends when status says; stopped never does.
         timeout: page.coreStatusMessage.length > 0 ? 0 : 8
         onDismissed: page.errorMessage = ""
+    }
+
+    // Live location under way: says so, stop beside.
+    SharingBar {
+        id: sharingBar
+        objectName: "sharingBar"
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: notice.top
+        }
+        sharing: messages.sharing_location
+        onStopRequested: messages.share_location(0)
     }
 
     // Reply or edit bar, one for both (edit isn't a send); reply returns after.
@@ -838,6 +852,7 @@ Page {
             appsAvailable: Settings.webxdcEnabled === true
             onCameraRequested: page.pickWith("CapturePage.qml")
             onLibraryRequested: page.pickWith("AttachLibraryPage.qml")
+            onLocationRequested: page.pickLocation()
             onVoiceRequested: voiceBar.start()
             // `.xdc` sent as file; core makes it an app.
             onAppRequested: page.pickApp()
@@ -903,6 +918,32 @@ Page {
         objectName: "attachmentSaver"
         onSaved: notice.show(attachmentSaver.savedText)
         onError: page.errorMessage = message
+    }
+
+    // Place once, or live for a while; dialog says which on accept.
+    function pickLocation() {
+        var dialog = pageStack.push(Qt.resolvedUrl("LocationShareDialog.qml"),
+                                    { sharing: messages.sharing_location })
+        if (dialog) {
+            dialog.locationPicked.connect(function (latitude, longitude) {
+                page.errorMessage = ""
+                messages.send_location(latitude, longitude)
+            })
+            dialog.sharingPicked.connect(function (seconds) {
+                messages.share_location(seconds)
+            })
+        }
+    }
+
+    // Map of row's place, or sender's newest. By URL (`Sailfish.WebView`).
+    function showLocation(messageId, senderId, senderName) {
+        pageStack.push(Qt.resolvedUrl("LocationPage.qml"), {
+            accountId: page.accountId,
+            chatId: page.chatId,
+            contactId: senderId,
+            messageId: messageId,
+            senderName: senderName
+        })
     }
 
     // App store reports saved file. By URL (`Sailfish.WebView`): missing type
