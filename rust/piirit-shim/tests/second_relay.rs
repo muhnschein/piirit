@@ -1,10 +1,8 @@
 //! Profile with several transports says which relay is its own.
 //!
-//! Core keeps own address (invite link, contact) in `configured_addr`. Account
-//! list and connectivity report took the first transport instead: list (no
-//! address since 2.61; old `addr` key held an old transport's) and report (first
-//! quota bar is oldest transport's). Result: stale relay named, with a third
-//! relay's mailbox.
+//! Own address (invite link) = own contact's; core 2.66+ takes first relay's.
+//! Account list has none since 2.61; `configured_addr` refused since 2.66. Mailbox
+//! shown = that relay's quota bar, not a later relay's.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -40,8 +38,7 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // Set up on this relay first; own address now on another. This one is first transport
-        // core lists and owns the report's first quota bar.
+        // Set up on this relay first, so own address (core 2.66+); another added since.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 
@@ -106,27 +103,25 @@ fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
     let answers = answers_at_end.borrow().clone();
     let methods = common::methods(&journal);
     assert_eq!(
-        listed, "account1@example.org",
-        "the profiles page's row does not name the profile's own address \
-         (`configured_addr`), the one its invite link and its own contact \
-         carry. Calls: {methods:?}"
+        listed, "ada@old.example.net",
+        "the profiles page's row does not name the profile's own address, \
+         the one its own contact carries. Calls: {methods:?}"
     );
     assert_eq!(
         answers.first().map(String::as_str),
-        Some("account1@example.org"),
+        Some("ada@old.example.net"),
         "the profile page showed something other than the profile's own \
          address. Calls: {methods:?}"
     );
     assert_eq!(
         answers.get(1).map(String::as_str),
-        Some("67"),
-        "the mailbox shown is not this profile's relay's: the first quota \
-         bar in the report belongs to the transport set up first. Calls: \
-         {methods:?}"
+        Some("95"),
+        "the mailbox shown is not the relay with the profile's own \
+         address. Calls: {methods:?}"
     );
     assert_eq!(
         answers.get(2).map(String::as_str),
-        Some("1.34 GiB of 2 GiB used"),
+        Some("1.9 GiB of 2 GiB used"),
         "the mailbox words are not the ones beside this profile's relay. \
          Calls: {methods:?}"
     );
