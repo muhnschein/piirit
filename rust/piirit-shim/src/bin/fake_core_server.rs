@@ -19,6 +19,9 @@ const SELF: u32 = 1;
 const RECOMMENDED_SIZE_KEY: &str = "sys.msgsize_max_recommended";
 const RECOMMENDED_SIZE: u64 = (30 - 1) * 1024 * 1024 / 4 * 3;
 
+/// Own address key core 2.66 dropped; read or written, refused (pinned in `real_server.rs`).
+const REMOVED_KEY: &str = "configured_addr";
+
 /// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it: oversize tests write KiB, not ~20 MiB.
 fn recommended_size() -> String {
     std::env::var("PIIRIT_FAKE_MSGSIZE_MAX")
@@ -154,7 +157,7 @@ struct State {
     /// Calls by message; placed here or via `PIIRIT_FAKE_INCOMING_CALL_MS`.
     calls: std::collections::BTreeMap<u32, FakeCall>,
     /// Transports per account, add order (core's `transports` table, `list_transports`).
-    /// Own-address one is `configured_addr` in `config`, as core.
+    /// Own address = first's, as core 2.66+ (own contact's address).
     transports: std::collections::BTreeMap<u32, Vec<String>>,
 }
 
@@ -169,22 +172,18 @@ impl State {
         self.transports.get(&account).cloned().unwrap_or_default()
     }
 
-    /// Keep new transport once, as core; own address if none yet (second = second address, not
-    /// change of first).
+    /// Keep new transport once, as core (second = second address, not change of first).
     fn add_transport(&mut self, account: u32, addr: &str) {
         let list = self.transports.entry(account).or_default();
         if !list.iter().any(|known| known == addr) {
             list.push(addr.to_string());
         }
-        self.config
-            .entry((account, "configured_addr".to_string()))
-            .or_insert_with(|| addr.to_string());
         self.transports_modified(account);
     }
 
     /// Configured profiles from `PIIRIT_FAKE_ACCOUNTS` (unset in onboarding tests), seeded before
     /// first request so early profile asks find transports. `PIIRIT_FAKE_OLDER_RELAY` seeds relay
-    /// listed before own address's (profile set up twice).
+    /// set up before `account<N>@example.org`; core 2.66+ makes it own address.
     fn seed_accounts(&mut self) {
         let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
@@ -199,10 +198,7 @@ impl State {
             if let Some(older) = &older {
                 list.push(older.clone());
             }
-            let own = format!("account{account}@example.org");
-            list.push(own.clone());
-            self.config
-                .insert((account, "configured_addr".to_string()), own);
+            list.push(format!("account{account}@example.org"));
         }
     }
 
@@ -359,10 +355,12 @@ impl State {
     /// Contact as `get_contacts`: own unlisted, askable by id (members). Ada has bio. Names:
     /// `authName` theirs, `name` given here, `displayName` `name` else `authName`. Every 2.62 key,
     /// unseen values (`lastSeen` 0, "Old"; own "Normal"). Picture only via
-    /// `PIIRIT_FAKE_CONTACT_PICTURE` (Ada, core-style path).
-    fn contact_object(&self, contact: u32) -> Option<Value> {
+    /// `PIIRIT_FAKE_CONTACT_PICTURE` (Ada, core-style path). Own address = first relay's;
+    /// `me@example.org` without one (core 2.66 refuses there; chat tests seed no relay).
+    fn contact_object(&self, account: u32, contact: u32) -> Option<Value> {
+        let own = self.transports.get(&account).and_then(|list| list.first());
         let address = if contact == SELF {
-            "me@example.org"
+            own.map_or("me@example.org", String::as_str)
         } else {
             self.contacts.get(&contact)?
         };
@@ -987,9 +985,6 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     state.imex(account, 1000);
     // Backup carries address: same backup twice = same address, keyed on import argument.
     let addr = backup_addr(from);
-    state
-        .config
-        .insert((account, "configured_addr".to_string()), addr.clone());
     state.add_transport(account, &addr);
     state.configure(account);
     ok(id, &Value::Null)
@@ -1399,24 +1394,7 @@ async fn serve() {
                     // Null clears, as core; "" is a value. Core refuses "" for `selfavatar`: app
                     // sends null.
                     match positional(2).as_str() {
-                        // Own address: core takes only one it has transport for (its words); since
-                        // 2.61, with none too, writing neither makes nor clears one. Pinned vs
-                        // binary.
-                        Some(value) if key == "configured_addr" => {
-                            if state
-                                .transports_for(account)
-                                .iter()
-                                .any(|addr| addr == value)
-                            {
-                                state.config.insert((account, key), value.to_string());
-                                ok(&id, &Value::Null)
-                            } else {
-                                err(&id, "Address does not belong to any transport.")
-                            }
-                        }
-                        None if key == "configured_addr" => {
-                            err(&id, "Cannot unset configured_addr")
-                        }
+                        _ if key == REMOVED_KEY => err(&id, &unknown_key(&key)),
                         Some(value) => {
                             state.config.insert((account, key), value.to_string());
                             ok(&id, &Value::Null)
@@ -1436,13 +1414,17 @@ async fn serve() {
                     let state = state.lock().await;
                     // `sys.` keys computed, not stored.
                     let default = (key == RECOMMENDED_SIZE_KEY).then(recommended_size);
-                    let value = state
-                        .config
-                        .get(&(account, key))
-                        .cloned()
-                        .or(default)
-                        .map_or(Value::Null, Value::String);
-                    ok(&id, &value)
+                    if key == REMOVED_KEY {
+                        err(&id, &unknown_key(&key))
+                    } else {
+                        let value = state
+                            .config
+                            .get(&(account, key))
+                            .cloned()
+                            .or(default)
+                            .map_or(Value::Null, Value::String);
+                        ok(&id, &value)
+                    }
                 }
                 // Read/unread from list. Core announces both (badges follow); profiles page counts
                 // `get_fresh_msgs`.
@@ -1610,8 +1592,7 @@ async fn serve() {
                         .collect();
                     ok(&id, &Value::Array(listed))
                 }
-                // Last or unknown transport refused (core's words). Removing own-address one elects
-                // newest of rest: upstream `maybe_update_sending_transport`.
+                // Last or unknown transport refused (core's words). Own address moves with order.
                 "delete_transport" => {
                     let account = account_id();
                     let addr = positional(1).as_str().unwrap_or_default().to_string();
@@ -1624,14 +1605,6 @@ async fn serve() {
                     } else {
                         let kept: Vec<String> =
                             known.into_iter().filter(|kept| *kept != addr).collect();
-                        if let Some(newest) = kept.last().filter(|_| {
-                            state.config(account, "configured_addr").as_deref()
-                                == Some(addr.as_str())
-                        }) {
-                            state
-                                .config
-                                .insert((account, "configured_addr".to_string()), newest.clone());
-                        }
                         state.transports.insert(account, kept);
                         state.transports_modified(account);
                         ok(&id, &Value::Null)
@@ -1657,7 +1630,7 @@ async fn serve() {
                     }
                     let contacts: Vec<Value> = ids
                         .iter()
-                        .filter_map(|contact| state.contact_object(*contact))
+                        .filter_map(|contact| state.contact_object(account_id(), *contact))
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
@@ -1674,7 +1647,7 @@ async fn serve() {
                     let ids: Vec<u32> = state.blocked.iter().copied().collect();
                     let contacts: Vec<Value> = ids
                         .iter()
-                        .filter_map(|contact| state.contact_object(*contact))
+                        .filter_map(|contact| state.contact_object(account_id(), *contact))
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
@@ -1960,7 +1933,7 @@ async fn serve() {
                     state.seed_chats();
                     let mut found = serde_json::Map::new();
                     for contact in ids {
-                        if let Some(object) = state.contact_object(contact) {
+                        if let Some(object) = state.contact_object(account_id(), contact) {
                             found.insert(contact.to_string(), object);
                         }
                     }
@@ -2321,7 +2294,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    match state.contact_object(contact) {
+                    match state.contact_object(account_id(), contact) {
                         Some(object) => ok(&id, &object),
                         None => err(&id, "contact not found"),
                     }
@@ -2903,6 +2876,11 @@ async fn serve() {
 
 fn ok(id: &Value, result: &Value) -> Value {
     json!({"jsonrpc": "2.0", "id": id, "result": result})
+}
+
+/// Core's words for config key it lacks.
+fn unknown_key(key: &str) -> String {
+    format!("unknown key {key:?}: Matching variant not found")
 }
 
 fn err(id: &Value, message: &str) -> Value {

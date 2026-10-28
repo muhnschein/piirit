@@ -3,8 +3,8 @@
 //! Two accounts on one address = two copies of one mailbox (unread counted twice,
 //! notifications twice, replies from whichever copy). Core lets `import_backup` write
 //! same backup again, so shim reads imported relays (`list_transports`) and refuses a
-//! profile any of whose relays another has; every relay, not own address (`configured_addr`
-//! may differ per copy; no address in account list since 2.61). Refused reason is
+//! profile any of whose relays another has; every relay, not own address (may differ per
+//! copy; no address in account list since 2.61). Refused reason is
 //! `restore_refused`; page localizes it. Refused import's account is removed, as
 //! on failure.
 //!

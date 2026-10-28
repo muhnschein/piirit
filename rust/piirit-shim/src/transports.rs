@@ -1,7 +1,7 @@
 //! Relays a profile is reached through.
 //!
 //! Mail arrives on any transport (`list_transports`); core picks outgoing per connect (newest
-//! answering since 2.61), unnamed over JSON-RPC. Own-address relay (`configured_addr`) listed
+//! answering since 2.61), unnamed over JSON-RPC. Own-address relay (own contact's) listed
 //! first. `delete_transport`: core refuses last; removing own-address relay makes core pick
 //! another, so rows read back: own address is core's answer, not a guess. Rows also carry
 //! report dot, status, mailbox (`connectivity.rs`), one parse for all.
@@ -11,7 +11,7 @@ use std::cell::RefCell;
 use qmetaobject::*;
 
 use crate::connectivity::transport_reports;
-use crate::core::connection;
+use crate::core::{connection, own_address};
 use crate::json;
 use crate::models::{TransportItem, TransportListModel};
 
@@ -36,7 +36,7 @@ pub struct Transports {
 
     /// Row count; gates removing last (core refuses). Field, not `rows.len()`: read mid-rebuild.
     pub count: qt_property!(u32; NOTIFY rows_changed),
-    /// Own address (`configured_addr`); empty until loaded.
+    /// Own address (own contact's); empty until loaded or if core can't say.
     pub primary: qt_property!(QString; NOTIFY rows_changed),
     /// `rows` changed.
     pub rows_changed: qt_signal!(),
@@ -114,11 +114,7 @@ impl Transports {
                     .call("list_transports", (account_id,))
                     .await
                     .map_err(|err| err.to_string())?;
-                let primary: String = rpc
-                    .call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
-                    .await
-                    .map(Option::unwrap_or_default)
-                    .map_err(|err| err.to_string())?;
+                let primary = own_address(&rpc, account_id).await.unwrap_or_default();
                 // Optional: relay listed even if report unreadable.
                 let report: String = rpc
                     .call("get_connectivity_html", (account_id,))

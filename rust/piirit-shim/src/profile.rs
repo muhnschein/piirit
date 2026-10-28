@@ -3,7 +3,7 @@
 use qmetaobject::*;
 
 use crate::connectivity::{quota_from_report, Quota};
-use crate::core::connection;
+use crate::core::{connection, own_address};
 use crate::json;
 use crate::media;
 
@@ -28,7 +28,7 @@ pub struct Profile {
     pub status: qt_property!(QString; NOTIFY loaded_changed),
     /// Picture path in core's blob dir; empty if none.
     pub avatar_path: qt_property!(QString; NOTIFY loaded_changed),
-    /// Address (`configured_addr`). Read-only: change means new transport.
+    /// Own contact's address. Read-only: change means new transport.
     pub address: qt_property!(QString; NOTIFY loaded_changed),
     /// Reader's own contact colour, `#rrggbb`.
     pub color: qt_property!(QString; NOTIFY loaded_changed),
@@ -168,12 +168,7 @@ impl Profile {
                     .unwrap_or(0);
                 // Which relay's mailbox (report covers all). Asked, not from `address`: load may
                 // not have filled it.
-                let address: String = rpc
-                    .call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
-                    .await
-                    .ok()
-                    .flatten()
-                    .unwrap_or_default();
+                let address = own_address(&rpc, account_id).await.unwrap_or_default();
                 Ok::<_, String>((
                     connectivity,
                     quota_from_report(&report, &address),
@@ -251,18 +246,24 @@ impl Profile {
                             .map_err(|err| err.to_string())
                     }
                 };
+                let display_name = get("displayname").await?;
+                let status = get("selfstatus").await?;
+                let avatar = get("selfavatar").await?;
+                // Core stores "1"/"0", default on: absent isn't off.
+                let read_receipts = get("mdns_enabled").await? != "0";
+                // Own contact id 1 in every account: address, colour. Optional: core 2.66+ has
+                // none before first relay.
+                let own = rpc
+                    .call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
+                    .await
+                    .unwrap_or_default();
                 Ok::<_, String>((
-                    get("displayname").await?,
-                    get("selfstatus").await?,
-                    get("selfavatar").await?,
-                    get("configured_addr").await?,
-                    // Core stores "1"/"0", default on: absent isn't off.
-                    get("mdns_enabled").await? != "0",
-                    // Own contact id 1 in every account. Optional: colourless still shows.
-                    rpc.call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
-                        .await
-                        .map(|contact| json::str_at(&contact, "color").to_string())
-                        .unwrap_or_default(),
+                    display_name,
+                    status,
+                    avatar,
+                    json::str_at(&own, "address").to_string(),
+                    read_receipts,
+                    json::str_at(&own, "color").to_string(),
                     // Recommended attachment ceiling. Optional.
                     media::attachment_limit(&rpc, account_id).await,
                 ))

@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A chat whose name starts with an emoji shows that emoji as its picture, not a "?".
 - Emoji are sharp at every size, in messages, reactions and the emoji picker.
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
