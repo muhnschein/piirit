@@ -2128,7 +2128,10 @@ async fn locations_against(client: &RpcClient, account: u32, chat: u32) {
         .call_unit("get_all_account_ids")
         .await
         .unwrap_or_else(|err| panic!("get_all_account_ids: {err}"));
-    assert!(accounts.contains(&account), "{accounts:?} lacks {account}");
+    assert!(
+        accounts.contains(&account),
+        "the profile is not among all profiles"
+    );
 
     client
         .call::<_, ()>("send_locations_to_chat", (account, chat, 1800_i64))

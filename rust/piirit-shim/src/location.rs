@@ -434,8 +434,7 @@ mod tests {
         // Widest at 85°: 0.003 / cos 85°.
         assert!(
             map_url(90.0, 0.0).contains("?bbox=-0.03442%2C89.99700%2C0.03442%2C90.00300&"),
-            "{}",
-            map_url(90.0, 0.0)
+            "box at a pole not that of 85°"
         );
     }
 }
