@@ -1488,7 +1488,7 @@ async fn serve() {
                 "set_webxdc_integration" => {
                     let account = account_id();
                     let path = positional(1).as_str().unwrap_or_default().to_string();
-                    match std::fs::read(&path) {
+                    match tokio::fs::read(&path).await {
                         Ok(bytes) if bytes.starts_with(b"PK\x03\x04") => {
                             let mut state = state.lock().await;
                             state.next_message_id += 1;
