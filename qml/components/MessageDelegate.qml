@@ -129,8 +129,11 @@ Item {
     property bool hasLocation: false
     /// Core's notice that sender shares location live.
     property bool startsLocation: false
+    /// Location on (setting); off, rows open no map.
+    property bool locationsEnabled: false
     /// Tap shows a map.
-    readonly property bool showsLocation: root.hasLocation || root.startsLocation
+    readonly property bool showsLocation: root.locationsEnabled
+                                          && (root.hasLocation || root.startsLocation)
 
     /// Row is a call.
     readonly property bool isCall: root.viewType === "Call"
@@ -340,7 +343,8 @@ Item {
         wrapMode: Text.Wrap
         font.pixelSize: Theme.fontSizeExtraSmall
         // Live sharing's notice opens map: lit as tappable.
-        color: root.startsLocation ? Theme.highlightColor : Theme.secondaryColor
+        color: root.showsLocation && root.startsLocation ? Theme.highlightColor
+                                                         : Theme.secondaryColor
         textFormat: Text.PlainText
         text: root.messageText
     }
@@ -586,7 +590,7 @@ Item {
         Item {
             id: locationRow
             objectName: "locationRow"
-            readonly property bool shown: root.hasLocation && !root.isInfo
+            readonly property bool shown: root.showsLocation && !root.isInfo
             readonly property real wantedWidth: locationIcon.width + Theme.paddingSmall
                                                 + locationMetric.implicitWidth
             visible: locationRow.shown

@@ -702,6 +702,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>ਨਵਾਂ</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>ਸਾਰੇ ਟਿਕਾਣੇ</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,22 +1241,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>ਆਖਰੀ ਵਾਰ ਇੱਥੇ %1 ਵਜੇ ਦੇਖਿਆ ਗਿਆ</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>ਹਾਲੇ ਤੱਕ ਕੋਈ ਟਿਕਾਣਾ ਨਹੀਂ ਆਇਆ।</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਖੋਲ੍ਹੋ</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1313,6 +1302,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>ਸਾਰੇ ਟਿਕਾਣੇ</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>ਨਕਸ਼ਾ</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1358,6 +1360,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No calls yet</source>
         <translation>ਹਾਲੇ ਕੋਈ ਕਾਲ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>ਨਕਸ਼ਾ</translation>
     </message>
 </context>
 <context>
@@ -2327,6 +2334,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ਟਿਕਾਣਾ ਸਟ੍ਰੀਮਿੰਗ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰਦਾ ਹੈ ਅਤੇ ਸਾਂਝੇ ਟਿਕਾਣੇ ਨਕਸ਼ੇ ਉੱਤੇ ਦਿਖਾਉਂਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

@@ -31,12 +31,13 @@ Name:       harbour-piirit
 Summary:    Native SailfishOS client for Delta Chat
 Version:    2.2.0
 Release:    1
-# Licences: GPL-3.0-or-later app; MPL-2.0 server; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
+# Licences: GPL-3.0-or-later app; MPL-2.0 server, maps app; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
+# Leaflet BSD-2-Clause;
 # emoji CC-BY-4.0, MIT, Unicode-3.0; FFmpeg LGPL-2.1+, x264 GPL-2.0+. Tag = package contents.
 %if 0%{?bundle_rpc_server}
-License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND BSD-2-Clause AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %else
-License:    GPL-3.0-or-later AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND BSD-2-Clause AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %endif
 Group:      Qt/Qt
 URL:        https://github.com/muhnschein/piirit
@@ -241,6 +242,9 @@ install -Dm 644 vendor/deltachat-rpc-server/SOURCE.md \
 # Same for call page (rust/piirit-shim/src/call_host.rs): GPL-3.0 source and notices.
 install -Dm 644 vendor/calls-webapp/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/calls-webapp/SOURCE.md
+# Same for map app (rust/piirit-shim/src/maps.rs): MPL-2.0 source, Leaflet notice.
+install -Dm 644 vendor/maps/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/maps/SOURCE.md
 # Emoji attribution (CC-BY-4.0) travels with them.
 install -Dm 644 vendor/emoji/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/emoji/SOURCE.md

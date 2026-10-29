@@ -704,6 +704,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nový</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1241,22 +1246,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>Naposledy zde v %1</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>Zatím nepřišla žádná poloha.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>Otevřít v prohlížeči</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1319,6 +1308,19 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1364,6 +1366,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>No calls yet</source>
         <translation>Zatím žádné hovory</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mapa</translation>
     </message>
 </context>
 <context>
@@ -2335,6 +2342,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>Spouští malé aplikace uvnitř chatů.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Povolit streamování polohy (experimentální)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Sdílí vaši polohu v chatech a zobrazuje sdílené polohy na mapě.</translation>
     </message>
 </context>
 <context>

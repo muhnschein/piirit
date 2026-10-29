@@ -182,11 +182,23 @@ Page {
 
     // All chat content kinds; tile says kind.
     function openMedia(kind) {
+        if (kind === "map") {
+            map.show(page.chatId, 0, 0)
+            return
+        }
         pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
             accountId: page.accountId,
             chatId: page.chatId,
             kind: kind
         })
+    }
+
+    MapOpener {
+        id: map
+        objectName: "map"
+        account_id: page.accountId
+        chatName: page.chatName
+        onError: page.errorMessage = message
     }
 
     function addMembers() {
@@ -329,6 +341,7 @@ Page {
                 objectName: "mediaKinds"
                 // `=== true`: dconf gives `undefined` until key read.
                 appsAvailable: Settings.webxdcEnabled === true
+                mapAvailable: Settings.locationStreamingEnabled === true
                 onKindRequested: page.openMedia(kind)
             }
 

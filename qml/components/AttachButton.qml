@@ -17,6 +17,8 @@ Item {
     property bool voiceAvailable: false
     /// Apps grid offered; page binds setting.
     property bool appsAvailable: false
+    /// Location entry offered; page binds setting.
+    property bool locationAvailable: false
     /// Take picture or video now.
     signal cameraRequested()
     /// Indexed picture, video, song or document.
@@ -91,6 +93,7 @@ Item {
 
             IconButton {
                 objectName: "attachLocation"
+                visible: root.locationAvailable
                 icon.source: "image://theme/icon-m-location"
                 onClicked: {
                     root.close()

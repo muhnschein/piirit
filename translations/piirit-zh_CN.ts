@@ -700,6 +700,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>新建</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>显示所有位置</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1231,22 +1236,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>最后一次在此出现于 %1</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>尚未收到任何位置。</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>在浏览器中打开</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1307,6 +1296,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>显示所有位置</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>地图</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1352,6 +1354,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No calls yet</source>
         <translation>暂无通话</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>地图</translation>
     </message>
 </context>
 <context>
@@ -2319,6 +2326,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>在聊天中运行小应用。</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>启用位置流（实验性）</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>在聊天中分享你的位置，并在地图上显示分享的位置。</translation>
     </message>
 </context>
 <context>

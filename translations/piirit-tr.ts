@@ -700,6 +700,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Yeni</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1231,22 +1236,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>Burada en son %1 saatinde görüldü</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>Henüz konum gelmedi.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>Tarayıcıda aç</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1307,6 +1296,19 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Harita</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1352,6 +1354,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>No calls yet</source>
         <translation>Henüz arama yok</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Harita</translation>
     </message>
 </context>
 <context>
@@ -2319,6 +2326,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Konum akışını etkinleştir (deneysel)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Konumunuzu sohbetlerde paylaşır ve paylaşılan konumları bir haritada gösterir.</translation>
     </message>
 </context>
 <context>

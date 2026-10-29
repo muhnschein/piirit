@@ -702,6 +702,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nuovo</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Mostra tutte le Posizioni</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,22 +1241,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>Visto qui l’ultima volta alle %1</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>Non è ancora arrivata nessuna posizione.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>Apri nel browser</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1313,6 +1302,19 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Mostra tutte le Posizioni</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mappa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1358,6 +1360,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>No calls yet</source>
         <translation>Ancora nessuna chiamata</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mappa</translation>
     </message>
 </context>
 <context>
@@ -2327,6 +2334,15 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>Esegue piccole app all&apos;interno delle chat.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Abilita la trasmissione della posizione (sperimentale)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Condivide la tua posizione nelle chat e mostra le posizioni condivise su una mappa.</translation>
     </message>
 </context>
 <context>

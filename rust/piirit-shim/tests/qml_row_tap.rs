@@ -50,12 +50,13 @@ const PROBE_QML: &str = r"
             list.item.appRequested.connect(function(id) {
                 raised = 'app:' + id
             })
-            list.item.locationRequested.connect(function(id, sender, name) {
-                raised = 'location:' + id + ':' + sender + ':' + name
+            list.item.locationRequested.connect(function(id, sender) {
+                raised = 'location:' + id + ':' + sender
             })
             return 'ok'
         }
         function setApps(on) { list.item.appsEnabled = on; return 'ok' }
+        function setLocations(on) { list.item.locationsEnabled = on; return 'ok' }
         // Text with a point, or core's notice that sender shares live.
         function showLocated(notice) {
             var located = row('Text', '', 'Done')
@@ -210,6 +211,11 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         call!("showLocated", false);
     });
     plan.after(1, move || unsafe {
+        // Location streaming off (experimental, as in Delta Chat): no map.
+        record!("point-tap-off", call!("tapRow"));
+        record!("locations-on", call!("setLocations", true));
+    });
+    plan.after(1, move || unsafe {
         // Map of row's own point; then of sender's newest, from their notice.
         record!("point-tap", call!("tapRow"));
         call!("showLocated", true);
@@ -288,13 +294,19 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         "a tap on a webxdc did not ask to run it. {context}"
     );
     assert_eq!(
+        value("point-tap-off"),
+        "",
+        "a point opened a map while location streaming is off. {context}"
+    );
+    assert_eq!(value("locations-on"), "ok", "{context}");
+    assert_eq!(
         value("point-tap"),
-        "location:7:10:Ada",
+        "location:7:10",
         "a tap on a row with a point did not ask for its map. {context}"
     );
     assert_eq!(
         value("notice-tap"),
-        "location:7:10:Ada",
+        "location:7:10",
         "a tap on live sharing's notice did not ask for its sender's map. {context}"
     );
 }

@@ -1,7 +1,7 @@
-//! Location's pieces on screen: tray entry, row pin, share dialog, sharing bar, map page, feed.
+//! Location's pieces on screen: tray entry, row pin, share dialog, sharing bar, feed. Map:
+//! `qml_map.rs`.
 //!
-//! Stubs: no layout, no position, no browser engine. What the map looks like, and whether the
-//! phone finds itself, are device questions.
+//! Stubs: no layout, no position. Whether the phone finds itself is a device question.
 
 // Qt harness: see chat_actions.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -172,19 +172,41 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    // Tray: location entry asks, tray goes away.
-    let s = steps.clone();
+    // Tray: location entry asks, tray goes away. Location streaming off (experimental, as in
+    // Delta Chat): no entry. Entries show once tray has faded in.
     plan.after(1, move || {
-        common::record(
-            &s,
-            "tray",
-            call!("load", common::component_url("AttachButton.qml"), "{}"),
-        );
-        call!("watch", "locationRequested");
+        call!("load", common::component_url("AttachButton.qml"), "{}");
         call!("set", "open", "true");
-        call!("tap", "attachLocation");
-        common::record(&s, "tray-asked", call!("heard"));
-        common::record(&s, "tray-open", call!("own", "open"));
+    });
+    let s = steps.clone();
+    plan.until(1, 20, move |last| {
+        let done = call!("get", "attachTray", "visible") == QString::from("true");
+        if done || last {
+            common::record(&s, "tray-off", call!("get", "attachLocation", "visible"));
+            common::record(
+                &s,
+                "tray",
+                call!(
+                    "load",
+                    common::component_url("AttachButton.qml"),
+                    r#"{"locationAvailable": true}"#
+                ),
+            );
+            call!("watch", "locationRequested");
+            call!("set", "open", "true");
+        }
+        done
+    });
+    let s = steps.clone();
+    plan.until(1, 20, move |last| {
+        let done = call!("get", "attachTray", "visible") == QString::from("true");
+        if done || last {
+            common::record(&s, "tray-on", call!("get", "attachLocation", "visible"));
+            call!("tap", "attachLocation");
+            common::record(&s, "tray-asked", call!("heard"));
+            common::record(&s, "tray-open", call!("own", "open"));
+        }
+        done
     });
 
     // Row with a point: pin and word, tap asks for map. Plain row: neither. Notice of live
@@ -192,10 +214,21 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
     let s = steps.clone();
     plan.after(1, move || {
         let delegate = common::component_url("MessageDelegate.qml");
+        // Location streaming off: no pin, tap asks nothing.
         call!(
             "load",
             delegate.clone(),
             r#"{"messageText": "https://www.openstreetmap.org/?mlat=1&mlon=2", "hasLocation": true}"#
+        );
+        call!("watch", "locationRequested");
+        common::record(&s, "off-pin", call!("get", "locationRow", "visible"));
+        call!("run", "tapped");
+        common::record(&s, "off-tap", call!("heard"));
+        call!(
+            "load",
+            delegate.clone(),
+            r#"{"messageText": "https://www.openstreetmap.org/?mlat=1&mlon=2", "hasLocation": true,
+                "locationsEnabled": true}"#
         );
         call!("watch", "locationRequested");
         common::record(&s, "pin-shown", call!("get", "locationRow", "visible"));
@@ -215,7 +248,7 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
             "load",
             delegate,
             r#"{"messageText": "Location streaming enabled by Ada.", "isInfo": true,
-                "startsLocation": true, "hasLocation": true}"#
+                "startsLocation": true, "hasLocation": true, "locationsEnabled": true}"#
         );
         call!("watch", "locationRequested");
         common::record(&s, "notice-pin", call!("get", "locationRow", "visible"));
@@ -289,54 +322,6 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         common::record(&s, "dialog-off", call!("get", "nowSwitch", "description"));
     });
 
-    // Map page: live notice shows sender's newest on osm.org's embed page.
-    let s = steps.clone();
-    plan.after(1, move || {
-        common::record(
-            &s,
-            "page",
-            call!(
-                "load",
-                common::page_url("LocationPage.qml"),
-                r#"{"accountId": 1, "chatId": 1, "contactId": 10, "messageId": 31,
-                    "senderName": "Ada Lovelace"}"#
-            ),
-        );
-    });
-    let s = steps.clone();
-    plan.until(1, 10, move |last| {
-        let done = !call!("get", "mapView", "url").to_string().is_empty();
-        if done || last {
-            common::record(&s, "page-title", call!("get", "locationHeader", "title"));
-            common::record(&s, "page-when", call!("get", "locationHeader", "subtitle"));
-            common::record(&s, "page-map", call!("get", "mapView", "url"));
-            common::record(&s, "page-browser", call!("get", "browserButton", "enabled"));
-            common::record(&s, "page-empty", call!("get", "mapEmpty", "visible"));
-            call!(
-                "load",
-                common::page_url("LocationPage.qml"),
-                r#"{"accountId": 1, "chatId": 1, "contactId": 12, "messageId": 0,
-                    "senderName": "Grace"}"#
-            );
-        }
-        done
-    });
-    let s = steps.clone();
-    plan.until(1, 10, move |last| {
-        let done = call!("get", "mapEmpty", "visible").to_string() == "true";
-        if done || last {
-            common::record(&s, "nowhere-shown", call!("get", "mapEmpty", "visible"));
-            common::record(&s, "nowhere-empty", call!("get", "mapEmpty", "text"));
-            common::record(&s, "nowhere-map", call!("get", "mapView", "visible"));
-            common::record(
-                &s,
-                "nowhere-browser",
-                call!("get", "browserButton", "enabled"),
-            );
-        }
-        done
-    });
-
     // Feed: still until a chat shares; then position on, phone awake, positions to core.
     let s = steps.clone();
     plan.after(1, move || {
@@ -394,7 +379,9 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         assert_eq!(value(label), wanted, "{label}: {why} {context}");
     };
 
+    expect("tray-off", "false", "tray offers location while it is off.");
     expect("tray", "ok", "tray did not load.");
+    expect("tray-on", "true", "tray hides location while it is on.");
     expect(
         "tray-asked",
         "locationRequested();",
@@ -406,6 +393,12 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "tray stayed open over the dialog it opened.",
     );
 
+    expect("off-pin", "false", "a pin shows while location is off.");
+    expect(
+        "off-tap",
+        "",
+        "a point asked for a map while location is off.",
+    );
     expect("pin-shown", "true", "a row with a point shows no pin.");
     expect("pin-word", "Location", "");
     expect(
@@ -500,26 +493,6 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "Turn on location in Settings to send it.",
         "a phone that cannot find itself says nothing.",
     );
-
-    expect("page", "ok", "map page did not load.");
-    expect("page-title", "Ada Lovelace", "");
-    assert!(
-        value("page-when").starts_with("Last seen here at "),
-        "live place not marked as last seen. {context}"
-    );
-    expect(
-        "page-map",
-        "https://www.openstreetmap.org/export/embed.html\
-         ?bbox=24.99396%2C60.19700%2C25.00604%2C60.20300\
-         &layer=mapnik&marker=60.20000%2C25.00000",
-        "map not on sender's newest place.",
-    );
-    expect("page-browser", "true", "");
-    expect("page-empty", "false", "");
-    expect("nowhere-shown", "true", "no place, and nothing says so.");
-    expect("nowhere-empty", "No location has arrived yet.", "");
-    expect("nowhere-map", "false", "an empty map shows.");
-    expect("nowhere-browser", "false", "browser offered with no place.");
 
     expect(
         "feed-idle",

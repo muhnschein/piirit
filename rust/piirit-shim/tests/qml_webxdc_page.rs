@@ -45,6 +45,18 @@ const PROBE_QML: &str = r"
             })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
+        // As map opens it: where to look, under chat's name.
+        function loadMap(url) {
+            loader.setSource('', {})
+            loader.setSource(url, {
+                accountId: 1,
+                messageId: 5,
+                query: '?poi=1.5,2.5',
+                heading: 'Ada',
+                subheading: 'Map'
+            })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -321,7 +333,38 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
             call!("get", QString::from("webxdcView"), QString::from("url"))
         );
         record!("served-after", reachable(&value_of(&*steps_ptr, "served")));
-        (*engine_ptr).quit();
+        record!(
+            "map",
+            call!("loadMap", QString::from(common::page_url("WebxdcPage.qml")))
+        );
+    });
+
+    plan.until(1, 10, move |last| unsafe {
+        let url = call!("get", QString::from("webxdcView"), QString::from("url"));
+        let done = !url.is_empty();
+        if done || last {
+            record!("map-url", url);
+            record!(
+                "map-title",
+                call!("get", QString::from("webxdcHeader"), QString::from("title"))
+            );
+            record!(
+                "map-subtitle",
+                call!(
+                    "get",
+                    QString::from("webxdcHeader"),
+                    QString::from("subtitle")
+                )
+            );
+            // Back home keeps where to look.
+            call!("wander", QString::from("https://example.org/pay"));
+            record!(
+                "map-home",
+                call!("get", QString::from("webxdcView"), QString::from("url"))
+            );
+            (*engine_ptr).quit();
+        }
+        done
     });
 
     plan.run();
@@ -470,5 +513,23 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         value("popped"),
         "pop;",
         "a page running an app that has been deleted stayed open. {context}"
+    );
+    // Map: opened on its point, under chat's name, and kept there.
+    assert_eq!(value("map"), "ok", "{context}");
+    assert!(
+        value("map-url").starts_with("http://127.0.0.1:")
+            && value("map-url").ends_with("/index.html?poi=1.5,2.5"),
+        "the map was not pointed where to look. {context}"
+    );
+    assert_eq!(
+        value("map-title"),
+        "Ada",
+        "map not headed by chat. {context}"
+    );
+    assert_eq!(value("map-subtitle"), "Map", "{context}");
+    assert_eq!(
+        value("map-home"),
+        value("map-url"),
+        "the map lost where to look on coming back home. {context}"
     );
 }

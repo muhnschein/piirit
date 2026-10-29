@@ -433,6 +433,19 @@ Page {
                 onClicked: page.toggleExperimental(webxdcSwitch, "webxdcEnabled")
             }
 
+            // Off until asked, as reference clients. Gates tray entry, map tile, all-chats map,
+            // map from rows; sharing already on still shows its bar, so it can be stopped.
+            TextSwitch {
+                id: locationSwitch
+                objectName: "locationSwitch"
+                //: Delta Chat's name for sharing your location in a chat, once or live.
+                text: qsTr("Enable location streaming (experimental)")
+                description: qsTr("Shares your location in chats and shows shared locations on a map.")
+                automaticCheck: false
+                checked: Settings.locationStreamingEnabled === true
+                onClicked: page.toggleExperimental(locationSwitch, "locationStreamingEnabled")
+            }
+
         }
     }
 

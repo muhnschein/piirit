@@ -1,7 +1,7 @@
-//! Location: point sent once, chat getting it live, a row's place read back.
+//! Location: point sent once, chat getting it live, map opened on a row's place.
 //!
 //! Real core's shapes pinned in `deltachat-jsonrpc/tests/real_server.rs`. Here: what shim asks of
-//! core, what QML sees.
+//! core, what QML sees. Map app's serving: `webxdc_map.rs`.
 
 // Qt harness: see chat_actions.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -24,22 +24,30 @@ const PROBE_QML: &str = r"
         ChatMessages { id: elsewhere; account_id: 1; chat_id: 1 }
         // Opened while sharing, deaf to events: must ask on load.
         ChatMessages { id: later; account_id: 1 }
-        SharedLocation { id: place; account_id: 1; chat_id: 1 }
+        LocationMap { id: map; account_id: 1 }
         LiveLocation { id: live }
         Connections {
             target: core
             onCore_event: {
                 chat.handle_event(context_id, kind, payload_json)
                 elsewhere.handle_event(context_id, kind, payload_json)
-                place.handle_event(context_id, kind, payload_json)
                 live.handle_event(context_id, kind, payload_json)
+                // Map app told of each stored position, as core does.
+                if (kind === 'WebxdcStatusUpdate') {
+                    moves += 1
+                }
             }
         }
         property string failed: ''
         property int sentId: 0
-        property int placeAnswers: 0
+        property int moves: 0
+        property var opened: []
         Connections { target: chat; onError: failed = message; onSent: sentId = message_id }
-        Connections { target: place; onPlace_changed: placeAnswers += 1 }
+        Connections {
+            target: map
+            onOpened: opened = opened.concat([message_id + query])
+            onError: opened = opened.concat(['error:' + message])
+        }
         Repeater {
             id: rows
             model: chat.rows
@@ -60,19 +68,10 @@ const PROBE_QML: &str = r"
             }
             return 'missing'
         }
-        // Message first: sender still 0 asks nothing, so one answer per look.
-        function look(contact, id) {
-            place.message_id = id
-            place.contact_id = contact
-            return 'ok'
-        }
-        function answers() { return '' + placeAnswers }
-        function shown() {
-            return [place.loaded, place.found, place.live, place.latitude, place.longitude,
-                    place.accuracy, place.timestamp].join(',')
-        }
-        function map() { return place.map_url }
-        function link() { return place.link }
+        function look(chatId, contact, id) { map.open(chatId, contact, id); return 'ok' }
+        function answers() { return '' + opened.length }
+        function shown() { return opened[opened.length - 1] || '' }
+        function moved() { return '' + moves }
         function send(latitude, longitude) {
             chat.send_location(latitude, longitude)
             return 'ok'
@@ -107,6 +106,8 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
         std::env::set_var("PIIRIT_FAKE_LOCATIONS", "1");
+        // Map app written here, not runner's cache.
+        std::env::set_var("XDG_CACHE_HOME", temp.join("cache"));
     }
 
     piirit_shim::register_qml_types();
@@ -137,7 +138,7 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
     });
     plan.until(1, 10, move |_| call!("loaded").to_string() == "true");
 
-    // Ada's one-off point, then her live sharing's notice.
+    // Ada's one-off point, then her live sharing's notice, then every chat.
     let s = steps.clone();
     plan.after(0, move || {
         common::record(&s, "rows", {
@@ -146,16 +147,14 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
             let other = call!("row", 2).to_string();
             QString::from(format!("{one_off}|{notice}|{other}"))
         });
-        call!("look", 10, 30);
+        call!("look", 1, 10, 30);
     });
     let s = steps.clone();
     plan.until(1, 10, move |last| {
-        let done = call!("answers").to_string() != "0";
+        let done = call!("answers").to_string() == "1";
         if done || last {
             common::record(&s, "own-point", call!("shown"));
-            common::record(&s, "own-map", call!("map"));
-            common::record(&s, "own-link", call!("link"));
-            call!("look", 10, 31);
+            call!("look", 1, 10, 31);
         }
         done
     });
@@ -163,15 +162,22 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
     plan.until(1, 10, move |last| {
         let done = call!("answers").to_string() == "2";
         if done || last {
-            common::record(&s, "newest", call!("shown"));
+            common::record(&s, "notice", call!("shown"));
+            call!("look", 0, 0, 0);
+        }
+        done
+    });
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        let done = call!("answers").to_string() == "3";
+        if done || last {
+            common::record(&s, "every", call!("shown"));
+            call!("send", 60.169_524_f64, 24.935_456_f64);
         }
         done
     });
 
     // Reader's own point, once; then one the world has no place for.
-    plan.after(0, move || {
-        call!("send", 60.169_524_f64, 24.935_456_f64);
-    });
     let s = steps.clone();
     plan.until(1, 10, move |last| {
         let sent = call!("sent").to_string();
@@ -181,15 +187,14 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
             common::record(&s, "sent-row", call!("row", id));
             call!("send", 91.0_f64, 0.0_f64);
             common::record(&s, "nowhere", call!("error"));
-            // Reader's own place from here: their positions move it.
-            call!("look", 1, id);
+            call!("look", 1, 1, id);
         }
         done
     });
 
     let s = steps.clone();
     plan.until(1, 10, move |last| {
-        let done = call!("answers").to_string() == "3";
+        let done = call!("answers").to_string() == "4";
         if done || last {
             common::record(&s, "sent-point", call!("shown"));
             // Live for half an hour; core's `ChatModified` tells chat and feed.
@@ -220,12 +225,12 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         }
         done
     });
-    // Position stored: core says so; sender's newest asked again.
+    // Position stored: open map hears of it.
     let s = steps.clone();
     plan.until(1, 10, move |last| {
-        let done = call!("answers").to_string() == "4";
+        let done = call!("moved").to_string() != "0";
         if done || last {
-            common::record(&s, "moved", call!("answers"));
+            common::record(&s, "moved", call!("moved"));
             call!("share", 0);
         }
         done
@@ -273,27 +278,21 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         "true,false,10|false,true,10|false,false,10",
         "rows do not say which carries a place and which starts live sharing. {context}"
     );
+    // One app, opened four ways.
+    let app = value("every");
+    assert!(
+        !app.is_empty() && app.bytes().all(|b| b.is_ascii_digit()),
+        "every chat's map did not open on the app alone. {context}"
+    );
     assert_eq!(
         value("own-point"),
-        "true,true,false,60.1,24.9,0,1700090000",
-        "a one-off point did not show itself, fixed. {context}"
+        format!("{app}?poi=60.1,24.9"),
+        "a one-off point's map did not open on it. {context}"
     );
     assert_eq!(
-        value("own-map"),
-        "https://www.openstreetmap.org/export/embed.html\
-         ?bbox=24.89398%2C60.09700%2C24.90602%2C60.10300\
-         &layer=mapnik&marker=60.10000%2C24.90000",
-        "{context}"
-    );
-    assert_eq!(
-        value("own-link"),
-        "https://www.openstreetmap.org/?mlat=60.10000&mlon=24.90000#map=16/60.10000/24.90000",
-        "{context}"
-    );
-    assert_eq!(
-        value("newest"),
-        "true,true,true,60.2,25,12,1700090600",
-        "live sharing's notice did not show its sender's newest place. {context}"
+        value("notice"),
+        format!("{app}?contactId=10"),
+        "live sharing's notice did not open the map on its sender. {context}"
     );
     assert_eq!(
         value("sent-row"),
@@ -301,9 +300,10 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         "the point sent is not on its row. {context}"
     );
     assert_eq!(value("nowhere"), "no location to send", "{context}");
-    assert!(
-        value("sent-point").starts_with("true,true,false,60.169524,24.935456,"),
-        "the point sent does not show itself. {context}"
+    assert_eq!(
+        value("sent-point"),
+        format!("{app}?poi=60.169524,24.935456"),
+        "the point sent does not open the map on itself. {context}"
     );
     assert_eq!(value("before"), "false,false,false", "{context}");
     assert_eq!(
@@ -318,8 +318,8 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
     );
     assert_eq!(
         value("moved"),
-        "4",
-        "the map did not ask again when its sender moved. {context}"
+        "1",
+        "core did not take the position, or the map was not told. {context}"
     );
     assert_eq!(
         value("stopped"),
@@ -372,17 +372,49 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         [&json!([60.2, 25.0, 8.0]), &json!([3.0, 4.0, 0.0])],
         "positions went to core while nobody wanted them, or not at all: {calls:?}"
     );
-    let asked: Vec<&Value> = calls
-        .iter()
-        .filter(|(method, _)| method == "get_locations")
-        .map(|(_, params)| params)
-        .collect();
-    let (ada, own) = (json!([1, 1, 10, 0, 0]), json!([1, 1, 1, 0, 0]));
-    assert!(
-        asked
+    let of = |name: &str| -> Vec<&Value> {
+        calls
             .iter()
-            .all(|params| **params == ada || **params == own)
-            && asked.last() == Some(&&own),
-        "a row's place asked of the wrong chat or sender, or not again on moving: {calls:?}"
+            .filter(|(method, _)| method == name)
+            .map(|(_, params)| params)
+            .collect()
+    };
+    // No app in core yet: bundled one handed over once, version noted; later opens reuse it.
+    let installed = of("set_webxdc_integration");
+    assert_eq!(
+        installed.len(),
+        1,
+        "map app not handed to core exactly once: {calls:?}"
+    );
+    let path = installed[0][1].as_str().unwrap_or_default();
+    assert!(
+        path.ends_with("piirit/piirit/maps/1.xdc") && !std::path::Path::new(path).exists(),
+        "map app not written to cache, or left there after core copied it: {calls:?}"
+    );
+    assert!(
+        of("set_config")
+            .iter()
+            .any(|params| params[1] == "ui.piirit.maps_version"
+                && params[2].as_str().is_some_and(|value| value.len() == 40)),
+        "core not told which map app it has: {calls:?}"
+    );
+    assert_eq!(
+        of("init_webxdc_integration"),
+        [
+            &json!([1, 1]),
+            &json!([1, 1]),
+            &json!([1, null]),
+            &json!([1, 1])
+        ],
+        "map app not pointed at chat, or at every chat: {calls:?}"
+    );
+    assert_eq!(
+        of("get_locations"),
+        [
+            &json!([1, 1, 10, 0, 0]),
+            &json!([1, 1, 10, 0, 0]),
+            &json!([1, 1, 1, 0, 0])
+        ],
+        "a row's point asked of the wrong chat or sender, or with no row: {calls:?}"
     );
 }

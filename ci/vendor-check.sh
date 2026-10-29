@@ -1,6 +1,7 @@
 #!/bin/sh
 # Prove third_party/qmetaobject = upstream 0.2.10 + one patch;
-# vendor/calls-webapp/index.html = upstream release asset; qml/ emoji = pinned
+# vendor/calls-webapp/index.html = upstream release asset; vendor/maps/maps.xdc =
+# Desktop's bundled zip; qml/ emoji = pinned
 # Twemoji and emojibase-data.
 #
 # Fetch crates.io tarball, apply qmetaobject.patch, require byte-for-byte match
@@ -55,6 +56,8 @@ if diff -r -q -x .cargo-ok "$upstream" "$vendored" >/dev/null 2>&1; then
     echo "vendor-check: ok (qmetaobject $version + qmetaobject.patch)"
     # Upstream page the call runs in: refetched, compared byte for byte.
     "$root/scripts/fetch-calls-webapp.sh" --check
+    # Map app: refetched from Desktop's pinned commit, compared byte for byte.
+    "$root/scripts/fetch-maps-xdc.sh" --check
     # Emoji pictures and list: regenerated from pinned Twemoji tag and
     # emojibase-data.
     "$root/scripts/fetch-emoji.py" --check

@@ -698,6 +698,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Ny</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Vis alle posisjoner</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1232,22 +1237,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>Sist sett her kl. %1</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>Ingen posisjon har kommet ennå.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>Åpne i nettleser</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1309,6 +1298,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Vis alle posisjoner</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Kart</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1354,6 +1356,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No calls yet</source>
         <translation>Ingen anrop ennå</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Kart</translation>
     </message>
 </context>
 <context>
@@ -2323,6 +2330,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>Kjører små apper inne i samtaler.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Slå på posisjonsdeling (eksperimentelt)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Deler posisjonen din i samtaler og viser delte posisjoner på et kart.</translation>
     </message>
 </context>
 <context>

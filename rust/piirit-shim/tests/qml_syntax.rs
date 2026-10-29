@@ -1127,17 +1127,12 @@ fn only_the_picker_pages_import_sailfish_pickers() {
     );
 }
 
-/// Only webxdc pages, map page and call view name `Sailfish.WebView`: engine is a separate package;
+/// Only webxdc pages and call view name `Sailfish.WebView`: engine is a separate package;
 /// missing, it takes down files naming it. These are pushed/loaded apart, so chats still
 /// open and a ringing call can still be seen and declined.
 #[test]
 fn only_the_webxdc_pages_import_sailfish_webview() {
-    const ALLOWED: [&str; 4] = [
-        "WebxdcPage.qml",
-        "WebxdcStorePage.qml",
-        "LocationPage.qml",
-        "CallView.qml",
-    ];
+    const ALLOWED: [&str; 3] = ["WebxdcPage.qml", "WebxdcStorePage.qml", "CallView.qml"];
     let mut offenders = Vec::new();
     for file in qml_files() {
         let name = file
@@ -1169,7 +1164,7 @@ fn only_the_webxdc_pages_import_sailfish_webview() {
 #[test]
 fn the_webxdc_pages_leave_the_views_activation_alone() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages");
-    for name in ["WebxdcPage.qml", "WebxdcStorePage.qml", "LocationPage.qml"] {
+    for name in ["WebxdcPage.qml", "WebxdcStorePage.qml"] {
         let code = code_only(&fs::read_to_string(root.join(name)).expect("read the page"));
         let offender = code
             .lines()

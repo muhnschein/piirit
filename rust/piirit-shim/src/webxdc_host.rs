@@ -14,6 +14,8 @@
 //! - chat API under unguessable `/webxdc-api/<token>/`: port finder gets app files, not chat;
 //! - exists only while app open;
 //! - CSP: this origin only, no network.
+//!
+//! App core lets online (maps integration) gets OSM tiles via core, behind token: [`TILES`].
 
 use std::io::Read;
 use std::net::{Ipv4Addr, SocketAddr};
@@ -40,6 +42,10 @@ const POLICY: &str = "default-src 'self'; \
      connect-src 'self' data: blob:; \
      form-action 'none'; \
      frame-ancestors 'none'";
+
+/// Tile server maps app asks; rewritten in its scripts to `<api>/tile/`, fetched by core
+/// (`get_http_response`: its cache, user agent, proxy). OSM refuses browser engine's own asks.
+const TILES: &str = "https://tile.openstreetmap.org/";
 
 /// Ms before re-asking after failed update request.
 const RETRY_INTERVAL: u32 = 300;
@@ -71,6 +77,8 @@ pub(crate) struct Instance {
     pub(crate) send_update_interval: u64,
     /// `window.webxdc.sendUpdateMaxSize`, bytes.
     pub(crate) send_update_max_size: u64,
+    /// Core lets app online (integration): tiles served, see [`TILES`].
+    pub(crate) internet_access: bool,
 }
 
 /// Hands file to page, which asks reader: API says `sendToChat`, but reader picks destination.
@@ -402,6 +410,10 @@ async fn route(shared: &Shared, request: &Request) -> Response {
         return match (request.method.as_str(), rest) {
             ("GET", "/updates") => updates(shared, query).await,
             ("POST", "/send") => send(shared, &request.body).await,
+            ("GET", tile) if shared.instance.internet_access => match tile_url(tile) {
+                Some(url) => fetch_tile(shared, &url).await,
+                None => Response::empty("404 Not Found"),
+            },
             _ => Response::empty("404 Not Found"),
         };
     }
@@ -435,8 +447,46 @@ async fn blob(shared: &Shared, path: &str) -> Response {
         return Response::empty("404 Not Found");
     };
     match file(shared, &name).await {
+        Ok(bytes)
+            if shared.instance.internet_access
+                && content_type(&name).starts_with("text/javascript") =>
+        {
+            let script =
+                String::from_utf8_lossy(&bytes).replace(TILES, &format!("{}/tile/", shared.api));
+            Response::new(content_type(&name), script.into_bytes())
+        }
         Ok(bytes) => Response::new(content_type(&name), bytes),
         Err(_) => Response::empty("404 Not Found"),
+    }
+}
+
+/// Tile server address for `/tile/{z}/{x}/{y}.png`; digits only, nothing else reaches core.
+fn tile_url(path: &str) -> Option<String> {
+    let tile = path.strip_prefix("/tile/")?;
+    let (numbers, extension) = tile.rsplit_once('.')?;
+    let digits = numbers.split('/').collect::<Vec<_>>();
+    let well_formed = extension == "png"
+        && digits.len() == 3
+        && digits
+            .iter()
+            .all(|part| (1..=7).contains(&part.len()) && part.bytes().all(|b| b.is_ascii_digit()));
+    well_formed.then(|| format!("{TILES}{tile}"))
+}
+
+/// One tile via core. Not a PNG: refused, page shows gap.
+async fn fetch_tile(shared: &Shared, url: &str) -> Response {
+    let answer: Result<serde_json::Value, _> = shared
+        .rpc
+        .call("get_http_response", (shared.instance.account_id, url))
+        .await;
+    let Ok(answer) = answer else {
+        return Response::empty("502 Bad Gateway");
+    };
+    // Type named here, not taken: server's header text never reaches page's.
+    let picture = crate::json::str_at(&answer, "mimetype").starts_with("image/png");
+    match decode_base64(crate::json::str_at(&answer, "blob")) {
+        Some(bytes) if picture => Response::new(content_type("tile.png"), bytes),
+        _ => Response::empty("502 Bad Gateway"),
     }
 }
 

@@ -25,7 +25,7 @@ docs/BUILDING.md, "Cutting a release").
 - Turning the unread filter off no longer flashes "No chats yet" before the chats come back.
 - After backing up a profile or handing it to a second device, swiping on to your chats ends there: swiping back no longer reopens the finished page.
 - "Add profile" under the profiles list opens a dialog to pick creating a profile, restoring a backup or adding this phone as a second device, each with a line on what it means; back from the page you picked returns to it.
-- **Share your location** with the new button beside the message field: once, or live for 30 minutes up to 24 hours. Tap a message with a location to see the place on OpenStreetMap. While you share live, Piirit keeps sending your position in the background; a line above the field stops it.
+- **Share your location**, experimental as in Delta Chat: turn on Enable location streaming in Settings. Then share from the button beside the message field: once, or live for 30 minutes up to 24 hours. Tap a message with a location to see it on a map, the same map app as Delta Chat's. A chat's map is under Map on its contact or group page; all chats' locations are under All locations in the chat list's pull-down menu. While you share live, Piirit keeps sending your position in the background; a line above the field stops it.
 
 ## 2.2.0 — 2026-10-23
 

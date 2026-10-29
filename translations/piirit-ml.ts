@@ -702,6 +702,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>പുതിയത്</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,22 +1241,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>അവസാനം ഇവിടെ കണ്ടത് %1-ന്</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>ഇതുവരെ ലൊക്കേഷനൊന്നും വന്നിട്ടില്ല.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>ബ്രൗസറിൽ തുറക്കുക</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1313,6 +1302,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1358,6 +1360,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No calls yet</source>
         <translation>ഇതുവരെ കോളുകളൊന്നുമില്ല</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
     </message>
 </context>
 <context>
@@ -2327,6 +2334,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ് പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
     </message>
 </context>
 <context>

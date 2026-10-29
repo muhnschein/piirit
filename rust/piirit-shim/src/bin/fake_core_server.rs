@@ -166,6 +166,10 @@ struct State {
     expiring: std::collections::BTreeSet<(u32, u32)>,
     /// Points sent here once, by message: latitude, longitude.
     points: std::collections::BTreeMap<u32, (f64, f64)>,
+    /// Map app (webxdc integration) per account: its message.
+    integrations: std::collections::BTreeMap<u32, u32>,
+    /// Map app's chat (0: all), as core's `WebxdcIntegrateFor`.
+    integrated_for: std::collections::BTreeMap<u32, u32>,
 }
 
 impl State {
@@ -699,6 +703,20 @@ fn webxdc_file(path: &str) -> Option<Vec<u8>> {
         ),
         "assets/app.js" => Some(b"window.playing = true\n".to_vec()),
         "icon.png" => Some(b"\x89PNG\r\n\x1a\n icon".to_vec()),
+        _ => None,
+    }
+}
+
+/// Fake map app: tile address as upstream's `index.js` writes it; other app's never touched.
+fn map_file(path: &str) -> Option<Vec<u8>> {
+    match path {
+        "index.html" => Some(
+            b"<html><head></head><body><script src=\"index.js\"></script></body></html>".to_vec(),
+        ),
+        "index.js" => {
+            Some(b"let url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';\n".to_vec())
+        }
+        "notes.txt" => Some(b"https://tile.openstreetmap.org/ stays\n".to_vec()),
         _ => None,
     }
 }
@@ -1426,8 +1444,47 @@ async fn serve() {
                             "contextId": account,
                             "event": {"kind": "LocationChanged", "contactId": SELF},
                         }));
+                        // Core tells map app too (`emit_location_changed`).
+                        if let Some(map) = state.integrations.get(account).copied() {
+                            state.events.push_back(json!({
+                                "contextId": account,
+                                "event": {"kind": "WebxdcStatusUpdate", "msgId": map,
+                                          "statusUpdateSerial": 0},
+                            }));
+                        }
                     }
                     ok(&id, &json!(!accounts.is_empty()))
+                }
+                // Core copies file in: unreadable or no zip refused. New app, new message.
+                "set_webxdc_integration" => {
+                    let account = account_id();
+                    let path = positional(1).as_str().unwrap_or_default().to_string();
+                    match std::fs::read(&path) {
+                        Ok(bytes) if bytes.starts_with(b"PK\x03\x04") => {
+                            let mut state = state.lock().await;
+                            state.next_message_id += 1;
+                            let app = state.next_message_id;
+                            state.integrations.insert(account, app);
+                            ok(&id, &Value::Null)
+                        }
+                        _ => err(&id, "not a webxdc file"),
+                    }
+                }
+                // Account's map app, pointed at chat; null if none.
+                "init_webxdc_integration" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    match state.integrations.get(&account).copied() {
+                        Some(app) => {
+                            state.integrated_for.insert(app, chat);
+                            ok(&id, &json!(app))
+                        }
+                        None => ok(&id, &Value::Null),
+                    }
                 }
                 // Newest first. Ada: streamed point after her one-off (message 30); own one-offs.
                 "get_locations" => {
@@ -2743,7 +2800,19 @@ async fn serve() {
                 // Core fetches off web, not app: store install.
                 "get_http_response" => {
                     let url = positional(1).as_str().unwrap_or_default().to_string();
-                    if should_fail(&url) {
+                    // Map tiles: `7/…` answered by server's error page, as a blocked one.
+                    if let Some(tile) = url.strip_prefix("https://tile.openstreetmap.org/") {
+                        let (body, mimetype) = if tile.starts_with("7/") {
+                            (b"<html>blocked</html>".to_vec(), "text/html")
+                        } else {
+                            (format!("\u{89}PNG tile {tile}").into_bytes(), "image/png")
+                        };
+                        ok(
+                            &id,
+                            &json!({"blob": base64(&body), "mimetype": mimetype,
+                                    "encoding": Value::Null}),
+                        )
+                    } else if should_fail(&url) {
                         err(&id, "could not reach the store")
                     } else {
                         ok(
@@ -2762,15 +2831,21 @@ async fn serve() {
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
-                    let sent = state
-                        .lock()
-                        .await
-                        .webxdc_updates
-                        .get(&msg)
-                        .map_or(0, Vec::len);
-                    ok(
-                        &id,
-                        &json!({
+                    let state_now = state.lock().await;
+                    let sent = state_now.webxdc_updates.get(&msg).map_or(0, Vec::len);
+                    let map = state_now.integrations.values().any(|app| *app == msg);
+                    drop(state_now);
+                    let answer = if map {
+                        // Integration: core lets it online.
+                        json!({
+                            "name": "Maps", "icon": "", "document": null, "summary": null,
+                            "sourceCodeUrl": "https://github.com/deltachat/maps",
+                            "internetAccess": true, "selfAddr": "self@example.org",
+                            "isAppSender": true, "isBroadcast": false,
+                            "sendUpdateInterval": 1000, "sendUpdateMaxSize": 102_400,
+                        })
+                    } else {
+                        json!({
                             "name": "Checkers",
                             "icon": "icon.png",
                             "document": null,
@@ -2786,13 +2861,20 @@ async fn serve() {
                             "isBroadcast": false,
                             "sendUpdateInterval": 1000,
                             "sendUpdateMaxSize": 102_400,
-                        }),
-                    )
+                        })
+                    };
+                    ok(&id, &answer)
                 }
                 // One archive file, base64 STANDARD_NO_PAD as core; page, icon only.
                 "get_webxdc_blob" => {
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
                     let path = positional(2).as_str().unwrap_or_default().to_string();
-                    match webxdc_file(&path) {
+                    let map = state.lock().await.integrations.values().any(|app| *app == msg);
+                    let file = if map { map_file(&path) } else { webxdc_file(&path) };
+                    match file {
                         Some(bytes) => ok(&id, &json!(base64(&bytes))),
                         None => err(&id, "no such file in the webxdc"),
                     }

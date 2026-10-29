@@ -702,6 +702,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Novo</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Todas as localizações</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,22 +1241,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
-    <name>LocationPage</name>
-    <message>
-        <source>Last seen here at %1</source>
-        <extracomment>Under the sender&apos;s name above a map of their live location; %1 is a date and time.</extracomment>
-        <translation>Visto aqui pela última vez às %1</translation>
-    </message>
-    <message>
-        <source>No location has arrived yet.</source>
-        <translation>Ainda não chegou nenhuma localização.</translation>
-    </message>
-    <message>
-        <source>Open in browser</source>
-        <translation>Abrir no navegador</translation>
-    </message>
-</context>
-<context>
     <name>LocationShareDialog</name>
     <message>
         <source>Share</source>
@@ -1313,6 +1302,19 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Todas as localizações</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1358,6 +1360,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>No calls yet</source>
         <translation>Ainda sem chamadas</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mapa</translation>
     </message>
 </context>
 <context>
@@ -2327,6 +2334,15 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Runs small apps inside chats.</source>
         <translation>Executa pequenas aplicações dentro das conversas.</translation>
+    </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Ativar transmissão de localização (experimental)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Partilha a sua localização nas conversas e mostra as localizações partilhadas num mapa.</translation>
     </message>
 </context>
 <context>

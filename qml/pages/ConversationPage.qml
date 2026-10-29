@@ -506,6 +506,7 @@ Page {
         markdownMode: Settings.markdownMode
         // Off: `.xdc` is a file. `=== true`: dconf undefined before read.
         appsEnabled: Settings.webxdcEnabled === true
+        locationsEnabled: Settings.locationStreamingEnabled === true
         // What core takes an edit in: see model.
         canEdit: messages.can_send && messages.is_encrypted
         placeholderText: qsTr("No messages yet")
@@ -580,7 +581,7 @@ Page {
         // Original lit here as search hit (older rows fill as view gets there); another chat's
         // opens over this one, Back returns; gone: said so. As reference clients.
         onQuoteRequested: messages.show_quoted(quotedId)
-        onLocationRequested: page.showLocation(messageId, senderId, senderName)
+        onLocationRequested: map.show(page.chatId, senderId, messageId)
         onForwardRequested: {
             // Message id captured here for picker's report.
             var travelling = messageId
@@ -850,6 +851,7 @@ Page {
             anchors.bottomMargin: inputRow.buttonLift
             voiceAvailable: voiceBar.available
             appsAvailable: Settings.webxdcEnabled === true
+            locationAvailable: Settings.locationStreamingEnabled === true
             onCameraRequested: page.pickWith("CapturePage.qml")
             onLibraryRequested: page.pickWith("AttachLibraryPage.qml")
             onLocationRequested: page.pickLocation()
@@ -935,15 +937,13 @@ Page {
         }
     }
 
-    // Map of row's place, or sender's newest. By URL (`Sailfish.WebView`).
-    function showLocation(messageId, senderId, senderName) {
-        pageStack.push(Qt.resolvedUrl("LocationPage.qml"), {
-            accountId: page.accountId,
-            chatId: page.chatId,
-            contactId: senderId,
-            messageId: messageId,
-            senderName: senderName
-        })
+    // Chat's map, on row's point or its sender.
+    MapOpener {
+        id: map
+        objectName: "map"
+        account_id: page.accountId
+        chatName: page.chatName
+        onError: page.errorMessage = message
     }
 
     // App store reports saved file. By URL (`Sailfish.WebView`): missing type
