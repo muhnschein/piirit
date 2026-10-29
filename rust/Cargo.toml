@@ -64,6 +64,11 @@ strip = "symbols"
 lto = "thin"
 codegen-units = 1
 
+# Line tables only: stacks keep file:line, gdb loses locals. Full debug info was 70% of each
+# 120 MB test binary; 232 of them, each links FFmpeg: shim change relinked 206s, now 55s.
+[profile.dev]
+debug = "line-tables-only"
+
 # qmetaobject needs QtWidgets QApplication, which Harbour bans (docs/HARBOUR.md).
 # Vendored copy: upstream 0.2.10 + third_party/qmetaobject.patch. ci/vendor-check.sh checks.
 [patch.crates-io]
