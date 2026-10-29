@@ -637,6 +637,8 @@ Page {
             bottom: notice.top
         }
         sharing: messages.sharing_location
+        until: messages.sharing_until
+        stalled: typeof appWindow !== "undefined" && appWindow.locationStalled === true
         onStopRequested: messages.share_location(0)
     }
 

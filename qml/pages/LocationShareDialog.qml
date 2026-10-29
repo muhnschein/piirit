@@ -1,11 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtPositioning 5.2
+import "../components"
 
 /*
  * Location into chat: current place once, or live for a set time (reference clients' times).
  * One switch at a time, as AddProfileWaysDialog.qml. Page sends on `accepted`; position
- * looked for only while this is up.
+ * looked for only while this is up. No fresh fix: nothing would go out, so only stop goes.
  */
 Dialog {
     id: dialog
@@ -21,10 +21,10 @@ Dialog {
     /// Live for `seconds`; 0 stops.
     signal sharingPicked(int seconds)
 
-    readonly property bool hasFix: source.position.latitudeValid
-                                   && source.position.longitudeValid
+    /// Ms without fresh fix until location counted lost; tests shorten it.
+    property int staleAfter: 15000
 
-    canAccept: dialog.choice.length > 0 && (dialog.choice !== "now" || dialog.hasFix)
+    canAccept: dialog.choice === "stop" || (dialog.choice.length > 0 && source.ready)
 
     onAccepted: {
         if (dialog.choice === "now") {
@@ -41,10 +41,11 @@ Dialog {
         dialog.choice = dialog.choice === which ? "" : which
     }
 
-    PositionSource {
+    FreshPosition {
         id: source
-        objectName: "position"
+        sourceName: "position"
         active: true
+        staleAfter: dialog.staleAfter
     }
 
     SilicaFlickable {
@@ -61,20 +62,31 @@ Dialog {
                 acceptText: qsTr("Share")
             }
 
+            Label {
+                objectName: "locationStatus"
+                visible: !source.ready
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                color: Theme.highlightColor
+                textFormat: Text.PlainText
+                text: source.failed
+                      ? qsTr("Turn on location in Settings to send it.")
+                      : source.lost
+                        //: No position for a while: location likely turned off since.
+                        ? qsTr("Still looking for your location. Is location turned on in Settings?")
+                        : qsTr("Finding your location…")
+            }
+
             // `automaticCheck: false`: one answer, dialog decides (AddProfileWaysDialog.qml).
             TextSwitch {
                 objectName: "nowSwitch"
                 text: qsTr("Send current location")
-                // 0: PositionSource.NoError.
-                description: dialog.hasFix
-                             ? (source.position.horizontalAccuracyValid
-                                //: %n is how far off, in metres, the phone's position may be.
-                                ? qsTr("Your location is accurate to %n metre(s).", "",
-                                       Math.round(source.position.horizontalAccuracy))
-                                : "")
-                             : source.sourceError !== 0 || !source.valid
-                               ? qsTr("Turn on location in Settings to send it.")
-                               : qsTr("Finding your location…")
+                description: source.ready && source.position.horizontalAccuracyValid
+                             //: %n is how far off, in metres, the phone's position may be.
+                             ? qsTr("Your location is accurate to %n metre(s).", "",
+                                    Math.round(source.position.horizontalAccuracy))
+                             : ""
                 automaticCheck: false
                 checked: dialog.choice === "now"
                 onClicked: dialog.choose("now")

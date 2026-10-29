@@ -762,11 +762,13 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
          push:GalleryPage.qml(at=15,newestFirst=true)|pop|\
          push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml(at=14)|\
          push:ChatMediaPage.qml(gallery)|\
-         push:WebxdcPage.qml(at=101,query=,heading=from the list,subheading=Map)|\
+         push:WebxdcPage.qml(at=101,query=?bounds=60.1,24.9,60.2,25,heading=from the list,\
+         subheading=Map)|\
          push:ChatMediaPage.qml(files)|\
-         push:WebxdcPage.qml(at=101,query=,heading=from the list,subheading=Map)|",
+         push:NoLocationsPage.qml(,heading=from the list,subheading=Map)|",
         "a tap did not open the right page, or Show in chat did not pop \
-         back to the conversation, or the map tile opened no chat map. {context}"
+         back to the conversation, or the map tile opened no chat map framing its locations, \
+         or a chat with none a map all the same. {context}"
     );
 
     // Each page asked core for its kinds.

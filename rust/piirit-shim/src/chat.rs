@@ -260,8 +260,10 @@ pub struct ChatMessages {
     pub share_location: qt_method!(fn(&mut self, seconds: u32)),
     /// Chat gets reader's location live now.
     pub sharing_location: qt_property!(bool; NOTIFY sharing_location_changed),
-    /// Emitted on `sharing_location` change.
+    /// Emitted on `sharing_location` or `sharing_until` change.
     pub sharing_location_changed: qt_signal!(),
+    /// Live sharing ends then, Unix seconds; 0 unknown (started before Piirit kept it).
+    pub sharing_until: qt_property!(u64; NOTIFY sharing_location_changed),
     /// Mark loaded unread messages read. Called at newest message.
     pub mark_seen_all: qt_method!(fn(&mut self)),
 
@@ -1767,6 +1769,23 @@ impl ChatMessages {
             }
         });
         runtime.spawn(async move {
+            // End noted first: core's `ChatModified` reads it back.
+            let until =
+                (seconds > 0).then(|| location::unix_now().saturating_add(u64::from(seconds)));
+            let noted: Result<serde_json::Value, _> = rpc
+                .call(
+                    "set_config",
+                    (
+                        account_id,
+                        location::until_key(chat_id),
+                        until.map(|until| until.to_string()),
+                    ),
+                )
+                .await;
+            if let Err(err) = noted {
+                done(Err(err.to_string()));
+                return;
+            }
             done(
                 rpc.call::<_, ()>(
                     "send_locations_to_chat",
@@ -1788,24 +1807,44 @@ impl ChatMessages {
             return;
         };
         let ptr: QPointer<Self> = QPointer::from(&*self);
-        let done = queued_callback(move |sharing: Option<bool>| {
+        let done = queued_callback(move |sharing: Option<(bool, u64)>| {
             let Some(this) = ptr.as_pinned() else { return };
             if this.borrow().chat_id != chat_id {
                 return;
             }
             // Unreadable: as was; next `ChatModified` asks again.
-            let Some(sharing) = sharing else { return };
-            if this.borrow().sharing_location != sharing {
-                this.borrow_mut().sharing_location = sharing;
-                this.borrow().sharing_location_changed();
+            let Some((sharing, until)) = sharing else {
+                return;
+            };
+            let changed = {
+                let this = this.borrow();
+                this.sharing_location != sharing || this.sharing_until != until
+            };
+            if changed {
+                let mut this = this.borrow_mut();
+                this.sharing_location = sharing;
+                this.sharing_until = until;
+                this.sharing_location_changed();
             }
         });
         runtime.spawn(async move {
-            done(
-                rpc.call::<_, bool>("is_sending_locations_to_chat", (account_id, chat_id))
+            let sharing = rpc
+                .call::<_, bool>("is_sending_locations_to_chat", (account_id, chat_id))
+                .await
+                .ok();
+            let until = match sharing {
+                Some(true) => rpc
+                    .call::<_, Option<String>>(
+                        "get_config",
+                        (account_id, location::until_key(chat_id)),
+                    )
                     .await
-                    .ok(),
-            );
+                    .ok()
+                    .flatten()
+                    .and_then(|until| location::until_ahead(&until, location::unix_now())),
+                _ => None,
+            };
+            done(sharing.map(|sharing| (sharing, until.unwrap_or(0))));
         });
     }
 

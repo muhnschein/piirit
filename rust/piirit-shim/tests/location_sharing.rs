@@ -84,6 +84,10 @@ const PROBE_QML: &str = r"
         }
         function openLater() { later.chat_id = 1; return 'ok' }
         function laterSharing() { return '' + later.sharing_location }
+        // When sharing ends, as each chat has it.
+        function ends() {
+            return chat.sharing_until + ',' + elsewhere.sharing_until + ',' + later.sharing_until
+        }
         function refresh() { live.refresh(); return 'ok' }
         function report(latitude, longitude, accuracy) {
             live.report(latitude, longitude, accuracy)
@@ -212,6 +216,7 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         let done = call!("sharing").to_string() == "true,true,true";
         if done || last {
             common::record(&s, "sharing", call!("sharing"));
+            common::record(&s, "sharing-ends", call!("ends"));
             call!("openLater");
         }
         done
@@ -221,6 +226,7 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         let done = call!("laterSharing").to_string() == "true";
         if done || last {
             common::record(&s, "opened-later", call!("laterSharing"));
+            common::record(&s, "later-ends", call!("ends"));
             call!("report", 60.2_f64, 25.0_f64, 8.0_f64);
         }
         done
@@ -231,6 +237,25 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         let done = call!("moved").to_string() != "0";
         if done || last {
             common::record(&s, "moved", call!("moved"));
+            // Longer while sharing: end moves, sharing as was.
+            call!("share", 7200);
+        }
+        done
+    });
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        // Past half an hour from now: the two hours' end.
+        let soon = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |since| since.as_secs())
+            + 3600;
+        let ends = call!("ends").to_string();
+        let done = ends
+            .split(',')
+            .take(2)
+            .all(|end| end.parse::<u64>().unwrap_or_default() > soon);
+        if done || last {
+            common::record(&s, "longer-ends", call!("ends"));
             call!("share", 0);
         }
         done
@@ -240,6 +265,7 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         let done = call!("sharing").to_string() == "false,false,false";
         if done || last {
             common::record(&s, "stopped", call!("sharing"));
+            common::record(&s, "stopped-ends", call!("ends"));
             // Nobody wants it: not handed to core.
             call!("report", 1.0_f64, 2.0_f64, 0.0_f64);
             // Runs out before next position, core's word on it lost.
@@ -278,11 +304,15 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         "true,false,10|false,true,10|false,false,10",
         "rows do not say which carries a place and which starts live sharing. {context}"
     );
-    // One app, opened four ways.
-    let app = value("every");
+    // One app, opened four ways. Every chat's: framing all (Ada's two points, fake core).
+    let every = value("every");
+    let app = every
+        .strip_suffix("?bounds=60.1,24.9,60.2,25")
+        .unwrap_or_default()
+        .to_string();
     assert!(
         !app.is_empty() && app.bytes().all(|b| b.is_ascii_digit()),
-        "every chat's map did not open on the app alone. {context}"
+        "every chat's map did not open framing every location. {context}"
     );
     assert_eq!(
         value("own-point"),
@@ -327,6 +357,39 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         "chat or feed did not hear live sharing stop. {context}"
     );
     assert_eq!(value("short"), "true,true,true", "{context}");
+    // Half an hour from when asked; a minute's slack for a slow runner.
+    let started = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_secs());
+    let ends: Vec<u64> = value("later-ends")
+        .split(',')
+        .map(|end| end.parse().unwrap_or_default())
+        .collect();
+    assert!(
+        ends.len() == 3
+            && ends.iter().all(|end| *end == ends[0])
+            && ends[0].abs_diff(started + 1800) < 120,
+        "chat, chat open elsewhere, or chat opened later does not know when sharing ends. \
+         {context}"
+    );
+    assert_eq!(
+        value("sharing-ends").split(',').take(2).collect::<Vec<_>>(),
+        [ends[0].to_string(), ends[0].to_string()],
+        "end not known as soon as sharing starts. {context}"
+    );
+    let longer: Vec<u64> = value("longer-ends")
+        .split(',')
+        .map(|end| end.parse().unwrap_or_default())
+        .collect();
+    assert!(
+        longer.len() == 3 && longer[0] == longer[1] && longer[0].abs_diff(started + 7200) < 120,
+        "a longer share while sharing did not move the end. {context}"
+    );
+    // Later's chat is deaf to events: only first two hear of stop.
+    assert!(
+        value("stopped-ends").starts_with("0,0,"),
+        "an end kept after sharing stopped. {context}"
+    );
     assert_eq!(
         value("ran-out"),
         "true,false,true",
@@ -359,7 +422,12 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         .collect();
     assert_eq!(
         shares,
-        [&json!([1, 1, 1800]), &json!([1, 1, 0]), &json!([1, 1, 30])],
+        [
+            &json!([1, 1, 1800]),
+            &json!([1, 1, 7200]),
+            &json!([1, 1, 0]),
+            &json!([1, 1, 30])
+        ],
         "{calls:?}"
     );
     let positions: Vec<&Value> = calls
@@ -408,13 +476,29 @@ fn a_place_goes_once_or_live_and_a_row_shows_where_its_sender_is() {
         ],
         "map app not pointed at chat, or at every chat: {calls:?}"
     );
+    let asked = of("get_locations");
+    let (whole, rows): (Vec<&Value>, Vec<&Value>) =
+        asked.into_iter().partition(|params| params[2].is_null());
     assert_eq!(
-        of("get_locations"),
+        rows,
         [
             &json!([1, 1, 10, 0, 0]),
             &json!([1, 1, 10, 0, 0]),
             &json!([1, 1, 1, 0, 0])
         ],
         "a row's point asked of the wrong chat or sender, or with no row: {calls:?}"
+    );
+    // Every chat's map: every chat, everyone, the day the map app shows.
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_secs());
+    assert!(
+        whole.len() == 1
+            && whole[0][1].is_null()
+            && whole[0][4] == 0
+            && whole[0][3]
+                .as_u64()
+                .is_some_and(|from: u64| from.abs_diff(now - 86_400) < 120),
+        "every chat's map not asked for the last day of every chat: {calls:?}"
     );
 }

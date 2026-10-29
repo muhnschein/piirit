@@ -31,6 +31,8 @@ use tokio::task::JoinHandle;
 
 /// API JS, compiled in: packaged file could go missing on phone only.
 const BRIDGE: &str = include_str!("webxdc.js");
+/// Map integration's opening view, after API: see file.
+const MAP_VIEW: &str = include_str!("map_view.js");
 
 /// `'self'`: this host only. `unsafe-inline`/`unsafe-eval` for app scripts: origin can't reach out.
 const POLICY: &str = "default-src 'self'; \
@@ -520,7 +522,8 @@ async fn updates(shared: &Shared, query: &str) -> Response {
     }
 }
 
-/// Core's answer since `serial`; `None` if none.
+/// Core's answer since `serial`; `None` if none. Map integration: points named, see
+/// [`named_points`].
 async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
     let answer: Result<String, _> = shared
         .rpc
@@ -533,7 +536,41 @@ async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
             ),
         )
         .await;
-    answer.ok()
+    let answer = answer.ok()?;
+    if shared.instance.internet_access {
+        return Some(named_points(&answer).unwrap_or(answer));
+    }
+    Some(answer)
+}
+
+/// Point whose label (its message's text) is only a link, as Piirit's one-off place: sender's
+/// name instead, as on live tracks. `None`: not core's update list, left as is.
+fn named_points(updates: &str) -> Option<String> {
+    let mut list: Vec<serde_json::Value> = serde_json::from_str(updates).ok()?;
+    for update in &mut list {
+        let Some(point) = update
+            .get_mut("payload")
+            .and_then(serde_json::Value::as_object_mut)
+        else {
+            continue;
+        };
+        let independent = point.get("independent") == Some(&serde_json::Value::Bool(true));
+        let link = point
+            .get("label")
+            .and_then(serde_json::Value::as_str)
+            .is_some_and(only_link);
+        if let (true, true, Some(name)) = (independent, link, point.get("name").cloned()) {
+            point.insert("label".to_string(), name);
+        }
+    }
+    serde_json::to_string(&list).ok()
+}
+
+/// Text is one web address, nothing else.
+fn only_link(text: &str) -> bool {
+    let text = text.trim();
+    (text.starts_with("https://") || text.starts_with("http://"))
+        && !text.contains(char::is_whitespace)
 }
 
 /// No brace in answer (`[]` or junk): wait, don't answer, else bridge re-asks in a loop.
@@ -752,9 +789,13 @@ async fn file(shared: &Shared, name: &str) -> Result<Vec<u8>, String> {
     decode_base64(&encoded).ok_or_else(|| format!("{name} came back as something unreadable"))
 }
 
-/// Bridge with instance values.
+/// Bridge with instance values; map integration's view after.
 fn bridge(shared: &Shared) -> String {
-    fill(BRIDGE, shared)
+    let mut script = fill(BRIDGE, shared);
+    if shared.instance.internet_access {
+        script.push_str(MAP_VIEW);
+    }
+    script
 }
 
 /// Placeholders as JSON literals: quotes in names stay strings.
@@ -951,9 +992,46 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        archive_path, content_type, decode_base64, in_outbox, inject, nothing_new, percent_decode,
-        token, Response,
+        archive_path, content_type, decode_base64, in_outbox, inject, named_points, nothing_new,
+        only_link, percent_decode, token, Response,
     };
+
+    #[test]
+    fn a_point_labelled_only_by_its_link_is_named_after_its_sender() {
+        let updates = serde_json::json!([
+            {"payload": {"action": "pos", "independent": true, "name": "Ada",
+                         "label": "https://www.openstreetmap.org/?mlat=60.1&mlon=24.9"}, "serial": 1},
+            {"payload": {"action": "pos", "independent": true, "name": "Ada", "label": "Café"},
+             "serial": 2},
+            {"payload": {"action": "pos", "independent": false, "name": "Ada",
+                         "label": "https://example.org/"}, "serial": 3},
+            {"payload": "not a point", "serial": 4},
+        ])
+        .to_string();
+        let named: serde_json::Value =
+            serde_json::from_str(&named_points(&updates).unwrap_or_default()).unwrap_or_default();
+        let labels: Vec<&str> = named
+            .as_array()
+            .map(|list| {
+                list.iter()
+                    .filter_map(|update| update.pointer("/payload/label")?.as_str())
+                    .collect()
+            })
+            .unwrap_or_default();
+        // Sender's name for link; own words kept; track untouched (app shows name there).
+        assert_eq!(labels, ["Ada", "Café", "https://example.org/"]);
+        assert_eq!(
+            named.pointer("/3/payload"),
+            Some(&serde_json::json!("not a point"))
+        );
+        assert_eq!(named_points("not json"), None);
+
+        assert!(only_link(" https://osm.org/?mlat=1 "));
+        assert!(only_link("http://osm.org/"));
+        assert!(!only_link("see https://osm.org/"));
+        assert!(!only_link("https://osm.org/ here"));
+        assert!(!only_link("ftp://osm.org/"));
+    }
 
     #[test]
     fn an_answer_with_no_update_in_it_is_waited_on() {

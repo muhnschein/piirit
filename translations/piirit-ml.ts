@@ -1300,6 +1300,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Stop sharing location</source>
         <translation>ലൊക്കേഷൻ പങ്കിടുന്നത് നിർത്തുക</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>ഇപ്പോഴും നിങ്ങളുടെ ലൊക്കേഷൻ തിരയുന്നു. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1551,6 +1556,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>ചാനലിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>ഇതുവരെ ലൊക്കേഷനുകളൊന്നുമില്ല</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>കഴിഞ്ഞ 24 മണിക്കൂറിൽ പങ്കിട്ട ലൊക്കേഷനുകൾ ഇവിടെ കാണാം.</translation>
     </message>
 </context>
 <context>
@@ -2363,6 +2381,27 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>You are sharing your location</source>
         <translation>നിങ്ങൾ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുന്നു</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>നിങ്ങളുടെ ലൊക്കേഷൻ അയയ്ക്കുന്നില്ല. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
     </message>
 </context>
 <context>

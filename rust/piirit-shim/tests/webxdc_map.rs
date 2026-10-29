@@ -23,22 +23,27 @@ const PROBE_QML: &str = r"
     import Piirit 1.0
     Item {
         property int mapId: 0
+        property string mapQuery: ''
+        property int empties: 0
         property string failed: ''
         LocationMap {
             id: map
             account_id: 1
-            onOpened: mapId = message_id
+            onOpened: { mapId = message_id; mapQuery = query }
+            onEmpty: empties++
             onError: failed = message
         }
         WebxdcApp { id: app; account_id: 1; onError: failed = message }
-        // Nothing asked of core until it is up.
-        function open() {
+        // Nothing asked of core until it is up. Chat 2 has no locations, 1 has.
+        function open(chat) {
             if (core.status !== 'ready') {
                 return 'waiting'
             }
-            map.open(1, 0, 0)
+            map.open(chat, 0, 0)
             return 'ok'
         }
+        function emptied() { return '' + empties }
+        function query() { return mapQuery }
         // Map app, else ordinary app 5.
         function start(useMap) {
             app.stop()
@@ -83,6 +88,22 @@ fn summary(answer: &str) -> String {
         .unwrap_or_default();
     let body = answer.split("\r\n\r\n").nth(1).unwrap_or_default();
     format!("{status}|{kind}|{body}")
+}
+
+/// Map points' labels from an updates answer, `|`-joined.
+fn labels(answer: &str) -> String {
+    let body = answer.split("\r\n\r\n").nth(1).unwrap_or_default();
+    let list: Vec<Value> = serde_json::from_str(body).unwrap_or_default();
+    list.iter()
+        .map(|update| {
+            update
+                .pointer("/payload/label")
+                .and_then(Value::as_str)
+                .unwrap_or("?")
+                .to_string()
+        })
+        .collect::<Vec<_>>()
+        .join("|")
 }
 
 fn authority_of(url: &str) -> String {
@@ -140,10 +161,23 @@ fn a_map_gets_its_tiles_through_core_and_nothing_else() {
     plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    plan.until(1, 10, move |_| call!("open") == "ok");
+    plan.until(1, 10, move |_| call!("open", 2) == "ok");
+    // Nothing to show: no app readied.
+    let s = steps.clone();
+    plan.until(1, 10, move |last| {
+        let done = call!("emptied") == "1";
+        if done || last {
+            common::record(&s, "empty-chat", call!("emptied").into());
+            common::record(&s, "empty-opened", call!("opened").into());
+            call!("open", 1);
+        }
+        done
+    });
+    let s = steps.clone();
     plan.until(1, 10, move |last| {
         let done = call!("opened") != "0";
         if done || last {
+            common::record(&s, "query", call!("query").into());
             call!("start", true);
         }
         done
@@ -155,9 +189,15 @@ fn a_map_gets_its_tiles_through_core_and_nothing_else() {
         let done = !url.is_empty();
         if done || last {
             let authority = authority_of(&url);
-            let api = api_of(&get(&authority, "/webxdc.js"));
+            let bridge = get(&authority, "/webxdc.js");
+            let api = api_of(&bridge);
             let record = |label: &str, value: String| common::record(&s, label, value.into());
             record("api", api.clone());
+            record("view", bridge.contains("map.zoom").to_string());
+            record(
+                "points",
+                labels(&get(&authority, &format!("{api}/updates?serial=0"))),
+            );
             record("script", summary(&get(&authority, "/index.js")));
             // Not a script: left as is.
             record("text", summary(&get(&authority, "/notes.txt")));
@@ -195,7 +235,13 @@ fn a_map_gets_its_tiles_through_core_and_nothing_else() {
         let done = !url.is_empty() && call!("error").is_empty();
         if done || last {
             let authority = authority_of(&url);
-            let api = api_of(&get(&authority, "/webxdc.js"));
+            let bridge = get(&authority, "/webxdc.js");
+            let api = api_of(&bridge);
+            common::record(
+                &s,
+                "other-view",
+                bridge.contains("map.zoom").to_string().into(),
+            );
             common::record(
                 &s,
                 "other-tile",
@@ -214,6 +260,25 @@ fn a_map_gets_its_tiles_through_core_and_nothing_else() {
     let context = format!("steps: {steps:?}");
     let api = value("api");
     assert!(api.starts_with("/webxdc-api/"), "{context}");
+    assert_eq!(
+        value("empty-chat"),
+        "1",
+        "a chat with no locations readied a map. {context}"
+    );
+    assert_eq!(value("empty-opened"), "0", "{context}");
+    // Chat 1: Ada's points at 60.1/24.9 and 60.2/25.0 (fake core).
+    assert_eq!(value("query"), "?bounds=60.1,24.9,60.2,25", "{context}");
+    assert_eq!(
+        value("view"),
+        "true",
+        "map opens without framing its points. {context}"
+    );
+    assert_eq!(value("other-view"), "false", "{context}");
+    assert_eq!(
+        value("points"),
+        "Ada|Café|",
+        "a place labelled only by its link was not named after its sender. {context}"
+    );
 
     assert_eq!(
         value("script"),

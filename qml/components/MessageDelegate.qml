@@ -134,6 +134,12 @@ Item {
     /// Tap shows a map.
     readonly property bool showsLocation: root.locationsEnabled
                                           && (root.hasLocation || root.startsLocation)
+    /// Body just point's osm.org link (location.rs `osm_link`): row stands for it, body hidden.
+    /// Location off: link only way to place.
+    readonly property bool linkOnly: root.showsLocation && root.hasLocation
+        && /^https:\/\/www\.openstreetmap\.org\/\?mlat=\S*$/.test(root.messageText.trim())
+    /// Body drawn.
+    readonly property bool showsText: root.messageText.length > 0 && !root.linkOnly
 
     /// Row is a call.
     readonly property bool isCall: root.viewType === "Call"
@@ -205,7 +211,7 @@ Item {
     /// taller than view, unscrollable.
     property int collapsedLines: 12
     /// Long bodies only; not captionless pictures nor held-back messages.
-    readonly property bool hasBody: root.messageText.length > 0 && !root.heldBack
+    readonly property bool hasBody: root.showsText && !root.heldBack
                                     && !root.isCall
     /// Core cut message: rest in HTML part, off phone. `hasHtml` alone too broad: core sets it
     /// for most mail (HTML alternative/only, stripped quote, forward). Only real cut ends in
@@ -266,8 +272,8 @@ Item {
         font: messageLabel.font
         // Measured as drawn: bold wider.
         textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
-        // Call text not drawn: doesn't size bubble.
-        text: root.isCall ? "" : root.bodyText
+        // Text not drawn (call, hidden link): doesn't size bubble.
+        text: root.isCall || !root.showsText ? "" : root.bodyText
         // Body lines unwrapped, as many as label shows: widest sets body width, even past bubble.
         maximumLineCount: root.collapsedLines
     }
@@ -632,7 +638,7 @@ Item {
         Label {
             id: messageLabel
             objectName: "messageLabel"
-            readonly property bool shown: root.messageText.length > 0 && !root.isCall
+            readonly property bool shown: root.showsText && !root.isCall
             visible: messageLabel.shown
             height: !messageLabel.shown ? 0
                     : root.bigEmoji ? root.bigPictures.height : implicitHeight

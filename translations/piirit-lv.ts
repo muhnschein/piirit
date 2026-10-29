@@ -1306,6 +1306,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Stop sharing location</source>
         <translation>Pārtraukt atrašanās vietas kopīgošanu</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Joprojām meklē jūsu atrašanās vietu. Vai atrašanās vieta ir ieslēgta iestatījumos?</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1558,6 +1563,19 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nosaukumu redz visi kanālā</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Vēl nav atrašanās vietu</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Šeit redzamas pēdējās 24 stundās kopīgotās atrašanās vietas.</translation>
     </message>
 </context>
 <context>
@@ -2371,6 +2389,29 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>You are sharing your location</source>
         <translation>Jūs kopīgojat savu atrašanās vietu</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>atlikusi %n minūte</numerusform>
+            <numerusform>atlikušas %n minūtes</numerusform>
+            <numerusform>atlikušas %n minūtes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>atlikusi %n stunda</numerusform>
+            <numerusform>atlikušas %n stundas</numerusform>
+            <numerusform>atlikušas %n stundas</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Jūsu atrašanās vieta netiek sūtīta. Vai atrašanās vieta ir ieslēgta iestatījumos?</translation>
     </message>
 </context>
 <context>

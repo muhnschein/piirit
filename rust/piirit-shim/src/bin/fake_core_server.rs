@@ -1516,11 +1516,14 @@ async fn serve() {
                     }
                 }
                 // Newest first. Ada: streamed point after her one-off (message 30); own one-offs.
+                // Chat 1 (Ada, contact 10) has locations; other chats none. Null: all.
                 "get_locations" => {
+                    let chat = positional(1).as_u64();
+                    let any = positional(2).is_null() && chat.map_or(true, |chat| chat == 1);
                     let contact = positional(2).as_u64().unwrap_or_default();
                     let state = state.lock().await;
                     let mut found = Vec::new();
-                    if contact == 10 {
+                    if contact == 10 || any {
                         found.push(json!({"latitude": 60.2, "longitude": 25.0, "accuracy": 12.0,
                                           "timestamp": 1_700_090_600, "contactId": 10,
                                           "msgId": 0, "isIndependent": false}));
@@ -1528,7 +1531,7 @@ async fn serve() {
                                           "timestamp": 1_700_090_000, "contactId": 10,
                                           "msgId": 30, "isIndependent": true}));
                     }
-                    if contact == u64::from(SELF) {
+                    if contact == u64::from(SELF) || any {
                         for (msg, (latitude, longitude)) in state.points.iter().rev() {
                             found.push(json!({"latitude": latitude, "longitude": longitude,
                                               "accuracy": 0.0, "timestamp": 1_700_090_000,
@@ -2919,7 +2922,24 @@ async fn serve() {
                         .and_then(|value| usize::try_from(value).ok())
                         .unwrap_or_default();
                     let state = state.lock().await;
-                    let updates = state.webxdc_updates.get(&msg).cloned().unwrap_or_default();
+                    // Map app: core's points (`maps_integration`): one-off place's label is its
+                    // message text, Piirit's link; a place named in Desktop's map; a track.
+                    let updates = if state.integrations.values().any(|app| *app == msg) {
+                        let point = |label: &str, independent: bool, serial: u32| {
+                            json!({"payload": {"action": "pos", "contactId": 10,
+                                               "lat": 60.1, "lng": 24.9, "independent": independent,
+                                               "timestamp": 1_700_090_000, "label": label,
+                                               "name": "Ada", "color": "#ff8080"},
+                                   "serial": serial, "max_serial": 3})
+                        };
+                        vec![
+                            point("https://www.openstreetmap.org/?mlat=60.1&mlon=24.9", true, 1),
+                            point("Café", true, 2),
+                            point("", false, 3),
+                        ]
+                    } else {
+                        state.webxdc_updates.get(&msg).cloned().unwrap_or_default()
+                    };
                     let after: Vec<Value> = updates.iter().skip(serial).cloned().collect();
                     ok(
                         &id,

@@ -1300,6 +1300,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Stop sharing location</source>
         <translation>Arrêter de partager la position</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Recherche de votre position en cours. La localisation est-elle activée dans les Paramètres ?</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1551,6 +1556,19 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Tout le monde dans le canal voit le nom</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Aucune position pour le moment</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Les positions partagées au cours des dernières 24 heures s’affichent ici.</translation>
     </message>
 </context>
 <context>
@@ -2363,6 +2381,27 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>You are sharing your location</source>
         <translation>Vous partagez votre position</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minute restante</numerusform>
+            <numerusform>%n minutes restantes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n heure restante</numerusform>
+            <numerusform>%n heures restantes</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Votre position n’est pas envoyée. La localisation est-elle activée dans les Paramètres ?</translation>
     </message>
 </context>
 <context>

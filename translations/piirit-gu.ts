@@ -1300,6 +1300,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Stop sharing location</source>
         <translation>સ્થાન શેર કરવાનું બંધ કરો</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>હજી તમારું સ્થાન શોધી રહ્યાં છીએ. શું સેટિંગ્સમાં સ્થાન ચાલુ છે?</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1551,6 +1556,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>ચેનલમાં બધા નામ જુએ છે</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>હજી સુધી કોઈ સ્થાન નથી</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>છેલ્લા 24 કલાકમાં શેર કરેલાં સ્થાનો અહીં દેખાય છે.</translation>
     </message>
 </context>
 <context>
@@ -2363,6 +2381,27 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>You are sharing your location</source>
         <translation>તમે તમારું સ્થાન શેર કરી રહ્યાં છો</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n મિનિટ બાકી</numerusform>
+            <numerusform>%n મિનિટ બાકી</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n કલાક બાકી</numerusform>
+            <numerusform>%n કલાક બાકી</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>તમારું સ્થાન મોકલાઈ રહ્યું નથી. શું સેટિંગ્સમાં સ્થાન ચાલુ છે?</translation>
     </message>
 </context>
 <context>

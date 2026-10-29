@@ -268,7 +268,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     );
     assert!(
         value("map-opens").ends_with(
-            r#"push:WebxdcPage.qml {"accountId":1,"messageId":101,"query":"","heading":"All locations","subheading":""}|"#
+            r#"push:WebxdcPage.qml {"accountId":1,"messageId":101,"query":"?bounds=60.1,24.9,60.2,25","heading":"All locations","subheading":""}|"#
         ),
         "All locations does not open every chat's map on this profile. {context}"
     );

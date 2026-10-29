@@ -14,6 +14,22 @@ pub(crate) fn osm_link(latitude: f64, longitude: f64) -> String {
     )
 }
 
+/// Where core keeps when chat's live sharing ends: core has it, tells no client.
+pub(crate) fn until_key(chat_id: u32) -> String {
+    format!("ui.piirit.locations_until.{chat_id}")
+}
+
+/// Kept end, if still ahead: past one is an earlier share's.
+pub(crate) fn until_ahead(kept: &str, now: u64) -> Option<u64> {
+    kept.parse().ok().filter(|until| *until > now)
+}
+
+pub(crate) fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_secs())
+}
+
 /// Some chat, any profile, gets reader's location live: phone's position goes to core.
 ///
 /// ```qml
@@ -121,7 +137,7 @@ async fn any_sharing(rpc: &RpcClient) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-    use super::osm_link;
+    use super::{osm_link, until_ahead};
 
     #[test]
     fn the_link_pins_the_place_to_a_metre() {
@@ -135,5 +151,14 @@ mod tests {
             "https://www.openstreetmap.org/?mlat=-33.85680&mlon=-151.21530\
              #map=16/-33.85680/-151.21530"
         );
+    }
+
+    #[test]
+    fn a_kept_end_counts_only_while_ahead() {
+        assert_eq!(until_ahead("1800", 1000), Some(1800));
+        assert_eq!(until_ahead("1000", 1000), None);
+        assert_eq!(until_ahead("999", 1000), None);
+        assert_eq!(until_ahead("", 1000), None);
+        assert_eq!(until_ahead("soon", 1000), None);
     }
 }

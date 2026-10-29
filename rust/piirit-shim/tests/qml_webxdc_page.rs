@@ -57,6 +57,12 @@ const PROBE_QML: &str = r"
             })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
+        // Map with nothing on it: no app, says so.
+        function loadEmpty(url) {
+            loader.setSource('', {})
+            loader.setSource(url, { heading: 'Ada', subheading: 'Map' })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -362,6 +368,25 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
                 "map-home",
                 call!("get", QString::from("webxdcView"), QString::from("url"))
             );
+            record!(
+                "empty",
+                call!(
+                    "loadEmpty",
+                    QString::from(common::page_url("NoLocationsPage.qml"))
+                )
+            );
+            for (label, name, property) in [
+                ("empty-title", "header", "title"),
+                ("empty-subtitle", "header", "description"),
+                ("empty-shown", "placeholder", "enabled"),
+                ("empty-text", "placeholder", "text"),
+                ("empty-hint", "placeholder", "hintText"),
+            ] {
+                record!(
+                    label,
+                    call!("get", QString::from(name), QString::from(property))
+                );
+            }
             (*engine_ptr).quit();
         }
         done
@@ -532,4 +557,18 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         value("map-url"),
         "the map lost where to look on coming back home. {context}"
     );
+    // Nothing to show: page says so under same heading, starts no app.
+    for (label, expected) in [
+        ("empty", "ok"),
+        ("empty-title", "Ada"),
+        ("empty-subtitle", "Map"),
+        ("empty-shown", "true"),
+        ("empty-text", "No locations yet"),
+        (
+            "empty-hint",
+            "Locations shared in the last 24 hours show here.",
+        ),
+    ] {
+        assert_eq!(value(label), expected, "{label}: empty map page. {context}");
+    }
 }

@@ -1300,6 +1300,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Stop sharing location</source>
         <translation>Lõpeta asukoha jagamine</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Sinu asukohta otsitakse endiselt. Kas asukoht on seadetes sisse lülitatud?</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1551,6 +1556,19 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nime näevad kõik kanalis</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Asukohti veel pole</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Siin on viimase 24 tunni jooksul jagatud asukohad.</translation>
     </message>
 </context>
 <context>
@@ -2363,6 +2381,27 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>You are sharing your location</source>
         <translation>Sa jagad oma asukohta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minut jäänud</numerusform>
+            <numerusform>%n minutit jäänud</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n tund jäänud</numerusform>
+            <numerusform>%n tundi jäänud</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Sinu asukohta ei saadeta. Kas asukoht on seadetes sisse lülitatud?</translation>
     </message>
 </context>
 <context>

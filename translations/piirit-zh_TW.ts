@@ -1290,6 +1290,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Stop sharing location</source>
         <translation>停止分享位置</translation>
     </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>仍在尋找您的地點。設定中的定位是否已開啟？</translation>
+    </message>
 </context>
 <context>
     <name>MapOpener</name>
@@ -1540,6 +1545,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>頻道中的每個人都看得到名稱</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>尚無地點</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>過去 24 小時內分享的地點會顯示在這裡。</translation>
     </message>
 </context>
 <context>
@@ -2351,6 +2369,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>You are sharing your location</source>
         <translation>您正在分享您的位置</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>剩餘 %n 分鐘</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>剩餘 %n 小時</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>未在傳送您的地點。設定中的定位是否已開啟？</translation>
     </message>
 </context>
 <context>

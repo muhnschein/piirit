@@ -17,6 +17,9 @@ const MAPS_XDC: &[u8] = include_bytes!("../../../vendor/maps/maps.xdc");
 /// Desktop commit `MAPS_XDC` came from. Core keeps it per profile: other value = older app.
 pub(crate) const MAPS_VERSION: &str = "bb52bd1d61e8458749745ae93509cd380432c719";
 
+/// App's window: core feeds it this much (`maps_integration`).
+const DAY: u64 = 24 * 60 * 60;
+
 /// Where core keeps `MAPS_VERSION`. Desktop's own: `ui.desktop.maps_version`.
 const VERSION_KEY: &str = "ui.piirit.maps_version";
 
@@ -36,8 +39,10 @@ pub struct LocationMap {
     /// Chat 0: every chat. Message with own point: map there; else sender's track, if any.
     pub open: qt_method!(fn(&mut self, chat_id: u32, contact_id: u32, message_id: u32)),
 
-    /// App's message, and query for its page (`?poi=…`, `?contactId=…`, or "").
+    /// App's message, and query for its page (`?poi=…`, `?contactId=…`, `?bounds=…`).
     pub opened: qt_signal!(message_id: u32, query: QString),
+    /// Whole map asked, nothing on it: no location in app's day. App not started.
+    pub empty: qt_signal!(),
     /// Failed; message from core.
     pub error: qt_signal!(message: QString),
 
@@ -59,35 +64,48 @@ impl LocationMap {
         self.opening = true;
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
-        let done = queued_callback(move |result: Result<(u32, String), String>| {
+        let done = queued_callback(move |result: Result<Option<(u32, String)>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
             this.borrow_mut().opening = false;
             match result {
-                Ok((app, query)) => this.borrow().opened(app, query.into()),
+                Ok(Some((app, query))) => this.borrow().opened(app, query.into()),
+                Ok(None) => this.borrow().empty(),
                 Err(err) => this.borrow().error(err.into()),
             }
         });
 
         runtime.spawn(async move {
-            let app = integration(&rpc, account_id, chat_id).await;
-            let result = match app {
-                Ok(app) => {
-                    let point = if message_id == 0 {
-                        None
-                    } else {
-                        // Unreadable: map opens, just not on point.
-                        locations(&rpc, account_id, chat_id, contact_id)
-                            .await
-                            .ok()
-                            .and_then(|found| own_point(&found, message_id))
-                    };
-                    Ok((app, start_query(point, contact_id)))
-                }
-                Err(err) => Err(err),
-            };
-            done(result);
+            done(start(&rpc, account_id, chat_id, contact_id, message_id).await);
         });
     }
+}
+
+/// App readied and its query; `None`: whole map asked, nothing on it.
+async fn start(
+    rpc: &RpcClient,
+    account_id: u32,
+    chat_id: u32,
+    contact_id: u32,
+    message_id: u32,
+) -> Result<Option<(u32, String)>, String> {
+    if message_id == 0 && contact_id == 0 {
+        let Some(area) = bounds(&recent(rpc, account_id, chat_id).await?) else {
+            return Ok(None);
+        };
+        let app = integration(rpc, account_id, chat_id).await?;
+        return Ok(Some((app, bounds_query(area))));
+    }
+    let app = integration(rpc, account_id, chat_id).await?;
+    let point = if message_id == 0 {
+        None
+    } else {
+        // Unreadable: map opens, just not on point.
+        locations(rpc, account_id, chat_id, contact_id)
+            .await
+            .ok()
+            .and_then(|found| own_point(&found, message_id))
+    };
+    Ok(Some((app, start_query(point, contact_id))))
 }
 
 /// App's message, set to `chat_id`. Missing or older app replaced first, as Desktop.
@@ -149,6 +167,46 @@ async fn locations(
         .map_err(|err| err.to_string())
 }
 
+/// Chat's locations (0: every chat's) core feeds app: last day, as `maps_integration`.
+async fn recent(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Vec<Value>, String> {
+    let from = crate::location::unix_now().saturating_sub(DAY);
+    let chat = (chat_id != 0).then_some(chat_id);
+    rpc.call(
+        "get_locations",
+        (account_id, chat, Option::<u32>::None, from, 0),
+    )
+    .await
+    .map_err(|err| err.to_string())
+}
+
+/// South, west, north, east around every location; `None` if none readable.
+pub(crate) fn bounds(locations: &[Value]) -> Option<(f64, f64, f64, f64)> {
+    locations
+        .iter()
+        .filter_map(|location| {
+            Some((
+                location.get("latitude").and_then(Value::as_f64)?,
+                location.get("longitude").and_then(Value::as_f64)?,
+            ))
+        })
+        .fold(None, |area, (lat, lon)| {
+            Some(match area {
+                None => (lat, lon, lat, lon),
+                Some((south, west, north, east)) => (
+                    f64::min(south, lat),
+                    f64::min(west, lon),
+                    f64::max(north, lat),
+                    f64::max(east, lon),
+                ),
+            })
+        })
+}
+
+/// Area for page; `webxdc_map.js` frames it.
+pub(crate) fn bounds_query((south, west, north, east): (f64, f64, f64, f64)) -> String {
+    format!("?bounds={south},{west},{north},{east}")
+}
+
 /// Message's own point, from core's `get_locations`. Live sharing's start notice has none.
 pub(crate) fn own_point(locations: &[Value], message_id: u32) -> Option<(f64, f64)> {
     let own = locations
@@ -172,7 +230,7 @@ pub(crate) fn start_query(point: Option<(f64, f64)>, contact_id: u32) -> String 
 
 #[cfg(test)]
 mod tests {
-    use super::{own_point, start_query, MAPS_VERSION, MAPS_XDC};
+    use super::{bounds, bounds_query, own_point, start_query, MAPS_VERSION, MAPS_XDC};
     use serde_json::json;
 
     #[test]
@@ -200,6 +258,27 @@ mod tests {
         assert_eq!(start_query(Some((-33.5, -151.25)), 0), "?poi=-33.5,-151.25");
         assert_eq!(start_query(None, 10), "?contactId=10");
         assert_eq!(start_query(None, 0), "");
+    }
+
+    #[test]
+    fn the_whole_map_frames_every_location_or_says_there_is_none() {
+        let found = [
+            json!({"latitude": 60.2, "longitude": 25.0}),
+            json!({"latitude": 61.5, "longitude": 23.75}),
+            json!({"latitude": 60.1, "longitude": 24.9}),
+            json!({"latitude": 99.0}),
+        ];
+        assert_eq!(bounds(&found), Some((60.1, 23.75, 61.5, 25.0)));
+        assert_eq!(
+            bounds(&[json!({"latitude": -33.5, "longitude": -151.25})]),
+            Some((-33.5, -151.25, -33.5, -151.25))
+        );
+        assert_eq!(bounds(&[]), None);
+        assert_eq!(bounds(&[json!({"longitude": 1.0})]), None);
+        assert_eq!(
+            bounds_query((60.1, 23.75, 61.5, 25.0)),
+            "?bounds=60.1,23.75,61.5,25"
+        );
     }
 
     #[test]

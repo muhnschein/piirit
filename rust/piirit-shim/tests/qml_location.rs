@@ -96,10 +96,19 @@ const PROBE_QML: &str = r"
             findIn(loader.item, 'position').report(latitude, longitude, accuracy)
             return 'ok'
         }
+        // Last known fix, `age` ms old: what Sailfish hands first.
+        function oldFix(latitude, longitude, accuracy, age) {
+            findIn(loader.item, 'position').report(latitude, longitude, accuracy, age)
+            return 'ok'
+        }
         function lose(code) { findIn(loader.item, 'position').fail(code); return 'ok' }
         // Feed's position, as phone would hand it over.
         function feedFix(latitude, longitude, accuracy) {
             findIn(loader.item, 'livePosition').report(latitude, longitude, accuracy)
+            return 'ok'
+        }
+        function feedOld(latitude, longitude, accuracy, age) {
+            findIn(loader.item, 'livePosition').report(latitude, longitude, accuracy, age)
             return 'ok'
         }
         function feedLost() { findIn(loader.item, 'livePosition').forget(); return 'ok' }
@@ -153,7 +162,7 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         }};
     }
     macro_rules! fix {
-        ($name:expr, $latitude:expr, $longitude:expr, $accuracy:expr) => {{
+        ($name:expr, $latitude:expr, $longitude:expr, $accuracy:expr $(, $age:expr)?) => {{
             unsafe {
                 (*engine_ptr).invoke_method(
                     $name.into(),
@@ -161,6 +170,7 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
                         QVariant::from($latitude),
                         QVariant::from($longitude),
                         QVariant::from($accuracy),
+                        $(QVariant::from($age),)?
                     ],
                 );
             }
@@ -222,6 +232,7 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         );
         call!("watch", "locationRequested");
         common::record(&s, "off-pin", call!("get", "locationRow", "visible"));
+        common::record(&s, "off-link", call!("get", "messageLabel", "visible"));
         call!("run", "tapped");
         common::record(&s, "off-tap", call!("heard"));
         call!(
@@ -233,8 +244,25 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         call!("watch", "locationRequested");
         common::record(&s, "pin-shown", call!("get", "locationRow", "visible"));
         common::record(&s, "pin-word", call!("get", "locationLabel", "text"));
+        common::record(&s, "pin-link", call!("get", "messageLabel", "visible"));
         call!("run", "tapped");
         common::record(&s, "pin-tap", call!("heard"));
+
+        // Words beside link, or other link (sent while sharing live): body stays.
+        call!(
+            "load",
+            delegate.clone(),
+            r#"{"messageText": "Here: https://www.openstreetmap.org/?mlat=1&mlon=2",
+                "hasLocation": true, "locationsEnabled": true}"#
+        );
+        common::record(&s, "worded-link", call!("get", "messageLabel", "visible"));
+        call!(
+            "load",
+            delegate.clone(),
+            r#"{"messageText": "https://example.org/", "hasLocation": true,
+                "locationsEnabled": true}"#
+        );
+        common::record(&s, "other-link", call!("get", "messageLabel", "visible"));
 
         call!("load", delegate.clone(), r#"{"messageText": "hello"}"#);
         call!("watch", "locationRequested");
@@ -265,12 +293,26 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         call!("load", bar.clone(), "{}");
         common::record(&s, "bar-idle", call!("own", "visible"));
         common::record(&s, "bar-idle-height", call!("own", "height"));
-        call!("load", bar, r#"{"sharing": true}"#);
+        call!("load", bar.clone(), r#"{"sharing": true}"#);
         call!("watch", "stopRequested");
         common::record(&s, "bar-on", call!("own", "visible"));
         common::record(&s, "bar-words", call!("get", "sharingLabel", "text"));
+        common::record(&s, "bar-no-end", call!("get", "sharingLeft", "visible"));
         call!("tap", "stopSharingButton");
         common::record(&s, "bar-stop", call!("heard"));
+        // Time left, against a set clock: 1000 s now.
+        let mut left = Vec::new();
+        for until in [1030, 2000, 4599, 4600, 5500, 6400, 87_400, 900] {
+            call!(
+                "load",
+                bar.clone(),
+                format!(r#"{{"sharing": true, "until": {until}, "now": 1000000}}"#)
+            );
+            left.push(call!("get", "sharingLeft", "text").to_string());
+        }
+        common::record(&s, "bar-left", left.join("|").into());
+        call!("set", "stalled", "true");
+        common::record(&s, "bar-stalled", call!("get", "sharingLabel", "text"));
     });
 
     // Dialog: once waits for a fix; live times; stop only while sharing.
@@ -283,15 +325,31 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         common::record(&s, "dialog-times", call!("live"));
         common::record(&s, "dialog-stop", call!("get", "stopSwitch", "visible"));
         common::record(&s, "dialog-idle", call!("own", "canAccept"));
-        common::record(
-            &s,
-            "dialog-finding",
-            call!("get", "nowSwitch", "description"),
-        );
+        common::record(&s, "dialog-finding", call!("get", "locationStatus", "text"));
+        // No fix: live would send nothing, so refused like once.
+        call!("pickLive", "1800");
+        common::record(&s, "dialog-live-nofix", call!("own", "canAccept"));
         call!("tap", "nowSwitch");
         common::record(&s, "dialog-nofix", call!("own", "canAccept"));
+        // Two minutes old: last known, not current.
+        fix!(
+            "oldFix",
+            60.169_524_f64,
+            24.935_456_f64,
+            7.6_f64,
+            120_000_f64
+        );
+        common::record(&s, "dialog-old", call!("own", "canAccept"));
         fix!("fix", 60.169_524_f64, 24.935_456_f64, 7.6_f64);
         common::record(&s, "dialog-fix", call!("own", "canAccept"));
+        common::record(
+            &s,
+            "dialog-fix-status",
+            call!("get", "locationStatus", "visible"),
+        );
+        call!("pickLive", "1800");
+        common::record(&s, "dialog-live-fix", call!("own", "canAccept"));
+        call!("tap", "nowSwitch");
         common::record(
             &s,
             "dialog-accuracy",
@@ -309,6 +367,10 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         call!("watch", "locationPicked");
         call!("watch", "sharingPicked");
         common::record(&s, "sharing-stop", call!("get", "stopSwitch", "visible"));
+        call!("tap", "stopSwitch");
+        common::record(&s, "sharing-stop-nofix", call!("own", "canAccept"));
+        call!("tap", "stopSwitch");
+        fix!("fix", 60.2_f64, 25.0_f64, 5.0_f64);
         call!("pickLive", "1800");
         call!("pickLive", "86400");
         common::record(&s, "sharing-times", call!("live"));
@@ -317,15 +379,41 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         common::record(&s, "sharing-now", call!("get", "nowSwitch", "checked"));
         call!("run", "accept");
         common::record(&s, "sharing-picked", call!("heard"));
-        call!("load", dialog, "{}");
+        call!("load", dialog.clone(), "{}");
         call!("lose", "2");
-        common::record(&s, "dialog-off", call!("get", "nowSwitch", "description"));
+        common::record(&s, "dialog-off", call!("get", "locationStatus", "text"));
+        // Fix in hand, then source fails: refused.
+        call!("load", dialog.clone(), "{}");
+        fix!("fix", 60.2_f64, 25.0_f64, 5.0_f64);
+        call!("tap", "nowSwitch");
+        call!("lose", "2");
+        common::record(&s, "dialog-off-accept", call!("own", "canAccept"));
+        // Location off while dialog up: fixes stop, nothing says so but time.
+        call!("load", dialog, r#"{"staleAfter": 200}"#);
+        fix!("fix", 60.2_f64, 25.0_f64, 5.0_f64);
+        call!("tap", "nowSwitch");
+        common::record(&s, "dialog-before-lost", call!("own", "canAccept"));
+    });
+    let s = steps.clone();
+    plan.until(1, 40, move |last| {
+        let done = call!("get", "locationStatus", "visible") == QString::from("true");
+        if done || last {
+            common::record(&s, "dialog-lost", call!("get", "locationStatus", "text"));
+            common::record(&s, "dialog-lost-accept", call!("own", "canAccept"));
+            fix!("fix", 60.2_f64, 25.0_f64, 5.0_f64);
+            common::record(&s, "dialog-found", call!("own", "canAccept"));
+        }
+        done
     });
 
     // Feed: still until a chat shares; then position on, phone awake, positions to core.
     let s = steps.clone();
     plan.after(1, move || {
-        call!("load", common::component_url("LocationFeed.qml"), "{}");
+        call!(
+            "load",
+            common::component_url("LocationFeed.qml"),
+            r#"{"staleAfter": 300}"#
+        );
     });
     let s2 = s.clone();
     plan.after(1, move || {
@@ -346,10 +434,22 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
                 "feed-awake",
                 call!("get", "locationKeepAlive", "enabled"),
             );
+            // Last known fix first, as Sailfish: not current, not sent.
+            fix!("feedOld", 60.4_f64, 25.2_f64, 5.0_f64, 120_000_f64);
             fix!("feedFix", 60.2_f64, 25.0_f64, 8.0_f64);
             // Accuracy unknown: 0 to core. Fix lost: nothing.
             fix!("feedFix", 60.3_f64, 25.1_f64, 0.0_f64);
+            common::record(&s, "feed-flowing", call!("own", "stalled"));
             call!("feedLost");
+        }
+        done
+    });
+    // No fresh fix for `staleAfter`: bar's warning.
+    let s = steps.clone();
+    plan.until(1, 40, move |last| {
+        let done = call!("own", "stalled") == QString::from("true");
+        if done || last {
+            common::record(&s, "feed-stalled", call!("own", "stalled"));
             call!("share", "0");
         }
         done
@@ -364,6 +464,7 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
                 "feed-asleep",
                 call!("get", "locationKeepAlive", "enabled"),
             );
+            common::record(&s, "feed-off-stalled", call!("own", "stalled"));
             unsafe { (*engine_ptr).quit() };
         }
         done
@@ -399,8 +500,20 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "",
         "a point asked for a map while location is off.",
     );
+    expect(
+        "off-link",
+        "true",
+        "location off hides the only way to the place.",
+    );
     expect("pin-shown", "true", "a row with a point shows no pin.");
     expect("pin-word", "Location", "");
+    expect(
+        "pin-link",
+        "false",
+        "the pin's own osm.org link still shows.",
+    );
+    expect("worded-link", "true", "words with the link hidden.");
+    expect("other-link", "true", "a link not the pin's hidden.");
     expect(
         "pin-tap",
         "locationRequested();",
@@ -434,6 +547,18 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
     );
     expect("bar-on", "true", "bar hides while sharing.");
     expect("bar-words", "You are sharing your location", "");
+    expect("bar-no-end", "false", "time left shown with no end known.");
+    expect(
+        "bar-left",
+        "1 minute(s) left|17 minute(s) left|60 minute(s) left|1 hour(s) left\
+         |1 hour(s) left|2 hour(s) left|24 hour(s) left|1 minute(s) left",
+        "time left not minutes rounded up under an hour, hours rounded after.",
+    );
+    expect(
+        "bar-stalled",
+        "Your location is not being sent. Is location turned on in Settings?",
+        "bar says sharing while nothing goes out.",
+    );
     expect("bar-stop", "stopRequested();", "bar's stop asked nothing.");
 
     expect("dialog", "ok", "dialog did not load.");
@@ -454,6 +579,22 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "dialog accepts with nothing picked.",
     );
     expect("dialog-finding", "Finding your location…", "");
+    expect(
+        "dialog-live-nofix",
+        "false",
+        "live accepted before the phone knew where it is.",
+    );
+    expect("dialog-old", "false", "last known fix taken for current.");
+    expect(
+        "dialog-fix-status",
+        "false",
+        "status still shown with a fix in hand.",
+    );
+    expect(
+        "dialog-live-fix",
+        "true",
+        "live refused with a fix in hand.",
+    );
     expect(
         "dialog-nofix",
         "false",
@@ -477,6 +618,11 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
     );
     expect("sharing-stop", "true", "stop not offered while sharing.");
     expect(
+        "sharing-stop-nofix",
+        "true",
+        "stop refused for want of a fix.",
+    );
+    expect(
         "sharing-times",
         "For 30 minutes=1800|For 1 hour=3600|For 2 hours=7200|For 6 hours=21600\
          |For 24 hours=86400*",
@@ -493,6 +639,23 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "Turn on location in Settings to send it.",
         "a phone that cannot find itself says nothing.",
     );
+    expect(
+        "dialog-off-accept",
+        "false",
+        "accepted though the source failed.",
+    );
+    expect("dialog-before-lost", "true", "");
+    expect(
+        "dialog-lost",
+        "Still looking for your location. Is location turned on in Settings?",
+        "location gone while dialog up, dialog says nothing.",
+    );
+    expect(
+        "dialog-lost-accept",
+        "false",
+        "accepted with the fix gone stale.",
+    );
+    expect("dialog-found", "true", "a fresh fix again still refused.");
 
     expect(
         "feed-idle",
@@ -511,6 +674,9 @@ fn the_place_is_offered_shown_and_fed_where_the_reader_looks() {
         "phone allowed to sleep while sharing.",
     );
     expect("feed-off", "false", "position still looked for after stop.");
+    expect("feed-flowing", "false", "warned while fixes go out.");
+    expect("feed-stalled", "true", "no warning while no fix goes out.");
+    expect("feed-off-stalled", "false", "warning stays after stop.");
     expect("feed-asleep", "false", "phone kept awake after stop.");
 
     // Both fixes in one tick: sends race, order not kept (phone's come 30 s apart).
