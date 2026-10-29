@@ -361,7 +361,7 @@ async fn import_call(
 /// Another configured account reaches an address of profile just taken over?
 ///
 /// By every transport address (`list_transports`): account list lacks address since 2.61;
-/// `configured_addr` can differ between copies. Asked of core, not remembered: earlier runs'
+/// own address can differ between copies. Asked of core, not remembered: earlier runs'
 /// copies count. Unreadable account passes (wrong refusal worse). One call per configured
 /// profile till match; once per takeover.
 async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {

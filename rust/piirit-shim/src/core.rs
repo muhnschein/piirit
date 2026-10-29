@@ -1062,7 +1062,7 @@ impl DeltaChatCore {
                         Some(AccountItem {
                             account_id: json::u32_opt(account, "id")?,
                             display_name: json::text(account, "displayName"),
-                            // Filled below (`primary_addr`).
+                            // Filled below (`own_address`).
                             addr: QString::default(),
                             is_configured: json::str_at(account, "kind") == "Configured",
                             avatar_path: json::text(account, "profileImage"),
@@ -1073,7 +1073,7 @@ impl DeltaChatCore {
                     .collect();
                 // Two calls per configured profile: address, badge.
                 for item in items.iter_mut().filter(|item| item.is_configured) {
-                    if let Some(addr) = primary_addr(&rpc, item.account_id).await {
+                    if let Some(addr) = own_address(&rpc, item.account_id).await {
                         item.addr = addr.into();
                     }
                     item.unread_count = fresh_count(&rpc, item.account_id).await;
@@ -1561,13 +1561,13 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
         .map_err(|err| err.to_string())
 }
 
-/// Own address via `configured_addr`: account list lacks it since 2.61; `list_transports` doesn't
-/// say which relay is own. `None` if core can't say.
-async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
-    rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+/// Own address: own contact's (id 1), core 2.66+ first relay's. Account list lacks it since
+/// 2.61; `configured_addr` gone in 2.66. `None` if core can't say (no relay yet).
+pub(crate) async fn own_address(rpc: &RpcClient, account_id: u32) -> Option<String> {
+    rpc.call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
         .await
         .ok()
-        .flatten()
+        .map(|contact| json::str_at(&contact, "address").to_string())
         .filter(|addr| !addr.is_empty())
 }
 

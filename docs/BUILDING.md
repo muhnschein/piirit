@@ -189,7 +189,7 @@ Release: build and rebuild side by side, then `compare`: ~17 min, longer when ru
 
 Payoffs, in order:
 
-- **Derived SDK image.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest → one arch not three, `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`; flattened (deleted files in layers still weigh). 5.04 GB pull → ~2.3 GB; `zypper` off critical path.
+- **Derived SDK image.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest → one arch not three, `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`; flattened (deleted files in layers still weigh), then cut into six layers (`ci/split-layers.py`): one 2 GB layer came down from ghcr as one stream, 0:29 to 3:49; six pull in parallel, 10–19 s. 5.04 GB pull → ~2.3 GB; `zypper` off critical path.
 - **FFmpeg/x264 kept when unchanged** (Making a video smaller): most of a build was them, rebuilt every run.
 - `rust/target`, crates carried between runs. Key: image, `Cargo.lock`, C lib sources and recipe; exact hit never re-saves, so key moves when there's something new to save.
 

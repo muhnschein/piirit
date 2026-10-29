@@ -144,7 +144,7 @@ pub struct AccountItem {
     pub account_id: u32,
     /// Profile name; empty if unset.
     pub display_name: QString,
-    /// `configured_addr`; empty if unconfigured or unknown.
+    /// Own contact's address; empty if unconfigured or unknown.
     pub addr: QString,
     /// Has a usable transport.
     pub is_configured: bool,
@@ -169,7 +169,7 @@ pub struct TransportItem {
     pub addr: QString,
     /// Relay domain (after `@`).
     pub domain: QString,
-    /// `configured_addr`: one per profile, first row. Not necessarily send relay (core picks
+    /// Own contact's address: one per profile, first row. Not necessarily send relay (core picks
     /// per connect, unsaid).
     pub is_primary: bool,
     /// Dot colour: `green`, `yellow`, `red`, `grey`; empty before reported.
