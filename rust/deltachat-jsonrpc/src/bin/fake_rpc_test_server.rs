@@ -77,6 +77,9 @@ async fn serve() {
                     released.notify_one();
                     ok(id, &json!("released"))
                 }
+                // No answer: exit closes pipe. Tests end here, not on `shutdown`'s kill, which
+                // loses this binary's coverage (written at exit).
+                "quit" => std::process::exit(0),
                 "get_next_event_batch" => {
                     let mut count = batch_counter.lock().await;
                     *count += 1;

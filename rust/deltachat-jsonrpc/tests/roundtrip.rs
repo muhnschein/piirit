@@ -12,6 +12,18 @@ fn fake_server_path() -> &'static str {
     env!("CARGO_BIN_EXE_fake-rpc-test-server")
 }
 
+/// Fake exits itself, then [`RpcClient::shutdown`].
+async fn stop(client: &RpcClient) {
+    let gone: Result<serde_json::Value, RpcError> = client.call_unit("quit").await;
+    assert!(
+        matches!(gone, Err(RpcError::TransportClosed)),
+        "the fake did not quit: {gone:?}"
+    );
+    if let Err(err) = client.shutdown().await {
+        panic!("shutdown: {err}");
+    }
+}
+
 #[tokio::test]
 async fn health_check_round_trip() {
     let client = RpcClient::spawn(fake_server_path(), Vec::<&str>::new())
@@ -29,7 +41,7 @@ async fn health_check_round_trip() {
     );
     assert_eq!(info.get("version").map(String::as_str), Some("0.0.0-test"));
 
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 #[tokio::test]
@@ -45,7 +57,7 @@ async fn echoes_arbitrary_json_params() {
         .expect("echo call");
 
     assert_eq!(echoed, payload);
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 /// Bad line is not transport close: later answers still arrive.
@@ -67,7 +79,7 @@ async fn an_undecodable_line_does_not_end_the_transport() {
         .expect("a call made after the undecodable line");
     assert_eq!(echoed, json!("still here"));
 
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 #[tokio::test]
@@ -85,7 +97,7 @@ async fn remote_errors_are_reported_as_rpc_error() {
         other => panic!("expected RpcError::Remote, got {other:?}"),
     }
 
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 #[tokio::test]
@@ -100,7 +112,7 @@ async fn unknown_method_reports_method_not_found() {
         other => panic!("expected RpcError::Remote(-32601), got {other:?}"),
     }
 
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 /// Calls matched by id, not send order: later call answered while earlier one still held.
@@ -128,7 +140,7 @@ async fn concurrent_calls_are_correlated_independently_of_order() {
     assert_eq!(released, "released");
     assert_eq!(held.await.expect("held call"), "held-done");
 
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
 
 #[tokio::test]
@@ -156,5 +168,5 @@ async fn event_loop_streams_batches_in_order() {
 
     // Long-poll with no events; stop must not hang.
     handle.stop();
-    client.shutdown().await.expect("shutdown");
+    stop(&client).await;
 }
