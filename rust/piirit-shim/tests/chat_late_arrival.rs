@@ -56,6 +56,9 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
     let temp = std::env::temp_dir().join(format!("piirit-late-arrival-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Dropped once chat top is read: message arrives then.
+    let arrive = temp.join("arrive");
+    let _ = std::fs::remove_file(&arrive);
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
@@ -63,8 +66,7 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // After chat top read, below.
-        std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL_MS", "5000");
+        std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL", &arrive);
     }
 
     piirit_shim::register_qml_types();
@@ -94,33 +96,45 @@ fn a_message_arriving_mid_chat_is_one_more_row_where_it_belongs() {
         }};
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
+    let last_row = i32::try_from(MESSAGES).unwrap_or(0) - 1;
     let mut plan = common::Plan::default();
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("count") != MESSAGES.to_string() && !last {
+            return false;
+        }
         (*steps_ptr).push(("opened", call!("count")));
         (*steps_ptr).push(("opened-edges", call!("edges")));
         // Up in history, rows filled in.
         (*steps_ptr).push(("read-top", call!("readTop")));
+        true
     });
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("filledAt", 0) != "true" && !last {
+            return false;
+        }
         (*steps_ptr).push(("top-filled", call!("filledAt", 0)));
+        std::fs::write(&arrive, "").expect("drop the arrival file");
+        true
     });
-    plan.after(4, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let landed =
+            call!("count") == (MESSAGES + 1).to_string() && call!("filledAt", last_row) == "true";
+        if !landed && !last {
+            return false;
+        }
         (*steps_ptr).push(("arrived", call!("count")));
         (*steps_ptr).push(("arrived-edges", call!("edges")));
-        (*steps_ptr).push((
-            "late-id",
-            call!("idAt", i32::try_from(MESSAGES).unwrap_or(0) - 1),
-        ));
-        (*steps_ptr).push((
-            "late-filled",
-            call!("filledAt", i32::try_from(MESSAGES).unwrap_or(0) - 1),
-        ));
+        (*steps_ptr).push(("late-id", call!("idAt", last_row)));
+        (*steps_ptr).push(("late-filled", call!("filledAt", last_row)));
         (*steps_ptr).push(("top-still-filled", call!("filledAt", 0)));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

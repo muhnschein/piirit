@@ -15,6 +15,7 @@ const PROBE_QML: &str = r"
     Item {
         ChatList { id: chats; account_id: 1 }
         function count() { return '' + chats.count }
+        function unread() { return '' + chats.unread_total }
         function filter(on) { chats.unread_only = on; return 'ok' }
         function markUnread(chatId) { chats.mark_unread(chatId); return 'ok' }
         function markRead(chatId) { chats.mark_read(chatId); return 'ok' }
@@ -65,42 +66,77 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
         };
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
+    // Next step once `$what` returns `$want` (last try: as it is).
+    macro_rules! once {
+        ($what:expr, $want:expr, $step:expr) => {
+            move |last| unsafe {
+                if call!($what) != $want && !last {
+                    return false;
+                }
+                $step;
+                true
+            }
+        };
+    }
+
     let mut plan = common::Plan::default();
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     // Two chats, neither unread.
-    plan.after(2, move || unsafe {
-        record!("all", call!("count"));
-        record!("filtered-on", call!("filter", true));
-    });
-
-    plan.after(1, move || unsafe {
-        record!("nothing-unread", call!("count"));
-        record!("marked-unread", call!("markUnread", 2u32));
-    });
-
-    plan.after(1, move || unsafe {
-        record!("one-unread", call!("count"));
-        record!("marked-read", call!("markRead", 2u32));
-    });
-
-    plan.after(2, move || unsafe {
-        record!("read-meanwhile", call!("count"));
-        record!("forgot", call!("forget"));
-    });
-
-    plan.after(1, move || unsafe {
-        record!("after-forgetting", call!("count"));
-        record!("filtered-off", call!("filter", false));
-    });
-
-    plan.after(1, move || unsafe {
-        record!("all-again", call!("count"));
-        (*engine_ptr).quit();
-    });
+    plan.until(
+        1,
+        30,
+        once!("count", "2", {
+            record!("all", call!("count"));
+            record!("filtered-on", call!("filter", true));
+        }),
+    );
+    plan.until(
+        1,
+        30,
+        once!("count", "0", {
+            record!("nothing-unread", call!("count"));
+            record!("marked-unread", call!("markUnread", 2u32));
+        }),
+    );
+    plan.until(
+        1,
+        30,
+        once!("count", "1", {
+            record!("one-unread", call!("count"));
+            record!("marked-read", call!("markRead", 2u32));
+        }),
+    );
+    // Read landed: nothing unread left, whether row stayed or not.
+    plan.until(
+        1,
+        30,
+        once!("unread", "0", {
+            record!("read-meanwhile", call!("count"));
+            record!("forgot", call!("forget"));
+        }),
+    );
+    plan.until(
+        1,
+        30,
+        once!("count", "0", {
+            record!("after-forgetting", call!("count"));
+            record!("filtered-off", call!("filter", false));
+        }),
+    );
+    plan.until(
+        1,
+        30,
+        once!("count", "2", {
+            record!("all-again", call!("count"));
+            (*engine_ptr).quit();
+        }),
+    );
 
     plan.run();
     engine.exec();

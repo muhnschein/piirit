@@ -29,17 +29,21 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
     let temp = std::env::temp_dir().join(format!("piirit-archived-race-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Ordinary listing answered only once archived one landed.
+    let hold = temp.join("hold");
+    std::fs::write(&hold, r#""get_chatlist_entries","params":[1,null"#)
+        .expect("write the hold file");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_JOURNAL", temp.join("journal.ndjson"));
-        // Long enough to land after archived answer.
-        std::env::set_var("PIIRIT_FAKE_CHATLIST_DELAY_MS", "1500");
+        std::env::set_var("PIIRIT_FAKE_HOLD", &hold);
     }
 
     piirit_shim::register_qml_types();
@@ -68,22 +72,43 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         }};
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
+    let journal = temp.join("journal.ndjson");
     let mut plan = common::Plan::default();
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
         (*engine_ptr).invoke_method("open".into(), &[]);
     });
 
-    // Archived answer back; ordinary still in flight.
-    plan.after(2, move || unsafe {
+    // Archived answer back; ordinary one held.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("count") != "1" && !last {
+            return false;
+        }
         (*steps_ptr).push(("early", call!("count")));
+        let _ = std::fs::remove_file(&hold);
+        true
     });
 
-    // Well after slow one landed.
-    plan.after(3, move || unsafe {
-        (*steps_ptr).push(("late", call!("count")));
+    // Ordinary answer let go, its rows asked for (list's last request): lands next.
+    plan.until(1, 30, move |_| {
+        common::methods(&journal)
+            .iter()
+            .filter(|name| *name == "get_chatlist_items_by_entries")
+            .count()
+            >= 2
+    });
+    // A late count of two is the bug: watch a while for it.
+    plan.until(1, 3, move |last| unsafe {
+        let count = call!("count");
+        if count == "1" && !last {
+            return false;
+        }
+        (*steps_ptr).push(("late", count));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
@@ -96,12 +121,16 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
             .map(|(_, value)| value.clone())
             .unwrap_or_default()
     };
-    let listings: Vec<String> = common::calls(&temp.join("journal.ndjson"))
-        .into_iter()
-        .filter(|(name, _)| name == "get_chatlist_entries")
-        .map(|(_, params)| params.to_string())
-        .collect();
-    let context = format!("steps: {steps:?}, listings: {listings:?}");
+    let asked = |method: &str| -> Vec<String> {
+        common::calls(&temp.join("journal.ndjson"))
+            .into_iter()
+            .filter(|(name, _)| name == method)
+            .map(|(_, params)| params.to_string())
+            .collect()
+    };
+    let listings = asked("get_chatlist_entries");
+    let rows = asked("get_chatlist_items_by_entries");
+    let context = format!("steps: {steps:?}, listings: {listings:?}, rows: {rows:?}");
 
     // No overlap, no race: test would pass on broken code.
     assert_eq!(
@@ -119,6 +148,12 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         "no request for the archived listing was made. {context}"
     );
 
+    assert_eq!(
+        rows,
+        ["[1,[3]]", "[1,[1,2]]"],
+        "the ordinary listing was not answered after the archived one, so \
+         this test is no longer arranged the way the bug needs. {context}"
+    );
     assert_eq!(
         value("early"),
         "1",
