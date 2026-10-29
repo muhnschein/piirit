@@ -2,13 +2,14 @@ import QtQuick 2.0
 
 // Stub: phone's position. Finds nothing; test hands fix via `report` (`age` ms old, as Qt's
 // last known fix from disk), loses it via `forget`, failure via `fail` (Qt's `sourceError`
-// numbers: 0 none, 1 access, 2 closed). New object = new fix. Unknown accuracy NaN, no
-// timestamp invalid Date, as Qt.
+// numbers: 0 access, 1 closed, 2 unknown, 3 none). New object = new fix. Unknown accuracy
+// NaN, no timestamp invalid Date, as Qt.
 QtObject {
+    enum SourceError { AccessError, ClosedError, UnknownSourceError, NoError }
     property bool active: false
     property int updateInterval: 0
     property bool valid: true
-    property int sourceError: 0
+    property int sourceError: 3
     property var position: ({ latitudeValid: false, longitudeValid: false,
                               horizontalAccuracyValid: false, horizontalAccuracy: NaN,
                               coordinate: { latitude: 0, longitude: 0 },

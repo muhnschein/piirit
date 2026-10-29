@@ -20,8 +20,8 @@ Item {
     property bool fresh: false
     /// Looking, nothing fresh for `staleAfter`: location likely off.
     property bool lost: false
-    /// Source refuses: location off at start, or no access.
-    readonly property bool failed: source.sourceError !== 0 || !source.valid
+    /// Source refuses: location off at start, or no access. NoError is 3, not 0 (Qt's enum).
+    readonly property bool failed: source.sourceError !== PositionSource.NoError || !source.valid
     readonly property bool ready: root.fresh && !root.failed
 
     /// Fresh fix; accuracy 0 unknown.
