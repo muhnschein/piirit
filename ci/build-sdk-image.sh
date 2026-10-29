@@ -55,6 +55,8 @@ esac
 # Fully qualified: Podman refuses short names without a search registry.
 upstream="${SDK_UPSTREAM_REPO:-docker.io/coderus/sailfishos-platform-sdk}@$digest"
 target="SailfishOS-$sfos-$arch"
+# Pull runs ~3 layer downloads at once (Docker default); more evens sizes.
+layers=6
 
 echo ">> deriving $output"
 echo "   from $upstream"
@@ -68,7 +70,12 @@ else
 fi
 
 cid=$("$engine" run -d --privileged "$upstream" sleep infinity)
-cleanup() { "$engine" rm -f "$cid" >/dev/null 2>&1 || true; }
+# Export and its layer tars: ~2x image size on disk.
+context=$(mktemp -d)
+cleanup() {
+    "$engine" rm -f "$cid" >/dev/null 2>&1 || true
+    rm -rf "$context"
+}
 trap cleanup EXIT
 
 # Copied, not bind-mounted: mount point would stay in export.
@@ -155,9 +162,10 @@ echo ">> putting the rustlib where the linker looks, and dropping the rest"
     [ -z "$high" ] || { echo "still owned by ids above 65535:" >&2; echo "$high" >&2; exit 1; }
 '
 
-# export: deletions are real, not whiteouts (hence export/import, not
-# `RUN rm`). Config restored by hand.
-echo ">> flattening"
+# export: deletions are real, not whiteouts (hence export, not `RUN rm`).
+# Then split into layers: one 2 GB layer pulls as one slow stream
+# (ci/split-layers.py). Config restored by hand.
+echo ">> flattening into $layers layers"
 "$engine" stop "$cid" >/dev/null
 
 # GHCR links package to repo by this label; else repo token can't pull it.
@@ -168,19 +176,22 @@ elif origin=$(git -C "$root" remote get-url origin 2>/dev/null); then
     source_url=${origin%.git}
 fi
 
-changes=(
-    --change 'ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-    --change 'USER mersdk'
-    --change 'WORKDIR /home/mersdk'
-)
-if [[ -n "$source_url" ]]; then
-    changes+=(--change "LABEL org.opencontainers.image.source=$source_url")
-fi
+"$engine" export -o "$context/rootfs.tar" "$cid"
+python3 "$root/ci/split-layers.py" "$context/rootfs.tar" "$context" "$layers"
+rm "$context/rootfs.tar"
 
-"$engine" export "$cid" |
-    "$engine" import "${changes[@]}" \
-        --message "piirit: $target, BuildRequires installed, one architecture" \
-        - "$output" >/dev/null
+# ADD unpacks a local tar keeping owners and modes; one layer each.
+{
+    echo "FROM scratch"
+    for tar in "$context"/layer-*.tar; do
+        echo "ADD ${tar##*/} /"
+    done
+    echo 'ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    echo 'USER mersdk'
+    echo 'WORKDIR /home/mersdk'
+    [[ -z "$source_url" ]] || echo "LABEL org.opencontainers.image.source=$source_url"
+} > "$context/Dockerfile"
+"$engine" build -q -t "$output" "$context" >/dev/null
 
 # Gate: an image failing these fails minutes into a build, misleadingly.
 echo ">> checking what came out"

@@ -262,8 +262,7 @@ fn base64(bytes: &[u8]) -> String {
 
 /// Mail server that says yes, on two loopback ports: IMAP, then SMTP.
 ///
-/// Core 2.61+ refuses `configured_addr` without a transport; JSON-RPC cannot add one without
-/// login. IMAP answers each tagged line `OK`, SMTP each step its reply. IO stopped once in.
+/// Core 2.66+: no own contact without a transport; JSON-RPC cannot add one without login. IMAP answers each tagged line `OK`, SMTP each step its reply. IO stopped once in.
 ///
 /// Threads not joined; listeners die with process.
 fn loopback_mailbox() -> (u16, u16) {
@@ -419,6 +418,53 @@ async fn offline_round_trip_against_real_core() {
 
     // Account bootstrap, as DeltaChatCore::add_account.
     let account_id: u32 = client.call_unit("add_account").await.expect("add_account");
+
+    // Account list: `kind` tag, "Configured"/"Unconfigured", camelCase fields.
+    let accounts: Vec<Value> = client
+        .call_unit("get_all_accounts")
+        .await
+        .expect("get_all_accounts");
+    let ours = accounts
+        .iter()
+        .find(|a| a.get("id").and_then(Value::as_u64) == Some(u64::from(account_id)))
+        .expect("our account missing from get_all_accounts");
+    assert_eq!(
+        ours.get("kind").and_then(Value::as_str),
+        Some("Unconfigured"),
+        "unexpected account shape: {ours:?}"
+    );
+
+    // Core 2.66+: no relay, no self contact; own drafts and messages then fail to load. App
+    // only opens chats once a profile has one. IO stopped: stub would be talked to all test.
+    client
+        .call::<_, ()>(
+            "add_transport_from_qr",
+            (
+                account_id,
+                dclogin("piirit@example.invalid", loopback_mailbox()),
+            ),
+        )
+        .await
+        .expect("add_transport_from_qr for the first account");
+    client
+        .call::<_, ()>("stop_io", (account_id,))
+        .await
+        .expect("stop_io on the first account");
+    // Welcome messages seen, so device chat's first unread is the probe's below.
+    let welcome: Option<u32> = client
+        .call("get_chat_id_by_contact_id", (account_id, 5))
+        .await
+        .expect("get_chat_id_by_contact_id for the first account's device chat");
+    if let Some(device) = welcome {
+        let shown: Vec<u32> = client
+            .call("get_message_ids", (account_id, device, false, false))
+            .await
+            .expect("get_message_ids on the first account's device chat");
+        client
+            .call::<_, ()>("markseen_msgs", (account_id, shown))
+            .await
+            .expect("markseen_msgs on the first account's welcome messages");
+    }
 
     // Config round trip, as configure_account (no `configure`: needs live mail).
     client
@@ -601,21 +647,6 @@ async fn offline_round_trip_against_real_core() {
             );
         }
     }
-
-    // Account list: `kind` tag, "Configured"/"Unconfigured", camelCase fields.
-    let accounts: Vec<Value> = client
-        .call_unit("get_all_accounts")
-        .await
-        .expect("get_all_accounts");
-    let ours = accounts
-        .iter()
-        .find(|a| a.get("id").and_then(Value::as_u64) == Some(u64::from(account_id)))
-        .expect("our account missing from get_all_accounts");
-    assert_eq!(
-        ours.get("kind").and_then(Value::as_str),
-        Some("Unconfigured"),
-        "unexpected account shape: {ours:?}"
-    );
 
     // Selected profile: core auto-selects a new account; `select_account` takes bare id;
     // `get_selected_account_id` gives id or null (`Option<u32>`, as shim decodes).
@@ -1930,15 +1961,16 @@ async fn offline_round_trip_against_real_core() {
              page draws: {configured:?}"
         );
     }
-    let own_addr: Option<String> = client
-        .call("get_config", (sender_id, "configured_addr"))
-        .await
-        .expect("get_config configured_addr");
     assert_eq!(
-        own_addr.as_deref(),
-        Some("self@example.invalid"),
-        "a configured account does not name the address it was configured \
-         with, so its row on the profiles page would have none"
+        own_address(&client, sender_id).await,
+        "self@example.invalid",
+        "a configured account's own contact does not carry the address it \
+         was configured with, so its row on the profiles page would have none"
+    );
+    // Core 2.66+: key gone; asking is refused, so shim must not.
+    assert_eq!(
+        refusal(&client, "get_config", (sender_id, "configured_addr")).await,
+        "unknown key \"configured_addr\": Matching variant not found"
     );
 
     // Empty name resets a contact's own name; contact page relies on it.
@@ -2240,6 +2272,19 @@ async fn unpinning_against(client: &RpcClient, account: u32, chat: u32, message:
     }
 }
 
+/// Own address, as shim reads it: own contact's (id 1). Core 2.66+: first relay's.
+async fn own_address(client: &RpcClient, account: u32) -> String {
+    let contact: Value = client
+        .call("get_contact", (account, 1_u32))
+        .await
+        .unwrap_or_else(|err| panic!("get_contact for self: {err}"));
+    contact
+        .get("address")
+        .and_then(Value::as_str)
+        .unwrap_or_else(|| panic!("own contact without an address: {contact:?}"))
+        .to_string()
+}
+
 /// Profile relays, as profile page and duplicate check read them. Three loopback relays.
 /// `relays_against` adds them.
 async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]) {
@@ -2261,11 +2306,7 @@ async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]
         .await
         .unwrap_or_else(|err| panic!("list_transports: {err}"));
     assert_eq!(listed(&transports), addrs, "{transports:?}");
-    let own: Option<String> = client
-        .call("get_config", (account, "configured_addr"))
-        .await
-        .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
-    assert_eq!(own.as_deref(), Some(addrs[0]));
+    assert_eq!(own_address(client, account).await, addrs[0]);
     // Core 2.63+: relays don't write legacy keys (`addr`, `mail_pw`); shim must never read them.
     for key in ["addr", "mail_pw", "mail_server", "send_server"] {
         let legacy: Option<String> = client
@@ -2328,24 +2369,6 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
     assert_eq!(
         refusal(
             client,
-            "set_config",
-            (account, "configured_addr", "nobody@example.invalid")
-        )
-        .await,
-        "Address does not belong to any transport."
-    );
-    assert_eq!(
-        refusal(
-            client,
-            "set_config",
-            (account, "configured_addr", Option::<String>::None)
-        )
-        .await,
-        "Cannot unset configured_addr"
-    );
-    assert_eq!(
-        refusal(
-            client,
             "delete_transport",
             (account, "nobody@example.invalid")
         )
@@ -2353,19 +2376,15 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         "Transport does not exist"
     );
 
-    // Removing relay with profile's address moves it to newest remaining.
+    // Core 2.66+: removing relay with profile's address moves it to oldest remaining.
     client
         .call::<_, ()>("delete_transport", (account, addrs[0]))
         .await
         .unwrap_or_else(|err| panic!("delete_transport of the profile's own relay: {err}"));
-    let own: Option<String> = client
-        .call("get_config", (account, "configured_addr"))
-        .await
-        .unwrap_or_else(|err| panic!("get_config configured_addr after the removal: {err}"));
     assert_eq!(
-        own.as_deref(),
-        Some(addrs[2]),
-        "the profile's own address did not move to the newest relay left"
+        own_address(client, account).await,
+        addrs[1],
+        "the profile's own address did not move to the oldest relay left"
     );
     client
         .call::<_, ()>("delete_transport", (account, addrs[1]))

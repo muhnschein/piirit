@@ -36,6 +36,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 - Footprint check (`fs_mark`, `footprint`): file app touched outside known dirs → add to reset or fail run. Leftovers taint results.
 - Before/after: same start state, same steps.
 - Motion or timing change: launch with `FRAMELOG`, report `frames` (fps, slow frames, worst gap per animation). Never measure frames while recording: recorder slows compositor.
+- Privacy: user stays muhnschein, nothing more. Harness results come scrubbed (no location, addresses, device or network ids; its AGENTS.md "Privacy"). PR evidence only from those files; never type identifiers in. Location tests: harness fake places only, never real fix.
 - Harness proves function and frame timing. Feel, lag, transitions stay user's call on device.
 
 ## Local checks
