@@ -1,0 +1,18 @@
+edges
+| test.rs:16:13:16:13 | p | test.rs:17:19:17:19 | p | provenance |  |
+| test.rs:16:29:16:39 | ...::null(...) | test.rs:16:13:16:13 | p | provenance | Src:MaD:503  |
+| test.rs:26:28:26:28 | p | test.rs:27:10:27:10 | p | provenance | Src:MaD:500  |
+| test.rs:39:5:39:14 | ...::null::<...>(...) | test.rs:39:5:39:14 | ...::null::<...>(...) | provenance | Src:MaD:503  |
+nodes
+| test.rs:16:13:16:13 | p | semmle.label | p |
+| test.rs:16:29:16:39 | ...::null(...) | semmle.label | ...::null(...) |
+| test.rs:17:19:17:19 | p | semmle.label | p |
+| test.rs:26:28:26:28 | p | semmle.label | p |
+| test.rs:27:10:27:10 | p | semmle.label | p |
+| test.rs:39:5:39:14 | ...::null::<...>(...) | semmle.label | ...::null::<...>(...) |
+| test.rs:39:5:39:14 | ...::null::<...>(...) | semmle.label | ...::null::<...>(...) |
+subpaths
+#select
+| test.rs:17:19:17:19 | p | test.rs:16:29:16:39 | ...::null(...) | test.rs:17:19:17:19 | p | This operation dereferences a pointer that may be $@. | test.rs:16:29:16:39 | ...::null(...) | invalid |
+| test.rs:27:10:27:10 | p | test.rs:26:28:26:28 | p | test.rs:27:10:27:10 | p | This operation dereferences a pointer that may be $@. | test.rs:26:28:26:28 | p | invalid |
+| test.rs:39:5:39:14 | ...::null::<...>(...) | test.rs:39:5:39:14 | ...::null::<...>(...) | test.rs:39:5:39:14 | ...::null::<...>(...) | This operation dereferences a pointer that may be $@. | test.rs:39:5:39:14 | ...::null::<...>(...) | invalid |

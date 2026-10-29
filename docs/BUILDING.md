@@ -60,6 +60,8 @@ Aspiration, tracked not gated: test volume > source volume.
 
 SonarQube Cloud reads every PR but docs-only (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides. Separate workflow: green `make check` on laptop = green CI, no hosted service.
 
+CodeQL: advanced setup (`.github/workflows/codeql.yml`), default setup off (GitHub refuses both). Languages, suite, categories as default setup; Rust swaps one query for ours (HARBOUR.md). Code-scanning ruleset blocks merge on any alert.
+
 - Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed, profile `ci` as CI's `test` (else llvm-cov's `cargo test`, ~10 min instrumented).
 
 ```

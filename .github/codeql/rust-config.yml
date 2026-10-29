@@ -1,0 +1,7 @@
+# Rust: default suite with our rust/access-invalid-pointer (rust-queries/code-scanning.qls).
+disable-default-queries: true
+queries:
+  - uses: ./.github/codeql/rust-queries/code-scanning.qls
+# Planted bugs for query test, not app code.
+paths-ignore:
+  - .github/codeql/rust-queries-tests
