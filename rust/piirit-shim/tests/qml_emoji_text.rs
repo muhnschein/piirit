@@ -143,6 +143,8 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     let texts: Vec<(&'static str, &'static str, bool)> = vec![
         ("thumb", "hi 👍", false),
+        ("line-start", "a\n👍", false),
+        ("after-code", "<pre>x</pre>👍", true),
         ("first", "💾 saved 💾", false),
         ("none", "no emoji at all, 1 # * 2", false),
         ("escaped", "a <b> & 👍\n  two  spaces", false),
@@ -252,16 +254,23 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     let img = |picture: &str| img(&base, picture);
 
     for (label, expected) in [
-        ("thumb", format!("hi {}", img("1f44d"))),
+        ("thumb", format!("hi&nbsp;{}", img("1f44d"))),
+        // No room toward a line break: picture starts its line.
+        ("line-start", format!("a<br>{}", img("1f44d"))),
+        ("after-code", format!("<pre>x</pre>{}", img("1f44d"))),
         // One at the very start, and the text after it from where it
         // ended: Sailfish's ARM64 JIT lost that once (Emoji.js, inText).
-        ("first", format!("{} saved {}", img("1f4be"), img("1f4be"))),
+        (
+            "first",
+            format!("{}&nbsp;saved&nbsp;{}", img("1f4be"), img("1f4be")),
+        ),
         ("none", String::new()),
-        // Sender's markup as text; line break `<br>`, spaces kept (StyledText folds them).
+        // Sender's markup as text; line break `<br>`, spaces kept (StyledText folds them); no
+        // room toward a line break.
         (
             "escaped",
             format!(
-                "a &lt;b&gt; &amp; {}<br>&nbsp;&nbsp;two &nbsp;spaces",
+                "a &lt;b&gt; &amp;&nbsp;{}<br>&nbsp;&nbsp;two &nbsp;spaces",
                 img("1f44d")
             ),
         ),
@@ -273,7 +282,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         // draws the emoji.
         ("heart-text", img("2764")),
         ("heart-emoji", img("2764")),
-        ("smiley-text", format!("{} hi", img("263a"))),
+        ("smiley-text", format!("{}&nbsp;hi", img("263a"))),
         // An emoji bare by Unicode: left to the font, a star sat between
         // pictures in Sailfish's own glyph.
         (
@@ -283,13 +292,13 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         // Unless the sender asked for text.
         ("star-text", String::new()),
         ("keycap", img("31-20e3")),
-        ("flag", format!("{}!", img("1f1eb-1f1ee"))),
+        ("flag", format!("{}&nbsp;!", img("1f1eb-1f1ee"))),
         ("family", img("1f468-200d-1f469-200d-1f467")),
         ("toned", img("1f44d")),
         // Shim's rendering already markup: left as is.
         (
             "styled",
-            format!("<b>bold</b> {}<br>&lt;i&gt;", img("1f525")),
+            format!("<b>bold</b>&nbsp;{}<br>&lt;i&gt;", img("1f525")),
         ),
         ("styled-none", String::new()),
     ] {
@@ -303,13 +312,13 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         "the glyph did not load. {context}"
     );
     assert!(
-        value("body-on").starts_with("styled:hi <img ")
+        value("body-on").starts_with("styled:hi&nbsp;<img ")
             && value("body-on").contains("/1f44d.svg")
-            && value("body-on").ends_with("> there"),
+            && value("body-on").ends_with(">&nbsp;there"),
         "the body's emoji is not drawn as its picture. {context}"
     );
     assert!(
-        value("quote-on").starts_with("styled:was <img ")
+        value("quote-on").starts_with("styled:was&nbsp;<img ")
             && value("quote-on").contains("/1f525.svg"),
         "the quote's emoji is not drawn as its picture. {context}"
     );

@@ -119,7 +119,7 @@ function escaped(text, lineStart) {
 /// bit taller. `tint` (colour, e.g. label's): pictures grey, shaded toward it,
 /// as faint, by app's picture provider (`image://piirit/emoji`, shim's
 /// pictures.rs). Else `saturation` below 1: colour turned down that far, same
-/// provider. Neither: as drawn.
+/// provider. Neither: as drawn. Text beside pictures gets room (`roomy`).
 ///
 /// Two passes (cuts, then text). One pass set "text left off" and "scan pos"
 /// from one value: Sailfish's ARM64 JIT could clobber it between the two
@@ -139,7 +139,8 @@ function inText(text, styled, size, tint, saturation) {
     for (var k = 0; k < cuts.length; k += 3) {
         var before = text.substring(from, cuts[k])
         var file = artBase + cuts[k + 2] + ".svg"
-        out += styled ? before : escaped(before, from === 0)
+        var piece = styled ? before : escaped(before, from === 0)
+        out += roomy(piece, from > 0, true)
         out += "<img src=\"" + (muted ? "image://piirit/emoji?file="
                                        + encodeURIComponent(file) + muted : file)
                + "\" width=\"" + edge
@@ -147,7 +148,20 @@ function inText(text, styled, size, tint, saturation) {
         from = cuts[k + 1]
     }
     var rest = text.substring(from)
-    return out + (styled ? rest : escaped(rest, from === 0))
+    var tail = styled ? rest : escaped(rest, from === 0)
+    return out + roomy(tail, true, false)
+}
+
+/// StyledText run beside pictures, a no-break space more toward each: Qt gives a picture
+/// one label-font space either side (sender's swallowed), reads as touching. Not between
+/// pictures, not at line ends.
+function roomy(piece, afterPicture, beforePicture) {
+    if (!/\S/.test(piece)) {
+        return piece
+    }
+    var out = afterPicture && !/^(<br>|<\/?pre>)/.test(piece)
+            ? "&nbsp;" + piece.replace(/^ /, "") : piece
+    return beforePicture && !/(<br>|<\/?pre>)$/.test(out) ? out.replace(/ $/, "") + "&nbsp;" : out
 }
 
 /// Label's StyledText: `marked` (Marks.js, or "") else plain `text`, with
