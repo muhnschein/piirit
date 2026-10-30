@@ -241,7 +241,7 @@ fn names_draw_their_emoji_as_twemoji() {
     assert_eq!(
         value("chat-name"),
         format!(
-            "styled:✉ Climbers {} &lt;{}&gt;",
+            "styled:✉ Climbers&nbsp;{}&nbsp;&lt;{}&gt;",
             img("1f9d7", 18.0),
             mark("crew")
         ),
@@ -255,17 +255,21 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("contact-name"),
-        format!("styled:✉ Ada {}", img("1f680", 18.0)),
+        format!("styled:✉ Ada&nbsp;{}", img("1f680", 18.0)),
         "a contact row's emoji is not a picture. {context}"
     );
     assert_eq!(
         value("result-title"),
-        format!("styled:{} {} Lovelace", mark("Ada"), img("1f680", 18.0)),
+        format!(
+            "styled:{}&nbsp;{}&nbsp;Lovelace",
+            mark("Ada"),
+            img("1f680", 18.0)
+        ),
         "a search hit's title loses its marks or its pictures. {context}"
     );
     assert_eq!(
         value("header-title"),
-        format!("styled:Family {}", img("1f3e1", 24.0)),
+        format!("styled:Family&nbsp;{}", img("1f3e1", 24.0)),
         "the chat header's emoji is not a picture. {context}"
     );
     assert_eq!(
@@ -275,7 +279,7 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("field-shown"),
-        format!("styled:Team {}", img("1f33b", 24.0)),
+        format!("styled:Team&nbsp;{}", img("1f33b", 24.0)),
         "a name field's emoji is not drawn as a picture over it. {context}"
     );
     assert_eq!(
@@ -296,7 +300,7 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("fallback-shown"),
-        format!("styled:Ada {}", img("1f680", 24.0)),
+        format!("styled:Ada&nbsp;{}", img("1f680", 24.0)),
         "an empty name field's fallback name loses its pictures. {context}"
     );
     assert_eq!(
@@ -306,16 +310,17 @@ fn names_draw_their_emoji_as_twemoji() {
     );
     assert_eq!(
         value("bubble-sender"),
-        format!("styled:Bo {}", img("1f41d", 10.0)),
+        format!("styled:Bo&nbsp;{}", img("1f41d", 10.0)),
         "a sender's name in a bubble loses its pictures. {context}"
     );
     assert_eq!(
         value("bubble-quote-author"),
-        format!("styled:Cy {}", img("1f335", 10.0)),
+        format!("styled:Cy&nbsp;{}", img("1f335", 10.0)),
         "a quote's author loses its pictures. {context}"
     );
     assert!(
-        value("request-text").starts_with(&format!("styled:Dee {} isn", img("1f98a", 12.0))),
+        value("request-text")
+            .starts_with(&format!("styled:Dee&nbsp;{}&nbsp;isn", img("1f98a", 12.0))),
         "the contact request bar's name loses its pictures. {context}"
     );
 }

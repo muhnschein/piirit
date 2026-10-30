@@ -4,8 +4,8 @@
 //! `StyledText` with tinted pictures, without stays plain; reply bar cut, not elided, with
 //! pictures (elided last line misplaces them, `qml_emoji_cut.rs`). Pixels prove the grey: row's
 //! picture, drawn through `StyledText` and provider, has no colour; same picture as message
-//! draws it has. Grey picture gets more room from text beside it than message's: Qt's one space
-//! too little at subtitle size (measured on phone).
+//! draws it has. Picture gets a space more from text beside it than Qt's one (measured on
+//! phone: reads as touching).
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -40,14 +40,14 @@ fn probe_qml() -> String {
                 color: 'black'
                 textFormat: Text.StyledText
             }}
-            // Same text, grey (preview's) and as message: gaps beside picture.
+            // Same text with room, and as Qt lays bare `<img>` out: gaps beside picture.
             Text {{ id: roomy; y: 520; color: 'white'; font.pixelSize: 40; textFormat: Text.StyledText }}
             Text {{ id: tight; y: 600; color: 'white'; font.pixelSize: 40; textFormat: Text.StyledText }}
             FontMetrics {{ id: metrics; font: roomy.font }}
         }}
         function pair(text) {{
             roomy.text = Emoji.inText(text, false, 40, '#a0a0a0')
-            tight.text = Emoji.inText(text, false, 40)
+            tight.text = Emoji.inText(text, false, 40).replace(/&nbsp;/g, ' ')
             return '' + metrics.advanceWidth(' ')
         }}
         function load(which, url, json) {{
@@ -488,11 +488,10 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
         "the row's emoji keep their colour, not grey as their text. {measured}"
     );
 
-    // Message: Qt's one space either side, less overhang. Grey: a space more.
+    // Bare: Qt's one space either side, less overhang. With room: a space more.
     let space: f64 = value("space").parse().unwrap_or(0.0);
     let (roomy, tight) = (gaps_in(&roomy_shot), gaps_in(&tight_shot));
-    let spaced =
-        format!("space {space} px, grey gaps {roomy:?}, message gaps {tight:?}. {context}");
+    let spaced = format!("space {space} px, gaps {roomy:?}, bare {tight:?}. {context}");
     assert!(
         space > 4.0 && roomy.len() == 2 && tight.len() == 2,
         "the gap probe did not draw `l`, picture, `l`, so this proves nothing: {spaced}"
@@ -500,7 +499,7 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     for side in 0..2 {
         assert!(
             f64::from(roomy[side] - tight[side]) >= 0.75 * space,
-            "a grey picture has no more room from its text than a message's: {spaced}"
+            "a picture has no more room from its text than Qt gives it: {spaced}"
         );
     }
     let _ = std::fs::remove_dir_all(&temp);

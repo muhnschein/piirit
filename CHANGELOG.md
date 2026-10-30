@@ -8,7 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- Emoji in message previews, search results and the reply bar have room on either side, so they no longer run into the words next to them.
+- Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
 - Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
 - The big picture on the profile, contact and group pages shows its letter or emoji at a size that fits it, not list size.
