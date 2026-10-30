@@ -30,7 +30,8 @@ const PROBE_QML: &str = r"
                 quote_text: '', quote_author: '', file_path: path,
                 file_name: 'holiday.png', view_type: viewType,
                 image_width: 0, image_height: 0, reactions: '',
-                download_state: downloadState, loaded: true
+                download_state: downloadState, loaded: true,
+                has_location: false, starts_location: false, sender_id: 0
             }
         }
         function loadList(url) {
@@ -49,9 +50,25 @@ const PROBE_QML: &str = r"
             list.item.appRequested.connect(function(id) {
                 raised = 'app:' + id
             })
+            list.item.locationRequested.connect(function(id, sender) {
+                raised = 'location:' + id + ':' + sender
+            })
             return 'ok'
         }
         function setApps(on) { list.item.appsEnabled = on; return 'ok' }
+        function setLocations(on) { list.item.locationsEnabled = on; return 'ok' }
+        // Text with a point, or core's notice that sender shares live.
+        function showLocated(notice) {
+            var located = row('Text', '', 'Done')
+            located.text = notice ? 'Location streaming enabled by Ada.' : 'https://osm.org'
+            located.is_info = notice
+            located.has_location = !notice
+            located.starts_location = notice
+            located.sender_id = 10
+            rows.set(0, located)
+            raised = ''
+            return 'ok'
+        }
         function show(viewType, path, downloadState) {
             rows.set(0, row(viewType, path, downloadState))
             raised = ''
@@ -191,6 +208,20 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
     plan.after(1, move || unsafe {
         // Apps on: run here, not handed to whatever system thinks opens .xdc.
         record!("xdc-tap-on", call!("tapRow"));
+        call!("showLocated", false);
+    });
+    plan.after(1, move || unsafe {
+        // Location streaming off (experimental, as in Delta Chat): no map.
+        record!("point-tap-off", call!("tapRow"));
+        record!("locations-on", call!("setLocations", true));
+    });
+    plan.after(1, move || unsafe {
+        // Map of row's own point; then of sender's newest, from their notice.
+        record!("point-tap", call!("tapRow"));
+        call!("showLocated", true);
+    });
+    plan.after(1, move || unsafe {
+        record!("notice-tap", call!("tapRow"));
         (*engine_ptr).quit();
     });
 
@@ -261,5 +292,21 @@ fn a_tap_opens_the_attachment_and_a_long_press_anywhere_opens_the_menu() {
         value("xdc-tap-on"),
         "app:7",
         "a tap on a webxdc did not ask to run it. {context}"
+    );
+    assert_eq!(
+        value("point-tap-off"),
+        "",
+        "a point opened a map while location streaming is off. {context}"
+    );
+    assert_eq!(value("locations-on"), "ok", "{context}");
+    assert_eq!(
+        value("point-tap"),
+        "location:7:10",
+        "a tap on a row with a point did not ask for its map. {context}"
+    );
+    assert_eq!(
+        value("notice-tap"),
+        "location:7:10",
+        "a tap on live sharing's notice did not ask for its sender's map. {context}"
     );
 }

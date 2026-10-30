@@ -21,6 +21,8 @@ SilicaListView {
     property bool canEdit: false
     /// Webxdc apps on; off draws `.xdc` as file. Bound from setting.
     property bool appsEnabled: false
+    /// Location on; off, location rows open no map. Bound from setting.
+    property bool locationsEnabled: false
 
     property bool stickToBottom: true
 
@@ -102,6 +104,8 @@ SilicaListView {
     signal reactionPickerRequested(int messageId, string current)
     /// Quote tapped. `quotedId` 0: core has no original (deleted, never here).
     signal quoteRequested(int quotedId)
+    /// Row's location tapped: map on its point, or on sender.
+    signal locationRequested(int messageId, int senderId)
 
     /// Delete wait, ms; tests lower it.
     property alias pendingDelay: doomedMessages.delay
@@ -822,10 +826,13 @@ SilicaListView {
                 webxdcSummary: model.webxdc_summary
                 webxdcIcon: model.webxdc_icon
                 appsEnabled: root.appsEnabled
+                locationsEnabled: root.locationsEnabled
                 scrolling: root.held
                 callState: model.call_state
                 callHasVideo: model.call_has_video
                 callDuration: model.call_duration
+                hasLocation: model.has_location
+                startsLocation: model.starts_location
                 reactions: model.reactions
                 onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
                                                     previewWidth, model.message_id)
@@ -840,6 +847,7 @@ SilicaListView {
                 onReactionRequested: root.reactionRequested(model.message_id, emoji)
                 // Read on tap, not bound: rows without role (tests' `ListModel`) stay quiet.
                 onQuoteRequested: root.quoteRequested(model.quote_message_id || 0)
+                onLocationRequested: root.locationRequested(model.message_id, model.sender_id)
                 // Long press on chip, download or play: row menu.
                 onMenuRequested: messageRow.openMenu()
             }

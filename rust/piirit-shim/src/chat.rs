@@ -15,7 +15,7 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
 use crate::video::Prepared;
-use crate::{calls, links, markdown, media, video, webxdc};
+use crate::{calls, links, location, markdown, media, video, webxdc};
 
 /// `DC_STATE_IN_FRESH`, `DC_STATE_IN_NOTICED`: unread incoming.
 const UNSEEN_STATES: [u32; 2] = [10, 13];
@@ -253,6 +253,17 @@ pub struct ChatMessages {
     pub send_file: qt_method!(fn(&mut self, text: QString, file_path: QString)),
     /// Send recording as `Voice` type; typed by file it would be music.
     pub send_voice: qt_method!(fn(&mut self, file_path: QString)),
+    /// Send one point, degrees: message carrying it, link to it as text (any client shows that).
+    pub send_location: qt_method!(fn(&mut self, latitude: f64, longitude: f64)),
+    /// Reader's location goes to chat live for `seconds`; 0 stops. Phone's position fed by
+    /// `LiveLocation`.
+    pub share_location: qt_method!(fn(&mut self, seconds: u32)),
+    /// Chat gets reader's location live now.
+    pub sharing_location: qt_property!(bool; NOTIFY sharing_location_changed),
+    /// Emitted on `sharing_location` or `sharing_until` change.
+    pub sharing_location_changed: qt_signal!(),
+    /// Live sharing ends then, Unix seconds; 0 unknown (started before Piirit kept it).
+    pub sharing_until: qt_property!(u64; NOTIFY sharing_location_changed),
     /// Mark loaded unread messages read. Called at newest message.
     pub mark_seen_all: qt_method!(fn(&mut self)),
 
@@ -743,6 +754,7 @@ impl ChatMessages {
         self.load_unread_mark();
         // Limit asked before file picked.
         self.load_attachment_limit();
+        self.refresh_sharing();
         // Prefetched by opener: no round trip; transition starts with rows.
         if let Some((shape, entries, items)) = crate::prefetch::take(account_id, chat_id) {
             self.take_shape(shape);
@@ -1068,6 +1080,8 @@ impl ChatMessages {
             }
             // Group or 1:1 contact rename (core doesn't say whose).
             "ChatModified" | "ContactsChanged" => {
+                // Live location started, stopped or ran out (any device) is `ChatModified` too.
+                self.refresh_sharing();
                 self.refresh_name();
                 // Join or leave: other half of header.
                 self.refresh_member_count();
@@ -1726,8 +1740,126 @@ impl ChatMessages {
         self.send_message(String::new(), Some((path, String::new())));
     }
 
-    /// The one send. `file`: path and shown name; empty name for voice.
+    /// Send one point; see `send_location` property.
+    pub fn send_location(&mut self, latitude: f64, longitude: f64) {
+        if !(-90.0..=90.0).contains(&latitude) || !(-180.0..=180.0).contains(&longitude) {
+            self.error(QString::from("no location to send"));
+            return;
+        }
+        let text = location::osm_link(latitude, longitude);
+        self.send_outgoing(text, None, Some((latitude, longitude)));
+    }
+
+    /// Start or stop live location; see `share_location` property.
+    pub fn share_location(&mut self, seconds: u32) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        // Started or stopped: core's `ChatModified` says so (`handle_event`).
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if let Err(err) = result {
+                this.borrow().error(err.into());
+            }
+        });
+        runtime.spawn(async move {
+            // End noted first: core's `ChatModified` reads it back.
+            let until =
+                (seconds > 0).then(|| location::unix_now().saturating_add(u64::from(seconds)));
+            let noted: Result<serde_json::Value, _> = rpc
+                .call(
+                    "set_config",
+                    (
+                        account_id,
+                        location::until_key(chat_id),
+                        until.map(|until| until.to_string()),
+                    ),
+                )
+                .await;
+            if let Err(err) = noted {
+                done(Err(err.to_string()));
+                return;
+            }
+            done(
+                rpc.call::<_, ()>(
+                    "send_locations_to_chat",
+                    (account_id, chat_id, i64::from(seconds)),
+                )
+                .await
+                .map_err(|err| err.to_string()),
+            );
+        });
+    }
+
+    /// Ask core whether chat gets reader's location live.
+    fn refresh_sharing(&mut self) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |sharing: Option<(bool, u64)>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            // Unreadable: as was; next `ChatModified` asks again.
+            let Some((sharing, until)) = sharing else {
+                return;
+            };
+            let changed = {
+                let this = this.borrow();
+                this.sharing_location != sharing || this.sharing_until != until
+            };
+            if changed {
+                let mut this = this.borrow_mut();
+                this.sharing_location = sharing;
+                this.sharing_until = until;
+                this.sharing_location_changed();
+            }
+        });
+        runtime.spawn(async move {
+            let sharing = rpc
+                .call::<_, bool>("is_sending_locations_to_chat", (account_id, chat_id))
+                .await
+                .ok();
+            let until = match sharing {
+                Some(true) => rpc
+                    .call::<_, Option<String>>(
+                        "get_config",
+                        (account_id, location::until_key(chat_id)),
+                    )
+                    .await
+                    .ok()
+                    .flatten()
+                    .and_then(|until| location::until_ahead(&until, location::unix_now())),
+                _ => None,
+            };
+            done(sharing.map(|sharing| (sharing, until.unwrap_or(0))));
+        });
+    }
+
+    /// Text and/or file. `file`: path and shown name; empty name for voice.
     fn send_message(&mut self, text: String, file: Option<(String, String)>) {
+        self.send_outgoing(text, file, None);
+    }
+
+    /// The one send.
+    fn send_outgoing(
+        &mut self,
+        text: String,
+        file: Option<(String, String)>,
+        location: Option<(f64, f64)>,
+    ) {
         // One at a time; guarded here, not only by button: other ways in, model knows answer.
         if self.sending {
             return;
@@ -1753,7 +1885,12 @@ impl ChatMessages {
             }
         });
 
-        let outgoing = Outgoing { text, file, quoted };
+        let outgoing = Outgoing {
+            text,
+            file,
+            location,
+            quoted,
+        };
         runtime.spawn(async move {
             done(outgoing.send(&rpc, account_id, chat_id).await);
         });
@@ -1838,6 +1975,8 @@ struct Outgoing {
     text: String,
     /// Path to attach and name shown; empty name for voice.
     file: Option<(String, String)>,
+    /// Point carried, degrees: latitude, longitude.
+    location: Option<(f64, f64)>,
     /// Message replied to, or 0.
     quoted: u32,
 }
@@ -1921,7 +2060,7 @@ impl Outgoing {
                     text,
                     path,
                     name,
-                    Option::<(f64, f64)>::None,
+                    self.location,
                     (self.quoted != 0).then_some(self.quoted),
                 ),
             )
@@ -2478,6 +2617,9 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         vcard_color: json::text(message, "/vcardContact/color"),
         reactions: reactions_json(message).into(),
         my_reaction: own_reaction(message).into(),
+        has_location: json::flag(message, "hasLocation"),
+        starts_location: json::str_at(message, "systemMessageType") == "LocationStreamingEnabled",
+        sender_id: json::u32_at(message, "fromId"),
         // Filled by `with_extras` for app rows (another call).
         ..MessageListItem::default()
     }

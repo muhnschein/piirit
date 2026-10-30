@@ -702,6 +702,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>പുതിയത്</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,6 +1241,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>പങ്കിടുക</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>നിലവിലെ ലൊക്കേഷൻ അയയ്ക്കുക</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>നിങ്ങളുടെ ലൊക്കേഷൻ %n മീറ്റർ വരെ കൃത്യമാണ്.</numerusform>
+            <numerusform>നിങ്ങളുടെ ലൊക്കേഷൻ %n മീറ്റർ വരെ കൃത്യമാണ്.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>ലൊക്കേഷൻ അയയ്ക്കാൻ ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാക്കുക.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>നിങ്ങളുടെ ലൊക്കേഷൻ കണ്ടെത്തുന്നു…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>തത്സമയ ലൊക്കേഷൻ പങ്കിടുക</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>പശ്ചാത്തലത്തിൽ പ്രവർത്തിക്കുമ്പോഴും Piirit നിങ്ങളുടെ ലൊക്കേഷൻ അയച്ചുകൊണ്ടിരിക്കും.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 മിനിറ്റത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>ലൊക്കേഷൻ പങ്കിടുന്നത് നിർത്തുക</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>ഇപ്പോഴും നിങ്ങളുടെ ലൊക്കേഷൻ തിരയുന്നു. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1282,6 +1366,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>ഇതുവരെ കോളുകളൊന്നുമില്ല</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1314,6 +1403,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>തിരുത്തിയത്</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>ലൊക്കേഷൻ</translation>
     </message>
 </context>
 <context>
@@ -1462,6 +1556,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>ചാനലിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>ഇതുവരെ ലൊക്കേഷനുകളൊന്നുമില്ല</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>കഴിഞ്ഞ 24 മണിക്കൂറിൽ പങ്കിട്ട ലൊക്കേഷനുകൾ ഇവിടെ കാണാം.</translation>
     </message>
 </context>
 <context>
@@ -2246,6 +2353,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ് പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2258,6 +2374,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>സന്ദേശമായി അയയ്ക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>നിങ്ങൾ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുന്നു</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>നിങ്ങളുടെ ലൊക്കേഷൻ അയയ്ക്കുന്നില്ല. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
     </message>
 </context>
 <context>

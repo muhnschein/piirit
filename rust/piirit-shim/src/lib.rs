@@ -43,6 +43,8 @@ mod full_text;
 mod html;
 mod json;
 mod links;
+mod location;
+mod maps;
 mod markdown;
 mod media;
 mod mic_watch;
@@ -77,6 +79,8 @@ pub use crate::core::{
     HANDLED_EVENT_KINDS,
 };
 pub use crate::full_text::FullText;
+pub use crate::location::LiveLocation;
+pub use crate::maps::LocationMap;
 pub use crate::mic_watch::{MicState, MicWatch, MicWatcher};
 pub use crate::pictures::{install as install_pictures, render as render_picture};
 pub use crate::prefetch::ChatPrefetch;
@@ -137,7 +141,11 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let Ok(mic_watch) = std::ffi::CStr::from_bytes_with_nul(b"MicWatch\0") else {
+    let (Ok(mic_watch), Ok(location_map), Ok(live_location)) = (
+        std::ffi::CStr::from_bytes_with_nul(b"MicWatch\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"LocationMap\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"LiveLocation\0"),
+    ) else {
         return;
     };
     qmetaobject::qml_register_type::<ChatMessages>(uri, 1, 0, messages);
@@ -161,6 +169,8 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<SecondDevice>(uri, 1, 0, second_device);
     qmetaobject::qml_register_type::<Call>(uri, 1, 0, call);
     qmetaobject::qml_register_type::<MicWatch>(uri, 1, 0, mic_watch);
+    qmetaobject::qml_register_type::<LocationMap>(uri, 1, 0, location_map);
+    qmetaobject::qml_register_type::<LiveLocation>(uri, 1, 0, live_location);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,

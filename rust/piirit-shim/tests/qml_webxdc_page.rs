@@ -45,6 +45,24 @@ const PROBE_QML: &str = r"
             })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
+        // As map opens it: where to look, under chat's name.
+        function loadMap(url) {
+            loader.setSource('', {})
+            loader.setSource(url, {
+                accountId: 1,
+                messageId: 5,
+                query: '?poi=1.5,2.5',
+                heading: 'Ada',
+                subheading: 'Map'
+            })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        // Map with nothing on it: no app, says so.
+        function loadEmpty(url) {
+            loader.setSource('', {})
+            loader.setSource(url, { heading: 'Ada', subheading: 'Map' })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -321,7 +339,57 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
             call!("get", QString::from("webxdcView"), QString::from("url"))
         );
         record!("served-after", reachable(&value_of(&*steps_ptr, "served")));
-        (*engine_ptr).quit();
+        record!(
+            "map",
+            call!("loadMap", QString::from(common::page_url("WebxdcPage.qml")))
+        );
+    });
+
+    plan.until(1, 10, move |last| unsafe {
+        let url = call!("get", QString::from("webxdcView"), QString::from("url"));
+        let done = !url.is_empty();
+        if done || last {
+            record!("map-url", url);
+            record!(
+                "map-title",
+                call!("get", QString::from("webxdcHeader"), QString::from("title"))
+            );
+            record!(
+                "map-subtitle",
+                call!(
+                    "get",
+                    QString::from("webxdcHeader"),
+                    QString::from("subtitle")
+                )
+            );
+            // Back home keeps where to look.
+            call!("wander", QString::from("https://example.org/pay"));
+            record!(
+                "map-home",
+                call!("get", QString::from("webxdcView"), QString::from("url"))
+            );
+            record!(
+                "empty",
+                call!(
+                    "loadEmpty",
+                    QString::from(common::page_url("NoLocationsPage.qml"))
+                )
+            );
+            for (label, name, property) in [
+                ("empty-title", "header", "title"),
+                ("empty-subtitle", "header", "description"),
+                ("empty-shown", "placeholder", "enabled"),
+                ("empty-text", "placeholder", "text"),
+                ("empty-hint", "placeholder", "hintText"),
+            ] {
+                record!(
+                    label,
+                    call!("get", QString::from(name), QString::from(property))
+                );
+            }
+            (*engine_ptr).quit();
+        }
+        done
     });
 
     plan.run();
@@ -471,4 +539,36 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         "pop;",
         "a page running an app that has been deleted stayed open. {context}"
     );
+    // Map: opened on its point, under chat's name, and kept there.
+    assert_eq!(value("map"), "ok", "{context}");
+    assert!(
+        value("map-url").starts_with("http://127.0.0.1:")
+            && value("map-url").ends_with("/index.html?poi=1.5,2.5"),
+        "the map was not pointed where to look. {context}"
+    );
+    assert_eq!(
+        value("map-title"),
+        "Ada",
+        "map not headed by chat. {context}"
+    );
+    assert_eq!(value("map-subtitle"), "Map", "{context}");
+    assert_eq!(
+        value("map-home"),
+        value("map-url"),
+        "the map lost where to look on coming back home. {context}"
+    );
+    // Nothing to show: page says so under same heading, starts no app.
+    for (label, expected) in [
+        ("empty", "ok"),
+        ("empty-title", "Ada"),
+        ("empty-subtitle", "Map"),
+        ("empty-shown", "true"),
+        ("empty-text", "No locations yet"),
+        (
+            "empty-hint",
+            "Locations shared in the last 24 hours show here.",
+        ),
+    ] {
+        assert_eq!(value(label), expected, "{label}: empty map page. {context}");
+    }
 }

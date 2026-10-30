@@ -704,6 +704,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nový</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1241,6 +1246,86 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Sdílet</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Odeslat aktuální polohu</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Vaše poloha je přesná na %n metr.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metry.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metrů.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Pro odeslání polohy ji zapněte v Nastavení.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Zjišťování vaší polohy…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Sdílet polohu živě</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit odesílá vaši polohu i tehdy, když běží na pozadí.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Na 30 minut</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Na 2 hodiny</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Na 6 hodin</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Na 24 hodin</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Přestat sdílet polohu</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Stále se hledá vaše poloha. Je poloha zapnutá v Nastavení?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1287,6 +1372,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>No calls yet</source>
         <translation>Zatím žádné hovory</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1319,6 +1409,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edited</source>
         <translation>Upraveno</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Poloha</translation>
     </message>
 </context>
 <context>
@@ -1468,6 +1563,19 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Jméno vidí všichni v kanálu</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Zatím žádné polohy</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Zde se zobrazují polohy sdílené za posledních 24 hodin.</translation>
     </message>
 </context>
 <context>
@@ -2253,6 +2361,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Runs small apps inside chats.</source>
         <translation>Spouští malé aplikace uvnitř chatů.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Povolit streamování polohy (experimentální)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Sdílí vaši polohu v chatech a zobrazuje sdílené polohy na mapě.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2265,6 +2382,36 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Odeslat jako zprávu</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sdílíte svou polohu</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>zbývá %n minuta</numerusform>
+            <numerusform>zbývají %n minuty</numerusform>
+            <numerusform>zbývá %n minut</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>zbývá %n hodina</numerusform>
+            <numerusform>zbývají %n hodiny</numerusform>
+            <numerusform>zbývá %n hodin</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Vaše poloha se neodesílá. Je poloha zapnutá v Nastavení?</translation>
     </message>
 </context>
 <context>

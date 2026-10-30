@@ -696,6 +696,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Mới</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tất cả vị trí</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1227,6 +1232,84 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Chia sẻ</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Gửi vị trí hiện tại</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Vị trí của bạn chính xác trong phạm vi %n mét.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Bật vị trí trong Cài đặt để gửi.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Đang tìm vị trí của bạn…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Chia sẻ vị trí trực tiếp</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit vẫn tiếp tục gửi vị trí của bạn khi chạy nền.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Trong 30 phút</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Trong 1 giờ</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Trong 2 giờ</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Trong 6 giờ</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Trong 24 giờ</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Dừng chia sẻ vị trí</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Vẫn đang tìm vị trí của bạn. Vị trí đã được bật trong Cài đặt chưa?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tất cả vị trí</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Bản đồ</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1273,6 +1356,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Chưa có cuộc gọi nào</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Bản đồ</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1305,6 +1393,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Đã sửa</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Vị trí</translation>
     </message>
 </context>
 <context>
@@ -1452,6 +1545,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Mọi người trong kênh đều thấy tên</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Chưa có vị trí nào</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Các vị trí được chia sẻ trong 24 giờ qua hiển thị ở đây.</translation>
     </message>
 </context>
 <context>
@@ -2235,6 +2341,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Bật truyền phát vị trí (thử nghiệm)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Chia sẻ vị trí của bạn trong cuộc trò chuyện và hiển thị các vị trí được chia sẻ trên bản đồ.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2247,6 +2362,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Gửi dưới dạng tin nhắn</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Bạn đang chia sẻ vị trí của mình</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>còn %n phút</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>còn %n giờ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Vị trí của bạn không được gửi. Vị trí đã được bật trong Cài đặt chưa?</translation>
     </message>
 </context>
 <context>

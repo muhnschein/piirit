@@ -700,6 +700,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Yeni</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1231,6 +1236,84 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Paylaş</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Geçerli konumu gönder</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Konumunuz %n metre hassasiyetinde.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Göndermek için Ayarlar&apos;dan konumu açın.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Konumunuz bulunuyor…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Canlı konum paylaş</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit arka planda çalışırken konumunuzu göndermeye devam eder.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 dakikalığına</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 saatliğine</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Konum paylaşımını durdur</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Konumunuz hâlâ aranıyor. Ayarlar&apos;da konum açık mı?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Harita</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1277,6 +1360,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>No calls yet</source>
         <translation>Henüz arama yok</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Harita</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1309,6 +1397,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edited</source>
         <translation>Düzenlendi</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Konum</translation>
     </message>
 </context>
 <context>
@@ -1456,6 +1549,19 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Adı kanaldaki herkes görür</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Henüz konum yok</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Son 24 saatte paylaşılan konumlar burada görünür.</translation>
     </message>
 </context>
 <context>
@@ -2239,6 +2345,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Runs small apps inside chats.</source>
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Konum akışını etkinleştir (deneysel)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Konumunuzu sohbetlerde paylaşır ve paylaşılan konumları bir haritada gösterir.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2251,6 +2366,32 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>İleti olarak gönder</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Konumunuzu paylaşıyorsunuz</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n dakika kaldı</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n saat kaldı</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Konumunuz gönderilmiyor. Ayarlar&apos;da konum açık mı?</translation>
     </message>
 </context>
 <context>

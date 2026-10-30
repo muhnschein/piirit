@@ -144,6 +144,14 @@ ApplicationWindow {
         }
     }
 
+    /// Phone's position to core while a chat gets it live.
+    LocationFeed {
+        id: locationFeed
+        objectName: "locationFeed"
+    }
+    /// Live sharing on, no position going out: bars warn.
+    readonly property bool locationStalled: locationFeed.stalled
+
     /// Call under way: notifications, quick actions keep its page up.
     readonly property bool callBusy: callCenter.busy
 

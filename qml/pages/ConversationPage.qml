@@ -506,6 +506,7 @@ Page {
         markdownMode: Settings.markdownMode
         // Off: `.xdc` is a file. `=== true`: dconf undefined before read.
         appsEnabled: Settings.webxdcEnabled === true
+        locationsEnabled: Settings.locationStreamingEnabled === true
         // What core takes an edit in: see model.
         canEdit: messages.can_send && messages.is_encrypted
         placeholderText: qsTr("No messages yet")
@@ -580,6 +581,7 @@ Page {
         // Original lit here as search hit (older rows fill as view gets there); another chat's
         // opens over this one, Back returns; gone: said so. As reference clients.
         onQuoteRequested: messages.show_quoted(quotedId)
+        onLocationRequested: map.show(page.chatId, senderId, messageId)
         onForwardRequested: {
             // Message id captured here for picker's report.
             var travelling = messageId
@@ -615,7 +617,7 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: notice.top
+            bottom: sharingBar.top
         }
         // Core state outranks earlier failure: read now, don't wait for change.
         text: page.coreStatusMessage.length > 0
@@ -623,6 +625,21 @@ Page {
         // Reconnect ends when status says; stopped never does.
         timeout: page.coreStatusMessage.length > 0 ? 0 : 8
         onDismissed: page.errorMessage = ""
+    }
+
+    // Live location under way: says so, stop beside.
+    SharingBar {
+        id: sharingBar
+        objectName: "sharingBar"
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: notice.top
+        }
+        sharing: messages.sharing_location
+        until: messages.sharing_until
+        stalled: typeof appWindow !== "undefined" && appWindow.locationStalled === true
+        onStopRequested: messages.share_location(0)
     }
 
     // Reply or edit bar, one for both (edit isn't a send); reply returns after.
@@ -836,8 +853,10 @@ Page {
             anchors.bottomMargin: inputRow.buttonLift
             voiceAvailable: voiceBar.available
             appsAvailable: Settings.webxdcEnabled === true
+            locationAvailable: Settings.locationStreamingEnabled === true
             onCameraRequested: page.pickWith("CapturePage.qml")
             onLibraryRequested: page.pickWith("AttachLibraryPage.qml")
+            onLocationRequested: page.pickLocation()
             onVoiceRequested: voiceBar.start()
             // `.xdc` sent as file; core makes it an app.
             onAppRequested: page.pickApp()
@@ -902,6 +921,30 @@ Page {
         id: attachmentSaver
         objectName: "attachmentSaver"
         onSaved: notice.show(attachmentSaver.savedText)
+        onError: page.errorMessage = message
+    }
+
+    // Place once, or live for a while; dialog says which on accept.
+    function pickLocation() {
+        var dialog = pageStack.push(Qt.resolvedUrl("LocationShareDialog.qml"),
+                                    { sharing: messages.sharing_location })
+        if (dialog) {
+            dialog.locationPicked.connect(function (latitude, longitude) {
+                page.errorMessage = ""
+                messages.send_location(latitude, longitude)
+            })
+            dialog.sharingPicked.connect(function (seconds) {
+                messages.share_location(seconds)
+            })
+        }
+    }
+
+    // Chat's map, on row's point or its sender.
+    MapOpener {
+        id: map
+        objectName: "map"
+        account_id: page.accountId
+        chatName: page.chatName
         onError: page.errorMessage = message
     }
 

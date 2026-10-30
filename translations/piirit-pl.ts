@@ -704,6 +704,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nowy</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Wszystkie lokalizacje</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1241,6 +1246,86 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Udostępnij</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Wyślij bieżącą lokalizację</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Twoja lokalizacja jest dokładna co do %n metra.</numerusform>
+            <numerusform>Twoja lokalizacja jest dokładna co do %n metrów.</numerusform>
+            <numerusform>Twoja lokalizacja jest dokładna co do %n metrów.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Włącz lokalizację w Ustawieniach, aby ją wysłać.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Ustalanie twojej lokalizacji…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Udostępnij lokalizację na żywo</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit nadal wysyła twoją lokalizację, gdy działa w tle.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Na 30 minut</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Na 1 godzinę</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Na 2 godziny</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Na 6 godzin</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Na 24 godziny</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Zatrzymaj udostępnianie lokalizacji</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Nadal trwa ustalanie twojej lokalizacji. Czy lokalizacja jest włączona w Ustawieniach?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Wszystkie lokalizacje</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1287,6 +1372,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>No calls yet</source>
         <translation>Brak połączeń</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1319,6 +1409,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Edited</source>
         <translation>Edytowano</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Lokalizacja</translation>
     </message>
 </context>
 <context>
@@ -1468,6 +1563,19 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nazwę widzą wszyscy w kanale</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Brak lokalizacji</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Tutaj pojawiają się lokalizacje udostępnione w ciągu ostatnich 24 godzin.</translation>
     </message>
 </context>
 <context>
@@ -2253,6 +2361,15 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Runs small apps inside chats.</source>
         <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Włącz strumieniowanie lokalizacji (eksperymentalne)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Udostępnia Twoją lokalizację w czatach i pokazuje udostępnione lokalizacje na mapie.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2265,6 +2382,36 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Wyślij jako wiadomość</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Udostępniasz swoją lokalizację</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>została %n minuta</numerusform>
+            <numerusform>zostały %n minuty</numerusform>
+            <numerusform>zostało %n minut</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>została %n godzina</numerusform>
+            <numerusform>zostały %n godziny</numerusform>
+            <numerusform>zostało %n godzin</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Twoja lokalizacja nie jest wysyłana. Czy lokalizacja jest włączona w Ustawieniach?</translation>
     </message>
 </context>
 <context>

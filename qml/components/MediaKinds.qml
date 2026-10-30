@@ -4,7 +4,7 @@ import "../js/Media.js" as Media
 
 /*
  * Chat media tiles: gallery, sounds, files, apps (if on), calls (contact chats), each to
- * pages/ChatMediaPage.qml, as deltachat-android/-ios. Tiles: doors, not settings. AppMark
+ * pages/ChatMediaPage.qml, as deltachat-android/-ios; map (if on) to chat's map. Tiles: doors, not settings. AppMark
  * draws apps' missing theme icon. Bindings, not Row: polish never runs headless. Own room
  * above/below for page columns. Opens nothing (page pushes), so testable alone.
  */
@@ -17,11 +17,15 @@ Item {
     /// Calls tile: contact chats only.
     property bool callsAvailable: false
 
-    /// Tapped: gallery, audio, files, apps or calls.
+    /// Map tile: location on (setting).
+    property bool mapAvailable: false
+
+    /// Tapped: gallery, audio, files, apps, calls or map.
     signal kindRequested(string kind)
 
     /// Kinds on offer, tile order.
-    readonly property var kinds: Media.kinds(root.appsAvailable, root.callsAvailable)
+    readonly property var kinds: Media.kinds(root.appsAvailable, root.callsAvailable,
+                                                root.mapAvailable)
     /// Tile width: row split inside page margins.
     readonly property real tileWidth: root.kinds.length > 0
         ? (root.width - 2 * Theme.horizontalPageMargin) / root.kinds.length

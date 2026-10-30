@@ -702,6 +702,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Uus</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Kõik asukohad</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1236,6 +1241,85 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Jaga</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Saada praegune asukoht</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Sinu asukoha täpsus on %n meeter.</numerusform>
+            <numerusform>Sinu asukoha täpsus on %n meetrit.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Asukoha saatmiseks lülita asukoht seadetes sisse.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Sinu asukohta otsitakse…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Jaga asukohta reaalajas</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit saadab sinu asukohta edasi ka siis, kui see töötab taustal.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Kestusega 30 minutit</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Kestusega 1 tund</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Kestusega 2 tundi</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Kestusega 6 tundi</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Kestusega 24 tundi</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Lõpeta asukoha jagamine</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Sinu asukohta otsitakse endiselt. Kas asukoht on seadetes sisse lülitatud?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Kõik asukohad</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Kaart</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1282,6 +1366,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>No calls yet</source>
         <translation>Kõnesid veel pole</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Kaart</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1314,6 +1403,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edited</source>
         <translation>Muudetud</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Asukoht</translation>
     </message>
 </context>
 <context>
@@ -1462,6 +1556,19 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nime näevad kõik kanalis</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Asukohti veel pole</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Siin on viimase 24 tunni jooksul jagatud asukohad.</translation>
     </message>
 </context>
 <context>
@@ -2246,6 +2353,15 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Runs small apps inside chats.</source>
         <translation>Käitab vestlustes väikeseid rakendusi.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Luba asukoha jagamine (katseline)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Jagab sinu asukohta vestlustes ja näitab jagatud asukohti kaardil.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2258,6 +2374,34 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Saada sõnumina</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sa jagad oma asukohta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minut jäänud</numerusform>
+            <numerusform>%n minutit jäänud</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n tund jäänud</numerusform>
+            <numerusform>%n tundi jäänud</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Sinu asukohta ei saadeta. Kas asukoht on seadetes sisse lülitatud?</translation>
     </message>
 </context>
 <context>

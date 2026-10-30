@@ -299,7 +299,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
 
-        // Settings page: one row under Advanced, then webxdc and calls switches; nothing after.
+        // Settings page: one row under Advanced, then webxdc and location switches; nothing after.
         record!(
             "under-advanced",
             call!("underHeading", QString::from("Advanced"))
@@ -311,6 +311,10 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!(
             "after-webxdc",
             call!("after", QString::from("webxdcSwitch"))
+        );
+        record!(
+            "after-location",
+            call!("after", QString::from("locationSwitch"))
         );
         record!(
             "old-heading",
@@ -625,9 +629,14 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "webxdcSwitch",
         "the webxdc switch is not under Advanced with them. {context}"
     );
-    // Calls had a switch here while experimental (#119).
     assert_eq!(
         value("after-webxdc"),
+        "locationSwitch",
+        "the location switch is not under Advanced with them. {context}"
+    );
+    // Calls had a switch here while experimental (#119).
+    assert_eq!(
+        value("after-location"),
         "nothing",
         "something follows Advanced. {context}"
     );

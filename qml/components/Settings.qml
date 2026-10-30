@@ -33,6 +33,8 @@ QtObject {
     property alias lastAccountId: lastAccountValue.value
     /// Webxdc apps offered (tray, store, running). Off until asked.
     property alias webxdcEnabled: webxdcEnabledValue.value
+    /// Location offered (tray, maps). Off until asked, as reference clients.
+    property alias locationStreamingEnabled: locationStreamingEnabledValue.value
     /// Contact calls ring here. Core's `who_can_call_me`, all profiles. On for all
     /// since #119; old key /apps/harbour-piirit/calls_enabled unread.
     property alias callsRing: callsRingValue.value
@@ -127,6 +129,13 @@ QtObject {
         key: "/apps/harbour-piirit/webxdc_enabled"
         // Off until asked: others' code, however sandboxed, not for unasked readers;
         // our half still new, finding bugs.
+        defaultValue: false
+    }
+
+    property ConfigurationValue locationStreamingEnabledConfig: ConfigurationValue {
+        id: locationStreamingEnabledValue
+        key: "/apps/harbour-piirit/location_streaming_enabled"
+        // Experimental in Delta Chat Android and Desktop too.
         defaultValue: false
     }
 

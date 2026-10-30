@@ -205,6 +205,10 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appKey", QString::from("webxdcEnabledConfig"))
         );
         record!(
+            "app-location-key",
+            call!("appKey", QString::from("locationStreamingEnabledConfig"))
+        );
+        record!(
             "app-notifications-key",
             call!("appKey", QString::from("notificationsEnabledConfig"))
         );
@@ -384,6 +388,36 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("webxdcEnabled"))
         );
         record!("apps-switch-off", get!("webxdcSwitch", "checked"));
+        // Location streaming: experimental as in Delta Chat, off until asked, same way.
+        record!(
+            "location-default",
+            call!("appReads", QString::from("locationStreamingEnabled"))
+        );
+        record!("location-switch", get!("locationSwitch", "checked"));
+        record!(
+            "flip-location",
+            call!("click", QString::from("locationSwitch"))
+        );
+        record!("location-asked", call!("pushed"));
+        record!(
+            "location-on-tap",
+            call!("appReads", QString::from("locationStreamingEnabled"))
+        );
+        record!("accept-location", call!("acceptDialog"));
+        record!(
+            "location-on",
+            call!("appReads", QString::from("locationStreamingEnabled"))
+        );
+        record!("location-switch-on", get!("locationSwitch", "checked"));
+        record!(
+            "flip-location-back",
+            call!("click", QString::from("locationSwitch"))
+        );
+        record!("location-off-asked", call!("pushed"));
+        record!(
+            "location-off",
+            call!("appReads", QString::from("locationStreamingEnabled"))
+        );
         // Calls not experimental (#119): no switch, nothing asked; ringing is own setting, usable
         // on a never-asked phone.
         record!("calls-switch", get!("callsSwitch", "visible"));
@@ -543,6 +577,24 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("apps-off-asked", ""),
         ("apps-off", "false"),
         ("apps-switch-off", "false"),
+        (
+            "app-location-key",
+            "/apps/harbour-piirit/location_streaming_enabled",
+        ),
+        ("location-default", "false"),
+        ("location-switch", "false"),
+        ("flip-location", "ok"),
+        (
+            "location-asked",
+            "ExperimentalFeatureDialog.qml:title=Enable location streaming (experimental)",
+        ),
+        ("location-on-tap", "false"),
+        ("accept-location", "ok"),
+        ("location-on", "true"),
+        ("location-switch-on", "true"),
+        ("flip-location-back", "ok"),
+        ("location-off-asked", ""),
+        ("location-off", "false"),
         ("calls-switch", "missing:callsSwitch"),
         ("calls-ring-usable", "true"),
         ("calls-ring-default", "true"),

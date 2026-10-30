@@ -1,5 +1,5 @@
-//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive, QR,
-//! new (chat, group, channel). Row menu: mark read or unread, never both. Hiding profiles with one
+//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive,
+//! every chat's map, QR, new (chat, group, channel). Row menu: mark read or unread, never both. Hiding profiles with one
 //! profile would remove the only route to making one; archive search field over empty archive is
 //! dead. It comes back the moment something is typed, or clearing it would be impossible.
 
@@ -13,6 +13,7 @@ mod common;
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import 'file://__COMPONENTS__'
     Item {
         // Silica `pageStack`, recorded not performed: page resolves bare name through this root.
         property QtObject pageStack: QtObject {
@@ -52,6 +53,7 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        function setLocations(on) { Settings.locationStreamingEnabled = on; return 'ok' }
         function get(name, property) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -104,7 +106,14 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.load_data(QByteArray::from(PROBE_QML));
+    // Components dir imported so probe can write settings.
+    let components =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    engine.load_data(QByteArray::from(
+        PROBE_QML
+            .replace("__COMPONENTS__", &components.display().to_string())
+            .as_str(),
+    ));
 
     core_box
         .pinned()
@@ -158,24 +167,39 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         record!("new-tapped", call!("click", QString::from("newMenuItem")));
         record!("new-opens", call!("navigation"));
         record!("qr", get!("qrMenuItem", "visible"));
+        // Location streaming off (experimental, as in Delta Chat): no map.
+        record!("map-off", get!("mapMenuItem", "visible"));
+        record!("locations-on", call!("setLocations", true));
+        record!("map", get!("mapMenuItem", "visible"));
+        record!("map-tapped", call!("click", QString::from("mapMenuItem")));
         record!("laid-out", call!("layout", QString::from("chatList")));
         // Seeded chats all read: first row offers mark unread.
         record!("mark-unread", get!("markUnreadItem", "visible"));
         record!("mark-read", get!("markReadItem", "visible"));
         record!("ordinary-search", get!("chatSearchPill", "visible"));
-        record!(
-            "archived",
-            call!(
-                "load",
-                QString::from(common::page_url("ChatListPage.qml")),
-                1,
-                true
-            )
-        );
+    });
+
+    // Map: core readies app, page follows.
+    plan.until(1, 10, move |last| unsafe {
+        let done = call!("navigation").contains("WebxdcPage");
+        if done || last {
+            record!("map-opens", call!("navigation"));
+            record!(
+                "archived",
+                call!(
+                    "load",
+                    QString::from(common::page_url("ChatListPage.qml")),
+                    1,
+                    true
+                )
+            );
+        }
+        done
     });
 
     plan.after(3, move || unsafe {
         record!("archived-count", get!("chats", "count"));
+        record!("archived-map", get!("mapMenuItem", "visible"));
         record!(
             "archived-laid-out",
             call!("layout", QString::from("chatList"))
@@ -218,13 +242,19 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     );
     // Settings belonging to no profile: own page, reached from here (a profile's are on its row on
     // profiles page). New chat, group, channel and adding contact start here too.
-    for label in ["settings", "new", "qr"] {
+    for label in ["settings", "new", "qr", "map"] {
         assert_eq!(
             value(label),
             "true",
             "the pulley does not offer {label}. {context}"
         );
     }
+    assert_eq!(
+        value("map-off"),
+        "false",
+        "the pulley offers the map while location streaming is off. {context}"
+    );
+    assert_eq!(value("locations-on"), "ok", "{context}");
     assert_eq!(
         value("new-tapped"),
         "ok",
@@ -235,6 +265,17 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         r#"push:NewDialog.qml {"accountId":1,"landOn":"page"}|"#,
         "New does not open the dialog that picks chat, group or channel, on this \
          profile, handed this page to open the chat over. {context}"
+    );
+    assert!(
+        value("map-opens").ends_with(
+            r#"push:WebxdcPage.qml {"accountId":1,"messageId":101,"query":"?bounds=60.1,24.9,60.2,25","heading":"All locations","subheading":""}|"#
+        ),
+        "All locations does not open every chat's map on this profile. {context}"
+    );
+    assert_eq!(
+        value("archived-map"),
+        "false",
+        "the archive's pulley offers a map. {context}"
     );
     assert_eq!(
         value("mark-unread"),

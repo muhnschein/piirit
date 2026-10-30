@@ -390,6 +390,14 @@ Page {
         onRemove: chats.delete_chat(id)
     }
 
+    // Every chat's map (pulley).
+    MapOpener {
+        id: map
+        objectName: "map"
+        account_id: page.accountId
+        onError: page.errorMessage = message
+    }
+
     property string errorMessage: ""
     // Core going away handled: no "restart Piirit" banner.
     readonly property string coreStatusMessage:
@@ -499,6 +507,15 @@ Page {
                     accountId: page.accountId,
                     archived: true
                 })
+            }
+            MenuItem {
+                // Every chat's shared locations, as reference clients' "All locations".
+                objectName: "mapMenuItem"
+                // `=== true`: dconf gives undefined before read.
+                visible: !page.archived && Settings.locationStreamingEnabled === true
+                //: Pull-down item. Opens the map of every chat's shared locations.
+                text: qsTr("All locations")
+                onClicked: map.show(0, 0, 0)
             }
             MenuItem {
                 // Both directions: show own code, scan theirs (address alone can't encrypt).

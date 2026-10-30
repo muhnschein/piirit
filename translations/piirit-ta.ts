@@ -698,6 +698,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>புதிய</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>அனைத்து இருப்பிடங்களும்</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1232,6 +1237,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>பகிர்</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>தற்போதைய இடத்தை அனுப்பு</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>உங்கள் இடம் %n மீட்டர் வரை துல்லியமானது.</numerusform>
+            <numerusform>உங்கள் இடம் %n மீட்டர்கள் வரை துல்லியமானது.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>இடத்தை அனுப்ப, அமைப்புகளில் இடத்தை இயக்கவும்.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>உங்கள் இடம் தேடப்படுகிறது…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>நேரடி இடத்தைப் பகிர்</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit பின்னணியில் இயங்கும்போதும் உங்கள் இடத்தை அனுப்பிக்கொண்டே இருக்கும்.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 நிமிடங்களுக்கு</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>இடம் பகிர்வதை நிறுத்து</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>இன்னும் உங்கள் இடம் தேடப்படுகிறது. அமைப்புகளில் இடம் இயக்கப்பட்டுள்ளதா?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>அனைத்து இருப்பிடங்களும்</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>வரைபடம்</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1278,6 +1362,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>இதுவரை அழைப்புகள் இல்லை</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>வரைபடம்</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1310,6 +1399,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>திருத்தப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>இடம்</translation>
     </message>
 </context>
 <context>
@@ -1458,6 +1552,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>சேனலில் உள்ள அனைவரும் பெயரைப் பார்க்கிறார்கள்</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>இதுவரை இடங்கள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>கடந்த 24 மணிநேரத்தில் பகிரப்பட்ட இடங்கள் இங்கே காட்டப்படும்.</translation>
     </message>
 </context>
 <context>
@@ -2242,6 +2349,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>இருப்பிடப் பகிர்வை இயக்கு (சோதனை முறை)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>அரட்டைகளில் உங்கள் இருப்பிடத்தைப் பகிர்ந்து, பகிரப்பட்ட இருப்பிடங்களை வரைபடத்தில் காட்டுகிறது.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2254,6 +2370,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>செய்தியாக அனுப்பு</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>நீங்கள் உங்கள் இடத்தைப் பகிர்கிறீர்கள்</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n நிமிடம் உள்ளது</numerusform>
+            <numerusform>%n நிமிடங்கள் உள்ளன</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n மணிநேரம் உள்ளது</numerusform>
+            <numerusform>%n மணிநேரம் உள்ளன</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>உங்கள் இடம் அனுப்பப்படவில்லை. அமைப்புகளில் இடம் இயக்கப்பட்டுள்ளதா?</translation>
     </message>
 </context>
 <context>
