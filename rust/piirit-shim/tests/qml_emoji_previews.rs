@@ -397,7 +397,10 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     };
     assert_eq!(
         value("row-emoji"),
-        format!("styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt;&nbsp;{}", grey("1f44d")),
+        format!(
+            "styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt;&nbsp;{}",
+            grey("1f44d")
+        ),
         "a chat-list preview's emoji is not a grey picture, or its text became markup. \
          {context}"
     );
@@ -488,7 +491,8 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     // Message: Qt's one space either side, less overhang. Grey: a space more.
     let space: f64 = value("space").parse().unwrap_or(0.0);
     let (roomy, tight) = (gaps_in(&roomy_shot), gaps_in(&tight_shot));
-    let spaced = format!("space {space} px, grey gaps {roomy:?}, message gaps {tight:?}. {context}");
+    let spaced =
+        format!("space {space} px, grey gaps {roomy:?}, message gaps {tight:?}. {context}");
     assert!(
         space > 4.0 && roomy.len() == 2 && tight.len() == 2,
         "the gap probe did not draw `l`, picture, `l`, so this proves nothing: {spaced}"
