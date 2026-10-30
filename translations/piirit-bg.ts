@@ -726,6 +726,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Известия</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Заглушено</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Включено</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1336,6 +1352,47 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Избиране на текст</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>Заглушаване</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>За 1 час</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>За 8 часа</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>За 1 ден</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>За 7 дни</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Завинаги</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Пак ще получавате известие, когато някой в тази група отговори на ваше съобщение.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Включване на известията</translation>
     </message>
 </context>
 <context>

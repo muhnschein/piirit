@@ -2266,7 +2266,7 @@ async fn basic_chat_info(
 }
 
 /// Basic info is a group, mailing list or broadcast.
-fn is_group_info(info: &serde_json::Value) -> bool {
+pub(crate) fn is_group_info(info: &serde_json::Value) -> bool {
     !matches!(json::str_at(info, "chatType"), "Single" | "")
 }
 

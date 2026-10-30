@@ -728,6 +728,22 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Bildirimler</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Sessize alındı</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Açık</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1335,6 +1351,47 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Metni seç</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>Sessize al</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 günlüğüne</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 günlüğüne</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Süresiz</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Bu gruptaki biri mesajlarınızdan birine yanıt verdiğinde yine de bildirim alırsınız.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Sesi aç</translation>
     </message>
 </context>
 <context>

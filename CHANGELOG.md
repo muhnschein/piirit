@@ -18,6 +18,7 @@ docs/BUILDING.md, "Cutting a release").
 - A message of nothing but emoji, up to five of them, shows them big.
 - Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
+- **Mute a chat for a while.** Mute in a chat's long-press menu in the chat list now asks for how long: 1 hour, 8 hours, 1 day, 7 days or forever, as in the other Delta Chat apps; Unmute there works at once. A contact's or group's page has a Notifications row that says On or Muted and offers the same choices, plus Unmute. In a group, a note says that replies to you still notify while Mentions is on in the notification settings.
 - A setting changed twice in quick succession keeps the second choice; the first one could win before.
 - Emoji in names show as pictures, as they do in messages, with their colours muted: in the chat list, the chat header, contact and group pages, search results, contact lists and calls. In message previews and the reply bar they are grey like the text, so lists stay calm.
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.

@@ -724,6 +724,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Thông báo</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Đã tắt tiếng</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Bật</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1331,6 +1347,47 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Chọn văn bản</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>Tắt thông báo</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>Trong 1 giờ</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>Trong 8 giờ</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>Trong 1 ngày</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>Trong 7 ngày</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Vĩnh viễn</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Bạn vẫn nhận được thông báo khi có người trong nhóm này trả lời một tin nhắn của bạn.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Bật thông báo</translation>
     </message>
 </context>
 <context>

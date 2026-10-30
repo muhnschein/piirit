@@ -726,6 +726,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>அறிவிப்புகள்</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>ஒலியடக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>இயக்கத்தில்</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1336,6 +1352,47 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>உரையைத் தேர்ந்தெடு</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>ஒலியடக்கு</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 மணி நேரத்திற்கு</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 மணி நேரத்திற்கு</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 நாளுக்கு</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 நாட்களுக்கு</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>எப்போதும்</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>இந்தக் குழுவில் யாராவது உங்கள் செய்தி ஒன்றுக்குப் பதிலளித்தால் உங்களுக்கு இன்னும் அறிவிப்பு வரும்.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>ஒலியை இயக்கு</translation>
     </message>
 </context>
 <context>

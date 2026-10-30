@@ -730,6 +730,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>सूचनाएँ</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>म्यूट</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>चालू</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1340,6 +1356,47 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>टेक्स्ट चुनें</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>म्यूट करें</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>1 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>8 घंटे के लिए</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>1 दिन के लिए</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>7 दिन के लिए</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>हमेशा के लिए</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>इस समूह में कोई आपके किसी संदेश का जवाब देगा तो आपको फिर भी सूचना मिलेगी।</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>अनम्यूट करें</translation>
     </message>
 </context>
 <context>

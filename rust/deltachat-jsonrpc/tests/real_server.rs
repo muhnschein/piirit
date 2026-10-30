@@ -1574,6 +1574,7 @@ async fn offline_round_trip_against_real_core() {
         "summaryStatus",
         "isPinned",
         "isMuted",
+        "chatType",
         "isContactRequest",
         "isSelfTalk",
         "isDeviceTalk",
@@ -1708,14 +1709,25 @@ async fn offline_round_trip_against_real_core() {
             .await
             .unwrap_or_else(|err| panic!("set_chat_visibility {visibility}: {err}"));
     }
-    for kind in ["Forever", "NotMuted"] {
+    // Timed: seconds from now; `isMuted` true until then (`ChatInfo` reads it).
+    for (duration, muted) in [
+        (serde_json::json!({"kind": "Forever"}), true),
+        (serde_json::json!({"kind": "Until", "duration": 3600}), true),
+        (serde_json::json!({"kind": "NotMuted"}), false),
+    ] {
         client
-            .call::<_, ()>(
-                "set_chat_mute_duration",
-                (sender_id, group, serde_json::json!({"kind": kind})),
-            )
+            .call::<_, ()>("set_chat_mute_duration", (sender_id, group, &duration))
             .await
-            .unwrap_or_else(|err| panic!("set_chat_mute_duration {kind}: {err}"));
+            .unwrap_or_else(|err| panic!("set_chat_mute_duration {duration}: {err}"));
+        let chat: Value = client
+            .call("get_full_chat_by_id", (sender_id, group))
+            .await
+            .expect("get_full_chat_by_id after mute");
+        assert_eq!(
+            chat.get("isMuted").and_then(Value::as_bool),
+            Some(muted),
+            "after {duration} the chat does not say it is muted ({muted}): {chat:?}"
+        );
     }
     client
         .call::<_, ()>("delete_chat", (sender_id, group))

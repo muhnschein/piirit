@@ -730,6 +730,22 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Notifications</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>En sourdine</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Activé</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1340,6 +1356,47 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Sélectionner le texte</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>Mettre en sourdine</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>Pendant 1 heure</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>Pendant 8 heures</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>Pendant 1 jour</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>Pendant 7 jours</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Pour toujours</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Vous recevrez quand même une notification si quelqu&apos;un dans ce groupe répond à l&apos;un de vos messages.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Réactiver les notifications</translation>
     </message>
 </context>
 <context>

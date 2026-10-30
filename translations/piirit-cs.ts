@@ -732,6 +732,22 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Oznámení</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
+        <translation>Ztlumeno</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Zapnuto</translation>
+    </message>
+</context>
+<context>
     <name>ChatPickerPage</name>
     <message>
         <source>Forward to</source>
@@ -1345,6 +1361,47 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Vybrat text</translation>
+    </message>
+</context>
+<context>
+    <name>MuteDialog</name>
+    <message>
+        <source>Mute</source>
+        <translation>Ztlumit</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
+        <translation>Na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>For 8 hours</source>
+        <translation>Na 8 hodin</translation>
+    </message>
+    <message>
+        <source>For 1 day</source>
+        <translation>Na 1 den</translation>
+    </message>
+    <message>
+        <source>For 7 days</source>
+        <translation>Na 7 dní</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Navždy</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Upozornění dostanete i nadále, když někdo v této skupině odpoví na některou z vašich zpráv.</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>Zrušit ztlumení</translation>
     </message>
 </context>
 <context>

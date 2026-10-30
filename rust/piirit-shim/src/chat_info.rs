@@ -8,6 +8,7 @@ use std::cell::RefCell;
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
+use crate::chatlist::mute_duration;
 use crate::contacts::contact_row;
 use crate::core::{connection, reconcile_rows};
 use crate::json;
@@ -25,6 +26,7 @@ struct Loaded {
     can_send: bool,
     can_call: bool,
     ephemeral_timer: u32,
+    is_muted: bool,
     description: String,
     can_edit_description: bool,
     is_channel: bool,
@@ -85,6 +87,8 @@ pub struct ChatInfo {
     pub is_own_channel: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds until messages disappear; 0 = never. Core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
+    /// Muted now. Core's `isMuted`; no end time given, none shown.
+    pub is_muted: qt_property!(bool; NOTIFY loaded_changed),
     /// True after any load, good or bad. Re-emitted per reload (all fields change with it).
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted per load.
@@ -130,6 +134,8 @@ pub struct ChatInfo {
     pub rename_contact: qt_method!(fn(&mut self, contact_id: u32, name: QString)),
     /// Messages disappear after `seconds`, 0 = never; core tells every member. `saved`.
     pub set_ephemeral_timer: qt_method!(fn(&mut self, seconds: u32)),
+    /// Mute `seconds`; -1 forever, 0 unmute. `saved`.
+    pub set_mute_duration: qt_method!(fn(&mut self, seconds: i32)),
 
     /// Stale-load guard. See `ContactList`.
     generation: u64,
@@ -199,6 +205,7 @@ impl ChatInfo {
                         this_mut.can_send = found.can_send;
                         this_mut.can_call = found.can_call;
                         this_mut.ephemeral_timer = found.ephemeral_timer;
+                        this_mut.is_muted = found.is_muted;
                         this_mut.description = found.description.into();
                         this_mut.can_edit_description = found.can_edit_description;
                         this_mut.is_channel = found.is_channel;
@@ -235,7 +242,7 @@ impl ChatInfo {
         match kind.as_str() {
             // Contact's name/picture; core omits whose.
             "ContactsChanged" | "EventChannelOverflow" => self.reload(),
-            // Rename, picture, join/leave (any device), timer (any member).
+            // Rename, picture, join/leave (any device), timer (any member), mute.
             "ChatModified" | "ChatEphemeralTimerModified" => {
                 let payload: serde_json::Value =
                     serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
@@ -425,6 +432,27 @@ impl ChatInfo {
         });
     }
 
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub fn set_mute_duration(&mut self, seconds: i32) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.stored_callback(Outcome::Saved);
+
+        runtime.spawn(async move {
+            let result = rpc
+                .call::<_, ()>(
+                    "set_chat_mute_duration",
+                    (account_id, chat_id, mute_duration(seconds)),
+                )
+                .await
+                .map_err(|err| err.to_string());
+            done(result);
+        });
+    }
+
     /// Local name, or clear.
     pub fn rename_contact(&mut self, contact_id: u32, name: QString) {
         let name = name.to_string().trim().to_string();
@@ -550,6 +578,7 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         can_send,
         can_call: crate::chat::takes_calls(&chat, is_group, can_send),
         ephemeral_timer: json::u32_at(&chat, "ephemeralTimer"),
+        is_muted: json::flag(&chat, "isMuted"),
         description,
         can_edit_description: matches!(chat_type, "Group" | "OutBroadcast") && self_in_group,
         is_channel: matches!(chat_type, "OutBroadcast" | "InBroadcast"),

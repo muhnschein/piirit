@@ -10,7 +10,7 @@ use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 use serde_json::json;
 
-use crate::chat::chat_is_group;
+use crate::chat::{chat_is_group, is_group_info};
 use crate::core::connection;
 use crate::json;
 use crate::models::{ChatListItem, ChatListModel};
@@ -110,8 +110,8 @@ pub struct ChatList {
     pub mark_unread: qt_method!(fn(&mut self, chat_id: u32)),
     /// Pin, or back to time order.
     pub set_pinned: qt_method!(fn(&mut self, chat_id: u32, pinned: bool)),
-    /// Mute or unmute.
-    pub set_muted: qt_method!(fn(&mut self, chat_id: u32, muted: bool)),
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub set_mute_duration: qt_method!(fn(&mut self, chat_id: u32, seconds: i32)),
     /// Move chat out of list.
     pub archive: qt_method!(fn(&mut self, chat_id: u32)),
     /// Accept contact request. QML calls.
@@ -413,10 +413,13 @@ impl ChatList {
         self.act(chat_id, "set_chat_visibility", json!([visibility]));
     }
 
-    /// Mute or unmute.
-    pub fn set_muted(&mut self, chat_id: u32, muted: bool) {
-        let kind = if muted { "Forever" } else { "NotMuted" };
-        self.act(chat_id, "set_chat_mute_duration", json!([{"kind": kind}]));
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub fn set_mute_duration(&mut self, chat_id: u32, seconds: i32) {
+        self.act(
+            chat_id,
+            "set_chat_mute_duration",
+            json!([mute_duration(seconds)]),
+        );
     }
 
     /// Move chat out of list.
@@ -642,6 +645,15 @@ impl ChatList {
     }
 }
 
+/// Core's tagged `MuteDuration`: negative forever, 0 unmuted, else seconds from now.
+pub(crate) fn mute_duration(seconds: i32) -> serde_json::Value {
+    match seconds {
+        0 => json!({"kind": "NotMuted"}),
+        forever if forever < 0 => json!({"kind": "Forever"}),
+        _ => json!({"kind": "Until", "duration": seconds}),
+    }
+}
+
 /// Arrival quotes account's own message in group (`deltachat-android` mention). Text-only
 /// quote could be anyone's: not counted.
 async fn is_mention(rpc: &RpcClient, account_id: u32, chat_id: u32, message_id: u32) -> bool {
@@ -857,6 +869,7 @@ pub(crate) async fn chat_items(
                     is_encrypted: json::flag(&item, "isEncrypted"),
                     is_pinned: json::flag(&item, "isPinned"),
                     is_muted: json::flag(&item, "isMuted"),
+                    is_group: is_group_info(&item),
                     is_contact_request: json::flag(&item, "isContactRequest"),
                     is_self_talk: json::flag(&item, "isSelfTalk"),
                     is_device_talk: json::flag(&item, "isDeviceTalk"),
@@ -866,4 +879,21 @@ pub(crate) async fn chat_items(
             )
         })
         .collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mute_seconds_become_the_cores_tagged_duration() {
+        assert_eq!(mute_duration(0), json!({"kind": "NotMuted"}));
+        assert_eq!(mute_duration(-1), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(i32::MIN), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(1), json!({"kind": "Until", "duration": 1}));
+        assert_eq!(
+            mute_duration(604_800),
+            json!({"kind": "Until", "duration": 604_800})
+        );
+    }
 }
