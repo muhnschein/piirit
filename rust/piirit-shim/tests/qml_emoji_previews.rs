@@ -4,7 +4,8 @@
 //! `StyledText` with tinted pictures, without stays plain; reply bar cut, not elided, with
 //! pictures (elided last line misplaces them, `qml_emoji_cut.rs`). Pixels prove the grey: row's
 //! picture, drawn through `StyledText` and provider, has no colour; same picture as message
-//! draws it has.
+//! draws it has. Grey picture gets more room from text beside it than message's: Qt's one space
+//! too little at subtitle size (measured on phone).
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -20,14 +21,14 @@ fn probe_qml() -> String {
     let qml = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     format!(
         r"
-    import QtQuick 2.0
+    import QtQuick 2.4
     import QtQuick.Window 2.0
     import 'file://{qml}/js/Emoji.js' as Emoji
     Item {{
         Window {{
             visible: true
             width: 540
-            height: 600
+            height: 700
             color: 'black'
             Loader {{ id: row }}
             Loader {{ id: result; y: 150 }}
@@ -39,6 +40,15 @@ fn probe_qml() -> String {
                 color: 'black'
                 textFormat: Text.StyledText
             }}
+            // Same text, grey (preview's) and as message: gaps beside picture.
+            Text {{ id: roomy; y: 520; color: 'white'; font.pixelSize: 40; textFormat: Text.StyledText }}
+            Text {{ id: tight; y: 600; color: 'white'; font.pixelSize: 40; textFormat: Text.StyledText }}
+            FontMetrics {{ id: metrics; font: roomy.font }}
+        }}
+        function pair(text) {{
+            roomy.text = Emoji.inText(text, false, 40, '#a0a0a0')
+            tight.text = Emoji.inText(text, false, 40)
+            return '' + metrics.advanceWidth(' ')
         }}
         function load(which, url, json) {{
             var loader = which === 'row' ? row : which === 'result' ? result : reply
@@ -79,7 +89,8 @@ fn probe_qml() -> String {
         property string saved: ''
         function savedShots() {{ return saved }}
         function shoot(name, path) {{
-            var item = name === 'messageLabel' ? message : findIn(row.item, name)
+            var item = name === 'messageLabel' ? message : name === 'roomy' ? roomy
+                : name === 'tight' ? tight : findIn(row.item, name)
             var ok = item.grabToImage(function (shot) {{
                 if (shot.saveToFile(path)) {{ saved += name + ';' }}
             }})
@@ -89,6 +100,34 @@ fn probe_qml() -> String {
 ",
         qml = qml.display()
     )
+}
+
+/// Widths of unlit column runs between lit ones, left to right.
+fn gaps_in(file: &str) -> Vec<i32> {
+    let image = QImage::load_from_file(QString::from(file));
+    let size = image.size();
+    let lit: Vec<bool> = (0..size.width)
+        .map(|x| {
+            (0..size.height).any(|y| {
+                let (r, g, b, _) = image.get_pixel_color(x, y).get_rgba();
+                r.max(g).max(b) > 80
+            })
+        })
+        .collect();
+    let mut gaps = Vec::new();
+    let (mut seen, mut dark) = (false, 0);
+    for on in lit {
+        if on {
+            if seen && dark > 0 {
+                gaps.push(dark);
+            }
+            seen = true;
+            dark = 0;
+        } else {
+            dark += 1;
+        }
+    }
+    gaps
 }
 
 /// Stub `Theme.highlightColor`, as Qt writes a colour.
@@ -139,6 +178,8 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     let shot = |name: &str| temp.join(format!("{name}.png")).display().to_string();
     let (row_shot, message_shot) = (shot("previewLabel"), shot("messageLabel"));
     let (row_path, message_path) = (row_shot.clone(), message_shot.clone());
+    let (roomy_shot, tight_shot) = (shot("roomy"), shot("tight"));
+    let (roomy_path, tight_path) = (roomy_shot.clone(), tight_shot.clone());
 
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
@@ -297,22 +338,33 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
             QString::from("preview"),
             QString::from("🔥🔥🔥")
         );
+        record!(
+            "row-only-emoji",
+            call!("label", QString::from("row"), QString::from("previewLabel"))
+        );
         record!("message", call!("asMessage", QString::from("🔥🔥🔥")));
+        // Stems and a full square: three lit runs, two gaps.
+        record!("space", call!("pair", QString::from("l 🟥 l")));
     });
     plan.after(1, move || unsafe {
-        for (name, path) in [("previewLabel", &row_path), ("messageLabel", &message_path)] {
+        for (name, path) in [
+            ("previewLabel", &row_path),
+            ("messageLabel", &message_path),
+            ("roomy", &roomy_path),
+            ("tight", &tight_path),
+        ] {
             record!(
                 format!("{name}-shot"),
                 call!("shoot", QString::from(name), QString::from(path.as_str()))
             );
         }
     });
-    // Each second: both labels grabbed, or patience spent? Then quit.
+    // Each second: all labels grabbed, or patience spent? Then quit.
     plan.until(1, 6, move |last| unsafe {
         let saved = QString::from_qvariant((*engine_ptr).invoke_method("savedShots".into(), &[]))
             .map(|value| value.to_string())
             .unwrap_or_default();
-        if saved.split(';').filter(|name| !name.is_empty()).count() < 2 && !last {
+        if saved.split(';').filter(|name| !name.is_empty()).count() < 4 && !last {
             return false;
         }
         (*engine_ptr).quit();
@@ -345,8 +397,14 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     };
     assert_eq!(
         value("row-emoji"),
-        format!("styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt; {}", grey("1f44d")),
+        format!("styled:A&amp;B: &lt;b&gt;hi&lt;/b&gt;&nbsp;{}", grey("1f44d")),
         "a chat-list preview's emoji is not a grey picture, or its text became markup. \
+         {context}"
+    );
+    assert_eq!(
+        value("row-only-emoji"),
+        format!("styled:{}", grey("1f525").repeat(3)),
+        "room added between pictures or at a preview's ends: only text beside pictures gets it. \
          {context}"
     );
     assert_eq!(
@@ -356,7 +414,7 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     );
     assert_eq!(
         value("result-emoji"),
-        format!("styled:party {} tonight", grey("1f389")),
+        format!("styled:party&nbsp;{}&nbsp;tonight", grey("1f389")),
         "a search hit's emoji is not a grey picture. {context}"
     );
     assert_eq!(
@@ -368,7 +426,7 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     assert_eq!(
         value("result-marked-emoji"),
         format!(
-            "styled:{} {} &lt;{}&gt;",
+            "styled:{}&nbsp;{}&nbsp;&lt;{}&gt;",
             mark("Party"),
             grey("1f389"),
             mark("party")
@@ -382,7 +440,7 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
     );
     assert_eq!(
         value("reply-emoji"),
-        format!("styled:Replying to Ada: on my way {}", grey("1f6b2")),
+        format!("styled:Replying to Ada: on my way&nbsp;{}", grey("1f6b2")),
         "the reply bar's emoji is not a grey picture. {context}"
     );
     assert_eq!(
@@ -426,6 +484,21 @@ fn previews_draw_their_emoji_as_grey_twemoji() {
         row_colour <= 8,
         "the row's emoji keep their colour, not grey as their text. {measured}"
     );
+
+    // Message: Qt's one space either side, less overhang. Grey: a space more.
+    let space: f64 = value("space").parse().unwrap_or(0.0);
+    let (roomy, tight) = (gaps_in(&roomy_shot), gaps_in(&tight_shot));
+    let spaced = format!("space {space} px, grey gaps {roomy:?}, message gaps {tight:?}. {context}");
+    assert!(
+        space > 4.0 && roomy.len() == 2 && tight.len() == 2,
+        "the gap probe did not draw `l`, picture, `l`, so this proves nothing: {spaced}"
+    );
+    for side in 0..2 {
+        assert!(
+            f64::from(roomy[side] - tight[side]) >= 0.75 * space,
+            "a grey picture has no more room from its text than a message's: {spaced}"
+        );
+    }
     let _ = std::fs::remove_dir_all(&temp);
 }
 
