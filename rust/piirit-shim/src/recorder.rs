@@ -77,9 +77,10 @@ pub struct VoiceRecorder {
     base: qt_base_class!(trait QObject),
 
     /// Audio input and encoder present; false: no mic button.
-    pub available: qt_property!(bool; READ is_available),
+    /// `CONST` (else Qt warns per binding): [`Probe`] once per process.
+    pub available: qt_property!(bool; READ is_available CONST),
     /// `mp3`, or empty if nothing recordable.
-    pub extension: qt_property!(QString; READ extension_name),
+    pub extension: qt_property!(QString; READ extension_name CONST),
 
     /// Relay limit bytes (core attachment limit); 0 unknown. `f64`: QML lacks 64-bit int.
     pub limit_bytes: qt_property!(f64; WRITE set_limit_bytes NOTIFY limit_changed),
