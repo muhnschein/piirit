@@ -46,6 +46,8 @@ Page {
     property bool stopping: false
     /// Made and reported; nothing more taken.
     property bool done: false
+    /// Still asked for, not yet written: Qt 5.6 `CameraCapture` has no `capturing`.
+    property bool taking: false
     /// Seconds counted here: recorder's duration reads 0 on device.
     property int seconds: 0
     property string errorMessage: ""
@@ -142,7 +144,10 @@ Page {
 
         imageCapture {
             onImageSaved: page.report(path)
-            onCaptureFailed: page.errorMessage = message
+            onCaptureFailed: {
+                page.taking = false
+                page.errorMessage = message
+            }
         }
 
         videoRecorder {
@@ -254,6 +259,7 @@ Page {
             var path = captures.new_path("photo", "jpg")
             if (path.length > 0) {
                 blink.restart()
+                page.taking = true
                 camera.imageCapture.captureToLocation(path)
             }
         } else if (page.recording) {
@@ -678,7 +684,7 @@ Page {
     BusyIndicator {
         objectName: "writing"
         anchors.centerIn: frame
-        running: page.done || page.stopping || camera.imageCapture.capturing
+        running: page.done || page.stopping || page.taking
         size: BusyIndicatorSize.Large
     }
 

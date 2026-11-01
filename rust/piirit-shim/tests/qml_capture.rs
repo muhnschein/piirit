@@ -86,6 +86,7 @@ const PROBE_QML: &str = r"
         function requestedVideo() { return '' + camera().videoRecorder.outputLocation }
         // The backend's answers.
         function stillWritten() { camera().imageCapture.saved(); return 'ok' }
+        function stillFailed() { camera().imageCapture.failed(); return 'ok' }
         function videoFinished() { camera().videoRecorder.finish(); return 'ok' }
         function ignoreStops() { camera().videoRecorder.stopsOnRequest = false; return 'ok' }
         function recorderState() { return '' + camera().videoRecorder.recorderState }
@@ -175,8 +176,11 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         record!("turn-upside-down", call!("turn", 2));
         // Face down: turn unchanged.
         record!("turn-face-down", call!("turn", 6));
+        probe!("still-idle", "writing", "running");
         record!("shutter", call!("tap", QString::from("shutter")));
         record!("still-asked", call!("requestedStill"));
+        // Spins while still written: Qt 5.6 says so only by signals.
+        probe!("still-busy", "writing", "running");
         // Nothing reported until file on disk.
         record!("still-early", call!("pickedPath"));
         record!("still-written", call!("stillWritten"));
@@ -193,6 +197,11 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
             "reload",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
         );
+        // Failed still: spinner off, shutter takes again.
+        record!("fail-shutter", call!("tap", QString::from("shutter")));
+        record!("still-failed", call!("stillFailed"));
+        probe!("failed-busy", "writing", "running");
+        probe!("failed-shutter", "shutter", "enabled");
         // Mode switched from stacked buttons; camera runs after.
         record!("video-mode", call!("tap", QString::from("modeOption1")));
         record!("running-in-video-mode", call!("running"));
@@ -308,6 +317,16 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
     assert!(
         still.contains("/captures/photo-") && still.rsplit('.').next() == Some("jpg"),
         "the still was not asked for in the captures directory as a photo: {still:?}. {context}"
+    );
+    assert_eq!(
+        [value("still-idle"), value("still-busy")],
+        ["false", "true"],
+        "the busy indicator does not show while the still is written. {context}"
+    );
+    assert_eq!(
+        [value("failed-busy"), value("failed-shutter")],
+        ["false", "true"],
+        "a failed still leaves the busy indicator on or the shutter off. {context}"
     );
     assert_eq!(
         value("still-early"),
