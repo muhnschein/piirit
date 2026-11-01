@@ -1289,6 +1289,8 @@ async fn serve() {
     // `"value"`); next request holding it takes it (here, in order read), waits 1 s, then
     // journaled and done. Later ones overtake it.
     let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Next request holding `PIIRIT_FAKE_FAIL_ONCE` file's text gets error answer; file taken.
+    let fail_once = std::env::var_os("PIIRIT_FAKE_FAIL_ONCE").map(std::path::PathBuf::from);
     // Answers held while `PIIRIT_FAKE_HOLD` file there: requests whose line holds its text
     // (journaled on arrival) wait till test removes it.
     let hold = std::env::var_os("PIIRIT_FAKE_HOLD").map(std::path::PathBuf::from);
@@ -1312,6 +1314,12 @@ async fn serve() {
         if let Some(path) = &slow_once {
             if let Ok(text) = tokio::fs::read_to_string(path).await {
                 slow = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
+            }
+        }
+        let mut failing = false;
+        if let Some(path) = &fail_once {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                failing = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
             }
         }
         let mut held_by = None;
@@ -2895,6 +2903,11 @@ async fn serve() {
                 _ => err(&id, "method not found"),
             };
 
+            let response = if failing {
+                err(&id, "fake failure")
+            } else {
+                response
+            };
             let mut out = stdout.lock().await;
             let _ = out.write_all(response.to_string().as_bytes()).await;
             let _ = out.write_all(b"\n").await;

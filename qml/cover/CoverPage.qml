@@ -44,6 +44,8 @@ CoverBackground {
                 id: chats
                 objectName: "coverChats"
                 account_id: model.is_configured ? model.account_id : 0
+                // Unseen cover reads nothing; app's page list shares the core meanwhile.
+                paused: !cover.gridSeen
                 onRows_changed: cover.gather()
             }
         }
