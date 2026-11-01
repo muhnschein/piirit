@@ -77,7 +77,7 @@ pub struct VoiceRecorder {
     base: qt_base_class!(trait QObject),
 
     /// Audio input and encoder present; false: no mic button.
-    /// `CONST` (else Qt warns per binding): [`Probe`] once per process.
+    /// `CONST` (else Qt warns per binding): platform probed once per process.
     pub available: qt_property!(bool; READ is_available CONST),
     /// `mp3`, or empty if nothing recordable.
     pub extension: qt_property!(QString; READ extension_name CONST),
