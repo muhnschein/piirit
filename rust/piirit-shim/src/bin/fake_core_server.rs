@@ -281,6 +281,17 @@ impl State {
             self.contacts.insert(11, "grace@example.org".to_string());
             // Chat 2 group: self + one contact; test adds other, removes this one.
             self.group_members.insert(2, vec![SELF, 10]);
+            // Big group on request: `PIIRIT_FAKE_CROWD=N` adds N members (ids from 1000).
+            let crowd = std::env::var("PIIRIT_FAKE_CROWD")
+                .ok()
+                .and_then(|value| value.parse::<u32>().ok())
+                .unwrap_or(0);
+            for index in 0..crowd {
+                let contact = 1000 + index;
+                self.contacts
+                    .insert(contact, format!("member{index}@example.org"));
+                self.group_members.entry(2).or_default().push(contact);
+            }
             self.next_chat_id = 500;
             // Received replies, on request: `PIIRIT_FAKE_QUOTES=120:1,119:10` (message:quoted).
             if let Ok(pairs) = std::env::var("PIIRIT_FAKE_QUOTES") {
