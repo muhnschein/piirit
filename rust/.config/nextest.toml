@@ -34,7 +34,7 @@ priority = 100
 speech-engine = { max-threads = 1 }
 
 [[profile.default.overrides]]
-filter = "binary_id(piirit-speech::engine)"
+filter = "binary_id(piirit-speech::engine) | binary_id(piirit-shim::transcripts_engine)"
 test-group = "speech-engine"
 
 [profile.ci]

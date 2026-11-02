@@ -766,7 +766,9 @@ fn message_object(msg: u64) -> Value {
         }
         13 => {
             message["viewType"] = json!("Voice");
-            message["file"] = json!("/tmp/piirit-fake/voice.aac");
+            // Real file for tests that transcribe it.
+            message["file"] = std::env::var("PIIRIT_FAKE_VOICE_FILE")
+                .map_or_else(|_| json!("/tmp/piirit-fake/voice.aac"), |file| json!(file));
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
