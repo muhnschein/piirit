@@ -3,7 +3,7 @@
 //! Not before a chat list exists, nor while a page that must not be jumped away from is up
 //! (backup, restore, code shown or read), anywhere in stack. Tap is read against settings
 //! and handed to chat list with what it needs (camera action: whether that side sends at
-//! once). Unknown kind: goes nowhere.
+//! once). Unknown kind: goes nowhere. Notification tap: window's adaptor hands chat to list.
 
 // Qt harness: see qml_startup.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -42,9 +42,11 @@ const PROBE_QML: &str = r"
         Item {
             id: fakeList
             property string asked: ''
+            property string shown: ''
             function quickAction(kind, accountId, chatId, sendNow) {
                 asked += kind + '|' + accountId + '|' + chatId + '|' + sendNow + ';'
             }
+            function showChat(chatId) { shown += chatId + ';' }
         }
 
         Loader { id: loader }
@@ -66,6 +68,17 @@ const PROBE_QML: &str = r"
                 }
             }
             return 'no-call-center'
+        }
+        // Lipstick's call for a tapped chat notification.
+        function notificationTap(chatId) {
+            var kids = loader.item.data
+            for (var i = 0; i < kids.length; i++) {
+                if (kids[i].objectName === 'notifierTaps') {
+                    kids[i].showChat(chatId)
+                    return fakeList.shown
+                }
+            }
+            return 'no-taps'
         }
         function land(there) {
             loader.item.chatList = there === 'true' ? fakeList : null
@@ -189,12 +202,14 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         // Nothing to land on yet: phone still on way to profile.
         record!("no-list", call!("allowed"));
         record!("no-list-tap", call!("tap", QString::from("left")));
+        record!("no-list-notification", call!("notificationTap", 7));
 
         record!("land", call!("land", QString::from("true")));
         record!("listed", call!("allowed"));
         record!("tap-left", call!("tap", QString::from("left")));
         record!("tap-right", call!("tap", QString::from("right")));
         record!("tap-cover", call!("tapCover", QString::from("left")));
+        record!("notification-tap", call!("notificationTap", 7));
 
         // Room for one: right one not there to tap.
         record!("room-for-one", call!("count", 1));
@@ -268,6 +283,16 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         value("listed"),
         "true",
         "the cover offers no quick actions with a chat list there. {context}"
+    );
+    assert_eq!(
+        value("no-list-notification"),
+        "",
+        "a notification tap with no chat list went somewhere. {context}"
+    );
+    assert_eq!(
+        value("notification-tap"),
+        "7;",
+        "a notification tap is not handed to the window's chat list. {context}"
     );
     assert_eq!(
         value("tap-left"),

@@ -144,6 +144,16 @@ ApplicationWindow {
         }
     }
 
+    /// Chat notification tapped: window's list opens it.
+    NotifierTaps {
+        objectName: "notifierTaps"
+        onChatRequested: {
+            if (appWindow.chatList !== null) {
+                appWindow.chatList.showChat(chatId)
+            }
+        }
+    }
+
     /// Call under way: notifications, quick actions keep its page up.
     readonly property bool callBusy: callCenter.busy
 

@@ -391,7 +391,7 @@ Item {
         preventBlanking: call.state === "ringing" || (center.watching && !center.away)
     }
 
-    // Notification taps. Own path under chat notifications' name (Notifier.qml):
+    // Notification taps. Own path under chat notifications' name (NotifierTaps.qml):
     // neither drops other's calls.
     DBusAdaptor {
         objectName: "callAdaptor"
