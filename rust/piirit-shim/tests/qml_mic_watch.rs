@@ -9,7 +9,10 @@
 
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::time::Duration;
+use std::sync::mpsc::channel;
+use std::time::{Duration, Instant};
+
+use piirit_shim::{MicState, MicWatcher};
 
 use qmetaobject::*;
 
@@ -72,6 +75,40 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     let daemon = Rc::new(daemon);
     let recording: Rc<RefCell<Option<pulse::Recording>>> = Rc::default();
 
+    // Second watcher, off Qt: says when server has seen a stream come or go while Qt thread is
+    // held, so QML's watcher has its report queued by then too.
+    let (tx, proxy_states) = channel();
+    let proxy = MicWatcher::start(std::process::id(), Some(&daemon.server()), move |state| {
+        tx.send(state).ok();
+    })
+    .expect("the second watcher did not start");
+    // Latest state is `want`: older ones in channel drained first.
+    let mut proxy_now = MicState::default();
+    let proxy_saw = move |want: MicState| {
+        let deadline = Instant::now() + Duration::from_secs(30);
+        loop {
+            while let Ok(state) = proxy_states.try_recv() {
+                proxy_now = state;
+            }
+            if proxy_now == want {
+                return "seen".to_string();
+            }
+            let left = deadline.saturating_duration_since(Instant::now());
+            match proxy_states.recv_timeout(left) {
+                Ok(state) => proxy_now = state,
+                Err(_) => return format!("not seen: {want:?}"),
+            }
+        }
+    };
+    let open = MicState {
+        known: true,
+        open: true,
+    };
+    let closed = MicState {
+        known: true,
+        open: false,
+    };
+
     let mut plan = common::Plan::default();
 
     let s = Rc::clone(&steps);
@@ -80,55 +117,83 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
         call!("activate", true);
     });
 
+    // Each step waits for state it expects (last try records what is there): listing takes what
+    // it takes on loaded runner.
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if (call!("state") != "known|closed" || call!("declaredState") != "known|closed") && !last {
+            return false;
+        }
         s.borrow_mut().push(("active", call!("state")));
         s.borrow_mut().push(("declared", call!("declaredState")));
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
+        true
     });
 
     let (s, r) = (Rc::clone(&steps), Rc::clone(&recording));
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("state") != "known|open" && !last {
+            return false;
+        }
         s.borrow_mut().push(("recording", call!("state")));
         if let Some(recording) = r.borrow_mut().take() {
             recording.kill();
         }
+        true
     });
 
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("state") != "known|closed" && !last {
+            return false;
+        }
         s.borrow_mut().push(("stopped", call!("state")));
         s.borrow_mut().push(("forged-open", call!("forge")));
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
+        true
     });
 
     // Stale report from stopped watcher must not count. Stream's end held behind busy
     // Qt thread during restart: taken, says "free" with stream open.
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
-    plan.after(2, move || unsafe {
+    let mut proxy_saw = Some(proxy_saw);
+    plan.until(1, 30, move |last| unsafe {
+        if call!("state") != "known|open" && !last {
+            return false;
+        }
+        let Some(mut proxy_saw) = proxy_saw.take() else {
+            return true;
+        };
         s.borrow_mut().push(("recording-again", call!("state")));
+        s.borrow_mut().push(("proxy-open", proxy_saw(open)));
         if let Some(recording) = r.borrow_mut().take() {
             recording.kill();
         }
-        std::thread::sleep(Duration::from_millis(500));
+        s.borrow_mut().push(("proxy-ended", proxy_saw(closed)));
         call!("activate", false);
         s.borrow_mut().push(("deactivated", call!("state")));
         s.borrow_mut().push(("forged-known", call!("forge")));
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
-        std::thread::sleep(Duration::from_millis(500));
+        s.borrow_mut().push(("proxy-reopened", proxy_saw(open)));
         call!("activate", true);
+        true
     });
 
     let (s, r) = (Rc::clone(&steps), Rc::clone(&recording));
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("state") != "known|open" && !last {
+            return false;
+        }
         s.borrow_mut().push(("reactivated", call!("state")));
         s.borrow_mut().push(("changes", call!("changes")));
         drop(r.borrow_mut().take());
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
     engine.exec();
+    drop(proxy);
 
     let steps = steps.borrow().clone();
     let value = |label: &str| {
@@ -166,6 +231,13 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
         "known|open",
         "the second stream was not seen"
     );
+    for proxy in ["proxy-open", "proxy-ended", "proxy-reopened"] {
+        assert_eq!(
+            value(proxy),
+            "seen",
+            "{proxy}: the server's change was never heard"
+        );
+    }
     assert_eq!(
         value("deactivated"),
         "unknown|closed",

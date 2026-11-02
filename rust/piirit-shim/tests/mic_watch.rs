@@ -38,7 +38,7 @@ const UNKNOWN: MicState = MicState {
 /// Watcher and every state it reported, in order.
 struct Watch {
     name: &'static str,
-    _watcher: MicWatcher,
+    watcher: MicWatcher,
     states: Receiver<MicState>,
     seen: Vec<MicState>,
 }
@@ -53,7 +53,7 @@ impl Watch {
         };
         Self {
             name,
-            _watcher: watcher,
+            watcher,
             states,
             seen: Vec::new(),
         }
@@ -97,6 +97,19 @@ impl Watch {
                 ),
             }
         }
+    }
+
+    /// Wait until `n` connections begun: retries counted, not guessed from clock. False: fewer
+    /// by then (connected, or stuck).
+    fn wait_attempts(&self, n: u32, within: Duration) -> bool {
+        let deadline = Instant::now() + within;
+        while self.watcher.attempts() < n {
+            if Instant::now() >= deadline {
+                return false;
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        true
     }
 
     /// Everything reported since `mark`.
@@ -242,8 +255,11 @@ fn a_server_that_is_not_there_is_not_known() {
     let scratch = pulse::Scratch::new();
     let server = format!("unix:{}", scratch.dir.join("native").display());
     let mut watch = Watch::start("nobody", std::process::id(), Some(&server));
-    // Long enough for two reconnects, a second apart.
-    std::thread::sleep(Duration::from_millis(3500));
+    assert!(
+        watch.wait_attempts(3, RECONNECT),
+        "the watch did not try again: {:?}",
+        watch.seen
+    );
     assert_eq!(
         watch.now(),
         UNKNOWN,
@@ -294,7 +310,10 @@ fn starting_and_stopping_at_any_moment_is_safe() {
     // Waiting to reconnect, nothing to reconnect to.
     daemon.kill();
     let mut watch = Watch::start("waiting", me, Some(&server));
-    std::thread::sleep(Duration::from_millis(1200));
+    assert!(
+        watch.wait_attempts(2, RECONNECT),
+        "the watch did not try again"
+    );
     assert_eq!(watch.now(), UNKNOWN);
     drop(watch);
     drop(recording);
@@ -310,12 +329,12 @@ fn no_daemon_is_ever_started_from_here() {
     // autospawn on.
     if let Some(dir) = std::env::var_os(CHILD) {
         let mut watch = Watch::start("lookup", std::process::id(), None);
-        std::thread::sleep(Duration::from_millis(3500));
+        let retried = watch.wait_attempts(3, RECONNECT);
         let started = Path::new(&dir).join("runtime").join("native").exists();
         assert!(
-            !started && watch.now() == UNKNOWN,
+            !started && retried && watch.now() == UNKNOWN,
             "a server was started for the watch (socket there: {started}; \
-             reported {:?})",
+             tried again: {retried}; reported {:?})",
             watch.seen
         );
         return;
