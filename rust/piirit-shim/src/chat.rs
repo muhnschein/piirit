@@ -27,6 +27,10 @@ const UNSEEN_STATES: [u32; 2] = [10, 13];
 /// (Whisperfish, deltachat-android likewise).
 const PAGE: usize = 50;
 
+/// Messages a chat opens with: over a phone screen. Rest filled as view asks (`hydrate`),
+/// while page slides in. Core builds messages one by one (50: ~140 ms on phone).
+const OPENING: usize = 20;
+
 /// Rows filled past view. Screen ~thirty one-line placeholders; less and fast scroll hits
 /// blanks.
 const MARGIN: usize = 40;
@@ -49,10 +53,10 @@ pub(crate) struct Entry {
 pub(crate) fn opening_page(entries: &[Entry], find: u32) -> &[Entry] {
     let start = match entries.iter().position(|entry| entry.message_id == find) {
         // Half page above: not on top edge.
-        Some(index) => index.saturating_sub(PAGE / 2),
-        None => entries.len().saturating_sub(PAGE),
+        Some(index) => index.saturating_sub(OPENING / 2),
+        None => entries.len().saturating_sub(OPENING),
     };
-    let end = start.saturating_add(PAGE).min(entries.len());
+    let end = start.saturating_add(OPENING).min(entries.len());
     entries.get(start..end).unwrap_or_default()
 }
 
@@ -2713,8 +2717,9 @@ fn file_name_of(path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        file_name_of, fill_order, gif_dimensions, local_path, other_chat, own_reaction,
-        place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff, MARGIN,
+        file_name_of, fill_order, gif_dimensions, local_path, opening_page, other_chat,
+        own_reaction, place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff,
+        MARGIN,
     };
     use crate::models::MessageListModel;
     use serde_json::json;
@@ -3151,5 +3156,46 @@ mod tests {
         assert_eq!(fill_order(count + 20, count + 30, count)[0], count - 1);
         assert_eq!(fill_order(0, 0, 0), Vec::<usize>::new());
         assert_eq!(fill_order(5, 2, count), Vec::<usize>::new());
+    }
+
+    #[test]
+    fn a_chat_opens_with_a_screenful_at_newest_or_around_the_hit() {
+        let chat: Vec<Entry> = (1..=3000)
+            .map(|message_id| Entry {
+                message_id,
+                day_number: 0,
+            })
+            .collect();
+        let ids = |page: &[Entry]| {
+            page.iter()
+                .map(|entry| entry.message_id)
+                .collect::<Vec<_>>()
+        };
+
+        // Newest twenty: over a phone screen, not fifty (core builds each, ~3 ms on phone).
+        assert_eq!(
+            ids(opening_page(&chat, 0)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Not in chat: newest too.
+        assert_eq!(
+            ids(opening_page(&chat, 9999)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Search hit: ten above, hit, nine below.
+        assert_eq!(
+            ids(opening_page(&chat, 1500)),
+            (1490..=1509).collect::<Vec<_>>()
+        );
+        // Near either end: what's there.
+        assert_eq!(ids(opening_page(&chat, 3)), (1..=20).collect::<Vec<_>>());
+        assert_eq!(
+            ids(opening_page(&chat, 2999)),
+            (2989..=3000).collect::<Vec<_>>()
+        );
+        assert_eq!(
+            ids(opening_page(&chat[..5], 0)),
+            (1..=5).collect::<Vec<_>>()
+        );
     }
 }
