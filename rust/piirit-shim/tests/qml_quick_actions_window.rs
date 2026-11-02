@@ -24,14 +24,26 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
 
-        // The stack as far as the window reads it: the page on top, and
-        // the one under each page.
+        // The stack as Silica has it: pages top first, in plain JS (no change
+        // signal); current page apart, mid-pop the one leaving, already off.
         property QtObject pageStack: QtObject {
             property var currentPage: null
             property int depth: 0
-            property var below: ({})
+            readonly property var held: ({ pages: [] })
             function previousPage(page) {
-                return page && page.objectName in below ? below[page.objectName] : null
+                var pages = held.pages
+                var at = pages.indexOf(page)
+                if (at < 0) {
+                    throw new Error('Cannot find previousPage for argument not present in stack')
+                }
+                return at + 1 < pages.length ? pages[at + 1] : null
+            }
+            function find(func) {
+                var pages = held.pages
+                for (var i = 0; i < pages.length; i++) {
+                    if (func(pages[i])) { return pages[i] }
+                }
+                return null
             }
         }
         QtObject { id: backup; objectName: 'backup'; property bool pausesQuickActions: true }
@@ -93,17 +105,17 @@ const PROBE_QML: &str = r"
             cover.quickAction(side)
             return fakeList.asked
         }
-        // What is on the stack, top first, by name.
-        function stack(names) {
-            var pages = { backup: backup, conversation: conversation, chats: chats }
+        // What is on the stack, top first, by name; `leaving` is popped
+        // page still current, as Silica has it mid-pop.
+        function stack(names, leaving) {
+            var byName = { backup: backup, conversation: conversation, chats: chats }
             var list = names.length > 0 ? names.split(',') : []
-            var below = {}
-            for (var i = 0; i + 1 < list.length; i++) {
-                below[list[i]] = pages[list[i + 1]]
-            }
-            pageStack.below = below
-            pageStack.currentPage = list.length > 0 ? pages[list[0]] : null
-            pageStack.depth = list.length
+            var pages = list.map(function (name) { return byName[name] })
+            pageStack.held.pages = pages
+            pageStack.depth = pages.length
+            var current = leaving ? byName[leaving] : (pages.length > 0 ? pages[0] : null)
+            // `var` signals on every write; Silica's only when page changes.
+            if (pageStack.currentPage !== current) { pageStack.currentPage = current }
             return '' + loader.item.quickActionsPaused + '|' + cover.quickActionsAllowed
         }
     }
@@ -218,13 +230,39 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("tap-right-not-now", call!("tap", QString::from("right")));
 
         // Stack decides, wherever the pausing page is.
-        record!("plain", call!("stack", QString::from("conversation,chats")));
-        record!("paused-top", call!("stack", QString::from("backup,chats")));
+        record!(
+            "plain",
+            call!(
+                "stack",
+                QString::from("conversation,chats"),
+                QString::from("")
+            )
+        );
+        record!(
+            "paused-top",
+            call!("stack", QString::from("backup,chats"), QString::from(""))
+        );
         record!(
             "paused-below",
-            call!("stack", QString::from("conversation,backup,chats"))
+            call!(
+                "stack",
+                QString::from("conversation,backup,chats"),
+                QString::from("")
+            )
         );
-        record!("resumed", call!("stack", QString::from("chats")));
+        record!(
+            "resumed",
+            call!("stack", QString::from("chats"), QString::from(""))
+        );
+        // Back swipe off backup: mid-pop, backup still current but off stack.
+        record!(
+            "paused-again",
+            call!("stack", QString::from("backup,chats"), QString::from(""))
+        );
+        record!(
+            "popping",
+            call!("stack", QString::from("chats"), QString::from("backup"))
+        );
 
         // List going takes actions with it.
         record!("unland", call!("land", QString::from("false")));
@@ -333,6 +371,17 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         value("resumed"),
         "false|true",
         "the quick actions do not come back once the page has gone. {context}"
+    );
+    assert_eq!(
+        value("paused-again"),
+        "true|false",
+        "a pausing page on top does not pause the quick actions. {context}"
+    );
+    assert_eq!(
+        value("popping"),
+        "false|true",
+        "mid back swipe, the window looked for the leaving page in the stack \
+         and stuck. {context}"
     );
     assert_eq!(
         value("unlisted"),

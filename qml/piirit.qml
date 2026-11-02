@@ -45,15 +45,11 @@ ApplicationWindow {
     /// Page quick actions must not leave (backup, profile made/moved/joined, code shown/read);
     /// each sets `pausesQuickActions`.
     readonly property bool quickActionsPaused: {
-        // Re-run when stack moves.
-        var depth = pageStack.depth
-        for (var shown = pageStack.currentPage; shown;
-             shown = pageStack.previousPage(shown)) {
-            if (shown.pausesQuickActions === true) {
-                return true
-            }
-        }
-        return false
+        // Re-run when stack moves. Not previousPage(currentPage): mid-pop, current is off
+        // stack and Silica throws.
+        var moved = [pageStack.depth, pageStack.currentPage]
+        return pageStack.find(function (page) { return page.pausesQuickActions === true })
+            !== null
     }
 
     /// Cover quick action: app opens, chat list does rest, like notification.
