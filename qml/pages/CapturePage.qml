@@ -234,7 +234,7 @@ Page {
     /// Shutter: picture, or video start/end. After self-timer; tap while counting
     /// cancels.
     function shutter() {
-        if (page.done) {
+        if (page.done || page.taking) {
             return
         }
         if (selfTimer.running) {
@@ -652,7 +652,7 @@ Page {
             id: shutter
             objectName: "shutter"
             anchors.centerIn: parent
-            enabled: !page.done
+            enabled: !page.done && !page.taking
             icon.source: page.shutterIcon
             onClicked: page.shutter()
 
