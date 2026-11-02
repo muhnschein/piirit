@@ -18,6 +18,7 @@ docs/BUILDING.md, "Cutting a release").
 - The camera shows it is busy while a photo is being saved.
 - A second tap on the shutter while a photo is saved no longer takes another photo.
 - When adding members to a group, people already in it are greyed out even if the group's member list arrives after the picker opened.
+- Tapping a message or missed-call notification opens its chat again after you have opened Archived chats or switched profiles. Before, such taps did nothing until Piirit was restarted.
 - Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
 - Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
