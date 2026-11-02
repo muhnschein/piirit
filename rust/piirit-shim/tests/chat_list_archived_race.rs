@@ -1,7 +1,7 @@
 //! Archived list must not show ordinary chats.
 //!
-//! QML sets `account_id` and `archived` in any order, each starting a fetch; slower answer wins.
-//! Fake answers ordinary listing slowly to make that order certain.
+//! `account_id` and `archived` set in different event-loop turns each start a fetch (same turn:
+//! one); slower answer must not win. Fake answers ordinary listing slowly to make order certain.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -11,16 +11,16 @@ use qmetaobject::*;
 
 mod common;
 
-// `pageStack.push` sets properties from key-sorted map: `accountId` before `archived`.
-// Model fetches account's ordinary list first, then hears archived was wanted.
+// Account first; archived wanted a turn later, once ordinary list was asked for.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
     Item {
         ChatList { id: chats }
+        Timer { id: later; interval: 100; onTriggered: chats.archived = true }
         function open() {
             chats.account_id = 1
-            chats.archived = true
+            later.start()
         }
         // The two listings differ in size -- one archived chat, two
         // ordinary ones -- so the count alone says which answer landed.

@@ -1,7 +1,8 @@
 //! Who is told of an arrival, what they see, and where a tap goes.
 //!
 //! Open chat: no notice. Stale notice trains reader to ignore the next. Detail is
-//! reader's choice (lock screen shows it). Tap returns to its chat.
+//! reader's choice (lock screen shows it). Tap returns to its chat, also after second chat list
+//! (archived, other profile) came and went: its notifier must not take tap name with it.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -12,13 +13,27 @@ mod common;
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import Nemo.DBus 2.0
     Item {
+        id: probe
         property int opened: 0
+        property string notifierUrl: ''
         Loader { id: loader }
-        function load(url) {
+        // Window's tap adaptor first, as app builds it before any chat list.
+        function load(url, tapsUrl) {
+            var taps = Qt.createComponent(tapsUrl).createObject(probe)
+            if (!taps) { return 'taps-failed' }
+            taps.chatRequested.connect(function(chatId) { opened = chatId })
+            notifierUrl = url
             loader.setSource(url, {})
             if (loader.status !== Loader.Ready) { return 'load-failed' }
-            loader.item.openRequested.connect(function(chatId) { opened = chatId })
+            return 'ok'
+        }
+        // Second chat list's notifier: comes, goes (archived list popped).
+        function secondList() {
+            var other = Qt.createComponent(notifierUrl).createObject(probe)
+            if (!other) { return 'second-failed' }
+            other.destroy()
             return 'ok'
         }
         function set(property, value) {
@@ -44,32 +59,21 @@ const PROBE_QML: &str = r"
         function nameOf(chatId) {
             return loader.item.nameOf(chatId)
         }
-        function findIn(node, name) {
-            if (!node) { return null }
-            if (node.objectName === name) { return node }
-            var kids = node.data !== undefined ? node.data : node.children
-            for (var i = 0; kids && i < kids.length; i++) {
-                var hit = findIn(kids[i], name)
-                if (hit) { return hit }
-            }
-            return null
-        }
         // What lipstick does with a tap: calls the method the
-        // notification's remote action names, on the name it names, with
-        // the arguments it carries. The adaptor answering to that name is
-        // the notifier's own.
+        // notification's remote action names, on the name and path it
+        // names, with the arguments it carries. Whatever adaptor holds that
+        // path on the bus answers.
         function tap(chatId) {
+            opened = 0
             var note = loader.item.notes[chatId]
             if (!note || !note.remoteActions || note.remoteActions.length === 0) {
                 return 'no-action'
             }
             var action = note.remoteActions[0]
-            var adaptor = findIn(loader.item, 'notifierAdaptor')
-            if (!adaptor) { return 'no-adaptor' }
-            if (adaptor.service !== action.service || adaptor.iface !== action.iface
-                    || adaptor.path !== action.path) {
-                return 'wrong-name:' + action.service + action.path + action.iface
-            }
+            if (!(action.service in StubBus.names)) { return 'no-name:' + action.service }
+            var adaptor = StubBus.objects[action.path]
+            if (!adaptor) { return 'no-object:' + action.path }
+            if (adaptor.iface !== action.iface) { return 'wrong-iface:' + action.iface }
             if (typeof adaptor[action.method] !== 'function') {
                 return 'no-method:' + action.method
             }
@@ -134,7 +138,11 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
     plan.after(1, move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(common::component_url("Notifier.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("Notifier.qml")),
+                QString::from(common::component_url("NotifierTaps.qml"))
+            )
         );
         call!("set", QString::from("appActive"), true);
         call!("set", QString::from("viewingChatId"), 0);
@@ -180,6 +188,12 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
 
         // Tap returns to chat via name adaptor owns.
         record!("tap", call!("tap", 13));
+        record!("second-list", call!("secondList"));
+    });
+
+    // Second notifier's destroy() deferred: its teardown lands before this step.
+    plan.after(1, move || unsafe {
+        record!("tap-after-second-list", call!("tap", 13));
 
         // Off: pending drop, arrivals silent. On: news again.
         record!("before-off", call!("published"));
@@ -296,6 +310,12 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("tap"),
         "13",
         "a tap on the notification did not come back to its chat. {context}"
+    );
+    assert_eq!(
+        value("tap-after-second-list"),
+        "13",
+        "after a second chat list came and went, a tap on the notification \
+         went nowhere. {context}"
     );
     assert_ne!(
         value("before-off"),

@@ -83,8 +83,15 @@ const PROBE_QML: &str = r"
         // What the line says, and how much room it takes on the row that
         // has it against a row that does not.
         function said() {
-            var label = findIn(loader.item, 'unreadLabel')
-            return label ? label.text : 'missing:unreadLabel'
+            var found = rowsInOrder()
+            for (var i = 0; i < found.length; i++) {
+                var line = findIn(found[i], 'unreadLine')
+                if (line && line.visible) {
+                    var label = findIn(line, 'unreadLabel')
+                    return label ? label.text : 'missing:unreadLabel'
+                }
+            }
+            return 'missing:shown line'
         }
         function heights() {
             var out = []

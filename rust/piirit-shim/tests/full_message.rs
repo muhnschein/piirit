@@ -185,20 +185,12 @@ fn the_rest_of_a_cut_message_comes_back_as_words() {
         "true",
         "the model never finished. {context}"
     );
-    // Markdown setting: rendered for page, no shim trip. Line breaks as `<br>`: only form
-    // `Text.StyledText` reads (see `qml_message_lines.rs`).
-    // No bold: heading came back as plain words, no `#` to render.
+    // Markdown setting: heading came back as plain words, nothing to style. No styled copy:
+    // page lays words out as written (four lines: `page-body` below).
     let styled = value("cut-styled");
-    assert!(
-        styled.contains("Groceries") && !styled.contains("&lt;"),
-        "the whole text was not rendered for the Markdown setting: \
-         {styled:?}. {context}"
-    );
     assert_eq!(
-        styled.matches("<br>").count(),
-        3,
-        "the four lines of the whole text are not four lines: \
-         {styled:?}. {context}"
+        styled, "",
+        "words with nothing to style got a styled copy to parse. {context}"
     );
 
     let short = value("short");

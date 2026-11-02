@@ -264,8 +264,9 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
             "load",
             call!("load", QString::from(common::component_url("ScanView.qml")))
         );
-        // Not on screen yet: camera not running, nothing grabbed.
+        // Not on screen yet: camera not running, not even loaded; nothing grabbed.
         record!("camera-before", get!("camera", "running"));
+        record!("camera-before-state", get!("camera", "cameraState"));
         record!("grabbing-before", get!("grabber", "running"));
         call!("setActive", true);
         record!("camera-active", get!("camera", "running"));
@@ -491,6 +492,11 @@ fn assert_scan(steps: &[(&str, String)]) {
         value("camera-before"),
         "false",
         "the camera runs before the view is on screen. {context}"
+    );
+    assert_eq!(
+        value("camera-before-state"),
+        "0",
+        "the camera is loaded before the view is on screen. {context}"
     );
     assert_eq!(
         value("grabbing-before"),

@@ -73,10 +73,18 @@ const PROBE_QML: &str = r"
             var detail = findIn(row, 'callDetail')
             var body = findIn(row, 'messageLabel')
             var icon = findIn(row, 'callIcon')
-            if (!callRow || !title || !detail || !body || !icon) { return 'missing' }
+            if (!callRow || !body) { return 'missing' }
+            // Call parts made only for a call: none on other rows.
+            if (!title || !detail || !icon) {
+                return title || detail || icon ? 'part missing'
+                     : callRow.visible + '|||' + body.visible + '|none|' + (callRow.height > 0)
+            }
             return callRow.visible + '|' + title.text + '|' + detail.text + '|'
                    + body.visible + '|' + (('' + icon.source).indexOf('video') >= 0 ? 'video' : 'call')
                    + '|' + (callRow.height > 0)
+                   // Bubble asked for room for icon and longer line.
+                   + '|' + (callRow.wantedWidth
+                            >= icon.width + Math.max(title.implicitWidth, detail.implicitWidth))
         }
         function tapRow() {
             var row = findIn(list.item, 'messageRow')
@@ -195,7 +203,7 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     // Source forms: no catalog.
     assert_eq!(
         value("completed"),
-        "true|Audio call|3 minute(s) duration|false|call|true",
+        "true|Audio call|3 minute(s) duration|false|call|true|true",
         "a completed call does not say what it was and how long it lasted, \
          in place of the core's sentence. {context}"
     );
@@ -206,12 +214,12 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     );
     assert_eq!(
         value("short"),
-        "true|Audio call|Less than 1 minute|false|call|true",
+        "true|Audio call|Less than 1 minute|false|call|true|true",
         "{context}"
     );
     assert_eq!(
         value("missed"),
-        "true|Missed call||false|call|true",
+        "true|Missed call||false|call|true|true",
         "{context}"
     );
     assert_eq!(
@@ -221,7 +229,7 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     );
     assert_eq!(
         value("ringing-here"),
-        "true|Audio call|Incoming call|false|call|true",
+        "true|Audio call|Incoming call|false|call|true|true",
         "{context}"
     );
     assert_eq!(
@@ -231,22 +239,22 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     );
     assert_eq!(
         value("ringing-there"),
-        "true|Audio call|Ringing…|false|call|true",
+        "true|Audio call|Ringing…|false|call|true|true",
         "{context}"
     );
     assert_eq!(
         value("declined-video"),
-        "true|Declined call||false|video|true",
+        "true|Declined call||false|video|true|true",
         "{context}"
     );
     assert_eq!(
         value("canceled"),
-        "true|Canceled call||false|call|true",
+        "true|Canceled call||false|call|true|true",
         "{context}"
     );
     assert_eq!(
         value("unknown"),
-        "false|Audio call||true|call|false",
+        "false|||true|none|false",
         "a call the core said nothing about did not fall back to its \
          sentence. {context}"
     );
