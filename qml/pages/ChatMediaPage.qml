@@ -27,6 +27,40 @@ Page {
 
     readonly property bool isGallery: page.kind === "gallery"
 
+    /// App-wide `Transcriber`; null (tests, loaded alone): no transcripts.
+    property QtObject transcriber: typeof appWindow !== "undefined" ? appWindow.transcriber : null
+    /// See AttachmentPreview.
+    property Component transcriptMaker: null
+    /// Audio page with transcription on.
+    readonly property bool transcribes: page.kind === "audio" && page.transcriber !== null
+                                        && page.transcriber.enabled === true
+    /// Chat's voice messages without transcript, as `count_chat` last answered.
+    property int untranscribed: 0
+
+    /// Ask count again; answer by `chat_counted`.
+    function countUntranscribed() {
+        if (page.transcribes) {
+            page.transcriber.count_chat(page.accountId, page.chatId)
+        } else {
+            page.untranscribed = 0
+        }
+    }
+
+    onTranscribesChanged: page.countUntranscribed()
+    Component.onCompleted: page.countUntranscribed()
+
+    Connections {
+        target: page.transcriber
+        // Qt 5.6 handler syntax; see WelcomePage.qml.
+        onChat_counted: {
+            if (account_id === page.accountId && chat_id === page.chatId) {
+                page.untranscribed = count
+            }
+        }
+        // Transcript made or deleted: count moved.
+        onStore_changed: page.countUntranscribed()
+    }
+
     /// Ms before message goes. Tests set low.
     property alias pendingDelay: doomedMessages.delay
 
@@ -40,6 +74,8 @@ Page {
         chat_id: page.chatId
         kind: page.kind
         onError: page.errorMessage = message
+        // Arrival or delete: voice messages counted again.
+        onRows_changed: page.countUntranscribed()
     }
 
     Connections {
@@ -377,6 +413,23 @@ Page {
                 title: Media.kindName(page.kind)
             }
 
+            // Audio, transcription on, something left to do.
+            PullDownMenu {
+                objectName: "transcribePulley"
+                visible: page.transcribes && page.untranscribed > 0
+
+                MenuItem {
+                    objectName: "transcribeChatItem"
+                    //: Pulley on a chat's Audio page. %n is how many voice
+                    //: messages have no transcript yet.
+                    text: qsTr("Transcribe %n voice message(s)", "", page.untranscribed)
+                    onClicked: {
+                        page.transcriber.transcribe_chat(page.accountId, page.chatId)
+                        page.countUntranscribed()
+                    }
+                }
+            }
+
             delegate: ListItem {
                 id: row
                 objectName: "mediaRow" + model.message_id
@@ -427,6 +480,30 @@ Page {
                             //: Goes back to the conversation, at this message.
                             text: qsTr("Show in chat")
                             onClicked: page.showInChat(model.message_id)
+                        }
+                        MenuItem {
+                            objectName: "copyTranscriptItem"
+                            // 3 = `Transcript` done.
+                            visible: preview.transcript !== null
+                                     && preview.transcript.state === 3
+                            //: Copies the text a voice message was turned into.
+                            text: qsTr("Copy transcript")
+                            onClicked: {
+                                Clipboard.text = preview.transcript.text
+                                notice.show(qsTr("Copied to clipboard"))
+                            }
+                        }
+                        MenuItem {
+                            objectName: "transcribeItem"
+                            // As conversation's row menu.
+                            visible: preview.transcript !== null
+                                     && (preview.transcript.state === 0
+                                         || preview.transcript.state === 6
+                                         || (preview.transcript.state === 1
+                                             && !preview.transcript.manual))
+                            //: Turns a voice message into text on the phone.
+                            text: qsTr("Transcribe")
+                            onClicked: preview.transcript.transcribe(false)
                         }
                         MenuItem {
                             objectName: "openItem"
@@ -555,6 +632,11 @@ Page {
                             webxdcIcon: model.webxdc_icon
                             // Apps page only where apps on: row draws as app.
                             appsEnabled: true
+                            accountId: page.accountId
+                            messageId: model.message_id
+                            transcriber: page.transcriber
+                            transcriptMaker: page.transcriptMaker
+                            compactTranscript: true
                             onMenuRequested: row.openMenu()
                         }
                     }
