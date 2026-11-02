@@ -246,7 +246,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("idle-mce", get!("mce", "called"));
     });
 
-    plan.after(2, move || unsafe {
+    // Rings when fake core's timer fires: wait for its page, not the clock.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pushes") == "0" && !last {
+            return false;
+        }
         record!("pushes", call!("pushes"));
         record!("status", get!("callStatus", "text"));
         record!("ringing-buttons", get!("ringingButtons", "visible"));
@@ -264,6 +268,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("clock", get!("callClock", "text"));
         record!("mute-ringing", get!("muteSwitch", "visible"));
         record!("answer", call!("tap", QString::from("answerButton")));
+        true
     });
 
     // Answered: page up, mic granted, nothing rings.
