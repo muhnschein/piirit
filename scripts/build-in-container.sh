@@ -71,8 +71,9 @@ else
 fi
 
 # Checked before the pull, not minutes in (build.rs says the same).
-if [ ! -f third_party/ffmpeg/configure ] || [ ! -f third_party/x264/x264.h ]; then
-    echo ">> fetching the FFmpeg and x264 submodules"
+if [ ! -f third_party/ffmpeg/configure ] || [ ! -f third_party/x264/x264.h ] \
+        || [ ! -f third_party/whisper.cpp/include/whisper.h ]; then
+    echo ">> fetching the FFmpeg, x264 and whisper.cpp submodules"
     git submodule update --init --depth 1
 fi
 if [ ! -f "vendor/deltachat-rpc-server/$arch/deltachat-rpc-server" ]; then
