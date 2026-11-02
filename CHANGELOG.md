@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- When adding members to a group, people already in it are greyed out even if the group's member list arrives after the picker opened.
 - Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
 - Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
