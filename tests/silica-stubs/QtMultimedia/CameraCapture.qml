@@ -6,10 +6,13 @@ QtObject {
     property bool ready: true
     /// Last capture's requested path.
     property string requested: ""
+    /// Captures asked for.
+    property int asked: 0
     signal imageSaved(int requestId, string path)
     signal captureFailed(int requestId, string message)
     function captureToLocation(location) {
         requested = location
+        asked += 1
         return 1
     }
     function capture() { return 1 }

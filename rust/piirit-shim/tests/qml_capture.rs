@@ -85,6 +85,7 @@ const PROBE_QML: &str = r"
         function requestedStill() { return camera().imageCapture.requested }
         function requestedVideo() { return '' + camera().videoRecorder.outputLocation }
         // The backend's answers.
+        function stillsAsked() { return '' + camera().imageCapture.asked }
         function stillWritten() { camera().imageCapture.saved(); return 'ok' }
         function stillFailed() { camera().imageCapture.failed(); return 'ok' }
         function videoFinished() { camera().videoRecorder.finish(); return 'ok' }
@@ -181,6 +182,10 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         record!("still-asked", call!("requestedStill"));
         // Spins while still written: Qt 5.6 says so only by signals.
         probe!("still-busy", "writing", "running");
+        // Second tap while written: no second still.
+        probe!("still-shutter", "shutter", "enabled");
+        record!("shutter-again", call!("tap", QString::from("shutter")));
+        record!("stills-asked", call!("stillsAsked"));
         // Nothing reported until file on disk.
         record!("still-early", call!("pickedPath"));
         record!("still-written", call!("stillWritten"));
@@ -322,6 +327,11 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         [value("still-idle"), value("still-busy")],
         ["false", "true"],
         "the busy indicator does not show while the still is written. {context}"
+    );
+    assert_eq!(
+        [value("still-shutter"), value("stills-asked")],
+        ["false", "1"],
+        "a second tap while the still is written asks for another. {context}"
     );
     assert_eq!(
         [value("failed-busy"), value("failed-shutter")],
