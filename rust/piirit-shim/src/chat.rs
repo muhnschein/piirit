@@ -1008,11 +1008,17 @@ impl ChatMessages {
             self.pending.remove(id);
         }
         self.fetches = self.fetches.saturating_sub(1);
-        let filled = result.map(|items| self.fill_rows(items).len());
+        let filled = result.map(|items| self.fill_rows(items));
         self.set_hydrating(self.fetches > 0);
         match filled {
             // In place: view keeps position, delegates.
-            Ok(filled) if filled > 0 => self.rows_changed(),
+            Ok(landed) if !landed.is_empty() => {
+                self.rows_changed();
+                // Chat opens with one screen; rest lands here, maybe after reader looked.
+                if !self.reading_history {
+                    self.mark_items_seen(&landed);
+                }
+            }
             Ok(_) => {}
             Err(err) => self.error(err.into()),
         }
