@@ -213,7 +213,7 @@ fn each_state_shows_its_line_and_its_button() {
         common::record(&s, "8-unfolded", call!("drawn"));
         common::record(&s, "8-unfold-lines", call!("fold"));
 
-        show!(r#"{"transcriptState": 5, "language": "sv"}"#);
+        show!(r#"{"transcriptState": 5, "language": "es"}"#);
         common::record(&s, "9-other", call!("drawn"));
         common::record(
             &s,
@@ -320,7 +320,7 @@ fn each_state_shows_its_line_and_its_button() {
         ),
         (
             "9-other",
-            "other|This voice message seems to be in Svenska, which is not selected.|\
+            "other|This voice message seems to be in Español, which is not selected.|\
              Transcribe anyway|-|-|no|no|visible",
         ),
         (

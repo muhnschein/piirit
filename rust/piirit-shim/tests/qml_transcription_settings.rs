@@ -176,8 +176,8 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
-        std::env::set_var("LC_ALL", "fi_FI.UTF-8");
-        std::env::set_var("LANG", "fi_FI.UTF-8");
+        std::env::set_var("LC_ALL", "de_DE.UTF-8");
+        std::env::set_var("LANG", "de_DE.UTF-8");
     }
 
     // Settings page's deletion count asks core; unstarted, it answers nothing.
@@ -271,11 +271,11 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "unpick-phone",
-            call!("click", q!("top"), q!("language_fi")),
+            call!("click", q!("top"), q!("language_de")),
         );
         common::record(&s, "no-language", call!("languages"));
         common::record(&s, "can-next-none", call!("topSays", q!("canAccept")));
-        call!("click", q!("top"), q!("language_fi"));
+        call!("click", q!("top"), q!("language_de"));
         call!("click", q!("top"), q!("language_en"));
         common::record(&s, "accept-languages", call!("accept"));
         common::record(&s, "to-when", call!("log"));
@@ -524,12 +524,15 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     let languages = value("languages");
     assert!(
-        languages.starts_with("fi+,en,bg,cs,"),
+        languages.starts_with("de+,en,es,fr,"),
         "the phone's language does not come first, picked, with the rest by name: \
          {languages}. {context}"
     );
     assert!(
-        languages.ends_with(",bn!,gu!,kn!,lt!,ml!,mr!,pa!,tt!,te!,yue!"),
+        languages.ends_with(
+            ",zh,bn!,bg!,cs!,da!,et!,el!,gu!,hi!,kn!,lv!,lt!,hu!,ml!,mr!,no!,pa!,ro!,sk!,sl!,fi!,sv!,\
+             ta!,tt!,te!,yue!"
+        ),
         "the languages not available yet are not listed greyed, after the rest: \
          {languages}. {context}"
     );
@@ -559,7 +562,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     assert_eq!(
         value("no-language"),
-        languages.replacen("fi+", "fi", 1).as_str(),
+        languages.replacen("de+", "de", 1).as_str(),
         "a greyed language could be picked, or the last one not taken off. {context}"
     );
     assert_eq!(
@@ -576,7 +579,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (
             "push:TranscriptionWhenDialog.qml;".to_string(),
             "true".to_string(),
-            "fi,en".to_string()
+            "de,en".to_string()
         ),
         "Next did not store the languages, turn transcription on and ask when. {context}"
     );
@@ -618,7 +621,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     assert_eq!(
         value("entry-says"),
-        "Suomi, English · Auto-transcribe: While charging",
+        "Deutsch, English · Auto-transcribe: While charging",
         "the entry does not name languages and timing. {context}"
     );
     assert_eq!(
@@ -636,7 +639,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (
             String::new(),
             "false".to_string(),
-            "fi,en".to_string(),
+            "de,en".to_string(),
             "false".to_string()
         ),
         "turning off asked something, did not turn off, or lost the languages. {context}"
@@ -649,7 +652,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     assert_eq!(
         value("page-languages"),
-        "Suomi, English",
+        "Deutsch, English",
         "the transcription page does not name the languages. {context}"
     );
     assert_eq!(
@@ -680,7 +683,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (
             "push:TranscriptionLanguagesDialog.qml;".to_string(),
             "false".to_string(),
-            languages.replacen("fi+,en,", "fi+,en+,", 1)
+            languages.replacen("de+,en,", "de+,en+,", 1)
         ),
         "Languages did not reopen the list with the stored picks. {context}"
     );

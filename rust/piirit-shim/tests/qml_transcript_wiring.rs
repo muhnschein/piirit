@@ -230,7 +230,7 @@ fn a_voice_message_draws_and_offers_its_own_transcript() {
         call!(
             "setState",
             0,
-            QString::from(r#"{"state": 5, "language": "sv"}"#)
+            QString::from(r#"{"state": 5, "language": "es"}"#)
         );
         common::record(&s, "other-bubble", call!("bubble", 0));
         call!("tapButton", 0);
@@ -325,7 +325,7 @@ fn a_voice_message_draws_and_offers_its_own_transcript() {
     );
     assert_eq!(
         value("other-bubble"),
-        "This voice message seems to be in Svenska, which is not selected.|Transcribe anyway",
+        "This voice message seems to be in Español, which is not selected.|Transcribe anyway",
         "another language is not said, or not offered anyway. {context}"
     );
     assert_eq!(
