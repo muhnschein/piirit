@@ -2279,11 +2279,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Käitab vestlustes väikeseid rakendusi.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Automaatne transkribeerimine: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Häälsõnumite transkribeerimine (katseline)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <translation>Nendes keeltes ei ole transkribeerimine veel piisavalt täpne.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Kõnemudel vajab %1 MB salvestusruumi.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit laadib kõnemudeli ühe korra alla ja transkribeerib häälsõnumid selles telefonis.</translation>
     </message>
@@ -2985,24 +2975,13 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Midagi, mida saadad või saad, ei lahku telefonist.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Selle keele transkriptsioonides on tõenäoliselt rohkem vigu.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Kõnemudeli allalaadimine… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 selles telefonis</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Kõigi transkriptsioonide kustutamine</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Häälsõnumite transkribeerimine</translation>
@@ -3018,15 +2997,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <translation>Millal</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Salvestusruum</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Kõnemudel</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
     </message>
@@ -3034,30 +3004,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Proovi uuesti</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Transkriptsioonid</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n häälsõnum</numerusform>
-            <numerusform>%n häälsõnumit</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Kustuta kõik transkriptsioonid</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Häälsõnumid transkribeeritakse selles telefonis.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Ei häälsõnumid ega nende transkriptsioonid lahku telefonist ja transkriptsioonid ei kuulu varukoopiasse.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Valmis</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Millal</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

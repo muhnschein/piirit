@@ -2283,11 +2283,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Paleidžia mažas programėles pokalbiuose.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Automatinis transkribavimas: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Transkribuoti balso žinutes (eksperimentinė)</translation>
     </message>
@@ -2981,11 +2976,6 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <translation>Šiomis kalbomis transkribavimas dar nėra pakankamai tikslus.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Kalbos modeliui reikia %1 MB vietos.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit vieną kartą atsisiunčia kalbos modelį ir transkribuoja balso žinutes šiame telefone.</translation>
     </message>
@@ -2993,24 +2983,13 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Niekas, ką siunčiate ar gaunate, neišeina iš telefono.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Šios kalbos transkripcijose greičiausiai bus daugiau klaidų.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Atsisiunčiamas kalbos modelis… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 šiame telefone</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Ištrinamos visos transkripcijos</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Balso žinučių transkribavimas</translation>
@@ -3026,15 +3005,6 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <translation>Kada</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Saugykla</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Kalbos modelis</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Nepavyko atsisiųsti kalbos modelio.</translation>
     </message>
@@ -3042,31 +3012,6 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Bandyti dar kartą</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Transkripcijos</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n balso žinutė</numerusform>
-            <numerusform>%n balso žinutės</numerusform>
-            <numerusform>%n balso žinučių</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Ištrinti visas transkripcijas</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Balso žinutės transkribuojamos šiame telefone.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Nei balso žinutės, nei jų transkripcijos neišeina iš telefono, o transkripcijos nėra atsarginės kopijos dalis.</translation>
     </message>
 </context>
 <context>
@@ -3090,11 +3035,6 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Atlikta</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kada</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

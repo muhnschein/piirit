@@ -1,4 +1,4 @@
-//! Transcript store: rows by message, deletion paths, counts, search index kept by triggers.
+//! Transcript store: rows by message, deletion paths, search index kept by triggers.
 
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
@@ -121,18 +121,7 @@ fn a_row_is_kept_per_message_and_rewritten_in_place() {
 }
 
 #[test]
-fn counts_say_transcripts_and_their_text_bytes() {
-    let store = Store::open_in_memory().unwrap();
-    assert_eq!(store.counts(DONE).unwrap(), (0, 0));
-    store.put(&row(1, 1, DONE, "hei")).unwrap();
-    store.put(&row(1, 2, DONE, "näin")).unwrap();
-    store.put(&row(1, 3, FAILED, "")).unwrap();
-    // Failed one is no transcript; bytes, not chars ("ä" is two).
-    assert_eq!(store.counts(DONE).unwrap(), (2, 8));
-}
-
-#[test]
-fn rows_go_with_their_message_profile_or_all_at_once() {
+fn rows_go_with_their_message_or_profile() {
     let store = Store::open_in_memory().unwrap();
     for (account, msg) in [(1, 10), (1, 11), (1, 12), (2, 10), (3, 10)] {
         store.put(&row(account, msg, DONE, "x")).unwrap();
@@ -155,10 +144,6 @@ fn rows_go_with_their_message_profile_or_all_at_once() {
     assert_eq!(store.keep_accounts(&[1, 3]).unwrap(), 1);
     assert_eq!(store.accounts().unwrap(), vec![1, 3]);
     assert!(store.get(2, 10).unwrap().is_none());
-    // Delete all.
-    assert_eq!(store.delete_all().unwrap(), 2);
-    assert_eq!(store.accounts().unwrap(), Vec::<u32>::new());
-    assert_eq!(store.counts(DONE).unwrap(), (0, 0));
 }
 
 #[test]
@@ -191,10 +176,6 @@ fn the_search_index_follows_every_write() {
     assert_eq!(hits(&scratch.file(), "train"), 0);
     store.delete_messages(1, &[1]).unwrap();
     assert_eq!(hits(&scratch.file(), "bus"), 0);
-    store.put(&row(3, 5, DONE, "nine lives")).unwrap();
-    assert_eq!(hits(&scratch.file(), "nine"), 1);
-    store.delete_all().unwrap();
-    assert_eq!(hits(&scratch.file(), "nine"), 0);
     // Index agrees with table (FTS5's own check).
     Connection::open(scratch.file())
         .unwrap()

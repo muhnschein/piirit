@@ -310,10 +310,9 @@ fn with<R>(task: impl FnOnce(&mut Hub) -> R) -> R {
     HUB.with(|hub| task(&mut hub.borrow_mut()))
 }
 
-/// App-wide object, for counts and answers.
+/// App-wide object, for answers.
 pub(crate) fn attach(transcriber: QPointer<Transcriber>) {
     with(|hub| hub.transcriber = transcriber);
-    update_counts();
 }
 
 /// Settings or power changed.
@@ -421,22 +420,6 @@ fn apply_live(key: Key) {
         if let Some(view) = view.as_pinned() {
             view.borrow_mut().show(&shown);
         }
-    }
-}
-
-/// Counts to `Transcriber`.
-pub(crate) fn update_counts() {
-    let reply = queued_callback(|counts: (u32, u64)| {
-        let transcriber = with(|hub| hub.transcriber.clone());
-        if let Some(transcriber) = transcriber.as_pinned() {
-            transcriber.borrow_mut().set_counts(counts.0, counts.1);
-        }
-    });
-    match with(Hub::existing_store) {
-        Some(store) => store.send(move |store| {
-            reply(store.counts(STATE_DONE).unwrap_or_default());
-        }),
-        None => reply((0, 0)),
     }
 }
 
@@ -589,10 +572,7 @@ fn record(job: &Job, result: Result<Outcome, Error>) {
 fn write(row: Row) {
     let key = (row.account, row.msg);
     with(|hub| hub.skip.insert(key));
-    let reply = queued_callback(move |row: Option<Row>| {
-        apply(key, row);
-        update_counts();
-    });
+    let reply = queued_callback(move |row: Option<Row>| apply(key, row));
     match with(Hub::store) {
         Some(store) => store.send(move |store| {
             if let Err(err) = store.put(&row) {
@@ -735,10 +715,7 @@ pub(crate) fn deleted(account: u32, msg: u32) {
         hub.skip.remove(&key);
         hub.existing_store()
     });
-    let reply = queued_callback(move |()| {
-        refresh(key);
-        update_counts();
-    });
+    let reply = queued_callback(move |()| refresh(key));
     match store {
         Some(store) => store.send(move |store| {
             if let Err(err) = store.delete(account, msg) {
@@ -789,28 +766,6 @@ fn after_accounts(accounts: Vec<u32>) {
         refresh(key);
     }
     refresh_all();
-    update_counts();
-}
-
-/// Delete every transcript.
-pub(crate) fn delete_all() {
-    let store = with(|hub| {
-        hub.skip.clear();
-        hub.existing_store()
-    });
-    let reply = queued_callback(|()| {
-        refresh_all();
-        update_counts();
-    });
-    match store {
-        Some(store) => store.send(move |store| {
-            if let Err(err) = store.delete_all() {
-                eprintln!("piirit: deleting all transcripts: {err}");
-            }
-            reply(());
-        }),
-        None => reply(()),
-    }
 }
 
 /// Core up (start or restart). First time: drop rows of messages gone meanwhile.

@@ -44,8 +44,7 @@ const PROBE_QML: &str = r#"
                 + (t.error !== '' ? 'error' : '')
         }
         function report() {
-            return transcriber.model_state + '|' + transcriber.transcript_count + '|'
-                + view(first) + '|' + view(twin) + '|' + view(other) + '|' + counted
+            return transcriber.model_state + '|' + view(first) + '|' + view(twin) + '|' + view(other) + '|' + counted
         }
         function act(what) {
             if (what === 'count 1') transcriber.count_chat(1, 2)
@@ -66,7 +65,6 @@ const PROBE_QML: &str = r#"
                 '{"kind":"MsgsChanged","chatId":2,"msgId":13}')
             else if (what === 'off') transcriber.enabled = false
             else if (what === 'on') transcriber.enabled = true
-            else if (what === 'delete all') transcriber.delete_all()
         }
     }
 "#;
@@ -170,7 +168,7 @@ fn transcripts_follow_messages_profiles_settings_and_power() {
     let act = move |what: &str| unsafe {
         (*engine_ptr).invoke_method("act".into(), &[QString::from(what).to_qvariant()]);
     };
-    // Field of report: 0 model, 1 count, 2 first, 3 twin, 4 other, 5 counted.
+    // Field of report: 0 model, 1 first, 2 twin, 3 other, 4 counted.
     let field = move |index: usize| {
         report()
             .split('|')
@@ -203,88 +201,92 @@ fn transcripts_follow_messages_profiles_settings_and_power() {
     };
     step(
         "swept",
-        Box::new(move || field(0) == "2" && field(1) == "2" && field(4).starts_with('3')),
+        Box::new({
+            let file = file.clone();
+            move || field(0) == "2" && rows(&file) == "1/13=3,2/13=3" && field(3).starts_with('3')
+        }),
         "count 1",
     );
     step(
         "counted with row",
-        Box::new(move || field(5).contains("1/2=")),
+        Box::new(move || field(4).contains("1/2=")),
         "remove profile 2",
     );
     step(
         "profile removed",
-        Box::new(move || field(1) == "1" && field(4).starts_with('0')),
+        Box::new({
+            let file = file.clone();
+            move || rows(&file) == "1/13=3" && field(3).starts_with('0')
+        }),
         "count 2",
     );
     step(
         "counted without row",
-        Box::new(move || field(5).contains("2/2=")),
+        Box::new(move || field(4).contains("2/2=")),
         "delete message",
     );
     step(
         "message deleted",
-        Box::new(move || field(1) == "0" && field(2).starts_with('0')),
+        Box::new({
+            let file = file.clone();
+            move || rows(&file).is_empty() && field(1).starts_with('0')
+        }),
         "tap",
     );
     step(
         "tapped",
-        Box::new(move || field(2).starts_with('6') && field(3).starts_with('6')),
+        Box::new(move || field(1).starts_with('6') && field(2).starts_with('6')),
         "arrival in battery saving",
     );
     step(
         "arrival held",
-        Box::new(move || field(4).starts_with('1')),
+        Box::new(move || field(3).starts_with('1')),
         "battery saving off",
     );
     step(
         "arrival ran",
-        Box::new(move || field(4).starts_with('6')),
+        Box::new(move || field(3).starts_with('6')),
         "off",
     );
     step(
         "off",
-        Box::new(move || field(0) == "0" && field(2).starts_with('0') && field(4).starts_with('0')),
+        Box::new(move || field(0) == "0" && field(1).starts_with('0') && field(3).starts_with('0')),
         "on",
     );
     step(
         "on without model",
-        Box::new(move || field(0) == "3" && field(2).starts_with('6')),
+        Box::new(move || field(0) == "3" && field(1).starts_with('6')),
         "tap any language",
     );
     step(
         "waits for model",
-        Box::new(move || field(2).starts_with('1')),
+        Box::new(move || field(1).starts_with('1')),
         "off",
     );
     step(
         "off while waiting",
-        Box::new(move || field(0) == "0" && field(2).starts_with('0')),
+        Box::new(move || field(0) == "0" && field(1).starts_with('0')),
         "on",
     );
     // Off forgot this session's seen messages: only the store knows 2/13 is done.
     step(
         "on again",
-        Box::new(move || field(0) == "3" && field(2).starts_with('6')),
+        Box::new(move || field(0) == "3" && field(1).starts_with('6')),
         "changed again",
     );
     step(
         "changed again",
-        Box::new(move || field(4).starts_with('6')),
+        Box::new(move || field(3).starts_with('6')),
         "tap any language",
     );
     step(
         "waits again",
-        Box::new(move || field(2).starts_with('1')),
+        Box::new(move || field(1).starts_with('1')),
         "cancel",
     );
     step(
         "cancelled",
-        Box::new(move || field(2).starts_with('6')),
-        "delete all",
-    );
-    step(
-        "all deleted",
-        Box::new(move || field(2).starts_with('0') && field(4).starts_with('0')),
+        Box::new(move || field(1).starts_with('6')),
         "quit",
     );
     plan.run();
@@ -317,7 +319,7 @@ fn check(log: &[(&'static str, String)], calls: &[(String, serde_json::Value)], 
     // Model at right size: ready without fetching. Sweep keeps live rows only.
     expect(
         "swept",
-        "2|2|3:a:hello there:|3:a:hello there:|3:a:second profile:|",
+        "2|3:a:hello there:|3:a:hello there:|3:a:second profile:|",
         "1/13=3,2/13=3",
         "rows of a deleted message and a removed profile go at start; live ones show",
     );
@@ -330,49 +332,49 @@ fn check(log: &[(&'static str, String)], calls: &[(String, serde_json::Value)], 
     );
     expect(
         "counted with row",
-        "2|2|3:a:hello there:|3:a:hello there:|3:a:second profile:|1/2=0;",
+        "2|3:a:hello there:|3:a:hello there:|3:a:second profile:|1/2=0;",
         "1/13=3,2/13=3",
         "a chat whose voice message has a transcript has none left to do",
     );
     expect(
         "profile removed",
-        "2|1|3:a:hello there:|3:a:hello there:|0:a::|1/2=0;",
+        "2|3:a:hello there:|3:a:hello there:|0:a::|1/2=0;",
         "1/13=3",
         "removing a profile drops its transcripts",
     );
     expect(
         "counted without row",
-        "2|1|3:a:hello there:|3:a:hello there:|0:a::|1/2=0;2/2=1;",
+        "2|3:a:hello there:|3:a:hello there:|0:a::|1/2=0;2/2=1;",
         "1/13=3",
         "a voice message without transcript is counted",
     );
     expect(
         "message deleted",
-        "2|0|0:a::|0:a::|0:a::|1/2=0;2/2=1;",
+        "2|0:a::|0:a::|0:a::|1/2=0;2/2=1;",
         "",
         "a deleted message's transcript goes, from every view",
     );
     expect(
         "tapped",
-        "2|0|6:a::error|6:a::error|0:a::|1/2=0;2/2=1;",
+        "2|6:a::error|6:a::error|0:a::|1/2=0;2/2=1;",
         "1/13=6",
         "a tap runs on the speech thread; stub engine fails it with a reason, stored",
     );
     expect(
         "arrival held",
-        "2|0|6:a::error|6:a::error|1:a::|1/2=0;2/2=1;",
+        "2|6:a::error|6:a::error|1:a::|1/2=0;2/2=1;",
         "1/13=6",
         "an arriving voice message queues in Always but battery saving holds it",
     );
     expect(
         "arrival ran",
-        "2|0|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
+        "2|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "battery saving off: the held arrival runs",
     );
     expect(
         "off",
-        "0|0|0:a::|0:a::|0:a::|1/2=0;2/2=1;",
+        "0|0:a::|0:a::|0:a::|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "switched off: model deleted, transcripts hidden but kept",
     );
@@ -383,19 +385,19 @@ fn check(log: &[(&'static str, String)], calls: &[(String, serde_json::Value)], 
     let on = at("on without model");
     assert_eq!(
         on.first()
-            .map(|report| report.split('|').skip(2).collect::<Vec<_>>().join("|")),
+            .map(|report| report.split('|').skip(1).collect::<Vec<_>>().join("|")),
         Some("6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;".to_owned()),
         "switched on again: rows show again, model fetch failed (nowhere to fetch). {context}"
     );
     expect(
         "waits for model",
-        "3|0|1:m::|1:m::|6:a::error|1/2=0;2/2=1;",
+        "3|1:m::|1:m::|6:a::error|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "a tap while the model is missing waits queued",
     );
     expect(
         "on again",
-        "3|0|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
+        "3|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "switching off dropped the waiting tap: stored outcome shows, nothing queued",
     );
@@ -409,20 +411,14 @@ fn check(log: &[(&'static str, String)], calls: &[(String, serde_json::Value)], 
     );
     expect(
         "waits again",
-        "3|0|1:m::|1:m::|6:a::error|1/2=0;2/2=1;",
+        "3|1:m::|1:m::|6:a::error|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "a new tap queues again",
     );
     expect(
         "cancelled",
-        "3|0|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
+        "3|6:a::error|6:a::error|6:a::error|1/2=0;2/2=1;",
         "1/13=6,2/13=6",
         "cancel takes it off the queue; stored outcome shows again",
-    );
-    expect(
-        "all deleted",
-        "3|0|0:a::|0:a::|0:a::|1/2=0;2/2=1;",
-        "",
-        "delete all empties the store",
     );
 }

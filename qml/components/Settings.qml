@@ -252,13 +252,13 @@ QtObject {
     property ConfigurationValue transcriptionModeConfig: ConfigurationValue {
         id: transcriptionModeValue
         key: "/apps/harbour-piirit/transcription/mode"
-        defaultValue: 0
+        defaultValue: 1
     }
 
     property ConfigurationValue transcriptionOlderConfig: ConfigurationValue {
         id: transcriptionOlderValue
         key: "/apps/harbour-piirit/transcription/older"
-        defaultValue: false
+        defaultValue: true
     }
 
     property ConfigurationValue backLensLabelsConfig: ConfigurationValue {

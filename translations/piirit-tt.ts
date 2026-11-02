@@ -2271,11 +2271,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Автоматик язуга күчерү: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Тавышлы хәбәрләрне язуга күчерү (сынау режимы)</translation>
     </message>
@@ -2965,11 +2960,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Бу телләрдә язуга күчерү әлегә җитәрлек төгәл түгел.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Сөйләм моделенә %1 МБ урын кирәк.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit сөйләм моделен бер тапкыр йөкли һәм тавышлы хәбәрләрне бу телефонда язуга күчерә.</translation>
     </message>
@@ -2977,24 +2967,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Сез җибәргән яки алган бернәрсә дә телефоннан чыкмый.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Бу телдәге язмаларда, мөгаен, хаталар күбрәк.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Сөйләм моделе йөкләнә… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>Бу телефонда %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Барлык язмалар бетерелә</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Тавышлы хәбәрләрне язуга күчерү</translation>
@@ -3010,15 +2989,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Кайчан</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Саклагыч</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Сөйләм моделе</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Сөйләм моделен йөкләп булмады.</translation>
     </message>
@@ -3026,29 +2996,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Кабатлау</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Язмалар</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n тавышлы хәбәр</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Барлык язмаларны бетерү</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Тавышлы хәбәрләр бу телефонда язуга күчерелә.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Тавышлы хәбәрләр дә, аларның язмалары да телефоннан чыкмый, һәм язмалар резерв күчермәгә кермиләр.</translation>
     </message>
 </context>
 <context>
@@ -3072,11 +3019,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Әзер</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Кайчан</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

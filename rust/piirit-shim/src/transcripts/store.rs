@@ -235,20 +235,4 @@ impl Store {
         }
         Ok(known)
     }
-
-    /// Delete every row.
-    pub(crate) fn delete_all(&self) -> rusqlite::Result<usize> {
-        self.connection.execute("DELETE FROM transcripts", [])
-    }
-
-    /// Transcripts (`done` rows) and bytes of text kept.
-    pub(crate) fn counts(&self, done: u32) -> rusqlite::Result<(u32, u64)> {
-        self.connection.query_row(
-            "SELECT COUNT(CASE WHEN state = ?1 THEN 1 END),
-                    COALESCE(SUM(LENGTH(CAST(text AS BLOB))), 0)
-             FROM transcripts",
-            [done],
-            |row| Ok((row.get(0)?, row.get(1)?)),
-        )
-    }
 }

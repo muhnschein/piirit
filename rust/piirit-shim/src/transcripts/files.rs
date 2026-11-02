@@ -2,8 +2,6 @@
 
 use std::path::{Path, PathBuf};
 
-/// Model shown in settings.
-pub(crate) const MODEL_NAME: &str = "Whisper small";
 /// File name on phone.
 pub(crate) const MODEL_FILE: &str = "ggml-small-q5_1.bin";
 /// Pinned by commit; hash checked after download.

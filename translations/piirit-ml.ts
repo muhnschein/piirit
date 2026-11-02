@@ -2279,11 +2279,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>സ്വയമേവ എഴുത്താക്കൽ: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക (പരീക്ഷണാത്മകം)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ഈ ഭാഷകളിൽ എഴുത്താക്കൽ ഇതുവരെ മതിയായ കൃത്യതയിലല്ല.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>സംഭാഷണ മാതൃകയ്ക്ക് %1 MB സംഭരണം വേണം.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit ഒരിക്കൽ ഒരു സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്ത് ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നു.</translation>
     </message>
@@ -2985,24 +2975,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>നിങ്ങൾ അയയ്ക്കുന്നതോ സ്വീകരിക്കുന്നതോ ആയ ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ഈ ഭാഷയിലെ എഴുത്തുരൂപങ്ങളിൽ കൂടുതൽ തെറ്റുകൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>ഈ ഫോണിൽ %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>എല്ലാ എഴുത്തുരൂപങ്ങളും ഇല്ലാതാക്കുന്നു</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
@@ -3018,15 +2997,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>എപ്പോൾ</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>സംഭരണം</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>സംഭാഷണ മാതൃക</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
     </message>
@@ -3034,30 +3004,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>വീണ്ടും ശ്രമിക്കുക</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>എഴുത്തുരൂപങ്ങൾ</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n ശബ്ദ സന്ദേശം</numerusform>
-            <numerusform>%n ശബ്ദ സന്ദേശങ്ങൾ</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>എല്ലാ എഴുത്തുരൂപങ്ങളും ഇല്ലാതാക്കുക</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>ശബ്ദ സന്ദേശങ്ങൾ ഈ ഫോണിൽ തന്നെ എഴുത്താക്കുന്നു.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>ശബ്ദ സന്ദേശങ്ങളോ അവയുടെ എഴുത്തുരൂപങ്ങളോ ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല, എഴുത്തുരൂപങ്ങൾ ബാക്കപ്പിന്റെ ഭാഗവുമല്ല.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>പൂർത്തിയായി</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>എപ്പോൾ</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

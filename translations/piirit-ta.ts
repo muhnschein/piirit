@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>தானியங்கி எழுத்தாக்கம்: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>குரல் செய்திகளை எழுத்தாக்கு (சோதனை முறை)</translation>
     </message>
@@ -2969,11 +2964,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>இந்த மொழிகளில் எழுத்தாக்கம் இன்னும் போதுமான துல்லியமாக இல்லை.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>பேச்சு மாதிரிக்கு %1 MB சேமிப்பிடம் தேவை.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit ஒருமுறை பேச்சு மாதிரியைப் பதிவிறக்கி, இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக்குகிறது.</translation>
     </message>
@@ -2981,24 +2971,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>நீங்கள் அனுப்புவதும் பெறுவதும் எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>இந்த மொழியின் எழுத்தாக்கங்களில் அதிகப் பிழைகள் இருக்க வாய்ப்புள்ளது.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>இந்தத் தொலைபேசியில் %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>எல்லா எழுத்தாக்கங்களும் நீக்கப்படுகின்றன</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
@@ -3014,15 +2993,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>எப்போது</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>சேமிப்பிடம்</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>பேச்சு மாதிரி</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
     </message>
@@ -3030,30 +3000,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>மீண்டும் முயல்க</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>எழுத்தாக்கங்கள்</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n குரல் செய்தி</numerusform>
-            <numerusform>%n குரல் செய்திகள்</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>எல்லா எழுத்தாக்கங்களையும் நீக்கு</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>குரல் செய்திகள் இந்தத் தொலைபேசியிலேயே எழுத்தாக்கப்படுகின்றன.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>குரல் செய்திகளோ அவற்றின் எழுத்தாக்கங்களோ தொலைபேசியை விட்டு வெளியேறாது, எழுத்தாக்கங்கள் காப்புப்பிரதியின் பகுதியும் அல்ல.</translation>
     </message>
 </context>
 <context>
@@ -3077,11 +3023,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>முடிந்தது</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>எப்போது</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

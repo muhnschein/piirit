@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Изпълнява малки приложения вътре в чатовете.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Автоматично транскрибиране: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Транскрибиране на гласови съобщения (експериментално)</translation>
     </message>
@@ -2969,11 +2964,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Транскрибирането все още не е достатъчно точно на тези езици.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Говорният модел се нуждае от %1 MB място.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit изтегля веднъж говорен модел и транскрибира гласовите съобщения на този телефон.</translation>
     </message>
@@ -2981,24 +2971,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Нищо от това, което изпращате или получавате, не напуска телефона.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Транскрипциите на този език вероятно съдържат повече грешки.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Изтегляне на говорния модел… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 на този телефон</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Изтриване на всички транскрипции</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Транскрибиране на гласови съобщения</translation>
@@ -3014,15 +2993,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Кога</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Хранилище</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Говорен модел</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Говорният модел не можа да бъде изтеглен.</translation>
     </message>
@@ -3030,30 +3000,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Опитайте отново</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Транскрипции</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n гласово съобщение</numerusform>
-            <numerusform>%n гласови съобщения</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Изтриване на всички транскрипции</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Гласовите съобщения се транскрибират на този телефон.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Нито гласовите съобщения, нито техните транскрипции напускат телефона, а транскрипциите не са част от резервно копие.</translation>
     </message>
 </context>
 <context>
@@ -3077,11 +3023,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Готово</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Кога</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

@@ -16,7 +16,7 @@ Dialog {
     property bool setup: false
     /// Settings page, where timing dialog's Done returns.
     property Item returnTo: null
-    /// App-wide `Transcriber`, for model size; null: size not said.
+    /// App-wide `Transcriber`, handed to timing dialog for download progress.
     property QtObject transcriber: null
     /// Phone's language, whisper code. Tests set.
     property string phoneLanguage: Speech.codeOf(Qt.locale().name)
@@ -115,6 +115,9 @@ Dialog {
                 TextSwitch {
                     objectName: "language_" + modelData.code
                     text: modelData.name
+                    description: modelData.rough
+                                 ? qsTr("Transcripts in this language are likely to contain more mistakes.")
+                                 : ""
                     automaticCheck: false
                     checked: dialog.chosen.indexOf(modelData.code) >= 0
                     onClicked: dialog.toggle(modelData.code)
@@ -146,20 +149,6 @@ Dialog {
                     checked: false
                     onClicked: dialog.toggle(modelData.code)
                 }
-            }
-
-            Label {
-                objectName: "transcriptionModelSize"
-                readonly property real megabytes: dialog.transcriber !== null
-                    ? Math.round(dialog.transcriber.model_download_bytes / 1000000) : 0
-                visible: dialog.setup && megabytes > 0
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryColor
-                //: %1 is the speech model's size in megabytes, such as 190.
-                text: qsTr("The speech model needs %1 MB of storage.").arg(megabytes)
             }
         }
     }

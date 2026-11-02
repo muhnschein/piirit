@@ -1,11 +1,11 @@
 //! Turning transcription on: Settings switch asks the experimental question, then languages
 //! (phone's first and picked; greyed ones can't be picked; Next needs one), which turn the
 //! feature on, then when to transcribe; Done returns to Settings. Cancel on languages leaves it
-//! off. Once on, an entry under the switch names languages and timing and opens the
-//! transcription page: storage, transcripts, delete all after the platform's countdown.
+//! off. Once on, an entry under the switch, flush like Quick actions, opens the transcription
+//! page: languages, timing, and a failed model download with Try again.
 //!
 //! Real pages vs stub Silica; page stack here builds pages it is asked for, as Silica does.
-//! Phone language Finnish (`LC_ALL`).
+//! Phone language German (`LC_ALL`).
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -40,12 +40,6 @@ fn probe_qml() -> String {
             property bool enabled: Settings.transcriptionEnabled === true
             property int model_state: 1
             property int model_permille: 340
-            property string model_name: 'Whisper small'
-            property real model_download_bytes: 190085487
-            property real model_bytes: 0
-            property int transcript_count: 0
-            property real transcript_bytes: 0
-            function delete_all() {{ calls += 'delete_all;' }}
             function download_model() {{ calls += 'download_model;' }}
         }}
 
@@ -128,7 +122,7 @@ fn probe_qml() -> String {
         function accept() {{ top().accept(); return 'ok' }}
         function pop() {{ stack.pop(); return 'ok' }}
         function reject() {{ var page = stack.pages.pop(); page.reject(); page.destroy(); return 'ok' }}
-        // Language rows in drawn order: code, picked, enabled.
+        // Language rows in drawn order: code, picked (+), greyed (!), noted (~).
         function languages() {{
             var found = []
             var seen = []
@@ -137,8 +131,24 @@ fn probe_qml() -> String {
                 seen.push(node)
                 if (('' + node.objectName).indexOf('language_') === 0) {{
                     found.push(node.objectName.substring(9) + (node.checked ? '+' : '')
-                               + (node.enabled ? '' : '!'))
+                               + (node.enabled ? '' : '!') + (node.description ? '~' : ''))
                 }}
+                var kids = node.children
+                for (var i = 0; kids && i < kids.length; i++) {{ walk(kids[i]) }}
+                if (node.contentItem && node.contentItem !== node) {{ walk(node.contentItem) }}
+            }}
+            walk(top())
+            return found.join(',')
+        }}
+        // Named items of top page (comma list) in drawn order.
+        function order(list) {{
+            var names = ('' + list).split(',')
+            var found = []
+            var seen = []
+            var walk = function (node) {{
+                if (!node || seen.indexOf(node) >= 0) {{ return }}
+                seen.push(node)
+                if (names.indexOf('' + node.objectName) >= 0) {{ found.push(node.objectName) }}
                 var kids = node.children
                 for (var i = 0; kids && i < kids.length; i++) {{ walk(kids[i]) }}
                 if (node.contentItem && node.contentItem !== node) {{ walk(node.contentItem) }}
@@ -148,21 +158,11 @@ fn probe_qml() -> String {
         }}
         function appReads(name) {{ return '' + Settings[name] }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
-        function remorse() {{
-            var popup = findIn(loader.item, 'deleteRemorse')
-            return popup.active + ':' + popup.text
-        }}
         function heard() {{ var was = calls; calls = ''; return was }}
         function codes() {{
             return ['fi_FI', 'nb_NO', 'zh_HK', 'zh_CN', 'C'].map(Speech.codeOf).join(',')
         }}
-        function storeSome() {{
-            transcriber.model_state = 2
-            transcriber.model_bytes = 190085487
-            transcriber.transcript_count = 132
-            transcriber.transcript_bytes = 48000
-            return 'ok'
-        }}
+        function failModel() {{ transcriber.model_state = 3; return 'ok' }}
     }}
 ",
         components.display(),
@@ -239,6 +239,16 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(&s, "to-languages", call!("log"));
         common::record(&s, "languages-setup", call!("topSays", q!("setup")));
         common::record(&s, "languages", call!("languages"));
+        common::record(
+            &s,
+            "note-fr",
+            call!("get", q!("top"), q!("language_fr"), q!("description")),
+        );
+        common::record(
+            &s,
+            "note-de",
+            call!("get", q!("top"), q!("language_de"), q!("description")),
+        );
         common::record(&s, "can-next", call!("topSays", q!("canAccept")));
         common::record(
             &s,
@@ -296,6 +306,11 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
+            "when-order",
+            call!("order", q!("transcriptionModeCombo,modelProgress")),
+        );
+        common::record(
+            &s,
             "when-mode",
             call!(
                 "get",
@@ -316,8 +331,8 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
-            "pick-charging",
-            call!("click", q!("top"), q!("transcriptionMode1")),
+            "pick-never",
+            call!("click", q!("top"), q!("transcriptionMode0")),
         );
         common::record(
             &s,
@@ -332,6 +347,16 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
                 q!("top"),
                 q!("transcriptionModeCombo"),
                 q!("description")
+            ),
+        );
+        common::record(
+            &s,
+            "older-at-first",
+            call!(
+                "get",
+                q!("top"),
+                q!("transcriptionOlderSwitch"),
+                q!("checked")
             ),
         );
         common::record(
@@ -361,8 +386,23 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
-            "entry-says",
-            call!("get", q!("page"), q!("transcriptionDetail"), q!("text")),
+            "entry-x",
+            call!("get", q!("page"), q!("transcriptionLabel"), q!("x")),
+        );
+        common::record(
+            &s,
+            "quick-x",
+            call!("get", q!("page"), q!("quickActionsLabel"), q!("x")),
+        );
+        common::record(
+            &s,
+            "entry-height",
+            call!("get", q!("page"), q!("transcriptionEntry"), q!("height")),
+        );
+        common::record(
+            &s,
+            "quick-height",
+            call!("get", q!("page"), q!("quickActionsEntry"), q!("height")),
         );
         common::record(
             &s,
@@ -410,8 +450,8 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
-            "page-model-loading",
-            call!("get", q!("page"), q!("modelLabel"), q!("text")),
+            "page-failed-while-loading",
+            call!("get", q!("page"), q!("modelFailed"), q!("visible")),
         );
         call!("appWrites", q!("transcriptionMode"), 2);
         common::record(
@@ -436,11 +476,6 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
-            "page-none-delete",
-            call!("get", q!("page"), q!("deleteAllButton"), q!("enabled")),
-        );
-        common::record(
-            &s,
             "page-open-languages",
             call!("click", q!("page"), q!("languagesEntry")),
         );
@@ -452,36 +487,20 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
 
     let s = steps.clone();
     plan.after(1, move || unsafe {
-        // Model on phone, transcripts stored.
-        call!("storeSome");
+        call!("failModel");
         common::record(
             &s,
-            "page-model",
-            call!("get", q!("page"), q!("modelLabel"), q!("text")),
+            "page-failed",
+            call!("get", q!("page"), q!("modelFailed"), q!("visible")),
         );
+        call!("heard");
         common::record(
             &s,
-            "page-transcripts",
-            call!("get", q!("page"), q!("transcriptsLabel"), q!("text")),
+            "page-retry",
+            call!("click", q!("page"), q!("modelRetry")),
         );
-        common::record(
-            &s,
-            "page-delete",
-            call!("click", q!("page"), q!("deleteAllButton")),
-        );
-        common::record(&s, "page-countdown", call!("remorse"));
-        common::record(&s, "page-not-yet", call!("heard"));
-    });
-
-    let s = steps.clone();
-    plan.until(1, 5, move |last| unsafe {
-        let heard = call!("heard").to_string();
-        if heard.is_empty() && !last {
-            return false;
-        }
-        common::record(&s, "page-deleted", heard.into());
+        common::record(&s, "page-retried", call!("heard"));
         (*engine_ptr).quit();
-        true
     });
 
     plan.run();
@@ -524,13 +543,21 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     let languages = value("languages");
     assert!(
-        languages.starts_with("de+,en,es,fr,"),
-        "the phone's language does not come first, picked, with the rest by name: \
-         {languages}. {context}"
+        languages.starts_with("de+,en,es,fr~,it,nl~,pl~,pt,ru,vi~,tr~,uk~,zh~,bn!,"),
+        "the phone's language does not come first, picked, with the rest by name, \
+         rough ones noted: {languages}. {context}"
+    );
+    assert_eq!(
+        (value("note-fr"), value("note-de")),
+        (
+            "Transcripts in this language are likely to contain more mistakes.".to_string(),
+            String::new()
+        ),
+        "a rough language is not noted, or a good one is. {context}"
     );
     assert!(
         languages.ends_with(
-            ",zh,bn!,bg!,cs!,da!,et!,el!,gu!,hi!,kn!,lv!,lt!,hu!,ml!,mr!,no!,pa!,ro!,sk!,sl!,fi!,sv!,\
+            ",bn!,bg!,cs!,da!,et!,el!,gu!,hi!,kn!,lv!,lt!,hu!,ml!,mr!,no!,pa!,ro!,sk!,sl!,fi!,sv!,\
              ta!,tt!,te!,yue!"
         ),
         "the languages not available yet are not listed greyed, after the rest: \
@@ -589,25 +616,30 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         "the timing dialog does not show the download it started. {context}"
     );
     assert_eq!(
-        (value("when-mode"), value("when-mode-says")),
-        (
-            "0".to_string(),
-            "Tap Transcribe on a voice message to turn it into text.".to_string()
-        ),
-        "a fresh phone does not start on Never, said in one sentence. {context}"
+        value("when-order"),
+        "modelProgress,transcriptionModeCombo",
+        "the download is not on top of the timing dialog. {context}"
     );
     assert_eq!(
-        (value("mode-stored"), value("when-mode-now")),
+        (value("when-mode"), value("when-mode-says")),
         (
             "1".to_string(),
             "New voice messages are transcribed while the phone is charging.".to_string()
         ),
-        "While charging was not stored, or the line under it did not follow. {context}"
+        "a fresh phone does not start on While charging, said in one sentence. {context}"
     );
     assert_eq!(
-        value("older-stored"),
-        "true",
-        "the older switch stored nothing. {context}"
+        (value("mode-stored"), value("when-mode-now")),
+        (
+            "0".to_string(),
+            "Tap Transcribe on a voice message to turn it into text.".to_string()
+        ),
+        "Never was not stored, or the line under it did not follow. {context}"
+    );
+    assert_eq!(
+        (value("older-at-first"), value("older-stored")),
+        ("true".to_string(), "false".to_string()),
+        "older voice messages are not on at first, or the switch stored nothing. {context}"
     );
     assert_eq!(
         (value("back-to-settings"), value("depth-after-done")),
@@ -620,9 +652,9 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         "after setup the switch is off, or its entry missing. {context}"
     );
     assert_eq!(
-        value("entry-says"),
-        "Deutsch, English · Auto-transcribe: While charging",
-        "the entry does not name languages and timing. {context}"
+        (value("entry-x"), value("entry-height")),
+        (value("quick-x"), value("quick-height")),
+        "the entry is indented or taller than Quick actions. {context}"
     );
     assert_eq!(
         value("to-page"),
@@ -656,9 +688,9 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         "the transcription page does not name the languages. {context}"
     );
     assert_eq!(
-        value("page-model-loading"),
-        "Whisper small · Downloading the speech model… 34%",
-        "the page does not show the download. {context}"
+        value("page-failed-while-loading"),
+        "false",
+        "the page says the download failed while it runs. {context}"
     );
     assert_eq!(
         (value("page-mode"), value("page-mode-says")),
@@ -668,11 +700,6 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
                 .to_string()
         ),
         "the page's timing does not follow the setting. {context}"
-    );
-    assert_eq!(
-        value("page-none-delete"),
-        "false",
-        "Delete all transcripts is offered with none stored. {context}"
     );
     assert_eq!(
         (
@@ -688,21 +715,16 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         "Languages did not reopen the list with the stored picks. {context}"
     );
     assert_eq!(
-        (value("page-model"), value("page-transcripts")),
         (
-            "Whisper small · 190.1 MB on this phone".to_string(),
-            "132 voice message(s) · 48.0 kB".to_string()
+            value("page-failed"),
+            value("page-retry"),
+            value("page-retried")
         ),
-        "the page does not say what transcription stores. {context}"
-    );
-    assert_eq!(
-        (value("page-countdown"), value("page-not-yet")),
-        ("true:Deleting all transcripts".to_string(), String::new()),
-        "Delete all transcripts did not wait on the platform's countdown first. {context}"
-    );
-    assert_eq!(
-        value("page-deleted"),
-        "delete_all;",
-        "the countdown ran out and nothing was deleted. {context}"
+        (
+            "true".to_string(),
+            "ok".to_string(),
+            "download_model;".to_string()
+        ),
+        "a failed download is not said, or Try again does not fetch again. {context}"
     );
 }

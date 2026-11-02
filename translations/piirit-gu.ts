@@ -2279,11 +2279,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>વાતચીતોની અંદર નાની ઍપ ચલાવે છે.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>આપમેળે લિપ્યંતરણ: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>વૉઇસ સંદેશાનું લિપ્યંતરણ કરો (પ્રાયોગિક)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>આ ભાષાઓમાં લિપ્યંતરણ હજી પૂરતું ચોક્કસ નથી.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>સ્પીચ મૉડલને %1 MB સ્ટોરેજ જોઈએ.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit એક વાર સ્પીચ મૉડલ ડાઉનલોડ કરે છે અને આ ફોન પર વૉઇસ સંદેશાનું લિપ્યંતરણ કરે છે.</translation>
     </message>
@@ -2985,24 +2975,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>તમે જે મોકલો કે મેળવો તેમાંથી કંઈ પણ ફોનની બહાર જતું નથી.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>આ ભાષાના લિપ્યંતરણમાં વધુ ભૂલો હોવાની શક્યતા છે.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>સ્પીચ મૉડલ ડાઉનલોડ થાય છે… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>આ ફોન પર %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>બધાં લિપ્યંતરણ કાઢી રહ્યાં છીએ</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>વૉઇસ સંદેશ લિપ્યંતરણ</translation>
@@ -3018,15 +2997,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ક્યારે</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>સ્ટોરેજ</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>સ્પીચ મૉડલ</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>સ્પીચ મૉડલ ડાઉનલોડ થઈ શક્યું નહીં.</translation>
     </message>
@@ -3034,30 +3004,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>ફરી પ્રયાસ કરો</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>લિપ્યંતરણ</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n વૉઇસ સંદેશ</numerusform>
-            <numerusform>%n વૉઇસ સંદેશા</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>બધાં લિપ્યંતરણ કાઢી નાખો</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>વૉઇસ સંદેશાનું લિપ્યંતરણ આ ફોન પર જ થાય છે.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>ન તો વૉઇસ સંદેશા કે ન તેમનાં લિપ્યંતરણ ફોનની બહાર જાય છે, અને લિપ્યંતરણ બૅકઅપનો ભાગ નથી.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>થઈ ગયું</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ક્યારે</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

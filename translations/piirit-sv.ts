@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kör små appar inuti chattar.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Transkribera automatiskt: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Transkribera röstmeddelanden (experimentellt)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <translation>Transkriberingen är ännu inte tillräckligt exakt på de här språken.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Talmodellen behöver %1 MB lagringsutrymme.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit laddar ned en talmodell en gång och transkriberar röstmeddelanden på den här telefonen.</translation>
     </message>
@@ -2985,24 +2975,13 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Ingenting du skickar eller tar emot lämnar telefonen.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transkriptioner på det här språket innehåller troligen fler fel.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Laddar ned talmodellen… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 på den här telefonen</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Raderar alla transkriptioner</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Transkribering av röstmeddelanden</translation>
@@ -3018,15 +2997,6 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <translation>När</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Lagring</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Talmodell</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Talmodellen kunde inte laddas ned.</translation>
     </message>
@@ -3034,30 +3004,6 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Försök igen</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Transkriptioner</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n röstmeddelande</numerusform>
-            <numerusform>%n röstmeddelanden</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Radera alla transkriptioner</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Röstmeddelanden transkriberas på den här telefonen.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Varken röstmeddelandena eller deras transkriptioner lämnar telefonen, och transkriptioner ingår inte i en säkerhetskopia.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Klar</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>När</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

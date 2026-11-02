@@ -2279,11 +2279,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>চ্যাটের ভিতরে ছোট অ্যাপ চালায়।</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>স্বয়ংক্রিয় প্রতিলিপি: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>ভয়েস বার্তা প্রতিলিপি করুন (পরীক্ষামূলক)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>এই ভাষাগুলোতে প্রতিলিপি এখনও যথেষ্ট নির্ভুল নয়।</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>স্পিচ মডেলের জন্য %1 MB জায়গা লাগে।</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit একবার একটি স্পিচ মডেল ডাউনলোড করে এবং এই ফোনে ভয়েস বার্তার প্রতিলিপি করে।</translation>
     </message>
@@ -2985,24 +2975,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>আপনি যা পাঠান বা পান, তার কিছুই ফোনের বাইরে যায় না।</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>এই ভাষার প্রতিলিপিতে সম্ভবত বেশি ভুল থাকবে।</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>স্পিচ মডেল ডাউনলোড হচ্ছে… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>এই ফোনে %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>সব প্রতিলিপি মুছে ফেলা হচ্ছে</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>ভয়েস বার্তার প্রতিলিপি</translation>
@@ -3018,15 +2997,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>কখন</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>স্টোরেজ</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>স্পিচ মডেল</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>স্পিচ মডেল ডাউনলোড করা যায়নি।</translation>
     </message>
@@ -3034,30 +3004,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>আবার চেষ্টা করুন</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>প্রতিলিপি</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%nটি ভয়েস বার্তা</numerusform>
-            <numerusform>%nটি ভয়েস বার্তা</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>সব প্রতিলিপি মুছুন</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>ভয়েস বার্তার প্রতিলিপি এই ফোনেই হয়।</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>ভয়েস বার্তা বা তাদের প্রতিলিপি কোনোটিই ফোনের বাইরে যায় না, আর প্রতিলিপি ব্যাকআপের অংশ নয়।</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>সম্পন্ন</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>কখন</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

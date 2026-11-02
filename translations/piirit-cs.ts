@@ -2287,11 +2287,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Spouští malé aplikace uvnitř chatů.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Automatický přepis: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Přepisovat hlasové zprávy (experimentální)</translation>
     </message>
@@ -2981,11 +2976,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>V těchto jazycích zatím přepis není dost přesný.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Řečový model potřebuje %1 MB místa.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit jednou stáhne řečový model a přepisuje hlasové zprávy v tomto telefonu.</translation>
     </message>
@@ -2993,24 +2983,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Nic, co odešlete nebo přijmete, neopustí telefon.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Přepisy v tomto jazyce pravděpodobně obsahují více chyb.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Stahování řečového modelu… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 v tomto telefonu</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Mazání všech přepisů</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Přepis hlasových zpráv</translation>
@@ -3026,15 +3005,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Kdy</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Úložiště</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Řečový model</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Řečový model se nepodařilo stáhnout.</translation>
     </message>
@@ -3042,31 +3012,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Zkusit znovu</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Přepisy</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n hlasová zpráva</numerusform>
-            <numerusform>%n hlasové zprávy</numerusform>
-            <numerusform>%n hlasových zpráv</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Smazat všechny přepisy</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Hlasové zprávy se přepisují v tomto telefonu.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Hlasové zprávy ani jejich přepisy neopustí telefon a přepisy nejsou součástí zálohy.</translation>
     </message>
 </context>
 <context>
@@ -3090,11 +3035,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Hotovo</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kdy</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

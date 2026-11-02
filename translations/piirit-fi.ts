@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Automaattinen litterointi: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Litteroi ääniviestit (kokeellinen)</translation>
     </message>
@@ -2969,11 +2964,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <translation>Litterointi ei ole vielä tarpeeksi tarkkaa näillä kielillä.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Puhemalli vaatii %1 Mt tallennustilaa.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit lataa puhemallin kerran ja litteroi ääniviestit tässä puhelimessa.</translation>
     </message>
@@ -2981,24 +2971,13 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Mikään lähettämäsi tai vastaanottamasi ei lähde puhelimesta.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Tämän kielen litteroinneissa on todennäköisesti enemmän virheitä.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Ladataan puhemallia… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 tässä puhelimessa</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Poistetaan kaikki litteroinnit</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Ääniviestien litterointi</translation>
@@ -3014,15 +2993,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <translation>Milloin</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Tallennustila</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Puhemalli</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Puhemallia ei voitu ladata.</translation>
     </message>
@@ -3030,30 +3000,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Yritä uudelleen</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Litteroinnit</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n ääniviesti</numerusform>
-            <numerusform>%n ääniviestiä</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Poista kaikki litteroinnit</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Ääniviestit litteroidaan tässä puhelimessa.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Ääniviestit tai niiden litteroinnit eivät lähde puhelimesta, eivätkä litteroinnit kuulu varmuuskopioon.</translation>
     </message>
 </context>
 <context>
@@ -3077,11 +3023,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Valmis</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Milloin</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

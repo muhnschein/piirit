@@ -97,8 +97,8 @@ fn the_transcriber_follows_settings_and_power() {
             call!(
                 "set",
                 QString::from(
-                    r#"{"transcriptionLanguages": "fi,en", "transcriptionMode": 1,
-                        "transcriptionOlder": true}"#
+                    r#"{"transcriptionLanguages": "fi,en", "transcriptionMode": 0,
+                        "transcriptionOlder": false}"#
                 )
             ),
         );
@@ -136,27 +136,27 @@ fn the_transcriber_follows_settings_and_power() {
     );
     assert_eq!(
         value("fresh"),
-        "transcriber|false||0|false|false|false",
-        "a fresh install's transcriber is not off with nothing chosen"
+        "transcriber|false||1|true|false|false",
+        "a fresh install's transcriber is not off with nothing chosen, While charging, older on"
     );
     assert_eq!(
         value("settings"),
-        "transcriber|false|fi,en|1|true|false|false",
+        "transcriber|false|fi,en|0|false|false|false",
         "languages, auto-transcribe or older did not reach the transcriber"
     );
     assert_eq!(
         value("always"),
-        "transcriber|false|fi,en|2|true|false|false",
+        "transcriber|false|fi,en|2|false|false|false",
         "a changed auto-transcribe choice did not reach the transcriber"
     );
     assert_eq!(
         value("plugged"),
-        "transcriber|false|fi,en|2|true|true|false",
+        "transcriber|false|fi,en|2|false|true|false",
         "charger in did not reach the transcriber"
     );
     assert_eq!(
         value("saving"),
-        "transcriber|false|fi,en|2|true|true|true",
+        "transcriber|false|fi,en|2|false|true|true",
         "battery saving mode did not reach the transcriber"
     );
 }

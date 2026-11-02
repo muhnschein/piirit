@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Voert kleine apps uit in chats.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Automatisch uitschrijven: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Spraakberichten uitschrijven (experimenteel)</translation>
     </message>
@@ -2969,11 +2964,6 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <translation>Uitschrijven is in deze talen nog niet nauwkeurig genoeg.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Het spraakmodel heeft %1 MB opslag nodig.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit downloadt eenmalig een spraakmodel en schrijft spraakberichten uit op deze telefoon.</translation>
     </message>
@@ -2981,24 +2971,13 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Niets wat je verstuurt of ontvangt verlaat de telefoon.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transcripties in deze taal bevatten waarschijnlijk meer fouten.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Spraakmodel downloaden… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 op deze telefoon</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Alle transcripties worden verwijderd</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Spraakberichten uitschrijven</translation>
@@ -3014,15 +2993,6 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <translation>Wanneer</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Opslag</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Spraakmodel</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Het spraakmodel kon niet worden gedownload.</translation>
     </message>
@@ -3030,30 +3000,6 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Opnieuw proberen</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Transcripties</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n spraakbericht</numerusform>
-            <numerusform>%n spraakberichten</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Alle transcripties verwijderen</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Spraakberichten worden op deze telefoon uitgeschreven.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>De spraakberichten en hun transcripties verlaten de telefoon niet, en transcripties maken geen deel uit van een back-up.</translation>
     </message>
 </context>
 <context>
@@ -3077,11 +3023,6 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Klaar</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Wanneer</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

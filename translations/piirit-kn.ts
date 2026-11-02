@@ -2279,11 +2279,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>ಸ್ವಯಂ ಲಿಪ್ಯಂತರ: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಲಿಪ್ಯಂತರಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ಈ ಭಾಷೆಗಳಲ್ಲಿ ಲಿಪ್ಯಂತರ ಇನ್ನೂ ಸಾಕಷ್ಟು ನಿಖರವಾಗಿಲ್ಲ.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>ಮಾತಿನ ಮಾದರಿಗೆ %1 MB ಸಂಗ್ರಹಣೆ ಬೇಕು.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit ಒಮ್ಮೆ ಮಾತಿನ ಮಾದರಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಈ ಫೋನ್‌ನಲ್ಲೇ ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಲಿಪ್ಯಂತರಿಸುತ್ತದೆ.</translation>
     </message>
@@ -2985,24 +2975,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>ನೀವು ಕಳುಹಿಸುವ ಅಥವಾ ಪಡೆಯುವ ಯಾವುದೂ ಫೋನ್‌ನಿಂದ ಹೊರಗೆ ಹೋಗುವುದಿಲ್ಲ.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ಈ ಭಾಷೆಯ ಲಿಪ್ಯಂತರಗಳಲ್ಲಿ ಹೆಚ್ಚು ತಪ್ಪುಗಳಿರುವ ಸಾಧ್ಯತೆ ಇದೆ.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>ಮಾತಿನ ಮಾದರಿ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>ಈ ಫೋನ್‌ನಲ್ಲಿ %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>ಎಲ್ಲಾ ಲಿಪ್ಯಂತರಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>ಧ್ವನಿ ಸಂದೇಶ ಲಿಪ್ಯಂತರ</translation>
@@ -3018,15 +2997,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ಯಾವಾಗ</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>ಸಂಗ್ರಹಣೆ</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>ಮಾತಿನ ಮಾದರಿ</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>ಮಾತಿನ ಮಾದರಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ.</translation>
     </message>
@@ -3034,30 +3004,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>ಲಿಪ್ಯಂತರಗಳು</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n ಧ್ವನಿ ಸಂದೇಶ</numerusform>
-            <numerusform>%n ಧ್ವನಿ ಸಂದೇಶಗಳು</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>ಎಲ್ಲಾ ಲಿಪ್ಯಂತರಗಳನ್ನು ಅಳಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಈ ಫೋನ್‌ನಲ್ಲೇ ಲಿಪ್ಯಂತರಿಸಲಾಗುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>ಧ್ವನಿ ಸಂದೇಶಗಳಾಗಲೀ ಅವುಗಳ ಲಿಪ್ಯಂತರಗಳಾಗಲೀ ಫೋನ್‌ನಿಂದ ಹೊರಗೆ ಹೋಗುವುದಿಲ್ಲ, ಮತ್ತು ಲಿಪ್ಯಂತರಗಳು ಬ್ಯಾಕಪ್‌ನ ಭಾಗವಲ್ಲ.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>ಮುಗಿದಿದೆ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ಯಾವಾಗ</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

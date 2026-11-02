@@ -2279,11 +2279,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>ਆਪੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
     </message>
@@ -2973,11 +2968,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ਇਨ੍ਹਾਂ ਭਾਸ਼ਾਵਾਂ ਵਿੱਚ ਲਿਖਤ ਹਾਲੇ ਕਾਫ਼ੀ ਸਹੀ ਨਹੀਂ ਹੈ।</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>ਬੋਲੀ ਮਾਡਲ ਨੂੰ %1 MB ਥਾਂ ਚਾਹੀਦੀ ਹੈ।</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit ਇੱਕ ਵਾਰ ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਕਰਦਾ ਹੈ ਅਤੇ ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
     </message>
@@ -2985,24 +2975,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>ਤੁਸੀਂ ਜੋ ਭੇਜਦੇ ਜਾਂ ਪ੍ਰਾਪਤ ਕਰਦੇ ਹੋ, ਉਸ ਵਿੱਚੋਂ ਕੁਝ ਵੀ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ਇਸ ਭਾਸ਼ਾ ਦੀਆਂ ਲਿਖਤਾਂ ਵਿੱਚ ਵਧੇਰੇ ਗਲਤੀਆਂ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>ਸਾਰੀਆਂ ਲਿਖਤਾਂ ਮਿਟਾਈਆਂ ਜਾ ਰਹੀਆਂ ਹਨ</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ</translation>
@@ -3018,15 +2997,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ਕਦੋਂ</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>ਸਟੋਰੇਜ</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>ਬੋਲੀ ਮਾਡਲ</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਸਕਿਆ।</translation>
     </message>
@@ -3034,30 +3004,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>ਲਿਖਤਾਂ</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n ਆਵਾਜ਼ ਸੁਨੇਹਾ</numerusform>
-            <numerusform>%n ਆਵਾਜ਼ ਸੁਨੇਹੇ</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>ਸਾਰੀਆਂ ਲਿਖਤਾਂ ਮਿਟਾਓ</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>ਆਵਾਜ਼ ਸੁਨੇਹੇ ਇਸੇ ਫ਼ੋਨ &apos;ਤੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ।</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>ਨਾ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਅਤੇ ਨਾ ਉਨ੍ਹਾਂ ਦੀਆਂ ਲਿਖਤਾਂ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਲਿਖਤਾਂ ਬੈਕਅੱਪ ਦਾ ਹਿੱਸਾ ਨਹੀਂ ਹਨ।</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>ਹੋ ਗਿਆ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ਕਦੋਂ</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

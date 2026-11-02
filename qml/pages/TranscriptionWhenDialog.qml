@@ -3,8 +3,8 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Setup's second dialog, after languages accepted (download already started): when to
- * transcribe, download progress. Done returns to Settings; back returns to languages.
+ * Setup's second dialog, after languages accepted (download already started): download
+ * progress on top, when to transcribe. Done returns to Settings; back returns to languages.
  * Download belongs to app-wide `Transcriber`: goes on when this closes.
  */
 Dialog {
@@ -37,13 +37,6 @@ Dialog {
                 //: Closes transcription setup.
                 acceptText: qsTr("Done")
             }
-
-            SectionHeader {
-                //: Heading over when voice messages are transcribed.
-                text: qsTr("When")
-            }
-
-            TranscriptionWhen {}
 
             Label {
                 objectName: "modelProgress"
@@ -105,6 +98,14 @@ Dialog {
                 text: qsTr("Try again")
                 onClicked: dialog.transcriber.download_model()
             }
+
+            Item {
+                visible: dialog.downloading || dialog.failed
+                width: 1
+                height: Theme.paddingMedium
+            }
+
+            TranscriptionWhen {}
         }
     }
 }

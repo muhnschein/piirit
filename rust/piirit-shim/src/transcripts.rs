@@ -44,7 +44,7 @@ pub const MODEL_READY: u32 = 2;
 /// Download or check failed; `model_error` set.
 pub const MODEL_FAILED: u32 = 3;
 
-/// App-wide side: settings in, model and counts out. One instance (`qml/piirit.qml`).
+/// App-wide side: settings in, model state out. One instance (`qml/piirit.qml`).
 ///
 /// ```qml
 /// Transcriber {
@@ -85,12 +85,6 @@ pub struct Transcriber {
     pub model_state: qt_property!(u32; NOTIFY model_changed),
     /// Download progress, 0..=1000.
     pub model_permille: qt_property!(u32; NOTIFY model_changed),
-    /// Model name for display (`Whisper small`).
-    pub model_name: qt_property!(QString; READ name CONST),
-    /// Download size, bytes, for "needs N MB".
-    pub model_download_bytes: qt_property!(f64; READ download_bytes CONST),
-    /// Model size on phone, bytes; 0 if absent.
-    pub model_bytes: qt_property!(f64; NOTIFY model_changed),
     /// Why download or check failed.
     pub model_error: qt_property!(QString; NOTIFY model_changed),
     /// Emitted when model state changes.
@@ -99,15 +93,6 @@ pub struct Transcriber {
     pub download_model: qt_method!(fn(&mut self)),
     /// Stop download; partial file kept for resume.
     pub cancel_download: qt_method!(fn(&mut self)),
-
-    /// Transcripts stored, all profiles.
-    pub transcript_count: qt_property!(u32; NOTIFY store_changed),
-    /// Their size, bytes.
-    pub transcript_bytes: qt_property!(f64; NOTIFY store_changed),
-    /// Emitted when counts change.
-    pub store_changed: qt_signal!(),
-    /// Delete every transcript.
-    pub delete_all: qt_method!(fn(&mut self)),
 
     /// Count voice messages in chat without transcript; answer via `chat_counted`.
     pub count_chat: qt_method!(fn(&mut self, account_id: u32, chat_id: u32)),
@@ -192,18 +177,6 @@ impl Transcriber {
         }
     }
 
-    /// Model name.
-    #[must_use]
-    pub fn name(&self) -> QString {
-        QString::from(files::MODEL_NAME)
-    }
-
-    /// Download size.
-    #[must_use]
-    pub fn download_bytes(&self) -> f64 {
-        to_f64(ModelSpec::current().bytes)
-    }
-
     /// After any setting: known to hub, model fetched once if missing, hub told.
     fn settle(&mut self) {
         if !self.attached {
@@ -239,24 +212,19 @@ impl Transcriber {
         let size = files::model_path()
             .and_then(|path| std::fs::metadata(path).ok())
             .map(|meta| meta.len());
-        if let Some(size) = size.filter(|size| *size == ModelSpec::current().bytes) {
-            self.set_model(MODEL_READY, 1000, size, String::new());
+        if size == Some(ModelSpec::current().bytes) {
+            self.set_model(MODEL_READY, 1000, String::new());
         }
     }
 
-    fn set_model(&mut self, state: u32, permille: u32, bytes: u64, error: String) {
-        let bytes = to_f64(bytes);
+    fn set_model(&mut self, state: u32, permille: u32, error: String) {
         let error = QString::from(error);
-        if self.model_state == state
-            && self.model_permille == permille
-            && self.model_bytes.to_bits() == bytes.to_bits()
-            && self.model_error == error
+        if self.model_state == state && self.model_permille == permille && self.model_error == error
         {
             return;
         }
         self.model_state = state;
         self.model_permille = permille;
-        self.model_bytes = bytes;
         self.model_error = error;
         self.model_changed();
     }
@@ -278,12 +246,7 @@ impl Transcriber {
         let part = files::partial_path(&model);
         let have = std::fs::metadata(&part).map_or(0, |meta| meta.len());
         self.generation = self.generation.wrapping_add(1);
-        self.set_model(
-            MODEL_DOWNLOADING,
-            permille(have, spec.bytes),
-            0,
-            String::new(),
-        );
+        self.set_model(MODEL_DOWNLOADING, permille(have, spec.bytes), String::new());
         if have == 0 {
             self.begin(&spec, &part, None);
             return;
@@ -347,7 +310,6 @@ impl Transcriber {
                     self.set_model(
                         MODEL_DOWNLOADING,
                         permille(bytes, spec.bytes),
-                        0,
                         String::new(),
                     );
                 }
@@ -378,13 +340,13 @@ impl Transcriber {
             self.fail_model(format!("could not keep the model: {err}"));
             return;
         }
-        self.set_model(MODEL_READY, 1000, size, String::new());
+        self.set_model(MODEL_READY, 1000, String::new());
         self.settle();
     }
 
     fn fail_model(&mut self, error: String) {
         eprintln!("piirit: speech model: {error}");
-        self.set_model(MODEL_FAILED, self.model_permille, 0, error);
+        self.set_model(MODEL_FAILED, self.model_permille, error);
     }
 
     /// Stop download; partial file kept for resume.
@@ -395,7 +357,7 @@ impl Transcriber {
         self.fetch = None;
         self.hashing = false;
         self.generation = self.generation.wrapping_add(1);
-        self.set_model(MODEL_ABSENT, 0, 0, String::new());
+        self.set_model(MODEL_ABSENT, 0, String::new());
     }
 
     /// Feature off: download stopped, model and part deleted.
@@ -407,22 +369,7 @@ impl Transcriber {
             remove(&files::partial_path(&model));
             remove(&model);
         }
-        self.set_model(MODEL_ABSENT, 0, 0, String::new());
-    }
-
-    /// Counts from store.
-    fn set_counts(&mut self, count: u32, bytes: u64) {
-        let bytes = to_f64(bytes);
-        if self.transcript_count != count || self.transcript_bytes.to_bits() != bytes.to_bits() {
-            self.transcript_count = count;
-            self.transcript_bytes = bytes;
-            self.store_changed();
-        }
-    }
-
-    /// Delete every transcript.
-    pub fn delete_all(&mut self) {
-        hub::delete_all();
+        self.set_model(MODEL_ABSENT, 0, String::new());
     }
 
     /// Count chat's voice messages without transcript.
@@ -450,12 +397,6 @@ impl Transcriber {
             _ => {}
         }
     }
-}
-
-/// Bytes for QML (no 64-bit int there); exact to 2^53.
-#[allow(clippy::cast_precision_loss)]
-fn to_f64(bytes: u64) -> f64 {
-    bytes as f64
 }
 
 /// Progress, 0..=1000.

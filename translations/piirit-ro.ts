@@ -2283,11 +2283,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Rulează aplicații mici în conversații.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Transcriere automată: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Transcrie mesajele vocale (experimental)</translation>
     </message>
@@ -2977,11 +2972,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <translation>Transcrierea nu este încă destul de precisă în aceste limbi.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Modelul de vorbire are nevoie de %1 MB de spațiu.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit descarcă o singură dată un model de vorbire și transcrie mesajele vocale pe acest telefon.</translation>
     </message>
@@ -2989,24 +2979,13 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Nimic din ce trimiți sau primești nu părăsește telefonul.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transcrierile în această limbă conțin probabil mai multe greșeli.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Se descarcă modelul de vorbire… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 pe acest telefon</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Se șterg toate transcrierile</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Transcrierea mesajelor vocale</translation>
@@ -3022,15 +3001,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <translation>Când</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Spațiu de stocare</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Model de vorbire</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
     </message>
@@ -3038,31 +3008,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Încearcă din nou</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Transcrieri</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n mesaj vocal</numerusform>
-            <numerusform>%n mesaje vocale</numerusform>
-            <numerusform>%n de mesaje vocale</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Șterge toate transcrierile</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Mesajele vocale sunt transcrise pe acest telefon.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Nici mesajele vocale, nici transcrierile lor nu părăsesc telefonul, iar transcrierile nu fac parte dintr-o copie de rezervă.</translation>
     </message>
 </context>
 <context>
@@ -3086,11 +3031,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Gata</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Când</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

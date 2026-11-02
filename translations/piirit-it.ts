@@ -2279,11 +2279,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Esegue piccole app all&apos;interno delle chat.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Trascrizione automatica: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Trascrivi i messaggi vocali (sperimentale)</translation>
     </message>
@@ -2973,11 +2968,6 @@ In attesa del dispositivo di %2$s che risponda…</translation>
         <translation>In queste lingue la trascrizione non è ancora abbastanza precisa.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Il modello vocale richiede %1 MB di spazio.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit scarica una volta un modello vocale e trascrive i messaggi vocali su questo telefono.</translation>
     </message>
@@ -2985,24 +2975,13 @@ In attesa del dispositivo di %2$s che risponda…</translation>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Niente di ciò che invii o ricevi lascia il telefono.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Le trascrizioni in questa lingua contengono probabilmente più errori.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Download del modello vocale… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 su questo telefono</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Eliminazione di tutte le trascrizioni</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Trascrizione dei messaggi vocali</translation>
@@ -3018,15 +2997,6 @@ In attesa del dispositivo di %2$s che risponda…</translation>
         <translation>Quando</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Spazio</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Modello vocale</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Non è stato possibile scaricare il modello vocale.</translation>
     </message>
@@ -3034,30 +3004,6 @@ In attesa del dispositivo di %2$s che risponda…</translation>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Riprova</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Trascrizioni</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n messaggio vocale</numerusform>
-            <numerusform>%n messaggi vocali</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Elimina tutte le trascrizioni</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>I messaggi vocali vengono trascritti su questo telefono.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Né i messaggi vocali né le loro trascrizioni lasciano il telefono, e le trascrizioni non fanno parte di un backup.</translation>
     </message>
 </context>
 <context>
@@ -3081,11 +3027,6 @@ In attesa del dispositivo di %2$s che risponda…</translation>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Fatto</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Quando</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

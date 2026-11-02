@@ -1,5 +1,6 @@
 // Spoken languages behind Piirit's catalogs, for transcription: whisper code, own name.
-// `available`: FLEURS WER (CER for zh) <= 25 % with shipped model as app runs it; else greyed.
+// FLEURS WER (CER for zh), shipped model as app runs it: <= 25 % `available`, else greyed;
+// over 15 % `rough`, said under name.
 // Order: own name, romanised. Library: nothing translated, one shared copy.
 .pragma library
 
@@ -13,7 +14,7 @@ var languages = [
     { code: "et", name: "Eesti", available: false },
     { code: "el", name: "Ελληνικά", available: false },
     { code: "es", name: "Español", available: true },
-    { code: "fr", name: "Français", available: true },
+    { code: "fr", name: "Français", available: true, rough: true },
     { code: "gu", name: "ગુજરાતી", available: false },
     { code: "hi", name: "हिन्दी", available: false },
     { code: "it", name: "Italiano", available: true },
@@ -23,10 +24,10 @@ var languages = [
     { code: "hu", name: "Magyar", available: false },
     { code: "ml", name: "മലയാളം", available: false },
     { code: "mr", name: "मराठी", available: false },
-    { code: "nl", name: "Nederlands", available: true },
+    { code: "nl", name: "Nederlands", available: true, rough: true },
     { code: "no", name: "Norsk bokmål", available: false },
     { code: "pa", name: "ਪੰਜਾਬੀ", available: false },
-    { code: "pl", name: "Polski", available: true },
+    { code: "pl", name: "Polski", available: true, rough: true },
     { code: "pt", name: "Português", available: true },
     { code: "ro", name: "Română", available: false },
     { code: "ru", name: "Русский", available: true },
@@ -37,10 +38,10 @@ var languages = [
     { code: "ta", name: "தமிழ்", available: false },
     { code: "tt", name: "Татар", available: false },
     { code: "te", name: "తెలుగు", available: false },
-    { code: "vi", name: "Tiếng Việt", available: true },
-    { code: "tr", name: "Türkçe", available: true },
-    { code: "uk", name: "Українська", available: true },
-    { code: "zh", name: "中文（普通话）", available: true },
+    { code: "vi", name: "Tiếng Việt", available: true, rough: true },
+    { code: "tr", name: "Türkçe", available: true, rough: true },
+    { code: "uk", name: "Українська", available: true, rough: true },
+    { code: "zh", name: "中文（普通话）", available: true, rough: true },
     // Whisper small has no Cantonese token (`yue` is large-v3's 100th language).
     { code: "yue", name: "粵語（廣東話）", available: false }
 ]

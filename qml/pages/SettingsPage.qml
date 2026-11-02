@@ -1,8 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import "../js/Speech.js" as Speech
-import "../js/Transcription.js" as Transcription
 
 /*
  * Per-phone settings, from chat list; profile's on profile page, except block
@@ -161,13 +159,6 @@ Page {
             url: Qt.resolvedUrl("TranscriptionLanguagesDialog.qml"),
             properties: { setup: true, returnTo: page, transcriber: page.transcriber }
         })
-    }
-
-    /// Entry subtitle: languages, auto-transcribe choice.
-    function transcriptionSummary() {
-        //: %1 is the auto-transcribe choice: Never, While charging or Always.
-        return Speech.names(Settings.transcriptionLanguages) + " · "
-               + qsTr("Auto-transcribe: %1").arg(Transcription.modeName(Settings.transcriptionMode))
     }
 
     /// Period awaiting answer, 0 none. Estimate by signal; earlier ask's ignored.
@@ -471,38 +462,23 @@ Page {
                 onClicked: page.toggleTranscription()
             }
 
-            // Set up: rest of transcription settings on own page.
+            // Set up: rest of transcription settings on own page. As Quick actions.
             BackgroundItem {
                 id: transcriptionEntry
                 objectName: "transcriptionEntry"
                 visible: Settings.transcriptionEnabled === true
                 width: parent.width
-                height: transcriptionLabel.height + transcriptionDetail.height
-                        + 2 * Theme.paddingSmall
+                height: Theme.itemSizeSmall
 
                 Label {
-                    id: transcriptionLabel
                     objectName: "transcriptionLabel"
-                    x: Theme.horizontalPageMargin + Theme.itemSizeExtraSmall
-                    y: Theme.paddingSmall
-                    width: parent.width - x - Theme.horizontalPageMargin
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
                     truncationMode: TruncationMode.Fade
                     color: transcriptionEntry.highlighted ? Theme.highlightColor
                                                           : Theme.primaryColor
                     text: qsTr("Voice message transcription")
-                }
-
-                Label {
-                    id: transcriptionDetail
-                    objectName: "transcriptionDetail"
-                    x: transcriptionLabel.x
-                    y: transcriptionLabel.y + transcriptionLabel.height
-                    width: transcriptionLabel.width
-                    truncationMode: TruncationMode.Fade
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: transcriptionEntry.highlighted ? Theme.secondaryHighlightColor
-                                                          : Theme.secondaryColor
-                    text: page.transcriptionSummary()
                 }
 
                 onClicked: pageStack.push(Qt.resolvedUrl("TranscriptionPage.qml"))

@@ -2271,11 +2271,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Otomatik yazıya dökme: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Sesli mesajları yazıya dök (deneysel)</translation>
     </message>
@@ -2965,11 +2960,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Bu dillerde yazıya dökme henüz yeterince doğru değil.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Konuşma modeli %1 MB depolama alanı gerektirir.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit bir kez bir konuşma modeli indirir ve sesli mesajları bu telefonda yazıya döker.</translation>
     </message>
@@ -2977,24 +2967,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Gönderdiğiniz veya aldığınız hiçbir şey telefondan çıkmaz.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Bu dildeki dökümlerde muhtemelen daha fazla hata vardır.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Konuşma modeli indiriliyor… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>Bu telefonda %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Tüm dökümler siliniyor</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Sesli mesajları yazıya dökme</translation>
@@ -3010,15 +2989,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Ne zaman</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Depolama</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Konuşma modeli</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Konuşma modeli indirilemedi.</translation>
     </message>
@@ -3026,29 +2996,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Yeniden dene</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Dökümler</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n sesli mesaj</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Tüm dökümleri sil</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Sesli mesajlar bu telefonda yazıya dökülür.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Ne sesli mesajlar ne de dökümleri telefondan çıkar ve dökümler yedeğin parçası değildir.</translation>
     </message>
 </context>
 <context>
@@ -3072,11 +3019,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Bitti</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Ne zaman</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

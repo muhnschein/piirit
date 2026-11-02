@@ -24,7 +24,7 @@ const PROBE_QML: &str = r"
         Transcriber { id: transcriber; enabled: true }
         function report() {
             return transcriber.model_state + '|' + transcriber.model_permille + '|'
-                + transcriber.model_bytes + '|' + transcriber.model_error
+                + transcriber.model_error
         }
         function act(what) {
             if (what === 'cancel') transcriber.cancel_download()
@@ -169,25 +169,21 @@ fn the_model_downloads_resumes_and_is_checked() {
     let context = format!("log: {log:?}\nranges: {:?}", server.ranges());
     let expected = sha256_hex(&body);
 
-    assert_eq!(get("held"), "1|500|0|", "{context}");
-    assert_eq!(
-        get("cancelled"),
-        "0|0|0|",
-        "stop is not a failure. {context}"
-    );
+    assert_eq!(get("held"), "1|500|", "{context}");
+    assert_eq!(get("cancelled"), "0|0|", "stop is not a failure. {context}");
     assert_eq!(
         get("part after cancel"),
         HELD.to_string(),
         "stop keeps the part. {context}"
     );
-    assert_eq!(get("resumed"), format!("2|1000|{SIZE}|"), "{context}");
+    assert_eq!(get("resumed"), "2|1000|", "{context}");
     assert_eq!(
         get("model hash"),
         expected,
         "resumed file is the model. {context}"
     );
     assert_eq!(get("part after resume"), "none", "{context}");
-    assert_eq!(get("off"), "0|0|0|", "{context}");
+    assert_eq!(get("off"), "0|0|", "{context}");
     assert_eq!(
         get("model after off"),
         "none",
@@ -203,7 +199,7 @@ fn the_model_downloads_resumes_and_is_checked() {
         "none",
         "a damaged part is not resumed. {context}"
     );
-    assert_eq!(get("restarted"), format!("2|1000|{SIZE}|"), "{context}");
+    assert_eq!(get("restarted"), "2|1000|", "{context}");
     assert_eq!(get("model hash after restart"), expected, "{context}");
     assert_eq!(
         server.ranges(),

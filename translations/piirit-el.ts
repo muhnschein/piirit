@@ -2275,11 +2275,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες.</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>Αυτόματη μεταγραφή: %1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Μεταγραφή φωνητικών μηνυμάτων (πειραματικό)</translation>
     </message>
@@ -2969,11 +2964,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Η μεταγραφή δεν είναι ακόμη αρκετά ακριβής σε αυτές τις γλώσσες.</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>Το μοντέλο ομιλίας χρειάζεται %1 MB χώρου.</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Το Piirit κατεβάζει μία φορά ένα μοντέλο ομιλίας και μεταγράφει τα φωνητικά μηνύματα σε αυτό το τηλέφωνο.</translation>
     </message>
@@ -2981,24 +2971,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>Τίποτα από όσα στέλνετε ή λαμβάνετε δεν φεύγει από το τηλέφωνο.</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Οι μεταγραφές σε αυτή τη γλώσσα πιθανότατα περιέχουν περισσότερα λάθη.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>%1 σε αυτό το τηλέφωνο</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>Διαγραφή όλων των μεταγραφών</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>Μεταγραφή φωνητικών μηνυμάτων</translation>
@@ -3014,15 +2993,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>Πότε</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>Αποθήκευση</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>Μοντέλο ομιλίας</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
     </message>
@@ -3030,30 +3000,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Δοκιμάστε ξανά</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>Μεταγραφές</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n φωνητικό μήνυμα</numerusform>
-            <numerusform>%n φωνητικά μηνύματα</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>Διαγραφή όλων των μεταγραφών</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>Τα φωνητικά μηνύματα μεταγράφονται σε αυτό το τηλέφωνο.</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>Ούτε τα φωνητικά μηνύματα ούτε οι μεταγραφές τους φεύγουν από το τηλέφωνο, και οι μεταγραφές δεν αποτελούν μέρος αντιγράφου ασφαλείας.</translation>
     </message>
 </context>
 <context>
@@ -3077,11 +3023,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>Τέλος</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Πότε</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>

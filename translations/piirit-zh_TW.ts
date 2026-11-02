@@ -2267,11 +2267,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>在聊天中執行小型應用程式。</translation>
     </message>
     <message>
-        <source>Auto-transcribe: %1</source>
-        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
-        <translation>自動轉寫：%1</translation>
-    </message>
-    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>轉寫語音訊息（實驗性）</translation>
     </message>
@@ -2959,11 +2954,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>這些語言的轉寫還不夠準確。</translation>
     </message>
     <message>
-        <source>The speech model needs %1 MB of storage.</source>
-        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
-        <translation>語音模型需要 %1 MB 儲存空間。</translation>
-    </message>
-    <message>
         <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
         <translation>Piirit 會下載一次語音模型，並在這支手機上轉寫語音訊息。</translation>
     </message>
@@ -2971,24 +2961,13 @@ Waiting for the device of %2$s to reply…</source>
         <source>Nothing you send or receive leaves the phone.</source>
         <translation>你傳送或接收的任何內容都不會離開手機。</translation>
     </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>這種語言的轉寫可能有較多錯誤。</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionPage</name>
-    <message>
-        <source>Downloading the speech model… %1%</source>
-        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
-        <translation>正在下載語音模型… %1%</translation>
-    </message>
-    <message>
-        <source>%1 on this phone</source>
-        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
-        <translation>本機上 %1</translation>
-    </message>
-    <message>
-        <source>Deleting all transcripts</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
-        <translation>正在刪除所有轉寫</translation>
-    </message>
     <message>
         <source>Voice message transcription</source>
         <translation>語音訊息轉寫</translation>
@@ -3004,15 +2983,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>何時</translation>
     </message>
     <message>
-        <source>Storage</source>
-        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
-        <translation>儲存空間</translation>
-    </message>
-    <message>
-        <source>Speech model</source>
-        <translation>語音模型</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>無法下載語音模型。</translation>
     </message>
@@ -3020,29 +2990,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>重試</translation>
-    </message>
-    <message>
-        <source>Transcripts</source>
-        <translation>轉寫內容</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n voice message(s)</source>
-        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
-        <translation>
-            <numerusform>%n 則語音訊息</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all transcripts</source>
-        <translation>刪除所有轉寫</translation>
-    </message>
-    <message>
-        <source>Voice messages are transcribed on this phone.</source>
-        <translation>語音訊息在這支手機上轉寫。</translation>
-    </message>
-    <message>
-        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
-        <translation>語音訊息及其轉寫都不會離開手機，轉寫也不包含在備份中。</translation>
     </message>
 </context>
 <context>
@@ -3066,11 +3013,6 @@ Waiting for the device of %2$s to reply…</source>
         <source>Done</source>
         <extracomment>Closes transcription setup.</extracomment>
         <translation>完成</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>何時</translation>
     </message>
     <message>
         <source>Downloading the speech model… %1%</source>
