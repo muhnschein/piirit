@@ -732,6 +732,30 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Delete</source>
         <translation>Izbriši</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Prepiši %n glasovno sporočilo</numerusform>
+            <numerusform>Prepiši %n glasovni sporočili</numerusform>
+            <numerusform>Prepiši %n glasovna sporočila</numerusform>
+            <numerusform>Prepiši %n glasovnih sporočil</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopiraj prepis</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Kopirano v odložišče</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Prepiši</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -832,6 +856,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Edit</source>
         <translation>Uredi</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopiraj prepis</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Prepiši</translation>
     </message>
 </context>
 <context>
@@ -2260,6 +2294,27 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Runs small apps inside chats.</source>
         <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>Samodejni prepis: %1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Prepisuj glasovna sporočila (poskusno)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Prepis glasovnih sporočil</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Pretvori glasovna sporočila v besedilo na tem telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nič ne zapusti telefona.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2879,11 +2934,267 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Med polnjenjem</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Vedno</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nikoli</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Nova glasovna sporočila se prepišejo, ko se telefon polni.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Nova glasovna sporočila se prepišejo, takoj ko so prenesena.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>To porablja baterijo.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Tapnite Prepiši pri glasovnem sporočilu, da ga pretvorite v besedilo.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Naprej</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Jeziki</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Še ni na voljo</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Prepis v teh jezikih še ni dovolj natančen.</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>Govorni model potrebuje %1 MB prostora.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit enkrat prenese govorni model in prepisuje glasovna sporočila na tem telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nič od tega, kar pošljete ali prejmete, ne zapusti telefona.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Prenašanje govornega modela… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>%1 na tem telefonu</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>Brisanje vseh prepisov</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Prepis glasovnih sporočil</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Jeziki</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kdaj</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>Shramba</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>Govorni model</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Govornega modela ni bilo mogoče prenesti.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Poskusi znova</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>Prepisi</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n glasovno sporočilo</numerusform>
+            <numerusform>%n glasovni sporočili</numerusform>
+            <numerusform>%n glasovna sporočila</numerusform>
+            <numerusform>%n glasovnih sporočil</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>Izbriši vse prepise</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>Glasovna sporočila se prepisujejo na tem telefonu.</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>Niti glasovna sporočila niti njihovi prepisi ne zapustijo telefona, prepisi pa niso del varnostne kopije.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Samodejno prepisuj glasovna sporočila</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Prepiši starejša glasovna sporočila</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Glasovna sporočila, ki so prispela, preden ste to vklopili, se prepišejo, ko se telefon polni.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Končano</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kdaj</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Prenašanje govornega modela… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Prenos se nadaljuje, ko zaprete to stran.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Govornega modela ni bilo mogoče prenesti.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Poskusi znova</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Snemanje %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>To glasovno sporočilo bo prepisano, ko se bo telefon polnil.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Prepisovanje je ustavljeno, dokler je vklopljen način varčevanja z energijo.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Čaka, da se prepišejo druga glasovna sporočila.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Prenašanje govornega modela… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Prepisovanje… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>To glasovno sporočilo je videti v jeziku %1, ki ni izbran.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>V tem glasovnem sporočilu ni bilo najdenega govora.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Tega glasovnega sporočila ni bilo mogoče prepisati.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Prepiši</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Prepiši zdaj</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Vseeno prepiši</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Poskusi znova</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Prepisano na tem telefonu</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Pokaži vse</translation>
     </message>
 </context>
 <context>

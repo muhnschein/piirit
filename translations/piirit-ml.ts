@@ -728,6 +728,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>ഇല്ലാതാക്കുക</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n ശബ്ദ സന്ദേശം എഴുത്താക്കുക</numerusform>
+            <numerusform>%n ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>എഴുത്തുരൂപം പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -828,6 +850,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>തിരുത്തുക</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>എഴുത്തുരൂപം പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
     </message>
 </context>
 <context>
@@ -2246,6 +2278,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>സ്വയമേവ എഴുത്താക്കൽ: %1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2865,11 +2918,265 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>ചാർജ് ചെയ്യുമ്പോൾ</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>എപ്പോഴും</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ഒരിക്കലും വേണ്ട</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ പുതിയ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>പുതിയ ശബ്ദ സന്ദേശങ്ങൾ ഡൗൺലോഡ് ആയ ഉടൻ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>ഇത് ബാറ്ററി ഉപയോഗിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>ഒരു ശബ്ദ സന്ദേശം എഴുത്താക്കാൻ അതിലെ എഴുത്താക്കുക ടാപ്പ് ചെയ്യുക.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>അടുത്തത്</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>ഇതുവരെ ലഭ്യമല്ല</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>ഈ ഭാഷകളിൽ എഴുത്താക്കൽ ഇതുവരെ മതിയായ കൃത്യതയിലല്ല.</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>സംഭാഷണ മാതൃകയ്ക്ക് %1 MB സംഭരണം വേണം.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ഒരിക്കൽ ഒരു സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്ത് ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>നിങ്ങൾ അയയ്ക്കുന്നതോ സ്വീകരിക്കുന്നതോ ആയ ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>ഈ ഫോണിൽ %1</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>എല്ലാ എഴുത്തുരൂപങ്ങളും ഇല്ലാതാക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>എപ്പോൾ</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>സംഭരണം</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>സംഭാഷണ മാതൃക</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>എഴുത്തുരൂപങ്ങൾ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n ശബ്ദ സന്ദേശം</numerusform>
+            <numerusform>%n ശബ്ദ സന്ദേശങ്ങൾ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>എല്ലാ എഴുത്തുരൂപങ്ങളും ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ ഈ ഫോണിൽ തന്നെ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങളോ അവയുടെ എഴുത്തുരൂപങ്ങളോ ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല, എഴുത്തുരൂപങ്ങൾ ബാക്കപ്പിന്റെ ഭാഗവുമല്ല.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ സ്വയമേവ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>പഴയ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>ഇത് ഓണാക്കുന്നതിന് മുമ്പ് വന്ന ശബ്ദ സന്ദേശങ്ങൾ ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>പൂർത്തിയായി</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>എപ്പോൾ</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>ഈ പേജ് അടച്ച ശേഷവും ഡൗൺലോഡ് തുടരും.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>റെക്കോർഡിംഗ് %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ ഈ ശബ്ദ സന്ദേശം എഴുത്താക്കും.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>ബാറ്ററി ലാഭിക്കൽ മോഡ് ഓണായിരിക്കുന്നിടത്തോളം എഴുത്താക്കൽ നിർത്തിവച്ചിരിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>മറ്റ് ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നതിനായി കാത്തിരിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>എഴുത്താക്കുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>ഈ ശബ്ദ സന്ദേശം %1 ഭാഷയിലാണെന്ന് തോന്നുന്നു, അത് തിരഞ്ഞെടുത്തിട്ടില്ല.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>ഈ ശബ്ദ സന്ദേശത്തിൽ സംസാരം കണ്ടെത്തിയില്ല.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>ഈ ശബ്ദ സന്ദേശം എഴുത്താക്കാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>ഇപ്പോൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>എന്നാലും എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>ഈ ഫോണിൽ എഴുത്താക്കിയത്</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>എല്ലാം കാണിക്കുക</translation>
     </message>
 </context>
 <context>
