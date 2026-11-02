@@ -190,7 +190,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: rust/target
-          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-${{ env.C_LIBS }}-${{ hashFiles('rust/piirit-video/build.rs', 'rust/piirit-video/build_reuse.rs') }}
+          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-${{ env.C_LIBS }}-${{ hashFiles('rust/piirit-video/build.rs', 'rust/piirit-video/build_reuse.rs', 'rust/piirit-speech/build.rs') }}
           restore-keys: |
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-

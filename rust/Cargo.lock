@@ -393,6 +393,7 @@ dependencies = [
 name = "piirit-speech"
 version = "2.2.0"
 dependencies = [
+ "cc",
  "piirit-video",
 ]
 
