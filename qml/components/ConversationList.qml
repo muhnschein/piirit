@@ -709,6 +709,9 @@ SilicaListView {
             // UTC date parts rebuilt as local; offset maths would bring back the DST error
             // model avoids.
             text: {
+                if (!dayHeading.shown) {
+                    return ""
+                }
                 var day = parseInt(messageRow.ListView.section, 10)
                 if (isNaN(day)) {
                     return ""
@@ -753,7 +756,7 @@ SilicaListView {
                 textFormat: Text.PlainText
                 //: The line in a conversation above the first message that
                 //: arrived while the reader was away.
-                text: qsTr("New messages")
+                text: unreadLine.shown ? qsTr("New messages") : ""
             }
 
             Rectangle {
