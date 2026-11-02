@@ -22,14 +22,11 @@ Dialog {
     acceptDestination: dialog.choice === "chat" ? Qt.resolvedUrl("NewChatPage.qml")
                      : dialog.choice.length > 0 ? Qt.resolvedUrl("NewGroupPage.qml")
                      : ""
-    // Chat page has no `channel`: only group page gets it.
-    acceptDestinationProperties: dialog.choice === "chat"
-                                 ? { accountId: dialog.accountId, landOn: dialog.landOn }
-                                 : { accountId: dialog.accountId, landOn: dialog.landOn,
-                                     channel: dialog.choice === "channel" }
+    // Keys both pages have. Silica builds page on URL change, maybe before a pick-bound
+    // value here updates: chat page got group's `channel`, logged non-existent property.
+    acceptDestinationProperties: ({ accountId: dialog.accountId, landOn: dialog.landOn })
 
-    // Silica builds destination once, when dialog opens or URL changes: group to channel
-    // keeps same page, built with old `channel`. Current pick set on it here.
+    // Group to channel keeps page built for group: pick set on it here.
     onAccepted: {
         if (dialog.choice !== "chat") {
             dialog.acceptDestinationInstance.channel = dialog.choice === "channel"
