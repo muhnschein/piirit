@@ -41,6 +41,7 @@ pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-serv
 /// **New reader kind: add here**, or it never arrives. `tests/event_kinds.rs`: sides match;
 /// `tests/event_fanout.rs`: gate applied.
 pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "AccountsChanged",
     "CallEnded",
     "ChatDeleted",
     "ChatEphemeralTimerModified",
@@ -477,6 +478,8 @@ impl DeltaChatCore {
                     for account_id in accounts {
                         Self::resume_io(started_ptr.clone(), Some(account_id));
                     }
+                    // Rows of messages gone while away dropped; backlog read.
+                    crate::transcripts::connected();
                     // Last: handler may call back in.
                     this.borrow().status_changed();
                 }

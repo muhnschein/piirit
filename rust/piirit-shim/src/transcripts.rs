@@ -1,9 +1,24 @@
 //! Voice message transcription (experimental): settings, speech model, per-message state.
-//! Engine: `piirit-speech`. Store: `SQLite` beside accounts, built for search later.
-//!
-//! Interface fixed up front; QML codes against it. Bodies land with store and scheduler.
+//! Engine: `piirit-speech` on own thread (`worker`). Store: `SQLite` beside accounts, indexed
+//! for search later (`store`). Queue and live views: `hub`. Rules: `schedule`.
+
+mod download;
+mod files;
+mod hub;
+mod schedule;
+mod store;
+mod worker;
+
+use std::path::Path;
 
 use qmetaobject::*;
+
+use download::{Fetch, FetchEvent, Hasher};
+use files::ModelSpec;
+use hub::Shown;
+use schedule::Conditions;
+
+pub(crate) use hub::connected;
 
 /// No transcript, nothing queued.
 pub const STATE_NONE: u32 = 0;
@@ -71,9 +86,9 @@ pub struct Transcriber {
     /// Download progress, 0..=1000.
     pub model_permille: qt_property!(u32; NOTIFY model_changed),
     /// Model name for display (`Whisper small`).
-    pub model_name: qt_property!(QString; CONST),
+    pub model_name: qt_property!(QString; READ name CONST),
     /// Download size, bytes, for "needs N MB".
-    pub model_download_bytes: qt_property!(f64; CONST),
+    pub model_download_bytes: qt_property!(f64; READ download_bytes CONST),
     /// Model size on phone, bytes; 0 if absent.
     pub model_bytes: qt_property!(f64; NOTIFY model_changed),
     /// Why download or check failed.
@@ -104,14 +119,31 @@ pub struct Transcriber {
     /// Core event, wired from QML like other models.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
+
+    /// Known to hub, model checked.
+    attached: bool,
+    /// Download running.
+    fetch: Option<Fetch>,
+    /// Part being hashed before resume.
+    hashing: bool,
+    /// Download count: late answers of a stopped one dropped.
+    generation: u64,
+    /// Download started by itself since switched on.
+    auto_started: bool,
 }
 
 impl Transcriber {
-    /// Set switch.
+    /// Set switch. Off: model deleted, queue dropped, transcripts hidden.
     pub fn set_enabled(&mut self, enabled: bool) {
         if self.enabled != enabled {
             self.enabled = enabled;
+            if enabled {
+                self.auto_started = false;
+            } else {
+                self.remove_model();
+            }
             self.settings_changed();
+            self.settle();
         }
     }
 
@@ -120,6 +152,7 @@ impl Transcriber {
         if self.languages != languages {
             self.languages = languages;
             self.settings_changed();
+            self.settle();
         }
     }
 
@@ -128,6 +161,7 @@ impl Transcriber {
         if self.mode != mode {
             self.mode = mode;
             self.settings_changed();
+            self.settle();
         }
     }
 
@@ -136,6 +170,7 @@ impl Transcriber {
         if self.older != older {
             self.older = older;
             self.settings_changed();
+            self.settle();
         }
     }
 
@@ -144,6 +179,7 @@ impl Transcriber {
         if self.charging != charging {
             self.charging = charging;
             self.power_changed();
+            self.settle();
         }
     }
 
@@ -152,28 +188,293 @@ impl Transcriber {
         if self.power_saving != power_saving {
             self.power_saving = power_saving;
             self.power_changed();
+            self.settle();
         }
     }
 
-    /// Fetch model.
-    pub fn download_model(&mut self) {}
+    /// Model name.
+    #[must_use]
+    pub fn name(&self) -> QString {
+        QString::from(files::MODEL_NAME)
+    }
 
-    /// Stop download.
-    pub fn cancel_download(&mut self) {}
+    /// Download size.
+    #[must_use]
+    pub fn download_bytes(&self) -> f64 {
+        to_f64(ModelSpec::current().bytes)
+    }
+
+    /// After any setting: known to hub, model fetched once if missing, hub told.
+    fn settle(&mut self) {
+        if !self.attached {
+            self.attached = true;
+            hub::attach(QPointer::from(&*self));
+            self.check_model();
+        }
+        if self.enabled && self.model_state == MODEL_ABSENT && !self.auto_started {
+            self.auto_started = true;
+            self.download_model();
+        }
+        hub::set_conditions(
+            Conditions {
+                enabled: self.enabled,
+                model_ready: self.model_state == MODEL_READY,
+                mode: self.mode,
+                older: self.older,
+                charging: self.charging,
+                power_saving: self.power_saving,
+            },
+            self.languages
+                .to_string()
+                .split(',')
+                .map(str::trim)
+                .filter(|code| !code.is_empty())
+                .map(str::to_owned)
+                .collect(),
+        );
+    }
+
+    /// Model on phone at right size: ready. Hashed only after download, not every start.
+    fn check_model(&mut self) {
+        let size = files::model_path()
+            .and_then(|path| std::fs::metadata(path).ok())
+            .map(|meta| meta.len());
+        if let Some(size) = size.filter(|size| *size == ModelSpec::current().bytes) {
+            self.set_model(MODEL_READY, 1000, size, String::new());
+        }
+    }
+
+    fn set_model(&mut self, state: u32, permille: u32, bytes: u64, error: String) {
+        let bytes = to_f64(bytes);
+        let error = QString::from(error);
+        if self.model_state == state
+            && self.model_permille == permille
+            && self.model_bytes.to_bits() == bytes.to_bits()
+            && self.model_error == error
+        {
+            return;
+        }
+        self.model_state = state;
+        self.model_permille = permille;
+        self.model_bytes = bytes;
+        self.model_error = error;
+        self.model_changed();
+    }
+
+    /// Fetch model (resumes partial file).
+    pub fn download_model(&mut self) {
+        if !self.enabled || self.fetch.is_some() || self.hashing || self.model_state == MODEL_READY
+        {
+            return;
+        }
+        let spec = ModelSpec::current();
+        let model = match files::make_speech_dir() {
+            Ok(dir) => dir.join(files::MODEL_FILE),
+            Err(err) => {
+                self.fail_model(err);
+                return;
+            }
+        };
+        let part = files::partial_path(&model);
+        let have = std::fs::metadata(&part).map_or(0, |meta| meta.len());
+        self.generation = self.generation.wrapping_add(1);
+        self.set_model(
+            MODEL_DOWNLOADING,
+            permille(have, spec.bytes),
+            0,
+            String::new(),
+        );
+        if have == 0 {
+            self.begin(&spec, &part, None);
+            return;
+        }
+        // Part hashed off Qt thread (190 MB: seconds), then fetch goes on from its end.
+        self.hashing = true;
+        let generation = self.generation;
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let hashed = queued_callback(move |hash: Hasher| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().generation == generation {
+                this.borrow_mut().resume(hash);
+            }
+        });
+        let started = std::thread::Builder::new()
+            .name("piirit-model-hash".to_owned())
+            .spawn(move || hashed(Hasher::of_file(&part)));
+        if let Err(err) = started {
+            self.hashing = false;
+            self.fail_model(format!("could not check the partial download: {err}"));
+        }
+    }
+
+    /// Part hashed: fetch rest, or check it if whole.
+    fn resume(&mut self, hash: Hasher) {
+        self.hashing = false;
+        if !self.enabled || self.model_state != MODEL_DOWNLOADING {
+            return;
+        }
+        let spec = ModelSpec::current();
+        let Some(model) = files::model_path() else {
+            return;
+        };
+        if hash.bytes() >= spec.bytes {
+            self.verify(&spec, &model, &hash.hex());
+        } else {
+            self.begin(&spec, &files::partial_path(&model), Some(hash));
+        }
+    }
+
+    fn begin(&mut self, spec: &ModelSpec, part: &Path, hash: Option<Hasher>) {
+        let generation = self.generation;
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let report = queued_callback(move |event: FetchEvent| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().generation == generation {
+                this.borrow_mut().fetched(event);
+            }
+        });
+        match Fetch::start(&spec.url, part, spec.bytes, hash, report) {
+            Ok(fetch) => self.fetch = Some(fetch),
+            Err(err) => self.fail_model(err),
+        }
+    }
+
+    fn fetched(&mut self, event: FetchEvent) {
+        let spec = ModelSpec::current();
+        match event {
+            FetchEvent::Progress(bytes) => {
+                if self.model_state == MODEL_DOWNLOADING {
+                    self.set_model(
+                        MODEL_DOWNLOADING,
+                        permille(bytes, spec.bytes),
+                        0,
+                        String::new(),
+                    );
+                }
+            }
+            FetchEvent::Done(result) => {
+                self.fetch = None;
+                match (result, files::model_path()) {
+                    (Ok(hex), Some(model)) => self.verify(&spec, &model, &hex),
+                    (Ok(_), None) => self.fail_model("no place for the model".to_owned()),
+                    (Err(err), _) => self.fail_model(err),
+                }
+            }
+        }
+    }
+
+    /// Whole part: right size and hash moves into place; else deleted (can't resume wrong one).
+    fn verify(&mut self, spec: &ModelSpec, model: &Path, hex: &str) {
+        let part = files::partial_path(model);
+        let size = std::fs::metadata(&part).map_or(0, |meta| meta.len());
+        if size != spec.bytes || !hex.eq_ignore_ascii_case(&spec.sha256) {
+            remove(&part);
+            self.fail_model(format!(
+                "the downloaded model is damaged ({size} bytes, SHA-256 {hex})"
+            ));
+            return;
+        }
+        if let Err(err) = std::fs::rename(&part, model) {
+            self.fail_model(format!("could not keep the model: {err}"));
+            return;
+        }
+        self.set_model(MODEL_READY, 1000, size, String::new());
+        self.settle();
+    }
+
+    fn fail_model(&mut self, error: String) {
+        eprintln!("piirit: speech model: {error}");
+        self.set_model(MODEL_FAILED, self.model_permille, 0, error);
+    }
+
+    /// Stop download; partial file kept for resume.
+    pub fn cancel_download(&mut self) {
+        if self.fetch.is_none() && !self.hashing {
+            return;
+        }
+        self.fetch = None;
+        self.hashing = false;
+        self.generation = self.generation.wrapping_add(1);
+        self.set_model(MODEL_ABSENT, 0, 0, String::new());
+    }
+
+    /// Feature off: download stopped, model and part deleted.
+    fn remove_model(&mut self) {
+        self.fetch = None;
+        self.hashing = false;
+        self.generation = self.generation.wrapping_add(1);
+        if let Some(model) = files::model_path() {
+            remove(&files::partial_path(&model));
+            remove(&model);
+        }
+        self.set_model(MODEL_ABSENT, 0, 0, String::new());
+    }
+
+    /// Counts from store.
+    fn set_counts(&mut self, count: u32, bytes: u64) {
+        let bytes = to_f64(bytes);
+        if self.transcript_count != count || self.transcript_bytes.to_bits() != bytes.to_bits() {
+            self.transcript_count = count;
+            self.transcript_bytes = bytes;
+            self.store_changed();
+        }
+    }
 
     /// Delete every transcript.
-    pub fn delete_all(&mut self) {}
+    pub fn delete_all(&mut self) {
+        hub::delete_all();
+    }
 
     /// Count chat's voice messages without transcript.
     pub fn count_chat(&mut self, account_id: u32, chat_id: u32) {
-        self.chat_counted(account_id, chat_id, 0);
+        if !hub::count_chat(account_id, chat_id) {
+            self.chat_counted(account_id, chat_id, 0);
+        }
     }
 
     /// Queue chat's voice messages.
-    pub fn transcribe_chat(&mut self, _account_id: u32, _chat_id: u32) {}
+    pub fn transcribe_chat(&mut self, account_id: u32, chat_id: u32) {
+        hub::transcribe_chat(account_id, chat_id);
+    }
 
     /// Core event.
-    pub fn handle_event(&mut self, _context_id: u32, _kind: QString, _payload_json: QString) {}
+    pub fn handle_event(&mut self, context_id: u32, kind: QString, payload_json: QString) {
+        let payload: serde_json::Value =
+            serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
+        let msg = crate::json::u32_at(&payload, "msgId");
+        match kind.to_string().as_str() {
+            // Arrival; `MsgsChanged` also when a limited download lands.
+            "IncomingMsg" | "MsgsChanged" if msg != 0 => hub::arrived(context_id, msg),
+            "MsgDeleted" if msg != 0 => hub::deleted(context_id, msg),
+            "AccountsChanged" => hub::accounts_changed(),
+            _ => {}
+        }
+    }
+}
+
+/// Bytes for QML (no 64-bit int there); exact to 2^53.
+#[allow(clippy::cast_precision_loss)]
+fn to_f64(bytes: u64) -> f64 {
+    bytes as f64
+}
+
+/// Progress, 0..=1000.
+fn permille(have: u64, total: u64) -> u32 {
+    have.min(total)
+        .saturating_mul(1000)
+        .checked_div(total)
+        .and_then(|value| u32::try_from(value).ok())
+        .unwrap_or(0)
+}
+
+/// Delete if there.
+fn remove(path: &Path) {
+    match std::fs::remove_file(path) {
+        Err(err) if err.kind() != std::io::ErrorKind::NotFound => {
+            eprintln!("piirit: could not delete {}: {err}", path.display());
+        }
+        _ => {}
+    }
 }
 
 /// One voice message's transcript, for its bubble or Audio row.
@@ -216,6 +517,9 @@ pub struct Transcript {
     pub transcribe: qt_method!(fn(&mut self, any_language: bool)),
     /// Drop from queue or stop run.
     pub cancel: qt_method!(fn(&mut self)),
+
+    /// Key registered with hub.
+    watched: (u32, u32),
 }
 
 impl Transcript {
@@ -224,6 +528,7 @@ impl Transcript {
         if self.account_id != account_id {
             self.account_id = account_id;
             self.source_changed();
+            self.watch();
         }
     }
 
@@ -232,12 +537,50 @@ impl Transcript {
         if self.message_id != message_id {
             self.message_id = message_id;
             self.source_changed();
+            self.watch();
         }
     }
 
+    /// Follow new message: old state off now, new one soon.
+    fn watch(&mut self) {
+        let key = (self.account_id, self.message_id);
+        hub::watch(&QPointer::from(&*self), self.watched, key);
+        self.watched = key;
+        self.show(&Shown::default());
+    }
+
     /// Queue now.
-    pub fn transcribe(&mut self, _any_language: bool) {}
+    pub fn transcribe(&mut self, any_language: bool) {
+        hub::transcribe((self.account_id, self.message_id), any_language);
+    }
 
     /// Drop or stop.
-    pub fn cancel(&mut self) {}
+    pub fn cancel(&mut self) {
+        hub::cancel((self.account_id, self.message_id));
+    }
+
+    /// Take hub's state.
+    fn show(&mut self, shown: &Shown) {
+        let (text, language, error) = (
+            QString::from(shown.text.as_str()),
+            QString::from(shown.language.as_str()),
+            QString::from(shown.error.as_str()),
+        );
+        if self.state == shown.state
+            && self.manual == shown.manual
+            && self.permille == shown.permille
+            && self.text == text
+            && self.language == language
+            && self.error == error
+        {
+            return;
+        }
+        self.state = shown.state;
+        self.manual = shown.manual;
+        self.permille = shown.permille;
+        self.text = text;
+        self.language = language;
+        self.error = error;
+        self.changed();
+    }
 }
