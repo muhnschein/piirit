@@ -12,7 +12,13 @@ QtObject {
         FocusPointAuto = 0, FocusPointCenter = 1,
         FocusPointFaceDetection = 2, FocusPointCustom = 3
     }
-    property bool running: false
+    // QCamera::State. Real one built Active: starts itself unless page says Unloaded.
+    enum State { UnloadedState = 0, LoadedState = 1, ActiveState = 2 }
+    property int cameraState: 2
+    readonly property bool running: cameraState === 2
+    /// Device and mode at each `start()` that started it, "device/mode", '|' between.
+    /// Qt's start on build not listed: shows as `running`.
+    property string starts: ""
     property var captureMode
     // QCamera::Position: BackFace 1, FrontFace 2. Keep `position` a number.
     property var position: 1
@@ -46,10 +52,15 @@ QtObject {
     // QCamera::Status: UnloadedStatus 1, LoadedStatus 3.
     property int cameraStatus: 3
     function supportedViewfinderResolutions() { return viewfinderResolutions }
-    function start() { running = true }
+    function start() {
+        if (cameraState !== 2) {
+            cameraState = 2
+            starts += (starts.length > 0 ? "|" : "") + deviceId + "/" + captureMode
+        }
+    }
     // Stop also ends recording: page's fallback.
     function stop() {
-        running = false
+        cameraState = 1
         if (videoRecorder.recorderState === 1) {
             videoRecorder.recorderState = 0
             videoRecorder.recorderStatus = 3
