@@ -726,6 +726,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>Șterge</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transcrie %n mesaj vocal</numerusform>
+            <numerusform>Transcrie %n mesaje vocale</numerusform>
+            <numerusform>Transcrie %n de mesaje vocale</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copiază transcrierea</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Copiat în clipboard</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -826,6 +849,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Editează</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copiază transcrierea</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
     </message>
 </context>
 <context>
@@ -2249,6 +2282,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Rulează aplicații mici în conversații.</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>Transcriere automată: %1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Transcrie mesajele vocale (experimental)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcrierea mesajelor vocale</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Transformă mesajele vocale în text pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nimic nu părăsește telefonul.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2868,11 +2922,266 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>În timpul încărcării</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Întotdeauna</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Niciodată</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Mesajele vocale noi sunt transcrise în timp ce telefonul se încarcă.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Mesajele vocale noi sunt transcrise imediat ce s-au descărcat.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Aceasta consumă baterie.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Atinge Transcrie pe un mesaj vocal pentru a-l transforma în text.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Înainte</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Limbi</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Încă indisponibil</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Transcrierea nu este încă destul de precisă în aceste limbi.</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>Modelul de vorbire are nevoie de %1 MB de spațiu.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit descarcă o singură dată un model de vorbire și transcrie mesajele vocale pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nimic din ce trimiți sau primești nu părăsește telefonul.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Se descarcă modelul de vorbire… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>%1 pe acest telefon</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>Se șterg toate transcrierile</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcrierea mesajelor vocale</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Limbi</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Când</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>Spațiu de stocare</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>Model de vorbire</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Încearcă din nou</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>Transcrieri</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n mesaj vocal</numerusform>
+            <numerusform>%n mesaje vocale</numerusform>
+            <numerusform>%n de mesaje vocale</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>Șterge toate transcrierile</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>Mesajele vocale sunt transcrise pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>Nici mesajele vocale, nici transcrierile lor nu părăsesc telefonul, iar transcrierile nu fac parte dintr-o copie de rezervă.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Transcrie automat mesajele vocale</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transcrie mesajele vocale mai vechi</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Mesajele vocale sosite înainte de activare sunt transcrise în timp ce telefonul se încarcă.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Gata</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Când</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Se descarcă modelul de vorbire… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Descărcarea continuă după ce închizi această pagină.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Încearcă din nou</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Se înregistrează %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Acest mesaj vocal este transcris când telefonul se încarcă.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Transcrierea este întreruptă cât timp modul de economisire a energiei este activ.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Se așteaptă transcrierea altor mesaje vocale.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Se descarcă modelul de vorbire… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Se transcrie… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Acest mesaj vocal pare să fie în %1, care nu este selectată.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Nu s-a găsit vorbire în acest mesaj vocal.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Acest mesaj vocal nu a putut fi transcris.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transcrie acum</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Transcrie oricum</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Încearcă din nou</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transcris pe acest telefon</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Arată tot</translation>
     </message>
 </context>
 <context>

@@ -724,6 +724,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Μεταγραφή %n φωνητικού μηνύματος</numerusform>
+            <numerusform>Μεταγραφή %n φωνητικών μηνυμάτων</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Αντιγραφή μεταγραφής</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Αντιγράφηκε στο πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -824,6 +846,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Αντιγραφή μεταγραφής</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
     </message>
 </context>
 <context>
@@ -2242,6 +2274,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες.</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>Αυτόματη μεταγραφή: %1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων (πειραματικό)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Μετατρέπει τα φωνητικά μηνύματα σε κείμενο σε αυτό το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Τίποτα δεν φεύγει από το τηλέφωνο.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2861,11 +2914,265 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Κατά τη φόρτιση</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Πάντα</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Ποτέ</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Τα νέα φωνητικά μηνύματα μεταγράφονται όσο το τηλέφωνο φορτίζει.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Τα νέα φωνητικά μηνύματα μεταγράφονται μόλις ληφθούν.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Αυτό καταναλώνει μπαταρία.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Πατήστε Μεταγραφή σε ένα φωνητικό μήνυμα για να το μετατρέψετε σε κείμενο.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Επόμενο</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Γλώσσες</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Δεν είναι ακόμη διαθέσιμο</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Η μεταγραφή δεν είναι ακόμη αρκετά ακριβής σε αυτές τις γλώσσες.</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>Το μοντέλο ομιλίας χρειάζεται %1 MB χώρου.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Το Piirit κατεβάζει μία φορά ένα μοντέλο ομιλίας και μεταγράφει τα φωνητικά μηνύματα σε αυτό το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Τίποτα από όσα στέλνετε ή λαμβάνετε δεν φεύγει από το τηλέφωνο.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>%1 σε αυτό το τηλέφωνο</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>Διαγραφή όλων των μεταγραφών</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Γλώσσες</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Πότε</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>Αποθήκευση</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>Μοντέλο ομιλίας</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>Μεταγραφές</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n φωνητικό μήνυμα</numerusform>
+            <numerusform>%n φωνητικά μηνύματα</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>Διαγραφή όλων των μεταγραφών</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>Τα φωνητικά μηνύματα μεταγράφονται σε αυτό το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>Ούτε τα φωνητικά μηνύματα ούτε οι μεταγραφές τους φεύγουν από το τηλέφωνο, και οι μεταγραφές δεν αποτελούν μέρος αντιγράφου ασφαλείας.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Αυτόματη μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Μεταγραφή παλαιότερων φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Τα φωνητικά μηνύματα που έφτασαν πριν το ενεργοποιήσετε μεταγράφονται όσο το τηλέφωνο φορτίζει.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Τέλος</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Πότε</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Η λήψη συνεχίζεται αφού κλείσετε αυτή τη σελίδα.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Εγγραφή %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Αυτό το φωνητικό μήνυμα θα μεταγραφεί όταν το τηλέφωνο φορτίζει.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Η μεταγραφή είναι σε παύση όσο η λειτουργία εξοικονόμησης ενέργειας είναι ενεργή.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Αναμονή για τη μεταγραφή άλλων φωνητικών μηνυμάτων.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Μεταγραφή… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Αυτό το φωνητικό μήνυμα φαίνεται να είναι σε %1, που δεν έχει επιλεγεί.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Δεν βρέθηκε ομιλία σε αυτό το φωνητικό μήνυμα.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Δεν ήταν δυνατή η μεταγραφή αυτού του φωνητικού μηνύματος.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Μεταγραφή τώρα</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Μεταγραφή ούτως ή άλλως</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Μεταγράφηκε σε αυτό το τηλέφωνο</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Εμφάνιση όλων</translation>
     </message>
 </context>
 <context>

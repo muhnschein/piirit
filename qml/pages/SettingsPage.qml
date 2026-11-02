@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/Speech.js" as Speech
+import "../js/Transcription.js" as Transcription
 
 /*
  * Per-phone settings, from chat list; profile's on profile page, except block
@@ -129,20 +131,43 @@ Page {
         core.estimate_auto_deletion(seconds)
     }
 
-    /// Experimental switch: off at once; on after reader accepts risk.
-    function toggleExperimental(toggle, setting) {
+    /// Experimental switch: off at once; on after reader accepts risk. `next` (`url`,
+    /// `properties`): dialog replacing question on accept, which turns setting on itself.
+    function toggleExperimental(toggle, setting, next) {
         if (toggle.checked) {
             Settings[setting] = false
             return
         }
-        var dialog = pageStack.push(Qt.resolvedUrl("ExperimentalFeatureDialog.qml"), {
-            title: toggle.text
-        })
-        if (dialog) {
+        var properties = { title: toggle.text }
+        if (next) {
+            properties.acceptDestination = next.url
+            properties.acceptDestinationProperties = next.properties
+            properties.acceptDestinationAction = PageStackAction.Replace
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("ExperimentalFeatureDialog.qml"), properties)
+        if (dialog && !next) {
             dialog.accepted.connect(function() {
                 Settings[setting] = true
             })
         }
+    }
+
+    /// App-wide `Transcriber`; null (tests, loaded alone): no model size in setup.
+    property QtObject transcriber: typeof appWindow !== "undefined" ? appWindow.transcriber : null
+
+    /// Transcription switch: question, then languages (which turn it on), then timing.
+    function toggleTranscription() {
+        page.toggleExperimental(transcriptionSwitch, "transcriptionEnabled", {
+            url: Qt.resolvedUrl("TranscriptionLanguagesDialog.qml"),
+            properties: { setup: true, returnTo: page, transcriber: page.transcriber }
+        })
+    }
+
+    /// Entry subtitle: languages, auto-transcribe choice.
+    function transcriptionSummary() {
+        //: %1 is the auto-transcribe choice: Never, While charging or Always.
+        return Speech.names(Settings.transcriptionLanguages) + " · "
+               + qsTr("Auto-transcribe: %1").arg(Transcription.modeName(Settings.transcriptionMode))
     }
 
     /// Period awaiting answer, 0 none. Estimate by signal; earlier ask's ignored.
@@ -392,7 +417,7 @@ Page {
                 })
             }
 
-            // Rarely needed: cover quick actions (QuickActionsPage.qml), webxdc apps.
+            // Rarely needed: quick actions (QuickActionsPage.qml), webxdc apps, transcription.
             SectionHeader {
                 //: The settings most readers never need to change.
                 text: qsTr("Advanced")
@@ -431,6 +456,56 @@ Page {
                 automaticCheck: false
                 checked: Settings.webxdcEnabled === true
                 onClicked: page.toggleExperimental(webxdcSwitch, "webxdcEnabled")
+            }
+
+            // On: languages dialog writes it (TranscriptionLanguagesDialog.qml).
+            TextSwitch {
+                id: transcriptionSwitch
+                objectName: "transcriptionSwitch"
+                text: qsTr("Transcribe voice messages (experimental)")
+                // One sentence per string (docs/PROJECT.md).
+                description: qsTr("Turns voice messages into text on this phone.") + " "
+                             + qsTr("Nothing leaves the phone.")
+                automaticCheck: false
+                checked: Settings.transcriptionEnabled === true
+                onClicked: page.toggleTranscription()
+            }
+
+            // Set up: rest of transcription settings on own page.
+            BackgroundItem {
+                id: transcriptionEntry
+                objectName: "transcriptionEntry"
+                visible: Settings.transcriptionEnabled === true
+                width: parent.width
+                height: transcriptionLabel.height + transcriptionDetail.height
+                        + 2 * Theme.paddingSmall
+
+                Label {
+                    id: transcriptionLabel
+                    objectName: "transcriptionLabel"
+                    x: Theme.horizontalPageMargin + Theme.itemSizeExtraSmall
+                    y: Theme.paddingSmall
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    truncationMode: TruncationMode.Fade
+                    color: transcriptionEntry.highlighted ? Theme.highlightColor
+                                                          : Theme.primaryColor
+                    text: qsTr("Voice message transcription")
+                }
+
+                Label {
+                    id: transcriptionDetail
+                    objectName: "transcriptionDetail"
+                    x: transcriptionLabel.x
+                    y: transcriptionLabel.y + transcriptionLabel.height
+                    width: transcriptionLabel.width
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: transcriptionEntry.highlighted ? Theme.secondaryHighlightColor
+                                                          : Theme.secondaryColor
+                    text: page.transcriptionSummary()
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("TranscriptionPage.qml"))
             }
 
         }

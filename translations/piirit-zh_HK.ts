@@ -722,6 +722,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>轉寫 %n 個語音訊息</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>複製轉寫</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>已複製到剪貼簿</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>轉寫</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -822,6 +843,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>編輯</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>複製轉寫</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>轉寫</translation>
     </message>
 </context>
 <context>
@@ -2235,6 +2266,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>在聊天中執行小型應用程式。</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>自動轉寫：%1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>轉寫語音訊息（實驗性）</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>語音訊息轉寫</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>喺呢部手機上將語音訊息轉成文字。</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>任何內容都唔會離開手機。</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2852,11 +2904,264 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>充電時</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>總是</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>從不</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>新嘅語音訊息會喺手機充電時轉寫。</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>新嘅語音訊息下載完成後即刻轉寫。</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>咁會耗電。</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>撳語音訊息上嘅「轉寫」就可以將佢轉成文字。</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>下一步</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>語言</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>暫時未提供</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>呢啲語言嘅轉寫仲未夠準確。</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>語音模型需要 %1 MB 儲存空間。</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit 會下載一次語音模型，並喺呢部手機上轉寫語音訊息。</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>你傳送或者接收嘅任何內容都唔會離開手機。</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>正在下載語音模型… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>本機上 %1</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>正在刪除所有轉寫</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>語音訊息轉寫</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>語言</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>幾時</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>儲存空間</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>語音模型</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>下載唔到語音模型。</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>再試</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>轉寫內容</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n 個語音訊息</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>刪除所有轉寫</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>語音訊息喺呢部手機上轉寫。</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>語音訊息同埋佢哋嘅轉寫都唔會離開手機，轉寫亦唔包括喺備份入面。</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>自動轉寫語音訊息</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>轉寫較舊嘅語音訊息</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>開啟呢個功能之前收到嘅語音訊息會喺手機充電時轉寫。</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>完成</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>幾時</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>正在下載語音模型… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>關閉呢頁之後下載會繼續。</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>下載唔到語音模型。</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>再試</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>錄音中 %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>呢個語音訊息會喺手機充電時轉寫。</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>省電模式開啟時，轉寫會暫停。</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>正在等其他語音訊息轉寫完成。</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>正在下載語音模型… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>正在轉寫… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>呢個語音訊息似乎係%1，但係呢種語言未揀。</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>呢個語音訊息入面搵唔到講嘢嘅聲。</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>轉寫唔到呢個語音訊息。</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>轉寫</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>即刻轉寫</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>照樣轉寫</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>再試</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>已喺呢部手機上轉寫</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>顯示全部</translation>
     </message>
 </context>
 <context>

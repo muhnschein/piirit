@@ -121,6 +121,14 @@ Item {
     property bool callHasVideo: false
     /// Seconds, completed call.
     property int callDuration: 0
+    /// Profile and message, for voice transcript.
+    property int accountId: 0
+    property int messageId: 0
+    /// App-wide `Transcriber`; see AttachmentPreview.
+    property QtObject transcriber: null
+    property Component transcriptMaker: null
+    /// Voice message's `Transcript`, or null (row menu reads it).
+    readonly property QtObject transcript: attachment.item ? attachment.item.transcript : null
 
     /// Row is a call.
     readonly property bool isCall: root.viewType === "Call"
@@ -503,6 +511,10 @@ Item {
                 webxdcIcon: root.webxdcIcon
                 appsEnabled: root.appsEnabled
                 scrolling: root.scrolling
+                accountId: root.accountId
+                messageId: root.messageId
+                transcriber: root.transcriber
+                transcriptMaker: root.transcriptMaker
                 // Long press on own control: row menu.
                 onMenuRequested: root.menuRequested()
             }

@@ -724,6 +724,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>நீக்கு</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n குரல் செய்தியை எழுத்தாக்கு</numerusform>
+            <numerusform>%n குரல் செய்திகளை எழுத்தாக்கு</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>எழுத்தாக்கத்தை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -824,6 +846,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>திருத்து</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>எழுத்தாக்கத்தை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
     </message>
 </context>
 <context>
@@ -2242,6 +2274,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
     </message>
+    <message>
+        <source>Auto-transcribe: %1</source>
+        <extracomment>%1 is the auto-transcribe choice: Never, While charging or Always.</extracomment>
+        <translation>தானியங்கி எழுத்தாக்கம்: %1</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>குரல் செய்திகளை எழுத்தாக்கு (சோதனை முறை)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக மாற்றுகிறது.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2861,11 +2914,265 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>சார்ஜ் ஆகும்போது</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>எப்போதும்</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ஒருபோதும் இல்லை</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>தொலைபேசி சார்ஜ் ஆகும்போது புதிய குரல் செய்திகள் எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>புதிய குரல் செய்திகள் பதிவிறங்கியதும் எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>இது மின்கலத்தைச் செலவழிக்கும்.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>குரல் செய்தியை எழுத்தாக மாற்ற அதில் எழுத்தாக்கு என்பதைத் தட்டவும்.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>அடுத்து</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>மொழிகள்</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>இன்னும் கிடைக்கவில்லை</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>இந்த மொழிகளில் எழுத்தாக்கம் இன்னும் போதுமான துல்லியமாக இல்லை.</translation>
+    </message>
+    <message>
+        <source>The speech model needs %1 MB of storage.</source>
+        <extracomment>%1 is the speech model&apos;s size in megabytes, such as 190.</extracomment>
+        <translation>பேச்சு மாதிரிக்கு %1 MB சேமிப்பிடம் தேவை.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ஒருமுறை பேச்சு மாதிரியைப் பதிவிறக்கி, இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>நீங்கள் அனுப்புவதும் பெறுவதும் எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>%1 is a size, such as &quot;190 MB&quot;.</extracomment>
+        <translation>இந்தத் தொலைபேசியில் %1</translation>
+    </message>
+    <message>
+        <source>Deleting all transcripts</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, before every transcript is deleted.</extracomment>
+        <translation>எல்லா எழுத்தாக்கங்களும் நீக்கப்படுகின்றன</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>மொழிகள்</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>எப்போது</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <extracomment>Heading over what transcription keeps on the phone.</extracomment>
+        <translation>சேமிப்பிடம்</translation>
+    </message>
+    <message>
+        <source>Speech model</source>
+        <translation>பேச்சு மாதிரி</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+    <message>
+        <source>Transcripts</source>
+        <translation>எழுத்தாக்கங்கள்</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n voice message(s)</source>
+        <extracomment>How many voice messages have a transcript on the phone.</extracomment>
+        <translation>
+            <numerusform>%n குரல் செய்தி</numerusform>
+            <numerusform>%n குரல் செய்திகள்</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete all transcripts</source>
+        <translation>எல்லா எழுத்தாக்கங்களையும் நீக்கு</translation>
+    </message>
+    <message>
+        <source>Voice messages are transcribed on this phone.</source>
+        <translation>குரல் செய்திகள் இந்தத் தொலைபேசியிலேயே எழுத்தாக்கப்படுகின்றன.</translation>
+    </message>
+    <message>
+        <source>Neither the voice messages nor their transcripts leave the phone, and transcripts are not part of a backup.</source>
+        <translation>குரல் செய்திகளோ அவற்றின் எழுத்தாக்கங்களோ தொலைபேசியை விட்டு வெளியேறாது, எழுத்தாக்கங்கள் காப்புப்பிரதியின் பகுதியும் அல்ல.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>குரல் செய்திகளைத் தானாக எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>பழைய குரல் செய்திகளை எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>இதை இயக்குவதற்கு முன் வந்த குரல் செய்திகள் தொலைபேசி சார்ஜ் ஆகும்போது எழுத்தாக்கப்படும்.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>முடிந்தது</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>எப்போது</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>இந்தப் பக்கத்தை மூடிய பிறகும் பதிவிறக்கம் தொடரும்.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>பதிவு செய்கிறது %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>தொலைபேசி சார்ஜ் ஆகும்போது இந்தக் குரல் செய்தி எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>மின்சேமிப்பு முறை இயங்கும்வரை எழுத்தாக்கம் நிறுத்தப்பட்டிருக்கும்.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>பிற குரல் செய்திகள் எழுத்தாக்கப்படக் காத்திருக்கிறது.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>எழுத்தாக்கப்படுகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>இந்தக் குரல் செய்தி %1 மொழியில் இருப்பதாகத் தெரிகிறது, அது தேர்ந்தெடுக்கப்படவில்லை.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>இந்தக் குரல் செய்தியில் பேச்சு எதுவும் கிடைக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>இந்தக் குரல் செய்தியை எழுத்தாக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>இப்போது எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>இருந்தாலும் எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>இந்தத் தொலைபேசியில் எழுத்தாக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>அனைத்தையும் காட்டு</translation>
     </message>
 </context>
 <context>
