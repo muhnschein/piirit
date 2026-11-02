@@ -111,6 +111,7 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 | `qrcode` | invite as code | one crate, no deps |
 | `rqrr` (+ `g2p`, `lru`) | code from camera | QR decoder too big to vendor |
 | `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | voice message MP3 (`voice.rs`) | phone recorder has no encoder iOS plays as voice; LAME = desktop client's; pure-Rust ones need Rust > 1.75 or are shine ports (no psychoacoustic model) |
+| `rusqlite` 0.31 (+ `libsqlite3-sys`, `hashlink`, `hashbrown` 0.14, `ahash`, `zerocopy`, `fallible-*`, `smallvec`, `bitflags`; build: `pkg-config`, `vcpkg`, `version_check`) | voice transcripts (`transcripts/store.rs`), full-text index for search later | standard SQLite binding; links phone's `libsqlite3.so.0` (Harbour-allowed), no bundled copy; 0.32+ use `c"…"` literals (Rust 1.77) |
 
 - `mp3lame-sys` carries LAME 3.100 C source, builds via its `configure` + `make` (C++ build host has both). Only non-Qt C dep; `rust/deny.toml` allows LGPL-3.0 for its two crates only (LGPL code conveyable in GPLv3 work).
 

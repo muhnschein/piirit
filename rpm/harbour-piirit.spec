@@ -99,6 +99,9 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Multimedia)
 # libpulse for mic watch (piirit-shim/src/mic_watch.rs); libpulse.so.0 Harbour-allowed.
 BuildRequires:  pkgconfig(libpulse)
+# Phone's SQLite for transcript store (piirit-shim/src/transcripts/store.rs), not a bundled
+# copy; libsqlite3.so.0 Harbour-allowed.
+BuildRequires:  pkgconfig(sqlite3)
 # lrelease: translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 
