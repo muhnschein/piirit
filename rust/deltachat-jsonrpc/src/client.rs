@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::process::Stdio;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -36,6 +36,20 @@ pub struct RpcClient {
     writer_task: Mutex<Option<JoinHandle<()>>>,
     /// Last stderr lines, capped.
     stderr_tail: Arc<Mutex<Vec<String>>>,
+    /// Timed calls unanswered; event polls not counted. See [`RpcClient::quiet_for`].
+    in_flight: AtomicUsize,
+    /// Last request sent or line read.
+    last_traffic: Arc<Mutex<Instant>>,
+}
+
+/// Counts one timed call in flight; drop (answer, timeout, cancel) ends it.
+struct InFlight<'a>(&'a RpcClient);
+
+impl Drop for InFlight<'_> {
+    fn drop(&mut self) {
+        self.0.in_flight.fetch_sub(1, Ordering::SeqCst);
+        *lock(&self.0.last_traffic) = Instant::now();
+    }
 }
 
 const STDERR_TAIL_CAPACITY: usize = 200;
@@ -63,7 +77,7 @@ async fn write_line(stdin: &mut ChildStdin, line: &str) -> std::io::Result<()> {
 /// Match stdout answers to waiters; wake them at end.
 ///
 /// EOF/read error: server gone. Bad UTF-8 line skipped (its call times out).
-async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
+async fn read_responses(stdout: ChildStdout, pending: &PendingMap, heard: &Mutex<Instant>) {
     let mut lines = BufReader::new(stdout).lines();
     loop {
         let line = match lines.next_line().await {
@@ -71,6 +85,7 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
             Err(err) if err.kind() == std::io::ErrorKind::InvalidData => continue,
             Ok(None) | Err(_) => break,
         };
+        *lock(heard) = Instant::now();
         let Some((id, outcome)) = parse_response(&line) else {
             continue;
         };
@@ -171,8 +186,10 @@ impl RpcClient {
         let writer_task = tokio::spawn(write_requests(stdin, stdin_rx));
 
         let reader_pending = pending.clone();
+        let last_traffic = Arc::new(Mutex::new(Instant::now()));
+        let heard = last_traffic.clone();
         let reader_task =
-            tokio::spawn(async move { read_responses(stdout, &reader_pending).await });
+            tokio::spawn(async move { read_responses(stdout, &reader_pending, &heard).await });
 
         let stderr_capture = stderr_tail.clone();
         tokio::spawn(async move { keep_stderr_tail(stderr, &stderr_capture).await });
@@ -185,6 +202,8 @@ impl RpcClient {
             reader_task: Mutex::new(Some(reader_task)),
             writer_task: Mutex::new(Some(writer_task)),
             stderr_tail,
+            in_flight: AtomicUsize::new(0),
+            last_traffic,
         })
     }
 
@@ -246,6 +265,10 @@ impl RpcClient {
             method: method.to_string(),
             source,
         })?;
+        let _counted = timeout.map(|_| {
+            self.in_flight.fetch_add(1, Ordering::SeqCst);
+            InFlight(self)
+        });
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let (tx, rx) = oneshot::channel();
         lock(&self.pending).insert(id, tx);
@@ -278,6 +301,16 @@ impl RpcClient {
             });
         };
         answer.unwrap_or(Err(RpcError::TransportClosed))
+    }
+
+    /// How long no timed call has been open and server silent; `None` while one is open. Tests
+    /// wait on it instead of fixed delays.
+    #[must_use]
+    pub fn quiet_for(&self) -> Option<Duration> {
+        if self.in_flight.load(Ordering::SeqCst) > 0 {
+            return None;
+        }
+        Some(lock(&self.last_traffic).elapsed())
     }
 
     /// Last `STDERR_TAIL_CAPACITY` stderr lines, oldest first.
