@@ -157,7 +157,7 @@ SONAR_COV_ARGS = --workspace \
 ## a time). Profile `ci` via env: llvm-cov's `--profile` is cargo's. No `--doc`:
 ## cargo-llvm-cov skips doctests. `test` runs them.
 ##
-## Also writes compile DB (piirit-video build.rs) for scanner's C analysis.
+## Also joins compile DBs (piirit-video, piirit-speech build.rs) for scanner's C analysis.
 ##
 ## Clippy not handed over: `make lint` already denies warnings, and gathering
 ## costs `cargo clean` + full rebuild. Sonar's own clippy off for another
@@ -185,11 +185,12 @@ sonar-reports:
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi
 	@echo "== wrote rust/target/sonar/lcov.info =="
-	@db=$$(find rust/target -path '*/build/piirit-video-*/out/compile_commands.json' | head -n 1); \
-	if [ -z "$$db" ]; then \
-		echo "sonar-reports: piirit-video wrote no compile_commands.json" >&2; exit 1; \
+	@video=$$(find rust/target -path '*/build/piirit-video-*/out/compile_commands.json' | head -n 1); \
+	speech=$$(find rust/target -path '*/build/piirit-speech-*/out/compile_commands.json' | head -n 1); \
+	if [ -z "$$video" ] || [ -z "$$speech" ]; then \
+		echo "sonar-reports: piirit-video or piirit-speech wrote no compile_commands.json" >&2; exit 1; \
 	fi; \
-	cp "$$db" rust/target/sonar/compile_commands.json
+	{ sed '$$ s/\]$$/,/' "$$video"; sed '1 s/^\[//' "$$speech"; } >rust/target/sonar/compile_commands.json
 	@echo "== wrote rust/target/sonar/compile_commands.json =="
 	@echo "== JavaScript coverage: the call page's bridge, under Node =="
 	node --test --experimental-test-coverage \

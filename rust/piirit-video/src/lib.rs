@@ -4,6 +4,7 @@
 //! (`build.rs`): Harbour app may not link platform codecs deltachat-android uses.
 //!
 //! [`probe`] reads header, [`plan`] decides, [`recode`] does it: shim says what's coming.
+//! [`sound`] decodes voice files for `piirit-speech`, same FFmpeg.
 
 // Shipped code: stricter lints than tests; see piirit-shim/src/lib.rs.
 #![cfg_attr(
@@ -358,6 +359,95 @@ pub fn synth(
     }
 }
 
+/// First sound stream of `path` as `rate` Hz mono, at most `max_samples` (piirit-speech).
+/// Damaged packets skipped.
+///
+/// # Errors
+///
+/// When file can't be opened, holds no sound, or sound can't be decoded.
+pub fn sound(path: &Path, rate: u32, max_samples: u64) -> Result<Vec<f32>, String> {
+    let path = c_path(path)?;
+    let rate = i32::try_from(rate).map_err(|err| format!("rate {rate}: {err}"))?;
+    let mut samples: Vec<f32> = Vec::new();
+    let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
+    // SAFETY: as `probe`; `context` is `samples`, alive for the call, only given to `collect`.
+    #[allow(unsafe_code)]
+    let result = unsafe {
+        ffi::piirit_video_sound(
+            path.as_ptr(),
+            rate,
+            i64::try_from(max_samples).unwrap_or(i64::MAX),
+            collect,
+            std::ptr::addr_of_mut!(samples).cast::<c_void>(),
+            error.as_mut_ptr(),
+            ERROR_LEN,
+        )
+    };
+    if result == ffi::OK {
+        Ok(samples)
+    } else {
+        Err(message(&error))
+    }
+}
+
+/// Called by C with decoded samples.
+extern "C" fn collect(context: *mut c_void, samples: *const f32, count: i32) {
+    let Ok(count) = usize::try_from(count) else {
+        return;
+    };
+    if samples.is_null() || count == 0 {
+        return;
+    }
+    // SAFETY: `context` is `sound`'s `Vec`, alive and unborrowed during the call; C passes
+    // `count` floats at `samples`, valid during the call.
+    #[allow(unsafe_code)]
+    let (out, samples) = unsafe {
+        (
+            &mut *context.cast::<Vec<f32>>(),
+            std::slice::from_raw_parts(samples, count),
+        )
+    };
+    out.extend_from_slice(samples);
+}
+
+/// Test voice message: `seconds` of 440 Hz tone, AAC at `rate` Hz, `channels`; raw ADTS
+/// stream if `adts` (Android), else M4A (iOS).
+///
+/// # Errors
+///
+/// When file can't be written.
+#[doc(hidden)]
+pub fn synth_tone(
+    path: &Path,
+    seconds: u32,
+    rate: u32,
+    channels: u32,
+    adts: bool,
+) -> Result<(), String> {
+    let path = c_path(path)?;
+    let int =
+        |value: u32| i32::try_from(value).map_err(|err| format!("{value} is too large: {err}"));
+    let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
+    // SAFETY: as `probe`.
+    #[allow(unsafe_code)]
+    let result = unsafe {
+        ffi::piirit_video_synth_tone(
+            path.as_ptr(),
+            int(seconds)?,
+            int(rate)?,
+            int(channels)?,
+            i32::from(adts),
+            error.as_mut_ptr(),
+            ERROR_LEN,
+        )
+    };
+    if result == ffi::OK {
+        Ok(())
+    } else {
+        Err(message(&error))
+    }
+}
+
 /// Error buffer size for C messages.
 const ERROR_LEN: usize = 256;
 
@@ -445,6 +535,8 @@ mod ffi {
 
     pub type Progress = extern "C" fn(context: *mut c_void, permille: i32) -> c_int;
 
+    pub type Samples = extern "C" fn(context: *mut c_void, samples: *const f32, count: i32);
+
     #[allow(unsafe_code)]
     extern "C" {
         pub fn piirit_video_probe(
@@ -467,6 +559,26 @@ mod ffi {
         pub fn piirit_video_synth(
             path: *const c_char,
             clip: *const Clip,
+            error: *mut c_char,
+            error_len: usize,
+        ) -> c_int;
+
+        pub fn piirit_video_sound(
+            path: *const c_char,
+            rate: i32,
+            max_samples: i64,
+            sink: Samples,
+            context: *mut c_void,
+            error: *mut c_char,
+            error_len: usize,
+        ) -> c_int;
+
+        pub fn piirit_video_synth_tone(
+            path: *const c_char,
+            seconds: i32,
+            rate: i32,
+            channels: i32,
+            adts: i32,
             error: *mut c_char,
             error_len: usize,
         ) -> c_int;

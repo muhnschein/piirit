@@ -5,7 +5,7 @@ Standard: [clove](https://github.com/muhnschein/clove) §9: pinned toolchain, pe
 ## Toolchains
 
 - `rust-toolchain.toml` pins 1.94.1 (reproducible lints). Device floor **1.75.0** (CI `msrv`, warnings denied). rustup only; SDK cargo ignores pin.
-- FFmpeg, x264 = submodules in `third_party/`, built by `rust/piirit-video` build.rs; fresh clone needs them first:
+- FFmpeg, x264, whisper.cpp = submodules in `third_party/`, built by `rust/piirit-video` and `rust/piirit-speech` build.rs; fresh clone needs them first:
 
 ```sh
 git submodule update --init --depth 1
@@ -111,13 +111,14 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 | `qrcode` | invite as code | one crate, no deps |
 | `rqrr` (+ `g2p`, `lru`) | code from camera | QR decoder too big to vendor |
 | `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | voice message MP3 (`voice.rs`) | phone recorder has no encoder iOS plays as voice; LAME = desktop client's; pure-Rust ones need Rust > 1.75 or are shine ports (no psychoacoustic model) |
+| whisper.cpp (submodule, not crate; ggml inside) | voice message to text (`piirit-speech`) | runs Whisper on phone CPU (ARM NEON, dotprod), quantised models, no runtime deps; MIT |
 
 - `mp3lame-sys` carries LAME 3.100 C source, builds via its `configure` + `make` (C++ build host has both). Only non-Qt C dep; `rust/deny.toml` allows LGPL-3.0 for its two crates only (LGPL code conveyable in GPLv3 work).
 
 ### Making a video smaller
 
 - Picked video recoded before send when ≥ 4/5 of core's recommended message size or outgoing media quality set worse (`rust/piirit-shim/src/video.rs`, `plan` in `rust/piirit-video`, #111). Phone recorder writes several times that; core sends as-is. Nothing Harbour lets app link recodes (GStreamer, codec libs off list), so `rust/piirit-video` builds codecs in, as `mp3lame-sys` LAME.
-- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1`. `--disable-everything` plus: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. No network, devices, filters, autodetected libs: picked-file attack surface = few demuxers/decoders.
+- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1`. `--disable-everything` plus: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. For voice to text (`piirit-speech`): `mp3`, `aac` (ADTS), `ogg`, `wav` demuxers; MP3, Opus, Vorbis, 16-bit PCM decoders; their parsers. No network, devices, filters, autodetected libs: picked-file attack surface = few demuxers/decoders.
 - **x264** (GPL-2.0-or-later), `third_party/x264`, `stable`, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders wrap external libs; openh264 lacks B-frames, looked worse at same rate.
 - Both GPL-3.0-or-later compatible, built from source into one executable (not bundled binary like core). `build.rs` runs each `configure` with cargo's target compiler (under scratchbox2 = target's own: native, like LAME). ARM asm on; x86 off (needs nasm; x86 only test host).
 - Same x264 linked again into call H.264 encoder: Gecko encodes H.264 only via on-disk media plugin (`HARBOUR.md`).
@@ -127,6 +128,20 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 - Cost: binary few MB heavier; plugin ≈ x264; clean build ~1 min native at 4 jobs, ~8-12 min in SDK at one.
 - Kept across builds when unchanged (`rust/piirit-video/build_reuse.rs`). Cargo reruns `build.rs` on any newer mtime under `third_party/`, and fresh checkout (every CI run) makes all new: configure + make from zero, cached libs unused. Stamp beside each install instead: submodule commit, configure and make command, configure's env, compiler `--version`. Same = kept. No commit readable (tarball) = built every time. Edit inside submodule without commit unseen: `cargo clean -p piirit-video`. C glue `rust/piirit-video/csrc`, small; Rust tests (`rust/piirit-video/tests`) vs clips made by same libs, no binary fixtures. Dependabot moves submodules along branches.
 - `tokio` `net`: webxdc host loopback socket; adds only `socket2` (tokio's socket platform layer). Alternative was zip reader + inflate for archive core already reads. Call host (`call_host.rs`) same socket, adds nothing: calls-webapp committed as one released file, compiled in (`vendor/calls-webapp/`); no node toolchain.
+
+### Turning voice into text
+
+- Voice messages transcribed on phone, experimental switch (#133): `rust/piirit-speech`. Sound never leaves phone. Model (`ggml-small-q5_1.bin`) downloaded when switched on, not packaged.
+- **whisper.cpp 1.9.5** (MIT, ggml inside), `third_party/whisper.cpp`, tag `v1.9.5` commit. CPU only: Harbour allows no GPU/NPU path. Moved by hand, not Dependabot (no fix-only branch): measure accuracy, speed on phone first.
+- `build.rs` compiles whisper.cpp + ggml with cargo's target compiler (`cc` crate), no CMake: its configure probes host, fetches KleidiAI. Defines mirror whisper.cpp CMake defaults minus OpenMP (libgomp not Harbour-allowed; ggml's pthread pool instead), BLAS, GPU backends. `-O3`.
+- Shared lib, `dlopen()`ed: aarch64 phones differ, binary must run on all. `libpiirit-speech-v82.so` (`armv8.2-a+dotprod+fp16`: Jolla Phone 2026, OnePlus 6), `libpiirit-speech-v8.so` (`armv8-a`: Xperia 10 II); `is_aarch64_feature_detected!` picks. x86_64 (tests only): one `libpiirit-speech.so`, `x86-64-v3` (AVX2: GitHub runners have it; SSE2 only: ~1 min per engine test).
+- Exports three functions (`csrc/speech.h`, version script); whisper.cpp, ggml hidden (`--exclude-libs,ALL`); `-z defs`, links libc, libm, libstdc++, libgcc_s, ld-linux only. Phone: `/usr/share/harbour-piirit/lib/speech/` (`HARBOUR.md`). Dev: `rust/target/<profile>/speech/`; tests: `PIIRIT_SPEECH_LIBS`.
+- Run on own thread, never caller's: pinned to given cores, nice 19 for background jobs (unprivileged thread can't raise nice back). ggml's worker threads inherit both.
+- Sound: piirit-video's FFmpeg (above) → 16 kHz mono float, capped.
+- Decoding: greedy, no timestamps, flash attention, whisper.cpp's temperature fallback kept. `audio_ctx` trimmed to clip plus ~2.5 s, only up to 30 s: past that whisper.cpp moves 30 s windows, smaller context would skip sound.
+- Language and silence: one detection step over first 30 s, every run (one language given too: one more 30 s encoder pass). Silence = no-speech token's probability after start-of-transcript > 0.6 (whisper's `no_speech_thold`), clip ≤ 30 s: nothing decoded. whisper.cpp alone turns silence, hiss into "Thank you."; its 1.9.5 per-segment value unusable (reads logits no step wrote).
+- Kept across builds like FFmpeg (`build_reuse.rs` stamp, per CPU level); glue built every time. Clean build: whisper.cpp ~1 min native at 4 jobs per lib (aarch64: two). Lib x86_64 ~2.3 MB stripped.
+- Tests (`rust/piirit-speech/tests`): engine against whisper.cpp's weightless `models/for-tests-ggml-tiny.bin` (plumbing, never text), one at a time (nextest group `speech-engine`: ggml threads spin, starve each other); `PIIRIT_SPEECH_MODEL=<ggml model>` adds real-model tests: `samples/jfk.wav`, silence, hiss. Decode: WAV and Ogg Opus written by test, AAC by same FFmpeg, MP3 = whisper.cpp's sample; no Vorbis (no encoder built).
 
 ## Comments
 

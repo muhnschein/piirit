@@ -6,10 +6,16 @@ rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
 description = "Turns voice messages into text on the phone: FFmpeg decodes the file, whisper.cpp transcribes it. Built from source into the app; see build.rs."
+# whisper.cpp built by build.rs, which must know when to rerun.
+build = "build.rs"
 
 [dependencies]
 # Decodes voice files: same FFmpeg build as video recoding.
 piirit-video = { path = "../piirit-video" }
+
+[build-dependencies]
+# Cargo's compilers for this target; already in tree (piirit-video).
+cc = "1"
 
 [lints]
 workspace = true
