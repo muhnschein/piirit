@@ -61,6 +61,11 @@ pub struct ChatList {
     /// Setting changed.
     pub notify_mentions_changed: qt_signal!(),
 
+    /// Events only noted, no core reads; one refresh once false. Cover off screen.
+    pub paused: qt_property!(bool; WRITE set_paused NOTIFY paused_changed),
+    /// Paused changed.
+    pub paused_changed: qt_signal!(),
+
     /// Rows for `SilicaListView`.
     pub rows: qt_property!(RefCell<ChatListModel>; CONST),
 
@@ -137,9 +142,23 @@ pub struct ChatList {
     /// `archived`, each fetching; search per keystroke).
     generation: u64,
 
-    /// Asked, unanswered (stale-dropped too). Reused rows are as old as last kept answer (mark
-    /// read, message elsewhere: badge back for good): owed chats refetched until one lands.
+    /// Owed, not yet asked. Reused rows are as old as last kept answer (mark read, message
+    /// elsewhere: badge back for good): owed chats refetched until one lands.
     awaiting: Awaiting,
+
+    /// What refresh in flight asks; back to `awaiting` if it fails or a newer one replaces it.
+    asking: Awaiting,
+
+    /// Generation of refresh in flight. One at a time: arrival is three events, burst hundreds;
+    /// those wait in `awaiting` for one refresh after it lands (`again`).
+    in_flight: Option<u64>,
+
+    /// Asked while one in flight or paused.
+    again: bool,
+
+    /// Account, query or filter changed: answer in flight is for old ones. Acted on from event
+    /// loop, once QML has set every property (`paused` may come after `account_id`).
+    restart_due: bool,
 
     /// Every chat core listed, unfiltered: refresh, announcements read here. Cover reads `rows`.
     all_rows: Vec<ChatListItem>,
@@ -187,7 +206,7 @@ impl ChatList {
         if self.account_id != account_id {
             self.account_id = account_id;
             self.account_changed();
-            self.reload();
+            self.restart(Refresh::All);
         }
     }
 
@@ -293,7 +312,7 @@ impl ChatList {
         if self.query.to_string() != query.to_string() {
             self.query = query;
             self.query_changed();
-            self.refresh(Refresh::Order);
+            self.restart(Refresh::Order);
         }
     }
 
@@ -302,7 +321,7 @@ impl ChatList {
         if self.archived != archived {
             self.archived = archived;
             self.archived_changed();
-            self.refresh(Refresh::All);
+            self.restart(Refresh::All);
         }
     }
 
@@ -311,7 +330,19 @@ impl ChatList {
         if self.for_forwarding != for_forwarding {
             self.for_forwarding = for_forwarding;
             self.for_forwarding_changed();
-            self.refresh(Refresh::All);
+            self.restart(Refresh::All);
+        }
+    }
+
+    /// Pause, or resume with one refresh of what was owed meanwhile.
+    pub fn set_paused(&mut self, paused: bool) {
+        if self.paused != paused {
+            self.paused = paused;
+            self.paused_changed();
+            if !paused && (self.restart_due || (self.again && self.in_flight.is_none())) {
+                self.restart_due = false;
+                self.start_refresh();
+            }
         }
     }
 
@@ -531,7 +562,88 @@ impl ChatList {
 
     /// [`Self::refresh`], announcing `announce` once row holds new preview.
     fn refresh_announcing(&mut self, scope: Refresh, announce: Option<u32>) {
+        if self.account_id == 0 {
+            return;
+        }
+        if let Some(chat_id) = announce {
+            self.pending_announcements.insert(chat_id);
+        }
+        self.awaiting.add(scope);
+        if self.paused || self.in_flight.is_some() || self.restart_due {
+            self.again = true;
+            return;
+        }
+        self.start_refresh();
+    }
+
+    /// Account, query, filter changed: answer in flight is for old ones, ask anew.
+    fn restart(&mut self, scope: Refresh) {
+        self.awaiting.add(scope);
+        if self.restart_due {
+            return;
+        }
+        self.restart_due = true;
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let kick = queued_callback(move |(): ()| {
+            if let Some(this) = ptr.as_pinned() {
+                let mut this_mut = this.borrow_mut();
+                if !this_mut.paused {
+                    this_mut.restart_due = false;
+                    this_mut.start_refresh();
+                }
+            }
+        });
+        kick(());
+    }
+
+    /// Refresh `generation` answered: rows and announcements, then refresh owed meanwhile.
+    fn landed(
+        this: QObjectPinned<'_, Self>,
+        generation: u64,
+        result: Result<Vec<ChatListItem>, String>,
+    ) {
+        // Superseded: newer one asks this one's chats too.
+        if this.borrow().in_flight != Some(generation) {
+            return;
+        }
+        {
+            let mut this_mut = this.borrow_mut();
+            this_mut.in_flight = None;
+            let asked = std::mem::take(&mut this_mut.asking);
+            if result.is_err() {
+                this_mut.awaiting.merge(asked);
+            }
+        }
+        match result {
+            Ok(target) => {
+                this.borrow_mut().all_rows = target;
+                Self::show(this);
+                let announcements = this.borrow_mut().settled_announcements();
+                for (chat_id, name, sender, preview) in announcements {
+                    this.borrow()
+                        .message_arrived(chat_id, name, sender, preview);
+                }
+                let restatements = this.borrow_mut().settled_restatements();
+                for (chat_id, name, sender, preview, unread) in restatements {
+                    this.borrow()
+                        .message_restated(chat_id, name, sender, preview, unread);
+                }
+            }
+            Err(err) => this.borrow().error(err.into()),
+        }
+        let again = {
+            let this_ref = this.borrow();
+            this_ref.again && !this_ref.paused && !this_ref.restart_due
+        };
+        if again {
+            this.borrow_mut().start_refresh();
+        }
+    }
+
+    /// Ask core for `awaiting` (plus what replaced refresh asked); one in flight after.
+    fn start_refresh(&mut self) {
         let account_id = self.account_id;
+        self.again = false;
         if account_id == 0 {
             return;
         }
@@ -546,49 +658,26 @@ impl ChatList {
         let first_load = cached.is_empty();
         // Set: list scan per entry is quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
-        if let Some(chat_id) = announce {
-            self.pending_announcements.insert(chat_id);
-        }
 
-        // Re-read: this refresh's ids plus unanswered `awaiting`.
-        self.awaiting.add(scope);
-        let refetch_all = matches!(self.awaiting, Awaiting::Everything);
-        let awaiting = match &self.awaiting {
+        let mut asked = std::mem::take(&mut self.awaiting);
+        if self.in_flight.is_some() {
+            asked.merge(std::mem::take(&mut self.asking));
+        }
+        self.asking = asked.clone();
+        let refetch_all = matches!(asked, Awaiting::Everything);
+        let awaiting = match &asked {
             Awaiting::Chats(chats) => chats.clone(),
             Awaiting::Nothing | Awaiting::Everything => HashSet::new(),
         };
 
         self.generation = self.generation.wrapping_add(1);
         let generation = self.generation;
+        self.in_flight = Some(generation);
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<ChatListItem>, String>| {
-            let Some(this) = ptr.as_pinned() else { return };
-            // Superseded.
-            if this.borrow().generation != generation {
-                return;
-            }
-            match result {
-                Ok(target) => {
-                    {
-                        let mut this_mut = this.borrow_mut();
-                        this_mut.all_rows = target;
-                        // All waiting re-read; failed one waits again.
-                        this_mut.awaiting = Awaiting::Nothing;
-                    }
-                    Self::show(this);
-                    let announcements = this.borrow_mut().settled_announcements();
-                    for (chat_id, name, sender, preview) in announcements {
-                        this.borrow()
-                            .message_arrived(chat_id, name, sender, preview);
-                    }
-                    let restatements = this.borrow_mut().settled_restatements();
-                    for (chat_id, name, sender, preview, unread) in restatements {
-                        this.borrow()
-                            .message_restated(chat_id, name, sender, preview, unread);
-                    }
-                }
-                Err(err) => this.borrow().error(err.into()),
+            if let Some(this) = ptr.as_pinned() {
+                Self::landed(this, generation, result);
             }
         });
 
@@ -668,7 +757,7 @@ async fn is_mention(rpc: &RpcClient, account_id: u32, chat_id: u32, message_id: 
 }
 
 /// Unanswered core asks. See field.
-#[derive(Default)]
+#[derive(Clone, Default)]
 enum Awaiting {
     /// Every question answered.
     #[default]
@@ -680,6 +769,19 @@ enum Awaiting {
 }
 
 impl Awaiting {
+    /// Owe both.
+    fn merge(&mut self, other: Awaiting) {
+        match other {
+            Awaiting::Nothing => {}
+            Awaiting::Everything => *self = Awaiting::Everything,
+            Awaiting::Chats(chats) => {
+                for chat_id in chats {
+                    self.add(Refresh::One(chat_id));
+                }
+            }
+        }
+    }
+
     /// Add what refresh will ask for.
     fn add(&mut self, scope: Refresh) {
         match (&mut *self, scope) {
