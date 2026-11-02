@@ -97,6 +97,30 @@ const PROBE_QML: &str = r"
             }
             return parts.join('|')
         }
+        // First cells drawn: emoji, picture file, items in cell. Picture alone: no text
+        // fallback or lookup made per cell (hundreds per page). '!' when drawn on UI thread
+        // or not at drawn size.
+        function cells(count) {
+            var found = findAll(loader.item, 'emojiOption', [])
+            var parts = []
+            for (var i = 0; i < found.length && i < count; i++) {
+                var image = findIn(found[i], 'emojiImage')
+                if (!image) { parts.push(found[i].emoji + '=none'); continue }
+                parts.push(found[i].emoji + '=' + ('' + image.source).split('/').pop()
+                           + '/' + made(found[i])
+                           + (image.asynchronous
+                              && image.sourceSize.width === Math.ceil(image.width)
+                              && image.sourceSize.height === Math.ceil(image.height)
+                              && image.width > 0 ? '' : '!'))
+            }
+            return parts.join('|')
+        }
+        function made(node) {
+            var n = 0
+            var kids = node.children
+            for (var i = 0; kids && i < kids.length; i++) { n += 1 + made(kids[i]) }
+            return n
+        }
         function tap(emoji) {
             var found = findAll(loader.item, 'emojiOption', [])
             for (var i = 0; i < found.length; i++) {
@@ -220,6 +244,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         record!("row-count", call!("rowCount"));
         record!("heading-fit", call!("headingFit"));
         record!("options", call!("options"));
+        record!("cells", call!("cells", 4));
         record!(
             "strip",
             call!("get", QString::from("groupStrip"), QString::from("visible"))
@@ -236,6 +261,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
     });
     plan.after(1, move || unsafe {
         record!("found", call!("results"));
+        record!("found-cells", call!("cells", 1));
         record!(
             "strip-searching",
             call!("get", QString::from("groupStrip"), QString::from("visible"))
@@ -339,6 +365,11 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
             .all(|option| option == "❤️*"),
         "something other than the reader's own reaction is marked: {options:?}. {context}"
     );
+    assert_eq!(
+        value("cells"),
+        "🔥=1f525.svg/1|❤️=2764.svg/1|😀=1f600.svg/1|😃=1f603.svg/1",
+        "a cell does not draw its emoji's picture alone. {context}"
+    );
     assert_eq!(value("strip"), "true", "{context}");
     assert_eq!(
         value("jump"),
@@ -360,6 +391,11 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         value("found").contains("🌶"),
         "searching for the start of two words does not find the hot pepper: {:?}. {context}",
         value("found")
+    );
+    assert_eq!(
+        value("found-cells"),
+        "🌶️=1f336.svg/1",
+        "a search result does not draw its picture. {context}"
     );
     assert_eq!(
         value("strip-searching"),
