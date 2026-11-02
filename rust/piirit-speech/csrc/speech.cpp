@@ -156,7 +156,9 @@ float no_speech(whisper_context *context, whisper_state *state)
     return static_cast<float>(std::exp(static_cast<double>(logits[nosp]) - top) / sum);
 }
 
-/* Detects language and silence; choose() sets `params.language` or STOPPED. */
+/* Detects language and silence; choose() sets `params.language` or STOPPED.
+ * Whole 30 s window on purpose (fresh state: no audio_ctx): 0.6 holds there. Trimmed,
+ * hum and hiss fall below it and decode to "you". */
 int pick_language(whisper_context *context, whisper_state *state,
                   const piirit_speech_job *job, run_state *run,
                   whisper_full_params *params, char *error, size_t error_len)

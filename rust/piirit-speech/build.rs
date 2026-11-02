@@ -131,8 +131,8 @@ fn main() {
     }
 }
 
-/// Lib per CPU level: name suffix, flags. aarch64: 8.0 (Xperia 10 II) and 8.2 with
-/// dotprod + fp16 (Jolla Phone 2026, `OnePlus` 6). `x86_64` (test hosts only): one,
+/// Lib per CPU level: name suffix, flags. aarch64: 8.0 (Xperia 10 II; `OnePlus` 6, no
+/// dotprod) and 8.2 with dotprod + fp16 (Jolla Phone 2026). `x86_64` (test hosts only): one,
 /// AVX2 + F16C level every CI runner has, not `native` (runners differ past it);
 /// plain SSE2: ~1 min per test-model run.
 fn levels(arch: &str) -> Vec<(&'static str, &'static [&'static str])> {
