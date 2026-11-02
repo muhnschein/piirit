@@ -233,10 +233,16 @@ Page {
                     }
                     onClicked: choose()
 
-                    EmojiGlyph {
+                    // Row data's picture, not EmojiGlyph: every entry has one; glyph's lookup
+                    // and text fallback were half of each cell's build.
+                    Image {
+                        objectName: "emojiImage"
                         anchors.centerIn: parent
-                        size: page.glyphSize
-                        emoji: cell.emoji
+                        // SVG drawn off UI thread, at drawn size; sized by it.
+                        asynchronous: true
+                        sourceSize.width: Math.ceil(page.glyphSize)
+                        sourceSize.height: Math.ceil(page.glyphSize)
+                        source: Emoji.artBase + row.entry.cells[index][1] + ".svg"
                     }
                 }
             }
