@@ -471,7 +471,7 @@ fn permille(have: u64, total: u64) -> u32 {
 fn remove(path: &Path) {
     match std::fs::remove_file(path) {
         Err(err) if err.kind() != std::io::ErrorKind::NotFound => {
-            eprintln!("piirit: could not delete {}: {err}", path.display());
+            eprintln!("piirit: could not delete a speech file: {err}");
         }
         _ => {}
     }

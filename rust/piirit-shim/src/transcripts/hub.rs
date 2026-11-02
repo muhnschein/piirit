@@ -166,7 +166,7 @@ impl StoreThread {
 fn open_store() -> Option<Store> {
     let opened = files::make_speech_dir()
         .map(|dir| dir.join("transcripts.sqlite"))
-        .and_then(|path| Store::open(&path).map_err(|err| format!("{}: {err}", path.display())));
+        .and_then(|path| Store::open(&path).map_err(|err| format!("transcripts.sqlite: {err}")));
     match opened {
         Ok(store) => {
             if !store.has_search() {

@@ -309,7 +309,7 @@ impl Fetch {
             return piirit_fetch_start(url, target, offset, total, hash, user);
         });
         if handle.is_null() {
-            return Err(format!("could not write {}", path.display()));
+            return Err("could not write the model file".to_owned());
         }
         Ok(Self {
             handle: handle as usize,

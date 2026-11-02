@@ -85,7 +85,7 @@ pub(crate) fn make_speech_dir() -> Result<PathBuf, String> {
     }
     builder
         .create(&dir)
-        .map_err(|err| format!("cannot create {}: {err}", dir.display()))?;
+        .map_err(|err| format!("cannot create the speech dir: {err}"))?;
     Ok(dir)
 }
 

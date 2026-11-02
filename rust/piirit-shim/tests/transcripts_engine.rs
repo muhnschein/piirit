@@ -17,7 +17,7 @@ mod common;
 #[path = "../src/transcripts/store.rs"]
 mod store;
 
-const PROBE_QML: &str = r#"
+const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
     Item {
@@ -35,7 +35,7 @@ const PROBE_QML: &str = r#"
         }
         function tap() { voice.transcribe(false) }
     }
-"#;
+";
 
 #[test]
 fn a_tapped_voice_message_goes_through_decoder_and_engine() {
