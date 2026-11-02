@@ -93,6 +93,7 @@ const PROBE_QML: &str = r"
             item.text = value
             return 'ok'
         }
+        function groupLoaded() { return '' + group.loaded }
         function get(name, property) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -101,9 +102,17 @@ const PROBE_QML: &str = r"
     }
 ";
 
-#[test]
-fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
-    let temp = std::env::temp_dir().join(format!("piirit-add-members-{}", std::process::id()));
+/// Fake core, `pageStack` probe, engine with probe loaded; core started.
+struct Harness {
+    journal: std::path::PathBuf,
+    core: QObjectBox<DeltaChatCore>,
+    stack: QObjectBox<PageStackProbe>,
+    engine: QmlEngine,
+}
+
+/// `hold`: `PIIRIT_FAKE_HOLD` file, answers held while it is there.
+fn start(name: &str, hold: Option<&std::path::Path>) -> Harness {
+    let temp = std::env::temp_dir().join(format!("piirit-{name}-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
@@ -112,43 +121,63 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        if let Some(hold) = hold {
+            std::env::set_var("PIIRIT_FAKE_HOLD", hold);
+        }
     }
 
     piirit_shim::register_qml_types();
 
-    let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
+    let core = QObjectBox::new(DeltaChatCore::default());
+    let stack = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
-    engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
+    engine.set_object_property("core".into(), core.pinned());
+    engine.set_object_property("pageStack".into(), stack.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
-    core_box
-        .pinned()
+    core.pinned()
         .borrow_mut()
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
-    let engine_ptr = std::ptr::addr_of_mut!(engine);
+    Harness {
+        journal,
+        core,
+        stack,
+        engine,
+    }
+}
+
+macro_rules! call {
+    ($engine:expr, $name:expr $(, $arg:expr)*) => {{
+        let result = (*$engine).invoke_method(
+            $name.into(),
+            &[$(QVariant::from($arg)),*],
+        );
+        QString::from_qvariant(result)
+            .map(|value| value.to_string())
+            .unwrap_or_default()
+    }};
+}
+
+#[test]
+fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
+    let mut harness = start("add-members", None);
+    let engine_ptr = std::ptr::addr_of_mut!(harness.engine);
+    let core_ptr = std::ptr::addr_of!(harness.core);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
-    macro_rules! call {
-        ($name:expr $(, $arg:expr)*) => {{
-            let result = (*engine_ptr).invoke_method(
-                $name.into(),
-                &[$(QVariant::from($arg)),*],
-            );
-            QString::from_qvariant(result)
-                .map(|value| value.to_string())
-                .unwrap_or_default()
-        }};
-    }
     macro_rules! get {
         ($name:expr, $property:expr) => {
-            call!("get", QString::from($name), QString::from($property))
+            call!(
+                engine_ptr,
+                "get",
+                QString::from($name),
+                QString::from($property)
+            )
         };
     }
     macro_rules! record {
@@ -159,11 +188,16 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
 
     let mut plan = common::Plan::default();
 
-    // Loaded once group is, so rows know who's in it.
-    plan.after(2, move || unsafe {
+    // Opened from a group page that shows its members: group loaded first.
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.until(1, 30, move |_| unsafe {
+        call!(engine_ptr, "groupLoaded") == "true"
+    });
+    plan.after(0, move || unsafe {
         record!(
             "load",
             call!(
+                engine_ptr,
                 "load",
                 QString::from(common::page_url("AddMembersPage.qml"))
             )
@@ -172,55 +206,152 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         record!("placeholder-fresh", get!("contactsPlaceholder", "enabled"));
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if get!("memberRow11", "enabled").starts_with("missing:") && !last {
+            return false;
+        }
         // Ada already in; Grace not.
         record!("in-greyed", get!("memberRow10", "enabled"));
         record!("out-offered", get!("memberRow11", "enabled"));
         record!("nothing-picked", get!("addButton", "enabled"));
         // Tapping someone in does nothing.
-        record!("tap-in", call!("click", QString::from("memberRow10")));
+        record!(
+            "tap-in",
+            call!(engine_ptr, "click", QString::from("memberRow10"))
+        );
         record!("still-nothing", get!("addButton", "enabled"));
         // Search narrows to Grace, found by address.
         record!(
             "search",
             call!(
+                engine_ptr,
                 "setText",
                 QString::from("searchField"),
                 QString::from("grace")
             )
         );
+        true
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if !get!("memberRow10", "enabled").starts_with("missing:") && !last {
+            return false;
+        }
         record!("ada-hidden", get!("memberRow10", "enabled"));
         record!("grace-found", get!("memberRow11", "enabled"));
-        record!("tap-out", call!("click", QString::from("memberRow11")));
+        record!(
+            "tap-out",
+            call!(engine_ptr, "click", QString::from("memberRow11"))
+        );
         record!("picked", get!("addButton", "enabled"));
-        record!("add", call!("click", QString::from("addButton")));
+        record!(
+            "add",
+            call!(engine_ptr, "click", QString::from("addButton"))
+        );
         // Search no contact answers: list really empty.
         record!(
             "search-nobody",
             call!(
+                engine_ptr,
                 "setText",
                 QString::from("searchField"),
                 QString::from("zzqq-nobody-is-called-this")
             )
         );
+        true
     });
 
     // Core answered, nobody to show: placeholder is the only thing on list.
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if get!("contactsPlaceholder", "enabled") != "true" && !last {
+            return false;
+        }
         record!("placeholder-empty", get!("contactsPlaceholder", "enabled"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
-    engine.exec();
+    harness.engine.exec();
 
     assert_outcome(
         &steps,
-        &stack_box.pinned().borrow().log.to_string(),
-        &common::calls(&journal),
+        &harness.stack.pinned().borrow().log.to_string(),
+        &common::calls(&harness.journal),
+    );
+}
+
+#[test]
+fn members_heard_after_the_picker_opened_grey_out() {
+    let temp = common::temp_tree("add-members-hold");
+    let hold = temp.join("hold");
+    std::fs::write(&hold, r#""get_full_chat_by_id""#).expect("write the hold file");
+    let mut harness = start("add-members-late", Some(&hold));
+    let engine_ptr = std::ptr::addr_of_mut!(harness.engine);
+    let core_ptr = std::ptr::addr_of!(harness.core);
+    let mut steps: Vec<(&str, String)> = Vec::new();
+    let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
+
+    let mut plan = common::Plan::default();
+
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
+        call!(
+            engine_ptr,
+            "load",
+            QString::from(common::page_url("AddMembersPage.qml"))
+        );
+    });
+    // Rows up, group's members not yet: then they land.
+    plan.until(1, 30, move |last| unsafe {
+        let ada = call!(
+            engine_ptr,
+            "get",
+            QString::from("memberRow10"),
+            QString::from("enabled")
+        );
+        if ada.starts_with("missing:") && !last {
+            return false;
+        }
+        (*steps_ptr).push(("group-unheard", call!(engine_ptr, "groupLoaded")));
+        let _ = std::fs::remove_file(&hold);
+        true
+    });
+    plan.until(1, 30, move |last| unsafe {
+        if call!(engine_ptr, "groupLoaded") != "true" && !last {
+            return false;
+        }
+        let ada = call!(
+            engine_ptr,
+            "get",
+            QString::from("memberRow10"),
+            QString::from("enabled")
+        );
+        (*steps_ptr).push(("in-greyed", ada));
+        (*engine_ptr).quit();
+        true
+    });
+
+    plan.run();
+    harness.engine.exec();
+
+    let context = format!("steps: {steps:?}");
+    let value = |label: &str| {
+        steps
+            .iter()
+            .find(|(name, _)| *name == label)
+            .map(|(_, value)| value.clone())
+            .unwrap_or_default()
+    };
+    assert_eq!(
+        value("group-unheard"),
+        "false",
+        "the group's members came before the rows, so this proves nothing. {context}"
+    );
+    assert_eq!(
+        value("in-greyed"),
+        "false",
+        "someone already in, heard of after the picker opened, can be picked again. {context}"
     );
 }
 
