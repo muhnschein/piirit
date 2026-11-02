@@ -13,6 +13,7 @@ docs/BUILDING.md, "Cutting a release").
 - The page of a group with hundreds of members opens and slides back smoothly: member rows are made as you scroll to them, not all at once.
 - Chats open and scroll more smoothly: each message builds and lays out only the parts it shows.
 - The emoji picker opens and searches faster: each emoji is just its picture.
+- The camera opens more smoothly: it starts once its page is on screen, on the side and in the mode asked, not while the page slides in. The same goes for the QR scanner opened from the cover.
 - Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
 - Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.

@@ -1,6 +1,7 @@
 //! Camera page opens as asked: video or still, front or back; stays up after answer when caller
 //! puts next page in place. Cover quick action asks all three (`ChatListPage.capture`). While
-//! recording, page says a quick action must not pull stack from under it.
+//! recording, page says a quick action must not pull stack from under it. Camera starts once page
+//! is on screen, already on asked side and mode (Qt's own start, on build, was neither).
 //!
 //! Via `QtMultimedia` stubs, as `qml_capture.rs`: two back cameras, one front.
 
@@ -51,6 +52,11 @@ const PROBE_QML: &str = r"
             var c = camera()
             return c.captureMode + '|' + c.deviceId + '|' + c.running
         }
+        // Device and mode at each start page asked for.
+        function starts() { return camera().starts }
+        function state() { return '' + camera().cameraState }
+        // Slide-in over: page on screen.
+        function show() { loader.item.status = PageStatus.Active; return 'ok' }
         function page(property) { return '' + loader.item[property] }
         function tap(name) {
             var item = findIn(loader.item, name)
@@ -169,6 +175,18 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         );
         record!("selfie-video-opened", call!("opened"));
 
+        // Pushed: built while sliding in (Silica's Activating), on screen after.
+        record!(
+            "sliding",
+            load!(r#"{"mode": 1, "front": true, "closeOnPick": false, "status": 1}"#)
+        );
+        record!("sliding-opened", call!("opened"));
+        record!("sliding-starts", call!("starts"));
+        record!("sliding-state", call!("state"));
+        record!("show", call!("show"));
+        record!("shown-opened", call!("opened"));
+        record!("shown-starts", call!("starts"));
+
         // Default: page still takes itself down.
         record!("closing", load!("{}"));
         record!("pops-before-close", call!("pops"));
@@ -190,7 +208,15 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
     };
     let context = format!("steps: {steps:?}");
 
-    for step in ["plain", "video", "selfie", "selfie-video", "closing"] {
+    for step in [
+        "plain",
+        "video",
+        "selfie",
+        "selfie-video",
+        "sliding",
+        "show",
+        "closing",
+    ] {
         assert_eq!(
             value(step),
             "ok",
@@ -234,6 +260,23 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         value("selfie-video-opened"),
         "2|front-0|true",
         "a selfie video did not open recording on the front camera. {context}"
+    );
+    assert_eq!(
+        (
+            value("sliding-opened").as_str(),
+            value("sliding-starts").as_str(),
+            value("sliding-state").as_str()
+        ),
+        ("2|front-0|false", "", "0"),
+        "the camera started, or loaded, while its page was still sliding in. {context}"
+    );
+    assert_eq!(
+        (
+            value("shown-opened").as_str(),
+            value("shown-starts").as_str()
+        ),
+        ("2|front-0|true", "front-0/2"),
+        "the camera did not start once on screen, as asked. {context}"
     );
 
     assert_eq!(

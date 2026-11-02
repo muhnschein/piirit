@@ -124,6 +124,9 @@ Page {
     Camera {
         id: camera
         objectName: "camera"
+        // Qt starts it once built: before page is on screen, on default device and
+        // mode. Off until `start()`.
+        cameraState: Camera.UnloadedState
         // Set by `setMode` while stopped: recording asked mid-rebuild never
         // reported.
         captureMode: Camera.CaptureStillImage
@@ -352,11 +355,11 @@ Page {
     }
 
     // Camera only while page on screen. From status, not `shown`: handler can
-    // run before binding.
+    // run before binding. Not stopped sliding in: not started, and stop() loads it.
     onStatusChanged: {
         if (page.status === PageStatus.Active && page.appActive && !page.done) {
             camera.start()
-        } else if (page.status !== PageStatus.Active) {
+        } else if (page.status !== PageStatus.Active && page.status !== PageStatus.Activating) {
             selfTimer.stop()
             if (page.recording) {
                 camera.videoRecorder.stop()
