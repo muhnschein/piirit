@@ -106,13 +106,12 @@ pub(crate) fn store_path() -> Option<PathBuf> {
     speech_path().map(|dir| dir.join("transcripts.sqlite"))
 }
 
-/// Engine libraries: `PIIRIT_SPEECH_LIBS` (run time, then build time), package's, else
+/// Engine libraries: `PIIRIT_SPEECH_LIBS`, package's, else
 /// `speech/` beside binary or its parent (test binaries sit in `deps/`).
 pub(crate) fn libs_dir() -> PathBuf {
     let exe = std::env::current_exe().ok();
     libs_dir_from(
         std::env::var("PIIRIT_SPEECH_LIBS").ok(),
-        option_env!("PIIRIT_SPEECH_LIBS"),
         exe.as_deref(),
         Path::is_dir,
     )
@@ -120,14 +119,10 @@ pub(crate) fn libs_dir() -> PathBuf {
 
 fn libs_dir_from(
     run_time: Option<String>,
-    build_time: Option<&str>,
     exe: Option<&Path>,
     is_dir: impl Fn(&Path) -> bool,
 ) -> PathBuf {
     if let Some(dir) = run_time.filter(|dir| !dir.is_empty()) {
-        return PathBuf::from(dir);
-    }
-    if let Some(dir) = build_time.filter(|dir| !dir.is_empty()) {
         return PathBuf::from(dir);
     }
     let bundled = PathBuf::from(BUNDLED_LIBS);
@@ -185,25 +180,21 @@ mod tests {
         let exe = Path::new("/b/target/debug/deps/test-1234");
         let none = |_: &Path| false;
         assert_eq!(
-            libs_dir_from(Some("/run".into()), Some("/build"), Some(exe), none),
+            libs_dir_from(Some("/run".into()), Some(exe), none),
             PathBuf::from("/run")
         );
         assert_eq!(
-            libs_dir_from(None, Some("/build"), Some(exe), none),
-            PathBuf::from("/build")
-        );
-        assert_eq!(
-            libs_dir_from(None, None, Some(exe), |dir| dir
+            libs_dir_from(None, Some(exe), |dir| dir
                 == Path::new("/usr/share/harbour-piirit/lib/speech")),
             PathBuf::from("/usr/share/harbour-piirit/lib/speech")
         );
         assert_eq!(
-            libs_dir_from(None, None, Some(exe), |dir| dir
+            libs_dir_from(None, Some(exe), |dir| dir
                 == Path::new("/b/target/debug/speech")),
             PathBuf::from("/b/target/debug/speech")
         );
         assert_eq!(
-            libs_dir_from(None, None, Some(exe), none),
+            libs_dir_from(None, Some(exe), none),
             PathBuf::from("/usr/share/harbour-piirit/lib/speech")
         );
     }
