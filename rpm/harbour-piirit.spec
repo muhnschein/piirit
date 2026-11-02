@@ -102,6 +102,9 @@ BuildRequires:  pkgconfig(libpulse)
 # Phone's SQLite for transcript store (piirit-shim/src/transcripts/store.rs), not a bundled
 # copy; libsqlite3.so.0 Harbour-allowed.
 BuildRequires:  pkgconfig(sqlite3)
+# QNetworkAccessManager for speech model download (piirit-shim/src/transcripts/download.rs);
+# libQt5Network Harbour-allowed.
+BuildRequires:  pkgconfig(Qt5Network)
 # lrelease: translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 

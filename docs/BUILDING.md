@@ -16,9 +16,10 @@ git submodule update --init --depth 1
 ## Lints
 
 - Workspace-level: bare `cargo clippy` fails like CI. Deny: `clippy::all`, `pedantic`, `unwrap_used`/`expect_used` (non-test), `missing_docs`, `unsafe_code`.
-- `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for `QTranslator` install, voice recording (`QAudioRecorder`), QML pictures (`QQuickImageProvider`), call mic watch (libpulse).
-- Hence four `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`; each crate's `build.rs` C++ step exists only for them. Each exception narrowest scope, reason stated, short enough to verify by reading.
+- `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for `QTranslator` install, voice recording (`QAudioRecorder`), QML pictures (`QQuickImageProvider`), call mic watch (libpulse), speech model download (`QNetworkAccessManager`).
+- Hence five `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`, `piirit-shim/src/transcripts/download.rs`; each crate's `build.rs` C++ step exists only for them. Each exception narrowest scope, reason stated, short enough to verify by reading.
 - Recorder: host `qtmultimedia5-dev` (`Makefile` lists packages), spec `pkgconfig(Qt5Multimedia)`, links `libQt5Multimedia`. Mic watch: host `libpulse-dev`, spec `pkgconfig(libpulse)`, links `libpulse.so.0`. Both Harbour-allowed. Mic-watch test runs own sound server: needs `pulseaudio`, `pulseaudio-utils`; skipped if absent, except CI fails.
+- Model download: Qt's network stack, not a Rust HTTP + TLS one (new, big, TLS certificates its own). Host `qtbase5-dev`, spec `pkgconfig(Qt5Network)`, links `libQt5Network`; Harbour-allowed. Tests point it at loopback host: `PIIRIT_SPEECH_MODEL_URL`, `PIIRIT_SPEECH_MODEL_SHA256`, `PIIRIT_SPEECH_MODEL_BYTES` (all three or none). Engine libraries: `PIIRIT_SPEECH_LIBS` (run or build time), else package's `/usr/share/harbour-piirit/lib/speech/`, else `speech/` beside binary.
 - `rust/clippy.toml` bans:
   - `tokio::runtime::Runtime::new`: use `CoreRuntime` (device-only panic)
   - `qmetaobject::single_shot`: tests step via `common::Plan` (see Testing). Sub-second waits work: vendored copy patched (`third_party/qmetaobject.patch`; 0.2.10 zeroed fraction)
