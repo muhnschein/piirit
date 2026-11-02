@@ -45,13 +45,17 @@ var languages = [
     { code: "yue", name: "粵語（廣東話）", available: false }
 ]
 
-/// Whisper code for a Qt locale name ("fi_FI", "nb_NO", "zh_HK").
+/// Whisper code for a Qt locale name ("fi_FI", "nb_NO", "zh_HK"). "C": no LANG, which
+/// Sailfish's default English leaves (no locale.conf).
 function codeOf(localeName) {
     var name = String(localeName)
     if (name === "zh_HK") {
         return "yue"
     }
     var language = name.split(/[_-]/)[0]
+    if (language === "C" || language === "POSIX" || language === "") {
+        return "en"
+    }
     return language === "nb" ? "no" : language
 }
 

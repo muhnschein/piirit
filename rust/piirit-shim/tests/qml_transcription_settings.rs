@@ -498,7 +498,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     assert_eq!(
         value("codes"),
-        "fi,no,yue,zh,C",
+        "fi,no,yue,zh,en",
         "a phone language does not map to its whisper code. {context}"
     );
     assert_eq!(
