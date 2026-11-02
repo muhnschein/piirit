@@ -379,6 +379,7 @@ dependencies = [
  "cpp_build",
  "deltachat-jsonrpc",
  "mp3lame-encoder",
+ "piirit-speech",
  "piirit-video",
  "qmetaobject",
  "qrcode",
@@ -386,6 +387,13 @@ dependencies = [
  "rqrr",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "piirit-speech"
+version = "2.2.0"
+dependencies = [
+ "piirit-video",
 ]
 
 [[package]]

@@ -1,0 +1,15 @@
+[package]
+name = "piirit-speech"
+version = "2.2.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Turns voice messages into text on the phone: FFmpeg decodes the file, whisper.cpp transcribes it. Built from source into the app; see build.rs."
+
+[dependencies]
+# Decodes voice files: same FFmpeg build as video recoding.
+piirit-video = { path = "../piirit-video" }
+
+[lints]
+workspace = true
