@@ -20,7 +20,7 @@ docs/BUILDING.md, "Cutting a release").
 - When adding members to a group, people already in it are greyed out even if the group's member list arrives after the picker opened.
 - Tapping a message or missed-call notification opens its chat again after you have opened Archived chats or switched profiles. Before, such taps did nothing until Piirit was restarted.
 - Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
-- Bundles deltachat-rpc-server 2.66.0 (was 2.65.0). On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
+- Bundles deltachat-rpc-server 2.67.0 (was 2.65.0). A webxdc app whose icon is broken now shows the standard webxdc icon instead of a plain grid. On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
 - A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
 - The big picture on the profile, contact and group pages shows its letter or emoji at a size that fits it, not list size.
 - A chat whose name starts with an emoji shows that emoji as its picture, not a "?".
