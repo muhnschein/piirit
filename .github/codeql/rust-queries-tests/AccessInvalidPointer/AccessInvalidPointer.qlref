@@ -1,1 +1,3 @@
-AccessInvalidPointer.ql
+query: AccessInvalidPointer.ql
+postprocess:
+ - utils/test/PrettyPrintModels.ql
