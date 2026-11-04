@@ -1510,6 +1510,48 @@ async fn offline_round_trip_against_real_core() {
         "the icon a row draws is not the one in the archive"
     );
 
+    // Core 2.67+: broken icon answers core's default icon, not an error (row: icon, not none).
+    let broken_file = std::env::temp_dir().join("piirit-real-server-broken-icon.xdc");
+    std::fs::write(
+        &broken_file,
+        webxdc(&[
+            ("index.html", page),
+            ("manifest.toml", b"name = \"Broken\"\n"),
+            ("icon.png", b"not a picture"),
+        ]),
+    )
+    .expect("write webxdc with a broken icon");
+    let (broken_id, _): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Option::<String>::None,
+                Some(broken_file.to_string_lossy().into_owned()),
+                Some("broken.xdc".to_string()),
+                Option::<(f64, f64)>::None,
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .expect("misc_send_msg with a broken-icon webxdc");
+    let broken_icon: String = client
+        .call("get_webxdc_blob", (sender_id, broken_id, "icon.png"))
+        .await
+        .expect("get_webxdc_blob refused a broken icon; core 2.67 answers its default icon");
+    let default_icon: String = client
+        .call(
+            "get_webxdc_blob",
+            (sender_id, broken_id, "__webxdc__/default-icon.png"),
+        )
+        .await
+        .expect("get_webxdc_blob for the default icon");
+    assert_eq!(
+        broken_icon, default_icon,
+        "a broken icon is not swapped for core's default icon"
+    );
+
     // Updates both ways: bridge POST, and poll collecting it.
     let update = "{\"payload\":{\"move\":\"e4\"}}";
     client
