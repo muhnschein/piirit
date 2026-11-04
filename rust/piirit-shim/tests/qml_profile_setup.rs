@@ -127,13 +127,14 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-setup-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    std::fs::write(temp.join("slow-gate"), "").expect("write the gate file");
     // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Relay that does not answer while watched.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "20000");
+        // Relay that does not answer while watched: gate never removed.
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", temp.join("slow-gate"));
     }
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
@@ -194,9 +195,10 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         common::record(&s, "activate", call!("activate"));
     });
 
+    // Slow call open from here on: steps time against page's own timers, not core.
     // 2s: waiting, nothing said yet.
     let s = steps.clone();
-    plan.after(1, move || {
+    plan.after_busy(1, move || {
         common::record(&s, "early-busy", call!("pageProperty", "busy"));
         common::record(&s, "early-hint", call!("get", "slowHint", "visible"));
         common::record(&s, "early-label", call!("get", "progressBar", "label"));
@@ -204,24 +206,28 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 6s: fourth second passed.
     let s = steps.clone();
-    plan.after(4, move || {
+    plan.after_busy(4, move || {
         common::record(&s, "hint", call!("get", "slowHint", "visible"));
         common::record(&s, "still-busy", call!("pageProperty", "busy"));
     });
 
     // 8s: deadline passed at seven.
     let s = steps.clone();
-    plan.after(2, move || {
+    plan.until(1, 30, move |last| {
+        if call!("pageProperty", "busy").to_string() != "false" && !last {
+            return false;
+        }
         common::record(&s, "late-busy", call!("pageProperty", "busy"));
         common::record(&s, "late-error", call!("pageProperty", "errorMessage"));
         common::record(&s, "late-hint", call!("get", "slowHint", "visible"));
         common::record(&s, "late-back", call!("get", "backButton", "visible"));
         common::record(&s, "late-cancel", call!("get", "cancelButton", "visible"));
+        true
     });
 
     // 9s: second attempt, core still on first.
     let s = steps.clone();
-    plan.after(1, move || {
+    plan.after_busy(1, move || {
         common::record(
             &s,
             "reload",
@@ -236,13 +242,21 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 
     // 10s: cancelled.
     let s = steps.clone();
-    plan.after(1, move || {
+    plan.after_busy(1, move || {
         common::record(&s, "cancel", call!("click", "cancelButton"));
         common::record(&s, "cancelled-busy", call!("pageProperty", "busy"));
     });
 
-    plan.after(2, move || unsafe {
+    let asked = journal.clone();
+    plan.until(1, 30, move |last| unsafe {
+        let stopped = common::methods(&asked)
+            .iter()
+            .any(|method| method == "stop_ongoing_process");
+        if !stopped && !last {
+            return false;
+        }
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

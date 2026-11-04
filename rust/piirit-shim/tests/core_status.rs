@@ -96,13 +96,20 @@ fn a_core_failure_reaches_qml_and_a_dead_server_is_replaced() {
     let after_ptr: *mut String = std::ptr::addr_of_mut!(after_restart);
     let mut trail = String::new();
     let trail_ptr: *mut String = std::ptr::addr_of_mut!(trail);
+    let asked = journal.clone();
     plan.until(1, 30, move |last| unsafe {
         let seen = (*engine_ptr).invoke_method("seen".into(), &[]);
         let seen = QString::from_qvariant(seen)
             .map(|text| text.to_string())
             .unwrap_or_default();
         let now = report();
-        let back = seen.contains("reconnecting") && now.ends_with("#ready");
+        // Back: replacement up and IO resumed on it.
+        let resumed = common::methods(&asked)
+            .iter()
+            .filter(|method| *method == "start_io")
+            .count()
+            >= 2;
+        let back = seen.contains("reconnecting") && now.ends_with("#ready") && resumed;
         if !back && !last {
             return false;
         }

@@ -7,8 +7,6 @@
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
-use std::time::{Duration, Instant};
-
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 use serde_json::json;
@@ -88,25 +86,32 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
 
     // SAFETY for every block: fire only inside `exec()` on this
     // thread; pointees outlive it.
-    plan.after(2, move || unsafe {
+    // Rings when fake core's timer fires: wait for it, not the clock.
+    plan.until(1, 30, move |last| unsafe {
+        if !call!("state").starts_with("ringing") && !last {
+            return false;
+        }
         record!("ringing", call!("state"));
         record!("answer", call!("answer"));
         record!("other", call!("ring"));
+        true
     });
 
     // Page up, reader closes app.
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if !call!("url").starts_with("http") && !last {
+            return false;
+        }
         record!("url", call!("url"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
     engine.exec();
 
     // What app does on window close.
-    let stopping = Instant::now();
-    piirit_shim::shutdown();
-    let stopped_in = stopping.elapsed();
+    let calls_ended = piirit_shim::shutdown();
 
     let value = |label: &str| {
         steps
@@ -115,7 +120,7 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
             .map(|(_, value)| value.clone())
             .unwrap_or_default()
     };
-    let context = format!("steps: {steps:?}, stopped in {stopped_in:?}");
+    let context = format!("steps: {steps:?}");
 
     let ringing = value("ringing");
     assert!(ringing.starts_with("ringing|"), "{context}");
@@ -145,7 +150,7 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
     );
     // Core sent end message; app stopped then, not at end of wait.
     assert!(
-        stopped_in < Duration::from_secs(2),
+        calls_ended,
         "the app did not stop the core once the call's end was sent. \
          {context}"
     );

@@ -90,11 +90,11 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
     });
 
     // While re-read of marked chat is still out.
-    plan.after(1, move || unsafe {
+    plan.after_busy(1, move || unsafe {
         call!("otherChatChanged");
     });
 
-    plan.after(3, move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after", call!("unread")));
         (*engine_ptr).quit();
     });

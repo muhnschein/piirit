@@ -164,7 +164,16 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         record!("settle", call!("settle"));
     });
 
-    plan.after(6, move || unsafe {
+    // Found, lit, flash over: waited on, not timed (core may answer late).
+    plan.until(1, 30, move |last| unsafe {
+        let cleared = call!(
+            "get",
+            QString::from("messageList"),
+            QString::from("foundMessageId")
+        );
+        if (call!("everFoundValue") == "0" || cleared != "0") && !last {
+            return false;
+        }
         record!("row", call!("rowOf", OLDER_MESSAGE));
         record!("found", call!("everFoundValue"));
         record!("lit", call!("everLitValue"));
@@ -191,6 +200,7 @@ fn a_message_a_search_found_is_where_the_chat_opens() {
         record!("ask", call!("ask", NEWER_MESSAGE));
         record!("asked-while-away", call!("everFoundValue"));
         record!("return", call!("settle"));
+        true
     });
 
     plan.after(2, move || unsafe {
