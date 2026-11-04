@@ -378,7 +378,7 @@ enum Decision {
     Other(usize),
     /// Nothing spoken.
     Silent,
-    /// Selected language not detectable: not whisper's.
+    /// Detection gave no languages.
     Unknown,
 }
 
@@ -393,12 +393,10 @@ fn decide(
     if one_window && no_speech > NO_SPEECH_ABOVE {
         return Decision::Silent;
     }
-    let speak = |index: Option<usize>| index.map_or(Decision::Unknown, Decision::Speak);
-    match selected {
-        [] => speak(likeliest(detected, |_| true)),
-        [one] => speak(likeliest(detected, |code| code == one)),
-        several => choose_language(several, detected),
+    if selected.is_empty() {
+        return likeliest(detected, |_| true).map_or(Decision::Unknown, Decision::Speak);
     }
+    choose_language(selected, detected)
 }
 
 /// Most likely selected language, unless an unselected one is over twice as likely: then
@@ -827,20 +825,21 @@ mod tests {
     }
 
     #[test]
-    fn any_language_is_the_likeliest_and_one_given_is_taken_as_said() {
+    fn any_language_is_the_likeliest_and_one_given_follows_the_rule_for_several() {
         let detected = [("en", 0.2), ("fi", 0.7), ("de", 0.1)];
         assert_eq!(
             decide(&codes(&[]), &detected, 0.0, true),
             Decision::Speak(1)
         );
-        // Given one: spoken, however unlikely.
+        // Regression (device run 41883450707): only English picked, German clip came out
+        // as English. Unselected language over twice as likely: reported.
         assert_eq!(
             decide(&codes(&["de"]), &detected, 0.0, true),
-            Decision::Speak(2)
+            Decision::Other(1)
         );
         assert_eq!(
-            decide(&codes(&["xx"]), &detected, 0.0, true),
-            Decision::Unknown
+            decide(&codes(&["en"]), &[("en", 0.4), ("de", 0.6)], 0.0, true),
+            Decision::Speak(0)
         );
         // Several: rule above.
         assert_eq!(
