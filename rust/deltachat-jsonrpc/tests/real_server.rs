@@ -1510,7 +1510,7 @@ async fn offline_round_trip_against_real_core() {
         "the icon a row draws is not the one in the archive"
     );
 
-    // Core 2.67+: broken icon answers core's default icon, not an error (row: icon, not none).
+    // Core 2.67+: broken icon answers core's default icon, not an error (row: that, not grid stand-in).
     let broken_file = std::env::temp_dir().join("piirit-real-server-broken-icon.xdc");
     std::fs::write(
         &broken_file,
