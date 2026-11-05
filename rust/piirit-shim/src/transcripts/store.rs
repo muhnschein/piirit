@@ -225,6 +225,35 @@ impl Store {
         Ok(gone)
     }
 
+    /// Profile's `state` rows whose text holds `query`, any case: core's message search
+    /// (`LIKE '%query%'` on lowercased text), not index's whole words. Newest message first.
+    pub(crate) fn matching(
+        &self,
+        account: u32,
+        state: u32,
+        query: &str,
+    ) -> rusqlite::Result<Vec<(u32, u32, String)>> {
+        let needle = query.trim().to_lowercase();
+        if needle.is_empty() {
+            return Ok(Vec::new());
+        }
+        let mut statement = self.connection.prepare(
+            "SELECT msg, chat, text FROM transcripts
+             WHERE account = ?1 AND state = ?2 ORDER BY msg DESC",
+        )?;
+        let rows = statement.query_map(params![account, state], |row| {
+            Ok((row.get(0)?, row.get(1)?, row.get::<_, String>(2)?))
+        })?;
+        let mut found = Vec::new();
+        for row in rows {
+            let row = row?;
+            if row.2.to_lowercase().contains(&needle) {
+                found.push(row);
+            }
+        }
+        Ok(found)
+    }
+
     /// Those of `msgs` with a row.
     pub(crate) fn known(&self, account: u32, msgs: &[u32]) -> rusqlite::Result<BTreeSet<u32>> {
         let mut statement = self
