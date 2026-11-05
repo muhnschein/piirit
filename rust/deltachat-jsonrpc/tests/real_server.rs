@@ -1072,6 +1072,15 @@ async fn offline_round_trip_against_real_core() {
         whole.contains("line 50"),
         "the message's HTML part does not hold the end of the body, so          there is nowhere left to read it from: {whole:?}"
     );
+    // Core 2.68+: cut on load, stored whole, so search finds the tail too.
+    let tail_hits: Vec<u32> = client
+        .call("search_messages", (sender_id, "line 50", Some(saved)))
+        .await
+        .expect("search_messages for the end of a long message");
+    assert!(
+        tail_hits.contains(&fourth),
+        "search misses words past the cut of a long message: {tail_hits:?}"
+    );
     // Short message whole. Asking for missing HTML part is no error.
     let short_message: Value = client
         .call("get_message", (sender_id, first))
