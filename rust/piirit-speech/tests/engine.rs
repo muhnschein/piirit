@@ -10,7 +10,9 @@
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use piirit_speech::{decode, Engine, Error, Options, Outcome, Progress, BUILT_LIBS, SAMPLE_RATE};
+use piirit_speech::{
+    decode, Engine, Error, Options, Outcome, Progress, BUILT_LIBS, SAMPLE_RATE, VAD_MODEL,
+};
 
 fn third_party(path: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -48,6 +50,98 @@ fn longer(samples: &[f32], seconds: usize) -> Vec<f32> {
 
 fn keep_going(_: &Progress) -> bool {
     true
+}
+
+/// `seconds` of `hz` sine at 1/8, as ffmpeg's `sine` source makes it.
+fn tone(hz: f32, seconds: usize) -> Vec<f32> {
+    let rate = 16_000.0_f32;
+    (0..seconds * SAMPLE_RATE as usize)
+        .map(|i| {
+            #[allow(clippy::cast_precision_loss)]
+            let t = i as f32 / rate;
+            0.125 * (std::f32::consts::TAU * hz * t).sin()
+        })
+        .collect()
+}
+
+/// Quiet noise, about -55 dBFS: a phone in a pocket.
+fn hiss(seconds: usize) -> Vec<f32> {
+    let mut seed = 1u32;
+    (0..seconds * SAMPLE_RATE as usize)
+        .map(|_| {
+            seed = seed.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            f32::from(u16::try_from(seed >> 16).unwrap()) / 32_768.0 * 0.003 - 0.003
+        })
+        .collect()
+}
+
+#[test]
+fn sound_without_speech_stops_before_any_decoding() {
+    let mut engine = Engine::load(libs(), &test_model()).expect("load the test model");
+    let sounds = [
+        ("silence", vec![0.0; 3 * SAMPLE_RATE as usize]),
+        ("hiss", hiss(5)),
+        // Regression (device run piirit-pr286-dev1b-1793824092): fixture's beep came out as "I".
+        ("440 Hz", tone(440.0, 3)),
+        ("1 kHz", tone(1000.0, 5)),
+        ("hum", tone(50.0, 5)),
+    ];
+    for (name, sound) in &sounds {
+        for languages in [vec![], vec!["xx".to_owned()]] {
+            let mut calls = 0;
+            let options = Options {
+                languages,
+                ..Options::default()
+            };
+            let outcome = engine.transcribe(sound, &options, &mut |_| {
+                calls += 1;
+                true
+            });
+            assert_eq!(outcome, Ok(Outcome::NoSpeech), "{name}");
+            assert_eq!(calls, 0, "{name}: decoded anyway");
+        }
+    }
+}
+
+#[test]
+fn short_speech_gets_past_the_speech_detector() {
+    // Regression: whisper's no-speech score called a third of 2 s speech clips silent.
+    let mut engine = Engine::load(libs(), &test_model()).expect("load the test model");
+    let unknown = Options {
+        languages: vec!["xx".into()],
+        ..Options::default()
+    };
+    for seconds in [1, 2] {
+        let speech = decode(&third_party("samples/jfk.wav"), seconds).expect("decode jfk.wav");
+        let outcome = engine.transcribe(&speech, &unknown, &mut |_| false);
+        // Language detection ran: reported, or chosen and under way.
+        assert!(
+            matches!(
+                outcome,
+                Err(Error::Cancelled) | Ok(Outcome::OtherLanguage { .. })
+            ),
+            "{seconds} s: {outcome:?}"
+        );
+    }
+}
+
+#[test]
+fn without_the_speech_detector_the_model_does_not_load() {
+    let libs_only =
+        std::env::temp_dir().join(format!("piirit-speech-novad-{}", std::process::id()));
+    std::fs::create_dir_all(&libs_only).unwrap();
+    for entry in std::fs::read_dir(libs()).unwrap() {
+        let path = entry.unwrap().path();
+        if path.file_name().is_some_and(|name| name != VAD_MODEL) {
+            std::fs::copy(&path, libs_only.join(path.file_name().unwrap())).unwrap();
+        }
+    }
+    let result = Engine::load(&libs_only, &test_model());
+    std::fs::remove_dir_all(&libs_only).unwrap();
+    match result {
+        Err(Error::Model(why)) => assert!(why.contains("speech detector"), "{why}"),
+        other => panic!("no speech detector: {other:?}"),
+    }
 }
 
 #[test]
@@ -115,7 +209,7 @@ fn languages_are_detected_chosen_or_given() {
     assert!(
         matches!(
             outcome,
-            Err(Error::Cancelled) | Ok(Outcome::NoSpeech | Outcome::OtherLanguage { .. })
+            Err(Error::Cancelled) | Ok(Outcome::OtherLanguage { .. })
         ),
         "{outcome:?}"
     );
@@ -129,7 +223,7 @@ fn languages_are_detected_chosen_or_given() {
         assert!(
             matches!(
                 outcome,
-                Err(Error::Cancelled) | Ok(Outcome::NoSpeech | Outcome::OtherLanguage { .. })
+                Err(Error::Cancelled) | Ok(Outcome::OtherLanguage { .. })
             ),
             "{language}: {outcome:?}"
         );
@@ -327,23 +421,14 @@ fn real_speech_in_an_unselected_language_is_reported_not_transcribed() {
 }
 
 #[test]
-fn real_silence_and_hiss_are_no_speech_whatever_the_languages() {
+fn real_silence_hiss_and_tones_are_no_speech_whatever_the_languages() {
     let Some(model) = real_model() else {
         eprintln!("PIIRIT_SPEECH_MODEL unset: skipped");
         return;
     };
     let mut engine = Engine::load(libs(), &model).expect("load the model");
     let silence = vec![0.0; 5 * SAMPLE_RATE as usize];
-    // Quiet noise, about -55 dBFS: a phone in a pocket.
-    let mut seed = 1u32;
-    let hiss: Vec<f32> = silence
-        .iter()
-        .map(|_| {
-            seed = seed.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
-            f32::from(u16::try_from(seed >> 16).unwrap()) / 32_768.0 * 0.003 - 0.003
-        })
-        .collect();
-    for sound in [&silence, &hiss] {
+    for sound in [&silence, &hiss(5), &tone(440.0, 5)] {
         for languages in [
             vec![],
             vec!["en".to_owned()],
@@ -356,8 +441,41 @@ fn real_silence_and_hiss_are_no_speech_whatever_the_languages() {
             let outcome = engine
                 .transcribe(sound, &options, &mut keep_going)
                 .expect("transcribe");
-            // Whisper alone says "Thank you." or "you" here.
+            // Whisper alone says "Thank you.", "you" or "I" here.
             assert_eq!(outcome, Outcome::NoSpeech, "{:?}", options.languages);
         }
     }
+}
+
+#[test]
+fn real_short_speech_is_transcribed() {
+    let Some(model) = real_model() else {
+        eprintln!("PIIRIT_SPEECH_MODEL unset: skipped");
+        return;
+    };
+    let mut engine = Engine::load(libs(), &model).expect("load the model");
+    let speech = decode(&third_party("samples/jfk.wav"), 2).expect("decode jfk.wav");
+    let english = Options {
+        languages: vec!["en".into()],
+        ..Options::default()
+    };
+    let outcome = engine
+        .transcribe(&speech, &english, &mut keep_going)
+        .expect("transcribe");
+    let Outcome::Text { text, .. } = outcome else {
+        panic!("2 s of speech: {outcome:?}");
+    };
+    assert!(words(&text).starts_with("and so"), "{text}");
+    // 1 s mid-sentence ("what"): whisper's own no-speech skip dropped it whole.
+    let word = jfk()
+        .get(4 * SAMPLE_RATE as usize + 8_000..5 * SAMPLE_RATE as usize + 8_000)
+        .unwrap()
+        .to_vec();
+    let outcome = engine
+        .transcribe(&word, &english, &mut keep_going)
+        .expect("transcribe");
+    assert!(
+        matches!(&outcome, Outcome::Text { text, .. } if !text.is_empty()),
+        "{outcome:?}"
+    );
 }

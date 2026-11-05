@@ -24,6 +24,7 @@
 
 struct piirit_speech {
     whisper_context *context;
+    whisper_vad_context *vad;
 };
 
 namespace {
@@ -134,31 +135,22 @@ struct state_guard {
     }
 };
 
-/* Whisper's silence signal: no-speech token's probability right after
- * start-of-transcript, from logits detection's one decode step leaves. 1.9.5's
- * per-segment value reads logits row no step wrote. */
-float no_speech(whisper_context *context, whisper_state *state)
+/* Highest speech probability Silero gives any 32 ms of clip; negative if it failed. */
+float loudest_speech(whisper_vad_context *vad, const piirit_speech_job *job)
 {
-    const float *logits = whisper_get_logits_from_state(state);
-    const int n_vocab = whisper_n_vocab(context);
-    const whisper_token nosp = whisper_token_nosp(context);
-    if (!logits || n_vocab <= 0 || nosp < 0 || nosp >= n_vocab) {
-        return 0.0f;
+    if (!whisper_vad_detect_speech(vad, job->samples, job->n_samples)) {
+        return -1.0f;
     }
-    float top = logits[0];
-    for (int i = 1; i < n_vocab; i++) {
-        top = std::fmax(top, logits[i]);
+    const float *probs = whisper_vad_probs(vad);
+    float top = 0.0f;
+    for (int i = 0; probs && i < whisper_vad_n_probs(vad); i++) {
+        top = std::fmax(top, probs[i]);
     }
-    double sum = 0.0;
-    for (int i = 0; i < n_vocab; i++) {
-        sum += std::exp(static_cast<double>(logits[i]) - top);
-    }
-    return static_cast<float>(std::exp(static_cast<double>(logits[nosp]) - top) / sum);
+    return top;
 }
 
-/* Detects language and silence; choose() sets `params.language` or STOPPED.
- * Whole 30 s window on purpose (fresh state: no audio_ctx): 0.6 holds there. Trimmed,
- * hum and hiss fall below it and decode to "you". */
+/* Detects language; choose() sets `params.language` or STOPPED. Whole 30 s
+ * window: fresh state has no audio_ctx. */
 int pick_language(whisper_context *context, whisper_state *state,
                   const piirit_speech_job *job, run_state *run,
                   whisper_full_params *params, char *error, size_t error_len)
@@ -186,8 +178,7 @@ int pick_language(whisper_context *context, whisper_state *state,
         return PIIRIT_SPEECH_CANCELLED;
     }
     const int32_t chosen = run->hooks->choose(run->hooks->context, codes.data(),
-                                              probs.data(), count,
-                                              no_speech(context, state));
+                                              probs.data(), count);
     if (chosen < 0 || chosen >= count) {
         return PIIRIT_SPEECH_STOPPED;
     }
@@ -211,6 +202,17 @@ int run(piirit_speech *speech, const piirit_speech_job *job,
     if (job->n_samples < SHORTEST) {
         return PIIRIT_SPEECH_OK;
     }
+    const float speech_p = loudest_speech(speech->vad, job);
+    if (speech_p < 0.0f) {
+        say(error, error_len, "could not listen for speech");
+        return PIIRIT_SPEECH_FAILED;
+    }
+    if (stop_asked(&run)) {
+        return PIIRIT_SPEECH_CANCELLED;
+    }
+    if (hooks->heard(hooks->context, speech_p) == 0) {
+        return PIIRIT_SPEECH_STOPPED;
+    }
     state_guard guard = {whisper_init_state(speech->context)};
     if (!guard.state) {
         say(error, error_len, "could not start the engine");
@@ -228,6 +230,9 @@ int run(piirit_speech *speech, const piirit_speech_job *job,
     params.greedy.best_of = 1;
     params.suppress_blank = true;
     params.suppress_nst = true;
+    /* Silero decided speech is there: whisper's own no-speech skip (> 0.6 and
+     * avg logprob < -1) dropped 4 of 100 short FLEURS clips whole. */
+    params.no_speech_thold = 1.0f;
     params.audio_ctx = job->audio_ctx;
     params.progress_callback = on_progress;
     params.progress_callback_user_data = &run;
@@ -263,8 +268,8 @@ int run(piirit_speech *speech, const piirit_speech_job *job,
 
 }  // namespace
 
-EXPORT piirit_speech *piirit_speech_load(const char *model, char *error,
-                                         size_t error_len)
+EXPORT piirit_speech *piirit_speech_load(const char *model, const char *vad_model,
+                                         char *error, size_t error_len)
 {
     try {
         last_error[0] = '\0';
@@ -279,8 +284,19 @@ EXPORT piirit_speech *piirit_speech_load(const char *model, char *error,
             say(error, error_len, "not a whisper model");
             return nullptr;
         }
-        auto *speech = new (std::nothrow) piirit_speech{context};
+        whisper_vad_context_params vad_params = whisper_vad_default_context_params();
+        /* One thread fastest: 30 s in 0.3 s on x86, two 0.4 s, four 0.9 s. */
+        vad_params.n_threads = 1;
+        vad_params.use_gpu = false;
+        whisper_vad_context *vad = whisper_vad_init_from_file_with_params(vad_model, vad_params);
+        if (!vad) {
+            whisper_free(context);
+            say(error, error_len, "not a speech detector model");
+            return nullptr;
+        }
+        auto *speech = new (std::nothrow) piirit_speech{context, vad};
         if (!speech) {
+            whisper_vad_free(vad);
             whisper_free(context);
             say(error, error_len, "out of memory");
         }
@@ -296,6 +312,7 @@ EXPORT piirit_speech *piirit_speech_load(const char *model, char *error,
 EXPORT void piirit_speech_free(piirit_speech *speech)
 {
     if (speech) {
+        whisper_vad_free(speech->vad);
         whisper_free(speech->context);
         delete speech;
     }

@@ -15,7 +15,7 @@
 //! whisper.cpp + ggml objects kept across builds while inputs same
 //! (piirit-video's `build_reuse.rs`); glue built every time. Libs land in
 //! `OUT_DIR/speech` (`PIIRIT_SPEECH_LIBS`, for tests) and beside binary (spec
-//! installs from there).
+//! installs from there), with speech detector model (`vendor/silero-vad`).
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -29,6 +29,8 @@ mod reuse;
 /// Lib file name stem; `src/lib.rs` adds CPU level and `.so`.
 const LIB: &str = "libpiirit-speech";
 const GLUE: &str = "csrc/speech.cpp";
+/// Speech detector, shipped beside libs; `src/lib.rs`'s `VAD_MODEL`.
+const VAD_MODEL: &str = "ggml-silero-v5.1.2.bin";
 /// Only these leave the lib.
 const EXPORTS: &str =
     "{ global: piirit_speech_load; piirit_speech_free; piirit_speech_run; local: *; };\n";
@@ -80,12 +82,16 @@ fn main() {
     println!("cargo:rerun-if-changed=../piirit-video/build_reuse.rs");
     println!("cargo:rerun-if-changed=csrc");
     println!("cargo:rerun-if-env-changed=PIIRIT_MAKE_JOBS");
+    let vad = manifest.join("../../vendor/silero-vad").join(VAD_MODEL);
+    println!("cargo:rerun-if-changed={}", vad.display());
 
     let out = PathBuf::from(env("OUT_DIR"));
     let arch = env("CARGO_CFG_TARGET_ARCH");
     let tools = Tools::from_env();
     let libs = out.join("speech");
     std::fs::create_dir_all(&libs).unwrap_or_else(|err| panic!("mkdir {}: {err}", libs.display()));
+    std::fs::copy(&vad, libs.join(VAD_MODEL))
+        .unwrap_or_else(|err| panic!("copy {}: {err}", vad.display()));
     let exports = out.join("speech.map");
     std::fs::write(&exports, EXPORTS)
         .unwrap_or_else(|err| panic!("write {}: {err}", exports.display()));

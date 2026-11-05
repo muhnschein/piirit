@@ -231,6 +231,9 @@ install -Dm 755 "$builddir/speech/libpiirit-speech-v82.so" \
 install -Dm 755 "$builddir/speech/libpiirit-speech.so" \
     %{buildroot}%{appdatadir}/lib/speech/libpiirit-speech.so
 %endif
+# Speech detector the engine checks clips with first (vendor/silero-vad/SOURCE.md).
+install -Dm 644 vendor/silero-vad/ggml-silero-v5.1.2.bin \
+    %{buildroot}%{appdatadir}/lib/speech/ggml-silero-v5.1.2.bin
 
 # QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
 # source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
@@ -263,6 +266,9 @@ install -Dm 644 vendor/emoji/SOURCE.md \
 # MIT notice for whisper.cpp and ggml, built into the speech libs.
 install -Dm 644 third_party/whisper.cpp/LICENSE \
     %{buildroot}%{appdatadir}/vendor/whisper.cpp/LICENSE
+# Same for Silero VAD, beside them.
+install -Dm 644 vendor/silero-vad/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/silero-vad/SOURCE.md
 install -Dm 644 LICENSE \
     %{buildroot}%{appdatadir}/LICENSE
 

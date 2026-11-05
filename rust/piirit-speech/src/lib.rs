@@ -27,6 +27,9 @@ use std::sync::mpsc;
 /// Rate [`decode`] returns and [`Engine::transcribe`] takes.
 pub const SAMPLE_RATE: u32 = 16_000;
 
+/// Speech detector (Silero VAD, ggml) beside engine libs: `vendor/silero-vad`.
+pub const VAD_MODEL: &str = "ggml-silero-v5.1.2.bin";
+
 /// Engine libs `build.rs` made, for tests: `target/<profile>/speech/` holds same.
 #[doc(hidden)]
 pub const BUILT_LIBS: &str = env!("PIIRIT_SPEECH_LIBS");
@@ -117,7 +120,8 @@ impl std::fmt::Debug for Engine {
 }
 
 impl Engine {
-    /// Loads `model` (ggml whisper file). `libs`: dir with engine libraries.
+    /// Loads `model` (ggml whisper file). `libs`: dir with engine libraries and
+    /// [`VAD_MODEL`].
     ///
     /// # Errors
     ///
@@ -125,11 +129,13 @@ impl Engine {
     pub fn load(libs: &Path, model: &Path) -> Result<Self, Error> {
         let library = Library::open(&libs.join(library_name()))?;
         let model = c_path(model).map_err(Error::Model)?;
+        let vad = c_path(&libs.join(VAD_MODEL)).map_err(Error::Model)?;
         let mut error = [0; ERROR_LEN];
-        // SAFETY: `load` matches speech.h; path NUL-terminated and error buffer's length
-        // beside it, both outlive call.
+        // SAFETY: `load` matches speech.h; paths NUL-terminated and error buffer's length
+        // beside it, all outlive call.
         #[allow(unsafe_code)]
-        let speech = unsafe { (library.load)(model.as_ptr(), error.as_mut_ptr(), ERROR_LEN) };
+        let speech =
+            unsafe { (library.load)(model.as_ptr(), vad.as_ptr(), error.as_mut_ptr(), ERROR_LEN) };
         let speech = NonNull::new(speech).ok_or_else(|| Error::Model(message(&error)))?;
         Ok(Self { speech, library })
     }
@@ -177,7 +183,6 @@ impl Engine {
                         events,
                         cancel,
                         selected: &options.languages,
-                        one_window: samples.len() <= WINDOW_POSITIONS * SAMPLES_PER_POSITION,
                         stop: None,
                     };
                     let (code, spoken, error) = speech.run(job, &mut hooks);
@@ -249,6 +254,7 @@ impl Engine {
         };
         let callbacks = ffi::Hooks {
             context: std::ptr::addr_of_mut!(*hooks).cast::<c_void>(),
+            heard: on_heard,
             choose: on_choose,
             progress: on_progress,
             segment: on_segment,
@@ -366,8 +372,14 @@ fn audio_context(samples: usize) -> i32 {
     i32::try_from(generous.min(WINDOW_POSITIONS)).unwrap_or(0)
 }
 
-/// Whisper's no-speech probability over this = silence (whisper's own `no_speech_thold`).
-const NO_SPEECH_ABOVE: f32 = 0.6;
+/// Silero's speech probability, some 32 ms over this = speech. Measured (FLEURS English
+/// plus generated noise, Opus): noise at most 0.19, speech from 1.2 s at least 0.38.
+const SPEECH_ABOVE: f32 = 0.3;
+
+/// Speech somewhere in clip, by Silero's highest frame. Unreadable = none.
+fn heard_speech(speech: f32) -> bool {
+    speech > SPEECH_ABOVE
+}
 
 /// What detection over first window says; indices into probabilities.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -376,23 +388,12 @@ enum Decision {
     Speak(usize),
     /// Most likely language, not selected.
     Other(usize),
-    /// Nothing spoken.
-    Silent,
     /// Detection gave no languages.
     Unknown,
 }
 
-/// Language to transcribe in, or why not. `no_speech` decides only if clip fits first
-/// window: past it, speech may come later.
-fn decide(
-    selected: &[String],
-    detected: &[(&str, f32)],
-    no_speech: f32,
-    one_window: bool,
-) -> Decision {
-    if one_window && no_speech > NO_SPEECH_ABOVE {
-        return Decision::Silent;
-    }
+/// Language to transcribe in, or why not.
+fn decide(selected: &[String], detected: &[(&str, f32)]) -> Decision {
     if selected.is_empty() {
         return likeliest(detected, |_| true).map_or(Decision::Unknown, Decision::Speak);
     }
@@ -466,8 +467,6 @@ struct Hooks<'a> {
     events: mpsc::Sender<Event>,
     cancel: &'a AtomicBool,
     selected: &'a [String],
-    /// Clip within whisper's first 30 s window.
-    one_window: bool,
     stop: Option<Stop>,
 }
 
@@ -481,12 +480,19 @@ fn hooks<'a>(context: *mut c_void) -> &'a mut Hooks<'a> {
     }
 }
 
+extern "C" fn on_heard(context: *mut c_void, speech: f32) -> i32 {
+    if heard_speech(speech) {
+        return 1;
+    }
+    hooks(context).stop = Some(Stop::Silent);
+    0
+}
+
 extern "C" fn on_choose(
     context: *mut c_void,
     codes: *const *const c_char,
     probs: *const f32,
     count: i32,
-    no_speech: f32,
 ) -> i32 {
     let hooks = hooks(context);
     let count = usize::try_from(count).unwrap_or(0);
@@ -510,12 +516,11 @@ extern "C" fn on_choose(
             })
             .collect()
     };
-    let stop = match decide(hooks.selected, &detected, no_speech, hooks.one_window) {
+    let stop = match decide(hooks.selected, &detected) {
         Decision::Speak(index) => return i32::try_from(index).unwrap_or(-1),
         Decision::Other(index) => detected
             .get(index)
             .map(|&(code, _)| Stop::Other(code.to_owned())),
-        Decision::Silent => Some(Stop::Silent),
         Decision::Unknown => Some(Stop::Unknown),
     };
     hooks.stop = stop;
@@ -699,7 +704,8 @@ mod ffi {
     #[repr(C)]
     pub struct Hooks {
         pub context: *mut c_void,
-        pub choose: extern "C" fn(*mut c_void, *const *const c_char, *const f32, i32, f32) -> i32,
+        pub heard: extern "C" fn(*mut c_void, f32) -> i32,
+        pub choose: extern "C" fn(*mut c_void, *const *const c_char, *const f32, i32) -> i32,
         pub progress: extern "C" fn(*mut c_void, i32),
         pub segment: extern "C" fn(*mut c_void, *const c_char),
         pub cancelled: extern "C" fn(*mut c_void) -> i32,
@@ -716,7 +722,8 @@ mod ffi {
         pub audio_ctx: i32,
     }
 
-    pub type Load = unsafe extern "C" fn(*const c_char, *mut c_char, usize) -> *mut c_void;
+    pub type Load =
+        unsafe extern "C" fn(*const c_char, *const c_char, *mut c_char, usize) -> *mut c_void;
     pub type Free = unsafe extern "C" fn(*mut c_void);
     pub type Run = unsafe extern "C" fn(
         *mut c_void,
@@ -741,7 +748,9 @@ mod ffi {
 
 #[cfg(test)]
 mod tests {
-    use super::{audio_context, big_cores_in, choose_language, decide, thread_count, Decision};
+    use super::{
+        audio_context, big_cores_in, choose_language, decide, heard_speech, thread_count, Decision,
+    };
 
     fn codes(list: &[&str]) -> Vec<String> {
         list.iter().map(|&code| code.to_owned()).collect()
@@ -801,54 +810,31 @@ mod tests {
     }
 
     #[test]
-    fn a_silent_first_window_is_no_speech_whatever_the_languages() {
-        let detected = [("en", 0.5), ("fi", 0.3), ("de", 0.2)];
-        for selected in [
-            codes(&[]),
-            codes(&["fi"]),
-            codes(&["fi", "de"]),
-            codes(&["xx"]),
-        ] {
-            assert_eq!(decide(&selected, &detected, 0.61, true), Decision::Silent);
-            // At whisper's threshold: still speech.
-            assert_ne!(decide(&selected, &detected, 0.6, true), Decision::Silent);
-        }
-        // Longer clip: speech may come after first window.
-        assert_eq!(
-            decide(&codes(&[]), &detected, 0.99, false),
-            Decision::Speak(0)
-        );
-        assert_eq!(
-            decide(&codes(&[]), &detected, f32::NAN, true),
-            Decision::Speak(0)
-        );
+    fn speech_is_heard_only_over_the_cut_off() {
+        assert!(heard_speech(0.38));
+        assert!(heard_speech(1.0));
+        // Loudest noise measured 0.19; cut-off itself: none.
+        assert!(!heard_speech(0.19));
+        assert!(!heard_speech(0.3));
+        assert!(!heard_speech(f32::NAN));
     }
 
     #[test]
     fn any_language_is_the_likeliest_and_one_given_follows_the_rule_for_several() {
         let detected = [("en", 0.2), ("fi", 0.7), ("de", 0.1)];
-        assert_eq!(
-            decide(&codes(&[]), &detected, 0.0, true),
-            Decision::Speak(1)
-        );
+        assert_eq!(decide(&codes(&[]), &detected), Decision::Speak(1));
         // Regression (device run 41883450707): only English picked, German clip came out
         // as English. Unselected language over twice as likely: reported.
+        assert_eq!(decide(&codes(&["de"]), &detected), Decision::Other(1));
         assert_eq!(
-            decide(&codes(&["de"]), &detected, 0.0, true),
-            Decision::Other(1)
-        );
-        assert_eq!(
-            decide(&codes(&["en"]), &[("en", 0.4), ("de", 0.6)], 0.0, true),
+            decide(&codes(&["en"]), &[("en", 0.4), ("de", 0.6)]),
             Decision::Speak(0)
         );
         // Several: rule above.
-        assert_eq!(
-            decide(&codes(&["en", "de"]), &detected, 0.0, true),
-            Decision::Other(1)
-        );
+        assert_eq!(decide(&codes(&["en", "de"]), &detected), Decision::Other(1));
         // Equals: first.
         let even = [("sv", 0.4), ("fi", 0.4), ("de", 0.2)];
-        assert_eq!(decide(&codes(&[]), &even, 0.0, true), Decision::Speak(0));
+        assert_eq!(decide(&codes(&[]), &even), Decision::Speak(0));
     }
 
     #[test]

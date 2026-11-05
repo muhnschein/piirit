@@ -16,7 +16,7 @@ extern "C" {
 /* Results. */
 #define PIIRIT_SPEECH_OK 0
 #define PIIRIT_SPEECH_CANCELLED 1
-/* choose() said not to transcribe. */
+/* heard() or choose() said not to transcribe. */
 #define PIIRIT_SPEECH_STOPPED 2
 #define PIIRIT_SPEECH_FAILED (-1)
 
@@ -25,10 +25,13 @@ struct piirit_speech;
 /* Called on the running thread. */
 struct piirit_speech_hooks {
     void *context;
-    /* Once, from first 30 s: probability per language (`n` codes), and that
-     * nothing is spoken. Index to transcribe in, or negative to stop. */
+    /* Once, first: highest speech probability (Silero VAD) in any 32 ms of
+     * clip. Zero stops. */
+    int32_t (*heard)(void *context, float speech);
+    /* Once, from first 30 s: probability per language (`n` codes). Index to
+     * transcribe in, or negative to stop. */
     int32_t (*choose)(void *context, const char *const *codes,
-                      const float *probs, int32_t n, float no_speech);
+                      const float *probs, int32_t n);
     /* 0..=1000. */
     void (*progress)(void *context, int32_t permille);
     /* Text of next segment; valid during call only. */
@@ -51,9 +54,10 @@ struct piirit_speech_job {
     int32_t audio_ctx;
 };
 
-/* NULL on failure, reason in `error`. */
-struct piirit_speech *piirit_speech_load(const char *model, char *error,
-                                         size_t error_len);
+/* `model`: whisper, `vad_model`: Silero VAD, both ggml. NULL on failure, reason
+ * in `error`. */
+struct piirit_speech *piirit_speech_load(const char *model, const char *vad_model,
+                                         char *error, size_t error_len);
 
 void piirit_speech_free(struct piirit_speech *speech);
 
