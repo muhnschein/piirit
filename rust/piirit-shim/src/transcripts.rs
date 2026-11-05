@@ -18,7 +18,7 @@ use files::ModelSpec;
 use hub::Shown;
 use schedule::Conditions;
 
-pub(crate) use hub::connected;
+pub(crate) use hub::{connected, matching};
 
 /// No transcript, nothing queued.
 pub const STATE_NONE: u32 = 0;

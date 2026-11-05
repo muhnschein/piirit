@@ -511,6 +511,12 @@ impl State {
             pre_message(&mut message, msg, fetched);
         }
         message["reactions"] = self.reactions_object(id);
+        // Sender's contact object, as core: says if blocked.
+        let sender = message["fromId"]
+            .as_u64()
+            .and_then(|from| u32::try_from(from).ok())
+            .unwrap_or_default();
+        message["sender"]["isBlocked"] = json!(self.blocked.contains(&sender));
         message
     }
 

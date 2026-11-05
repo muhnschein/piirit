@@ -9,6 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - Voice messages can be turned into text on the phone itself (experimental, off by default; Settings, Advanced). Piirit downloads a speech model once; nothing you send or receive leaves the phone. Transcribe one voice message with a tap, or let Piirit do them on its own while charging (the default) or as soon as they arrive. The text shows under the voice message, can be copied from its menu, and a chat's Audio page can transcribe all its voice messages at once. It works in 13 languages so far, and the list says for which of them transcripts are likely to contain more mistakes; other languages can't be picked yet.
+- Search finds voice messages by what is said in them, once they are turned into text, and lists them with the text messages.
 - The cover shows everyone from the start; right after Piirit opened, some people could be missing from it until a new message came.
 - When many messages arrive at once, such as after a while offline, the chat list catches up in one go instead of once per message, and the cover only reads your chats while you look at it, so the app stays quicker to respond.
 - The page of a group with hundreds of members opens and slides back smoothly: member rows are made as you scroll to them, not all at once.

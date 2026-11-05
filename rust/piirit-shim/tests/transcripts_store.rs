@@ -185,3 +185,36 @@ fn the_search_index_follows_every_write() {
         )
         .unwrap();
 }
+
+#[test]
+fn search_finds_any_part_of_done_transcripts_in_any_case() {
+    let store = Store::open_in_memory().unwrap();
+    store.put(&row(1, 4, DONE, "Äiti soittaa illalla")).unwrap();
+    store
+        .put(&row(1, 9, DONE, "Soitan äidille huomenna"))
+        .unwrap();
+    store.put(&row(1, 6, DONE, "bring the umbrella")).unwrap();
+    // Failed run's partial text, other profile: never found.
+    store.put(&row(1, 7, FAILED, "äiti")).unwrap();
+    store.put(&row(2, 5, DONE, "äiti")).unwrap();
+    let found = |query: &str| -> Vec<u32> {
+        store
+            .matching(1, DONE, query)
+            .unwrap()
+            .into_iter()
+            .map(|(msg, _, _)| msg)
+            .collect()
+    };
+
+    // Core's search: lowercased, anywhere in text, newest message first.
+    assert_eq!(found("ÄI"), vec![9, 4]);
+    assert_eq!(found("  soit "), vec![9, 4]);
+    assert_eq!(found("mbrell"), vec![6]);
+    assert_eq!(found("äiti soittaa"), vec![4]);
+    assert!(found("soittaa äiti").is_empty());
+    assert!(found(" ").is_empty());
+    assert_eq!(
+        store.matching(1, DONE, "umbrella").unwrap(),
+        vec![(6, 7, "bring the umbrella".to_owned())]
+    );
+}

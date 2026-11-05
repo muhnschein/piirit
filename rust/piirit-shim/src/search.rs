@@ -1,10 +1,11 @@
-//! Search results: chats, contacts, messages, each counted.
+//! Search results: chats, contacts, messages, each counted. Voice messages count as text
+//! messages when their transcript matches.
 //!
 //! Three core calls, one flat model: `section` groups it in one view. Three lists in a flickable
 //! nest flickables fighting for drag on Silica.
 
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
@@ -14,6 +15,10 @@ use crate::contacts::contact_row;
 use crate::core::connection;
 use crate::json;
 use crate::models::{SearchItem, SearchListModel};
+use crate::transcripts;
+
+/// `DC_GCL_ARCHIVED_ONLY`.
+const ARCHIVED_ONLY: u32 = 0x01;
 
 /// Max message rows: common words match thousands; `message_total` keeps true count. Private:
 /// rustdoc bars public links to it.
@@ -169,12 +174,15 @@ impl SearchResults {
             }
         });
 
+        // Store's own thread: runs beside core calls.
+        let spoken = runtime.spawn(transcripts::matching(account_id, query.clone()));
         runtime.spawn(async move {
             let result = async {
                 // Display order; sequential: core does one call at a time.
                 let mut rows = matching_chats(&rpc, account_id, &query).await?;
                 rows.extend(matching_contacts(&rpc, account_id, &query).await?);
-                let (messages, total) = matching_messages(&rpc, account_id, &query).await?;
+                let spoken = spoken.await.unwrap_or_default();
+                let (messages, total) = matching_messages(&rpc, account_id, &query, spoken).await?;
                 rows.extend(messages);
                 Ok::<_, String>((rows, total))
             }
@@ -281,20 +289,28 @@ async fn matching_contacts(
         .collect())
 }
 
-/// Messages matching text, newest first; total before cut.
+/// Messages matching text or transcript (`spoken`: message, chat, text), newest first; total
+/// before cut.
 async fn matching_messages(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
+    spoken: Vec<(u32, u32, String)>,
 ) -> Result<(Vec<SearchItem>, u32), String> {
     // Three args, last chat to search (null: all); two rejected.
-    let hits: Vec<u32> = rpc
+    let mut hits: Vec<u32> = rpc
         .call(
             "search_messages",
             (account_id, query.to_string(), Option::<u32>::None),
         )
         .await
         .map_err(|err| err.to_string())?;
+    let transcripts = spoken_only(rpc, account_id, &hits, spoken).await?;
+    if !transcripts.is_empty() {
+        hits.extend(transcripts.keys());
+        // Core's order: newest received (id) first.
+        hits.sort_unstable_by(|a, b| b.cmp(a));
+    }
     let total = u32::try_from(hits.len()).unwrap_or(u32::MAX);
     let shown: Vec<u32> = hits.into_iter().take(MESSAGE_LIMIT).collect();
     if shown.is_empty() {
@@ -322,12 +338,20 @@ async fn matching_messages(
         chat_items(rpc, account_id, &chat_ids).await?
     };
 
+    let mut blocked = 0_u32;
     let rows = shown
         .into_iter()
         .filter_map(|message_id| {
             let message = messages.get(&message_id)?;
             // Load failure: skip, no blank row.
             if json::str_at(message, "kind") == "loadingError" {
+                return None;
+            }
+            let transcript = transcripts.get(&message_id);
+            // Core leaves blocked senders out; same for their transcripts. Not counted either
+            // (those past cut still are: sender known only once loaded).
+            if transcript.is_some() && json::flag(message, "/sender/isBlocked") {
+                blocked = blocked.saturating_add(1);
                 return None;
             }
             let chat_id = chat_of(Some(message)).unwrap_or(0);
@@ -338,7 +362,8 @@ async fn matching_messages(
                 contact_id: 0,
                 message_id,
                 title: chat.map(|chat| chat.name.clone()).unwrap_or_default(),
-                subtitle: json::text(message, "text"),
+                subtitle: transcript
+                    .map_or_else(|| json::text(message, "text"), |text| text.as_str().into()),
                 timestamp: json::i64_at(message, "timestamp"),
                 color: chat.map(|chat| chat.color.clone()).unwrap_or_default(),
                 avatar_path: chat
@@ -347,7 +372,45 @@ async fn matching_messages(
             })
         })
         .collect();
-    Ok((rows, total))
+    Ok((rows, total.saturating_sub(blocked)))
+}
+
+/// Transcript hits core didn't find, in chats core lists: blocked chats keep their transcripts.
+async fn spoken_only(
+    rpc: &RpcClient,
+    account_id: u32,
+    found: &[u32],
+    spoken: Vec<(u32, u32, String)>,
+) -> Result<HashMap<u32, String>, String> {
+    let found: HashSet<u32> = found.iter().copied().collect();
+    let spoken: Vec<_> = spoken
+        .into_iter()
+        .filter(|(message_id, ..)| !found.contains(message_id))
+        .collect();
+    if spoken.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let mut listed: HashSet<u32> = HashSet::new();
+    for flags in [None, Some(ARCHIVED_ONLY)] {
+        let entries: Vec<u32> = rpc
+            .call(
+                "get_chatlist_entries",
+                (
+                    account_id,
+                    flags,
+                    Option::<String>::None,
+                    Option::<u32>::None,
+                ),
+            )
+            .await
+            .map_err(|err| err.to_string())?;
+        listed.extend(entries);
+    }
+    Ok(spoken
+        .into_iter()
+        .filter(|(_, chat_id, _)| listed.contains(chat_id))
+        .map(|(message_id, _, text)| (message_id, text))
+        .collect())
 }
 
 /// Chat a message is in.
