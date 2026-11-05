@@ -3,13 +3,26 @@
 //! offers and starts nothing; page shows send button, not a mic. Encoders existing: device
 //! question (docs/HARBOUR.md). Limit too: longest recording relay takes follows limit and
 //! media quality strip is handed; strip time says nothing of it.
+//! Strip binds only to recorder properties Qt can follow (no `non-NOTIFYable` warning).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
+use std::sync::Mutex;
+
+use qmetaobject::log::{install_message_handler, QMessageLogContext, QtMsgType};
 use qmetaobject::*;
 
 mod common;
+
+/// Qt's messages while test runs.
+static QT_MESSAGES: Mutex<Vec<String>> = Mutex::new(Vec::new());
+
+extern "C" fn keep_message(_: QtMsgType, _: &QMessageLogContext, message: &QString) {
+    if let Ok(mut messages) = QT_MESSAGES.lock() {
+        messages.push(message.to_string());
+    }
+}
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
@@ -61,6 +74,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
 
+    install_message_handler(Some(keep_message));
     piirit_shim::register_qml_types();
 
     let mut engine = QmlEngine::new();
@@ -119,6 +133,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
             .unwrap_or_default()
     };
     let context = format!("steps: {steps:?}");
+    let messages = QT_MESSAGES.lock().map(|m| m.clone()).unwrap_or_default();
 
     assert_eq!(value("load"), "ok", "the strip did not load. {context}");
     // No multimedia backend on test runner: must say so, not offer a mic.
@@ -131,6 +146,11 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         value("extension"),
         "",
         "a recorder with no encoder names an extension. {context}"
+    );
+    // Device: warning per chat open, binding never re-read.
+    assert!(
+        !messages.iter().any(|m| m.contains("non-NOTIFYable")),
+        "the strip binds to a recorder property Qt cannot follow. {messages:?}"
     );
     assert_eq!(
         value("hidden"),

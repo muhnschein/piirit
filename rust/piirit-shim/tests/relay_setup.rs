@@ -74,6 +74,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     let temp = std::env::temp_dir().join(format!("piirit-relay-setup-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    std::fs::write(temp.join("slow-gate"), "").expect("write the gate file");
 
     // SAFETY: single-threaded; set before Qt and server.
     unsafe {
@@ -81,8 +82,8 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // Does not answer while watched.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "20000");
+        // Does not answer while watched: gate never removed.
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", temp.join("slow-gate"));
     }
 
     piirit_shim::register_qml_types();
@@ -157,21 +158,25 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         record!("add-hidden", get!("addButton", "visible"));
     });
 
+    // Slow call open from here on: steps time against page's own timers, not core.
     // 2s: waiting, nothing said yet.
-    plan.after(1, move || unsafe {
+    plan.after_busy(1, move || unsafe {
         record!("early-hint", get!("slowHint", "visible"));
         record!("early-label", get!("progressBar", "label"));
         record!("early-cancel", get!("cancelButton", "visible"));
     });
 
     // 6s: fourth second passed.
-    plan.after(4, move || unsafe {
+    plan.after_busy(4, move || unsafe {
         record!("hint", get!("slowHint", "visible"));
         record!("still-busy", call!("pageProperty", QString::from("busy")));
     });
 
     // 8s: deadline passed at 7s.
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pageProperty", QString::from("busy")) != "false" && !last {
+            return false;
+        }
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "late-error",
@@ -182,10 +187,15 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         record!("late-field", get!("customField", "readOnly"));
         // Second attempt while core busy.
         record!("again", call!("click", QString::from("addButton")));
+        true
     });
 
     // 10s: refused (one process per profile); then unreachable relay.
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let said = call!("pageProperty", QString::from("errorMessage"));
+        if !said.ends_with("ongoing process running.") && !last {
+            return false;
+        }
         record!("again-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "again-error",
@@ -200,9 +210,14 @@ fn a_slow_relay_is_explained_and_given_up_on() {
             )
         );
         record!("unreachable", call!("click", QString::from("addButton")));
+        true
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let said = call!("pageProperty", QString::from("errorMessage"));
+        if !said.ends_with("cannot resolve chatmail server") && !last {
+            return false;
+        }
         record!(
             "unreachable-busy",
             call!("pageProperty", QString::from("busy"))
@@ -213,6 +228,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         );
         record!("navigation", call!("navigation"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

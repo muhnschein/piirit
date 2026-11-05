@@ -735,6 +735,29 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Delete</source>
         <translation>Odstrániť</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Prepísať %n hlasovú správu</numerusform>
+            <numerusform>Prepísať %n hlasové správy</numerusform>
+            <numerusform>Prepísať %n hlasových správ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopírovať prepis</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Skopírované do schránky</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Prepísať</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -835,6 +858,16 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Edit</source>
         <translation>Upraviť</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopírovať prepis</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Prepísať</translation>
     </message>
 </context>
 <context>
@@ -2370,6 +2403,22 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Shares your location in chats and shows shared locations on a map.</source>
         <translation>Zdieľa vašu polohu v chatoch a zobrazuje zdieľané polohy na mape.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Prepisovať hlasové správy (experimentálne)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Prepis hlasových správ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Prevádza hlasové správy na text v tomto telefóne.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nič neopustí telefón.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -3019,11 +3068,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Pri nabíjaní</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Vždy</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nikdy</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Nové hlasové správy sa prepisujú, keď sa telefón nabíja.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Nové hlasové správy sa prepisujú hneď po stiahnutí.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Spotrebúva to batériu.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Ťuknutím na Prepísať pri hlasovej správe ju prevediete na text.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Ďalej</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Jazyky</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Zatiaľ nedostupné</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>V týchto jazykoch ešte prepis nie je dosť presný.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit raz stiahne rečový model a prepisuje hlasové správy v tomto telefóne.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nič, čo odošlete alebo prijmete, neopustí telefón.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Prepisy v tomto jazyku pravdepodobne obsahujú viac chýb.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Prepis hlasových správ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Jazyky</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kedy</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Rečový model sa nepodarilo stiahnuť.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Skúsiť znova</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Automaticky prepisovať hlasové správy</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Prepísať staršie hlasové správy</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Hlasové správy, ktoré prišli pred zapnutím tejto funkcie, sa prepisujú, keď sa telefón nabíja.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Hotovo</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Sťahuje sa rečový model… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Sťahovanie pokračuje aj po zatvorení tejto stránky.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Rečový model sa nepodarilo stiahnuť.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Skúsiť znova</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Nahrávanie %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Táto hlasová správa sa prepíše, keď sa telefón bude nabíjať.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Prepis je pozastavený, kým je zapnutý úsporný režim.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Čaká sa na prepis iných hlasových správ.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Sťahuje sa rečový model… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Prepisuje sa… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Táto hlasová správa je zrejme v jazyku %1, ktorý nie je vybraný.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>V tejto hlasovej správe sa nenašla reč.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Túto hlasovú správu sa nepodarilo prepísať.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Prepísať</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Prepísať teraz</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Aj tak prepísať</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Skúsiť znova</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Prepísané v tomto telefóne</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Zobraziť všetko</translation>
     </message>
 </context>
 <context>

@@ -563,9 +563,13 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("ended-lists", call!("lists"));
         record!("ended-drawn", call!("drawn"));
         record!("ended-ticking", call!("ticking"));
-        record!("ended-grid", call!("grid"));
         record!("reset", state!("", "", "", -1, "false", "false"));
         record!("reset-mode", call!("mode"));
+    });
+
+    // Lists resumed at call end read what they owe: one answer later.
+    plan.after(1, move || unsafe {
+        record!("ended-grid", call!("grid"));
     });
 
     // Call fits cover at phone theme sizes: worst name, no picture, both pills; large and
@@ -748,12 +752,12 @@ fn the_cover_shows_the_call_while_one_is_up() {
         "without a picture the cover is not the plain one with their avatar. {context}"
     );
 
-    // Grid laid out after call, not under it.
+    // Under call lists wait (paused: nothing read, nothing laid out); caught up after.
     assert_eq!(value("idle-grid"), "0|fresh", "{context}");
     assert_eq!(
         value("ring-grid"),
-        "0|stale",
-        "the grid was laid out again under the call. {context}"
+        "0|fresh",
+        "the cover's lists read the core under the call, though its grid is hidden. {context}"
     );
     assert_eq!(
         value("ended-grid"),

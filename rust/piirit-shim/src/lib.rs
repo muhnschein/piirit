@@ -59,6 +59,7 @@ mod saver;
 mod search;
 mod second_device;
 mod signup;
+mod transcripts;
 mod transports;
 mod video;
 mod voice;
@@ -75,8 +76,8 @@ pub use crate::chat_media::ChatMedia;
 pub use crate::chatlist::ChatList;
 pub use crate::contacts::ContactList;
 pub use crate::core::{
-    server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER, DEFAULT_PROVIDER_QR,
-    HANDLED_EVENT_KINDS,
+    core_settled, server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER,
+    DEFAULT_PROVIDER_QR, HANDLED_EVENT_KINDS,
 };
 pub use crate::full_text::FullText;
 pub use crate::location::LiveLocation;
@@ -90,6 +91,11 @@ pub use crate::recorder::VoiceRecorder;
 pub use crate::saver::FileSaver;
 pub use crate::search::SearchResults;
 pub use crate::second_device::SecondDevice;
+pub use crate::transcripts::{
+    Transcriber, Transcript, MODEL_ABSENT, MODEL_DOWNLOADING, MODEL_FAILED, MODEL_READY,
+    STATE_DONE, STATE_FAILED, STATE_NONE, STATE_NO_SPEECH, STATE_OTHER_LANGUAGE, STATE_QUEUED,
+    STATE_RUNNING,
+};
 pub use crate::transports::Transports;
 pub use crate::webxdc::{WebxdcApp, WebxdcStore};
 
@@ -141,10 +147,12 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let (Ok(mic_watch), Ok(location_map), Ok(live_location)) = (
+    let (Ok(mic_watch), Ok(location_map), Ok(live_location), Ok(transcriber), Ok(transcript)) = (
         std::ffi::CStr::from_bytes_with_nul(b"MicWatch\0"),
         std::ffi::CStr::from_bytes_with_nul(b"LocationMap\0"),
         std::ffi::CStr::from_bytes_with_nul(b"LiveLocation\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"Transcriber\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"Transcript\0"),
     ) else {
         return;
     };
@@ -171,6 +179,8 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<MicWatch>(uri, 1, 0, mic_watch);
     qmetaobject::qml_register_type::<LocationMap>(uri, 1, 0, location_map);
     qmetaobject::qml_register_type::<LiveLocation>(uri, 1, 0, live_location);
+    qmetaobject::qml_register_type::<Transcriber>(uri, 1, 0, transcriber);
+    qmetaobject::qml_register_type::<Transcript>(uri, 1, 0, transcript);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,

@@ -727,6 +727,27 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>Xóa</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Chép lời %n tin nhắn thoại</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Sao chép bản chép lời</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Đã sao chép vào bộ nhớ tạm</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Chép lời</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -827,6 +848,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Sửa</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Sao chép bản chép lời</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Chép lời</translation>
     </message>
 </context>
 <context>
@@ -2350,6 +2381,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Shares your location in chats and shows shared locations on a map.</source>
         <translation>Chia sẻ vị trí của bạn trong cuộc trò chuyện và hiển thị các vị trí được chia sẻ trên bản đồ.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Chép lời tin nhắn thoại (thử nghiệm)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Chép lời tin nhắn thoại</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Chuyển tin nhắn thoại thành văn bản trên điện thoại này.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Không có gì rời khỏi điện thoại.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2995,11 +3042,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Khi đang sạc</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Luôn luôn</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Không bao giờ</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Tin nhắn thoại mới được chép lời khi điện thoại đang sạc.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Tin nhắn thoại mới được chép lời ngay khi tải xong.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Việc này tốn pin.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Chạm Chép lời trên một tin nhắn thoại để chuyển nó thành văn bản.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Tiếp</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Ngôn ngữ</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Chưa có</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Việc chép lời bằng các ngôn ngữ này chưa đủ chính xác.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit tải một mô hình giọng nói một lần và chép lời tin nhắn thoại trên điện thoại này.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Không có gì bạn gửi hoặc nhận rời khỏi điện thoại.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Bản chép lời bằng ngôn ngữ này có thể chứa nhiều lỗi hơn.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Chép lời tin nhắn thoại</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Ngôn ngữ</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Khi nào</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Không thể tải mô hình giọng nói.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Thử lại</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Tự động chép lời tin nhắn thoại</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Chép lời tin nhắn thoại cũ hơn</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Tin nhắn thoại đến trước khi bạn bật tính năng này được chép lời khi điện thoại đang sạc.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Xong</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Đang tải mô hình giọng nói… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Việc tải xuống vẫn tiếp tục sau khi bạn đóng trang này.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Không thể tải mô hình giọng nói.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Thử lại</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Đang ghi âm %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Tin nhắn thoại này sẽ được chép lời khi điện thoại đang sạc.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Việc chép lời tạm dừng khi chế độ tiết kiệm pin đang bật.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Đang chờ chép lời các tin nhắn thoại khác.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Đang tải mô hình giọng nói… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Đang chép lời… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Tin nhắn thoại này có vẻ là tiếng %1, ngôn ngữ chưa được chọn.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Không tìm thấy lời nói trong tin nhắn thoại này.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Không thể chép lời tin nhắn thoại này.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Chép lời</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Chép lời ngay</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Vẫn chép lời</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Thử lại</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Đã chép lời trên điện thoại này</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Hiện tất cả</translation>
     </message>
 </context>
 <context>

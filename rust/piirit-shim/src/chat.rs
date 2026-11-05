@@ -27,6 +27,10 @@ const UNSEEN_STATES: [u32; 2] = [10, 13];
 /// (Whisperfish, deltachat-android likewise).
 const PAGE: usize = 50;
 
+/// Messages a chat opens with: over a phone screen. Rest filled as view asks (`hydrate`),
+/// while page slides in. Core builds messages one by one (50: ~140 ms on phone).
+const OPENING: usize = 20;
+
 /// Rows filled past view. Screen ~thirty one-line placeholders; less and fast scroll hits
 /// blanks.
 const MARGIN: usize = 40;
@@ -49,10 +53,10 @@ pub(crate) struct Entry {
 pub(crate) fn opening_page(entries: &[Entry], find: u32) -> &[Entry] {
     let start = match entries.iter().position(|entry| entry.message_id == find) {
         // Half page above: not on top edge.
-        Some(index) => index.saturating_sub(PAGE / 2),
-        None => entries.len().saturating_sub(PAGE),
+        Some(index) => index.saturating_sub(OPENING / 2),
+        None => entries.len().saturating_sub(OPENING),
     };
-    let end = start.saturating_add(PAGE).min(entries.len());
+    let end = start.saturating_add(OPENING).min(entries.len());
     entries.get(start..end).unwrap_or_default()
 }
 
@@ -1016,11 +1020,17 @@ impl ChatMessages {
             self.pending.remove(id);
         }
         self.fetches = self.fetches.saturating_sub(1);
-        let filled = result.map(|items| self.fill_rows(items).len());
+        let filled = result.map(|items| self.fill_rows(items));
         self.set_hydrating(self.fetches > 0);
         match filled {
             // In place: view keeps position, delegates.
-            Ok(filled) if filled > 0 => self.rows_changed(),
+            Ok(landed) if !landed.is_empty() => {
+                self.rows_changed();
+                // Chat opens with one screen; rest lands here, maybe after reader looked.
+                if !self.reading_history {
+                    self.mark_items_seen(&landed);
+                }
+            }
             Ok(_) => {}
             Err(err) => self.error(err.into()),
         }
@@ -2597,6 +2607,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         quote_author: json::text(message, "/quote/authorDisplayName"),
         // `JustText` quote has none.
         quote_message_id: json::u32_at(message, "/quote/messageId"),
+        quote_is_voice: json::str_at(message, "/quote/viewType") == "Voice",
         file_path: file_path.into(),
         file_name: json::text(message, "/fileName"),
         view_type: view_type.into(),
@@ -2855,8 +2866,9 @@ fn file_name_of(path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        file_name_of, fill_order, gif_dimensions, local_path, other_chat, own_reaction,
-        place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff, MARGIN,
+        file_name_of, fill_order, gif_dimensions, local_path, opening_page, other_chat,
+        own_reaction, place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff,
+        MARGIN,
     };
     use crate::models::MessageListModel;
     use serde_json::json;
@@ -3028,6 +3040,13 @@ mod tests {
         assert_eq!(row_from(5, &with_message).quote_message_id, 42);
         assert_eq!(row_from(5, &just_text).quote_message_id, 0);
         assert_eq!(row_from(5, &unquoted).quote_message_id, 0);
+        assert!(!row_from(5, &with_message).quote_is_voice);
+        let voice = json!({
+            "text": "re",
+            "quote": {"kind": "WithMessage", "messageId": 42, "chatId": 7, "viewType": "Voice",
+                      "text": "🎤 Voice message", "authorDisplayName": "Ada"},
+        });
+        assert!(row_from(5, &voice).quote_is_voice);
     }
 
     #[test]
@@ -3293,5 +3312,46 @@ mod tests {
         assert_eq!(fill_order(count + 20, count + 30, count)[0], count - 1);
         assert_eq!(fill_order(0, 0, 0), Vec::<usize>::new());
         assert_eq!(fill_order(5, 2, count), Vec::<usize>::new());
+    }
+
+    #[test]
+    fn a_chat_opens_with_a_screenful_at_newest_or_around_the_hit() {
+        let chat: Vec<Entry> = (1..=3000)
+            .map(|message_id| Entry {
+                message_id,
+                day_number: 0,
+            })
+            .collect();
+        let ids = |page: &[Entry]| {
+            page.iter()
+                .map(|entry| entry.message_id)
+                .collect::<Vec<_>>()
+        };
+
+        // Newest twenty: over a phone screen, not fifty (core builds each, ~3 ms on phone).
+        assert_eq!(
+            ids(opening_page(&chat, 0)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Not in chat: newest too.
+        assert_eq!(
+            ids(opening_page(&chat, 9999)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Search hit: ten above, hit, nine below.
+        assert_eq!(
+            ids(opening_page(&chat, 1500)),
+            (1490..=1509).collect::<Vec<_>>()
+        );
+        // Near either end: what's there.
+        assert_eq!(ids(opening_page(&chat, 3)), (1..=20).collect::<Vec<_>>());
+        assert_eq!(
+            ids(opening_page(&chat, 2999)),
+            (2989..=3000).collect::<Vec<_>>()
+        );
+        assert_eq!(
+            ids(opening_page(&chat[..5], 0)),
+            (1..=5).collect::<Vec<_>>()
+        );
     }
 }

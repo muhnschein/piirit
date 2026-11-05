@@ -253,9 +253,9 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
     // Name's emoji as Twemoji, as every name label draws it (qml_emoji_names.rs).
     let intro = value("code-intro");
     assert!(
-        intro.starts_with("Scan to join channel \"News <img src=\"image://piirit/emoji?file=")
+        intro.starts_with("Scan to join channel \"News&nbsp;<img src=\"image://piirit/emoji?file=")
             && intro.contains("1f4e2.svg")
-            && intro.ends_with("align=\"middle\">\""),
+            && intro.ends_with("align=\"middle\">&nbsp;\""),
         "the channel's code is not named as Delta Chat names it, emoji drawn as a picture. \
          {context}"
     );

@@ -1,0 +1,6 @@
+# Default Rust suite, stock rust/access-invalid-pointer swapped for ours (same id, alerts keep history).
+- import: codeql-suites/rust-code-scanning.qls
+  from: codeql/rust-queries
+- exclude:
+    id: rust/access-invalid-pointer
+- query: AccessInvalidPointer.ql

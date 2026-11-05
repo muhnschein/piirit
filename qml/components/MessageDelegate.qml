@@ -91,6 +91,9 @@ Item {
     property bool showSender: false
     property string quoteText: ""
     property string quoteAuthor: ""
+    /// Quoted voice message: its done transcript shows in place of core's words.
+    property bool quoteIsVoice: false
+    property int quoteMessageId: 0
     property string filePath: ""
     property string fileName: ""
     property string fileMime: ""
@@ -140,12 +143,21 @@ Item {
         && /^https:\/\/www\.openstreetmap\.org\/\?mlat=\S*$/.test(root.messageText.trim())
     /// Body drawn.
     readonly property bool showsText: root.messageText.length > 0 && !root.linkOnly
+    /// Profile and message, for voice transcript.
+    property int accountId: 0
+    property int messageId: 0
+    /// App-wide `Transcriber`; see AttachmentPreview.
+    property QtObject transcriber: null
+    property Component transcriptMaker: null
+    /// Voice message's `Transcript`, or null (row menu reads it).
+    readonly property QtObject transcript: attachment.item ? attachment.item.transcript : null
 
     /// Row is a call.
     readonly property bool isCall: root.viewType === "Call"
                                    && root.callState.length > 0
     /// Call headline, sub-line; see Calls.js.
-    readonly property string callTitle: Calls.title(root.callState, root.callHasVideo)
+    readonly property string callTitle: root.isCall
+                                        ? Calls.title(root.callState, root.callHasVideo) : ""
     readonly property string callDetail: Calls.detail(root.callState, root.callDuration,
                                                       root.isOutgoing)
     /// Missed, declined, canceled: "bad" colour.
@@ -182,9 +194,6 @@ Item {
                                        : root.emojiBody.length > 0
                                        ? root.emojiBody : root.shownText
     readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
-    /// Quote: as written.
-    readonly property string emojiQuote: Emoji.inText(root.quoteText, false,
-                                                      Theme.fontSizeExtraSmall)
     /// Header only, fetching, or failed: tappable.
     readonly property bool heldBack: root.downloadState.length > 0
                                      && root.downloadState !== "Done"
@@ -290,10 +299,11 @@ Item {
     // Offer measured unconstrained, else width loops through bubble.
     Text {
         id: fullMetric
+        objectName: "fullMetric"
         visible: false
         font.pixelSize: Theme.fontSizeSmall
         textFormat: Text.PlainText
-        text: root.fullText
+        text: root.showsFull ? root.fullText : ""
     }
 
     // Footer likewise: "Edited" can widen one-word bubble.
@@ -352,7 +362,8 @@ Item {
         color: root.showsLocation && root.startsLocation ? Theme.highlightColor
                                                          : Theme.secondaryColor
         textFormat: Text.PlainText
-        text: root.messageText
+        // Hidden text is laid out too: body wrapped twice per message.
+        text: infoLabel.shown ? root.messageText : ""
     }
 
     Rectangle {
@@ -389,11 +400,14 @@ Item {
             font.pixelSize: Theme.fontSizeExtraSmall
             color: root.senderColor.length > 0 ? root.senderColor : Theme.highlightColor
             // Emoji as Twemoji, as body's.
-            readonly property string pictured: Emoji.inText(root.senderName, false,
-                                                            font.pixelSize,
-                                                            "", Emoji.nameSaturation)
+            readonly property string pictured: senderLabel.shown
+                                               ? Emoji.inText(root.senderName, false,
+                                                              font.pixelSize,
+                                                              "", Emoji.nameSaturation)
+                                               : ""
             textFormat: senderLabel.pictured.length > 0 ? Text.StyledText : Text.PlainText
-            text: senderLabel.pictured.length > 0 ? senderLabel.pictured : root.senderName
+            text: !senderLabel.shown ? ""
+                  : senderLabel.pictured.length > 0 ? senderLabel.pictured : root.senderName
         }
 
         // Marked as reference client, above quote (covers whole message). Not remote text: no
@@ -412,75 +426,124 @@ Item {
             font.italic: true
             color: Theme.secondaryColor
             textFormat: Text.PlainText
-            text: qsTr("Forwarded")
+            text: forwardedLabel.shown ? qsTr("Forwarded") : ""
         }
 
         // Quote, bar down left. Own tap: goes to original, not message's own (file, call).
-        Item {
+        // Made only for a quote, as call and offer below: most rows have none.
+        Loader {
             id: quoteRow
             objectName: "quoteRow"
             readonly property bool shown: root.quoteText.length > 0
+            active: quoteRow.shown
             visible: quoteRow.shown
             x: Theme.paddingMedium
             y: root.below(forwardedLabel, quoteRow.shown)
             width: root.contentWidth
-            height: quoteRow.shown ? quoteLabel.y + quoteLabel.height : 0
+            // Explicit: Loader keeps last item's height after unloading it.
+            height: quoteRow.shown && quoteRow.item ? quoteRow.item.implicitHeight : 0
 
-            // Press lit as Silica's: own area takes press from row, row's highlight stays off.
-            Rectangle {
-                anchors.fill: parent
-                visible: quoteArea.pressed
-                color: Theme.rgba(Theme.highlightBackgroundColor,
-                                  Theme.highlightBackgroundOpacity)
-            }
+            sourceComponent: Item {
+                id: quoteItem
+                implicitHeight: quoteLabel.y + quoteLabel.height
 
-            MouseArea {
-                id: quoteArea
-                objectName: "quoteArea"
-                anchors.fill: parent
-                onClicked: root.quoteRequested()
-                onPressAndHold: root.menuRequested()
-            }
+                readonly property bool transcribes: root.quoteIsVoice && root.quoteMessageId > 0
+                                                    && root.transcriber !== null
+                                                    && root.transcriber.enabled === true
+                property QtObject transcript: null
+                // 3 = `Transcript` done.
+                readonly property string said: quoteItem.transcript !== null
+                                               && quoteItem.transcript.state === 3
+                                               && quoteItem.transcript.text.length > 0
+                                               ? "🎤 " + quoteItem.transcript.text
+                                               : root.quoteText
+                readonly property string pictured: Emoji.inText(quoteItem.said, false,
+                                                                Theme.fontSizeExtraSmall)
 
-            Rectangle {
-                width: 2
-                height: parent.height
-                color: Theme.highlightColor
-            }
+                // As AttachmentPreview's: made once, retargeted, dropped when off.
+                function placeTranscript() {
+                    if (!quoteItem.transcribes) {
+                        if (quoteItem.transcript !== null) {
+                            quoteItem.transcript.destroy()
+                            quoteItem.transcript = null
+                        }
+                    } else if (quoteItem.transcript !== null) {
+                        quoteItem.transcript.account_id = root.accountId
+                        quoteItem.transcript.message_id = root.quoteMessageId
+                    } else {
+                        var maker = root.transcriptMaker !== null
+                                    ? root.transcriptMaker
+                                    : Qt.createComponent(Qt.resolvedUrl("MessageTranscript.qml"))
+                        quoteItem.transcript = maker.createObject(quoteItem, {
+                            account_id: root.accountId,
+                            message_id: root.quoteMessageId
+                        })
+                    }
+                }
+                onTranscribesChanged: quoteItem.placeTranscript()
+                Connections {
+                    target: root
+                    onQuoteMessageIdChanged: quoteItem.placeTranscript()
+                    onAccountIdChanged: quoteItem.placeTranscript()
+                }
+                Component.onCompleted: quoteItem.placeTranscript()
 
-            Label {
-                id: quoteAuthorLabel
-                objectName: "quoteAuthor"
-                x: 2 + Theme.paddingSmall
-                width: parent.width - 2 - Theme.paddingSmall
-                truncationMode: TruncationMode.Fade
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.highlightColor
-                readonly property string pictured: Emoji.inText(root.quoteAuthor, false,
-                                                                font.pixelSize,
-                                                                "", Emoji.nameSaturation)
-                textFormat: quoteAuthorLabel.pictured.length > 0 ? Text.StyledText
-                                                                 : Text.PlainText
-                text: quoteAuthorLabel.pictured.length > 0 ? quoteAuthorLabel.pictured
-                                                           : root.quoteAuthor
-            }
+                // Press lit as Silica's: own area takes press from row, row's highlight stays off.
+                Rectangle {
+                    anchors.fill: parent
+                    visible: quoteArea.pressed
+                    color: Theme.rgba(Theme.highlightBackgroundColor,
+                                      Theme.highlightBackgroundOpacity)
+                }
 
-            Label {
-                id: quoteLabel
-                objectName: "quoteLabel"
-                x: quoteAuthorLabel.x
-                y: quoteAuthorLabel.height
-                width: quoteAuthorLabel.width
-                maximumLineCount: 2
-                wrapMode: Text.Wrap
-                // Elided only without pictures: see body.
-                truncationMode: root.emojiQuote.length > 0 ? TruncationMode.None
-                                                           : TruncationMode.Elide
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryColor
-                // Plain unless emoji: see top.
-                textFormat: root.emojiQuote.length > 0 ? Text.StyledText : Text.PlainText
-                text: root.emojiQuote.length > 0 ? root.emojiQuote : root.quoteText
+                MouseArea {
+                    id: quoteArea
+                    objectName: "quoteArea"
+                    anchors.fill: parent
+                    onClicked: root.quoteRequested()
+                    onPressAndHold: root.menuRequested()
+                }
+
+                Rectangle {
+                    width: 2
+                    height: parent.height
+                    color: Theme.highlightColor
+                }
+
+                Label {
+                    id: quoteAuthorLabel
+                    objectName: "quoteAuthor"
+                    x: 2 + Theme.paddingSmall
+                    width: parent.width - 2 - Theme.paddingSmall
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.highlightColor
+                    readonly property string pictured: Emoji.inText(root.quoteAuthor, false,
+                                                                    font.pixelSize,
+                                                                    "", Emoji.nameSaturation)
+                    textFormat: quoteAuthorLabel.pictured.length > 0 ? Text.StyledText
+                                                                     : Text.PlainText
+                    text: quoteAuthorLabel.pictured.length > 0 ? quoteAuthorLabel.pictured
+                                                               : root.quoteAuthor
+                }
+
+                Label {
+                    id: quoteLabel
+                    objectName: "quoteLabel"
+                    x: quoteAuthorLabel.x
+                    y: quoteAuthorLabel.height
+                    width: quoteAuthorLabel.width
+                    maximumLineCount: 2
+                    wrapMode: Text.Wrap
+                    // Elided only without pictures: see body.
+                    truncationMode: quoteItem.pictured.length > 0 ? TruncationMode.None
+                                                                  : TruncationMode.Elide
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    // Plain unless emoji: see top.
+                    textFormat: quoteItem.pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: quoteItem.pictured.length > 0 ? quoteItem.pictured : quoteItem.said
+                }
             }
         }
 
@@ -512,82 +575,94 @@ Item {
                 webxdcIcon: root.webxdcIcon
                 appsEnabled: root.appsEnabled
                 scrolling: root.scrolling
+                accountId: root.accountId
+                messageId: root.messageId
+                transcriber: root.transcriber
+                transcriptMaker: root.transcriptMaker
                 // Long press on own control: row menu.
                 onMenuRequested: root.menuRequested()
             }
         }
 
         // Call: kind, outcome, length, instead of text.
-        Item {
+        Loader {
             id: callRow
             objectName: "callRow"
             readonly property bool shown: root.isCall
             /// Icon, gap, wider of two lines.
-            readonly property real wantedWidth:
-                callIcon.width + Theme.paddingMedium
-                + Math.max(callTitleMetric.implicitWidth, callDetailMetric.implicitWidth)
+            readonly property real wantedWidth: callRow.item ? callRow.item.wantedWidth : 0
+            active: callRow.shown
             visible: callRow.shown
             x: Theme.paddingMedium
             y: root.below(attachment, callRow.shown)
             width: root.contentWidth
-            height: callRow.shown
-                    ? Math.max(callIcon.height, callTitleLabel.height + callDetailLabel.height)
-                    : 0
+            height: callRow.shown && callRow.item ? callRow.item.implicitHeight : 0
 
-            Text {
-                id: callTitleMetric
-                visible: false
-                font.pixelSize: Theme.fontSizeMedium
-                textFormat: Text.PlainText
-                text: root.callTitle
-            }
+            sourceComponent: Item {
+                id: callBox
+                readonly property real wantedWidth:
+                    callIcon.width + Theme.paddingMedium
+                    + Math.max(callTitleMetric.implicitWidth, callDetailMetric.implicitWidth)
+                implicitHeight: Math.max(callIcon.height,
+                                         callTitleLabel.height + callDetailLabel.height)
 
-            Text {
-                id: callDetailMetric
-                visible: false
-                font.pixelSize: Theme.fontSizeExtraSmall
-                textFormat: Text.PlainText
-                text: root.callDetail
-            }
+                Text {
+                    id: callTitleMetric
+                    objectName: "callTitleMetric"
+                    visible: false
+                    font.pixelSize: Theme.fontSizeMedium
+                    textFormat: Text.PlainText
+                    text: root.callTitle
+                }
 
-            Image {
-                id: callIcon
-                objectName: "callIcon"
-                width: Theme.iconSizeMedium
-                height: Theme.iconSizeMedium
-                anchors.verticalCenter: parent.verticalCenter
-                // Theme icons take colour after `?`.
-                source: (root.callHasVideo ? "image://theme/icon-m-video?"
-                                           : "image://theme/icon-m-call?")
-                        + (root.callFailed ? Theme.errorColor : Theme.highlightColor)
-            }
+                Text {
+                    id: callDetailMetric
+                    objectName: "callDetailMetric"
+                    visible: false
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    textFormat: Text.PlainText
+                    text: root.callDetail
+                }
 
-            Label {
-                id: callTitleLabel
-                objectName: "callTitle"
-                x: callIcon.width + Theme.paddingMedium
-                y: callDetailLabel.height > 0
-                   ? Math.floor((callRow.height - height - callDetailLabel.height) / 2)
-                   : Math.floor((callRow.height - height) / 2)
-                width: callRow.width - x
-                truncationMode: TruncationMode.Fade
-                color: root.callFailed ? Theme.errorColor : Theme.primaryColor
-                textFormat: Text.PlainText
-                text: root.callTitle
-            }
+                Image {
+                    id: callIcon
+                    objectName: "callIcon"
+                    width: Theme.iconSizeMedium
+                    height: Theme.iconSizeMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    // Theme icons take colour after `?`.
+                    source: (root.callHasVideo ? "image://theme/icon-m-video?"
+                                               : "image://theme/icon-m-call?")
+                            + (root.callFailed ? Theme.errorColor : Theme.highlightColor)
+                }
 
-            Label {
-                id: callDetailLabel
-                objectName: "callDetail"
-                x: callTitleLabel.x
-                y: callTitleLabel.y + callTitleLabel.height
-                width: callTitleLabel.width
-                height: root.callDetail.length > 0 ? implicitHeight : 0
-                truncationMode: TruncationMode.Fade
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryColor
-                textFormat: Text.PlainText
-                text: root.callDetail
+                Label {
+                    id: callTitleLabel
+                    objectName: "callTitle"
+                    x: callIcon.width + Theme.paddingMedium
+                    y: callDetailLabel.height > 0
+                       ? Math.floor((callBox.height - height - callDetailLabel.height) / 2)
+                       : Math.floor((callBox.height - height) / 2)
+                    width: callBox.width - x
+                    truncationMode: TruncationMode.Fade
+                    color: root.callFailed ? Theme.errorColor : Theme.primaryColor
+                    textFormat: Text.PlainText
+                    text: root.callTitle
+                }
+
+                Label {
+                    id: callDetailLabel
+                    objectName: "callDetail"
+                    x: callTitleLabel.x
+                    y: callTitleLabel.y + callTitleLabel.height
+                    width: callTitleLabel.width
+                    height: root.callDetail.length > 0 ? implicitHeight : 0
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    textFormat: Text.PlainText
+                    text: root.callDetail
+                }
             }
         }
 
@@ -684,31 +759,35 @@ Item {
         }
 
         // Body not fitting: two-word tap in download offer's colour.
-        Item {
+        Loader {
             id: bodyActions
             objectName: "bodyActions"
             readonly property bool shown: root.showsFull
+            active: bodyActions.shown
             visible: bodyActions.shown
             x: Theme.paddingMedium
             y: root.below(messageLabel, bodyActions.shown)
             width: root.contentWidth
-            height: bodyActions.shown ? fullLabel.implicitHeight + Theme.paddingSmall : 0
+            height: bodyActions.shown && bodyActions.item ? bodyActions.item.implicitHeight : 0
 
-            Label {
-                id: fullLabel
-                objectName: "fullButton"
-                visible: root.showsFull
-                // Row's far end. Placed, not anchored.
-                x: parent.width - width
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.highlightColor
-                textFormat: Text.PlainText
-                text: root.fullText
+            sourceComponent: Item {
+                implicitHeight: fullLabel.implicitHeight + Theme.paddingSmall
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: root.fullTextRequested()
-                    onPressAndHold: root.menuRequested()
+                Label {
+                    id: fullLabel
+                    objectName: "fullButton"
+                    // Row's far end. Placed, not anchored.
+                    x: parent.width - width
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.highlightColor
+                    textFormat: Text.PlainText
+                    text: root.fullText
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.fullTextRequested()
+                        onPressAndHold: root.menuRequested()
+                    }
                 }
             }
         }
@@ -728,7 +807,8 @@ Item {
             color: Theme.highlightColor
             // Translated literals, by core's state.
             textFormat: Text.PlainText
-            text: root.downloadState === "InProgress"
+            text: !downloadLabel.shown ? ""
+                  : root.downloadState === "InProgress"
                   ? qsTr("Downloading…")
                   : root.downloadState === "Failure"
                     ? qsTr("⬇ Download failed, tap to try again")

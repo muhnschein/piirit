@@ -89,6 +89,6 @@ fn main() {
     view.show();
     view.engine().exec();
 
-    // Stop server explicitly, not via closed pipe.
-    piirit_shim::shutdown();
+    // Stop server explicitly, not via closed pipe. Outcome logged there.
+    let _ended = piirit_shim::shutdown();
 }

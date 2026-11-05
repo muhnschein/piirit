@@ -116,8 +116,6 @@ Page {
         // Off: nothing announced, shown ones withdrawn; model still reports arrivals.
         enabled: Settings.notificationsEnabled === true
         detail: Settings.notificationDetail
-        // Notification tap: back to list, then into chat.
-        onOpenRequested: page.showChat(chatId)
     }
 
     /// Core answered. Empty = no chats or no answer yet (on resume): no "No chats yet" till set.

@@ -1197,8 +1197,13 @@ mod tests {
 
         let lines: Vec<&str> = kept.lines().collect();
         assert_eq!(lines.len(), 2, "{kept:?}");
-        // Seconds since call began.
-        assert!(lines[0].starts_with("    0.0 "), "{kept:?}");
+        // Seconds since call began, right-aligned, one decimal; never back in time.
+        let seconds = |line: &str| -> f64 {
+            assert_eq!(line.as_bytes()[7], b' ', "{kept:?}");
+            line[..7].trim_start().parse().unwrap()
+        };
+        assert!(seconds(lines[0]) >= 0.0, "{kept:?}");
+        assert!(seconds(lines[1]) >= seconds(lines[0]), "{kept:?}");
         assert!(lines[0].ends_with(" camera open: front"), "{kept:?}");
         assert!(lines[1].ends_with(" video stats: sent"), "{kept:?}");
 

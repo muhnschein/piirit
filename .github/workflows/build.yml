@@ -89,6 +89,7 @@ jobs:
             qttools5-dev-tools \
             libqt5svg5 \
             libpulse-dev \
+            libsqlite3-dev \
             pulseaudio \
             pulseaudio-utils
 

@@ -36,6 +36,8 @@ pub struct ChatListItem {
     pub color: QString,
     /// Picture path; empty if none.
     pub avatar_path: QString,
+    /// Last message, if voice: its transcript previews it. 0 otherwise.
+    pub voice_message_id: u32,
 }
 
 /// Chat-list model.
@@ -77,6 +79,8 @@ pub struct MessageListItem {
     pub quote_author: QString,
     /// Quoted message (`WithMessage` quote); 0 if core has none (deleted, never here).
     pub quote_message_id: u32,
+    /// Quoted message is voice (its transcript stands in for core's words).
+    pub quote_is_voice: bool,
     /// Absolute attachment path in blob dir.
     pub file_path: QString,
     /// Attachment name.

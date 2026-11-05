@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Nemo.Notifications 1.0
-import Nemo.DBus 2.0
 
 /*
  * Notifies unseen arrivals; withdraws once seen. One per chat, reused (`replacesId`),
@@ -8,9 +7,7 @@ import Nemo.DBus 2.0
  * ChatList decides arrivals, skips muted. Here: was reader there, how much to say (lock
  * screen shows anyone; `detail` follows setting).
  *
- * Taps return over D-Bus: Sailjail lets app own OrganizationName.ApplicationName from
- * desktop file, `piirit.piirit`. Adaptor below owns it, remote action names it;
- * lipstick's call lands as `openRequested`.
+ * Taps return over D-Bus to window's NotifierTaps.qml; remote action names it.
  */
 Item {
     id: notifier
@@ -22,9 +19,6 @@ Item {
     /// 0 chat and message, 1 chat only, 2 arrival only. Page binds it: no setting read here,
     /// loads alone.
     property int detail: 0
-
-    /// Tapped: chat to open.
-    signal openRequested(int chatId)
 
     // `enabled` off: nothing announced, shown ones withdrawn. Page binds it.
     onEnabledChanged: {
@@ -40,7 +34,7 @@ Item {
     /// chatId -> messages announced since notification up.
     property var counts: ({})
 
-    /// Tap D-Bus name (header); service and interface alike, as Nemo's remote-action reference.
+    /// Tap D-Bus name, NotifierTaps.qml's.
     readonly property string busName: "piirit.piirit"
     readonly property string busPath: "/"
 
@@ -53,24 +47,6 @@ Item {
     onAppActiveChanged: {
         if (appActive && viewingChatId !== 0) {
             notifier.clear(viewingChatId)
-        }
-    }
-
-    DBusAdaptor {
-        id: adaptor
-        objectName: "notifierAdaptor"
-        service: notifier.busName
-        path: notifier.busPath
-        iface: notifier.busName
-        xml: "  <interface name=\"piirit.piirit\">\n" +
-             "    <method name=\"showChat\">\n" +
-             "      <arg name=\"chatId\" type=\"i\" direction=\"in\"/>\n" +
-             "    </method>\n" +
-             "  </interface>\n"
-
-        /// Tap's call. Chat id is notification's own argument: survives app restart.
-        function showChat(chatId) {
-            notifier.openRequested(chatId)
         }
     }
 

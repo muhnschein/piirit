@@ -45,15 +45,11 @@ ApplicationWindow {
     /// Page quick actions must not leave (backup, profile made/moved/joined, code shown/read);
     /// each sets `pausesQuickActions`.
     readonly property bool quickActionsPaused: {
-        // Re-run when stack moves.
-        var depth = pageStack.depth
-        for (var shown = pageStack.currentPage; shown;
-             shown = pageStack.previousPage(shown)) {
-            if (shown.pausesQuickActions === true) {
-                return true
-            }
-        }
-        return false
+        // Re-run when stack moves. Not previousPage(currentPage): mid-pop, current is off
+        // stack and Silica throws.
+        var moved = [pageStack.depth, pageStack.currentPage]
+        return pageStack.find(function (page) { return page.pausesQuickActions === true })
+            !== null
     }
 
     /// Cover quick action: app opens, chat list does rest, like notification.
@@ -130,6 +126,18 @@ ApplicationWindow {
         value: Settings.callsRing === false ? 2 : 1
     }
 
+    /// Voice message transcription, app-wide (components/Transcription.qml); null if not
+    /// loaded. Pages read `appWindow.transcriber`.
+    readonly property QtObject transcriber: transcription.item
+                                            ? transcription.item.transcriber : null
+
+    // Loaded, not declared: window tests run without shim types. Synchronous: pages bind at once.
+    Loader {
+        id: transcription
+        objectName: "transcription"
+        source: Qt.resolvedUrl("components/Transcription.qml")
+    }
+
     /// App's one call, no page owns it. See components/CallCenter.qml.
     CallCenter {
         id: callCenter
@@ -151,6 +159,15 @@ ApplicationWindow {
     }
     /// Live sharing on, no position going out: bars warn.
     readonly property bool locationStalled: locationFeed.stalled
+    /// Chat notification tapped: window's list opens it.
+    NotifierTaps {
+        objectName: "notifierTaps"
+        onChatRequested: {
+            if (appWindow.chatList !== null) {
+                appWindow.chatList.showChat(chatId)
+            }
+        }
+    }
 
     /// Call under way: notifications, quick actions keep its page up.
     readonly property bool callBusy: callCenter.busy

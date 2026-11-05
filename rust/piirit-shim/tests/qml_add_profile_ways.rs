@@ -3,15 +3,7 @@
 //! top (back returns here); restore page told which half, also when page already built.
 
 // Qt harness: see qml_new_group.rs.
-#![allow(
-    unsafe_code,
-    unused_unsafe,
-    clippy::borrow_as_ptr,
-    clippy::disallowed_methods,
-    clippy::expect_used
-)]
-
-use std::time::Duration;
+#![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
 
 use qmetaobject::*;
 
@@ -124,7 +116,8 @@ fn the_add_profile_dialog_offers_create_backup_and_second_device() {
     let steps: common::Steps = common::Steps::default();
     let taken = steps.clone();
     // Loads, builds switches, taps, accepts: all synchronous once loop runs.
-    single_shot(Duration::from_secs(1), move || unsafe {
+    let mut plan = common::Plan::default();
+    plan.after(1, move || unsafe {
         let record = |label: &str, value: String| common::record(&taken, label, value.into());
         record(
             "load",
@@ -173,6 +166,7 @@ fn the_add_profile_dialog_offers_create_backup_and_second_device() {
         record("navigation", call!("navigation"));
         (*engine_ptr).quit();
     });
+    plan.run();
 
     engine.exec();
 

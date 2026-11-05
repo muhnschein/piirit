@@ -12,7 +12,7 @@
 //! built. Edits inside a submodule without a new commit not seen: rebuild with
 //! `cargo clean -p piirit-video`.
 //!
-//! Own file: build.rs and `tests/build_reuse.rs` both include it.
+//! Own file: build.rs, `tests/build_reuse.rs` and piirit-speech's build.rs include it.
 
 use std::ffi::{OsStr, OsString};
 use std::fmt::Write as _;

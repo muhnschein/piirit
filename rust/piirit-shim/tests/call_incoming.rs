@@ -131,7 +131,11 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     let mut plan = common::Plan::default();
 
     // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
-    plan.after(3, move || unsafe {
+    // Rings when fake core's timer fires: wait for it, not the clock.
+    plan.until(1, 30, move |last| unsafe {
+        if !call!("state").starts_with("ringing") && !last {
+            return false;
+        }
         record!("ringing", call!("state"));
         // Second call while one rings: rings nowhere.
         record!("second", call!("ring", 9000));
@@ -143,6 +147,7 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
             .unwrap_or_default();
         record!("pick-up", call!("pickUp", first));
         record!("answer", call!("answer"));
+        true
     });
 
     plan.after(1, move || unsafe {

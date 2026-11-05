@@ -729,6 +729,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>తొలగించు</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n వాయిస్ సందేశాన్ని లిప్యంతరీకరించు</numerusform>
+            <numerusform>%n వాయిస్ సందేశాలను లిప్యంతరీకరించు</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>లిప్యంతరీకరణను కాపీ చేయి</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>లిప్యంతరీకరించు</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -829,6 +851,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>సవరించు</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>లిప్యంతరీకరణను కాపీ చేయి</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>లిప్యంతరీకరించు</translation>
     </message>
 </context>
 <context>
@@ -2358,6 +2390,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Shares your location in chats and shows shared locations on a map.</source>
         <translation>సంభాషణల్లో మీ స్థానాన్ని పంచుకుని, పంచుకున్న స్థానాలను మ్యాప్‌లో చూపిస్తుంది.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>వాయిస్ సందేశాలను లిప్యంతరీకరించు (ప్రయోగాత్మకం)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>వాయిస్ సందేశాల లిప్యంతరీకరణ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ఈ ఫోన్‌లోనే వాయిస్ సందేశాలను వచనంగా మారుస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ఏదీ ఫోన్ బయటకు వెళ్లదు.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -3005,11 +3053,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>ఛార్జ్ అవుతున్నప్పుడు</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>ఎల్లప్పుడూ</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ఎప్పుడూ కాదు</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ఫోన్ ఛార్జ్ అవుతున్నప్పుడు కొత్త వాయిస్ సందేశాలు లిప్యంతరీకరించబడతాయి.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>కొత్త వాయిస్ సందేశాలు డౌన్‌లోడ్ అయిన వెంటనే లిప్యంతరీకరించబడతాయి.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>దీని వల్ల బ్యాటరీ ఖర్చవుతుంది.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>వాయిస్ సందేశాన్ని వచనంగా మార్చడానికి దానిపై లిప్యంతరీకరించు నొక్కండి.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>తదుపరి</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>భాషలు</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>ఇంకా అందుబాటులో లేదు</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>ఈ భాషల్లో లిప్యంతరీకరణ ఇంకా తగినంత కచ్చితంగా లేదు.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ఒకసారి స్పీచ్ మోడల్‌ను డౌన్‌లోడ్ చేసి, ఈ ఫోన్‌లోనే వాయిస్ సందేశాలను లిప్యంతరీకరిస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>మీరు పంపేది లేదా అందుకునేది ఏదీ ఫోన్ బయటకు వెళ్లదు.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ఈ భాషలోని లిప్యంతరీకరణల్లో ఎక్కువ తప్పులు ఉండే అవకాశం ఉంది.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>వాయిస్ సందేశాల లిప్యంతరీకరణ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>భాషలు</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>ఎప్పుడు</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>స్పీచ్ మోడల్‌ను డౌన్‌లోడ్ చేయలేకపోయాం.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>మళ్లీ ప్రయత్నించండి</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>వాయిస్ సందేశాలను ఆటోమేటిక్‌గా లిప్యంతరీకరించు</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>పాత వాయిస్ సందేశాలను లిప్యంతరీకరించు</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>దీన్ని ఆన్ చేయడానికి ముందు వచ్చిన వాయిస్ సందేశాలు ఫోన్ ఛార్జ్ అవుతున్నప్పుడు లిప్యంతరీకరించబడతాయి.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>పూర్తయింది</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>స్పీచ్ మోడల్ డౌన్‌లోడ్ అవుతోంది… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>ఈ పేజీని మూసిన తర్వాత కూడా డౌన్‌లోడ్ కొనసాగుతుంది.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>స్పీచ్ మోడల్‌ను డౌన్‌లోడ్ చేయలేకపోయాం.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>మళ్లీ ప్రయత్నించండి</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>రికార్డింగ్ %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ఫోన్ ఛార్జ్ అవుతున్నప్పుడు ఈ వాయిస్ సందేశం లిప్యంతరీకరించబడుతుంది.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>బ్యాటరీ సేవర్ మోడ్ ఆన్‌లో ఉన్నంత వరకు లిప్యంతరీకరణ ఆగి ఉంటుంది.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>ఇతర వాయిస్ సందేశాలు లిప్యంతరీకరించబడే వరకు వేచి ఉంది.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>స్పీచ్ మోడల్ డౌన్‌లోడ్ అవుతోంది… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>లిప్యంతరీకరిస్తోంది… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>ఈ వాయిస్ సందేశం %1లో ఉన్నట్లుంది, అది ఎంచుకున్న భాష కాదు.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>ఈ వాయిస్ సందేశంలో మాటలు కనబడలేదు.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>ఈ వాయిస్ సందేశాన్ని లిప్యంతరీకరించలేకపోయాం.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>లిప్యంతరీకరించు</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>ఇప్పుడే లిప్యంతరీకరించు</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>అయినా లిప్యంతరీకరించు</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>మళ్లీ ప్రయత్నించండి</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>ఈ ఫోన్‌లో లిప్యంతరీకరించబడింది</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>అన్నీ చూపించు</translation>
     </message>
 </context>
 <context>

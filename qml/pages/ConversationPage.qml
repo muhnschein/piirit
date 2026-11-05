@@ -507,6 +507,7 @@ Page {
         // Off: `.xdc` is a file. `=== true`: dconf undefined before read.
         appsEnabled: Settings.webxdcEnabled === true
         locationsEnabled: Settings.locationStreamingEnabled === true
+        accountId: page.accountId
         // What core takes an edit in: see model.
         canEdit: messages.can_send && messages.is_encrypted
         placeholderText: qsTr("No messages yet")

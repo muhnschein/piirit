@@ -266,6 +266,10 @@ impl State {
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
             }
+            // Voice message last: chat-list row previews it.
+            if std::env::var_os("PIIRIT_FAKE_VOICE_LAST").is_some() {
+                self.chats.insert(2, vec![10, 13]);
+            }
             // Not yet downloaded too (`pre_message`), plus plain text. 16 sent before 14 and 15
             // (conversation order, not id): gallery must merge by it.
             if std::env::var_os("PIIRIT_FAKE_PRE_MESSAGES").is_some() {
@@ -296,6 +300,17 @@ impl State {
             self.contacts.insert(11, "grace@example.org".to_string());
             // Chat 2 group: self + one contact; test adds other, removes this one.
             self.group_members.insert(2, vec![SELF, 10]);
+            // Big group on request: `PIIRIT_FAKE_CROWD=N` adds N members (ids from 1000).
+            let crowd = std::env::var("PIIRIT_FAKE_CROWD")
+                .ok()
+                .and_then(|value| value.parse::<u32>().ok())
+                .unwrap_or(0);
+            for index in 0..crowd {
+                let contact = 1000 + index;
+                self.contacts
+                    .insert(contact, format!("member{index}@example.org"));
+                self.group_members.entry(2).or_default().push(contact);
+            }
             self.next_chat_id = 500;
             // Received replies, on request: `PIIRIT_FAKE_QUOTES=120:1,119:10` (message:quoted).
             if let Ok(pairs) = std::env::var("PIIRIT_FAKE_QUOTES") {
@@ -496,12 +511,18 @@ impl State {
             }
         }
         if let Some(quoted) = self.quotes.get(&id) {
-            // Core's `WithMessage` quote: id, chat, text, author.
+            // Core's `WithMessage` quote: id, chat, text, author, kind; voice worded as core.
+            let view_type = message_object(u64::from(*quoted))["viewType"].clone();
             message["quote"] = json!({
                 "kind": "WithMessage",
                 "messageId": quoted,
                 "chatId": self.chat_of(*quoted),
-                "text": wordy(u64::from(*quoted)),
+                "text": if view_type == "Voice" {
+                    VOICE_SUMMARY.to_string()
+                } else {
+                    wordy(u64::from(*quoted))
+                },
+                "viewType": view_type,
                 "authorDisplayName": "Ada Lovelace",
             });
         }
@@ -519,6 +540,12 @@ impl State {
             pre_message(&mut message, msg, fetched);
         }
         message["reactions"] = self.reactions_object(id);
+        // Sender's contact object, as core: says if blocked.
+        let sender = message["fromId"]
+            .as_u64()
+            .and_then(|from| u32::try_from(from).ok())
+            .unwrap_or_default();
+        message["sender"]["isBlocked"] = json!(self.blocked.contains(&sender));
         message
     }
 
@@ -737,6 +764,9 @@ fn base64(bytes: &[u8]) -> String {
     out
 }
 
+/// Core's preview of a voice message without text (pinned in `real_server.rs`).
+const VOICE_SUMMARY: &str = "🎤 Voice message";
+
 /// Message shaped like core's. Seeded 1 quotes, 2 unread, 10 image: one fetch covers view.
 fn message_object(msg: u64) -> Value {
     let timestamp = message_timestamp(msg);
@@ -801,7 +831,9 @@ fn message_object(msg: u64) -> Value {
         }
         13 => {
             message["viewType"] = json!("Voice");
-            message["file"] = json!("/tmp/piirit-fake/voice.aac");
+            // Real file for tests that transcribe it.
+            message["file"] = std::env::var("PIIRIT_FAKE_VOICE_FILE")
+                .map_or_else(|_| json!("/tmp/piirit-fake/voice.aac"), |file| json!(file));
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
@@ -921,7 +953,7 @@ fn env_ids(var: &str) -> Vec<u64> {
         .unwrap_or_default()
 }
 
-/// Ask relay in `qr` for account. Instant unless `slow`: after `PIIRIT_FAKE_SLOW_MS` (3 s
+/// Ask relay in `qr` for account. Instant unless `slow`: after [`slow_work`] (gate or 3 s
 /// default), as down relay holds core. Pending = configuring: second transport call refused
 /// (core's words); `stop_ongoing_process` fails it unless `deaf` (stop too late).
 async fn add_transport_from_qr(
@@ -937,7 +969,7 @@ async fn add_transport_from_qr(
         return err(id, "There is already another ongoing process running.");
     }
     let stopped = if qr.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !qr.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1016,7 +1048,7 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     }
     state.lock().await.imex(account, 300);
     let stopped = if from.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !from.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1086,7 +1118,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     }
     state.lock().await.imex(account, 300);
     let stopped = if folder.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !folder.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1124,7 +1156,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
 
 /// Offer profile to second device, as `provide_backup`: open until taken or stopped.
 /// `ImexProgress` 1000 taken, 0 stopped; unread code emits nothing. By account:
-/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken `PIIRIT_FAKE_SLOW_MS` later,
+/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken after [`slow_work`],
 /// `PIIRIT_FAKE_STALLED` arrives then leaves; others wait for stop.
 async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
     if env_ids("PIIRIT_FAKE_PROVIDE_FAIL").contains(&u64::from(account)) {
@@ -1135,16 +1167,16 @@ async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> 
     }
     let stalls = env_ids("PIIRIT_FAKE_STALLED").contains(&u64::from(account));
     let taken = if stalls || env_ids("PIIRIT_FAKE_TAKEN").contains(&u64::from(account)) {
-        // Device arrives half a wait in: transfer has a middle (page bar, mid-transfer test).
-        let wait = delay_or("PIIRIT_FAKE_SLOW_MS", 3000);
-        tokio::time::sleep(wait / 2).await;
-        state.lock().await.imex(account, 300);
+        // Device arrives at once: transfer has a middle (page bar, mid-transfer test). Taken done
+        // when slow work ends; stalled arrives only then, and leaves.
         if stalls {
-            false
-        } else {
-            tokio::time::sleep(wait).await;
-            true
+            slow_work().await;
         }
+        state.lock().await.imex(account, 300);
+        if !stalls {
+            slow_work().await;
+        }
+        !stalls
     } else {
         wait_for_stop(state, account).await;
         false
@@ -1188,6 +1220,15 @@ async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     }
     err(id, "no backup provider is running")
+}
+
+/// Slow relay, backup, transfer: until test removes `PIIRIT_FAKE_SLOW_GATE` file if set (test
+/// acts mid-call on condition, not clock), else `PIIRIT_FAKE_SLOW_MS` (3 s default).
+async fn slow_work() {
+    match std::env::var_os("PIIRIT_FAKE_SLOW_GATE") {
+        Some(gate) => file_present(std::path::Path::new(&gate), false).await,
+        None => tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await,
+    }
 }
 
 /// Reply delay in ms from `var`, or `default`.
@@ -1335,6 +1376,8 @@ async fn serve() {
     // `"value"`); next request holding it takes it (here, in order read), waits 1 s, then
     // journaled and done. Later ones overtake it.
     let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Next request holding `PIIRIT_FAKE_FAIL_ONCE` file's text gets error answer; file taken.
+    let fail_once = std::env::var_os("PIIRIT_FAKE_FAIL_ONCE").map(std::path::PathBuf::from);
     // Answers held while `PIIRIT_FAKE_HOLD` file there: requests whose line holds its text
     // (journaled on arrival) wait till test removes it.
     let hold = std::env::var_os("PIIRIT_FAKE_HOLD").map(std::path::PathBuf::from);
@@ -1358,6 +1401,12 @@ async fn serve() {
         if let Some(path) = &slow_once {
             if let Ok(text) = tokio::fs::read_to_string(path).await {
                 slow = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
+            }
+        }
+        let mut failing = false;
+        if let Some(path) = &fail_once {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                failing = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
             }
         }
         let mut held_by = None;
@@ -1385,6 +1434,16 @@ async fn serve() {
             let params = request.get("params").cloned().unwrap_or(Value::Null);
             if slow {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            }
+            // Stop noted before journaled: test that sees it there may end slow work, which must
+            // find it.
+            if method == "stop_ongoing_process" {
+                let account = params.get(0).and_then(Value::as_u64).unwrap_or_default();
+                state
+                    .lock()
+                    .await
+                    .stopped
+                    .insert(u32::try_from(account).unwrap_or_default());
             }
             journal(&method, &params);
             if let Some(path) = held_by {
@@ -1552,6 +1611,11 @@ async fn serve() {
                     if state.selected == Some(gone) {
                         state.selected = state.accounts.first().map(|account| account.id);
                     }
+                    // Account manager's event: no account context.
+                    state.events.push_back(json!({
+                        "contextId": 0,
+                        "event": {"kind": "AccountsChanged"},
+                    }));
                     ok(&id, &Value::Null)
                 }
                 "add_account" => {
@@ -1697,8 +1761,6 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
-                    // Held back on request: events arrive while count read.
-                    tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
                         .fresh
@@ -1719,13 +1781,11 @@ async fn serve() {
                 | "set_chat_visibility"
                 | "resend_messages"
                 // Forgotten; tests read journal.
-                | "set_stock_strings" => ok(&id, &Value::Null),
+                | "set_stock_strings"
+                // Noted before journal.
+                | "stop_ongoing_process" => ok(&id, &Value::Null),
                 "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
                     state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
-                    ok(&id, &Value::Null)
-                }
-                "stop_ongoing_process" => {
-                    state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
                 }
                 // Core picks relays: first answering, second once up (background). Keyed on
@@ -1922,6 +1982,26 @@ async fn serve() {
                     )
                 }
                 "get_account_file_size" => ok(&id, &json!(123_456)),
+                // Those still in some chat (accounts share chats here).
+                "get_existing_msg_ids" => {
+                    let asked: Vec<u32> = positional(1)
+                        .as_array()
+                        .map(|array| {
+                            array
+                                .iter()
+                                .filter_map(Value::as_u64)
+                                .filter_map(|value| u32::try_from(value).ok())
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let existing: Vec<u32> = asked
+                        .into_iter()
+                        .filter(|msg| state.chat_of(*msg) != 0)
+                        .collect();
+                    ok(&id, &json!(existing))
+                }
                 // As `get_messages`: reader asks before download-limited rest.
                 "get_message" => {
                     let msg = positional(1).as_u64().unwrap_or_default();
@@ -2334,6 +2414,16 @@ async fn serve() {
                     let account = account_id();
                     let mut state = state.lock().await;
                     state.seed_chats();
+                    // Core's per-message event too, on request (other suites pinned without).
+                    if std::env::var_os("PIIRIT_FAKE_MSG_DELETED").is_some() {
+                        for msg in &ids {
+                            let chat = state.chat_of(*msg);
+                            state.events.push_back(json!({
+                                "contextId": account,
+                                "event": {"kind": "MsgDeleted", "chatId": chat, "msgId": msg},
+                            }));
+                        }
+                    }
                     for messages in state.chats.values_mut() {
                         messages.retain(|msg| !ids.contains(msg));
                     }
@@ -2560,6 +2650,12 @@ async fn serve() {
                             .ok()
                             .and_then(|chat| state.drafts.get(&chat))
                             .filter(|text| !text.is_empty());
+                        let last = u32::try_from(chat)
+                            .ok()
+                            .and_then(|chat| state.chats.get(&chat))
+                            .and_then(|messages| messages.last().copied());
+                        let last_type = last.map(|msg| message_object(u64::from(msg))["viewType"].clone());
+                        let voice = draft.is_none() && last_type.as_ref().is_some_and(|kind| kind == "Voice");
                         items.insert(
                             chat.to_string(),
                             json!({
@@ -2567,9 +2663,15 @@ async fn serve() {
                                 "name": format!("chat {chat}"),
                                 "summaryText1": draft.map(|_| "Draft"),
                                 "summaryText2": draft.map_or_else(
-                                    || format!("last in {chat}"),
+                                    || if voice {
+                                        VOICE_SUMMARY.to_string()
+                                    } else {
+                                        format!("last in {chat}")
+                                    },
                                     Clone::clone,
                                 ),
+                                "lastMessageId": last,
+                                "lastMessageType": last_type,
                                 "summaryStatus": if draft.is_some() { 19 } else { 0 },
                                 "freshMessageCounter": u32::from(fresh),
                                 "isEncrypted": true,
@@ -3116,6 +3218,11 @@ async fn serve() {
                 _ => err(&id, "method not found"),
             };
 
+            let response = if failing {
+                err(&id, "fake failure")
+            } else {
+                response
+            };
             let mut out = stdout.lock().await;
             let _ = out.write_all(response.to_string().as_bytes()).await;
             let _ = out.write_all(b"\n").await;

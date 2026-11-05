@@ -9,9 +9,22 @@
 
 use crate::links::url_spans;
 
-/// Message as `Text.StyledText`: escaped, Markdown to Qt tags. Line by line (fences, headings
-/// are lines).
+/// Message as `Text.StyledText`: escaped, Markdown to Qt tags; "" when that is the text as
+/// written (most messages: label lays it out plain, no styled parse per row). `\r` stays
+/// styled: plain label breaks line there.
 pub(crate) fn render(text: &str) -> String {
+    let styled = styled(text);
+    let mut plain = String::with_capacity(text.len());
+    push_escaped(&mut plain, text);
+    if !text.contains('\r') && styled == plain.replace('\n', "<br>") {
+        String::new()
+    } else {
+        styled
+    }
+}
+
+/// [`render`] without the plain case. Line by line (fences, headings are lines).
+fn styled(text: &str) -> String {
     let mut lines: Vec<String> = Vec::new();
     let mut fence = Fence::default();
     for line in text.split('\n') {
@@ -402,7 +415,7 @@ impl Seek {
 
 #[cfg(test)]
 mod tests {
-    use super::render;
+    use super::{render, styled};
 
     #[test]
     fn emphasis_code_and_headings_become_tags() {
@@ -428,33 +441,57 @@ mod tests {
     #[test]
     fn every_line_of_a_message_is_drawn_on_a_line_of_its_own() {
         // Bug: to-do lines ran together.
-        assert_eq!(render("one\ntwo\nthree"), "one<br>two<br>three");
-        assert_eq!(render("one\n\nthree"), "one<br><br>three");
+        assert_eq!(styled("one\ntwo\nthree"), "one<br>two<br>three");
+        assert_eq!(styled("one\n\nthree"), "one<br><br>three");
         // Inside code, newlines stay; `<pre>` tags break outside.
         assert_eq!(render("a\n```\nx\ny\n```\nb"), "a<pre>x\ny</pre>b");
-        assert_eq!(render("\nx\n"), "<br>x<br>");
+        assert_eq!(styled("\nx\n"), "<br>x<br>");
     }
 
     #[test]
     fn what_is_not_markdown_is_left_alone() {
-        assert_eq!(render("2 * 3 * 4"), "2 * 3 * 4");
-        assert_eq!(render("snake_case_name"), "snake_case_name");
-        assert_eq!(render("a ** b"), "a ** b");
-        assert_eq!(render("*unclosed"), "*unclosed");
-        assert_eq!(render("**"), "**");
+        assert_eq!(styled("2 * 3 * 4"), "2 * 3 * 4");
+        assert_eq!(styled("snake_case_name"), "snake_case_name");
+        assert_eq!(styled("a ** b"), "a ** b");
+        assert_eq!(styled("*unclosed"), "*unclosed");
+        assert_eq!(styled("**"), "**");
         assert_eq!(render(r"\*not\*"), "*not*");
         assert_eq!(render(""), "");
+    }
+
+    #[test]
+    fn text_with_nothing_to_style_renders_to_nothing() {
+        // Row then lays body out plain, as written: no styled parse per message.
+        for text in [
+            "2 * 3 * 4",
+            "snake_case_name",
+            "a ** b",
+            "**",
+            "a & b < c",
+            "  two  spaces",
+        ] {
+            assert_eq!(render(text), "", "{text}");
+        }
+        assert_eq!(render("a\nb"), "");
+        assert_eq!(render("<b>plain</b>"), "");
+        // Styled still: markup, links, and `\r` (plain label would break there).
+        assert_eq!(render("a\n*b*"), "a<br><i>b</i>");
+        assert_eq!(
+            render("see https://example.org"),
+            "see <a href=\"https://example.org\">https://example.org</a>"
+        );
+        assert_eq!(render("a\r\nb"), "a\r<br>b");
     }
 
     #[test]
     fn openers_that_never_close_cost_one_read_of_the_line() {
         // Unclosed openers each read to line end: slow.
         let underscores = "a__".repeat(7000);
-        assert_eq!(render(&underscores), underscores);
+        assert_eq!(styled(&underscores), underscores);
         let brackets = "[".repeat(20_000);
-        assert_eq!(render(&brackets), brackets);
+        assert_eq!(styled(&brackets), brackets);
         let spaced = format!("{}a]({})", "[".repeat(5000), " ".repeat(5000));
-        assert_eq!(render(&spaced), spaced);
+        assert_eq!(styled(&spaced), spaced);
     }
 
     #[test]
@@ -489,10 +526,10 @@ mod tests {
             "<a href=\"mailto:a@example.org\">mail</a>"
         );
         assert_eq!(
-            render("[x](javascript:alert(1))"),
+            styled("[x](javascript:alert(1))"),
             "[x](javascript:alert(1))"
         );
-        assert_eq!(render("[x](file:///etc/passwd)"), "[x](file:///etc/passwd)");
+        assert_eq!(styled("[x](file:///etc/passwd)"), "[x](file:///etc/passwd)");
     }
 
     #[test]
@@ -507,7 +544,7 @@ mod tests {
             "&lt;img src=&quot;<a href=\"https://tracker/p.gif\">https://tracker/p.gif</a>&quot;&gt; \
              &amp; &lt;a href=&quot;x&quot;&gt;y&lt;/a&gt;"
         );
-        assert_eq!(render("<b>plain</b>"), "&lt;b&gt;plain&lt;/b&gt;");
+        assert_eq!(styled("<b>plain</b>"), "&lt;b&gt;plain&lt;/b&gt;");
         assert_eq!(render("`<b>`"), "<tt>&lt;b&gt;</tt>");
         assert_eq!(
             render("[<i>](https://example.org/?a=1&b=2)"),

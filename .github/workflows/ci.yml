@@ -57,7 +57,7 @@ jobs:
       # QtQuick runtime plugin (-dev omits it), lrelease (translation test),
       # QAudioRecorder (voice recorder), QtQuick.Window (chat search test),
       # libpulse (mic watch), pulseaudio + utils (its test's sound server).
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev libsqlite3-dev pulseaudio pulseaudio-utils
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
@@ -108,7 +108,7 @@ jobs:
         with:
           persist-credentials: false
           submodules: true
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev libsqlite3-dev
       - run: rustup toolchain install 1.75.0 --profile minimal
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
@@ -133,7 +133,7 @@ jobs:
           persist-credentials: false
           submodules: true
       # real_core drives shim through a QML probe.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev libsqlite3-dev
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
@@ -184,7 +184,7 @@ jobs:
           persist-credentials: false
           submodules: true
       # rpm (%files layout), file (icons), binutils (binary symbols).
-      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
+      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev libsqlite3-dev
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust

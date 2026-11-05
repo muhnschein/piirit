@@ -729,6 +729,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n spraakbericht uitschrijven</numerusform>
+            <numerusform>%n spraakberichten uitschrijven</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Transcriptie kopiëren</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Gekopieerd naar klembord</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Uitschrijven</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -829,6 +851,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Bewerken</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Transcriptie kopiëren</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Uitschrijven</translation>
     </message>
 </context>
 <context>
@@ -2358,6 +2390,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Shares your location in chats and shows shared locations on a map.</source>
         <translation>Deelt je locatie in chats en toont gedeelde locaties op een kaart.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Spraakberichten uitschrijven (experimenteel)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Spraakberichten uitschrijven</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Zet spraakberichten om in tekst op deze telefoon.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Niets verlaat de telefoon.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -3005,11 +3053,211 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Tijdens opladen</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Altijd</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nooit</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Nieuwe spraakberichten worden uitgeschreven terwijl de telefoon oplaadt.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Nieuwe spraakberichten worden uitgeschreven zodra ze zijn gedownload.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Dit kost batterij.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Tik op Uitschrijven bij een spraakbericht om het in tekst om te zetten.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Volgende</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Talen</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Nog niet beschikbaar</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Uitschrijven is in deze talen nog niet nauwkeurig genoeg.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit downloadt eenmalig een spraakmodel en schrijft spraakberichten uit op deze telefoon.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Niets wat je verstuurt of ontvangt verlaat de telefoon.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transcripties in deze taal bevatten waarschijnlijk meer fouten.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Spraakberichten uitschrijven</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Talen</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Wanneer</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Het spraakmodel kon niet worden gedownload.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Opnieuw proberen</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Spraakberichten automatisch uitschrijven</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Oudere spraakberichten uitschrijven</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Spraakberichten die binnenkwamen voordat je dit aanzette, worden uitgeschreven terwijl de telefoon oplaadt.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Klaar</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Spraakmodel downloaden… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Het downloaden gaat door als je deze pagina sluit.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Het spraakmodel kon niet worden gedownload.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Opnieuw proberen</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Opname %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Dit spraakbericht wordt uitgeschreven als de telefoon oplaadt.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Uitschrijven is gepauzeerd zolang de energiebesparingsmodus aan staat.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Wacht tot andere spraakberichten zijn uitgeschreven.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Spraakmodel downloaden… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Uitschrijven… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Dit spraakbericht lijkt in het %1 te zijn, dat niet is gekozen.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Er is geen spraak gevonden in dit spraakbericht.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Dit spraakbericht kon niet worden uitgeschreven.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Uitschrijven</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Nu uitschrijven</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Toch uitschrijven</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Opnieuw proberen</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Uitgeschreven op deze telefoon</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Alles tonen</translation>
     </message>
 </context>
 <context>

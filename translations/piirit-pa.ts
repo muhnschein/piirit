@@ -733,6 +733,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>ਹਟਾਓ</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n ਆਵਾਜ਼ ਸੁਨੇਹੇ ਦੀ ਲਿਖਤ ਬਣਾਓ</numerusform>
+            <numerusform>%n ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ ਬਣਾਓ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>ਲਿਖਤ ਕਾਪੀ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ਕਲਿੱਪਬੋਰਡ ਉੱਤੇ ਕਾਪੀ ਕੀਤਾ</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>ਲਿਖਤ ਬਣਾਓ</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -833,6 +855,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>ਸੋਧੋ</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>ਲਿਖਤ ਕਾਪੀ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>ਲਿਖਤ ਬਣਾਓ</translation>
     </message>
 </context>
 <context>
@@ -2362,6 +2394,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Shares your location in chats and shows shared locations on a map.</source>
         <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰਦਾ ਹੈ ਅਤੇ ਸਾਂਝੇ ਟਿਕਾਣੇ ਨਕਸ਼ੇ ਉੱਤੇ ਦਿਖਾਉਂਦਾ ਹੈ।</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ਕੁਝ ਵੀ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -3009,11 +3057,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>ਚਾਰਜ ਹੋਣ ਵੇਲੇ</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>ਹਮੇਸ਼ਾ</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ਕਦੇ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ਫ਼ੋਨ ਚਾਰਜ ਹੋਣ ਵੇਲੇ ਨਵੇਂ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>ਨਵੇਂ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਡਾਊਨਲੋਡ ਹੁੰਦੇ ਹੀ ਲਿਖਤ ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>ਇਸ ਨਾਲ ਬੈਟਰੀ ਖਰਚ ਹੁੰਦੀ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹੇ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਣ ਲਈ ਉਸ &apos;ਤੇ ਲਿਖਤ ਬਣਾਓ ਨੂੰ ਟੈਪ ਕਰੋ।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>ਅੱਗੇ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>ਭਾਸ਼ਾਵਾਂ</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>ਹਾਲੇ ਉਪਲਬਧ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>ਇਨ੍ਹਾਂ ਭਾਸ਼ਾਵਾਂ ਵਿੱਚ ਲਿਖਤ ਹਾਲੇ ਕਾਫ਼ੀ ਸਹੀ ਨਹੀਂ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ਇੱਕ ਵਾਰ ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਕਰਦਾ ਹੈ ਅਤੇ ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>ਤੁਸੀਂ ਜੋ ਭੇਜਦੇ ਜਾਂ ਪ੍ਰਾਪਤ ਕਰਦੇ ਹੋ, ਉਸ ਵਿੱਚੋਂ ਕੁਝ ਵੀ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ਇਸ ਭਾਸ਼ਾ ਦੀਆਂ ਲਿਖਤਾਂ ਵਿੱਚ ਵਧੇਰੇ ਗਲਤੀਆਂ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>ਭਾਸ਼ਾਵਾਂ</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>ਕਦੋਂ</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਸਕਿਆ।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਆਪੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>ਪੁਰਾਣੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>ਇਹ ਚਾਲੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਆਏ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਫ਼ੋਨ ਚਾਰਜ ਹੋਣ ਵੇਲੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>ਹੋ ਗਿਆ</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>ਇਹ ਸਫ਼ਾ ਬੰਦ ਕਰਨ ਤੋਂ ਬਾਅਦ ਵੀ ਡਾਊਨਲੋਡ ਜਾਰੀ ਰਹਿੰਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਸਕਿਆ।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>ਰਿਕਾਰਡਿੰਗ %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ਇਹ ਆਵਾਜ਼ ਸੁਨੇਹਾ ਫ਼ੋਨ ਚਾਰਜ ਹੋਣ ਵੇਲੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲਿਆ ਜਾਵੇਗਾ।</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>ਬੈਟਰੀ ਬੱਚਤ ਮੋਡ ਚਾਲੂ ਹੋਣ ਤੱਕ ਲਿਖਤ ਰੁਕੀ ਰਹਿੰਦੀ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>ਹੋਰ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲਣ ਦੀ ਉਡੀਕ ਹੋ ਰਹੀ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>ਲਿਖਤ ਬਣ ਰਹੀ ਹੈ… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>ਇਹ ਆਵਾਜ਼ ਸੁਨੇਹਾ %1 ਵਿੱਚ ਲੱਗਦਾ ਹੈ, ਜੋ ਚੁਣੀ ਹੋਈ ਭਾਸ਼ਾ ਨਹੀਂ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>ਇਸ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਵਿੱਚ ਕੋਈ ਬੋਲ ਨਹੀਂ ਮਿਲਿਆ।</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>ਇਹ ਆਵਾਜ਼ ਸੁਨੇਹਾ ਲਿਖਤ ਵਿੱਚ ਨਹੀਂ ਬਦਲਿਆ ਜਾ ਸਕਿਆ।</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>ਲਿਖਤ ਬਣਾਓ</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>ਹੁਣੇ ਲਿਖਤ ਬਣਾਓ</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>ਫਿਰ ਵੀ ਲਿਖਤ ਬਣਾਓ</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਲਿਖਤ ਬਣਾਈ ਗਈ</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>ਸਭ ਦਿਖਾਓ</translation>
     </message>
 </context>
 <context>

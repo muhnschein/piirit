@@ -1,8 +1,8 @@
 //! Mark-read from list sticks, whatever core says meanwhile.
 //!
-//! Refresh reads unfetched rows as they were at start; old answers dropped (`generation`).
-//! So: mark read, message lands in another chat, newer refresh has pre-mark copy, older one
-//! with cleared badge discarded; badge returns. Fake answers listing slowly so both are in flight.
+//! Refresh reuses unfetched rows as they were at start. Mark read, message lands in another
+//! chat while that re-read is out: next refresh must not bring pre-mark badge back. Fake
+//! answers listing slowly so event comes mid-flight.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -90,11 +90,11 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
     });
 
     // While re-read of marked chat is still out.
-    plan.after(1, move || unsafe {
+    plan.after_busy(1, move || unsafe {
         call!("otherChatChanged");
     });
 
-    plan.after(3, move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("after", call!("unread")));
         (*engine_ptr).quit();
     });
@@ -131,12 +131,12 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         .collect();
     let context = format!("steps: {steps:?}, calls: {names:?}, listings: {listings:?}");
 
-    // Second question must come while first in flight: fake holds listings back by delay.
+    // Other chat's event fed while mark's refresh out (1 s after mark, answer takes 1.5 s):
+    // one refresh at a time, so both chats' re-reads ride on the listing after the mark.
     assert!(
-        listings.len() >= 2 && listings[listings.len() - 1] < listings[0] + 1500,
-        "the refresh for the other chat was not asked for while the one \
-         from marking the chat read was still out, so nothing here is being \
-         tested. {context}"
+        !listings.is_empty(),
+        "nothing was listed after the chat was marked read, so nothing here \
+         is being tested. {context}"
     );
 
     // Nothing unread to clear: nothing tested.

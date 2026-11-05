@@ -1,6 +1,6 @@
 //! Cover does no work while nobody looks. It's drawn only when app is minimised, home screen shows
-//! and display is on. Rest of the time (most of it, all night) app still receives and cover's chat
-//! lists follow every arrival, so every message used to rebuild a face grid nothing would draw.
+//! and display is on. Rest of the time (most of it, all night) app still receives; cover's chat
+//! lists used to re-read core and rebuild a face grid nothing would draw on every message.
 //!
 //! Must not stay wrong: whatever it missed is there once looked at. Both halves checked.
 
@@ -34,7 +34,7 @@ const PROBE_QML: &str = r"
             var lists = allIn(loader.item, 'coverChats', [])
             var total = 0
             for (var i = 0; i < lists.length; i++) {
-                total += lists[i].rowCount()
+                total += lists[i].count
             }
             return '' + total
         }
@@ -124,6 +124,7 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
 
     let awake = steps.clone();
     plan.after(1, move || unsafe {
+        common::record(&awake, "known-awake", call!("known").into());
         common::record(&awake, "drawn-awake", call!("planned").into());
         common::record(&awake, "stale-awake", call!("stale").into());
         (*engine_ptr).quit();
@@ -144,11 +145,16 @@ fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
         "the cover did not make one chat list per profile, so nothing here \
          was following anything and this test proves nothing"
     );
-    assert_ne!(
+    assert_eq!(
         common::value_of(&steps, "known"),
         "0",
-        "the lists never filled, so there was nothing for the cover to draw \
-         whether it was looking or not and this test proves nothing"
+        "the cover's lists read the core while nothing was looking at it"
+    );
+    assert_ne!(
+        common::value_of(&steps, "known-awake"),
+        "0",
+        "the lists never filled once looked at, so there was nothing for the \
+         cover to draw and this test proves nothing"
     );
     assert_eq!(
         common::value_of(&steps, "drawn-asleep"),

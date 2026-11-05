@@ -123,6 +123,9 @@ Item {
     Camera {
         id: camera
         objectName: "camera"
+        // Qt starts it once built: before page is on screen, on default device and
+        // mode. Off until `start()`.
+        cameraState: Camera.UnloadedState
         // Autofocus and torch in video pipeline.
         captureMode: Camera.CaptureVideo
         flash.mode: root.torch ? Viewfinder.flashTorch : Viewfinder.flashOff

@@ -30,6 +30,9 @@ rqrr = { version = "0.10", default-features = false }
 mp3lame-encoder = "0.2"
 # Picked video, small enough to send (src/video.rs). FFmpeg + x264 from source.
 piirit-video = { path = "../piirit-video" }
+# Voice message transcription (src/transcripts.rs). whisper.cpp from source.
+piirit-speech = { path = "../piirit-speech" }
+rusqlite = { version = "0.31", default-features = false }
 
 [build-dependencies]
 cpp_build = "0.5"
