@@ -154,7 +154,7 @@ bool refuse(whisper_context *, whisper_state *, void *) { return false; }
 /* Detects language; choose() sets `params.language` or STOPPED. Only API that sets
  * state's audio_ctx is whisper_full: run it, refused before encoding, so detection
  * sees clip, not 30 s window. FLEURS, 9 languages: sentences same pick, twice as
- * fast; 1-2 s cuts 7x faster, up to 5 % more wrong picks. */
+ * fast; 1-2 s cuts 5x faster, up to 4 % more wrong picks. */
 int pick_language(whisper_context *context, whisper_state *state,
                   const piirit_speech_job *job, run_state *run,
                   whisper_full_params *params, char *error, size_t error_len)

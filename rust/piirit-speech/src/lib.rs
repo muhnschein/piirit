@@ -357,9 +357,10 @@ fn thread_count(cpus: &[u32], big: impl FnOnce() -> Vec<u32>) -> i32 {
 const SAMPLES_PER_POSITION: usize = 320;
 const WINDOW_POSITIONS: usize = 1500;
 
-/// Encoder positions for a clip: its length plus ~2.5 s, in 64s; 0 (model's 1500) past one
-/// window. Past 30 s whisper.cpp moves window 30 s per step, whatever this says: smaller
-/// would skip sound.
+/// Encoder positions for a clip: its length plus ~2.5 s, in 256s; 0 (model's 1500) past one
+/// window. 256s: whisper.cpp's flash attention pads to 256 unmasked, so padding would read
+/// leftovers of an earlier encode (same clip, other text). Past 30 s whisper.cpp moves
+/// window 30 s per step, whatever this says: smaller would skip sound.
 fn audio_context(samples: usize) -> i32 {
     let positions = samples.div_ceil(SAMPLES_PER_POSITION);
     if positions > WINDOW_POSITIONS {
@@ -367,8 +368,8 @@ fn audio_context(samples: usize) -> i32 {
     }
     let generous = positions
         .saturating_add(128)
-        .div_ceil(64)
-        .saturating_mul(64);
+        .div_ceil(256)
+        .saturating_mul(256);
     i32::try_from(generous.min(WINDOW_POSITIONS)).unwrap_or(0)
 }
 
@@ -839,16 +840,17 @@ mod tests {
 
     #[test]
     fn a_short_clip_is_encoded_short_and_a_long_one_whole() {
-        // 5 s: 250 positions, plus margin, in 64s.
-        assert_eq!(audio_context(5 * 16_000), 384);
-        assert_eq!(audio_context(10 * 16_000), 640);
+        // 5 s: 250 positions, plus margin, in 256s (flash attention's padding, never read).
+        assert_eq!(audio_context(5 * 16_000), 512);
+        assert_eq!(audio_context(10 * 16_000), 768);
+        assert_eq!(audio_context(25 * 16_000), 1500);
         // Never past one window.
         assert_eq!(audio_context(29 * 16_000), 1500);
         assert_eq!(audio_context(30 * 16_000), 1500);
         // Past one window: model's own, as whisper.cpp moves 30 s per step.
         assert_eq!(audio_context(30 * 16_000 + 320), 0);
         assert_eq!(audio_context(120 * 16_000), 0);
-        assert_eq!(audio_context(1), 192);
+        assert_eq!(audio_context(1), 256);
     }
 
     #[test]
