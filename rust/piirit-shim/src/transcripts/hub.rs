@@ -1070,3 +1070,34 @@ pub(crate) fn transcribe_chat(account: u32, chat: u32) {
         done(find_voice(&rpc, store.as_ref(), Some((account, chat))).await);
     });
 }
+
+/// Done transcripts of `account` holding `query`, as (message, chat, text), newest first.
+/// Switched off or no store: none, as views hide them. Call on Qt thread, await anywhere.
+pub(crate) fn matching(
+    account: u32,
+    query: String,
+) -> impl std::future::Future<Output = Vec<(u32, u32, String)>> + Send {
+    let store = with(|hub| {
+        if hub.conditions.enabled {
+            hub.existing_store()
+        } else {
+            None
+        }
+    });
+    async move {
+        let Some(store) = store else {
+            return Vec::new();
+        };
+        match store
+            .ask(move |store| store.matching(account, STATE_DONE, &query))
+            .await
+        {
+            Some(Ok(found)) => found,
+            Some(Err(err)) => {
+                eprintln!("piirit: searching transcripts: {err}");
+                Vec::new()
+            }
+            None => Vec::new(),
+        }
+    }
+}

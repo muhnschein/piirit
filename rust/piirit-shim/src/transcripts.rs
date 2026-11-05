@@ -18,7 +18,7 @@ use files::ModelSpec;
 use hub::Shown;
 use schedule::Conditions;
 
-pub(crate) use hub::{connected, epoch, follow, previews, Change, Previews};
+pub(crate) use hub::{connected, epoch, follow, matching, previews, Change, Previews};
 
 const _: () = assert!(store::DONE == STATE_DONE);
 

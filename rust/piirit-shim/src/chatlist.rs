@@ -1064,7 +1064,7 @@ async fn with_transcripts(
 }
 
 /// `🎤 text`, one line as core previews text (`real_server.rs`).
-fn voice_preview(text: &str) -> String {
+pub(crate) fn voice_preview(text: &str) -> String {
     let line = text.split_whitespace().collect::<Vec<_>>().join(" ");
     format!("{VOICE_MARK} {line}")
 }
