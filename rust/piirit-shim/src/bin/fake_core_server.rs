@@ -766,7 +766,9 @@ fn message_object(msg: u64) -> Value {
         }
         13 => {
             message["viewType"] = json!("Voice");
-            message["file"] = json!("/tmp/piirit-fake/voice.aac");
+            // Real file for tests that transcribe it.
+            message["file"] = std::env::var("PIIRIT_FAKE_VOICE_FILE")
+                .map_or_else(|_| json!("/tmp/piirit-fake/voice.aac"), |file| json!(file));
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
@@ -1408,6 +1410,14 @@ async fn serve() {
                     let list = state.account_list();
                     ok(&id, &list)
                 }
+                "get_all_account_ids" => {
+                    let mut state = state.lock().await;
+                    if state.accounts.is_empty() {
+                        state.seed_accounts();
+                    }
+                    let ids: Vec<u32> = state.accounts.iter().map(|account| account.id).collect();
+                    ok(&id, &json!(ids))
+                }
                 "remove_account" => {
                     let mut state = state.lock().await;
                     let gone = positional(0).as_u64().unwrap_or(0);
@@ -1419,6 +1429,11 @@ async fn serve() {
                     if state.selected == Some(gone) {
                         state.selected = state.accounts.first().map(|account| account.id);
                     }
+                    // Account manager's event: no account context.
+                    state.events.push_back(json!({
+                        "contextId": 0,
+                        "event": {"kind": "AccountsChanged"},
+                    }));
                     ok(&id, &Value::Null)
                 }
                 "add_account" => {
@@ -1785,6 +1800,26 @@ async fn serve() {
                     )
                 }
                 "get_account_file_size" => ok(&id, &json!(123_456)),
+                // Those still in some chat (accounts share chats here).
+                "get_existing_msg_ids" => {
+                    let asked: Vec<u32> = positional(1)
+                        .as_array()
+                        .map(|array| {
+                            array
+                                .iter()
+                                .filter_map(Value::as_u64)
+                                .filter_map(|value| u32::try_from(value).ok())
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let existing: Vec<u32> = asked
+                        .into_iter()
+                        .filter(|msg| state.chat_of(*msg) != 0)
+                        .collect();
+                    ok(&id, &json!(existing))
+                }
                 // As `get_messages`: reader asks before download-limited rest.
                 "get_message" => {
                     let msg = positional(1).as_u64().unwrap_or_default();
@@ -2197,6 +2232,16 @@ async fn serve() {
                     let account = account_id();
                     let mut state = state.lock().await;
                     state.seed_chats();
+                    // Core's per-message event too, on request (other suites pinned without).
+                    if std::env::var_os("PIIRIT_FAKE_MSG_DELETED").is_some() {
+                        for msg in &ids {
+                            let chat = state.chat_of(*msg);
+                            state.events.push_back(json!({
+                                "contextId": account,
+                                "event": {"kind": "MsgDeleted", "chatId": chat, "msgId": msg},
+                            }));
+                        }
+                    }
                     for messages in state.chats.values_mut() {
                         messages.retain(|msg| !ids.contains(msg));
                     }

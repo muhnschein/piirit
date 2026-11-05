@@ -728,6 +728,28 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>মুছুন</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%nটি ভয়েস বার্তা প্রতিলিপি করুন</numerusform>
+            <numerusform>%nটি ভয়েস বার্তা প্রতিলিপি করুন</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>প্রতিলিপি কপি করুন</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ক্লিপবোর্ডে কপি করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -828,6 +850,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>সম্পাদনা করুন</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>প্রতিলিপি কপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
     </message>
 </context>
 <context>
@@ -2246,6 +2278,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>চ্যাটের ভিতরে ছোট অ্যাপ চালায়।</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>ভয়েস বার্তা প্রতিলিপি করুন (পরীক্ষামূলক)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ভয়েস বার্তার প্রতিলিপি</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>এই ফোনে ভয়েস বার্তাকে লেখায় রূপান্তর করে।</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>কিছুই ফোনের বাইরে যায় না।</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2865,11 +2913,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>চার্জ হওয়ার সময়</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>সবসময়</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>কখনও না</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ফোন চার্জ হওয়ার সময় নতুন ভয়েস বার্তার প্রতিলিপি হয়।</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>নতুন ভয়েস বার্তা ডাউনলোড হলেই তার প্রতিলিপি হয়।</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>এতে ব্যাটারি খরচ হয়।</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>কোনো ভয়েস বার্তাকে লেখায় রূপান্তর করতে তাতে প্রতিলিপি করুন ট্যাপ করুন।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>পরবর্তী</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>ভাষা</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>এখনও উপলব্ধ নয়</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>এই ভাষাগুলোতে প্রতিলিপি এখনও যথেষ্ট নির্ভুল নয়।</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit একবার একটি স্পিচ মডেল ডাউনলোড করে এবং এই ফোনে ভয়েস বার্তার প্রতিলিপি করে।</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>আপনি যা পাঠান বা পান, তার কিছুই ফোনের বাইরে যায় না।</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>এই ভাষার প্রতিলিপিতে সম্ভবত বেশি ভুল থাকবে।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ভয়েস বার্তার প্রতিলিপি</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>ভাষা</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>কখন</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>স্পিচ মডেল ডাউনলোড করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>ভয়েস বার্তা স্বয়ংক্রিয়ভাবে প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>পুরনো ভয়েস বার্তা প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>এটি চালু করার আগে আসা ভয়েস বার্তার প্রতিলিপি ফোন চার্জ হওয়ার সময় হয়।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>স্পিচ মডেল ডাউনলোড হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>এই পাতা বন্ধ করার পরও ডাউনলোড চলতে থাকে।</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>স্পিচ মডেল ডাউনলোড করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>রেকর্ড হচ্ছে %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ফোন চার্জ হওয়ার সময় এই ভয়েস বার্তার প্রতিলিপি হবে।</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>ব্যাটারি সাশ্রয় মোড চালু থাকলে প্রতিলিপি থেমে থাকে।</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>অন্য ভয়েস বার্তার প্রতিলিপির জন্য অপেক্ষা করছে।</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>স্পিচ মডেল ডাউনলোড হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>প্রতিলিপি হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>এই ভয়েস বার্তাটি %1-এ মনে হচ্ছে, যা নির্বাচিত নয়।</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>এই ভয়েস বার্তায় কোনো কথা পাওয়া যায়নি।</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>এই ভয়েস বার্তার প্রতিলিপি করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>এখনই প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>তবুও প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>এই ফোনে প্রতিলিপি করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>সব দেখান</translation>
     </message>
 </context>
 <context>

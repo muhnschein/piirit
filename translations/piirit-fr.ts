@@ -728,6 +728,28 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transcrire %n message vocal</numerusform>
+            <numerusform>Transcrire %n messages vocaux</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copier la transcription</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Copié dans le presse-papiers</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrire</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -828,6 +850,16 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Edit</source>
         <translation>Modifier</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copier la transcription</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrire</translation>
     </message>
 </context>
 <context>
@@ -2246,6 +2278,22 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Runs small apps inside chats.</source>
         <translation>Exécute de petites applications dans les discussions.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Transcrire les messages vocaux (expérimental)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcription des messages vocaux</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Convertit les messages vocaux en texte sur ce téléphone.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Rien ne quitte le téléphone.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2865,11 +2913,211 @@ En attente de réponse de l&apos;appareil de %2$s...</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Pendant la charge</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Toujours</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Jamais</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Les nouveaux messages vocaux sont transcrits pendant que le téléphone charge.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Les nouveaux messages vocaux sont transcrits une fois téléchargés.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Cela consomme de la batterie.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Touchez Transcrire sur un message vocal pour le convertir en texte.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Langues</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Pas encore disponible</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>La transcription n’est pas encore assez précise dans ces langues.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit télécharge une fois un modèle vocal et transcrit les messages vocaux sur ce téléphone.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Rien de ce que vous envoyez ou recevez ne quitte le téléphone.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Les transcriptions dans cette langue contiennent probablement plus d’erreurs.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcription des messages vocaux</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Langues</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Quand</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Le modèle vocal n’a pas pu être téléchargé.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Réessayer</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Transcrire automatiquement les messages vocaux</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transcrire les messages vocaux plus anciens</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Les messages vocaux arrivés avant l’activation sont transcrits pendant que le téléphone charge.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Téléchargement du modèle vocal… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Le téléchargement continue après la fermeture de cette page.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Le modèle vocal n’a pas pu être téléchargé.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Réessayer</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Enregistrement %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Ce message vocal sera transcrit quand le téléphone charge.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>La transcription est en pause tant que le mode d’économie d’énergie est activé.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>En attente de la transcription d’autres messages vocaux.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Téléchargement du modèle vocal… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Transcription… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Ce message vocal semble être en %1, qui n’est pas sélectionné.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Aucune parole n’a été trouvée dans ce message vocal.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Ce message vocal n’a pas pu être transcrit.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transcrire</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transcrire maintenant</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Transcrire quand même</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Réessayer</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transcrit sur ce téléphone</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Tout afficher</translation>
     </message>
 </context>
 <context>

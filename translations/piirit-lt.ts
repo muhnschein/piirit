@@ -726,6 +726,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>Ištrinti</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transkribuoti %n balso žinutę</numerusform>
+            <numerusform>Transkribuoti %n balso žinutes</numerusform>
+            <numerusform>Transkribuoti %n balso žinučių</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopijuoti transkripciją</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Nukopijuota į iškarpinę</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribuoti</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -826,6 +849,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Redaguoti</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopijuoti transkripciją</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribuoti</translation>
     </message>
 </context>
 <context>
@@ -2249,6 +2282,22 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Paleidžia mažas programėles pokalbiuose.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Transkribuoti balso žinutes (eksperimentinė)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Balso žinučių transkribavimas</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Šiame telefone paverčia balso žinutes tekstu.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Niekas neišeina iš telefono.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2872,11 +2921,211 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Kraunant</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Visada</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Niekada</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Naujos balso žinutės transkribuojamos, kol telefonas kraunamas.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Naujos balso žinutės transkribuojamos, kai tik atsisiunčiamos.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Tai naudoja bateriją.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Bakstelėkite Transkribuoti prie balso žinutės, kad paverstumėte ją tekstu.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Toliau</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Kalbos</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Dar neprieinama</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Šiomis kalbomis transkribavimas dar nėra pakankamai tikslus.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit vieną kartą atsisiunčia kalbos modelį ir transkribuoja balso žinutes šiame telefone.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Niekas, ką siunčiate ar gaunate, neišeina iš telefono.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Šios kalbos transkripcijose greičiausiai bus daugiau klaidų.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Balso žinučių transkribavimas</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Kalbos</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kada</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Nepavyko atsisiųsti kalbos modelio.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Bandyti dar kartą</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Automatiškai transkribuoti balso žinutes</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transkribuoti senesnes balso žinutes</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Balso žinutės, gautos prieš įjungiant šią funkciją, transkribuojamos, kol telefonas kraunamas.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Atlikta</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Atsisiunčiamas kalbos modelis… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Atsisiuntimas tęsiasi uždarius šį puslapį.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Nepavyko atsisiųsti kalbos modelio.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Bandyti dar kartą</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Įrašoma %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Ši balso žinutė bus transkribuota, kai telefonas bus kraunamas.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Transkribavimas pristabdytas, kol įjungtas energijos taupymo režimas.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Laukiama, kol bus transkribuotos kitos balso žinutės.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Atsisiunčiamas kalbos modelis… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Transkribuojama… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Atrodo, kad ši balso žinutė yra kalba %1, kuri nepasirinkta.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Šioje balso žinutėje kalbos nerasta.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Nepavyko transkribuoti šios balso žinutės.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transkribuoti</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transkribuoti dabar</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Vis tiek transkribuoti</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Bandyti dar kartą</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transkribuota šiame telefone</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Rodyti viską</translation>
     </message>
 </context>
 <context>

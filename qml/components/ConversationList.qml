@@ -21,6 +21,12 @@ SilicaListView {
     property bool canEdit: false
     /// Webxdc apps on; off draws `.xdc` as file. Bound from setting.
     property bool appsEnabled: false
+    /// Chat's profile, for voice transcripts.
+    property int accountId: 0
+    /// App-wide `Transcriber`; null (tests, loaded alone): no transcripts.
+    property QtObject transcriber: typeof appWindow !== "undefined" ? appWindow.transcriber : null
+    /// See AttachmentPreview.
+    property Component transcriptMaker: null
 
     property bool stickToBottom: true
 
@@ -574,6 +580,26 @@ SilicaListView {
                     onClicked: root.copyRequested(model.text)
                 }
                 MenuItem {
+                    objectName: "copyTranscriptItem"
+                    // 3 = `Transcript` done.
+                    visible: messageRow.transcript !== null && messageRow.transcript.state === 3
+                    //: Copies the text a voice message was turned into.
+                    text: qsTr("Copy transcript")
+                    onClicked: root.copyRequested(messageRow.transcript.text)
+                }
+                MenuItem {
+                    objectName: "transcribeItem"
+                    // Not done, not under way; failed tries again.
+                    visible: messageRow.transcript !== null
+                             && (messageRow.transcript.state === 0
+                                 || messageRow.transcript.state === 6
+                                 || (messageRow.transcript.state === 1
+                                     && !messageRow.transcript.manual))
+                    //: Turns a voice message into text on the phone.
+                    text: qsTr("Transcribe")
+                    onClicked: messageRow.transcript.transcribe(false)
+                }
+                MenuItem {
                     objectName: "openItem"
                     // Files only; not pictures/videos (own page) or Webxdc while apps on.
                     visible: model.file_path.length > 0
@@ -636,6 +662,9 @@ SilicaListView {
 
         /// Pending delete.
         readonly property bool doomed: doomedMessages.pending(model.message_id)
+
+        /// Voice message's `Transcript` (bubble's), or null; menu reads it.
+        readonly property QtObject transcript: body.item ? body.item.transcript : null
 
         /// Countdown up: answer and rebuild both raise it; second `execute` resets it.
         property bool countingDown: false
@@ -826,6 +855,10 @@ SilicaListView {
                 webxdcIcon: model.webxdc_icon
                 appsEnabled: root.appsEnabled
                 scrolling: root.held
+                accountId: root.accountId
+                messageId: model.message_id
+                transcriber: root.transcriber
+                transcriptMaker: root.transcriptMaker
                 callState: model.call_state
                 callHasVideo: model.call_has_video
                 callDuration: model.call_duration

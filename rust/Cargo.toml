@@ -5,6 +5,7 @@ members = [
     "piirit-shim",
     "piirit-app",
     "piirit-video",
+    "piirit-speech",
 ]
 
 [workspace.package]

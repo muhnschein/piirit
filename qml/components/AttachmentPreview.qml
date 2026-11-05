@@ -48,9 +48,51 @@ Item {
     property bool appsEnabled: false
     /// Bubble max width.
     property real contentWidth: 0
+    /// Message's profile and id, for its transcript.
+    property int accountId: 0
+    property int messageId: 0
+    /// App-wide `Transcriber`; null or off: no transcript drawn.
+    property QtObject transcriber: null
+    /// Makes `Transcript`; null: components/MessageTranscript.qml. Tests hand in stand-in.
+    property Component transcriptMaker: null
+    /// Audio list: transcript folds to three lines (VoiceTranscript.compact).
+    property bool compactTranscript: false
 
     /// Long press on small controls passes to row menu.
     signal menuRequested()
+
+    /// Voice message with transcription on: transcript object made.
+    readonly property bool transcribes: root.viewType === "Voice" && root.hasFile
+                                        && root.transcriber !== null
+                                        && root.transcriber.enabled === true
+    /// This message's `Transcript` (row menu reads it); null when not `transcribes`.
+    property QtObject transcript: null
+
+    /// Make or drop transcript to match `transcribes`. Made only when needed: one per voice row.
+    function placeTranscript() {
+        if (!root.transcribes) {
+            if (root.transcript !== null) {
+                root.transcript.destroy()
+                root.transcript = null
+            }
+            return
+        }
+        if (root.transcript !== null) {
+            return
+        }
+        var maker = root.transcriptMaker !== null
+                    ? root.transcriptMaker
+                    : Qt.createComponent(Qt.resolvedUrl("MessageTranscript.qml"))
+        root.transcript = maker.createObject(root, {
+            account_id: root.accountId,
+            message_id: root.messageId
+        })
+    }
+
+    onTranscribesChanged: root.placeTranscript()
+    onAccountIdChanged: if (root.transcript !== null) root.transcript.account_id = root.accountId
+    onMessageIdChanged: if (root.transcript !== null) root.transcript.message_id = root.messageId
+    Component.onCompleted: root.placeTranscript()
 
     readonly property bool hasFile: root.filePath.length > 0
     // Sender names: `#`/`%` break file:// + path. Encode per segment (encodeURI keeps `#`, `?`).
@@ -299,10 +341,7 @@ Item {
                 id: soundRow
                 objectName: "attachmentAudio"
                 width: root.contentWidth
-                // Labels, track fit beside theme-sized button.
-                height: Math.max(playButton.height,
-                                 soundName.height + soundTime.height
-                                 + track.height + 2 * Theme.paddingSmall)
+                height: playerArea.height + voiceText.height
 
                 /// Player made on first play: on Sailfish each is a GStreamer pipeline paused on
                 /// file at once (`autoLoad`), threads per scrolled-past sound otherwise.
@@ -340,10 +379,20 @@ Item {
                     }
                 }
 
+                // Player's part of row; transcript below.
+                Item {
+                    id: playerArea
+                    width: parent.width
+                    // Labels, track fit beside theme-sized button.
+                    height: Math.max(playButton.height,
+                                     soundName.height + soundTime.height
+                                     + track.height + 2 * Theme.paddingSmall)
+                }
+
                 IconButton {
                     id: playButton
                     objectName: "audioPlayButton"
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenter: playerArea.verticalCenter
                     icon.source: soundRow.playing
                                  ? "image://theme/icon-m-pause"
                                  : "image://theme/icon-m-play"
@@ -405,7 +454,7 @@ Item {
                     anchors {
                         left: soundName.left
                         right: parent.right
-                        bottom: parent.bottom
+                        bottom: playerArea.bottom
                         bottomMargin: Theme.paddingSmall
                     }
                     height: 2
@@ -419,6 +468,31 @@ Item {
                                ? parent.width * Math.min(1, soundRow.position / soundRow.duration)
                                : 0
                     }
+                }
+
+                // Voice only, transcription on: `root.transcript` drives it.
+                VoiceTranscript {
+                    id: voiceText
+                    objectName: "voiceTranscript"
+                    readonly property QtObject source: root.transcript
+                    y: playerArea.height
+                    width: parent.width
+                    hasFile: voiceText.source !== null
+                    transcriptState: voiceText.source !== null ? voiceText.source.state : 0
+                    manual: voiceText.source !== null && voiceText.source.manual === true
+                    permille: voiceText.source !== null ? voiceText.source.permille : 0
+                    text: voiceText.source !== null ? voiceText.source.text : ""
+                    language: voiceText.source !== null ? voiceText.source.language : ""
+                    modelState: root.transcriber !== null ? root.transcriber.model_state : 0
+                    modelPermille: root.transcriber !== null
+                                   ? root.transcriber.model_permille : 0
+                    powerSaving: root.transcriber !== null
+                                 && root.transcriber.power_saving === true
+                    charging: root.transcriber !== null && root.transcriber.charging === true
+                    mode: root.transcriber !== null ? root.transcriber.mode : 0
+                    compact: root.compactTranscript
+                    onTranscribeRequested: voiceText.source.transcribe(anyLanguage)
+                    onStopRequested: voiceText.source.cancel()
                 }
             }
         }

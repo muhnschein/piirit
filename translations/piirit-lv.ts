@@ -730,6 +730,29 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Delete</source>
         <translation>Dzēst</translation>
     </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Atšifrēt %n balss ziņu</numerusform>
+            <numerusform>Atšifrēt %n balss ziņas</numerusform>
+            <numerusform>Atšifrēt %n balss ziņu</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopēt atšifrējumu</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Nokopēts starpliktuvē</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Atšifrēt</translation>
+    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -830,6 +853,16 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Edit</source>
         <translation>Rediģēt</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopēt atšifrējumu</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Atšifrēt</translation>
     </message>
 </context>
 <context>
@@ -2253,6 +2286,22 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Runs small apps inside chats.</source>
         <translation>Darbina mazas lietotnes sarakstēs.</translation>
     </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Atšifrēt balss ziņas (eksperimentāli)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Balss ziņu atšifrēšana</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Šajā tālrunī pārvērš balss ziņas tekstā.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nekas neatstāj tālruni.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2872,11 +2921,211 @@ Gaida %2$s ierīces atbildi…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Uzlādes laikā</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Vienmēr</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nekad</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Jaunās balss ziņas tiek atšifrētas, kamēr tālrunis lādējas.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Jaunās balss ziņas tiek atšifrētas, tiklīdz tās ir lejupielādētas.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Tas patērē akumulatoru.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Pieskarieties Atšifrēt pie balss ziņas, lai pārvērstu to tekstā.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Tālāk</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Valodas</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Vēl nav pieejams</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Šajās valodās atšifrēšana vēl nav pietiekami precīza.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit vienreiz lejupielādē runas modeli un atšifrē balss ziņas šajā tālrunī.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nekas no tā, ko sūtāt vai saņemat, neatstāj tālruni.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Šīs valodas atšifrējumos, visticamāk, būs vairāk kļūdu.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Balss ziņu atšifrēšana</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Valodas</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kad</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Runas modeli neizdevās lejupielādēt.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Mēģināt vēlreiz</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Automātiski atšifrēt balss ziņas</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Atšifrēt vecākas balss ziņas</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Balss ziņas, kas pienāca pirms šīs funkcijas ieslēgšanas, tiek atšifrētas, kamēr tālrunis lādējas.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Gatavs</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Lejupielādē runas modeli… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Lejupielāde turpinās arī pēc šīs lapas aizvēršanas.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Runas modeli neizdevās lejupielādēt.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Mēģināt vēlreiz</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Ierakstīšana %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Šī balss ziņa tiks atšifrēta, kad tālrunis lādēsies.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Atšifrēšana ir apturēta, kamēr ieslēgts enerģijas taupīšanas režīms.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Gaida, kamēr tiks atšifrētas citas balss ziņas.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Lejupielādē runas modeli… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Atšifrē… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Šķiet, ka šī balss ziņa ir valodā %1, kas nav izvēlēta.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Šajā balss ziņā netika atrasta runa.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Šo balss ziņu neizdevās atšifrēt.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Atšifrēt</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Atšifrēt tagad</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Tomēr atšifrēt</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Mēģināt vēlreiz</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Atšifrēts šajā tālrunī</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Rādīt visu</translation>
     </message>
 </context>
 <context>

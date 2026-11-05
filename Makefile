@@ -7,11 +7,12 @@
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
 #               qtdeclarative5-dev-tools qml-module-qtquick2 \
 #               qml-module-qtquick-window2 qttools5-dev-tools \
-#               libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
+#               libqt5svg5 libpulse-dev libsqlite3-dev pulseaudio pulseaudio-utils
 #
 # qml-module-qtquick2: QtQuick runtime (-dev omits it). -window2: QtQuick.Window
 # (tests). qttools5-dev-tools: lupdate/lrelease. libqt5svg5: SVG image plugin
-# (emoji pictures). Rest: multimedia, pulse (mic, test server).
+# (emoji pictures). libsqlite3-dev: transcript store. Rest: multimedia, pulse (mic,
+# test server).
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
@@ -157,7 +158,7 @@ SONAR_COV_ARGS = --workspace \
 ## a time). Profile `ci` via env: llvm-cov's `--profile` is cargo's. No `--doc`:
 ## cargo-llvm-cov skips doctests. `test` runs them.
 ##
-## Also writes compile DB (piirit-video build.rs) for scanner's C analysis.
+## Also joins compile DBs (piirit-video, piirit-speech build.rs) for scanner's C analysis.
 ##
 ## Clippy not handed over: `make lint` already denies warnings, and gathering
 ## costs `cargo clean` + full rebuild. Sonar's own clippy off for another
@@ -185,11 +186,12 @@ sonar-reports:
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi
 	@echo "== wrote rust/target/sonar/lcov.info =="
-	@db=$$(find rust/target -path '*/build/piirit-video-*/out/compile_commands.json' | head -n 1); \
-	if [ -z "$$db" ]; then \
-		echo "sonar-reports: piirit-video wrote no compile_commands.json" >&2; exit 1; \
+	@video=$$(find rust/target -path '*/build/piirit-video-*/out/compile_commands.json' | head -n 1); \
+	speech=$$(find rust/target -path '*/build/piirit-speech-*/out/compile_commands.json' | head -n 1); \
+	if [ -z "$$video" ] || [ -z "$$speech" ]; then \
+		echo "sonar-reports: piirit-video or piirit-speech wrote no compile_commands.json" >&2; exit 1; \
 	fi; \
-	cp "$$db" rust/target/sonar/compile_commands.json
+	{ sed '$$ s/\]$$/,/' "$$video"; sed '1 s/^\[//' "$$speech"; } >rust/target/sonar/compile_commands.json
 	@echo "== wrote rust/target/sonar/compile_commands.json =="
 	@echo "== JavaScript coverage: the call page's bridge, under Node =="
 	node --test --experimental-test-coverage \

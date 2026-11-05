@@ -126,6 +126,18 @@ ApplicationWindow {
         value: Settings.callsRing === false ? 2 : 1
     }
 
+    /// Voice message transcription, app-wide (components/Transcription.qml); null if not
+    /// loaded. Pages read `appWindow.transcriber`.
+    readonly property QtObject transcriber: transcription.item
+                                            ? transcription.item.transcriber : null
+
+    // Loaded, not declared: window tests run without shim types. Synchronous: pages bind at once.
+    Loader {
+        id: transcription
+        objectName: "transcription"
+        source: Qt.resolvedUrl("components/Transcription.qml")
+    }
+
     /// App's one call, no page owns it. See components/CallCenter.qml.
     CallCenter {
         id: callCenter
