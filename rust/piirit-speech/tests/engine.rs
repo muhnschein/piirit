@@ -126,6 +126,26 @@ fn short_speech_gets_past_the_speech_detector() {
 }
 
 #[test]
+fn a_message_in_another_language_reports_no_progress() {
+    // Language check runs whisper_full first, stopped before encoding: no "Transcribing… 0 %".
+    let mut engine = Engine::load(libs(), &test_model()).expect("load the test model");
+    let options = Options {
+        languages: vec!["xx".into()],
+        ..Options::default()
+    };
+    let mut calls = 0;
+    let outcome = engine.transcribe(&one_second(), &options, &mut |_| {
+        calls += 1;
+        true
+    });
+    assert!(
+        matches!(outcome, Ok(Outcome::OtherLanguage { .. })),
+        "{outcome:?}"
+    );
+    assert_eq!(calls, 0);
+}
+
+#[test]
 fn without_the_speech_detector_the_model_does_not_load() {
     let libs_only =
         std::env::temp_dir().join(format!("piirit-speech-novad-{}", std::process::id()));
