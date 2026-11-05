@@ -1,0 +1,5 @@
+burst  start(s)  frames  dur(ms)  fps   slow>25ms  worst_gap(ms)
+    1      0.31      13      315    38          6             41
+    2      7.61      23      348    63          0             21
+    3     10.10      22      326    64          0             21
+    4     12.59     111     2003    55         20             56
