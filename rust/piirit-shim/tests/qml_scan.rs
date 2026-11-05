@@ -24,7 +24,6 @@
 )]
 
 use std::path::Path;
-use std::time::{Duration, Instant};
 
 use qmetaobject::*;
 
@@ -150,29 +149,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Run `then` once `idle` says so, asked each event-loop turn; at `deadline`, runs it whatever
-/// `idle` says. Step reading what an async call left waits on the call, not a time guess: 2s
-/// was one, and under coverage the decoder outran it.
-// Zero wait: next event-loop turn. Rechecks only once last check ran, so no fixed time to
-// overrun.
-#[allow(clippy::disallowed_methods)]
-fn when_idle<I, T>(idle: I, deadline: Instant, then: T)
-where
-    I: Fn() -> bool + 'static,
-    T: FnOnce() + 'static,
-{
-    if idle() || Instant::now() >= deadline {
-        then();
-        return;
-    }
-    let mut pending = Some((idle, then));
-    single_shot(Duration::ZERO, move || {
-        if let Some((idle, then)) = pending.take() {
-            when_idle(idle, deadline, then);
-        }
-    });
-}
-
 /// Modules as page's `QrCode` reports, drawn into P5 PGM with quiet zone, four pixels
 /// per module: what Qt writes for `.pgm`, less camera.
 fn write_frame(encoded: &str, path: &Path) -> Result<(), String> {
@@ -286,72 +262,75 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
     });
 
     // Decode over: read while running, `heard` is empty.
-    plan.after(2, move || {
-        when_idle(
-            move || unsafe { get!("scanner", "busy") } != "true",
-            Instant::now() + Duration::from_secs(20),
-            move || unsafe {
-                record!("heard", call!("heardText"));
-                record!("camera-after", get!("camera", "running"));
-                record!("grabbing-after", get!("grabber", "running"));
-                record!("acting-after", get!("acting", "running"));
-                // Seconds on screen, no search asked: continuous video focus
-                // search would lock lens.
-                record!("searches", get!("camera", "searches"));
-                // Other way in, fresh view: link typed not scanned, clipboard offering it first.
-                record!(
-                    "reload",
-                    call!("load", QString::from(common::component_url("ScanView.qml")))
-                );
-                call!("setActive", true);
-                // Tap: plain autofocus on point under finger for a while,
-                // then lock off, continuous back.
-                record!(
-                    "tap",
-                    call!("tapAt", QString::from("0.25"), QString::from("0.75"))
-                );
-                record!("focus-tapped", call!("focusState"));
-                record!("hold-over", call!("expire", QString::from("focusHold")));
-                record!("focus-released", call!("focusState"));
-                record!("panel-before", get!("linkPanel", "visible"));
-                record!(
-                    "shopping",
-                    call!("setClipboard", QString::from("milk, eggs"))
-                );
-                record!("open", call!("click", QString::from("typeLinkButton")));
-                record!("panel-open", get!("linkPanel", "visible"));
-                record!("not-pasted", get!("linkField", "text"));
-                record!(
-                    "reload-again",
-                    call!("load", QString::from(common::component_url("ScanView.qml")))
-                );
-                call!("setActive", true);
-                record!("copied", call!("setClipboard", QString::from(TYPED)));
-                record!(
-                    "open-again",
-                    call!("click", QString::from("typeLinkButton"))
-                );
-                record!("pasted", get!("linkField", "text"));
-                record!("connect", call!("click", QString::from("followButton")));
-                record!("typed-heard", call!("heardText"));
-                record!("typed-camera", get!("camera", "running"));
-                record!("typed-acting", get!("acting", "running"));
-                // Frame grabbed in viewfinder's shape, long side capped;
-                // viewfinder smaller than cap taken as is, not blown up.
-                call!("sizeView", QString::from("1080"), QString::from("1920"));
-                record!("grab-tall", call!("grabShape"));
-                call!("sizeView", QString::from("1920"), QString::from("1080"));
-                record!("grab-wide", call!("grabShape"));
-                call!("sizeView", QString::from("540"), QString::from("800"));
-                record!("grab-small", call!("grabShape"));
-                // Camera asked for viewfinder big enough to read a dense code;
-                // left alone when it offers nothing.
-                record!("asked", call!("askedResolution"));
-                record!("offer-nothing", call!("offerNothing"));
-                record!("asked-after", call!("askedResolution"));
-                (*engine_ptr).quit();
-            },
+    let mut read = Some(move || unsafe {
+        record!("heard", call!("heardText"));
+        record!("camera-after", get!("camera", "running"));
+        record!("grabbing-after", get!("grabber", "running"));
+        record!("acting-after", get!("acting", "running"));
+        // Seconds on screen, no search asked: continuous video focus
+        // search would lock lens.
+        record!("searches", get!("camera", "searches"));
+        // Other way in, fresh view: link typed not scanned, clipboard offering it first.
+        record!(
+            "reload",
+            call!("load", QString::from(common::component_url("ScanView.qml")))
         );
+        call!("setActive", true);
+        // Tap: plain autofocus on point under finger for a while,
+        // then lock off, continuous back.
+        record!(
+            "tap",
+            call!("tapAt", QString::from("0.25"), QString::from("0.75"))
+        );
+        record!("focus-tapped", call!("focusState"));
+        record!("hold-over", call!("expire", QString::from("focusHold")));
+        record!("focus-released", call!("focusState"));
+        record!("panel-before", get!("linkPanel", "visible"));
+        record!(
+            "shopping",
+            call!("setClipboard", QString::from("milk, eggs"))
+        );
+        record!("open", call!("click", QString::from("typeLinkButton")));
+        record!("panel-open", get!("linkPanel", "visible"));
+        record!("not-pasted", get!("linkField", "text"));
+        record!(
+            "reload-again",
+            call!("load", QString::from(common::component_url("ScanView.qml")))
+        );
+        call!("setActive", true);
+        record!("copied", call!("setClipboard", QString::from(TYPED)));
+        record!(
+            "open-again",
+            call!("click", QString::from("typeLinkButton"))
+        );
+        record!("pasted", get!("linkField", "text"));
+        record!("connect", call!("click", QString::from("followButton")));
+        record!("typed-heard", call!("heardText"));
+        record!("typed-camera", get!("camera", "running"));
+        record!("typed-acting", get!("acting", "running"));
+        // Frame grabbed in viewfinder's shape, long side capped;
+        // viewfinder smaller than cap taken as is, not blown up.
+        call!("sizeView", QString::from("1080"), QString::from("1920"));
+        record!("grab-tall", call!("grabShape"));
+        call!("sizeView", QString::from("1920"), QString::from("1080"));
+        record!("grab-wide", call!("grabShape"));
+        call!("sizeView", QString::from("540"), QString::from("800"));
+        record!("grab-small", call!("grabShape"));
+        // Camera asked for viewfinder big enough to read a dense code;
+        // left alone when it offers nothing.
+        record!("asked", call!("askedResolution"));
+        record!("offer-nothing", call!("offerNothing"));
+        record!("asked-after", call!("askedResolution"));
+        (*engine_ptr).quit();
+    });
+    plan.until(1, 30, move |last| {
+        if unsafe { get!("scanner", "busy") } == "true" && !last {
+            return false;
+        }
+        if let Some(read) = read.take() {
+            read();
+        }
+        true
     });
 
     plan.run();

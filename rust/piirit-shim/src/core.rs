@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -21,6 +22,25 @@ pub(crate) fn connection() -> Option<(Arc<RpcClient>, CoreRuntime)> {
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .clone()
+}
+
+/// Server being spawned: no connection yet, but answers coming. See [`core_settled`].
+static SPAWNING: AtomicBool = AtomicBool::new(false);
+
+/// Silence after last answer that counts as settled: covers answer's hop to Qt thread and event
+/// that triggers another read.
+const SETTLED_QUIET: Duration = Duration::from_millis(100);
+
+/// No server spawning, no call open, server silent [`SETTLED_QUIET`]. Tests wait on it in place
+/// of fixed delays; app never asks.
+#[doc(hidden)]
+pub fn core_settled() -> bool {
+    if SPAWNING.load(Ordering::SeqCst) {
+        return false;
+    }
+    connection().map_or(true, |(rpc, _)| {
+        rpc.quiet_for().is_some_and(|quiet| quiet >= SETTLED_QUIET)
+    })
 }
 
 fn set_connection(value: Option<(Arc<RpcClient>, CoreRuntime)>) {
@@ -134,34 +154,35 @@ pub fn server_pid() -> Option<u32> {
 
 /// Stop server after Qt loop returns, bounded; else child dies only with last `RpcClient` (statics
 /// never drop). Ends live call first, telling peer: only here is window (call host) up and server
-/// not yet gone.
-pub fn shutdown() {
+/// not yet gone. False: a call did not end in time (or the stop itself overran).
+#[must_use]
+pub fn shutdown() -> bool {
     let Some((rpc, runtime)) = CONNECTION
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .take()
     else {
-        return;
+        return true;
     };
-    let (done_tx, done_rx) = std::sync::mpsc::channel::<()>();
+    let (done_tx, done_rx) = std::sync::mpsc::channel::<bool>();
     runtime.spawn(async move {
         // Call not ended in time: left to server exit.
-        if tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
+        let ended = tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
             .await
-            .is_err()
-        {
+            .is_ok();
+        if !ended {
             eprintln!("piirit: a call did not end in time; stopping the core anyway");
         }
         if let Err(err) = rpc.shutdown().await {
             eprintln!("piirit: stopping the core: {err}");
         }
         // Receiver gone only if wait gave up.
-        done_tx.send(()).ok();
+        done_tx.send(ended).ok();
     });
     // Timeout quits without goodbye.
     done_rx
         .recv_timeout(CALL_END_TIMEOUT.saturating_add(SHUTDOWN_TIMEOUT))
-        .ok();
+        .unwrap_or(false)
 }
 
 /// Last server stderr lines, if any: user's only crash clue.
@@ -449,7 +470,9 @@ impl DeltaChatCore {
     fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
         let started_ptr = ptr;
         let retry_path = path.clone();
+        SPAWNING.store(true, Ordering::SeqCst);
         let started = queued_callback(move |result: Result<Arc<RpcClient>, String>| {
+            SPAWNING.store(false, Ordering::SeqCst);
             let Some(this) = started_ptr.as_pinned() else {
                 return;
             };

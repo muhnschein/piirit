@@ -158,12 +158,16 @@ fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     });
 
     let (old, video, young) = (old_capture, old_video, young_capture);
-    plan.after(1, move || unsafe {
-        // Sweep has had a second on its thread.
+    // Sweep runs on its own thread: wait for it to clear the old ones.
+    plan.until(1, 30, move |last| unsafe {
+        if (exists(&old) == "true" || exists(&video) == "true") && !last {
+            return false;
+        }
         (*steps_ptr).push(("old-capture", exists(&old)));
         (*steps_ptr).push(("old-video", exists(&video)));
         (*steps_ptr).push(("young-capture", exists(&young)));
         (*steps_ptr).push(("close", call!("close")));
+        true
     });
 
     // Capture sent, chat closed before core answered.

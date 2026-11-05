@@ -96,6 +96,7 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
         };
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
     let mut plan = common::Plan::default();
 
     plan.after(1, move || unsafe {
@@ -109,7 +110,13 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
         ));
     });
 
-    plan.after(4, move || unsafe {
+    // Read while core is away: between attempts, not mid-spawn or in a server's short life.
+    let away =
+        move || unsafe { (*core_ptr).pinned().borrow().status.to_string() == "reconnecting" };
+    plan.until(1, 30, move |last| unsafe {
+        if !away() && !last {
+            return false;
+        }
         probe!("away-shown", "errorLabel", "text");
         probe!("away-timeout", "errorBanner", "timeout");
         // Page opened while core away never saw it go.
@@ -121,11 +128,16 @@ fn a_core_being_restarted_says_so_on_every_page_that_opens() {
                 1
             ),
         ));
+        true
     });
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if !away() && !last {
+            return false;
+        }
         probe!("reopened-shown", "errorLabel", "text");
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

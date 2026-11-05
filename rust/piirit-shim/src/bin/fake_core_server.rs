@@ -888,7 +888,7 @@ fn env_ids(var: &str) -> Vec<u64> {
         .unwrap_or_default()
 }
 
-/// Ask relay in `qr` for account. Instant unless `slow`: after `PIIRIT_FAKE_SLOW_MS` (3 s
+/// Ask relay in `qr` for account. Instant unless `slow`: after [`slow_work`] (gate or 3 s
 /// default), as down relay holds core. Pending = configuring: second transport call refused
 /// (core's words); `stop_ongoing_process` fails it unless `deaf` (stop too late).
 async fn add_transport_from_qr(
@@ -904,7 +904,7 @@ async fn add_transport_from_qr(
         return err(id, "There is already another ongoing process running.");
     }
     let stopped = if qr.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !qr.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -983,7 +983,7 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     }
     state.lock().await.imex(account, 300);
     let stopped = if from.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !from.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1053,7 +1053,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     }
     state.lock().await.imex(account, 300);
     let stopped = if folder.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !folder.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1091,7 +1091,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
 
 /// Offer profile to second device, as `provide_backup`: open until taken or stopped.
 /// `ImexProgress` 1000 taken, 0 stopped; unread code emits nothing. By account:
-/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken `PIIRIT_FAKE_SLOW_MS` later,
+/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken after [`slow_work`],
 /// `PIIRIT_FAKE_STALLED` arrives then leaves; others wait for stop.
 async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
     if env_ids("PIIRIT_FAKE_PROVIDE_FAIL").contains(&u64::from(account)) {
@@ -1102,16 +1102,16 @@ async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> 
     }
     let stalls = env_ids("PIIRIT_FAKE_STALLED").contains(&u64::from(account));
     let taken = if stalls || env_ids("PIIRIT_FAKE_TAKEN").contains(&u64::from(account)) {
-        // Device arrives half a wait in: transfer has a middle (page bar, mid-transfer test).
-        let wait = delay_or("PIIRIT_FAKE_SLOW_MS", 3000);
-        tokio::time::sleep(wait / 2).await;
-        state.lock().await.imex(account, 300);
+        // Device arrives at once: transfer has a middle (page bar, mid-transfer test). Taken done
+        // when slow work ends; stalled arrives only then, and leaves.
         if stalls {
-            false
-        } else {
-            tokio::time::sleep(wait).await;
-            true
+            slow_work().await;
         }
+        state.lock().await.imex(account, 300);
+        if !stalls {
+            slow_work().await;
+        }
+        !stalls
     } else {
         wait_for_stop(state, account).await;
         false
@@ -1155,6 +1155,15 @@ async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     }
     err(id, "no backup provider is running")
+}
+
+/// Slow relay, backup, transfer: until test removes `PIIRIT_FAKE_SLOW_GATE` file if set (test
+/// acts mid-call on condition, not clock), else `PIIRIT_FAKE_SLOW_MS` (3 s default).
+async fn slow_work() {
+    match std::env::var_os("PIIRIT_FAKE_SLOW_GATE") {
+        Some(gate) => file_present(std::path::Path::new(&gate), false).await,
+        None => tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await,
+    }
 }
 
 /// Reply delay in ms from `var`, or `default`.
@@ -1361,6 +1370,16 @@ async fn serve() {
             if slow {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
+            // Stop noted before journaled: test that sees it there may end slow work, which must
+            // find it.
+            if method == "stop_ongoing_process" {
+                let account = params.get(0).and_then(Value::as_u64).unwrap_or_default();
+                state
+                    .lock()
+                    .await
+                    .stopped
+                    .insert(u32::try_from(account).unwrap_or_default());
+            }
             journal(&method, &params);
             if let Some(path) = held_by {
                 file_present(&path, false).await;
@@ -1560,8 +1579,6 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
-                    // Held back on request: events arrive while count read.
-                    tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
                         .fresh
@@ -1582,13 +1599,11 @@ async fn serve() {
                 | "set_chat_visibility"
                 | "resend_messages"
                 // Forgotten; tests read journal.
-                | "set_stock_strings" => ok(&id, &Value::Null),
+                | "set_stock_strings"
+                // Noted before journal.
+                | "stop_ongoing_process" => ok(&id, &Value::Null),
                 "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
                     state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
-                    ok(&id, &Value::Null)
-                }
-                "stop_ongoing_process" => {
-                    state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
                 }
                 // Core picks relays: first answering, second once up (background). Keyed on

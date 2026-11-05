@@ -161,7 +161,12 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         );
     });
 
-    plan.after(2, move || unsafe {
+    // Call rings when fake core's timer fires: wait for its row.
+    plan.until(1, 30, move |last| unsafe {
+        let rows = call!("get", QString::from("callList"), QString::from("count"));
+        if rows == "0" && !last {
+            return false;
+        }
         record!(
             "title",
             call!("get", QString::from("callList"), QString::from("count"))
@@ -199,6 +204,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         record!("call", call!("tap", QString::from("callAction")));
         record!("after-call", call!("tapRow"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

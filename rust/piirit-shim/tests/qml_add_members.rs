@@ -295,7 +295,8 @@ fn members_heard_after_the_picker_opened_grey_out() {
     let mut plan = common::Plan::default();
 
     plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
-    plan.after(0, move || unsafe {
+    // Group's read held: core not settled.
+    plan.after_busy(0, move || unsafe {
         call!(
             engine_ptr,
             "load",

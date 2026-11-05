@@ -246,7 +246,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("idle-mce", get!("mce", "called"));
     });
 
-    plan.after(2, move || unsafe {
+    // Rings when fake core's timer fires: wait for its page, not the clock.
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pushes") == "0" && !last {
+            return false;
+        }
         record!("pushes", call!("pushes"));
         record!("status", get!("callStatus", "text"));
         record!("ringing-buttons", get!("ringingButtons", "visible"));
@@ -264,10 +268,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("clock", get!("callClock", "text"));
         record!("mute-ringing", get!("muteSwitch", "visible"));
         record!("answer", call!("tap", QString::from("answerButton")));
+        true
     });
 
-    // Answered: page up, mic granted, nothing rings.
-    plan.after(1, move || unsafe {
+    // Answered: page up, mic granted, nothing rings. Call host starts off core: waited on.
+    plan.until(1, 30, move |last| unsafe {
+        let up = get!("callView", "url").starts_with("http")
+            && call!("engine").contains("embedui:perms");
+        if !up && !last {
+            return false;
+        }
         record!("answered", call!("callState"));
         record!("view", get!("callView", "url"));
         record!("engine", call!("engine"));
@@ -283,6 +293,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("muted", get!("muteSwitch", "checked"));
         // Unseen, under a shield: stray tap reaches none of call page's controls.
         record!("view-opacity", get!("callViewLoader", "opacity"));
+        true
     });
 
     plan.after(1, move || unsafe {

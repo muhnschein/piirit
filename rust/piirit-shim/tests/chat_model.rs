@@ -55,6 +55,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-model-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
@@ -97,7 +98,15 @@ fn each_chat_has_its_own_model_and_loads_in_one_batch() {
     let sent_ptr: *mut String = std::ptr::addr_of_mut!(counts_after_send);
     let mut ever_sent = String::new();
     let ever_ptr: *mut String = std::ptr::addr_of_mut!(ever_sent);
-    plan.after(7, move || unsafe {
+    // Event (delayed past send's reply) reached model: it asked for the id list after the send.
+    let asked = journal.clone();
+    plan.until(1, 30, move |_| {
+        common::methods(&asked)
+            .iter()
+            .skip_while(|name| *name != "misc_send_msg")
+            .any(|name| name == "get_message_list_items")
+    });
+    plan.after(0, move || unsafe {
         let read = |name: &str| {
             QString::from_qvariant((*engine_ptr).invoke_method(name.into(), &[]))
                 .map(|text| text.to_string())
