@@ -2517,6 +2517,8 @@ async fn serve() {
                                 // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
+                                "chatType": u32::try_from(chat)
+                                    .map_or("Single", |chat| state.chat_type(chat)),
                                 // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
                                 "isContactRequest": u32::try_from(chat)

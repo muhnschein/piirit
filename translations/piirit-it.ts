@@ -585,6 +585,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Chat</translation>
     </message>
     <message>
@@ -689,7 +690,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Tocca «%1» per mostrare tutte le chat</translation>
     </message>
     <message>
@@ -701,6 +702,21 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nuovo</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Canali</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Nessun canale non letto</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Tocca «%1» per mostrare tutti i canali</translation>
     </message>
 </context>
 <context>

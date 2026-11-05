@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.
 - A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.
 - With voice messages turned into text, the chat list shows a voice message's text instead of just "Voice message", and so does a reply's quote of it and the reply bar while you answer one. Until the text is there, or with the feature off, they read as before.
 - Voice messages can be turned into text on the phone itself (experimental, off by default; Settings, Advanced). Piirit downloads a speech model once; nothing you send or receive leaves the phone. Transcribe one voice message with a tap, or let Piirit do them on its own while charging (the default) or as soon as they arrive. The text shows under the voice message, can be copied from its menu, and a chat's Audio page can transcribe all its voice messages at once. It works in 13 languages so far, and the list says for which of them transcripts are likely to contain more mistakes; other languages can't be picked yet.

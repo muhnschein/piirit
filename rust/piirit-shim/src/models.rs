@@ -32,6 +32,8 @@ pub struct ChatListItem {
     pub is_self_talk: bool,
     /// Core's device chat. Not a person.
     pub is_device_talk: bool,
+    /// Channel, own or joined (`OutBroadcast`, `InBroadcast`): kind filter splits on it.
+    pub is_channel: bool,
     /// Chat colour, `#rrggbb`.
     pub color: QString,
     /// Picture path; empty if none.
