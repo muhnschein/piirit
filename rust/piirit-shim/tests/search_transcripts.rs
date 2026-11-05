@@ -88,14 +88,15 @@ fn voice_messages_are_found_by_their_transcript() {
     std::fs::write(speech.join("ggml-small-q5_1.bin"), [0_u8; 16]).expect("place model");
     {
         let store = store::Store::open(&speech.join("transcripts.sqlite")).expect("make store");
-        // 13: voice message in group chat 2; 30: in archived chat 3.
+        // 13: voice message in group chat 2 (two lines); 30: in archived chat 3, text kind in
+        // fake core: marked by transcript alone.
         store
             .put(&row(
                 1,
                 13,
                 2,
                 DONE,
-                "Meet me at the Café, message 1 follows",
+                "Meet me at the Café,\n message 1 follows",
             ))
             .expect("row");
         store
@@ -201,18 +202,20 @@ fn voice_messages_are_found_by_their_transcript() {
             .map(|(_, rest)| rest.to_owned())
             .unwrap_or(report)
     };
-    // Unicode case, archived chat too, newest first; core's text found nothing.
+    // Unicode case, archived chat too, newest first; core's text found nothing. Voice as chat
+    // list previews it: mark, one line.
     assert_eq!(
         shown("any case"),
-        "2/2:30@3=café in the archive, message 1 too;\
-         13@2=Meet me at the Café, message 1 follows;",
+        "2/2:30@3=🎤 café in the archive, message 1 too;\
+         13@2=🎤 Meet me at the Café, message 1 follows;",
         "{log:?}"
     );
-    // Core found 1, 10, 12..15 by text: 13 once, with its own text; 30 by transcript, in id order.
+    // Core found 1, 10, 12..15 by text: 13 once, with its own text (marked: voice); 30 by
+    // transcript, in id order.
     assert_eq!(
         shown("merged"),
-        "7/7:30@3=café in the archive, message 1 too;15@2=message 15;14@2=message 14;\
-         13@2=message 13;12@2=message 12;10@2=message 10;1@1=message 1;",
+        "7/7:30@3=🎤 café in the archive, message 1 too;15@2=message 15;14@2=message 14;\
+         13@2=🎤 message 13;12@2=message 12;10@2=message 10;1@1=message 1;",
         "{log:?}"
     );
     // Switched off: transcripts hidden, here too.

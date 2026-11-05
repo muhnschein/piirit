@@ -10,7 +10,7 @@ use std::collections::{HashMap, HashSet};
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
-use crate::chatlist::chat_items;
+use crate::chatlist::{chat_items, voice_preview};
 use crate::contacts::contact_row;
 use crate::core::connection;
 use crate::json;
@@ -362,8 +362,7 @@ async fn matching_messages(
                 contact_id: 0,
                 message_id,
                 title: chat.map(|chat| chat.name.clone()).unwrap_or_default(),
-                subtitle: transcript
-                    .map_or_else(|| json::text(message, "text"), |text| text.as_str().into()),
+                subtitle: subtitle(message, transcript),
                 timestamp: json::i64_at(message, "timestamp"),
                 color: chat.map(|chat| chat.color.clone()).unwrap_or_default(),
                 avatar_path: chat
@@ -373,6 +372,18 @@ async fn matching_messages(
         })
         .collect();
     Ok((rows, total.saturating_sub(blocked)))
+}
+
+/// Message text; voice message (transcript: always one) as chat list previews it, `🎤 text`, by
+/// transcript if found so.
+fn subtitle(message: &serde_json::Value, transcript: Option<&String>) -> QString {
+    match transcript {
+        Some(text) => voice_preview(text).into(),
+        None if json::str_at(message, "viewType") == "Voice" => {
+            voice_preview(json::str_at(message, "text")).into()
+        }
+        None => json::text(message, "text"),
+    }
 }
 
 /// Transcript hits core didn't find, in chats core lists: blocked chats keep their transcripts.
