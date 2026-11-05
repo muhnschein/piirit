@@ -4,18 +4,18 @@ Binaries bundled by Piirit's RPM (installed to `/usr/libexec/harbour-piirit/delt
 
 - **Project:** Delta Chat core (chatmail core library)
 - **Source:** https://github.com/chatmail/core
-- **Version / tag:** `v2.67.0`
+- **Version / tag:** `v2.68.0`
 - **License:** MPL-2.0. Piirit GPL-3.0-or-later; the two sit side by side in RPM as separate works. This file installed with package for MPL-2.0 §3.2(a): recipients told how to get Source Code Form.
 - **Build:** upstream release builds from `.github/workflows/deltachat-rpc-server.yml` nix builds, **statically linked against musl libc** ("to avoid problems with glibc version incompatibility", per that workflow). Triples: `aarch64-unknown-linux-musl`, `armv7-unknown-linux-musleabihf` (hard-float, matches Sailfish `armv7hl`), `x86_64-unknown-linux-musl`.
-- **Channel:** PyPI `deltachat-rpc-server==2.67.0` wheels = same binaries as upstream GitHub release (both nix output). Fetched, checksum-verified, placed by `scripts/fetch-rpc-server.sh`, which pins sha256 of every wheel *and* every extracted binary.
+- **Channel:** PyPI `deltachat-rpc-server==2.68.0` wheels = same binaries as upstream GitHub release (both nix output). Fetched, checksum-verified, placed by `scripts/fetch-rpc-server.sh`, which pins sha256 of every wheel *and* every extracted binary.
 
 ## Layout
 
 ```
 vendor/deltachat-rpc-server/
-  aarch64/deltachat-rpc-server   sha256 38066a1cd9270ced33e32a0ce3f1fc526ba68b0eae3a401e207fa8bcb5166491
-  armv7hl/deltachat-rpc-server   sha256 83d3235ee62da181fb78a18567867e55a19e2fa32df674cc6867c2fb8f3a27ba
-  x86_64/deltachat-rpc-server    sha256 40e0df8174027d3048c330b2b5869c995bce7b0bb17365e6e6133005a00d38e3
+  aarch64/deltachat-rpc-server   sha256 c424a42de601f2a60aa05e4c2cfee4c02ed9c88e19e623973d0460c14fe64252
+  armv7hl/deltachat-rpc-server   sha256 bc53b69747bcb53a54ad5a3d14f469f7e7d5a7f3977ab2f8588f3fa6e765fcee
+  x86_64/deltachat-rpc-server    sha256 bf1b10a1656d10b69325b2a8efadc329c9ecea5190ee4e5350d996bd7c65e7ec
 ```
 
 Dir names = Sailfish arch names (`%{_target_cpu}`, not `%{_arch}`, which maps every armv7h* to `arm`). `rpm/harbour-piirit.spec` `%install` keys on them.
