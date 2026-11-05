@@ -55,6 +55,38 @@ impl Shown {
     }
 }
 
+/// What previews must re-read.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Change {
+    /// One message's row written.
+    Message(Key),
+    /// Switched on or off.
+    All,
+}
+
+/// Store reader for previews (chat list): off-thread, async.
+#[derive(Clone)]
+pub(crate) struct Previews(StoreThread);
+
+impl Previews {
+    /// Done transcripts among `msgs`; empty if store fails.
+    pub(crate) async fn texts(&self, account: u32, msgs: Vec<u32>) -> BTreeMap<u32, String> {
+        if msgs.is_empty() {
+            return BTreeMap::new();
+        }
+        match self.0.ask(move |store| store.texts(account, &msgs)).await {
+            Some(Ok(texts)) => texts,
+            Some(Err(err)) => {
+                eprintln!("piirit: reading transcripts for previews: {err}");
+                BTreeMap::new()
+            }
+            None => BTreeMap::new(),
+        }
+    }
+}
+
+type Listener = Box<dyn Fn(Change) -> bool>;
+
 /// Downloaded voice message, as core says.
 #[derive(Clone, Debug)]
 struct Found {
@@ -198,6 +230,8 @@ struct Hub {
     scanning: bool,
     /// Messages seen this session needing no look again (row, or not voice).
     skip: BTreeSet<Key>,
+    /// Bumped on every row written and switch: preview read before it may be stale.
+    epoch: u64,
 }
 
 impl Hub {
@@ -310,6 +344,44 @@ fn with<R>(task: impl FnOnce(&mut Hub) -> R) -> R {
     HUB.with(|hub| task(&mut hub.borrow_mut()))
 }
 
+thread_local! {
+    static LISTENERS: RefCell<Vec<Listener>> = RefCell::new(Vec::new());
+}
+
+/// Previews follow transcripts: `listener` told of each change till it returns false.
+pub(crate) fn follow(listener: impl Fn(Change) -> bool + 'static) {
+    LISTENERS.with(|listeners| listeners.borrow_mut().push(Box::new(listener)));
+}
+
+/// Tell listeners. Taken out while called: listener may `follow` anew.
+fn tell(change: Change) {
+    with(|hub| hub.epoch = hub.epoch.wrapping_add(1));
+    let mut called = LISTENERS.with(|listeners| std::mem::take(&mut *listeners.borrow_mut()));
+    called.retain(|listener| listener(change));
+    LISTENERS.with(|listeners| {
+        let mut listeners = listeners.borrow_mut();
+        called.append(&mut listeners);
+        *listeners = called;
+    });
+}
+
+/// Count of changes so far; differs: preview read since may be stale.
+pub(crate) fn epoch() -> u64 {
+    with(|hub| hub.epoch)
+}
+
+/// Reader for previews; `None` when off or no transcript stored yet.
+pub(crate) fn previews() -> Option<Previews> {
+    with(|hub| {
+        if hub.conditions.enabled {
+            hub.existing_store()
+        } else {
+            None
+        }
+    })
+    .map(Previews)
+}
+
 /// App-wide object, for answers.
 pub(crate) fn attach(transcriber: QPointer<Transcriber>) {
     with(|hub| hub.transcriber = transcriber);
@@ -348,6 +420,7 @@ pub(crate) fn set_conditions(conditions: Conditions, languages: Vec<String>) {
         }
     } else {
         refresh_all();
+        tell(Change::All);
     }
     if schedule::queues_backlog(&conditions) && !schedule::queues_backlog(&was) {
         scan_backlog();
@@ -572,7 +645,10 @@ fn record(job: &Job, result: Result<Outcome, Error>) {
 fn write(row: Row) {
     let key = (row.account, row.msg);
     with(|hub| hub.skip.insert(key));
-    let reply = queued_callback(move |row: Option<Row>| apply(key, row));
+    let reply = queued_callback(move |row: Option<Row>| {
+        apply(key, row);
+        tell(Change::Message(key));
+    });
     match with(Hub::store) {
         Some(store) => store.send(move |store| {
             if let Err(err) = store.put(&row) {

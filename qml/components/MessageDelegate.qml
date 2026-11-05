@@ -87,6 +87,9 @@ Item {
     property bool showSender: false
     property string quoteText: ""
     property string quoteAuthor: ""
+    /// Quoted voice message: its done transcript shows in place of core's words.
+    property bool quoteIsVoice: false
+    property int quoteMessageId: 0
     property string filePath: ""
     property string fileName: ""
     property string fileMime: ""
@@ -172,9 +175,6 @@ Item {
                                        : root.emojiBody.length > 0
                                        ? root.emojiBody : root.shownText
     readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
-    /// Quote: as written.
-    readonly property string emojiQuote: Emoji.inText(root.quoteText, false,
-                                                      Theme.fontSizeExtraSmall)
     /// Header only, fetching, or failed: tappable.
     readonly property bool heldBack: root.downloadState.length > 0
                                      && root.downloadState !== "Done"
@@ -422,7 +422,49 @@ Item {
             height: quoteRow.shown && quoteRow.item ? quoteRow.item.implicitHeight : 0
 
             sourceComponent: Item {
+                id: quoteItem
                 implicitHeight: quoteLabel.y + quoteLabel.height
+
+                readonly property bool transcribes: root.quoteIsVoice && root.quoteMessageId > 0
+                                                    && root.transcriber !== null
+                                                    && root.transcriber.enabled === true
+                property QtObject transcript: null
+                // 3 = `Transcript` done.
+                readonly property string said: quoteItem.transcript !== null
+                                               && quoteItem.transcript.state === 3
+                                               && quoteItem.transcript.text.length > 0
+                                               ? "🎤 " + quoteItem.transcript.text
+                                               : root.quoteText
+                readonly property string pictured: Emoji.inText(quoteItem.said, false,
+                                                                Theme.fontSizeExtraSmall)
+
+                // As AttachmentPreview's: made once, retargeted, dropped when off.
+                function placeTranscript() {
+                    if (!quoteItem.transcribes) {
+                        if (quoteItem.transcript !== null) {
+                            quoteItem.transcript.destroy()
+                            quoteItem.transcript = null
+                        }
+                    } else if (quoteItem.transcript !== null) {
+                        quoteItem.transcript.account_id = root.accountId
+                        quoteItem.transcript.message_id = root.quoteMessageId
+                    } else {
+                        var maker = root.transcriptMaker !== null
+                                    ? root.transcriptMaker
+                                    : Qt.createComponent(Qt.resolvedUrl("MessageTranscript.qml"))
+                        quoteItem.transcript = maker.createObject(quoteItem, {
+                            account_id: root.accountId,
+                            message_id: root.quoteMessageId
+                        })
+                    }
+                }
+                onTranscribesChanged: quoteItem.placeTranscript()
+                Connections {
+                    target: root
+                    onQuoteMessageIdChanged: quoteItem.placeTranscript()
+                    onAccountIdChanged: quoteItem.placeTranscript()
+                }
+                Component.onCompleted: quoteItem.placeTranscript()
 
                 // Press lit as Silica's: own area takes press from row, row's highlight stays off.
                 Rectangle {
@@ -472,13 +514,13 @@ Item {
                     maximumLineCount: 2
                     wrapMode: Text.Wrap
                     // Elided only without pictures: see body.
-                    truncationMode: root.emojiQuote.length > 0 ? TruncationMode.None
-                                                               : TruncationMode.Elide
+                    truncationMode: quoteItem.pictured.length > 0 ? TruncationMode.None
+                                                                  : TruncationMode.Elide
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
                     // Plain unless emoji: see top.
-                    textFormat: root.emojiQuote.length > 0 ? Text.StyledText : Text.PlainText
-                    text: root.emojiQuote.length > 0 ? root.emojiQuote : root.quoteText
+                    textFormat: quoteItem.pictured.length > 0 ? Text.StyledText : Text.PlainText
+                    text: quoteItem.pictured.length > 0 ? quoteItem.pictured : quoteItem.said
                 }
             }
         }

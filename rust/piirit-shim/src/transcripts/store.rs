@@ -2,10 +2,13 @@
 //!
 //! Self-contained (std, `rusqlite`): tests include it by `#[path]`.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use rusqlite::{params, Connection, OptionalExtension};
+
+/// `STATE_DONE`; store stays std-only (tests include it).
+pub(crate) const DONE: u32 = 3;
 
 /// Schema version in `user_version`.
 const VERSION: i32 = 1;
@@ -234,5 +237,26 @@ impl Store {
             }
         }
         Ok(known)
+    }
+
+    /// Done transcripts among `msgs`, for previews.
+    pub(crate) fn texts(
+        &self,
+        account: u32,
+        msgs: &[u32],
+    ) -> rusqlite::Result<BTreeMap<u32, String>> {
+        let mut statement = self.connection.prepare_cached(
+            "SELECT text FROM transcripts WHERE account = ?1 AND msg = ?2 AND state = ?3 AND text != ''",
+        )?;
+        let mut texts = BTreeMap::new();
+        for msg in msgs {
+            if let Some(text) = statement
+                .query_row(params![account, msg, DONE], |row| row.get(0))
+                .optional()?
+            {
+                texts.insert(*msg, text);
+            }
+        }
+        Ok(texts)
     }
 }

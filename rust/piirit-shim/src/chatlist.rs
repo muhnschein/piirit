@@ -14,6 +14,7 @@ use crate::chat::chat_is_group;
 use crate::core::connection;
 use crate::json;
 use crate::models::{ChatListItem, ChatListModel};
+use crate::transcripts::{self, Change, Previews};
 
 /// One account's chats, most recent first.
 ///
@@ -165,6 +166,11 @@ pub struct ChatList {
 
     /// Unread since filter on. Cleared on filter on and by `forget_read`.
     kept: HashSet<u32>,
+
+    /// Told of transcript changes (`transcripts::follow`).
+    following: bool,
+    /// `transcripts::epoch` when refresh in flight read transcripts.
+    asked_epoch: u64,
 }
 
 impl ChatList {
@@ -417,6 +423,51 @@ impl ChatList {
         this.borrow().rows_changed();
     }
 
+    /// Register once for transcript changes; registration ends with this object.
+    fn follow_transcripts(&mut self) {
+        if std::mem::replace(&mut self.following, true) {
+            return;
+        }
+        let alive: QPointer<Self> = QPointer::from(&*self);
+        let ptr = alive.clone();
+        // Deferred: teller's stack may hold this object.
+        let changed = queued_callback(move |change: Change| {
+            if let Some(this) = ptr.as_pinned() {
+                if this.borrow_mut().owe_voice_rows(change) {
+                    this.borrow_mut().refresh(Refresh::Order);
+                }
+            }
+        });
+        transcripts::follow(move |change| {
+            if alive.is_null() {
+                return false;
+            }
+            changed(change);
+            true
+        });
+    }
+
+    /// Owe rows whose last message is voice `change` touches. False: none.
+    fn owe_voice_rows(&mut self, change: Change) -> bool {
+        let account = self.account_id;
+        let chats: Vec<u32> = self
+            .all_rows
+            .iter()
+            .filter(|row| {
+                row.voice_message_id != 0
+                    && match change {
+                        Change::All => true,
+                        Change::Message(key) => key == (account, row.voice_message_id),
+                    }
+            })
+            .map(|row| row.chat_id)
+            .collect();
+        for chat_id in &chats {
+            self.awaiting.add(Refresh::One(*chat_id));
+        }
+        !chats.is_empty()
+    }
+
     /// Accept contact request; chat becomes ordinary.
     pub fn accept_chat(&mut self, chat_id: u32) {
         self.act(chat_id, "accept_chat", serde_json::Value::Null);
@@ -618,6 +669,11 @@ impl ChatList {
             Ok(target) => {
                 this.borrow_mut().all_rows = target;
                 Self::show(this);
+                // Transcript written or switch flipped meanwhile: voice rows read again.
+                let stale = this.borrow().asked_epoch != transcripts::epoch();
+                if stale && this.borrow_mut().owe_voice_rows(Change::All) {
+                    this.borrow_mut().again = true;
+                }
                 let announcements = this.borrow_mut().settled_announcements();
                 for (chat_id, name, sender, preview) in announcements {
                     this.borrow()
@@ -650,6 +706,9 @@ impl ChatList {
         let Some((rpc, runtime)) = connection() else {
             return;
         };
+        self.follow_transcripts();
+        let previews = transcripts::previews();
+        self.asked_epoch = transcripts::epoch();
         let query = self.query.to_string();
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
@@ -704,6 +763,7 @@ impl ChatList {
                 } else {
                     chat_items(&rpc, account_id, first).await?
                 };
+                with_transcripts(previews.as_ref(), account_id, &mut fresh).await;
                 if !rest.is_empty() {
                     early(
                         entries
@@ -711,7 +771,9 @@ impl ChatList {
                             .filter_map(|chat_id| fresh.get(chat_id).cloned())
                             .collect(),
                     );
-                    fresh.extend(chat_items(&rpc, account_id, rest).await?);
+                    let mut more = chat_items(&rpc, account_id, rest).await?;
+                    with_transcripts(previews.as_ref(), account_id, &mut more).await;
+                    fresh.extend(more);
                 }
                 // Order from core; contents from fetch, else model.
                 Ok::<_, String>(
@@ -964,8 +1026,54 @@ pub(crate) async fn chat_items(
                     is_device_talk: json::flag(&item, "isDeviceTalk"),
                     color: json::text(&item, "color"),
                     avatar_path: json::text(&item, "avatarPath"),
+                    voice_message_id: if json::str_at(&item, "lastMessageType") == "Voice" {
+                        json::u32_at(&item, "lastMessageId")
+                    } else {
+                        0
+                    },
                 },
             )
         })
         .collect())
+}
+
+/// Core's mark on voice previews (`🎤 Voice message`); transcript follows it as text would.
+const VOICE_MARK: &str = "🎤";
+
+/// Voice rows with done transcript preview it in place of core's words.
+async fn with_transcripts(
+    previews: Option<&Previews>,
+    account_id: u32,
+    items: &mut HashMap<u32, ChatListItem>,
+) {
+    let Some(previews) = previews else { return };
+    let voice: Vec<u32> = items
+        .values()
+        .map(|item| item.voice_message_id)
+        .filter(|msg| *msg != 0)
+        .collect();
+    let texts = previews.texts(account_id, voice).await;
+    for item in items.values_mut() {
+        if let Some(text) = texts.get(&item.voice_message_id) {
+            item.preview = voice_preview(text).into();
+        }
+    }
+}
+
+/// `🎤 text`, one line as core previews text (`real_server.rs`).
+fn voice_preview(text: &str) -> String {
+    let line = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    format!("{VOICE_MARK} {line}")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::voice_preview;
+
+    #[test]
+    fn a_transcript_previews_on_one_line() {
+        assert_eq!(voice_preview(" hello\n there\t "), "🎤 hello there");
+        let long = "word ".repeat(400);
+        assert_eq!(voice_preview(&long), format!("🎤 {}", long.trim_end()));
+    }
 }

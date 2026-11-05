@@ -1295,6 +1295,87 @@ async fn offline_round_trip_against_real_core() {
         "the voice message lost its file: {:?}",
         voices[&voice_id]
     );
+    // Chat-list row and quote of a voice message: what transcript previews key on
+    // (piirit-shim/src/chatlist.rs, MessageDelegate.qml), and the words they replace.
+    let items: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (sender_id, vec![saved]))
+        .await
+        .expect("get_chatlist_items_by_entries after a voice message");
+    let row = &items[&saved];
+    assert_eq!(
+        (
+            row.get("lastMessageId").and_then(Value::as_u64),
+            row.get("lastMessageType").and_then(Value::as_str),
+            row.get("summaryText2").and_then(Value::as_str),
+        ),
+        (
+            Some(u64::from(voice_id)),
+            Some("Voice"),
+            Some("🎤 Voice message")
+        ),
+        "a voice message's chat-list row changed shape: {row:?}"
+    );
+    let (reply_id, _): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Some("re"),
+                Option::<String>::None,
+                Option::<String>::None,
+                Option::<(f64, f64)>::None,
+                Some(voice_id),
+            ),
+        )
+        .await
+        .expect("misc_send_msg quoting a voice message");
+    let replies: std::collections::HashMap<u32, Value> = client
+        .call("get_messages", (sender_id, vec![reply_id]))
+        .await
+        .expect("get_messages for the reply to a voice message");
+    let quote = &replies[&reply_id]["quote"];
+    assert_eq!(
+        (
+            quote.get("messageId").and_then(Value::as_u64),
+            quote.get("viewType").and_then(Value::as_str),
+            quote.get("text").and_then(Value::as_str),
+        ),
+        (
+            Some(u64::from(voice_id)),
+            Some("Voice"),
+            Some("🎤 Voice message")
+        ),
+        "a quote of a voice message changed shape: {quote:?}"
+    );
+    // Text previews one line, as transcript previews (`voice_preview`); not cut (2000 characters
+    // came back whole).
+    let lines = "one\ntwo  three\tfour";
+    client
+        .call::<_, (u32, Value)>(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Some(lines),
+                Option::<String>::None,
+                Option::<String>::None,
+                Option::<(f64, f64)>::None,
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .expect("misc_send_msg with lines");
+    let items: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (sender_id, vec![saved]))
+        .await
+        .expect("get_chatlist_items_by_entries after lines");
+    assert_eq!(
+        items[&saved].get("summaryText2").and_then(Value::as_str),
+        Some("one two three four"),
+        "the core no longer previews text on one line: {:?}",
+        items[&saved]
+    );
 
     let sent_tone = send_file(&client, sender_id, saved, &tone, "tone.wav").await;
     assert_eq!(
