@@ -589,6 +589,7 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Klepeti</translation>
     </message>
     <message>
@@ -693,7 +694,7 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Tapnite »%1«, da prikažete vse klepete</translation>
     </message>
     <message>
@@ -705,6 +706,21 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Novo</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanali</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Ni neprebranih kanalov</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Tapnite »%1«, da prikažete vse kanale</translation>
     </message>
 </context>
 <context>
