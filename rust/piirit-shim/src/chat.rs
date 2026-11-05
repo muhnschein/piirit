@@ -2468,6 +2468,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         quote_author: json::text(message, "/quote/authorDisplayName"),
         // `JustText` quote has none.
         quote_message_id: json::u32_at(message, "/quote/messageId"),
+        quote_is_voice: json::str_at(message, "/quote/viewType") == "Voice",
         file_path: file_path.into(),
         file_name: json::text(message, "/fileName"),
         view_type: view_type.into(),
@@ -2897,6 +2898,13 @@ mod tests {
         assert_eq!(row_from(5, &with_message).quote_message_id, 42);
         assert_eq!(row_from(5, &just_text).quote_message_id, 0);
         assert_eq!(row_from(5, &unquoted).quote_message_id, 0);
+        assert!(!row_from(5, &with_message).quote_is_voice);
+        let voice = json!({
+            "text": "re",
+            "quote": {"kind": "WithMessage", "messageId": 42, "chatId": 7, "viewType": "Voice",
+                      "text": "🎤 Voice message", "authorDisplayName": "Ada"},
+        });
+        assert!(row_from(5, &voice).quote_is_voice);
     }
 
     #[test]

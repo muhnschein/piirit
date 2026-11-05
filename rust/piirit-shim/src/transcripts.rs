@@ -18,7 +18,9 @@ use files::ModelSpec;
 use hub::Shown;
 use schedule::Conditions;
 
-pub(crate) use hub::{connected, matching};
+pub(crate) use hub::{connected, epoch, follow, matching, previews, Change, Previews};
+
+const _: () = assert!(store::DONE == STATE_DONE);
 
 /// No transcript, nothing queued.
 pub const STATE_NONE: u32 = 0;

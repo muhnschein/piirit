@@ -251,6 +251,10 @@ impl State {
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
             }
+            // Voice message last: chat-list row previews it.
+            if std::env::var_os("PIIRIT_FAKE_VOICE_LAST").is_some() {
+                self.chats.insert(2, vec![10, 13]);
+            }
             // Not yet downloaded too (`pre_message`), plus plain text. 16 sent before 14 and 15
             // (conversation order, not id): gallery must merge by it.
             if std::env::var_os("PIIRIT_FAKE_PRE_MESSAGES").is_some() {
@@ -488,12 +492,18 @@ impl State {
             }
         }
         if let Some(quoted) = self.quotes.get(&id) {
-            // Core's `WithMessage` quote: id, chat, text, author.
+            // Core's `WithMessage` quote: id, chat, text, author, kind; voice worded as core.
+            let view_type = message_object(u64::from(*quoted))["viewType"].clone();
             message["quote"] = json!({
                 "kind": "WithMessage",
                 "messageId": quoted,
                 "chatId": self.chat_of(*quoted),
-                "text": wordy(u64::from(*quoted)),
+                "text": if view_type == "Voice" {
+                    VOICE_SUMMARY.to_string()
+                } else {
+                    wordy(u64::from(*quoted))
+                },
+                "viewType": view_type,
                 "authorDisplayName": "Ada Lovelace",
             });
         }
@@ -720,6 +730,9 @@ fn base64(bytes: &[u8]) -> String {
     }
     out
 }
+
+/// Core's preview of a voice message without text (pinned in `real_server.rs`).
+const VOICE_SUMMARY: &str = "🎤 Voice message";
 
 /// Message shaped like core's. Seeded 1 quotes, 2 unread, 10 image: one fetch covers view.
 fn message_object(msg: u64) -> Value {
@@ -2474,6 +2487,12 @@ async fn serve() {
                             .ok()
                             .and_then(|chat| state.drafts.get(&chat))
                             .filter(|text| !text.is_empty());
+                        let last = u32::try_from(chat)
+                            .ok()
+                            .and_then(|chat| state.chats.get(&chat))
+                            .and_then(|messages| messages.last().copied());
+                        let last_type = last.map(|msg| message_object(u64::from(msg))["viewType"].clone());
+                        let voice = draft.is_none() && last_type.as_ref().is_some_and(|kind| kind == "Voice");
                         items.insert(
                             chat.to_string(),
                             json!({
@@ -2481,9 +2500,15 @@ async fn serve() {
                                 "name": format!("chat {chat}"),
                                 "summaryText1": draft.map(|_| "Draft"),
                                 "summaryText2": draft.map_or_else(
-                                    || format!("last in {chat}"),
+                                    || if voice {
+                                        VOICE_SUMMARY.to_string()
+                                    } else {
+                                        format!("last in {chat}")
+                                    },
                                     Clone::clone,
                                 ),
+                                "lastMessageId": last,
+                                "lastMessageType": last_type,
                                 "summaryStatus": if draft.is_some() { 19 } else { 0 },
                                 "freshMessageCounter": u32::from(fresh),
                                 "isEncrypted": true,

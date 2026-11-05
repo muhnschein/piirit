@@ -560,8 +560,13 @@ SilicaListView {
                     // Not on core notices.
                     visible: !model.is_info
                     text: qsTr("Reply")
-                    onClicked: root.replyRequested(model.message_id, model.text,
-                                                   model.sender_name)
+                    // Voice: done transcript, as chat list previews it. 3 = `Transcript` done.
+                    onClicked: root.replyRequested(
+                        model.message_id,
+                        messageRow.transcript !== null && messageRow.transcript.state === 3
+                        && messageRow.transcript.text.length > 0
+                        ? "🎤 " + messageRow.transcript.text : model.text,
+                        model.sender_name)
                 }
                 MenuItem {
                     objectName: "editItem"
@@ -836,6 +841,8 @@ SilicaListView {
                 showSender: root.showSender
                 quoteText: model.quote_text
                 quoteAuthor: model.quote_author
+                quoteIsVoice: model.quote_is_voice
+                quoteMessageId: model.quote_message_id || 0
                 filePath: model.file_path
                 fileName: model.file_name
                 fileMime: model.file_mime

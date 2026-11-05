@@ -147,6 +147,22 @@ fn rows_go_with_their_message_or_profile() {
 }
 
 #[test]
+fn previews_read_done_transcripts_with_text_only() {
+    const NO_SPEECH: u32 = 4;
+    let store = Store::open_in_memory().unwrap();
+    store.put(&row(1, 10, DONE, "hello")).unwrap();
+    store.put(&row(1, 11, DONE, "")).unwrap();
+    // Text a failed or wordless row may carry never previews.
+    store.put(&row(1, 12, FAILED, "half")).unwrap();
+    store.put(&row(1, 13, NO_SPEECH, "hiss")).unwrap();
+    store.put(&row(2, 14, DONE, "other profile")).unwrap();
+    assert_eq!(
+        store.texts(1, &[10, 11, 12, 13, 14, 99]).unwrap(),
+        [(10, "hello".to_owned())].into_iter().collect()
+    );
+}
+
+#[test]
 fn the_search_index_follows_every_write() {
     let scratch = Scratch::new("search");
     let store = Store::open(&scratch.file()).unwrap();
