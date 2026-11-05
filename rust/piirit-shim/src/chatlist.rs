@@ -464,6 +464,8 @@ impl ChatList {
             .collect();
         for chat_id in &chats {
             self.awaiting.add(Refresh::One(*chat_id));
+            // Notification up shows row's text: transcript in, or core's words back.
+            self.pending_restatements.insert(*chat_id);
         }
         !chats.is_empty()
     }
@@ -669,11 +671,6 @@ impl ChatList {
             Ok(target) => {
                 this.borrow_mut().all_rows = target;
                 Self::show(this);
-                // Transcript written or switch flipped meanwhile: voice rows read again.
-                let stale = this.borrow().asked_epoch != transcripts::epoch();
-                if stale && this.borrow_mut().owe_voice_rows(Change::All) {
-                    this.borrow_mut().again = true;
-                }
                 let announcements = this.borrow_mut().settled_announcements();
                 for (chat_id, name, sender, preview) in announcements {
                     this.borrow()
@@ -683,6 +680,12 @@ impl ChatList {
                 for (chat_id, name, sender, preview, unread) in restatements {
                     this.borrow()
                         .message_restated(chat_id, name, sender, preview, unread);
+                }
+                // Transcript written or switch flipped meanwhile: voice rows read again. After
+                // restatements: those owed now wait for re-read rows.
+                let stale = this.borrow().asked_epoch != transcripts::epoch();
+                if stale && this.borrow_mut().owe_voice_rows(Change::All) {
+                    this.borrow_mut().again = true;
                 }
             }
             Err(err) => this.borrow().error(err.into()),
