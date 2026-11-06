@@ -96,13 +96,23 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
         record!("offer", call!("offer"));
     });
 
-    plan.after(1, move || unsafe {
+    // Offer open till stopped: core never settles; wait on code.
+    plan.until(1, 30, move |last| unsafe {
+        if !call!("state").contains("DCBACKUP") && !last {
+            return false;
+        }
         record!("first", call!("state"));
         record!("cancel", call!("cancelAndAgain"));
+        true
+    });
+
+    // Second offer up.
+    plan.until(1, 30, move |last| unsafe {
+        call!("state").contains("DCBACKUP") || last
     });
 
     // Past the held second.
-    plan.after(2, move || unsafe {
+    plan.after_busy(2, move || unsafe {
         record!("second", call!("state"));
         record!("said", call!("said"));
         // Second offer still stoppable.

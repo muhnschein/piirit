@@ -7,7 +7,8 @@
 //! (mp3lame-sys). See docs/BUILDING.md, "Making a video smaller".
 //!
 //! Trimmed: FFmpeg reads MP4/`QuickTime`, decodes H.264/HEVC/AAC, scales and
-//! resamples, encodes AAC, writes MP4; x264 does 8-bit 4:2:0 H.264. Nothing
+//! resamples, encodes AAC, writes MP4; reads voice files (MP3, ADTS AAC, Ogg
+//! Opus/Vorbis, WAV) for piirit-speech; x264 does 8-bit 4:2:0 H.264. Nothing
 //! else, so binary grows a few MB, not a few dozen.
 //!
 //! Compiler is cargo's for this target (`cc` crate), so configure builds for
@@ -108,7 +109,7 @@ fn main() {
 }
 
 /// C glue between FFmpeg, x264 and Rust.
-const GLUE: [&str; 2] = ["csrc/recode.c", "csrc/synth.c"];
+const GLUE: [&str; 3] = ["csrc/recode.c", "csrc/synth.c", "csrc/audio.c"];
 
 /// Media plugin source; Gecko stand-in drives it in tests.
 const GMP_SOURCE: &str = "csrc/gmp_h264.cpp";
@@ -468,6 +469,10 @@ fn build_ffmpeg(src: &Path, out: &Path, target: &Target) -> PathBuf {
             "--enable-decoder=h264,hevc,aac",
             "--enable-parser=h264,hevc,aac",
             "--enable-encoder=aac",
+            // Voice messages, for piirit-speech: other clients send these.
+            "--enable-demuxer=mp3,aac,ogg,wav",
+            "--enable-decoder=mp3float,opus,vorbis,pcm_s16le",
+            "--enable-parser=mpegaudio,opus,vorbis",
         ]);
     if target.without_asm() {
         configure.arg("--disable-asm");

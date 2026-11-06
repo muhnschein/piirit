@@ -183,13 +183,14 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         format!("1..{MESSAGES}"),
         "the rows do not run from the first message to the last. {context}"
     );
-    // Only one page fetched.
+    // One screenful fetched: core builds each message; the rest wait for the view.
     assert_eq!(
         number("opened-filled"),
-        50,
-        "opening the chat fetched something other than one page of \
+        20,
+        "opening the chat fetched something other than one screenful of \
          messages -- the point of a row per message is that it costs a \
-         list of numbers, not a list of messages. {context}"
+         list of numbers, not a list of messages, and every message \
+         fetched before the page shows is time the reader waits. {context}"
     );
     assert_eq!(
         value("first-empty"),

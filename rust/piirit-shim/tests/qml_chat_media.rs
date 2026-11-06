@@ -85,7 +85,14 @@ impl PageStackProbe {
         )
         .map(|newest| format!(",newestFirst={newest}"))
         .unwrap_or_default();
-        self.note(&format!("push:{name}({kind}{everyone}{at}{order})"));
+        // Map: where it opens, under what heading.
+        let text = |key: &str| {
+            QString::from_qvariant(properties.value(QString::from(key), QVariant::default()))
+                .map(|value| format!(",{key}={value}"))
+                .unwrap_or_default()
+        };
+        let map = format!("{}{}{}", text("query"), text("heading"), text("subheading"));
+        self.note(&format!("push:{name}({kind}{everyone}{at}{order}{map})"));
         if name == "DeleteMessageDialog.qml" {
             return self.chooser.clone();
         }
@@ -111,7 +118,9 @@ impl PageStackProbe {
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
+    import 'file://__COMPONENTS__'
     Item {
+        function setLocations(on) { Settings.locationStreamingEnabled = on; return 'ok' }
         Loader { id: loader }
         function load(url, properties) {
             loader.setSource('', {})
@@ -237,7 +246,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.set_object_property("pageStack".into(), stack_box.pinned());
-    engine.load_data(QByteArray::from(PROBE_QML));
+    // Components dir imported so probe can write settings.
+    let components =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    engine.load_data(QByteArray::from(
+        PROBE_QML
+            .replace("__COMPONENTS__", &components.display().to_string())
+            .as_str(),
+    ));
 
     core_box
         .pinned()
@@ -431,6 +447,24 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("contact-apps", get!("appsTile", "objectName"));
         record!("contact-gallery", get!("galleryTile", "objectName"));
         record!("open-gallery", call!("click", QString::from("galleryTile")));
+        // Location streaming off (experimental, as in Delta Chat): no map tile.
+        record!("contact-map-off", get!("mapTile", "objectName"));
+        record!("locations-on", call!("setLocations", true));
+        // Chat's map: core readies app first, page follows.
+        record!("contact-map", call!("click", QString::from("mapTile")));
+    });
+    let stack_early = std::ptr::addr_of!(stack_box);
+    plan.until(1, 10, move |last| unsafe {
+        // SAFETY: fires only while `exec()` runs; `stack_box` outlives it.
+        let done = (*stack_early)
+            .pinned()
+            .borrow()
+            .log
+            .to_string()
+            .contains("heading=");
+        if !(done || last) {
+            return false;
+        }
         // Tiles on own, apps on.
         record!(
             "load-tiles",
@@ -443,12 +477,26 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
             "load-group",
             call!("loadDetail", QString::from(page.clone()), 2)
         );
+        true
     });
 
     plan.after(2, move || unsafe {
         record!("group-tiles", get!("mediaKinds", "visible"));
         record!("open-files", call!("click", QString::from("filesTile")));
-        (*engine_ptr).quit();
+        call!("setLocations", false);
+        record!("group-map-off", get!("mapTile", "objectName"));
+        call!("setLocations", true);
+        record!("open-map", call!("click", QString::from("mapTile")));
+    });
+    let stack_ptr = std::ptr::addr_of!(stack_box);
+    plan.until(1, 10, move |last| {
+        // SAFETY: fires only while `exec()` runs; `stack_box` outlives it.
+        let log = unsafe { (*stack_ptr).pinned().borrow().log.to_string() };
+        let done = log.matches("heading=").count() == 2;
+        if done || last {
+            unsafe { (*engine_ptr).quit() };
+        }
+        done
     });
 
     plan.run();
@@ -685,6 +733,17 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "the contact page has no gallery tile",
         ),
         (
+            "contact-map-off",
+            "missing:mapTile",
+            "the contact page offers the map while location streaming is off",
+        ),
+        ("locations-on", "ok", "location streaming was not turned on"),
+        (
+            "group-map-off",
+            "missing:mapTile",
+            "the group page offers the map while location streaming is off",
+        ),
+        (
             "tiles-apps",
             "appsTile",
             "the tiles offer no apps while they are on",
@@ -702,9 +761,14 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "push:GalleryPage.qml(at=10,newestFirst=true)|\
          push:GalleryPage.qml(at=15,newestFirst=true)|pop|\
          push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml(at=14)|\
-         push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(files)|",
+         push:ChatMediaPage.qml(gallery)|\
+         push:WebxdcPage.qml(at=101,query=?bounds=60.1,24.9,60.2,25,heading=from the list,\
+         subheading=Map)|\
+         push:ChatMediaPage.qml(files)|\
+         push:NoLocationsPage.qml(,heading=from the list,subheading=Map)|",
         "a tap did not open the right page, or Show in chat did not pop \
-         back to the conversation. {context}"
+         back to the conversation, or the map tile opened no chat map framing its locations, \
+         or a chat with none a map all the same. {context}"
     );
 
     // Each page asked core for its kinds.

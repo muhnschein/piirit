@@ -700,6 +700,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nou</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Afișați toate locațiile</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -725,6 +730,29 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Șterge</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transcrie %n mesaj vocal</numerusform>
+            <numerusform>Transcrie %n mesaje vocale</numerusform>
+            <numerusform>Transcrie %n de mesaje vocale</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copiază transcrierea</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Copiat în clipboard</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
     </message>
 </context>
 <context>
@@ -844,6 +872,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Editează</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Copiază transcrierea</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
     </message>
 </context>
 <context>
@@ -1255,6 +1293,86 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Partajează</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Trimite locația curentă</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Locația ta are o precizie de %n metru.</numerusform>
+            <numerusform>Locația ta are o precizie de %n metri.</numerusform>
+            <numerusform>Locația ta are o precizie de %n de metri.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Activează locația în Setări pentru a o trimite.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Se caută locația ta…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Partajează locația în timp real</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit continuă să îți trimită locația cât timp rulează în fundal.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Timp de 30 de minute</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Timp de 1 oră</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Timp de 2 ore</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Timp de 6 ore</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Timp de 24 de ore</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Oprește partajarea locației</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Încă se caută locația ta. Este activată locația în Setări?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Afișați toate locațiile</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Hartă</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1301,6 +1419,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Încă nu există apeluri</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Hartă</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1333,6 +1456,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Editat</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Locație</translation>
     </message>
 </context>
 <context>
@@ -1482,6 +1610,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Toți cei din canal văd numele</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Încă nu există locații</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Aici apar locațiile partajate în ultimele 24 de ore.</translation>
     </message>
 </context>
 <context>
@@ -2267,6 +2408,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Rulează aplicații mici în conversații.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Activează transmiterea locației (experimental)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Partajează locația ta în conversații și arată locațiile partajate pe o hartă.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Transcrie mesajele vocale (experimental)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcrierea mesajelor vocale</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Transformă mesajele vocale în text pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nimic nu părăsește telefonul.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2279,6 +2445,36 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Trimite ca mesaj</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Îți partajezi locația</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>a mai rămas %n minut</numerusform>
+            <numerusform>au mai rămas %n minute</numerusform>
+            <numerusform>au mai rămas %n de minute</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>a mai rămas %n oră</numerusform>
+            <numerusform>au mai rămas %n ore</numerusform>
+            <numerusform>au mai rămas %n de ore</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Locația ta nu este trimisă. Este activată locația în Setări?</translation>
     </message>
 </context>
 <context>
@@ -2886,11 +3082,211 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>În timpul încărcării</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Întotdeauna</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Niciodată</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Mesajele vocale noi sunt transcrise în timp ce telefonul se încarcă.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Mesajele vocale noi sunt transcrise imediat ce s-au descărcat.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Aceasta consumă baterie.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Atinge Transcrie pe un mesaj vocal pentru a-l transforma în text.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Înainte</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Limbi</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Încă indisponibil</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Transcrierea nu este încă destul de precisă în aceste limbi.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit descarcă o singură dată un model de vorbire și transcrie mesajele vocale pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nimic din ce trimiți sau primești nu părăsește telefonul.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transcrierile în această limbă conțin probabil mai multe greșeli.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transcrierea mesajelor vocale</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Limbi</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Când</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Încearcă din nou</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Transcrie automat mesajele vocale</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transcrie mesajele vocale mai vechi</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Mesajele vocale sosite înainte de activare sunt transcrise în timp ce telefonul se încarcă.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Gata</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Se descarcă modelul de vorbire… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Descărcarea continuă după ce închizi această pagină.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Încearcă din nou</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Se înregistrează %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Acest mesaj vocal este transcris când telefonul se încarcă.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Transcrierea este întreruptă cât timp modul de economisire a energiei este activ.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Se așteaptă transcrierea altor mesaje vocale.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Se descarcă modelul de vorbire… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Se transcrie… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Acest mesaj vocal pare să fie în %1, care nu este selectată.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Nu s-a găsit vorbire în acest mesaj vocal.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Acest mesaj vocal nu a putut fi transcris.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transcrie</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transcrie acum</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Transcrie oricum</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Încearcă din nou</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transcris pe acest telefon</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Arată tot</translation>
     </message>
 </context>
 <context>

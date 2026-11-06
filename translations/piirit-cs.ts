@@ -704,6 +704,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Nový</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -729,6 +734,29 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Delete</source>
         <translation>Smazat</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Přepsat %n hlasovou zprávu</numerusform>
+            <numerusform>Přepsat %n hlasové zprávy</numerusform>
+            <numerusform>Přepsat %n hlasových zpráv</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopírovat přepis</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Zkopírováno do schránky</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Přepsat</translation>
     </message>
 </context>
 <context>
@@ -848,6 +876,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edit</source>
         <translation>Upravit</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopírovat přepis</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Přepsat</translation>
     </message>
 </context>
 <context>
@@ -1259,6 +1297,86 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Sdílet</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Odeslat aktuální polohu</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Vaše poloha je přesná na %n metr.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metry.</numerusform>
+            <numerusform>Vaše poloha je přesná na %n metrů.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Pro odeslání polohy ji zapněte v Nastavení.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Zjišťování vaší polohy…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Sdílet polohu živě</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit odesílá vaši polohu i tehdy, když běží na pozadí.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Na 30 minut</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Na 1 hodinu</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Na 2 hodiny</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Na 6 hodin</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Na 24 hodin</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Přestat sdílet polohu</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Stále se hledá vaše poloha. Je poloha zapnutá v Nastavení?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Všechny polohy</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1305,6 +1423,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>No calls yet</source>
         <translation>Zatím žádné hovory</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Mapa</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1337,6 +1460,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edited</source>
         <translation>Upraveno</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Poloha</translation>
     </message>
 </context>
 <context>
@@ -1486,6 +1614,19 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Jméno vidí všichni v kanálu</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Zatím žádné polohy</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Zde se zobrazují polohy sdílené za posledních 24 hodin.</translation>
     </message>
 </context>
 <context>
@@ -2271,6 +2412,31 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Runs small apps inside chats.</source>
         <translation>Spouští malé aplikace uvnitř chatů.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Povolit streamování polohy (experimentální)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Sdílí vaši polohu v chatech a zobrazuje sdílené polohy na mapě.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Přepisovat hlasové zprávy (experimentální)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Přepis hlasových zpráv</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Převádí hlasové zprávy na text v tomto telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nic neopustí telefon.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2283,6 +2449,36 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Odeslat jako zprávu</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sdílíte svou polohu</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>zbývá %n minuta</numerusform>
+            <numerusform>zbývají %n minuty</numerusform>
+            <numerusform>zbývá %n minut</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>zbývá %n hodina</numerusform>
+            <numerusform>zbývají %n hodiny</numerusform>
+            <numerusform>zbývá %n hodin</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Vaše poloha se neodesílá. Je poloha zapnutá v Nastavení?</translation>
     </message>
 </context>
 <context>
@@ -2890,11 +3086,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Při nabíjení</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Vždy</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nikdy</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Nové hlasové zprávy se přepisují, když se telefon nabíjí.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Nové hlasové zprávy se přepisují, jakmile se stáhnou.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Spotřebovává to baterii.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Klepnutím na Přepsat u hlasové zprávy ji převedete na text.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Další</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Jazyky</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Zatím nedostupné</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>V těchto jazycích zatím přepis není dost přesný.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit jednou stáhne řečový model a přepisuje hlasové zprávy v tomto telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nic, co odešlete nebo přijmete, neopustí telefon.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Přepisy v tomto jazyce pravděpodobně obsahují více chyb.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Přepis hlasových zpráv</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Jazyky</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Kdy</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Řečový model se nepodařilo stáhnout.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Zkusit znovu</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Automaticky přepisovat hlasové zprávy</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Přepsat starší hlasové zprávy</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Hlasové zprávy, které přišly před zapnutím této funkce, se přepisují, když se telefon nabíjí.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Hotovo</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Stahování řečového modelu… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Stahování pokračuje i po zavření této stránky.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Řečový model se nepodařilo stáhnout.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Zkusit znovu</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Nahrávání %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Tato hlasová zpráva se přepíše, když se telefon bude nabíjet.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Přepis je pozastaven, dokud je zapnutý úsporný režim.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Čeká se na přepis jiných hlasových zpráv.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Stahování řečového modelu… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Přepisování… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Tato hlasová zpráva je zřejmě v jazyce %1, který není vybraný.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>V této hlasové zprávě nebyla nalezena řeč.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Tuto hlasovou zprávu se nepodařilo přepsat.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Přepsat</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Přepsat nyní</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Přesto přepsat</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Zkusit znovu</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Přepsáno v tomto telefonu</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Zobrazit vše</translation>
     </message>
 </context>
 <context>

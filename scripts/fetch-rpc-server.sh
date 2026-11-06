@@ -25,13 +25,13 @@ set -eu
 check_only=0
 [ "${1:-}" = --check ] && check_only=1
 
-VERSION="2.65.0"
+VERSION="2.68.0"
 
 # sailfish-arch  upstream-arch  wheel-tag                                                                     wheel-sha256                                                       binary-sha256
 TABLE="
-aarch64 aarch64 py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64 73cb549de372650b623d24e196b5efb55cea546e714c01b40825d9bc71f5f456 01c0f9ff0ce1fe8c3f99ba8f66d056f75653fdf2e39c00decac374285097c33c
-armv7hl armv7l py3-none-linux_armv7l.manylinux_2_17_armv7l.manylinux2014_armv7l.musllinux_1_1_armv7l 97ff2fa439d25190514510e0e7ada2c0e9b32a9884f80179f6cabb3533f98108 0da3625b78ad06ae2cafcbeff115aa218c76aa12a475e47d8aae017222c06e8a
-x86_64 x86_64 py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.musllinux_1_1_x86_64 f2ec9f161ad0ebd3352791a7f8a72d5a1a0e4f3babbd3f12ca8cef40ad8b8aa0 fc4945c3179499f5b69579d224e3da2f1f4bfa5ce927db4253fba844bec4ad1a
+aarch64 aarch64 py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64 33462c7ce86500392948bc176f6314e3374f7881f9e4d031fdcf058d9febd815 c424a42de601f2a60aa05e4c2cfee4c02ed9c88e19e623973d0460c14fe64252
+armv7hl armv7l py3-none-linux_armv7l.manylinux_2_17_armv7l.manylinux2014_armv7l.musllinux_1_1_armv7l 9614db0fdbe00dadde93d57c25fac4a1a82ec486740952eae5e352b5565b20f5 bc53b69747bcb53a54ad5a3d14f469f7e7d5a7f3977ab2f8588f3fa6e765fcee
+x86_64 x86_64 py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.musllinux_1_1_x86_64 15858adc0752f3f1a3cc467c66c95533f0950ae96187ea1b3cab25fd55eb2264 bf1b10a1656d10b69325b2a8efadc329c9ecea5190ee4e5350d996bd7c65e7ec
 "
 
 repo_root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)

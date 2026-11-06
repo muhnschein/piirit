@@ -262,8 +262,7 @@ fn base64(bytes: &[u8]) -> String {
 
 /// Mail server that says yes, on two loopback ports: IMAP, then SMTP.
 ///
-/// Core 2.61+ refuses `configured_addr` without a transport; JSON-RPC cannot add one without
-/// login. IMAP answers each tagged line `OK`, SMTP each step its reply. IO stopped once in.
+/// Core 2.66+: no own contact without a transport; JSON-RPC cannot add one without login. IMAP answers each tagged line `OK`, SMTP each step its reply. IO stopped once in.
 ///
 /// Threads not joined; listeners die with process.
 fn loopback_mailbox() -> (u16, u16) {
@@ -419,6 +418,53 @@ async fn offline_round_trip_against_real_core() {
 
     // Account bootstrap, as DeltaChatCore::add_account.
     let account_id: u32 = client.call_unit("add_account").await.expect("add_account");
+
+    // Account list: `kind` tag, "Configured"/"Unconfigured", camelCase fields.
+    let accounts: Vec<Value> = client
+        .call_unit("get_all_accounts")
+        .await
+        .expect("get_all_accounts");
+    let ours = accounts
+        .iter()
+        .find(|a| a.get("id").and_then(Value::as_u64) == Some(u64::from(account_id)))
+        .expect("our account missing from get_all_accounts");
+    assert_eq!(
+        ours.get("kind").and_then(Value::as_str),
+        Some("Unconfigured"),
+        "unexpected account shape: {ours:?}"
+    );
+
+    // Core 2.66+: no relay, no self contact; own drafts and messages then fail to load. App
+    // only opens chats once a profile has one. IO stopped: stub would be talked to all test.
+    client
+        .call::<_, ()>(
+            "add_transport_from_qr",
+            (
+                account_id,
+                dclogin("piirit@example.invalid", loopback_mailbox()),
+            ),
+        )
+        .await
+        .expect("add_transport_from_qr for the first account");
+    client
+        .call::<_, ()>("stop_io", (account_id,))
+        .await
+        .expect("stop_io on the first account");
+    // Welcome messages seen, so device chat's first unread is the probe's below.
+    let welcome: Option<u32> = client
+        .call("get_chat_id_by_contact_id", (account_id, 5))
+        .await
+        .expect("get_chat_id_by_contact_id for the first account's device chat");
+    if let Some(device) = welcome {
+        let shown: Vec<u32> = client
+            .call("get_message_ids", (account_id, device, false, false))
+            .await
+            .expect("get_message_ids on the first account's device chat");
+        client
+            .call::<_, ()>("markseen_msgs", (account_id, shown))
+            .await
+            .expect("markseen_msgs on the first account's welcome messages");
+    }
 
     // Config round trip, as configure_account (no `configure`: needs live mail).
     client
@@ -601,21 +647,6 @@ async fn offline_round_trip_against_real_core() {
             );
         }
     }
-
-    // Account list: `kind` tag, "Configured"/"Unconfigured", camelCase fields.
-    let accounts: Vec<Value> = client
-        .call_unit("get_all_accounts")
-        .await
-        .expect("get_all_accounts");
-    let ours = accounts
-        .iter()
-        .find(|a| a.get("id").and_then(Value::as_u64) == Some(u64::from(account_id)))
-        .expect("our account missing from get_all_accounts");
-    assert_eq!(
-        ours.get("kind").and_then(Value::as_str),
-        Some("Unconfigured"),
-        "unexpected account shape: {ours:?}"
-    );
 
     // Selected profile: core auto-selects a new account; `select_account` takes bare id;
     // `get_selected_account_id` gives id or null (`Option<u32>`, as shim decodes).
@@ -1041,6 +1072,15 @@ async fn offline_round_trip_against_real_core() {
         whole.contains("line 50"),
         "the message's HTML part does not hold the end of the body, so          there is nowhere left to read it from: {whole:?}"
     );
+    // Core 2.68+: cut on load, stored whole, so search finds the tail too.
+    let tail_hits: Vec<u32> = client
+        .call("search_messages", (sender_id, "line 50", Some(saved)))
+        .await
+        .expect("search_messages for the end of a long message");
+    assert!(
+        tail_hits.contains(&fourth),
+        "search misses words past the cut of a long message: {tail_hits:?}"
+    );
     // Short message whole. Asking for missing HTML part is no error.
     let short_message: Value = client
         .call("get_message", (sender_id, first))
@@ -1264,6 +1304,87 @@ async fn offline_round_trip_against_real_core() {
         "the voice message lost its file: {:?}",
         voices[&voice_id]
     );
+    // Chat-list row and quote of a voice message: what transcript previews key on
+    // (piirit-shim/src/chatlist.rs, MessageDelegate.qml), and the words they replace.
+    let items: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (sender_id, vec![saved]))
+        .await
+        .expect("get_chatlist_items_by_entries after a voice message");
+    let row = &items[&saved];
+    assert_eq!(
+        (
+            row.get("lastMessageId").and_then(Value::as_u64),
+            row.get("lastMessageType").and_then(Value::as_str),
+            row.get("summaryText2").and_then(Value::as_str),
+        ),
+        (
+            Some(u64::from(voice_id)),
+            Some("Voice"),
+            Some("🎤 Voice message")
+        ),
+        "a voice message's chat-list row changed shape: {row:?}"
+    );
+    let (reply_id, _): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Some("re"),
+                Option::<String>::None,
+                Option::<String>::None,
+                Option::<(f64, f64)>::None,
+                Some(voice_id),
+            ),
+        )
+        .await
+        .expect("misc_send_msg quoting a voice message");
+    let replies: std::collections::HashMap<u32, Value> = client
+        .call("get_messages", (sender_id, vec![reply_id]))
+        .await
+        .expect("get_messages for the reply to a voice message");
+    let quote = &replies[&reply_id]["quote"];
+    assert_eq!(
+        (
+            quote.get("messageId").and_then(Value::as_u64),
+            quote.get("viewType").and_then(Value::as_str),
+            quote.get("text").and_then(Value::as_str),
+        ),
+        (
+            Some(u64::from(voice_id)),
+            Some("Voice"),
+            Some("🎤 Voice message")
+        ),
+        "a quote of a voice message changed shape: {quote:?}"
+    );
+    // Text previews one line, as transcript previews (`voice_preview`); not cut (2000 characters
+    // came back whole).
+    let lines = "one\ntwo  three\tfour";
+    client
+        .call::<_, (u32, Value)>(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Some(lines),
+                Option::<String>::None,
+                Option::<String>::None,
+                Option::<(f64, f64)>::None,
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .expect("misc_send_msg with lines");
+    let items: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (sender_id, vec![saved]))
+        .await
+        .expect("get_chatlist_items_by_entries after lines");
+    assert_eq!(
+        items[&saved].get("summaryText2").and_then(Value::as_str),
+        Some("one two three four"),
+        "the core no longer previews text on one line: {:?}",
+        items[&saved]
+    );
 
     let sent_tone = send_file(&client, sender_id, saved, &tone, "tone.wav").await;
     assert_eq!(
@@ -1477,6 +1598,48 @@ async fn offline_round_trip_against_real_core() {
         encoded_icon,
         base64(ONE_PIXEL_PNG),
         "the icon a row draws is not the one in the archive"
+    );
+
+    // Core 2.67+: broken icon answers core's default icon, not an error (row: that, not grid stand-in).
+    let broken_file = std::env::temp_dir().join("piirit-real-server-broken-icon.xdc");
+    std::fs::write(
+        &broken_file,
+        webxdc(&[
+            ("index.html", page),
+            ("manifest.toml", b"name = \"Broken\"\n"),
+            ("icon.png", b"not a picture"),
+        ]),
+    )
+    .expect("write webxdc with a broken icon");
+    let (broken_id, _): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                sender_id,
+                saved,
+                Option::<String>::None,
+                Some(broken_file.to_string_lossy().into_owned()),
+                Some("broken.xdc".to_string()),
+                Option::<(f64, f64)>::None,
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .expect("misc_send_msg with a broken-icon webxdc");
+    let broken_icon: String = client
+        .call("get_webxdc_blob", (sender_id, broken_id, "icon.png"))
+        .await
+        .expect("get_webxdc_blob refused a broken icon; core 2.67 answers its default icon");
+    let default_icon: String = client
+        .call(
+            "get_webxdc_blob",
+            (sender_id, broken_id, "__webxdc__/default-icon.png"),
+        )
+        .await
+        .expect("get_webxdc_blob for the default icon");
+    assert_eq!(
+        broken_icon, default_icon,
+        "a broken icon is not swapped for core's default icon"
     );
 
     // Updates both ways: bridge POST, and poll collecting it.
@@ -1930,15 +2093,16 @@ async fn offline_round_trip_against_real_core() {
              page draws: {configured:?}"
         );
     }
-    let own_addr: Option<String> = client
-        .call("get_config", (sender_id, "configured_addr"))
-        .await
-        .expect("get_config configured_addr");
     assert_eq!(
-        own_addr.as_deref(),
-        Some("self@example.invalid"),
-        "a configured account does not name the address it was configured \
-         with, so its row on the profiles page would have none"
+        own_address(&client, sender_id).await,
+        "self@example.invalid",
+        "a configured account's own contact does not carry the address it \
+         was configured with, so its row on the profiles page would have none"
+    );
+    // Core 2.66+: key gone; asking is refused, so shim must not.
+    assert_eq!(
+        refusal(&client, "get_config", (sender_id, "configured_addr")).await,
+        "unknown key \"configured_addr\": Matching variant not found"
     );
 
     // Empty name resets a contact's own name; contact page relies on it.
@@ -2051,11 +2215,143 @@ async fn offline_round_trip_against_real_core() {
     relays_against(&client, mailbox).await;
     calls_against(&client, mailbox).await;
     channels_against(&client, mailbox).await;
+    locations_against(&client, sender_id, saved).await;
 
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
     client.shutdown().await.expect("shutdown");
     let _ = std::fs::remove_dir_all(&accounts_dir);
+}
+
+/// Location as shim reads it (`location.rs`, `chat.rs`): one-off point carried and found by
+/// its message, live sharing on and off with its notice typed, positions stored only while on.
+#[allow(clippy::too_many_lines)]
+async fn locations_against(client: &RpcClient, account: u32, chat: u32) {
+    let link =
+        "https://www.openstreetmap.org/?mlat=60.16952&mlon=24.93546#map=16/60.16952/24.93546";
+    let (point, sent): (u32, Value) = client
+        .call(
+            "misc_send_msg",
+            (
+                account,
+                chat,
+                Some(link),
+                Option::<String>::None,
+                Option::<String>::None,
+                Some((60.169_524_f64, 24.935_456_f64)),
+                Option::<u32>::None,
+            ),
+        )
+        .await
+        .unwrap_or_else(|err| panic!("misc_send_msg with a location: {err}"));
+    assert_eq!(
+        (sent.get("hasLocation"), sent.get("text")),
+        (Some(&Value::Bool(true)), Some(&Value::from(link))),
+        "a point sent once does not say it carries one: {sent:?}"
+    );
+
+    // Params: account, chat, contact, from, to (0: now). Newest first.
+    let mine = || async move {
+        client
+            .call::<_, Vec<Value>>("get_locations", (account, chat, 1u32, 0, 0))
+            .await
+            .unwrap_or_else(|err| panic!("get_locations: {err}"))
+    };
+    let found = mine().await;
+    let own = found
+        .iter()
+        .find(|location| location.get("msgId") == Some(&Value::from(point)))
+        .unwrap_or_else(|| panic!("the point sent is not among the chat's: {found:?}"));
+    for (field, wanted) in [
+        ("latitude", Value::from(60.169_524_f64)),
+        ("longitude", Value::from(24.935_456_f64)),
+        ("contactId", Value::from(1)),
+        ("isIndependent", Value::Bool(true)),
+    ] {
+        assert_eq!(own.get(field), Some(&wanted), "{field} of {own:?}");
+    }
+    assert!(
+        own.get("timestamp").and_then(Value::as_i64).is_some()
+            && own.get("accuracy").and_then(Value::as_f64).is_some(),
+        "a point has no time or accuracy: {own:?}"
+    );
+
+    let sharing = || async move {
+        let anywhere: bool = client
+            .call("is_sending_locations", (account,))
+            .await
+            .unwrap_or_else(|err| panic!("is_sending_locations: {err}"));
+        let here: bool = client
+            .call("is_sending_locations_to_chat", (account, chat))
+            .await
+            .unwrap_or_else(|err| panic!("is_sending_locations_to_chat: {err}"));
+        (anywhere, here)
+    };
+    assert_eq!(sharing().await, (false, false));
+    let accounts: Vec<u32> = client
+        .call_unit("get_all_account_ids")
+        .await
+        .unwrap_or_else(|err| panic!("get_all_account_ids: {err}"));
+    assert!(
+        accounts.contains(&account),
+        "the profile is not among all profiles"
+    );
+
+    client
+        .call::<_, ()>("send_locations_to_chat", (account, chat, 1800_i64))
+        .await
+        .unwrap_or_else(|err| panic!("send_locations_to_chat: {err}"));
+    assert_eq!(sharing().await, (true, true), "live sharing did not start");
+    let wanted: bool = client
+        .call("set_location", (60.2_f64, 25.0_f64, 8.0_f64))
+        .await
+        .unwrap_or_else(|err| panic!("set_location: {err}"));
+    assert!(wanted, "the core did not want a position while sharing");
+    let found = mine().await;
+    assert_eq!(
+        found.first().map(|newest| (
+            newest.get("latitude").and_then(Value::as_f64),
+            newest.get("msgId").and_then(Value::as_u64),
+            newest.get("isIndependent").and_then(Value::as_bool),
+        )),
+        Some((Some(60.2), Some(0), Some(false))),
+        "the position fed is not the newest, or came with a message: {found:?}"
+    );
+
+    let ids: Vec<u32> = client
+        .call("get_message_ids", (account, chat, false, false))
+        .await
+        .unwrap_or_else(|err| panic!("get_message_ids: {err}"));
+    let messages: std::collections::HashMap<u32, Value> = client
+        .call("get_messages", (account, ids))
+        .await
+        .unwrap_or_else(|err| panic!("get_messages: {err}"));
+    let notice = messages
+        .values()
+        .find(|message| {
+            message.get("systemMessageType").and_then(Value::as_str)
+                == Some("LocationStreamingEnabled")
+        })
+        .unwrap_or_else(|| panic!("live sharing left no notice: {messages:?}"));
+    assert_eq!(
+        (notice.get("isInfo"), notice.get("fromId")),
+        (Some(&Value::Bool(true)), Some(&Value::from(1))),
+        "live sharing's notice is not a notice from its sharer: {notice:?}"
+    );
+
+    client
+        .call::<_, ()>("send_locations_to_chat", (account, chat, 0_i64))
+        .await
+        .unwrap_or_else(|err| panic!("send_locations_to_chat 0: {err}"));
+    assert_eq!(sharing().await, (false, false), "live sharing did not stop");
+    let wanted: bool = client
+        .call("set_location", (60.3_f64, 25.1_f64, 8.0_f64))
+        .await
+        .unwrap_or_else(|err| panic!("set_location after stop: {err}"));
+    assert!(
+        !wanted,
+        "the core still wants positions after sharing stopped"
+    );
 }
 
 /// Pinning a message, then unpinning it, as another Delta Chat app does in a chat
@@ -2108,6 +2404,19 @@ async fn unpinning_against(client: &RpcClient, account: u32, chat: u32, message:
     }
 }
 
+/// Own address, as shim reads it: own contact's (id 1). Core 2.66+: first relay's.
+async fn own_address(client: &RpcClient, account: u32) -> String {
+    let contact: Value = client
+        .call("get_contact", (account, 1_u32))
+        .await
+        .unwrap_or_else(|err| panic!("get_contact for self: {err}"));
+    contact
+        .get("address")
+        .and_then(Value::as_str)
+        .unwrap_or_else(|| panic!("own contact without an address: {contact:?}"))
+        .to_string()
+}
+
 /// Profile relays, as profile page and duplicate check read them. Three loopback relays.
 /// `relays_against` adds them.
 async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]) {
@@ -2129,11 +2438,7 @@ async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]
         .await
         .unwrap_or_else(|err| panic!("list_transports: {err}"));
     assert_eq!(listed(&transports), addrs, "{transports:?}");
-    let own: Option<String> = client
-        .call("get_config", (account, "configured_addr"))
-        .await
-        .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
-    assert_eq!(own.as_deref(), Some(addrs[0]));
+    assert_eq!(own_address(client, account).await, addrs[0]);
     // Core 2.63+: relays don't write legacy keys (`addr`, `mail_pw`); shim must never read them.
     for key in ["addr", "mail_pw", "mail_server", "send_server"] {
         let legacy: Option<String> = client
@@ -2196,24 +2501,6 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
     assert_eq!(
         refusal(
             client,
-            "set_config",
-            (account, "configured_addr", "nobody@example.invalid")
-        )
-        .await,
-        "Address does not belong to any transport."
-    );
-    assert_eq!(
-        refusal(
-            client,
-            "set_config",
-            (account, "configured_addr", Option::<String>::None)
-        )
-        .await,
-        "Cannot unset configured_addr"
-    );
-    assert_eq!(
-        refusal(
-            client,
             "delete_transport",
             (account, "nobody@example.invalid")
         )
@@ -2221,19 +2508,15 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         "Transport does not exist"
     );
 
-    // Removing relay with profile's address moves it to newest remaining.
+    // Core 2.66+: removing relay with profile's address moves it to oldest remaining.
     client
         .call::<_, ()>("delete_transport", (account, addrs[0]))
         .await
         .unwrap_or_else(|err| panic!("delete_transport of the profile's own relay: {err}"));
-    let own: Option<String> = client
-        .call("get_config", (account, "configured_addr"))
-        .await
-        .unwrap_or_else(|err| panic!("get_config configured_addr after the removal: {err}"));
     assert_eq!(
-        own.as_deref(),
-        Some(addrs[2]),
-        "the profile's own address did not move to the newest relay left"
+        own_address(client, account).await,
+        addrs[1],
+        "the profile's own address did not move to the oldest relay left"
     );
     client
         .call::<_, ()>("delete_transport", (account, addrs[1]))

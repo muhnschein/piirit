@@ -44,6 +44,8 @@ cpp! {{
         void *user = nullptr;
         // Failed attempts: sets wait.
         unsigned failures = 0;
+        // Connections begun; tests wait on it.
+        unsigned attempts = 0;
         // Server accepted subscription.
         bool subscribed = false;
         // Listing under way; changed since asked; pid seen.
@@ -238,6 +240,7 @@ cpp! {{
     }
 
     static void piirit_mic_connect(PiiritMicWatch *w) {
+        w->attempts++;
         pa_context *c = pa_context_new(w->api, "piirit");
         if (!c) {
             piirit_mic_retry(w);
@@ -281,6 +284,14 @@ cpp! {{
             return nullptr;
         }
         return w;
+    }
+
+    // Not from mainloop thread.
+    static unsigned piirit_mic_attempts(PiiritMicWatch *w) {
+        pa_threaded_mainloop_lock(w->loop);
+        unsigned attempts = w->attempts;
+        pa_threaded_mainloop_unlock(w->loop);
+        return attempts;
     }
 
     // Not from mainloop thread, which this joins.
@@ -352,6 +363,17 @@ impl MicWatcher {
         Some(Self {
             handle: handle as usize,
             report,
+        })
+    }
+
+    /// Connections begun, first included. Tests wait on retries with it, not on clock.
+    #[doc(hidden)]
+    #[must_use]
+    pub fn attempts(&self) -> u32 {
+        let watch = self.handle as *mut c_void;
+        // SAFETY: handle valid till drop; off mainloop thread (takes its lock).
+        cpp!(unsafe [watch as "PiiritMicWatch *"] -> u32 as "unsigned" {
+            return piirit_mic_attempts(watch);
         })
     }
 }

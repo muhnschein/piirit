@@ -25,6 +25,16 @@ Page {
     /// App's name from the row, until core answers.
     property string appName: ""
 
+    /// Heading instead of app's name, and line under it (map: chat's name, "Map").
+    property string heading: ""
+    property string subheading: ""
+
+    /// Appended to app's address, e.g. map's `?poi=…`.
+    property string query: ""
+
+    /// Where view goes: app's address plus `query`; empty until host answers.
+    readonly property string address: app.url.length > 0 ? app.url + page.query : ""
+
     property string errorMessage: ""
 
     /// App drew once; later loads bring no spinner.
@@ -51,8 +61,8 @@ Page {
             return
         }
         view.stop()
-        // App broke the binding; restore it (not address) so close still empties view.
-        view.url = Qt.binding(function () { return app.url })
+        // App broke the binding; restore binding, not a fixed address: close still empties view.
+        view.url = Qt.binding(function () { return page.address })
     }
 
     WebxdcApp {
@@ -137,7 +147,9 @@ Page {
     ConversationHeader {
         id: header
         objectName: "webxdcHeader"
-        title: app.name.length > 0 ? app.name : page.appName
+        title: page.heading.length > 0 ? page.heading
+               : app.name.length > 0 ? app.name : page.appName
+        subtitle: page.subheading
     }
 
     // Empty until host gives address. `active` left to WebView.qml (page status, focus):
@@ -151,7 +163,7 @@ Page {
             right: parent.right
             bottom: parent.bottom
         }
-        url: app.url
+        url: page.address
         onUrlChanged: page.keepInside()
         onLoadedChanged: {
             if (view.loaded) {

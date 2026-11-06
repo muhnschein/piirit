@@ -174,7 +174,7 @@ fn the_relays_are_listed_removed_and_added() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // Two relays: first set up, and the one holding address now.
+        // Two relays: first set up (holds address, core 2.66+), and one added since.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 
@@ -469,7 +469,7 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     assert_eq!(value("count"), "2", "{context}");
     assert_eq!(
         value("first"),
-        "account1@example.org",
+        "ada@old.example.net",
         "the relay with the profile's own address is not listed first. {context}"
     );
     assert_eq!(value("menu-found"), "removeRelayItem", "{context}");
@@ -479,36 +479,36 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
         "a row still claims to be the relay mail leaves through, or offers \
          to make it so, which the core no longer lets anyone choose. {context}"
     );
-    assert_eq!(value("second"), "ada@old.example.net", "{context}");
-    assert_eq!(value("second-domain"), "old.example.net", "{context}");
-    assert_eq!(value("first-report"), "example.org", "{context}");
+    assert_eq!(value("second"), "account1@example.org", "{context}");
+    assert_eq!(value("second-domain"), "example.org", "{context}");
+    assert_eq!(value("first-report"), "old.example.net", "{context}");
     assert_eq!(
         value("first-status"),
-        "Connected",
+        "Connecting…",
         "the relay's connection is not said in the core's own words. {context}"
     );
-    assert_eq!(value("second-report"), "old.example.net", "{context}");
+    assert_eq!(value("second-report"), "example.org", "{context}");
     assert_eq!(
         value("second-status"),
-        "Connecting…",
+        "Connected",
         "the second relay's connection is not its own. {context}"
     );
     assert_eq!(
         value("second-quota"),
-        "95",
+        "67",
         "the second relay's mailbox is not its own. {context}"
     );
     assert_eq!(
         value("second-words"),
-        "2.0 GB of 2.1 GB used",
+        "1.4 GB of 2.1 GB used",
         "the second relay's mailbox is not said as used of the whole. {context}"
     );
     assert_eq!(value("first-remove"), "true", "{context}");
     assert_eq!(value("second-remove"), "true", "{context}");
-    assert_eq!(value("address"), "account1@example.org", "{context}");
+    assert_eq!(value("address"), "ada@old.example.net", "{context}");
     assert_eq!(
         value("quota"),
-        "67",
+        "95",
         "the first bar is not the mailbox of the relay with the profile's \
          own address. {context}"
     );
@@ -541,17 +541,17 @@ fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], con
         "1",
         "the relay was not removed once the countdown ran out. {context}"
     );
-    assert_eq!(value("remaining"), "ada@old.example.net", "{context}");
+    assert_eq!(value("remaining"), "account1@example.org", "{context}");
     assert_eq!(
         value("moved-address"),
-        "ada@old.example.net",
+        "account1@example.org",
         "the profile's own address did not follow the core to the relay \
          left. {context}"
     );
-    assert_eq!(value("moved-report"), "old.example.net", "{context}");
+    assert_eq!(value("moved-report"), "example.org", "{context}");
     assert_eq!(
         value("moved-quota"),
-        "95",
+        "67",
         "the reports did not follow the order of the rows. {context}"
     );
     assert_eq!(
@@ -574,7 +574,7 @@ fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], con
     );
     assert_eq!(
         deletions[0].pointer("/1").and_then(Value::as_str),
-        Some("account1@example.org"),
+        Some("ada@old.example.net"),
         "the wrong relay was removed"
     );
 }
@@ -643,7 +643,7 @@ fn assert_added(
         "2",
         "the added relay did not land in the list. {context}"
     );
-    assert_eq!(value("added-first"), "ada@old.example.net", "{context}");
+    assert_eq!(value("added-first"), "account1@example.org", "{context}");
     assert_eq!(
         value("added-second"),
         "account1@mailchat.pl",

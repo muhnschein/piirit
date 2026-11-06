@@ -9,6 +9,25 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
+- A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.
+- With voice messages turned into text, the chat list shows a voice message's text instead of just "Voice message", and so does a reply's quote of it and the reply bar while you answer one. Until the text is there, or with the feature off, they read as before.
+- Voice messages can be turned into text on the phone itself (experimental, off by default; Settings, Advanced). Piirit downloads a speech model once; nothing you send or receive leaves the phone. Transcribe one voice message with a tap, or let Piirit do them on its own while charging (the default) or as soon as they arrive. The text shows under the voice message, can be copied from its menu, and a chat's Audio page can transcribe all its voice messages at once. It works in 13 languages so far, and the list says for which of them transcripts are likely to contain more mistakes; other languages can't be picked yet.
+- Search finds voice messages by what is said in them, once they are turned into text, and lists them with the text messages as 🎤 and their text, as the chat list shows them.
+- The cover shows everyone from the start; right after Piirit opened, some people could be missing from it until a new message came.
+- When many messages arrive at once, such as after a while offline, the chat list catches up in one go instead of once per message, and the cover only reads your chats while you look at it, so the app stays quicker to respond.
+- The page of a group with hundreds of members opens and slides back smoothly: member rows are made as you scroll to them, not all at once.
+- Chats open and scroll more smoothly: each message builds and lays out only the parts it shows.
+- The emoji picker opens and searches faster: each emoji is just its picture.
+- The camera opens more smoothly: it starts once its page is on screen, on the side and in the mode asked, not while the page slides in. The same goes for the QR scanner opened from the cover.
+- Long chats open sooner: Piirit loads one screen of messages before showing the chat, not fifty, and the rest right after.
+- The camera shows it is busy while a photo is being saved.
+- A second tap on the shutter while a photo is saved no longer takes another photo.
+- When adding members to a group, people already in it are greyed out even if the group's member list arrives after the picker opened.
+- Tapping a message or missed-call notification opens its chat again after you have opened Archived chats or switched profiles. Before, such taps did nothing until Piirit was restarted.
+- Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
+- Bundles deltachat-rpc-server 2.68.0 (was 2.65.0). Search finds words anywhere in a long message, not just in the part the chat shows, and resending a long message sends all of it; this holds for messages sent or received from now on. A webxdc app whose icon is broken now shows the standard webxdc icon instead of a plain grid. On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
+- A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
+- The big picture on the profile, contact and group pages shows its letter or emoji at a size that fits it, not list size.
 - A chat whose name starts with an emoji shows that emoji as its picture, not a "?".
 - Emoji are sharp at every size, in messages, reactions and the emoji picker.
 - A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
@@ -24,6 +43,7 @@ docs/BUILDING.md, "Cutting a release").
 - Turning the unread filter off no longer flashes "No chats yet" before the chats come back.
 - After backing up a profile or handing it to a second device, swiping on to your chats ends there: swiping back no longer reopens the finished page.
 - "Add profile" under the profiles list opens a dialog to pick creating a profile, restoring a backup or adding this phone as a second device, each with a line on what it means; back from the page you picked returns to it.
+- **Share your location**, experimental as in Delta Chat: turn on Enable location streaming in Settings. Then share from the button beside the message field: once, or live for 30 minutes up to 24 hours. Sharing waits until the phone has found where it is, and says so when location is off in Settings. A message with a location shows just "Location": tap it to see the place on a map, the same map app as Delta Chat's, with each marker named after its sender. A chat's map is under Map on its contact or group page; all chats' locations are under All locations in the chat list's pull-down menu. The map opens framing every location of the last 24 hours, or says there are none. While you share live, Piirit keeps sending your position in the background; a line above the field shows the time left, warns when no position goes out, and stops sharing.
 
 ## 2.2.0 — 2026-10-23
 

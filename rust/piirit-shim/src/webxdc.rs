@@ -39,6 +39,8 @@ pub(crate) struct Info {
     pub(crate) send_update_interval: u64,
     /// Largest update core takes, bytes.
     pub(crate) send_update_max_size: u64,
+    /// Core lets app online: maps integration.
+    pub(crate) internet_access: bool,
 }
 
 /// What a message row shows for a webxdc.
@@ -74,6 +76,10 @@ async fn fetch_info(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result
         send_update_max_size: json::i64_at(&answer, "sendUpdateMaxSize")
             .try_into()
             .unwrap_or(0),
+        internet_access: answer
+            .get("internetAccess")
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or_default(),
     })
 }
 
@@ -501,6 +507,7 @@ async fn host_for(
             self_name,
             send_update_interval: info.send_update_interval,
             send_update_max_size: info.send_update_max_size,
+            internet_access: info.internet_access,
         },
         to_chat,
     )

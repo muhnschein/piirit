@@ -30,15 +30,22 @@ fn a_long_list_shows_its_first_screenful_before_the_rest() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-list-first-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Rest of the list (from 21st chat, id 219) held till first screenful is checked.
+    let hold = temp.join("hold");
+    std::fs::write(
+        &hold,
+        r#""get_chatlist_items_by_entries","params":[1,[219,"#,
+    )
+    .expect("write the hold file");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // 32 chats; two seconds per batch of rows.
+        // 32 chats: 1, 2, 201..=230.
         std::env::set_var("PIIRIT_FAKE_MANY_CHATS", "30");
-        std::env::set_var("PIIRIT_FAKE_CHATLIST_ITEMS_DELAY_MS", "2000");
+        std::env::set_var("PIIRIT_FAKE_HOLD", &hold);
     }
 
     piirit_shim::register_qml_types();
@@ -64,21 +71,31 @@ fn a_long_list_shows_its_first_screenful_before_the_rest() {
         };
     }
 
+    let core_ptr = std::ptr::addr_of!(core_box);
     let mut plan = common::Plan::default();
 
-    // SAFETY for every block: fire only inside `exec()`; `engine` and `steps` outlive it.
-    plan.after(1, move || unsafe {
+    // SAFETY for every block: fire only inside `exec()`; `engine`, `core_box`, `steps` outlive it.
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
-    // First batch lands ~2 s after load; second 2 s after that.
-    plan.after(3, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("count") != "20" && !last {
+            return false;
+        }
         (*steps_ptr).push(("early-count", call!("count")));
         (*steps_ptr).push(("early-first", call!("first")));
+        let _ = std::fs::remove_file(&hold);
+        true
     });
-    plan.after(3, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("count") != "32" && !last {
+            return false;
+        }
         (*steps_ptr).push(("count", call!("count")));
         (*steps_ptr).push(("first", call!("first")));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

@@ -50,14 +50,16 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     let journal = common::fresh_journal(&temp);
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
+    // Slow relay held till test lets go.
+    let gate = temp.join("slow-gate");
+    std::fs::write(&gate, "").expect("write the gate file");
 
     // SAFETY: single-threaded; all set pre-Qt and before shim spawns server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &accounts);
-        // Slow relay answers 3.5s after asked: between ticks, never on one.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "3500");
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", &gate);
     }
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
@@ -84,27 +86,50 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
-    // 2s: reader gives up on it.
+    // Reader gives up on it once relay asked.
     let cancel = core_ptr.clone();
-    plan.after(1, move || {
+    let asked = journal.clone();
+    plan.until(1, 30, move |last| {
+        let relay_asked = common::methods(&asked)
+            .iter()
+            .any(|method| method == "add_transport_from_qr");
+        if !relay_asked && !last {
+            return false;
+        }
         if let Some(this) = cancel.as_pinned() {
             this.borrow_mut().cancel_ongoing();
         }
+        true
     });
 
-    // 3s: tries another, while core still on first.
+    // Tries another while core still on first; first answers once second asked.
     let retry = core_ptr.clone();
-    plan.after(1, move || {
+    plan.after_busy(1, move || {
         if let Some(this) = retry.as_pinned() {
             let provider = this.borrow_mut().default_provider_qr();
             this.borrow_mut()
                 .create_profile(QString::from("Ada"), provider);
         }
     });
+    let first = gate.clone();
+    let second = journal.clone();
+    plan.until(1, 30, move |last| {
+        let asked = common::methods(&second)
+            .iter()
+            .filter(|method| *method == "add_transport_from_qr")
+            .count();
+        if asked < 2 && !last {
+            return false;
+        }
+        let _ = std::fs::remove_file(&first);
+        true
+    });
 
-    // 6s: relay answers late, after the two seconds given, deaf to the stop.
+    // Relay held again: answers late, after the two seconds given, deaf to the stop.
     let deaf = core_ptr;
-    plan.after(3, move || {
+    let again = gate.clone();
+    plan.after(1, move || {
+        std::fs::write(&again, "").expect("write the gate file");
         if let Some(this) = deaf.as_pinned() {
             this.borrow_mut().profile_timeout = 2;
             this.borrow_mut().create_profile(
@@ -114,8 +139,11 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
+    plan.after_busy(3, move || {
+        let _ = std::fs::remove_file(&gate);
+    });
     let engine_ptr: *const QmlEngine = &engine;
-    plan.after(5, move || {
+    plan.after(1, move || {
         // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();

@@ -15,7 +15,7 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
 use crate::video::Prepared;
-use crate::{calls, links, markdown, media, video, webxdc};
+use crate::{calls, links, location, markdown, media, video, webxdc};
 
 /// `DC_STATE_IN_FRESH`, `DC_STATE_IN_NOTICED`: unread incoming.
 const UNSEEN_STATES: [u32; 2] = [10, 13];
@@ -26,6 +26,10 @@ const UNSEEN_STATES: [u32; 2] = [10, 13];
 /// viewed ones. First message stays row 0: moving window would lose view's place
 /// (Whisperfish, deltachat-android likewise).
 const PAGE: usize = 50;
+
+/// Messages a chat opens with: over a phone screen. Rest filled as view asks (`hydrate`),
+/// while page slides in. Core builds messages one by one (50: ~140 ms on phone).
+const OPENING: usize = 20;
 
 /// Rows filled past view. Screen ~thirty one-line placeholders; less and fast scroll hits
 /// blanks.
@@ -49,10 +53,10 @@ pub(crate) struct Entry {
 pub(crate) fn opening_page(entries: &[Entry], find: u32) -> &[Entry] {
     let start = match entries.iter().position(|entry| entry.message_id == find) {
         // Half page above: not on top edge.
-        Some(index) => index.saturating_sub(PAGE / 2),
-        None => entries.len().saturating_sub(PAGE),
+        Some(index) => index.saturating_sub(OPENING / 2),
+        None => entries.len().saturating_sub(OPENING),
     };
-    let end = start.saturating_add(PAGE).min(entries.len());
+    let end = start.saturating_add(OPENING).min(entries.len());
     entries.get(start..end).unwrap_or_default()
 }
 
@@ -253,6 +257,17 @@ pub struct ChatMessages {
     pub send_file: qt_method!(fn(&mut self, text: QString, file_path: QString)),
     /// Send recording as `Voice` type; typed by file it would be music.
     pub send_voice: qt_method!(fn(&mut self, file_path: QString)),
+    /// Send one point, degrees: message carrying it, link to it as text (any client shows that).
+    pub send_location: qt_method!(fn(&mut self, latitude: f64, longitude: f64)),
+    /// Reader's location goes to chat live for `seconds`; 0 stops. Phone's position fed by
+    /// `LiveLocation`.
+    pub share_location: qt_method!(fn(&mut self, seconds: u32)),
+    /// Chat gets reader's location live now.
+    pub sharing_location: qt_property!(bool; NOTIFY sharing_location_changed),
+    /// Emitted on `sharing_location` or `sharing_until` change.
+    pub sharing_location_changed: qt_signal!(),
+    /// Live sharing ends then, Unix seconds; 0 unknown (started before Piirit kept it).
+    pub sharing_until: qt_property!(u64; NOTIFY sharing_location_changed),
     /// Mark loaded unread messages read. Called at newest message.
     pub mark_seen_all: qt_method!(fn(&mut self)),
 
@@ -743,6 +758,7 @@ impl ChatMessages {
         self.load_unread_mark();
         // Limit asked before file picked.
         self.load_attachment_limit();
+        self.refresh_sharing();
         // Prefetched by opener: no round trip; transition starts with rows.
         if let Some((shape, entries, items)) = crate::prefetch::take(account_id, chat_id) {
             self.take_shape(shape);
@@ -1004,11 +1020,17 @@ impl ChatMessages {
             self.pending.remove(id);
         }
         self.fetches = self.fetches.saturating_sub(1);
-        let filled = result.map(|items| self.fill_rows(items).len());
+        let filled = result.map(|items| self.fill_rows(items));
         self.set_hydrating(self.fetches > 0);
         match filled {
             // In place: view keeps position, delegates.
-            Ok(filled) if filled > 0 => self.rows_changed(),
+            Ok(landed) if !landed.is_empty() => {
+                self.rows_changed();
+                // Chat opens with one screen; rest lands here, maybe after reader looked.
+                if !self.reading_history {
+                    self.mark_items_seen(&landed);
+                }
+            }
             Ok(_) => {}
             Err(err) => self.error(err.into()),
         }
@@ -1068,6 +1090,8 @@ impl ChatMessages {
             }
             // Group or 1:1 contact rename (core doesn't say whose).
             "ChatModified" | "ContactsChanged" => {
+                // Live location started, stopped or ran out (any device) is `ChatModified` too.
+                self.refresh_sharing();
                 self.refresh_name();
                 // Join or leave: other half of header.
                 self.refresh_member_count();
@@ -1726,8 +1750,126 @@ impl ChatMessages {
         self.send_message(String::new(), Some((path, String::new())));
     }
 
-    /// The one send. `file`: path and shown name; empty name for voice.
+    /// Send one point; see `send_location` property.
+    pub fn send_location(&mut self, latitude: f64, longitude: f64) {
+        if !(-90.0..=90.0).contains(&latitude) || !(-180.0..=180.0).contains(&longitude) {
+            self.error(QString::from("no location to send"));
+            return;
+        }
+        let text = location::osm_link(latitude, longitude);
+        self.send_outgoing(text, None, Some((latitude, longitude)));
+    }
+
+    /// Start or stop live location; see `share_location` property.
+    pub fn share_location(&mut self, seconds: u32) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        // Started or stopped: core's `ChatModified` says so (`handle_event`).
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if let Err(err) = result {
+                this.borrow().error(err.into());
+            }
+        });
+        runtime.spawn(async move {
+            // End noted first: core's `ChatModified` reads it back.
+            let until =
+                (seconds > 0).then(|| location::unix_now().saturating_add(u64::from(seconds)));
+            let noted: Result<serde_json::Value, _> = rpc
+                .call(
+                    "set_config",
+                    (
+                        account_id,
+                        location::until_key(chat_id),
+                        until.map(|until| until.to_string()),
+                    ),
+                )
+                .await;
+            if let Err(err) = noted {
+                done(Err(err.to_string()));
+                return;
+            }
+            done(
+                rpc.call::<_, ()>(
+                    "send_locations_to_chat",
+                    (account_id, chat_id, i64::from(seconds)),
+                )
+                .await
+                .map_err(|err| err.to_string()),
+            );
+        });
+    }
+
+    /// Ask core whether chat gets reader's location live.
+    fn refresh_sharing(&mut self) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |sharing: Option<(bool, u64)>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            // Unreadable: as was; next `ChatModified` asks again.
+            let Some((sharing, until)) = sharing else {
+                return;
+            };
+            let changed = {
+                let this = this.borrow();
+                this.sharing_location != sharing || this.sharing_until != until
+            };
+            if changed {
+                let mut this = this.borrow_mut();
+                this.sharing_location = sharing;
+                this.sharing_until = until;
+                this.sharing_location_changed();
+            }
+        });
+        runtime.spawn(async move {
+            let sharing = rpc
+                .call::<_, bool>("is_sending_locations_to_chat", (account_id, chat_id))
+                .await
+                .ok();
+            let until = match sharing {
+                Some(true) => rpc
+                    .call::<_, Option<String>>(
+                        "get_config",
+                        (account_id, location::until_key(chat_id)),
+                    )
+                    .await
+                    .ok()
+                    .flatten()
+                    .and_then(|until| location::until_ahead(&until, location::unix_now())),
+                _ => None,
+            };
+            done(sharing.map(|sharing| (sharing, until.unwrap_or(0))));
+        });
+    }
+
+    /// Text and/or file. `file`: path and shown name; empty name for voice.
     fn send_message(&mut self, text: String, file: Option<(String, String)>) {
+        self.send_outgoing(text, file, None);
+    }
+
+    /// The one send.
+    fn send_outgoing(
+        &mut self,
+        text: String,
+        file: Option<(String, String)>,
+        location: Option<(f64, f64)>,
+    ) {
         // One at a time; guarded here, not only by button: other ways in, model knows answer.
         if self.sending {
             return;
@@ -1753,7 +1895,12 @@ impl ChatMessages {
             }
         });
 
-        let outgoing = Outgoing { text, file, quoted };
+        let outgoing = Outgoing {
+            text,
+            file,
+            location,
+            quoted,
+        };
         runtime.spawn(async move {
             done(outgoing.send(&rpc, account_id, chat_id).await);
         });
@@ -1838,6 +1985,8 @@ struct Outgoing {
     text: String,
     /// Path to attach and name shown; empty name for voice.
     file: Option<(String, String)>,
+    /// Point carried, degrees: latitude, longitude.
+    location: Option<(f64, f64)>,
     /// Message replied to, or 0.
     quoted: u32,
 }
@@ -1921,7 +2070,7 @@ impl Outgoing {
                     text,
                     path,
                     name,
-                    Option::<(f64, f64)>::None,
+                    self.location,
                     (self.quoted != 0).then_some(self.quoted),
                 ),
             )
@@ -2458,6 +2607,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         quote_author: json::text(message, "/quote/authorDisplayName"),
         // `JustText` quote has none.
         quote_message_id: json::u32_at(message, "/quote/messageId"),
+        quote_is_voice: json::str_at(message, "/quote/viewType") == "Voice",
         file_path: file_path.into(),
         file_name: json::text(message, "/fileName"),
         view_type: view_type.into(),
@@ -2478,6 +2628,9 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         vcard_color: json::text(message, "/vcardContact/color"),
         reactions: reactions_json(message).into(),
         my_reaction: own_reaction(message).into(),
+        has_location: json::flag(message, "hasLocation"),
+        starts_location: json::str_at(message, "systemMessageType") == "LocationStreamingEnabled",
+        sender_id: json::u32_at(message, "fromId"),
         // Filled by `with_extras` for app rows (another call).
         ..MessageListItem::default()
     }
@@ -2713,8 +2866,9 @@ fn file_name_of(path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        file_name_of, fill_order, gif_dimensions, local_path, other_chat, own_reaction,
-        place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff, MARGIN,
+        file_name_of, fill_order, gif_dimensions, local_path, opening_page, other_chat,
+        own_reaction, place_arrivals, reactions_json, row_from, video_dimensions, Entry, RowDiff,
+        MARGIN,
     };
     use crate::models::MessageListModel;
     use serde_json::json;
@@ -2886,6 +3040,13 @@ mod tests {
         assert_eq!(row_from(5, &with_message).quote_message_id, 42);
         assert_eq!(row_from(5, &just_text).quote_message_id, 0);
         assert_eq!(row_from(5, &unquoted).quote_message_id, 0);
+        assert!(!row_from(5, &with_message).quote_is_voice);
+        let voice = json!({
+            "text": "re",
+            "quote": {"kind": "WithMessage", "messageId": 42, "chatId": 7, "viewType": "Voice",
+                      "text": "🎤 Voice message", "authorDisplayName": "Ada"},
+        });
+        assert!(row_from(5, &voice).quote_is_voice);
     }
 
     #[test]
@@ -3151,5 +3312,46 @@ mod tests {
         assert_eq!(fill_order(count + 20, count + 30, count)[0], count - 1);
         assert_eq!(fill_order(0, 0, 0), Vec::<usize>::new());
         assert_eq!(fill_order(5, 2, count), Vec::<usize>::new());
+    }
+
+    #[test]
+    fn a_chat_opens_with_a_screenful_at_newest_or_around_the_hit() {
+        let chat: Vec<Entry> = (1..=3000)
+            .map(|message_id| Entry {
+                message_id,
+                day_number: 0,
+            })
+            .collect();
+        let ids = |page: &[Entry]| {
+            page.iter()
+                .map(|entry| entry.message_id)
+                .collect::<Vec<_>>()
+        };
+
+        // Newest twenty: over a phone screen, not fifty (core builds each, ~3 ms on phone).
+        assert_eq!(
+            ids(opening_page(&chat, 0)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Not in chat: newest too.
+        assert_eq!(
+            ids(opening_page(&chat, 9999)),
+            (2981..=3000).collect::<Vec<_>>()
+        );
+        // Search hit: ten above, hit, nine below.
+        assert_eq!(
+            ids(opening_page(&chat, 1500)),
+            (1490..=1509).collect::<Vec<_>>()
+        );
+        // Near either end: what's there.
+        assert_eq!(ids(opening_page(&chat, 3)), (1..=20).collect::<Vec<_>>());
+        assert_eq!(
+            ids(opening_page(&chat, 2999)),
+            (2989..=3000).collect::<Vec<_>>()
+        );
+        assert_eq!(
+            ids(opening_page(&chat[..5], 0)),
+            (1..=5).collect::<Vec<_>>()
+        );
     }
 }

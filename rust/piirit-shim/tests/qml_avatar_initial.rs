@@ -26,6 +26,14 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        // Letter and emoji size at `width`: 'letter|emoji'.
+        function sizes(width) {
+            loader.item.width = width
+            loader.item.initial = 'ada'
+            var letter = findIn(loader.item, 'avatarInitial').font.pixelSize
+            loader.item.initial = '🎉'
+            return letter + '|' + findIn(loader.item, 'avatarEmoji').size
+        }
         // What stands in for `initial`: 'emoji:X', 'letter:X', or both/neither.
         function drawn(initial) {
             loader.item.initial = initial
@@ -87,4 +95,43 @@ fn an_avatar_draws_the_first_whole_character_of_a_name() {
         })
         .collect();
     assert!(wrong.is_empty(), "avatar initials wrong: {wrong:#?}");
+}
+
+/// Big page avatars (contact, group, profile) kept list-size letter: tiny in big disc.
+#[test]
+fn a_big_avatar_draws_a_big_initial() {
+    // SAFETY: single-threaded; set pre-Qt.
+    unsafe {
+        std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+    }
+
+    let mut engine = QmlEngine::new();
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
+    engine.load_data(QByteArray::from(PROBE_QML));
+
+    let mut call = |name: &str, arg: QVariant| {
+        let result = engine.invoke_method(name.into(), &[arg]);
+        QString::from_qvariant(result)
+            .map(|value| value.to_string())
+            .unwrap_or_default()
+    };
+
+    assert_eq!(
+        call(
+            "load",
+            QString::from(common::component_url("Avatar.qml")).into()
+        ),
+        "ok",
+        "the avatar did not load"
+    );
+    // Stub Theme: itemSizeSmall 60, fontSizeLarge 24, itemSizeExtraLarge 180.
+    for (width, want) in [(60, "24|24"), (40, "24|24"), (360, "144|144")] {
+        assert_eq!(
+            call("sizes", width.into()),
+            want,
+            "initial at width {width}: 'letter|emoji' pixel size"
+        );
+    }
 }

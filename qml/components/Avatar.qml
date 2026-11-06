@@ -74,6 +74,10 @@ Rectangle {
         }
     }
 
+    /// Initial grows with disc past list size, same share of it; never below list size.
+    readonly property real initialSize: Math.max(Theme.fontSizeLarge,
+                                                 avatar.width * Theme.fontSizeLarge / Theme.itemSizeSmall)
+
     /// Initial as drawn: emoji whole (picture), else letter.
     readonly property string first: Emoji.firstOf(avatar.initial)
     readonly property bool firstIsEmoji: Emoji.emojiEnd(avatar.first, 0) > 0
@@ -83,7 +87,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: !avatar.showsPicture && avatar.firstIsEmoji
         opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
-        size: Theme.fontSizeLarge
+        size: avatar.initialSize
         emoji: avatar.firstIsEmoji ? avatar.first : ""
     }
 
@@ -94,7 +98,7 @@ Rectangle {
         // Letter fades whole: too small to fade across.
         opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
         color: Theme.primaryColor
-        font.pixelSize: Theme.fontSizeLarge
+        font.pixelSize: avatar.initialSize
         textFormat: Text.PlainText
         text: avatar.firstIsEmoji ? "" : avatar.first.toUpperCase()
     }

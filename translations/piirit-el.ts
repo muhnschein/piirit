@@ -698,6 +698,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Νέο</translation>
     </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Εμφάνιση όλων των Τοποθεσιών</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -723,6 +728,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Μεταγραφή %n φωνητικού μηνύματος</numerusform>
+            <numerusform>Μεταγραφή %n φωνητικών μηνυμάτων</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Αντιγραφή μεταγραφής</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Αντιγράφηκε στο πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
     </message>
 </context>
 <context>
@@ -842,6 +869,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Αντιγραφή μεταγραφής</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1287,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Κοινή χρήση</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Αποστολή τρέχουσας τοποθεσίας</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Η τοποθεσία σας έχει ακρίβεια %n μέτρου.</numerusform>
+            <numerusform>Η τοποθεσία σας έχει ακρίβεια %n μέτρων.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Ενεργοποιήστε την τοποθεσία στις Ρυθμίσεις για να την στείλετε.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Εύρεση της τοποθεσίας σας…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Κοινή χρήση ζωντανής τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Το Piirit συνεχίζει να στέλνει την τοποθεσία σας όσο εκτελείται στο παρασκήνιο.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Για 30 λεπτά</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Για 1 ώρα</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Για 2 ώρες</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Για 6 ώρες</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Για 24 ώρες</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Διακοπή κοινής χρήσης τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Η τοποθεσία σας αναζητείται ακόμα. Είναι ενεργή η τοποθεσία στις Ρυθμίσεις;</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Εμφάνιση όλων των Τοποθεσιών</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Χάρτης</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1296,6 +1412,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Δεν υπάρχουν κλήσεις ακόμα</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Χάρτης</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1328,6 +1449,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Επεξεργασμένο</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Τοποθεσία</translation>
     </message>
 </context>
 <context>
@@ -1476,6 +1602,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Όλοι στο κανάλι βλέπουν το όνομα</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Δεν υπάρχουν τοποθεσίες ακόμα</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Εδώ εμφανίζονται οι τοποθεσίες που κοινοποιήθηκαν τις τελευταίες 24 ώρες.</translation>
     </message>
 </context>
 <context>
@@ -2260,6 +2399,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Ενεργοποίηση ροής τοποθεσίας (πειραματικό)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Κοινοποιεί την τοποθεσία σας στις συνομιλίες και δείχνει τις κοινόχρηστες τοποθεσίες σε χάρτη.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων (πειραματικό)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Μετατρέπει τα φωνητικά μηνύματα σε κείμενο σε αυτό το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Τίποτα δεν φεύγει από το τηλέφωνο.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2272,6 +2436,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Αποστολή ως μήνυμα</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Μοιράζεστε την τοποθεσία σας</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>απομένει %n λεπτό</numerusform>
+            <numerusform>απομένουν %n λεπτά</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>απομένει %n ώρα</numerusform>
+            <numerusform>απομένουν %n ώρες</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Η τοποθεσία σας δεν αποστέλλεται. Είναι ενεργή η τοποθεσία στις Ρυθμίσεις;</translation>
     </message>
 </context>
 <context>
@@ -2879,11 +3071,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Κατά τη φόρτιση</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Πάντα</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Ποτέ</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Τα νέα φωνητικά μηνύματα μεταγράφονται όσο το τηλέφωνο φορτίζει.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Τα νέα φωνητικά μηνύματα μεταγράφονται μόλις ληφθούν.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Αυτό καταναλώνει μπαταρία.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Πατήστε Μεταγραφή σε ένα φωνητικό μήνυμα για να το μετατρέψετε σε κείμενο.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Επόμενο</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Γλώσσες</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Δεν είναι ακόμη διαθέσιμο</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Η μεταγραφή δεν είναι ακόμη αρκετά ακριβής σε αυτές τις γλώσσες.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Το Piirit κατεβάζει μία φορά ένα μοντέλο ομιλίας και μεταγράφει τα φωνητικά μηνύματα σε αυτό το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Τίποτα από όσα στέλνετε ή λαμβάνετε δεν φεύγει από το τηλέφωνο.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Οι μεταγραφές σε αυτή τη γλώσσα πιθανότατα περιέχουν περισσότερα λάθη.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Γλώσσες</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Πότε</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Αυτόματη μεταγραφή φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Μεταγραφή παλαιότερων φωνητικών μηνυμάτων</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Τα φωνητικά μηνύματα που έφτασαν πριν το ενεργοποιήσετε μεταγράφονται όσο το τηλέφωνο φορτίζει.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Τέλος</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Η λήψη συνεχίζεται αφού κλείσετε αυτή τη σελίδα.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Εγγραφή %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Αυτό το φωνητικό μήνυμα θα μεταγραφεί όταν το τηλέφωνο φορτίζει.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Η μεταγραφή είναι σε παύση όσο η λειτουργία εξοικονόμησης ενέργειας είναι ενεργή.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Αναμονή για τη μεταγραφή άλλων φωνητικών μηνυμάτων.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Λήψη του μοντέλου ομιλίας… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Μεταγραφή… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Αυτό το φωνητικό μήνυμα φαίνεται να είναι σε %1, που δεν έχει επιλεγεί.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Δεν βρέθηκε ομιλία σε αυτό το φωνητικό μήνυμα.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Δεν ήταν δυνατή η μεταγραφή αυτού του φωνητικού μηνύματος.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Μεταγραφή</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Μεταγραφή τώρα</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Μεταγραφή ούτως ή άλλως</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Δοκιμάστε ξανά</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Μεταγράφηκε σε αυτό το τηλέφωνο</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Εμφάνιση όλων</translation>
     </message>
 </context>
 <context>

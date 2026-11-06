@@ -90,8 +90,6 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // 3s, then answers whatever was said meanwhile.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "3000");
     }
 
     piirit_shim::register_qml_types();
@@ -162,19 +160,27 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         record!("nowhere", call!("nowhere"));
     });
 
-    // 7s: relay answered at 5s, to nobody.
-    plan.after(5, move || unsafe {
+    // Relay answered, to nobody: on profile's list once page asks again.
+    let mut listed = String::new();
+    let listed_ptr: *mut String = std::ptr::addr_of_mut!(listed);
+    plan.until(1, 30, move |last| unsafe {
+        *listed_ptr = call!("listed");
+        if (*listed_ptr).starts_with("2:") || last {
+            return true;
+        }
+        call!("refresh");
+        false
+    });
+
+    // Settled: an answer still awaited would have landed.
+    plan.after(0, move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "late-error",
             call!("pageProperty", QString::from("errorMessage"))
         );
         record!("signalled", call!("signalled"));
-        record!("reload", call!("refresh"));
-    });
-
-    plan.after(2, move || unsafe {
-        record!("after", call!("listed"));
+        record!("after", (*listed_ptr).clone());
         record!("navigation", call!("navigation"));
         (*engine_ptr).quit();
     });

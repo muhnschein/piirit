@@ -57,8 +57,8 @@ jobs:
       # QtQuick runtime plugin (-dev omits it), lrelease (translation test),
       # QAudioRecorder (voice recorder), QtQuick.Window (chat search test),
       # libpulse (mic watch), pulseaudio + utils (its test's sound server).
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev pulseaudio pulseaudio-utils
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libqt5svg5 libpulse-dev libsqlite3-dev pulseaudio pulseaudio-utils
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
       - run: rustc --version && cargo --version
@@ -67,7 +67,7 @@ jobs:
       - run: cd rust && cargo clippy --locked --workspace --all-targets -- -D warnings
       # nextest: one process per test, 32 at once, ~10 min down to ~2 (Qt timers).
       # Profiles: rust/.config/nextest.toml.
-      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2.87.31
         with:
           tool: cargo-nextest
       # Test killed by a signal leaves its core here (#239); read below on failure.
@@ -108,9 +108,9 @@ jobs:
         with:
           persist-credentials: false
           submodules: true
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev libsqlite3-dev
       - run: rustup toolchain install 1.75.0 --profile minimal
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
           # Own key: rust-cache keys on default toolchain, job uses `+1.75.0`;
@@ -133,8 +133,8 @@ jobs:
           persist-credentials: false
           submodules: true
       # real_core drives shim through a QML probe.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev libsqlite3-dev
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
       # Checksum-pinned: wheel and extracted binary.
@@ -184,8 +184,8 @@ jobs:
           persist-credentials: false
           submodules: true
       # rpm (%files layout), file (icons), binutils (binary symbols).
-      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev libsqlite3-dev
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust
       # Bundled server is installed; layout check can't judge it absent.
@@ -212,7 +212,7 @@ jobs:
           persist-credentials: false
       # cargo-deny prebuilt binary: the action's Docker Hub pull limit failed
       # every PR.
-      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2.87.31
         with:
           tool: cargo-deny
       - run: cd rust && cargo deny check
@@ -227,7 +227,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2.87.31
         with:
           tool: zizmor@1.30.1
       - run: zizmor --offline .github/workflows/

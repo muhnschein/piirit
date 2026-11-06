@@ -261,6 +261,11 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
+/// Core answered `start`. Model made before fetches nothing (app waits on it too).
+pub fn ready(core: &qmetaobject::QObjectBox<piirit_shim::DeltaChatCore>) -> bool {
+    core.pinned().borrow().status.to_string() == "ready"
+}
+
 /// Each step's recorded result. One step per tick: shim answers async.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
@@ -284,18 +289,38 @@ pub fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
 /// Steps run in turn, each some seconds after last one ended, not at fixed time from start:
 /// stalled loop on busy machine then can't run two back to back with no events between.
 #[derive(Default)]
-pub struct Plan(Vec<(u64, u32, Check)>);
+pub struct Plan(Vec<Entry>);
+
+/// Wait in s, tries, whether to wait for settled core first, the step.
+type Entry = (u64, u32, bool, Check);
 
 /// One step's work. Told whether it is last try; says whether done.
 type Check = Box<dyn FnMut(bool) -> bool>;
 
+/// Settled-core poll interval, and how long to wait before running step anyway (it then records
+/// what is there; its assert says what was missing).
+const SETTLE_POLL: Duration = Duration::from_millis(50);
+const SETTLE_LIMIT: u32 = 600;
+
 impl Plan {
-    /// `step` `wait` s after one before ended.
+    /// `step` `wait` s after one before ended, once core answered all it was asked
+    /// ([`piirit_shim::core_settled`]): wait on answers, not on clock. `wait` still orders it after
+    /// QML timers (debounce) started before.
     pub fn after(&mut self, wait: u64, step: impl FnOnce() + 'static) {
+        self.push(wait, true, step);
+    }
+
+    /// [`Plan::after`] without waiting for settled core: step acts while a call is held open.
+    pub fn after_busy(&mut self, wait: u64, step: impl FnOnce() + 'static) {
+        self.push(wait, false, step);
+    }
+
+    fn push(&mut self, wait: u64, settle: bool, step: impl FnOnce() + 'static) {
         let mut step = Some(step);
         self.0.push((
             wait,
             1,
+            settle,
             Box::new(move |_| {
                 if let Some(step) = step.take() {
                     step();
@@ -309,30 +334,56 @@ impl Plan {
     /// `tries` ran; last try told so (record what is there). Waits on condition, not clock: loaded
     /// runner may take seconds.
     pub fn until(&mut self, every: u64, tries: u32, check: impl FnMut(bool) -> bool + 'static) {
-        self.0.push((every, tries.max(1), Box::new(check)));
+        self.0.push((every, tries.max(1), false, Box::new(check)));
     }
 
     pub fn run(mut self) {
         if self.0.is_empty() {
             return;
         }
-        let (wait, tries, check) = self.0.remove(0);
-        self.fire(wait, tries, check);
+        let (wait, tries, settle, check) = self.0.remove(0);
+        self.fire(wait, tries, settle, check);
     }
 
     /// Plan's one `single_shot`: each schedules next only once it ran.
     #[allow(clippy::disallowed_methods)] // Plan's own timer.
-    fn fire(self, wait: u64, tries: u32, check: Check) {
+    fn fire(self, wait: u64, tries: u32, settle: bool, check: Check) {
         let mut pending = Some((check, self));
         single_shot(Duration::from_secs(wait), move || {
-            if let Some((mut check, rest)) = pending.take() {
-                let last = tries <= 1;
-                if check(last) || last {
-                    rest.run();
+            if let Some((check, rest)) = pending.take() {
+                if settle {
+                    rest.settle(SETTLE_LIMIT, check);
                 } else {
-                    rest.fire(wait, tries - 1, check);
+                    rest.attempt(wait, tries, check);
                 }
             }
         });
+    }
+
+    /// Run `check` once core settled, or after [`SETTLE_LIMIT`] polls.
+    #[allow(clippy::disallowed_methods)] // Plan's own timer.
+    fn settle(self, left: u32, check: Check) {
+        if left == 0 || piirit_shim::core_settled() {
+            if left == 0 {
+                eprintln!("plan: core still busy after {SETTLE_LIMIT} polls; step runs anyway");
+            }
+            self.attempt(0, 1, check);
+            return;
+        }
+        let mut pending = Some((check, self));
+        single_shot(SETTLE_POLL, move || {
+            if let Some((check, rest)) = pending.take() {
+                rest.settle(left - 1, check);
+            }
+        });
+    }
+
+    fn attempt(self, wait: u64, tries: u32, mut check: Check) {
+        let last = tries <= 1;
+        if check(last) || last {
+            self.run();
+        } else {
+            self.fire(wait, tries - 1, false, check);
+        }
     }
 }

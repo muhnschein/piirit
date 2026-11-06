@@ -11,9 +11,13 @@ updates:
       prefix: ci
   # FFmpeg, x264 (third_party/, built in by piirit-video): fix-only branches
   # (release/7.1, stable), so bumps = security/bug fixes for the video reader.
+  # whisper.cpp: no fix-only branch; moved by hand, speed and accuracy measured
+  # on phone (docs/BUILDING.md "Turning voice into text").
   - package-ecosystem: gitsubmodule
     directory: /
     schedule:
       interval: weekly
     commit-message:
       prefix: build(video)
+    ignore:
+      - dependency-name: third_party/whisper.cpp

@@ -58,14 +58,16 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
     let journal = common::fresh_journal(&temp);
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
+    // Slow transfer held till reader gave up.
+    let gate = temp.join("slow-gate");
+    std::fs::write(&gate, "").expect("write the gate file");
 
     // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &accounts);
-        // Slow transfer answers between ticks, not on one.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "2500");
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", &gate);
     }
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
@@ -126,14 +128,27 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
         }
     });
     let cancel = core_ptr;
-    plan.after(1, move || {
+    plan.after_busy(1, move || {
         if let Some(this) = cancel.as_pinned() {
             this.borrow_mut().cancel_ongoing();
         }
     });
+    // Slow transfer ends once core told to stop: answers after reader gave up.
+    let stopped = journal.clone();
+    plan.until(1, 30, move |last| {
+        if !common::methods(&stopped)
+            .iter()
+            .any(|m| m == "stop_ongoing_process")
+            && !last
+        {
+            return false;
+        }
+        let _ = std::fs::remove_file(&gate);
+        true
+    });
 
     let engine_ptr: *const QmlEngine = &engine;
-    plan.after(4, move || {
+    plan.after(1, move || {
         // SAFETY: see tests/smoke.rs; fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();

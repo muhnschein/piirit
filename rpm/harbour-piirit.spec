@@ -2,7 +2,7 @@
 # Sources: rust/, qml/, separately fetched deltachat-rpc-server (scripts/fetch-rpc-server.sh).
 # C libs built from source by build scripts with target compiler: LAME (in mp3lame-sys crate),
 # FFmpeg and x264 (third_party/ submodules, so Source0 must carry them; docs/BUILDING.md,
-# "Making a video smaller").
+# "Making a video smaller"), whisper.cpp (same; "Turning voice into text").
 #
 # `sfdk build` fetches crates; `sfdk build -- --with vendor` uses vendor.tar.xz (OBS/Chum, no
 # network; scripts/vendor-crates.sh).
@@ -31,12 +31,13 @@ Name:       harbour-piirit
 Summary:    Native SailfishOS client for Delta Chat
 Version:    2.2.0
 Release:    1
-# Licences: GPL-3.0-or-later app; MPL-2.0 server; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
-# emoji CC-BY-4.0, MIT, Unicode-3.0; FFmpeg LGPL-2.1+, x264 GPL-2.0+. Tag = package contents.
+# Licences: GPL-3.0-or-later app; MPL-2.0 server, maps app; calls-webapp GPL-3.0 (+MIT, Apache-2.0);
+# Leaflet BSD-2-Clause; emoji CC-BY-4.0, MIT, Unicode-3.0; FFmpeg LGPL-2.1+, x264 GPL-2.0+;
+# whisper.cpp MIT. Tag = package contents.
 %if 0%{?bundle_rpc_server}
-License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND BSD-2-Clause AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %else
-License:    GPL-3.0-or-later AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND BSD-2-Clause AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %endif
 Group:      Qt/Qt
 URL:        https://github.com/muhnschein/piirit
@@ -64,8 +65,11 @@ Requires:   nemo-qml-plugin-dbus-qt5
 # Nemo.Configuration: profile-less settings in dconf, so a change reaches every open page.
 Requires:   nemo-qml-plugin-configuration-qt5
 # Nemo.KeepAlive: phone awake during a call, screen on while ringing
-# (qml/components/CallCenter.qml). Package carries QML module beside the library.
+# (qml/components/CallCenter.qml), and while location shared live. Package carries QML
+# module beside the library.
 Requires:   libkeepalive
+# QtPositioning: phone's position for location sharing (qml/components/LocationFeed.qml).
+Requires:   qml(QtPositioning)
 # Sailfish.WebView: webxdc apps and store only (qml/pages/Webxdc*Page.qml); a device without
 # engine loses those alone.
 # Silica's WebView.qml imports Sailfish.WebView.Popups/.Pickers; unresolved, that page never loads.
@@ -99,6 +103,12 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Multimedia)
 # libpulse for mic watch (piirit-shim/src/mic_watch.rs); libpulse.so.0 Harbour-allowed.
 BuildRequires:  pkgconfig(libpulse)
+# Phone's SQLite for transcript store (piirit-shim/src/transcripts/store.rs), not a bundled
+# copy; libsqlite3.so.0 Harbour-allowed.
+BuildRequires:  pkgconfig(sqlite3)
+# QNetworkAccessManager for speech model download (piirit-shim/src/transcripts/download.rs);
+# libQt5Network Harbour-allowed.
+BuildRequires:  pkgconfig(Qt5Network)
 # lrelease: translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 
@@ -213,6 +223,21 @@ install -Dm 755 "$builddir/gmp-piirit/1.0/libpiirit.so" \
 install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
     %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/piirit.info
 
+# Voice to text: whisper.cpp engine, built by rust/piirit-speech/build.rs, loaded at run time
+# from here. aarch64: one per CPU level (8.2 with dotprod and fp16, else 8.0); picked on phone.
+%ifarch aarch64
+install -Dm 755 "$builddir/speech/libpiirit-speech-v8.so" \
+    %{buildroot}%{appdatadir}/lib/speech/libpiirit-speech-v8.so
+install -Dm 755 "$builddir/speech/libpiirit-speech-v82.so" \
+    %{buildroot}%{appdatadir}/lib/speech/libpiirit-speech-v82.so
+%else
+install -Dm 755 "$builddir/speech/libpiirit-speech.so" \
+    %{buildroot}%{appdatadir}/lib/speech/libpiirit-speech.so
+%endif
+# Speech detector the engine checks clips with first (vendor/silero-vad/SOURCE.md).
+install -Dm 644 vendor/silero-vad/ggml-silero-v5.1.2.bin \
+    %{buildroot}%{appdatadir}/lib/speech/ggml-silero-v5.1.2.bin
+
 # QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
 # source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
 # qml/art/ .png files: first-screen mark and intro pictures; .svg: emoji.
@@ -238,9 +263,18 @@ install -Dm 644 vendor/deltachat-rpc-server/SOURCE.md \
 # Same for call page (rust/piirit-shim/src/call_host.rs): GPL-3.0 source and notices.
 install -Dm 644 vendor/calls-webapp/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/calls-webapp/SOURCE.md
+# Same for map app (rust/piirit-shim/src/maps.rs): MPL-2.0 source, Leaflet notice.
+install -Dm 644 vendor/maps/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/maps/SOURCE.md
 # Emoji attribution (CC-BY-4.0) travels with them.
 install -Dm 644 vendor/emoji/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/emoji/SOURCE.md
+# MIT notice for whisper.cpp and ggml, built into the speech libs.
+install -Dm 644 third_party/whisper.cpp/LICENSE \
+    %{buildroot}%{appdatadir}/vendor/whisper.cpp/LICENSE
+# Same for Silero VAD, beside them.
+install -Dm 644 vendor/silero-vad/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/silero-vad/SOURCE.md
 install -Dm 644 LICENSE \
     %{buildroot}%{appdatadir}/LICENSE
 

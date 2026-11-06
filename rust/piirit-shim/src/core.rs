@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -23,6 +24,25 @@ pub(crate) fn connection() -> Option<(Arc<RpcClient>, CoreRuntime)> {
         .clone()
 }
 
+/// Server being spawned: no connection yet, but answers coming. See [`core_settled`].
+static SPAWNING: AtomicBool = AtomicBool::new(false);
+
+/// Silence after last answer that counts as settled: covers answer's hop to Qt thread and event
+/// that triggers another read.
+const SETTLED_QUIET: Duration = Duration::from_millis(100);
+
+/// No server spawning, no call open, server silent [`SETTLED_QUIET`]. Tests wait on it in place
+/// of fixed delays; app never asks.
+#[doc(hidden)]
+pub fn core_settled() -> bool {
+    if SPAWNING.load(Ordering::SeqCst) {
+        return false;
+    }
+    connection().map_or(true, |(rpc, _)| {
+        rpc.quiet_for().is_some_and(|quiet| quiet >= SETTLED_QUIET)
+    })
+}
+
 fn set_connection(value: Option<(Arc<RpcClient>, CoreRuntime)>) {
     *CONNECTION
         .lock()
@@ -41,6 +61,7 @@ pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-serv
 /// **New reader kind: add here**, or it never arrives. `tests/event_kinds.rs`: sides match;
 /// `tests/event_fanout.rs`: gate applied.
 pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "AccountsChanged",
     "CallEnded",
     "ChatDeleted",
     "ChatEphemeralTimerModified",
@@ -133,34 +154,35 @@ pub fn server_pid() -> Option<u32> {
 
 /// Stop server after Qt loop returns, bounded; else child dies only with last `RpcClient` (statics
 /// never drop). Ends live call first, telling peer: only here is window (call host) up and server
-/// not yet gone.
-pub fn shutdown() {
+/// not yet gone. False: a call did not end in time (or the stop itself overran).
+#[must_use]
+pub fn shutdown() -> bool {
     let Some((rpc, runtime)) = CONNECTION
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .take()
     else {
-        return;
+        return true;
     };
-    let (done_tx, done_rx) = std::sync::mpsc::channel::<()>();
+    let (done_tx, done_rx) = std::sync::mpsc::channel::<bool>();
     runtime.spawn(async move {
         // Call not ended in time: left to server exit.
-        if tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
+        let ended = tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
             .await
-            .is_err()
-        {
+            .is_ok();
+        if !ended {
             eprintln!("piirit: a call did not end in time; stopping the core anyway");
         }
         if let Err(err) = rpc.shutdown().await {
             eprintln!("piirit: stopping the core: {err}");
         }
         // Receiver gone only if wait gave up.
-        done_tx.send(()).ok();
+        done_tx.send(ended).ok();
     });
     // Timeout quits without goodbye.
     done_rx
         .recv_timeout(CALL_END_TIMEOUT.saturating_add(SHUTDOWN_TIMEOUT))
-        .ok();
+        .unwrap_or(false)
 }
 
 /// Last server stderr lines, if any: user's only crash clue.
@@ -448,7 +470,9 @@ impl DeltaChatCore {
     fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
         let started_ptr = ptr;
         let retry_path = path.clone();
+        SPAWNING.store(true, Ordering::SeqCst);
         let started = queued_callback(move |result: Result<Arc<RpcClient>, String>| {
+            SPAWNING.store(false, Ordering::SeqCst);
             let Some(this) = started_ptr.as_pinned() else {
                 return;
             };
@@ -477,6 +501,8 @@ impl DeltaChatCore {
                     for account_id in accounts {
                         Self::resume_io(started_ptr.clone(), Some(account_id));
                     }
+                    // Rows of messages gone while away dropped; backlog read.
+                    crate::transcripts::connected();
                     // Last: handler may call back in.
                     this.borrow().status_changed();
                 }
@@ -1062,7 +1088,7 @@ impl DeltaChatCore {
                         Some(AccountItem {
                             account_id: json::u32_opt(account, "id")?,
                             display_name: json::text(account, "displayName"),
-                            // Filled below (`primary_addr`).
+                            // Filled below (`own_address`).
                             addr: QString::default(),
                             is_configured: json::str_at(account, "kind") == "Configured",
                             avatar_path: json::text(account, "profileImage"),
@@ -1073,7 +1099,7 @@ impl DeltaChatCore {
                     .collect();
                 // Two calls per configured profile: address, badge.
                 for item in items.iter_mut().filter(|item| item.is_configured) {
-                    if let Some(addr) = primary_addr(&rpc, item.account_id).await {
+                    if let Some(addr) = own_address(&rpc, item.account_id).await {
                         item.addr = addr.into();
                     }
                     item.unread_count = fresh_count(&rpc, item.account_id).await;
@@ -1561,13 +1587,13 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
         .map_err(|err| err.to_string())
 }
 
-/// Own address via `configured_addr`: account list lacks it since 2.61; `list_transports` doesn't
-/// say which relay is own. `None` if core can't say.
-async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
-    rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+/// Own address: own contact's (id 1), core 2.66+ first relay's. Account list lacks it since
+/// 2.61; `configured_addr` gone in 2.66. `None` if core can't say (no relay yet).
+pub(crate) async fn own_address(rpc: &RpcClient, account_id: u32) -> Option<String> {
+    rpc.call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
         .await
         .ok()
-        .flatten()
+        .map(|contact| json::str_at(&contact, "address").to_string())
         .filter(|addr| !addr.is_empty())
 }
 

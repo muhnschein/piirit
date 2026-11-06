@@ -101,13 +101,14 @@ fn the_first_message_stays_row_zero_however_much_the_core_talks() {
         (*steps_ptr).push(("stir-1", call!("stir")));
         true
     });
-    plan.after(0, move || unsafe {
+    // Stirred again while reads are in flight.
+    plan.after_busy(0, move || unsafe {
         (*steps_ptr).push(("stir-2", call!("stir")));
     });
-    plan.after(0, move || unsafe {
+    plan.after_busy(0, move || unsafe {
         (*steps_ptr).push(("stir-3", call!("stir")));
     });
-    plan.after(4, move || unsafe {
+    plan.after(1, move || unsafe {
         (*steps_ptr).push(("first", call!("firstRow")));
         (*steps_ptr).push(("count", call!("count")));
         (*steps_ptr).push(("edges", call!("edges")));

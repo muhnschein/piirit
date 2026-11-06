@@ -28,6 +28,15 @@ filter = """\
     | test(=a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told)"""
 priority = 100
 
+# Speech engine (whisper.cpp): CPU-bound, thread per core; ggml's threads spin at barriers,
+# so several runs at once starve each other. One at a time; rest of suite alongside.
+[test-groups]
+speech-engine = { max-threads = 1 }
+
+[[profile.default.overrides]]
+filter = "binary_id(piirit-speech::engine) | binary_id(piirit-shim::transcripts_engine)"
+test-group = "speech-engine"
+
 [profile.ci]
 # One failure should not hide others.
 fail-fast = false

@@ -34,14 +34,17 @@ status=0
 findings=0
 skipped=0
 declare -A waiver_used=()
+declare -A skipped_id=()
 
 # HARBOUR_CHECK_STRICT=1: missing tool fails. CI sets it.
 strict=${HARBOUR_CHECK_STRICT:-0}
 
 note() { echo "harbour-check: $*"; return 0; }
 
+# skip "<ids>" <why>: every check id the missing tool stops.
 skip() {
-    local id=$1 why=$2
+    local id=$1 why=$2 i
+    for i in $id; do skipped_id[$i]=1; done
     if [[ "$strict" = 1 ]]; then
         echo "harbour-check: FAIL [$id] cannot run: $why (strict mode)" >&2
         status=1
@@ -174,7 +177,8 @@ fi
 # 1.2 File layout; 1.6.7/1.8.x: read off spec
 #
 if ! command -v rpmspec >/dev/null 2>&1; then
-    skip 1.2.1 "rpmspec not found (install rpm)"
+    skip "1.2.1 1.2.2 1.2.3 1.2.4 1.2.6 1.2.7 1.2.8 1.5.2 1.6.7 1.8.1 1.8.2 1.8.3 1.8.4 1.8.5 1.8.6 1.8.7" \
+        "rpmspec not found (install rpm)"
 else
     for arch in $ARCHES; do
         expanded=$(rpmspec -P --target "$arch" "$spec" 2>/dev/null)
@@ -722,7 +726,8 @@ else
 fi
 
 #
-# Waiver matching nothing: stale.
+# Waiver matching nothing: stale. Skipped check matched nothing because it
+# never looked: not stale.
 #
 if [[ -f "$waivers" ]]; then
     while IFS= read -r line; do
@@ -730,6 +735,7 @@ if [[ -f "$waivers" ]]; then
         # shellcheck disable=SC2086
         set -- $line
         [[ $# -ge 2 ]] || continue
+        [[ -n "${skipped_id[$1]:-}" ]] && continue
         if [[ -z "${waiver_used["$1 $2"]:-}" ]]; then
             echo "harbour-check: FAIL stale waiver '$1 $2' in ci/harbour/waivers.conf matches nothing; delete it" >&2
             status=1
