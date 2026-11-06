@@ -140,11 +140,9 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
     );
     assert!(
         entries.iter().any(|params| contact_of(params) == Some(10)),
-        "a list of one contact's chats was never asked of the core by \
-         contact, so it could only filter chats already loaded. calls: \
-         {entries:?}"
+        "one contact's chats were never asked of the core by contact. calls: {entries:?}"
     );
-    // First load: neither search nor archive nor contact.
+    // First load: neither search nor archive.
     let first = entries.first().cloned().unwrap_or(Value::Null);
     assert_eq!(
         query_of(&first),
@@ -152,14 +150,9 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         "the ordinary list was loaded with a query. calls: {entries:?}"
     );
     assert_eq!(
-        flags_of(&first),
-        None,
-        "the ordinary list was loaded with list flags. calls: {entries:?}"
-    );
-    assert_eq!(
-        contact_of(&first),
-        None,
-        "the ordinary list was loaded for one contact. calls: {entries:?}"
+        (flags_of(&first), contact_of(&first)),
+        (None, None),
+        "the ordinary list was loaded with list flags or for one contact. calls: {entries:?}"
     );
 
     let methods = common::methods(&journal);
