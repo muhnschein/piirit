@@ -4,6 +4,8 @@
 # .conf files are authoritative Harbour rules (prose docs lag); harbour-check.sh
 # reads them, not a transcription. Vendored for deterministic offline CI; this
 # script moves them, the diff is the review.
+#
+#     scripts/update-harbour-rules.sh [ref]     (default: master; e.g. pull/189/head)
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -21,7 +23,10 @@ files='allowed_libraries.conf allowed_permissions.conf allowed_qmlimports.conf
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-git clone --depth 1 "$repo" "$tmp/validator" >&2
+git init -q "$tmp/validator"
+ref=${1:-master}
+git -C "$tmp/validator" fetch -q --depth 1 "$repo" "$ref" >&2
+git -C "$tmp/validator" checkout -q FETCH_HEAD
 commit=$(cd "$tmp/validator" && git rev-parse HEAD)
 date=$(cd "$tmp/validator" && git log -1 --format=%cs)
 
@@ -36,7 +41,7 @@ verbatim from
 
     $repo
 
-at commit $commit ($date), by scripts/update-harbour-rules.sh.
+at commit $commit ($date, $ref), by scripts/update-harbour-rules.sh.
 ci/harbour-validate-rpm.sh runs the validator from that same commit.
 
 They carry that project's licence, GPL-2.0-or-later, which Piirit's own

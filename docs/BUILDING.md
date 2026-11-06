@@ -224,7 +224,7 @@ aarch64, SDK 5.2.0.15, 1.0.0 (`rpm/harbour-piirit.spec` 1.0.0-1, run 152). "In t
 
 | raw | in the package | what |
 |---|---|---|
-| 20.42 MB | 9.38 MB | `%{_libexecdir}/%{name}/deltachat-rpc-server` |
+| 20.42 MB | 9.38 MB | `libexec/deltachat-rpc-server` |
 | 5.83 MB | 1.46 MB | `%{_bindir}/%{name}` |
 | 3.05 MB | 3.01 MB | `qml/art/intro-*.png` |
 | 1.42 MB | ~0.1 MB | 41 `.qm` catalogs |

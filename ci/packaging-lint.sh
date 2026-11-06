@@ -31,6 +31,19 @@ if command -v rpmspec >/dev/null 2>&1; then
         echo "packaging-lint: FAIL rpm/harbour-piirit.spec does not parse" >&2
         status=1
     fi
+    # App finds bundled server only at BUNDLED_SERVER; spec moved alone = app without core.
+    installed=$(rpmspec -P --target aarch64 "$root/rpm/harbour-piirit.spec" 2>/dev/null |
+        sed -e ':a' -e '/\\$/{N;s/\\\n[[:space:]]*/ /;ta' -e '}' |
+        sed -n 's#^install .*/deltachat-rpc-server .*/BUILDROOT/[^/ ]*\(/[^ ]*\)$#\1#p')
+    wanted=$(sed -n 's/^pub const BUNDLED_SERVER: &str = "\(.*\)";$/\1/p' \
+        "$root/rust/piirit-shim/src/core.rs")
+    if [ -n "$installed" ] && [ "$installed" = "$wanted" ]; then
+        echo "packaging-lint: spec installs deltachat-rpc-server where the app looks ($wanted)"
+    else
+        echo "packaging-lint: FAIL spec installs deltachat-rpc-server at '$installed'," \
+             "BUNDLED_SERVER (rust/piirit-shim/src/core.rs) is '$wanted'" >&2
+        status=1
+    fi
 else
     skip rpmspec "install rpm"
 fi

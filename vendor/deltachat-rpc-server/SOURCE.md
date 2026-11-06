@@ -1,6 +1,6 @@
 # `deltachat-rpc-server` provenance
 
-Binaries bundled by Piirit's RPM (installed to `/usr/libexec/harbour-piirit/deltachat-rpc-server`) = **unmodified upstream builds**:
+Binaries bundled by Piirit's RPM (installed to `/usr/share/harbour-piirit/libexec/deltachat-rpc-server`) = **unmodified upstream builds**:
 
 - **Project:** Delta Chat core (chatmail core library)
 - **Source:** https://github.com/chatmail/core

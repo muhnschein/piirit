@@ -53,7 +53,7 @@ fn set_connection(value: Option<(Arc<RpcClient>, CoreRuntime)>) {
 pub const DEFAULT_PROVIDER_QR: &str = "dcaccount:nine.testrun.org";
 
 /// RPM install path: not on `PATH`.
-pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-server";
+pub const BUNDLED_SERVER: &str = "/usr/share/harbour-piirit/libexec/deltachat-rpc-server";
 
 /// Kinds reaching `core_event`; rest (log, unused: most of bulk syncs) dropped early.
 ///
