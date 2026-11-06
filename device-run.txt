@@ -1,0 +1,21 @@
+== 2.2.0 before upgrade
+exe=/usr/libexec/harbour-piirit/deltachat-rpc-server parent=
+== after upgrade
+exe=/usr/share/harbour-piirit/libexec/deltachat-rpc-server parent=
+== clean install
+exe=/usr/share/harbour-piirit/libexec/deltachat-rpc-server parent=
+
+== 2.2.0 before upgrade
+harbour-piirit-2.2.0-1.aarch64
+drwxr-xr-x 2 root root 4096 Nov  6 09:28 /usr/libexec/harbour-piirit
+ls: cannot access '/usr/share/harbour-piirit/libexec/': No such file or directory
+== after upgrade
+harbour-piirit-2.2.0-1.413.aarch64
+ls: cannot access '/usr/libexec/harbour-piirit': No such file or directory
+total 20328
+-rwxr-xr-x 1 root root 20813192 Nov  6 08:34 deltachat-rpc-server
+== clean install
+harbour-piirit-2.2.0-1.413.aarch64
+ls: cannot access '/usr/libexec/harbour-piirit': No such file or directory
+total 20328
+-rwxr-xr-x 1 root root 20813192 Nov  6 08:34 deltachat-rpc-server
