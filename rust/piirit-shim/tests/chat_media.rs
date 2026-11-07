@@ -151,13 +151,18 @@ fn a_chats_media_is_read_by_kind_newest_first() {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    // Backstop: reads reached steps, quits.
-    plan.after(7, move || unsafe {
+    // Probe steps itself, each on last answer: wait for its end, not the clock. Out of tries:
+    // reads step reached, quits.
+    plan.until(1, 60, move |last| unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
             .unwrap_or_default();
+        if !(*report_ptr).starts_with("2#") && !last {
+            return false;
+        }
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

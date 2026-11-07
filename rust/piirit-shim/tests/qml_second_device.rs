@@ -283,8 +283,11 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         true
     });
 
+    // Code and profile's row: each its own answer.
     plan.until(1, 30, move |last| unsafe {
-        if get!("device", "code").is_empty() && !last {
+        let shown = !get!("device", "code").is_empty()
+            && !call!("profileShows", QString::from("ownColor")).is_empty();
+        if !shown && !last {
             return false;
         }
         // Drawn like invite code, account colour.

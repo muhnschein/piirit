@@ -161,10 +161,10 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         );
     });
 
-    // Call rings when fake core's timer fires: wait for its row.
+    // Call rings when fake core's timer fires: wait for its row, filled (message read after).
     plan.until(1, 30, move |last| unsafe {
-        let rows = call!("get", QString::from("callList"), QString::from("count"));
-        if rows == "0" && !last {
+        let row = call!("rowSays");
+        if (row == "no row" || row.starts_with('|')) && !last {
             return false;
         }
         record!(
