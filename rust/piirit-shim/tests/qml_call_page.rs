@@ -246,9 +246,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("idle-mce", get!("mce", "called"));
     });
 
-    // Rings when fake core's timer fires: wait for its page, not the clock.
+    // Rings when fake core's timer fires: wait for its page and caller's name (core's later
+    // answer), not the clock.
     plan.until(1, 30, move |last| unsafe {
-        if call!("pushes") == "0" && !last {
+        let up = call!("pushes") != "0" && !get!("ringNote", "summary").is_empty();
+        if !up && !last {
             return false;
         }
         record!("pushes", call!("pushes"));
