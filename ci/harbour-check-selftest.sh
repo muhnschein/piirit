@@ -301,7 +301,7 @@ elif HARBOUR_WAIVERS=/dev/null \
     echo "selftest: FAIL HARBOUR_WAIVERS=/dev/null should waive nothing" >&2
     status=1
 else
-    echo "selftest: ok   waivers off -> a waived error is rejected again"
+    echo "selftest: ok   waivers off -> a waived finding is rejected again"
 fi
 
 # harbour-pin-check.sh against a local stand-in for upstream: master at B,
