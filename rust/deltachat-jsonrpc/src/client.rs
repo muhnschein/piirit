@@ -15,7 +15,10 @@ use tokio::task::JoinHandle;
 use crate::error::{RpcError, SpawnError};
 use crate::protocol::{RequestEnvelope, ResponseEnvelope};
 
-type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Result<serde_json::Value, RpcError>>>>>;
+/// Waiters by request id; `None` once transport gone, so later calls fail instead of waiting on
+/// answer nobody reads.
+type PendingMap = Arc<Mutex<Option<HashMap<u64, Answer>>>>;
+type Answer = oneshot::Sender<Result<serde_json::Value, RpcError>>;
 
 /// Lock ignoring poison: plain collections survive panic.
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
@@ -90,14 +93,17 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap, heard: &Mutex
             continue;
         };
         // Remove first: no lock while sending.
-        let waiting = lock(pending).remove(&id);
+        let waiting = lock(pending)
+            .as_mut()
+            .and_then(|waiting| waiting.remove(&id));
         if let Some(sender) = waiting {
             // Closed receiver: caller timed out.
             sender.send(outcome).ok();
         }
     }
     // Transport gone: wake waiters.
-    for (_, sender) in lock(pending).drain() {
+    let waiting = lock(pending).take().unwrap_or_default();
+    for sender in waiting.into_values() {
         sender.send(Err(RpcError::TransportClosed)).ok();
     }
 }
@@ -179,7 +185,7 @@ impl RpcClient {
         let stdout = child.stdout.take().ok_or(SpawnError::MissingPipe)?;
         let stderr = child.stderr.take().ok_or(SpawnError::MissingPipe)?;
 
-        let pending: PendingMap = Arc::new(Mutex::new(HashMap::new()));
+        let pending: PendingMap = Arc::new(Mutex::new(Some(HashMap::new())));
         let stderr_tail = Arc::new(Mutex::new(Vec::new()));
 
         let (stdin_tx, stdin_rx) = mpsc::unbounded_channel::<String>();
@@ -271,7 +277,10 @@ impl RpcClient {
         });
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let (tx, rx) = oneshot::channel();
-        lock(&self.pending).insert(id, tx);
+        match lock(&self.pending).as_mut() {
+            Some(waiting) => waiting.insert(id, tx),
+            None => return Err(RpcError::TransportClosed),
+        };
 
         let request = RequestEnvelope {
             jsonrpc: "2.0",
@@ -285,7 +294,7 @@ impl RpcClient {
         })?;
 
         if self.stdin_tx.send(line).is_err() {
-            lock(&self.pending).remove(&id);
+            self.forget(id);
             return Err(RpcError::TransportClosed);
         }
 
@@ -294,13 +303,20 @@ impl RpcClient {
         };
         let Ok(answer) = tokio::time::timeout(limit, rx).await else {
             // Nobody reads it now; drop sender.
-            lock(&self.pending).remove(&id);
+            self.forget(id);
             return Err(RpcError::Timeout {
                 method: method.to_string(),
                 seconds: limit.as_secs(),
             });
         };
         answer.unwrap_or(Err(RpcError::TransportClosed))
+    }
+
+    /// Drop waiter `id`; its answer, if any, goes nowhere.
+    fn forget(&self, id: u64) {
+        if let Some(waiting) = lock(&self.pending).as_mut() {
+            waiting.remove(&id);
+        }
     }
 
     /// How long no timed call has been open and server silent; `None` while one is open. Tests
