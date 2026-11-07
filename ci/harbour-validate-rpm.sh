@@ -14,11 +14,12 @@
 #     ci/harbour-validate-rpm.sh --log <saved validation log>
 #
 # Validator: upstream's clone, not vendored. $HARBOUR_VALIDATOR points at it.
+# $HARBOUR_WAIVERS: other waiver file; /dev/null = none (rpm.yml's canary).
 set -u
 shopt -s extglob
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
-waivers="$root/ci/harbour/waivers.conf"
+waivers=${HARBOUR_WAIVERS:-$root/ci/harbour/waivers.conf}
 validator=${HARBOUR_VALIDATOR:-/tmp/harbour-validator}
 
 usage() {

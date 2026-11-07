@@ -13,7 +13,8 @@ Target: [Jolla's Harbour store](https://harbour.jolla.com). Validator fail = rej
 
 - `sfdk check` = Jolla's `rpmvalidation.sh` on RPM via `ci/harbour-validate-rpm.sh`; decides. Source check: sfdk can't run every push; PR fix cheaper than intake.
 - `sfdk check` runs after artifact upload; waived blockers don't fail it (rejected package still worth phone-testing; workflow red for known reason stops being read). Anything not in `ci/harbour/waivers.conf` fails.
-- `ci/harbour/` = validator's allow-lists, verbatim via `scripts/update-harbour-rules.sh`; `rpm.yml` warns if behind upstream. `ci/harbour-check.sh` reimplements logic around them from `rpmvalidation.sh`.
+- Gate alive: `rpm.yml` then runs it, waivers off, over 2.2.0 (Harbour rejected: bundled server in `/usr/libexec`); must still fail on that. Quiet validator, missing tool = red, not silent pass.
+- `ci/harbour/` = validator's allow-lists, verbatim via `scripts/update-harbour-rules.sh`; `scheduled.yml` (`ci/harbour-pin-check.sh`) red weekly when pin's ref moved or pinned PR closed. `ci/harbour-check.sh` reimplements logic around them from `rpmvalidation.sh`.
 
 ## What the source check covers
 
