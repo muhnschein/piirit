@@ -159,6 +159,19 @@ jobs:
           PIIRIT_REPO="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
             ./scripts/verify-release.sh "$@"
 
+  # ci/harbour/UPSTREAM pins Jolla's validator; Harbour QA runs its latest.
+  # Red = upstream moved or pinned PR closed; script says what to do.
+  harbour-validator-pin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: ./ci/harbour-pin-check.sh
+
   # ci.yml runs zizmor offline. Online adds: advisories on pinned actions,
   # pinned commits not on the action's own repo. These change without a
   # commit here, hence weekly.

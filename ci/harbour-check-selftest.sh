@@ -286,6 +286,59 @@ else
     echo "selftest: ok   rpmspec missing -> its waivers not stale, others still are"
 fi
 
+# Canary runs validate-rpm with waivers off: known blockers must fail again.
+cases=$((cases + 1))
+printf '%s\n' '!BEGIN!x' \
+    'ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|Installation not allowed in this location' \
+    '!END!FAIL!x' > "$work/canary.log"
+printf '1.2.1  /usr/libexec/harbour-piirit/*  Installation not allowed*\n' > "$work/canary-waivers.conf"
+if ! HARBOUR_WAIVERS="$work/canary-waivers.conf" \
+        "$pristine/ci/harbour-validate-rpm.sh" --log "$work/canary.log" >/dev/null 2>&1; then
+    echo "selftest: FAIL a waived error should pass with its waiver file" >&2
+    status=1
+elif HARBOUR_WAIVERS=/dev/null \
+        "$pristine/ci/harbour-validate-rpm.sh" --log "$work/canary.log" >/dev/null 2>&1; then
+    echo "selftest: FAIL HARBOUR_WAIVERS=/dev/null should waive nothing" >&2
+    status=1
+else
+    echo "selftest: ok   waivers off -> a waived finding is rejected again"
+fi
+
+# harbour-pin-check.sh against a local stand-in for upstream: master at B,
+# pull/189/head at A.
+up="$work/upstream.git"
+git init -q --bare "$up"
+tree=$(git -C "$up" hash-object -t tree -w --stdin < /dev/null)
+a=$(git -C "$up" -c user.name=t -c user.email=t@t commit-tree "$tree" -m a < /dev/null)
+b=$(git -C "$up" -c user.name=t -c user.email=t@t commit-tree "$tree" -p "$a" -m b < /dev/null)
+git -C "$up" update-ref refs/heads/master "$b"
+git -C "$up" update-ref refs/pull/189/head "$a"
+pin_check() {
+    local expect=$1 what=$2 line=$3 state=${4:-}
+    cases=$((cases + 1))
+    printf 'verbatim from\n\n%s\n' "$line" > "$work/UPSTREAM"
+    if HARBOUR_UPSTREAM="$work/UPSTREAM" HARBOUR_VALIDATOR_REPO="$up" HARBOUR_PR_STATE="$state" \
+            "$pristine/ci/harbour-pin-check.sh" >/dev/null 2>&1; then
+        local got=pass
+    else
+        local got=fail
+    fi
+    if [[ "$got" = "$expect" ]]; then
+        echo "selftest: ok   pin $what -> $expect"
+    else
+        echo "selftest: FAIL pin $what should $expect, got $got" >&2
+        status=1
+    fi
+    return 0
+}
+pin_check pass "at master's tip" "at commit $b (2026-09-10), by scripts/update-harbour-rules.sh."
+pin_check fail "behind master" "at commit $a (2026-09-10), by scripts/update-harbour-rules.sh."
+pin_check pass "at an open PR's head" "at commit $a (2026-10-17, pull/189/head), by x." open
+pin_check fail "at a merged PR's head" "at commit $a (2026-10-17, pull/189/head), by x." merged
+pin_check fail "behind a PR's head" "at commit $b (2026-10-17, pull/189/head), by x." open
+pin_check fail "at a ref upstream lacks" "at commit $b (2026-10-17, gone), by x."
+pin_check fail "missing" "at some point, by x."
+
 echo
 if [[ "$status" -eq 0 ]]; then
     echo "selftest: ok ($cases cases, $skipped skipped for want of a tool)"

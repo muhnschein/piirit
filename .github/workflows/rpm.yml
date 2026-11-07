@@ -252,6 +252,27 @@ jobs:
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
 
+      # Gate alive: Harbour rejected 2.2.0 (bundled server in /usr/libexec);
+      # with waivers off, validator must still say so. Quiet validator or
+      # missing tool would pass every package: red here instead.
+      - name: Harbour's validator still rejects 2.2.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CANARY: harbour-piirit-2.2.0-1.aarch64.rpm
+          CANARY_SHA256: c072530b3884682a6f997c2e512cd5e45855aa800fdbf5eba187ec25ecfe6d84
+        run: |
+          dir="$RUNNER_TEMP/canary"
+          gh release download v2.2.0 --pattern "$CANARY" --dir "$dir"
+          echo "$CANARY_SHA256  $dir/$CANARY" | sha256sum -c -
+          if HARBOUR_WAIVERS=/dev/null ./ci/harbour-validate-rpm.sh "$dir/$CANARY" > "$dir/log" 2>&1; then
+            cat "$dir/log"
+            echo "::error::the validator passed 2.2.0, which Harbour rejected"; exit 1
+          fi
+          grep -F 'FAIL /usr/libexec/harbour-piirit/deltachat-rpc-server -- Installation not allowed' "$dir/log" || {
+            cat "$dir/log"
+            echo "::error::the validator failed 2.2.0, but not for the bundled server's place"; exit 1; }
+
   # Release gate: fresh clone of the same commit, rebuilt the way
   # docs/VERIFYING.md tells users (verify-release.sh), on another runner, with
   # Podman not Docker, another time zone and umask. Not byte-identical: no
