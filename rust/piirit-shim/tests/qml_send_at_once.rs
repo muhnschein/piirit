@@ -282,7 +282,14 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     // 2 min.
     let journal_h = journal.clone();
     plan.until(1, 56, move |last| unsafe {
-        if sends_in(&journal_h).len() < 2 && !last {
+        // Bar cleared on send's answer, after core journals it.
+        let sent = sends_in(&journal_h).len() >= 2
+            && call!(
+                "get",
+                QString::from("attachmentBar"),
+                QString::from("visible")
+            ) == "false";
+        if !sent && !last {
             return false;
         }
         probe!("video-preparing-done", "messages", "preparing");

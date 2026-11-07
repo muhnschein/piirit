@@ -51,11 +51,17 @@ fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
     let mut plan = common::Plan::default();
 
     let engine_ptr: *const QmlEngine = &engine;
-    plan.after(8, move || {
+    let core_ptr = std::ptr::addr_of!(core_box);
+    // Till QML's own retries landed, not a set time.
+    plan.until(1, 30, move |last| {
         // SAFETY: same lifetime argument as tests/smoke.rs.
         unsafe {
+            if (*core_ptr).pinned().borrow().system_info.is_empty() && !last {
+                return false;
+            }
             (*engine_ptr).quit();
         }
+        true
     });
 
     plan.run();
