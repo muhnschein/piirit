@@ -4,7 +4,8 @@
 # A gate printing only "ok" may have stopped looking. Each case breaks one
 # Harbour rule in a throwaway tree copy and asserts the check names it.
 #
-# Binary and bundled server aren't copied: checks needing them SKIP.
+# Binary and bundled server aren't copied: checks needing them SKIP, unless a
+# case plants a stand-in.
 set -u
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -15,7 +16,8 @@ trap 'rm -rf "$work"' EXIT
 pristine="$work/pristine"
 mkdir -p "$pristine"
 tar -C "$root" -cf - \
-    --exclude=./rust/target --exclude=./.git --exclude=./vendor \
+    --exclude=./rust/target --exclude=./.git \
+    --exclude='./vendor/deltachat-rpc-server/*/deltachat-rpc-server' \
     . 2>/dev/null | tar -C "$pristine" -xf -
 if [[ ! -d "$pristine/ci" ]] || [[ ! -f "$pristine/.github/workflows/rpm.yml" ]]; then
     echo "selftest: FAIL could not stage a copy of the tree" >&2
@@ -144,16 +146,53 @@ break_and_expect 2.6 "a write into the installed data directory" \
 break_and_expect 1.2.3 "a cargo binary named something other than the package" \
     "sed -i 's|^name = \"harbour-piirit\"\$|name = \"piirit\"|' rust/piirit-app/Cargo.toml"
 
+# Stand-in server per device arch: 1.6.7 reads file type, not arch.
+plant_server() {
+    local src=$1 a
+    for a in aarch64 armv7hl; do
+        mkdir -p "vendor/deltachat-rpc-server/$a"
+        cp "$src" "vendor/deltachat-rpc-server/$a/deltachat-rpc-server"
+    done
+}
+exe=$(type -P true)
+so=$(ldd "$exe" 2>/dev/null | awk '/libc\.so/ {print $3; exit}')
+break_and_expect 1.6.7 "the bundled server back in /usr/libexec" \
+    "plant_server $exe && sed -i 's|^%define appexecdir .*|%define appexecdir %{_libexecdir}/%{name}|' $S"
+if [[ -f "$so" ]]; then
+    break_and_expect 1.6.7 "a shared library in the private libexec" "plant_server $so"
+else
+    echo "selftest: FAIL found no shared library to stand in for a misplaced one" >&2
+    status=1
+fi
+# Allowed place stays allowed.
+cases=$((cases + 1))
+rm -rf "$work/case"
+cp -a "$pristine" "$work/case"
+( cd "$work/case" && plant_server "$exe" )
+out=$("$work/case/ci/harbour-check.sh" 2>&1)
+if grep -qF 'FAIL [1.6.7]' <<< "$out"; then
+    echo "selftest: FAIL an executable under /usr/share/harbour-piirit/libexec/ should pass 1.6.7" >&2
+    grep -F '[1.6.7]' <<< "$out" >&2
+    status=1
+elif grep -q 'SKIP \[1\.6\.7\]' <<< "$out"; then
+    echo "selftest: FAIL 1.6.7 skipped; the stand-in server is not what the spec installs" >&2
+    status=1
+else
+    echo "selftest: ok   an executable in the private libexec -> allowed"
+fi
+
 # validate-rpm judges real validator output against the same waivers. Matching
 # is subtle: layout errors name the path; linking errors name the *binary*,
 # library in message. Fed saved logs (built RPM needs SDK).
+# $vtree: tree whose waivers judge.
+vtree=$pristine
 validate_rpm() {
     local expect=$1 what=$2 body=$3
     local log="$work/validation.log"
     cases=$((cases + 1))
     printf '%s' "$body" > "$log"
 
-    if "$pristine/ci/harbour-validate-rpm.sh" --log "$log" >/dev/null 2>&1; then
+    if "$vtree/ci/harbour-validate-rpm.sh" --log "$log" >/dev/null 2>&1; then
         local got=pass
     else
         local got=fail
@@ -162,24 +201,49 @@ validate_rpm() {
         echo "selftest: ok   $what -> $expect"
     else
         echo "selftest: FAIL $what should $expect, got $got" >&2
-        "$pristine/ci/harbour-validate-rpm.sh" --log "$log" >&2
+        "$vtree/ci/harbour-validate-rpm.sh" --log "$log" >&2
         status=1
     fi
     return 0
 }
 
-validate_rpm pass "an RPM breaking only the waived rules" \
+# Validator at sailfishos/sdk-harbour-rpmvalidator#189 head
+# (ci/harbour/UPSTREAM) on today's layout.
+validate_rpm pass "the server where sailfishos/sdk-harbour-rpmvalidator#189 allows it" \
+'!BEGIN!x
+INFO|/usr/share/harbour-piirit/libexec/deltachat-rpc-server|Private executable shipped
+WARNING|/usr/bin/harbour-piirit|file is not stripped!
+!END!PASS!x
+'
+validate_rpm fail "the server back in /usr/libexec" \
 '!BEGIN!x
 ERROR|/usr/libexec/harbour-piirit|Installation not allowed in this location
 ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|ELF binary in wrong location
 ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|File must not be executable (current permissions: 755)
-WARNING|/usr/bin/harbour-piirit|file is not stripped!
 !END!FAIL!x
 '
 # Vendored qmetaobject patch keeps QtWidgets out of the binary; if lost, fail.
 validate_rpm fail "a binary that links QtWidgets again" \
 '!BEGIN!x
 ERROR|/usr/bin/harbour-piirit|Cannot link to shared library: libQt5Widgets.so.5
+!END!FAIL!x
+'
+
+# No waivers today: mechanism proved on copy carrying old /usr/libexec ones.
+vtree="$work/waived"
+cp -a "$pristine" "$vtree"
+printf '%s\n' \
+    '1.2.1  /usr/libexec/harbour-piirit    Installation not allowed*' \
+    '1.2.1  /usr/libexec/harbour-piirit/*  Installation not allowed*' \
+    '1.6.7  /usr/libexec/harbour-piirit/*  ELF binary in wrong location*' \
+    '1.6.7  /usr/libexec/harbour-piirit/*  File must not be executable*' \
+    >> "$vtree/ci/harbour/waivers.conf"
+validate_rpm pass "an RPM breaking only the waived rules" \
+'!BEGIN!x
+ERROR|/usr/libexec/harbour-piirit|Installation not allowed in this location
+ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|ELF binary in wrong location
+ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|File must not be executable (current permissions: 755)
+WARNING|/usr/bin/harbour-piirit|file is not stripped!
 !END!FAIL!x
 '
 # Waiver = path + accepted errors. Path-only match would swallow other errors
@@ -199,6 +263,7 @@ validate_rpm fail "a waived message about a path the waiver does not name" \
 ERROR|/usr/share/harbour-piirit/qml/piirit.qml|File must not be executable (current permissions: 755)
 !END!FAIL!x
 '
+vtree=$pristine
 validate_rpm fail "an RPM installing somewhere new" \
 '!BEGIN!x
 ERROR|/etc/harbour-piirit.conf|Installation not allowed in this location

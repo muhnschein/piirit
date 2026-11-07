@@ -81,8 +81,8 @@ Requires:   sailfish-components-webview-qt5-pickers
 Requires:   qt5-qtsvg-plugin-imageformat-svg
 
 # Harbour allows no Provides:, and rpm generates one from any packaged shared library (e.g.
-# libpiirit.so under %%{appdatadir}/lib). Exclude both private dirs.
-%define __provides_exclude_from ^(%{_datadir}/%{name}|%{_libexecdir}/%{name})/.*$
+# libpiirit.so under %%{appdatadir}/lib). Exclude the private dir.
+%define __provides_exclude_from ^%{_datadir}/%{name}/.*$
 
 # Sailfish Rust 1.75.0. rust/Cargo.lock v3 (Cargo reads v4 from 1.78).
 # rust-std-static: native std. Cross std is rust-std-static-%%{rusttarget}; if "can't find crate
@@ -142,7 +142,7 @@ BuildRequires:  qt5-qttools-linguist
 %define builddir rust/target/%{rusttarget}/release
 %define nativedir rust/target/release
 %define appdatadir %{_datadir}/%{name}
-%define appexecdir %{_libexecdir}/%{name}
+%define appexecdir %{appdatadir}/libexec
 
 %description
 Piirit is a Silica/QML SailfishOS client for Delta Chat. It contributes
@@ -248,8 +248,9 @@ install -Dm 644 vendor/silero-vad/ggml-silero-v5.1.2.bin \
 (cd translations && find . -type f -name 'piirit-*.qm' -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/translations/{}" \; )
 
-# Bundled server in private libexec, not %%{_bindir}: nothing searching PATH picks it up as a
-# generic deltachat-rpc-server. piirit-app defaults to this exact path.
+# Bundled server in %%{appdatadir}/libexec, not %%{_bindir}: nothing searching PATH picks it up
+# as a generic deltachat-rpc-server. Only private place Harbour lets an executable live
+# (sailfishos/sdk-harbour-rpmvalidator#189). piirit-app defaults to this exact path.
 #
 # %%{_target_cpu}, not %%{_arch}: rpm maps armv7h* to "arm"; fetch script writes armv7hl/.
 %if 0%{?bundle_rpc_server}
@@ -297,10 +298,5 @@ install -Dm 644 icons/256x256/%{name}.png \
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
 %{appdatadir}
-%if 0%{?bundle_rpc_server}
-# Own the directory too: listing only the file leaves /usr/libexec/%%{name} on uninstall.
-%dir %{appexecdir}
-%{appexecdir}/deltachat-rpc-server
-%endif
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
