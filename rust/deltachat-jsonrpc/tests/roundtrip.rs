@@ -170,3 +170,27 @@ async fn event_loop_streams_batches_in_order() {
     handle.stop();
     stop(&client).await;
 }
+
+#[tokio::test]
+async fn a_call_after_the_server_is_gone_fails_instead_of_waiting_forever() {
+    let client = RpcClient::spawn(fake_server_path(), Vec::<&str>::new())
+        .await
+        .expect("spawn fake server");
+    let gone: Result<serde_json::Value, RpcError> = client.call_unit("quit").await;
+    assert!(matches!(gone, Err(RpcError::TransportClosed)), "{gone:?}");
+
+    // Event loop between polls when server died: its next poll has no timeout. Bound only so a
+    // hang fails here instead of stalling run.
+    let late = tokio::time::timeout(
+        std::time::Duration::from_secs(30),
+        client.call_polling::<serde_json::Value>("get_next_event_batch"),
+    )
+    .await;
+    assert!(
+        matches!(late, Ok(Err(RpcError::TransportClosed))),
+        "a call to a server already gone did not fail: {late:?}"
+    );
+    if let Err(err) = client.shutdown().await {
+        panic!("shutdown: {err}");
+    }
+}

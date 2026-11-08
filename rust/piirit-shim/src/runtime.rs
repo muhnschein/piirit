@@ -5,12 +5,38 @@
 //! thread; only a `Handle` returned (its `spawn` never enters runtime context).
 
 use std::future::Future;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::time::Duration;
 
 use tokio::runtime::{Builder, Handle};
 use tokio::task::JoinHandle;
+
+/// Spawned work not done yet, answer handed to Qt included. Tests wait for none
+/// ([`crate::core_settled`]).
+static WORKING: AtomicUsize = AtomicUsize::new(0);
+
+/// One unit of [`WORKING`]; dropped with its task, however it ends.
+pub(crate) struct Working(());
+
+impl Working {
+    pub(crate) fn new() -> Self {
+        WORKING.fetch_add(1, Ordering::SeqCst);
+        Self(())
+    }
+}
+
+impl Drop for Working {
+    fn drop(&mut self) {
+        WORKING.fetch_sub(1, Ordering::SeqCst);
+    }
+}
+
+/// Spawned work not done yet.
+pub(crate) fn working() -> usize {
+    WORKING.load(Ordering::SeqCst)
+}
 
 /// Bounded: wedged thread cannot hang UI.
 const HANDLE_TIMEOUT: Duration = Duration::from_secs(5);
@@ -67,8 +93,22 @@ impl CoreRuntime {
         }
     }
 
-    /// Spawn via `Handle` (enqueue only).
+    /// Spawn via `Handle` (enqueue only). Counted till done: work that answers something.
     pub fn spawn<F>(&self, future: F) -> JoinHandle<F::Output>
+    where
+        F: Future + Send + 'static,
+        F::Output: Send + 'static,
+    {
+        let working = Working::new();
+        self.0.handle.spawn(async move {
+            let _working = working;
+            future.await
+        })
+    }
+
+    /// [`Self::spawn`], not counted: runs as long as server (event stream, queue) or waits on
+    /// clock (retry, ring out). Tests can't wait for it to end.
+    pub fn spawn_untracked<F>(&self, future: F) -> JoinHandle<F::Output>
     where
         F: Future + Send + 'static,
         F::Output: Send + 'static,
