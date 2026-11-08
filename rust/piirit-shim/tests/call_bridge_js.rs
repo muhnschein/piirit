@@ -1,4 +1,4 @@
-//! Call page bridge, tested in Node: `tests/js/*.test.js`.
+//! Call page bridge and map's opening view (`map_view.js`), tested in Node: `tests/js/*.test.js`.
 //!
 //! Bridge is JS run in browser engine beside upstream page; Rust can't run it.
 //! Node runs it against stand-ins for page and engine: camera, peer connection,

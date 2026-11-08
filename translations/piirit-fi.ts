@@ -700,6 +700,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Uusi</translation>
     </message>
     <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Näytä kaikki sijainnit</translation>
+    </message>
+    <message>
         <source>Channels</source>
         <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
         <translation>Kanavat</translation>
@@ -1280,6 +1285,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Jaa</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Lähetä nykyinen sijainti</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Sijaintisi on %n metrin tarkkuudella.</numerusform>
+            <numerusform>Sijaintisi on %n metrin tarkkuudella.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Ota sijainti käyttöön Asetuksissa, jotta voit lähettää sen.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Sijaintiasi haetaan…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Jaa reaaliaikainen sijainti</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit lähettää sijaintiasi myös silloin, kun se on taustalla.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 minuutiksi</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 tunniksi</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 tunniksi</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 tunniksi</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 tunniksi</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Lopeta sijainnin jakaminen</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Sijaintiasi haetaan yhä. Onko sijainti käytössä Asetuksissa?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Näytä kaikki sijainnit</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Kartta</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1326,6 +1410,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Ei vielä puheluita</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Kartta</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1358,6 +1447,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Muokattu</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Sijainti</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1600,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Kaikki kanavalla näkevät nimen</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Ei vielä sijainteja</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Täällä näkyvät viimeisen 24 tunnin aikana jaetut sijainnit.</translation>
     </message>
 </context>
 <context>
@@ -2291,6 +2398,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
     </message>
     <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Ota sijainnin jatkuva jakaminen käyttöön (kokeellinen)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Jakaa sijaintisi keskusteluissa ja näyttää jaetut sijainnit kartalla.</translation>
+    </message>
+    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Litteroi ääniviestit (kokeellinen)</translation>
     </message>
@@ -2318,6 +2434,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Lähetä viestinä</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Jaat sijaintisi</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minuutti jäljellä</numerusform>
+            <numerusform>%n minuuttia jäljellä</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n tunti jäljellä</numerusform>
+            <numerusform>%n tuntia jäljellä</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Sijaintiasi ei lähetetä. Onko sijainti käytössä Asetuksissa?</translation>
     </message>
 </context>
 <context>

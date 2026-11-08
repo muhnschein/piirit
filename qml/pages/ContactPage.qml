@@ -107,6 +107,10 @@ Page {
 
     // Each content kind on own page, pushed by name.
     function openMedia(kind) {
+        if (kind === "map") {
+            map.show(page.chatId, 0, 0)
+            return
+        }
         if (kind === "calls") {
             pageStack.push(Qt.resolvedUrl("CallsPage.qml"), {
                 accountId: page.accountId,
@@ -120,6 +124,14 @@ Page {
             chatId: page.chatId,
             kind: kind
         })
+    }
+
+    MapOpener {
+        id: map
+        objectName: "map"
+        account_id: page.accountId
+        chatName: page.chatName
+        onError: page.errorMessage = message
     }
 
     // Picture, full size. None if no picture: initial disc is not one.
@@ -254,6 +266,7 @@ Page {
                 // `=== true`: dconf gives undefined before read.
                 appsAvailable: Settings.webxdcEnabled === true
                 callsAvailable: chat.can_call
+                mapAvailable: Settings.locationStreamingEnabled === true
                 onKindRequested: page.openMedia(kind)
             }
 

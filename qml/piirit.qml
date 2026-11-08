@@ -152,6 +152,13 @@ ApplicationWindow {
         }
     }
 
+    /// Phone's position to core while a chat gets it live.
+    LocationFeed {
+        id: locationFeed
+        objectName: "locationFeed"
+    }
+    /// Live sharing on, no position going out: bars warn.
+    readonly property bool locationStalled: locationFeed.stalled
     /// Chat notification tapped: window's list opens it.
     NotifierTaps {
         objectName: "notifierTaps"

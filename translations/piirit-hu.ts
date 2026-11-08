@@ -698,6 +698,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Új</translation>
     </message>
     <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Az összes hely megjelenítése</translation>
+    </message>
+    <message>
         <source>Channels</source>
         <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
         <translation>Csatornák</translation>
@@ -1274,6 +1279,84 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Megosztás</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Jelenlegi hely küldése</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>A helyed %n méter pontosságú.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>A küldéshez kapcsold be a helymeghatározást a Beállításokban.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Helyed meghatározása…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Élő hely megosztása</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>A Piirit a háttérben futva is küldi a helyedet.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 percre</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 órára</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 órára</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 órára</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 órára</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Helymegosztás leállítása</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>A helyed meghatározása még tart. Be van kapcsolva a helymeghatározás a Beállításokban?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Az összes hely megjelenítése</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Térkép</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1320,6 +1403,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Még nincsenek hívások</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Térkép</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1352,6 +1440,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Szerkesztve</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Hely</translation>
     </message>
 </context>
 <context>
@@ -1499,6 +1592,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>A nevet a csatorna minden tagja látja</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Még nincsenek helyek</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Itt jelennek meg az elmúlt 24 órában megosztott helyek.</translation>
     </message>
 </context>
 <context>
@@ -2283,6 +2389,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kis alkalmazásokat futtat a csevegéseken belül.</translation>
     </message>
     <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Folyamatos helymegosztás engedélyezése (kísérleti)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Megosztja a tartózkodási helyét a csevegésekben, és térképen mutatja a megosztott helyeket.</translation>
+    </message>
+    <message>
         <source>Transcribe voice messages (experimental)</source>
         <translation>Hangüzenetek átírása (kísérleti)</translation>
     </message>
@@ -2310,6 +2425,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Küldés üzenetként</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Megosztod a helyedet</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>még %n perc</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>még %n óra</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>A helyed nem kerül elküldésre. Be van kapcsolva a helymeghatározás a Beállításokban?</translation>
     </message>
 </context>
 <context>
