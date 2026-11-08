@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
 - Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.
 - If the Delta Chat core stops while Piirit waits for news, Piirit notices, says it is reconnecting and starts the core again. Before, it could miss that and keep showing chats that no longer updated until restarted.
 - A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.
