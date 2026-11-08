@@ -585,6 +585,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>ಚಾಟ್‌ಗಳು</translation>
     </message>
     <message>
@@ -689,7 +690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>ಎಲ್ಲಾ ಚಾಟ್‌ಗಳನ್ನು ತೋರಿಸಲು &quot;%1&quot; ಟ್ಯಾಪ್ ಮಾಡಿ</translation>
     </message>
     <message>
@@ -706,6 +707,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>All locations</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>ಎಲ್ಲಾ ಸ್ಥಳಗಳು</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>ಚಾನಲ್‌ಗಳು</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>ಓದದ ಚಾನಲ್‌ಗಳಿಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>ಎಲ್ಲಾ ಚಾನಲ್‌ಗಳನ್ನು ತೋರಿಸಲು &quot;%1&quot; ಟ್ಯಾಪ್ ಮಾಡಿ</translation>
     </message>
 </context>
 <context>
