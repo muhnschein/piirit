@@ -23,7 +23,7 @@ use crate::transcripts::{self, Change, Previews};
 /// SilicaListView { model: chats.rows }
 /// ```
 #[derive(QObject, Default)]
-// Four QML-set properties; folding them hides them from QML.
+// Bools are QML properties; folding them hides them from QML.
 #[allow(clippy::struct_excessive_bools)]
 pub struct ChatList {
     base: qt_base_class!(trait QObject),
@@ -61,6 +61,15 @@ pub struct ChatList {
     pub unread_only_changed: qt_signal!(),
     /// Release chats read since filter on (app resume).
     pub forget_read: qt_method!(fn(&mut self)),
+
+    /// Chats only, no channels. Turning on turns `channels_only` off.
+    pub chats_only: qt_property!(bool; WRITE set_chats_only NOTIFY kind_filter_changed),
+    /// Channels only. Turning on turns `chats_only` off.
+    pub channels_only: qt_property!(bool; WRITE set_channels_only NOTIFY kind_filter_changed),
+    /// Either kind filter changed.
+    pub kind_filter_changed: qt_signal!(),
+    /// List holds a channel: kind filters offered. Last one gone turns them off.
+    pub has_channels: qt_property!(bool; NOTIFY rows_changed),
 
     /// Reader setting: announce muted-group reply to own message (reference clients' mentions).
     /// Groups only: muted 1:1 was muted for that person.
@@ -378,6 +387,26 @@ impl ChatList {
         }
     }
 
+    /// Show only chats without channels, or all.
+    pub fn set_chats_only(&mut self, on: bool) {
+        if self.chats_only != on {
+            self.chats_only = on;
+            self.channels_only &= !on;
+            self.kind_filter_changed();
+            self.show_later();
+        }
+    }
+
+    /// Show only channels, or all.
+    pub fn set_channels_only(&mut self, on: bool) {
+        if self.channels_only != on {
+            self.channels_only = on;
+            self.chats_only &= !on;
+            self.kind_filter_changed();
+            self.show_later();
+        }
+    }
+
     /// Release chats read since filter on.
     pub fn forget_read(&mut self) {
         if self.unread_only && !self.kept.is_empty() {
@@ -398,10 +427,25 @@ impl ChatList {
         show(());
     }
 
-    /// Rows filter passes, core order.
+    /// Rows filters pass, core order.
     fn shown(&mut self) -> Vec<ChatListItem> {
+        let (chats_only, channels_only) = (self.chats_only, self.channels_only);
+        let kind = move |row: &ChatListItem| {
+            if chats_only {
+                !row.is_channel
+            } else if channels_only {
+                row.is_channel
+            } else {
+                true
+            }
+        };
         if !self.unread_only {
-            return self.all_rows.clone();
+            return self
+                .all_rows
+                .iter()
+                .filter(|row| kind(row))
+                .cloned()
+                .collect();
         }
         // Gone chats' ids dropped too.
         let listed: HashSet<u32> = self.all_rows.iter().map(|row| row.chat_id).collect();
@@ -413,22 +457,30 @@ impl ChatList {
         }
         self.all_rows
             .iter()
-            .filter(|row| self.kept.contains(&row.chat_id))
+            .filter(|row| kind(row) && self.kept.contains(&row.chat_id))
             .cloned()
             .collect()
     }
 
     /// Bring model in line with `all_rows` and filter.
     fn show(this: QObjectPinned<'_, Self>) {
-        let target = {
+        let (target, kind_dropped) = {
             let mut this_mut = this.borrow_mut();
+            this_mut.has_channels = this_mut.all_rows.iter().any(|row| row.is_channel);
+            // Pills hide with last channel: filter they'd turn off goes too.
+            let kind_dropped =
+                !this_mut.has_channels && (this_mut.chats_only || this_mut.channels_only);
+            if kind_dropped {
+                this_mut.chats_only = false;
+                this_mut.channels_only = false;
+            }
             let target = this_mut.shown();
             // Count before setting rows: setting makes QML read counts.
             let pinned = target.iter().filter(|row| row.is_pinned).count();
             this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
             this_mut.unpinned_count =
                 u32::try_from(target.len().saturating_sub(pinned)).unwrap_or(u32::MAX);
-            target
+            (target, kind_dropped)
         };
         {
             let this_ref = this.borrow();
@@ -436,6 +488,9 @@ impl ChatList {
             reconcile(&mut rows, target);
         }
         this.borrow().rows_changed();
+        if kind_dropped {
+            this.borrow().kind_filter_changed();
+        }
     }
 
     /// Register once for transcript changes; registration ends with this object.
@@ -591,9 +646,10 @@ impl ChatList {
         announcements
     }
 
-    /// Waiting restatements, rows current. Unlisted chats dropped.
+    /// Waiting restatements, rows current. Unlisted chats dropped; filtered-out ones kept: their
+    /// notifications stay up.
     fn settled_restatements(&mut self) -> Vec<(u32, QString, QString, QString, u32)> {
-        let rows = self.rows.borrow();
+        let rows = &self.all_rows;
         self.pending_restatements
             .drain()
             .filter_map(|chat_id| rows.iter().find(|row| row.chat_id == chat_id))
@@ -1065,6 +1121,10 @@ pub(crate) async fn chat_items(
                     is_contact_request: json::flag(&item, "isContactRequest"),
                     is_self_talk: json::flag(&item, "isSelfTalk"),
                     is_device_talk: json::flag(&item, "isDeviceTalk"),
+                    is_channel: matches!(
+                        json::str_at(&item, "chatType"),
+                        "OutBroadcast" | "InBroadcast"
+                    ),
                     color: json::text(&item, "color"),
                     avatar_path: json::text(&item, "avatarPath"),
                     voice_message_id: if json::str_at(&item, "lastMessageType") == "Voice" {

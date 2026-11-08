@@ -29,6 +29,9 @@ const PROBE_QML: &str = r"
 
         Loader { id: loader }
         Transports { id: transports; account_id: 1 }
+        // Reads landed: next asked only once last one did (newer read drops older one's answer).
+        property int lists: 0
+        Connections { target: transports; onRows_changed: lists = lists + 1 }
         property int added: 0
         property string errors: ''
         Connections {
@@ -69,6 +72,7 @@ const PROBE_QML: &str = r"
         function pageProperty(property) { return '' + loader.item[property] }
         // Made before core was up; the list has to be asked for.
         function refresh() { transports.reload(); return 'ok' }
+        function landed() { return '' + lists }
         function listed() { return transports.count + ':' + transports.primary }
         function signalled() { return added + '/' + errors }
         function navigation() { return probe.pageStack.log }
@@ -163,12 +167,17 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
     // Relay answered, to nobody: on profile's list once page asks again.
     let mut listed = String::new();
     let listed_ptr: *mut String = std::ptr::addr_of_mut!(listed);
+    let mut asked_at = String::new();
     plan.until(1, 30, move |last| unsafe {
         *listed_ptr = call!("listed");
         if (*listed_ptr).starts_with("2:") || last {
             return true;
         }
-        call!("refresh");
+        let landed = call!("landed");
+        if landed != asked_at {
+            asked_at = landed;
+            call!("refresh");
+        }
         false
     });
 

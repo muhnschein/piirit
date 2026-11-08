@@ -2833,4 +2833,20 @@ async fn channels_against(client: &RpcClient, mailbox: (u16, u16)) {
         Some(false),
         "a subscriber can write to the channel: {chat:?}"
     );
+    channel_row_says(client, owner, channel, "OutBroadcast").await;
+    channel_row_says(client, reader, joined, "InBroadcast").await;
+}
+
+/// Chat list's Chats and Channels filters split on a row's own `chatType`.
+async fn channel_row_says(client: &RpcClient, account: u32, id: u32, kind: &str) {
+    let rows: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (account, vec![id]))
+        .await
+        .unwrap_or_else(|err| panic!("get_chatlist_items_by_entries for a channel: {err}"));
+    assert_eq!(
+        rows[&id].get("chatType").and_then(Value::as_str),
+        Some(kind),
+        "a channel's chat list row does not say it is one: {:?}",
+        rows[&id]
+    );
 }

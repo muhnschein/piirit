@@ -1245,6 +1245,14 @@ async fn slow_work() {
     }
 }
 
+/// Send's reply held: while `PIIRIT_FAKE_SEND_GATE` file there, else `PIIRIT_FAKE_SEND_DELAY_MS`.
+async fn send_wait() {
+    match std::env::var_os("PIIRIT_FAKE_SEND_GATE") {
+        Some(gate) => file_present(std::path::Path::new(&gate), false).await,
+        None => tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await,
+    }
+}
+
 /// Reply delay in ms from `var`, or `default`.
 fn delay_or(var: &str, default: u64) -> std::time::Duration {
     std::time::Duration::from_millis(
@@ -1462,6 +1470,11 @@ async fn serve() {
             journal(&method, &params);
             if let Some(path) = held_by {
                 file_present(&path, false).await;
+            }
+            // Audit, not set by tests: every answer late. Test reading before its answer fails.
+            let late = delay("PIIRIT_FAKE_ANSWER_DELAY_MS");
+            if !late.is_zero() && method != "get_next_event_batch" {
+                tokio::time::sleep(late).await;
             }
 
             let positional = |index: usize| -> Value {
@@ -2696,6 +2709,8 @@ async fn serve() {
                                 // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
+                                "chatType": u32::try_from(chat)
+                                    .map_or("Single", |chat| state.chat_type(chat)),
                                 // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
                                 "isContactRequest": u32::try_from(chat)
@@ -2864,9 +2879,9 @@ async fn serve() {
                             }
                             msg
                         };
-                        // Queued above: delay puts event before reply (core can); it duplicated a
+                        // Queued above: held reply comes after event (core can); it duplicated a
                         // sent row.
-                        tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
+                        send_wait().await;
                         // Extension, not content: image vs paperclip.
                         let extension = file.as_str().and_then(|path| {
                             std::path::Path::new(path)
@@ -2931,7 +2946,7 @@ async fn serve() {
                         err(&id, "send_msg without a file is not what the app sends")
                     } else {
                         // Held back like other send: in-flight tests.
-                        tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
+                        send_wait().await;
                         let mut state = state.lock().await;
                         let msg = state.add_message(account, chat);
                         state.sent_files.insert(

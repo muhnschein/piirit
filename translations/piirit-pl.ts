@@ -587,6 +587,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Czaty</translation>
     </message>
     <message>
@@ -691,7 +692,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Stuknij „%1”, aby pokazać wszystkie czaty</translation>
     </message>
     <message>
@@ -708,6 +709,21 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>All locations</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Wszystkie lokalizacje</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanały</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Brak nieprzeczytanych kanałów</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Stuknij „%1”, aby pokazać wszystkie kanały</translation>
     </message>
 </context>
 <context>

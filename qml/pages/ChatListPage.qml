@@ -124,6 +124,8 @@ Page {
     /// Placeholder words follow rows, not the filter flag: flag flips before rows, and the
     /// placeholder fades out over them.
     property bool emptyUnreadOnly: false
+    /// Same for kind filter: "chats", "channels", or "".
+    property string emptyKind: ""
 
     Connections {
         target: chats
@@ -134,6 +136,8 @@ Page {
             page.chatsLoaded = true
             if (chats.count === 0) {
                 page.emptyUnreadOnly = chats.unread_only
+                page.emptyKind = chats.channels_only ? "channels"
+                                                     : chats.chats_only ? "chats" : ""
             }
         }
     }
@@ -561,8 +565,8 @@ Page {
                 // row under finger.
             }
 
-            // Ordinary: Search, Unread pills; field fades in on Search, out when closed or left
-            // empty. Archived: field only.
+            // Ordinary: Search, Unread, Chats, Channels pills; field fades in on Search, out when
+            // closed or left empty. Archived: field only.
             Item {
                 width: parent.width
                 height: searchField.height
@@ -624,33 +628,67 @@ Page {
                                                        : Theme.primaryColor)
                 }
 
-                Row {
+                // Four words outgrow phone width: strip scrolls sideways.
+                Flickable {
                     objectName: "chatListPills"
-                    x: Theme.horizontalPageMargin
+                    width: parent.width
+                    height: pills.height
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.paddingMedium
+                    contentWidth: pills.width + 2 * Theme.horizontalPageMargin
+                    flickableDirection: Flickable.HorizontalFlick
+                    boundsBehavior: Flickable.StopAtBounds
+                    clip: true
                     visible: !page.archived && (!page.searchOpen || opacity > 0)
                     opacity: page.searchOpen ? 0 : 1
                     enabled: !page.searchOpen
                     Behavior on opacity { NumberAnimation { duration: 200 } }
 
-                    PillButton {
-                        objectName: "chatSearchPill"
-                        icon: "image://theme/icon-m-search"
-                        text: qsTr("Search")
-                        onClicked: page.openSearch()
-                    }
+                    Row {
+                        id: pills
+                        x: Theme.horizontalPageMargin
+                        spacing: Theme.paddingMedium
 
-                    // Beside search, as reference clients. Hidden with Search pill while open:
-                    // search covers every chat.
-                    PillButton {
-                        id: unreadFilter
-                        objectName: "unreadFilterButton"
-                        //: Turns the chat list's filter to unread chats on
-                        //: and off.
-                        text: qsTr("Unread")
-                        checked: chats.unread_only
-                        onClicked: chats.unread_only = !chats.unread_only
+                        PillButton {
+                            objectName: "chatSearchPill"
+                            icon: "image://theme/icon-m-search"
+                            text: qsTr("Search")
+                            onClicked: page.openSearch()
+                        }
+
+                        // Beside search, as reference clients. Hidden with Search pill while open:
+                        // search covers every chat.
+                        PillButton {
+                            id: unreadFilter
+                            objectName: "unreadFilterButton"
+                            //: Turns the chat list's filter to unread chats on
+                            //: and off.
+                            text: qsTr("Unread")
+                            checked: chats.unread_only
+                            onClicked: chats.unread_only = !chats.unread_only
+                        }
+
+                        // Kind pills only once a channel exists; one kind at a time, either with
+                        // Unread (`ChatList` turns other off).
+                        PillButton {
+                            id: chatsFilter
+                            objectName: "chatsFilterButton"
+                            visible: chats.has_channels
+                            //: Title of the chat list, and its filter button
+                            //: that shows only chats that are not channels.
+                            text: qsTr("Chats")
+                            checked: chats.chats_only
+                            onClicked: chats.chats_only = !chats.chats_only
+                        }
+
+                        PillButton {
+                            objectName: "channelsFilterButton"
+                            visible: chats.has_channels
+                            //: Turns the chat list's filter to channels on and
+                            //: off.
+                            text: qsTr("Channels")
+                            checked: chats.channels_only
+                            onClicked: chats.channels_only = !chats.channels_only
+                        }
                     }
                 }
             }
@@ -828,7 +866,11 @@ Page {
                 objectName: "chatListPlaceholder"
                 // Not until core answered: see `chatsLoaded`.
                 enabled: page.chatsLoaded && chats.count === 0
+                // Channels alone never empty: its pill shows only beside a channel.
                 text: page.archived ? qsTr("No archived chats")
+                                    //: The unread and channels filters are
+                                    //: on and every channel has been read.
+                                    : page.emptyUnreadOnly && page.emptyKind === "channels" ? qsTr("No unread channels")
                                     //: The unread filter is on and every
                                     //: chat has been read.
                                     : page.emptyUnreadOnly ? qsTr("No unread chats")
@@ -836,10 +878,14 @@ Page {
                 // Archiving happens in ordinary list.
                 hintText: page.archived ? ""
                                         //: %1 is the label of the unread
-                                        //: filter, a button at the right of
-                                        //: the search field.
+                                        //: filter, a button beside the search
+                                        //: button.
+                                        : page.emptyUnreadOnly && page.emptyKind === "channels" ? qsTr("Tap %1 to show all channels").arg(unreadFilter.text)
+                                        //: %1 is the label of a filter, a
+                                        //: button beside the search button.
                                         : page.emptyUnreadOnly ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
-                                                               : qsTr("Pull down to start one")
+                                        : page.emptyKind === "chats" ? qsTr("Tap %1 to show all chats").arg(chatsFilter.text)
+                                                                     : qsTr("Pull down to start one")
             }
         }
 
