@@ -825,7 +825,7 @@ Page {
                                 if (model.is_muted) {
                                     chats.set_mute_duration(model.chat_id, 0)
                                 } else {
-                                    page.askMute(model.chat_id, model.is_group)
+                                    page.askMute(model.chat_id, model.is_group && !model.is_channel)
                                 }
                             }
                         }

@@ -22,7 +22,7 @@ mod common;
 /// Page stack is a QML object (context property), not Rust: as `qml_blocking`. Fresh dialog per
 /// push: a pick can't reach handler an earlier page connected.
 #[allow(clippy::too_many_lines)]
-fn probe_qml() -> String {
+fn probe_qml(script: &str) -> String {
     format!(
         r"
     import QtQuick 2.0
@@ -151,54 +151,7 @@ fn probe_qml() -> String {
 
         property int step: 0
         property bool finished: false
-        readonly property var script: [
-            {{ until: function() {{ return core.status === 'ready' }},
-               run: function() {{
-                   // Replies still notify: note in groups only.
-                   Settings.notificationsEnabled = true
-                   Settings.mentionNotifications = true
-                   record('list-load', load('{list}', {{ accountId: 1, archived: false }}))
-               }} }},
-            {{ until: function() {{ layout(); return rowCount() === 2 && muteText() === 'Mute' }},
-               run: function() {{ muteVia('row0', 28800) }} }},
-            {{ until: function() {{ return muteText() === 'Unmute' }},
-               run: function() {{ unmuteVia('row0') }} }},
-            {{ until: function() {{ return muteText() === 'Mute' }},
-               run: function() {{ row = 1; muteVia('row1', 3600) }} }},
-            {{ until: function() {{ return muteText() === 'Unmute' }},
-               run: function() {{ unmuteVia('row1') }} }},
-            {{ until: function() {{ return muteText() === 'Mute' }},
-               run: function() {{
-                   // Mentions off: no note even in a group. Backed out: nothing sent.
-                   Settings.mentionNotifications = false
-                   row = 0
-                   openOnly('quiet0')
-                   row = 1
-                   openOnly('quiet1')
-                   Settings.mentionNotifications = true
-                   record('group-load', load('{group}', {{ accountId: 1, chatId: 2, chatName: 'Group' }}))
-               }} }},
-            {{ until: function() {{ return rowValue() === 'On' }},
-               run: function() {{ rowVia('group', 86400) }} }},
-            {{ until: function() {{ return rowValue() === 'Muted' }},
-               run: function() {{ rowVia('group-muted', 0) }} }},
-            {{ until: function() {{ return rowValue() === 'On' }},
-               run: function() {{
-                   // Mentions off: no note. Backed out: nothing sent.
-                   Settings.mentionNotifications = false
-                   stack.props = null
-                   click('notifications')
-                   record('group-quiet-note', stack.props ? stack.props.mentionsStillNotify : 'none')
-                   Settings.mentionNotifications = true
-                   record('contact-load', load('{contact}', {{ accountId: 1, chatId: 1, chatName: 'Contact' }}))
-               }} }},
-            {{ until: function() {{ return rowValue() === 'On' }},
-               run: function() {{ rowVia('contact', 604800) }} }},
-            {{ until: function() {{ return rowValue() === 'Muted' }},
-               run: function() {{ rowVia('contact-muted', 0) }} }},
-            {{ until: function() {{ return rowValue() === 'On' }},
-               run: function() {{ finished = true }} }}
-        ]
+        readonly property var script: {script}
         Timer {{
             interval: 50; running: !finished; repeat: true
             onTriggered: {{
@@ -216,19 +169,104 @@ fn probe_qml() -> String {
         components = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../qml/components")
             .display(),
-        list = common::page_url("ChatListPage.qml"),
-        group = common::page_url("GroupPage.qml"),
-        contact = common::page_url("ContactPage.qml"),
     )
+    .replace("{list}", &common::page_url("ChatListPage.qml"))
+    .replace("{group}", &common::page_url("GroupPage.qml"))
+    .replace("{contact}", &common::page_url("ContactPage.qml"))
 }
+
+/// Every entry, both mute states. Group: chat 2; contact: chat 1.
+const EVERY_ENTRY: &str = r"[
+            { until: function() { return core.status === 'ready' },
+               run: function() {
+                   // Replies still notify: note in groups only.
+                   Settings.notificationsEnabled = true
+                   Settings.mentionNotifications = true
+                   record('list-load', load('{list}', { accountId: 1, archived: false }))
+               } },
+            { until: function() { layout(); return rowCount() === 2 && muteText() === 'Mute' },
+               run: function() { muteVia('row0', 28800) } },
+            { until: function() { return muteText() === 'Unmute' },
+               run: function() { unmuteVia('row0') } },
+            { until: function() { return muteText() === 'Mute' },
+               run: function() { row = 1; muteVia('row1', 3600) } },
+            { until: function() { return muteText() === 'Unmute' },
+               run: function() { unmuteVia('row1') } },
+            { until: function() { return muteText() === 'Mute' },
+               run: function() {
+                   // Mentions off: no note even in a group. Backed out: nothing sent.
+                   Settings.mentionNotifications = false
+                   row = 0
+                   openOnly('quiet0')
+                   row = 1
+                   openOnly('quiet1')
+                   Settings.mentionNotifications = true
+                   record('group-load', load('{group}', { accountId: 1, chatId: 2, chatName: 'Group' }))
+               } },
+            { until: function() { return rowValue() === 'On' },
+               run: function() { rowVia('group', 86400) } },
+            { until: function() { return rowValue() === 'Muted' },
+               run: function() { rowVia('group-muted', 0) } },
+            { until: function() { return rowValue() === 'On' },
+               run: function() {
+                   // Mentions off: no note. Backed out: nothing sent.
+                   Settings.mentionNotifications = false
+                   stack.props = null
+                   click('notifications')
+                   record('group-quiet-note', stack.props ? stack.props.mentionsStillNotify : 'none')
+                   Settings.mentionNotifications = true
+                   record('contact-load', load('{contact}', { accountId: 1, chatId: 1, chatName: 'Contact' }))
+               } },
+            { until: function() { return rowValue() === 'On' },
+               run: function() { rowVia('contact', 604800) } },
+            { until: function() { return rowValue() === 'Muted' },
+               run: function() { rowVia('contact-muted', 0) } },
+            { until: function() { return rowValue() === 'On' },
+               run: function() { finished = true } }
+        ]";
+
+/// Chat 2 a channel: nobody replies to reader there, so no note.
+const CHANNEL: &str = r"[
+            { until: function() { return core.status === 'ready' },
+               run: function() {
+                   Settings.notificationsEnabled = true
+                   Settings.mentionNotifications = true
+                   record('list-load', load('{list}', { accountId: 1, archived: false }))
+               } },
+            { until: function() { layout(); return rowCount() === 2 && muteText() === 'Mute' },
+               run: function() { row = 1; openOnly('channel-row') } },
+            { until: function() { return true },
+               run: function() {
+                   record('channel-load', load('{group}', { accountId: 1, chatId: 2, chatName: 'Channel' }))
+               } },
+            { until: function() { return rowValue() === 'On' },
+               run: function() {
+                   stack.props = null
+                   click('notifications')
+                   record('channel-page-note', stack.props ? stack.props.mentionsStillNotify : 'none')
+                   finished = true
+               } }
+        ]";
 
 /// Seconds for steps; only a broken run spends them.
 const PATIENCE_SECONDS: u32 = 40;
 
-#[test]
-#[allow(clippy::too_many_lines)]
-fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
-    let temp = std::env::temp_dir().join(format!("piirit-mute-flow-{}", std::process::id()));
+/// Steps, journal's calls, and context for assert messages.
+struct Run {
+    steps: Vec<(String, String)>,
+    calls: Vec<(String, Value)>,
+    context: String,
+}
+
+impl Run {
+    fn value(&self, label: &str) -> String {
+        common::value_of(&self.steps, label).to_string()
+    }
+}
+
+/// `script` against the fake core; `channels` names chats core calls channels.
+fn run(name: &str, script: &str, channels: &str) -> Run {
+    let temp = std::env::temp_dir().join(format!("piirit-{name}-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
@@ -237,6 +275,7 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        std::env::set_var("PIIRIT_FAKE_CHANNELS", channels);
     }
 
     piirit_shim::register_qml_types();
@@ -247,7 +286,7 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.load_data(QByteArray::from(probe_qml()));
+    engine.load_data(QByteArray::from(probe_qml(script)));
     // Named for the page before load, as Silica names its own.
     let stack = engine.invoke_method("stackObject".into(), &[]);
     engine.set_property("pageStack".into(), stack);
@@ -266,10 +305,22 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
 
     let (steps_json, reached) = outcome;
     let steps: Vec<(String, String)> = serde_json::from_str(&steps_json).unwrap_or_default();
-    let value = |label: &str| common::value_of(&steps, label).to_string();
     let calls = common::calls(&journal);
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("steps: {steps:?}, reached step {reached}, calls: {names:?}");
+    Run {
+        steps,
+        calls,
+        context,
+    }
+}
+
+#[test]
+#[allow(clippy::too_many_lines)]
+fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
+    let run = run("mute-flow", EVERY_ENTRY, "");
+    let value = |label: &str| run.value(label);
+    let (calls, context) = (&run.calls, &run.context);
 
     assert_eq!(
         value("list-load"),
@@ -381,6 +432,27 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
              gets it. {context}"
         );
     }
+}
+
+#[test]
+fn a_channel_gets_no_note_on_replies() {
+    let run = run("mute-channel", CHANNEL, "2");
+    let context = &run.context;
+    assert_eq!(
+        (
+            run.value("list-load"),
+            run.value("channel-row-note"),
+            run.value("channel-load"),
+            run.value("channel-page-note"),
+        ),
+        (
+            "ok".to_string(),
+            "false".to_string(),
+            "ok".to_string(),
+            "false".to_string()
+        ),
+        "a channel's mute dialog says replies still notify; nobody replies there. {context}"
+    );
 }
 
 /// Steps done, or patience spent: take steps, quit.
