@@ -9,7 +9,7 @@ use qmetaobject::*;
 
 use crate::json;
 use crate::models::{AccountItem, AccountListModel};
-use crate::runtime::CoreRuntime;
+use crate::runtime::{CoreRuntime, Working};
 use crate::signup::{self, Attempts, Outcome, Source, Taken, Transport};
 
 /// Live server connection, shared by per-chat models. One per process, unenforced: `start` guard
@@ -31,11 +31,14 @@ static SPAWNING: AtomicBool = AtomicBool::new(false);
 /// that triggers another read.
 const SETTLED_QUIET: Duration = Duration::from_millis(100);
 
-/// No server spawning, no call open, server silent [`SETTLED_QUIET`]. Tests wait on it in place
-/// of fixed delays; app never asks.
+/// No server spawning, no spawned work unfinished, no call open, server silent [`SETTLED_QUIET`].
+/// Tests wait on it in place of fixed delays; app never asks.
 #[doc(hidden)]
 pub fn core_settled() -> bool {
     if SPAWNING.load(Ordering::SeqCst) {
+        return false;
+    }
+    if crate::runtime::working() > 0 {
         return false;
     }
     connection().map_or(true, |(rpc, _)| {
@@ -605,7 +608,7 @@ impl DeltaChatCore {
                 stock.clone(),
             );
         });
-        runtime.spawn(async move {
+        runtime.spawn_untracked(async move {
             tokio::time::sleep(delay).await;
             retry(());
         });
@@ -705,14 +708,15 @@ impl DeltaChatCore {
         let stopped = queued_callback(move |tail: Vec<String>| {
             Self::schedule_restart(stopped_ptr.clone(), path.clone(), last_words(&tail));
         });
-        let emit = queued_callback(move |batch: Vec<CoreEvent>| {
+        // Batch counted till relayed: handlers' own asks start before it ends.
+        let emit = queued_callback(move |(batch, _working): (Vec<CoreEvent>, Working)| {
             for event in &batch {
                 // Looked up per event: handler may remove the object.
                 let Some(this) = ptr.as_pinned() else { return };
                 this.borrow().relay(event);
             }
         });
-        runtime.spawn(async move {
+        runtime.spawn_untracked(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
             let mut arrived = Vec::new();
             while events.recv_many(&mut arrived, EVENT_BATCH_LIMIT).await > 0 {
@@ -727,7 +731,7 @@ impl DeltaChatCore {
                     })
                     .collect();
                 if !batch.is_empty() {
-                    emit(batch);
+                    emit((batch, Working::new()));
                 }
             }
             // Server gone; stderr only clue.
@@ -919,9 +923,9 @@ impl DeltaChatCore {
             let Some((rpc, runtime)) = self.connection() else {
                 return;
             };
-            let (sender, mut jobs) = tokio::sync::mpsc::unbounded_channel::<ConfigJob>();
-            runtime.spawn(async move {
-                while let Some(job) = jobs.recv().await {
+            let (sender, mut jobs) = tokio::sync::mpsc::unbounded_channel::<(ConfigJob, Working)>();
+            runtime.spawn_untracked(async move {
+                while let Some((job, _working)) = jobs.recv().await {
                     job(rpc.clone()).await;
                 }
             });
@@ -929,7 +933,7 @@ impl DeltaChatCore {
         }
         if let Some(sender) = lane.as_ref() {
             // Closed only with runtime gone: nothing left to write to.
-            sender.send(job).ok();
+            sender.send((job, Working::new())).ok();
         }
     }
 
@@ -1572,7 +1576,7 @@ type ConfigJob = Box<
 >;
 
 /// Feeds the task running [`ConfigJob`]s in order. Dropped: task ends after jobs queued.
-type ConfigLane = tokio::sync::mpsc::UnboundedSender<ConfigJob>;
+type ConfigLane = tokio::sync::mpsc::UnboundedSender<(ConfigJob, Working)>;
 
 /// Id of every account core has, configured or not.
 async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
