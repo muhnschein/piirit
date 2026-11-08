@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>প্রোফাইল যোগ করুন</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>পরবর্তী</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>প্রোফাইল তৈরি করুন</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>আপনি একটি নতুন ঠিকানা দিয়ে শুরু করেন, কোনো চ্যাট ছাড়াই।</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>ব্যাকআপ থেকে ফিরিয়ে আনুন</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>আপনি একটি ব্যাকআপ ফাইল থেকে একটি প্রোফাইল ইমপোর্ট করেন।</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>দ্বিতীয় যন্ত্র হিসেবে যোগ করুন</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>আপনি এই ফোনে এবং অন্য একটি ডিভাইসে একই প্রোফাইল ব্যবহার করেন।</translation>
     </message>
 </context>
 <context>
@@ -572,6 +585,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>চ্যাট</translation>
     </message>
     <message>
@@ -676,7 +690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>সব চ্যাট দেখতে &quot;%1&quot;-এ ট্যাপ করুন</translation>
     </message>
     <message>
@@ -688,6 +702,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>নতুন</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>সব অবস্থান</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>চ্যানেল</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>কোনো অপঠিত চ্যানেল নেই</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>সব চ্যানেল দেখতে &quot;%1&quot;-এ ট্যাপ করুন</translation>
     </message>
 </context>
 <context>
@@ -714,6 +748,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>মুছুন</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%nটি ভয়েস বার্তা প্রতিলিপি করুন</numerusform>
+            <numerusform>%nটি ভয়েস বার্তা প্রতিলিপি করুন</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>প্রতিলিপি কপি করুন</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ক্লিপবোর্ডে কপি করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
     </message>
 </context>
 <context>
@@ -831,6 +887,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>সম্পাদনা করুন</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>প্রতিলিপি কপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
     </message>
 </context>
 <context>
@@ -1239,6 +1305,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>শেয়ার করুন</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>বর্তমান অবস্থান পাঠান</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>আপনার অবস্থান %n মিটার পর্যন্ত নির্ভুল।</numerusform>
+            <numerusform>আপনার অবস্থান %n মিটার পর্যন্ত নির্ভুল।</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>অবস্থান পাঠাতে সেটিংসে অবস্থান চালু করুন।</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>আপনার অবস্থান খোঁজা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>লাইভ অবস্থান শেয়ার করুন</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit ব্যাকগ্রাউন্ডে চলার সময়ও আপনার অবস্থান পাঠাতে থাকে।</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>৩০ মিনিটের জন্য</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>১ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>২ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>৬ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>২৪ ঘণ্টার জন্য</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>অবস্থান শেয়ার করা বন্ধ করুন</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>এখনও আপনার অবস্থান খোঁজা হচ্ছে। সেটিংসে অবস্থান চালু আছে কি?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>সব অবস্থান</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>মানচিত্র</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1285,6 +1430,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>এখনও কোনো কল নেই</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>মানচিত্র</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1317,6 +1467,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>সম্পাদিত</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>অবস্থান</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1661,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>চ্যানেলের সবাই নামটি দেখতে পায়</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>এখনও কোনো অবস্থান নেই</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>গত ২৪ ঘণ্টায় শেয়ার করা অবস্থান এখানে দেখা যায়।</translation>
     </message>
 </context>
 <context>
@@ -2290,6 +2458,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>চ্যাটের ভিতরে ছোট অ্যাপ চালায়।</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>লোকেশন স্ট্রিমিং চালু করুন (পরীক্ষামূলক)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>চ্যাটে আপনার অবস্থান শেয়ার করে এবং শেয়ার করা অবস্থান মানচিত্রে দেখায়।</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>ভয়েস বার্তা প্রতিলিপি করুন (পরীক্ষামূলক)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ভয়েস বার্তার প্রতিলিপি</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>এই ফোনে ভয়েস বার্তাকে লেখায় রূপান্তর করে।</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>কিছুই ফোনের বাইরে যায় না।</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2302,6 +2495,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>বার্তা হিসেবে পাঠান</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>আপনি আপনার অবস্থান শেয়ার করছেন</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n মিনিট বাকি</numerusform>
+            <numerusform>%n মিনিট বাকি</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n ঘণ্টা বাকি</numerusform>
+            <numerusform>%n ঘণ্টা বাকি</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>আপনার অবস্থান পাঠানো হচ্ছে না। সেটিংসে অবস্থান চালু আছে কি?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>চার্জ হওয়ার সময়</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>সবসময়</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>কখনও না</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ফোন চার্জ হওয়ার সময় নতুন ভয়েস বার্তার প্রতিলিপি হয়।</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>নতুন ভয়েস বার্তা ডাউনলোড হলেই তার প্রতিলিপি হয়।</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>এতে ব্যাটারি খরচ হয়।</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>কোনো ভয়েস বার্তাকে লেখায় রূপান্তর করতে তাতে প্রতিলিপি করুন ট্যাপ করুন।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>পরবর্তী</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>ভাষা</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>এখনও উপলব্ধ নয়</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>এই ভাষাগুলোতে প্রতিলিপি এখনও যথেষ্ট নির্ভুল নয়।</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit একবার একটি স্পিচ মডেল ডাউনলোড করে এবং এই ফোনে ভয়েস বার্তার প্রতিলিপি করে।</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>আপনি যা পাঠান বা পান, তার কিছুই ফোনের বাইরে যায় না।</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>এই ভাষার প্রতিলিপিতে সম্ভবত বেশি ভুল থাকবে।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ভয়েস বার্তার প্রতিলিপি</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>ভাষা</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>কখন</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>স্পিচ মডেল ডাউনলোড করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>ভয়েস বার্তা স্বয়ংক্রিয়ভাবে প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>পুরনো ভয়েস বার্তা প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>এটি চালু করার আগে আসা ভয়েস বার্তার প্রতিলিপি ফোন চার্জ হওয়ার সময় হয়।</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>সম্পন্ন</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>স্পিচ মডেল ডাউনলোড হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>এই পাতা বন্ধ করার পরও ডাউনলোড চলতে থাকে।</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>স্পিচ মডেল ডাউনলোড করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>রেকর্ড হচ্ছে %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ফোন চার্জ হওয়ার সময় এই ভয়েস বার্তার প্রতিলিপি হবে।</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>ব্যাটারি সাশ্রয় মোড চালু থাকলে প্রতিলিপি থেমে থাকে।</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>অন্য ভয়েস বার্তার প্রতিলিপির জন্য অপেক্ষা করছে।</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>স্পিচ মডেল ডাউনলোড হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>প্রতিলিপি হচ্ছে… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>এই ভয়েস বার্তাটি %1-এ মনে হচ্ছে, যা নির্বাচিত নয়।</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>এই ভয়েস বার্তায় কোনো কথা পাওয়া যায়নি।</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>এই ভয়েস বার্তার প্রতিলিপি করা যায়নি।</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>এখনই প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>তবুও প্রতিলিপি করুন</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>আবার চেষ্টা করুন</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>এই ফোনে প্রতিলিপি করা হয়েছে</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>সব দেখান</translation>
     </message>
 </context>
 <context>

@@ -5,7 +5,7 @@
 //! are noted; one more read after it lands. However many asked, read after all, so
 //! count ends where last event left it.
 //!
-//! Fake core holds reads back half a second, so burst is all in before first read.
+//! Fake core holds first read till burst reached Qt thread: all of it comes while read is out.
 
 // Qt harness: see download_limit.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -25,11 +25,28 @@ fn reads(journal: &std::path::Path) -> Vec<Value> {
         .collect()
 }
 
+/// Counts burst's last kind as relayed to QML.
+const PROBE_QML: &str = r"
+    import QtQuick 2.0
+    Item {
+        property int tails: 0
+        Connections {
+            target: core
+            onCore_event: if (kind === 'ChatlistItemChanged') tails = tails + 1
+        }
+        function tail() { return '' + tails }
+    }
+";
+
 #[test]
 fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
     let temp = std::env::temp_dir().join(format!("piirit-unread-reads-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    let arrive = temp.join("arrive");
+    let _ = std::fs::remove_file(&arrive);
+    let hold = temp.join("hold");
+    std::fs::write(&hold, "get_fresh_msgs").expect("write the hold file");
 
     // SAFETY: single-threaded; set before Qt and server.
     unsafe {
@@ -43,9 +60,9 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
             "IncomingMsg,MsgsChanged,ChatlistChanged,ChatlistItemChanged,Info,\
              IncomingMsg,MsgsChanged,ChatlistChanged,ChatlistItemChanged",
         );
-        std::env::set_var("PIIRIT_FAKE_FRESH_DELAY_MS", "500");
-        // One more message after both reads landed: count may be read again.
-        std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL_MS", "4000");
+        std::env::set_var("PIIRIT_FAKE_HOLD", &hold);
+        // One more message once test drops file, after both reads landed: count may be read again.
+        std::env::set_var("PIIRIT_FAKE_LATE_ARRIVAL", &arrive);
     }
 
     piirit_shim::register_qml_types();
@@ -53,7 +70,7 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.load_data(QByteArray::from("import QtQuick 2.0\nItem {}\n"));
+    engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
         .pinned()
@@ -66,13 +83,30 @@ fn a_burst_of_events_reads_the_count_once_more_not_once_each() {
 
     let mut plan = common::Plan::default();
 
-    // SAFETY for both blocks: fire only while `exec()` runs on this thread; all they point
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they point
     // at outlives it.
-    let seen = journal.clone();
-    plan.after(3, move || unsafe {
-        *after_burst_ptr = reads(&seen);
+    // Burst's last event relayed: read let go.
+    plan.until(1, 30, move |last| unsafe {
+        let relayed = QString::from_qvariant((*engine_ptr).invoke_method("tail".into(), &[]))
+            .map(|value| value.to_string())
+            .unwrap_or_default();
+        if relayed != "2" && !last {
+            return false;
+        }
+        let _ = std::fs::remove_file(&hold);
+        true
     });
-    plan.after(3, move || unsafe {
+    let seen = journal.clone();
+    plan.until(1, 30, move |_| reads(&seen).len() >= 2);
+    // Settled: nothing more coming from the burst.
+    let seen = journal.clone();
+    plan.after(0, move || unsafe {
+        *after_burst_ptr = reads(&seen);
+        std::fs::write(&arrive, "").expect("drop the arrival file");
+    });
+    let seen = journal.clone();
+    plan.until(1, 30, move |_| reads(&seen).len() >= 3);
+    plan.after(0, move || unsafe {
         (*engine_ptr).quit();
     });
 

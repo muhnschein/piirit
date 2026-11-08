@@ -1,11 +1,12 @@
-// Chat's non-text kinds (gallery, audio, files, apps, calls): names, icons.
+// Chat's non-text kinds (gallery, audio, files, apps, calls, map): names, icons.
 // No `.pragma library`: qsTr() needs importing file's context.
 
-/// Kinds in tile order. Apps first if on; calls last, if chat can hold one.
-function kinds(appsAvailable, callsAvailable) {
+/// Kinds in tile order. Apps first if on; calls, if chat can hold one; map last, if on.
+function kinds(appsAvailable, callsAvailable, mapAvailable) {
     return (appsAvailable ? ["apps", "gallery", "audio", "files"]
                           : ["gallery", "audio", "files"])
         .concat(callsAvailable ? ["calls"] : [])
+        .concat(mapAvailable ? ["map"] : [])
 }
 
 /// Kind's name: tile word and page heading.
@@ -29,6 +30,10 @@ function kindName(kind) {
     if (kind === "calls") {
         //: The calls made and received in a chat: a tile, and a page heading.
         return qsTr("Calls")
+    }
+    if (kind === "map") {
+        //: Tile opening the map of a chat's shared locations.
+        return qsTr("Map")
     }
     return ""
 }
@@ -66,6 +71,9 @@ function kindIcon(kind) {
     }
     if (kind === "calls") {
         return "icon-m-call"
+    }
+    if (kind === "map") {
+        return "icon-m-location"
     }
     return ""
 }

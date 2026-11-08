@@ -28,14 +28,15 @@ fn a_send_announced_before_it_is_answered_lands_once() {
     let temp = std::env::temp_dir().join(format!("piirit-send-race-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    let gate = temp.join("send-gate");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Long enough for queued event to poll first.
-        std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "300");
+        // Reply held till event's row landed: event first, not by clock.
+        std::env::set_var("PIIRIT_FAKE_SEND_GATE", &gate);
     }
 
     piirit_shim::register_qml_types();
@@ -56,8 +57,20 @@ fn a_send_announced_before_it_is_answered_lands_once() {
     plan.after(1, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
+    let held = gate.clone();
     plan.after(2, move || unsafe {
+        std::fs::write(&held, "").expect("write the send gate");
         (*engine_ptr).invoke_method("send".into(), &[QVariant::from(QString::from("hello"))]);
+    });
+    // Event's fetch put the row in; then reply let go.
+    let held = gate;
+    plan.until(1, 30, move |last| unsafe {
+        let value = (*engine_ptr).invoke_method("count".into(), &[]);
+        if u32::from_qvariant(value).unwrap_or_default() < 3 && !last {
+            return false;
+        }
+        std::fs::remove_file(&held).expect("open the send gate");
+        true
     });
 
     let mut count_after_send = 0_u32;

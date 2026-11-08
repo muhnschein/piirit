@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -8,7 +9,7 @@ use qmetaobject::*;
 
 use crate::json;
 use crate::models::{AccountItem, AccountListModel};
-use crate::runtime::CoreRuntime;
+use crate::runtime::{CoreRuntime, Working};
 use crate::signup::{self, Attempts, Outcome, Source, Taken, Transport};
 
 /// Live server connection, shared by per-chat models. One per process, unenforced: `start` guard
@@ -21,6 +22,28 @@ pub(crate) fn connection() -> Option<(Arc<RpcClient>, CoreRuntime)> {
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .clone()
+}
+
+/// Server being spawned: no connection yet, but answers coming. See [`core_settled`].
+static SPAWNING: AtomicBool = AtomicBool::new(false);
+
+/// Silence after last answer that counts as settled: covers answer's hop to Qt thread and event
+/// that triggers another read.
+const SETTLED_QUIET: Duration = Duration::from_millis(100);
+
+/// No server spawning, no spawned work unfinished, no call open, server silent [`SETTLED_QUIET`].
+/// Tests wait on it in place of fixed delays; app never asks.
+#[doc(hidden)]
+pub fn core_settled() -> bool {
+    if SPAWNING.load(Ordering::SeqCst) {
+        return false;
+    }
+    if crate::runtime::working() > 0 {
+        return false;
+    }
+    connection().map_or(true, |(rpc, _)| {
+        rpc.quiet_for().is_some_and(|quiet| quiet >= SETTLED_QUIET)
+    })
 }
 
 fn set_connection(value: Option<(Arc<RpcClient>, CoreRuntime)>) {
@@ -41,6 +64,7 @@ pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-serv
 /// **New reader kind: add here**, or it never arrives. `tests/event_kinds.rs`: sides match;
 /// `tests/event_fanout.rs`: gate applied.
 pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "AccountsChanged",
     "CallEnded",
     "ChatDeleted",
     "ChatEphemeralTimerModified",
@@ -133,34 +157,35 @@ pub fn server_pid() -> Option<u32> {
 
 /// Stop server after Qt loop returns, bounded; else child dies only with last `RpcClient` (statics
 /// never drop). Ends live call first, telling peer: only here is window (call host) up and server
-/// not yet gone.
-pub fn shutdown() {
+/// not yet gone. False: a call did not end in time (or the stop itself overran).
+#[must_use]
+pub fn shutdown() -> bool {
     let Some((rpc, runtime)) = CONNECTION
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .take()
     else {
-        return;
+        return true;
     };
-    let (done_tx, done_rx) = std::sync::mpsc::channel::<()>();
+    let (done_tx, done_rx) = std::sync::mpsc::channel::<bool>();
     runtime.spawn(async move {
         // Call not ended in time: left to server exit.
-        if tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
+        let ended = tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
             .await
-            .is_err()
-        {
+            .is_ok();
+        if !ended {
             eprintln!("piirit: a call did not end in time; stopping the core anyway");
         }
         if let Err(err) = rpc.shutdown().await {
             eprintln!("piirit: stopping the core: {err}");
         }
         // Receiver gone only if wait gave up.
-        done_tx.send(()).ok();
+        done_tx.send(ended).ok();
     });
     // Timeout quits without goodbye.
     done_rx
         .recv_timeout(CALL_END_TIMEOUT.saturating_add(SHUTDOWN_TIMEOUT))
-        .ok();
+        .unwrap_or(false)
 }
 
 /// Last server stderr lines, if any: user's only crash clue.
@@ -448,7 +473,9 @@ impl DeltaChatCore {
     fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
         let started_ptr = ptr;
         let retry_path = path.clone();
+        SPAWNING.store(true, Ordering::SeqCst);
         let started = queued_callback(move |result: Result<Arc<RpcClient>, String>| {
+            SPAWNING.store(false, Ordering::SeqCst);
             let Some(this) = started_ptr.as_pinned() else {
                 return;
             };
@@ -477,6 +504,8 @@ impl DeltaChatCore {
                     for account_id in accounts {
                         Self::resume_io(started_ptr.clone(), Some(account_id));
                     }
+                    // Rows of messages gone while away dropped; backlog read.
+                    crate::transcripts::connected();
                     // Last: handler may call back in.
                     this.borrow().status_changed();
                 }
@@ -579,7 +608,7 @@ impl DeltaChatCore {
                 stock.clone(),
             );
         });
-        runtime.spawn(async move {
+        runtime.spawn_untracked(async move {
             tokio::time::sleep(delay).await;
             retry(());
         });
@@ -679,14 +708,15 @@ impl DeltaChatCore {
         let stopped = queued_callback(move |tail: Vec<String>| {
             Self::schedule_restart(stopped_ptr.clone(), path.clone(), last_words(&tail));
         });
-        let emit = queued_callback(move |batch: Vec<CoreEvent>| {
+        // Batch counted till relayed: handlers' own asks start before it ends.
+        let emit = queued_callback(move |(batch, _working): (Vec<CoreEvent>, Working)| {
             for event in &batch {
                 // Looked up per event: handler may remove the object.
                 let Some(this) = ptr.as_pinned() else { return };
                 this.borrow().relay(event);
             }
         });
-        runtime.spawn(async move {
+        runtime.spawn_untracked(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
             let mut arrived = Vec::new();
             while events.recv_many(&mut arrived, EVENT_BATCH_LIMIT).await > 0 {
@@ -701,7 +731,7 @@ impl DeltaChatCore {
                     })
                     .collect();
                 if !batch.is_empty() {
-                    emit(batch);
+                    emit((batch, Working::new()));
                 }
             }
             // Server gone; stderr only clue.
@@ -893,9 +923,9 @@ impl DeltaChatCore {
             let Some((rpc, runtime)) = self.connection() else {
                 return;
             };
-            let (sender, mut jobs) = tokio::sync::mpsc::unbounded_channel::<ConfigJob>();
-            runtime.spawn(async move {
-                while let Some(job) = jobs.recv().await {
+            let (sender, mut jobs) = tokio::sync::mpsc::unbounded_channel::<(ConfigJob, Working)>();
+            runtime.spawn_untracked(async move {
+                while let Some((job, _working)) = jobs.recv().await {
                     job(rpc.clone()).await;
                 }
             });
@@ -903,7 +933,7 @@ impl DeltaChatCore {
         }
         if let Some(sender) = lane.as_ref() {
             // Closed only with runtime gone: nothing left to write to.
-            sender.send(job).ok();
+            sender.send((job, Working::new())).ok();
         }
     }
 
@@ -1062,7 +1092,7 @@ impl DeltaChatCore {
                         Some(AccountItem {
                             account_id: json::u32_opt(account, "id")?,
                             display_name: json::text(account, "displayName"),
-                            // Filled below (`primary_addr`).
+                            // Filled below (`own_address`).
                             addr: QString::default(),
                             is_configured: json::str_at(account, "kind") == "Configured",
                             avatar_path: json::text(account, "profileImage"),
@@ -1073,7 +1103,7 @@ impl DeltaChatCore {
                     .collect();
                 // Two calls per configured profile: address, badge.
                 for item in items.iter_mut().filter(|item| item.is_configured) {
-                    if let Some(addr) = primary_addr(&rpc, item.account_id).await {
+                    if let Some(addr) = own_address(&rpc, item.account_id).await {
                         item.addr = addr.into();
                     }
                     item.unread_count = fresh_count(&rpc, item.account_id).await;
@@ -1546,7 +1576,7 @@ type ConfigJob = Box<
 >;
 
 /// Feeds the task running [`ConfigJob`]s in order. Dropped: task ends after jobs queued.
-type ConfigLane = tokio::sync::mpsc::UnboundedSender<ConfigJob>;
+type ConfigLane = tokio::sync::mpsc::UnboundedSender<(ConfigJob, Working)>;
 
 /// Id of every account core has, configured or not.
 async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
@@ -1561,13 +1591,13 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
         .map_err(|err| err.to_string())
 }
 
-/// Own address via `configured_addr`: account list lacks it since 2.61; `list_transports` doesn't
-/// say which relay is own. `None` if core can't say.
-async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
-    rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+/// Own address: own contact's (id 1), core 2.66+ first relay's. Account list lacks it since
+/// 2.61; `configured_addr` gone in 2.66. `None` if core can't say (no relay yet).
+pub(crate) async fn own_address(rpc: &RpcClient, account_id: u32) -> Option<String> {
+    rpc.call::<_, serde_json::Value>("get_contact", (account_id, 1_u32))
         .await
         .ok()
-        .flatten()
+        .map(|contact| json::str_at(&contact, "address").to_string())
         .filter(|addr| !addr.is_empty())
 }
 

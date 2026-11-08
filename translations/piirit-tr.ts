@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Profil ekle</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>İleri</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Profil oluştur</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Yeni bir adresle ve hiç sohbet olmadan başlarsınız.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Yedekten geri yükle</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Bir yedek dosyasından profil içe aktarırsınız.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>İkinci cihaz olarak ekle</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Aynı profili bu telefonda ve başka bir cihazda kullanırsınız.</translation>
     </message>
 </context>
 <context>
@@ -570,6 +583,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Sohbetler</translation>
     </message>
     <message>
@@ -674,7 +688,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Tüm sohbetleri göstermek için &quot;%1&quot; öğesine dokunun</translation>
     </message>
     <message>
@@ -686,6 +700,26 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Yeni</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanallar</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Okunmamış kanal yok</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Tüm kanalları göstermek için &quot;%1&quot; öğesine dokunun</translation>
     </message>
 </context>
 <context>
@@ -712,6 +746,27 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Delete</source>
         <translation>Sil</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n sesli mesajı yazıya dök</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Dökümü kopyala</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Panoya kopyalandı</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Yazıya dök</translation>
     </message>
 </context>
 <context>
@@ -829,6 +884,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edit</source>
         <translation>Düzenle</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Dökümü kopyala</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Yazıya dök</translation>
     </message>
 </context>
 <context>
@@ -1234,6 +1299,84 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Paylaş</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Geçerli konumu gönder</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Konumunuz %n metre hassasiyetinde.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Göndermek için Ayarlar&apos;dan konumu açın.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Konumunuz bulunuyor…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Canlı konum paylaş</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit arka planda çalışırken konumunuzu göndermeye devam eder.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 dakikalığına</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 saatliğine</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 saatliğine</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Konum paylaşımını durdur</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Konumunuz hâlâ aranıyor. Ayarlar&apos;da konum açık mı?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Tüm Konumlar</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Harita</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1280,6 +1423,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>No calls yet</source>
         <translation>Henüz arama yok</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Harita</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1312,6 +1460,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edited</source>
         <translation>Düzenlendi</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Konum</translation>
     </message>
 </context>
 <context>
@@ -1500,6 +1653,19 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Adı kanaldaki herkes görür</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Henüz konum yok</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Son 24 saatte paylaşılan konumlar burada görünür.</translation>
     </message>
 </context>
 <context>
@@ -2283,6 +2449,31 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Runs small apps inside chats.</source>
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Konum akışını etkinleştir (deneysel)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Konumunuzu sohbetlerde paylaşır ve paylaşılan konumları bir haritada gösterir.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Sesli mesajları yazıya dök (deneysel)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Sesli mesajları yazıya dökme</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Sesli mesajları bu telefonda yazıya dönüştürür.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Hiçbir şey telefondan çıkmaz.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2295,6 +2486,32 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>İleti olarak gönder</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Konumunuzu paylaşıyorsunuz</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n dakika kaldı</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n saat kaldı</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Konumunuz gönderilmiyor. Ayarlar&apos;da konum açık mı?</translation>
     </message>
 </context>
 <context>
@@ -2902,11 +3119,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Şarj olurken</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Her zaman</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Hiçbir zaman</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Yeni sesli mesajlar telefon şarj olurken yazıya dökülür.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Yeni sesli mesajlar indirilir indirilmez yazıya dökülür.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Bu, pil tüketir.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Bir sesli mesajı yazıya dönüştürmek için Yazıya dök düğmesine dokunun.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>İleri</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Diller</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Henüz kullanılamıyor</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Bu dillerde yazıya dökme henüz yeterince doğru değil.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit bir kez bir konuşma modeli indirir ve sesli mesajları bu telefonda yazıya döker.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Gönderdiğiniz veya aldığınız hiçbir şey telefondan çıkmaz.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Bu dildeki dökümlerde muhtemelen daha fazla hata vardır.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Sesli mesajları yazıya dökme</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Diller</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Ne zaman</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Konuşma modeli indirilemedi.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Yeniden dene</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Sesli mesajları otomatik olarak yazıya dök</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Eski sesli mesajları yazıya dök</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Bunu açmadan önce gelen sesli mesajlar telefon şarj olurken yazıya dökülür.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Bitti</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Konuşma modeli indiriliyor… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Bu sayfayı kapattıktan sonra indirme devam eder.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Konuşma modeli indirilemedi.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Yeniden dene</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Kaydediliyor %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Bu sesli mesaj telefon şarj olurken yazıya dökülecek.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Güç tasarrufu modu açıkken yazıya dökme duraklatılır.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Diğer sesli mesajların yazıya dökülmesi bekleniyor.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Konuşma modeli indiriliyor… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Yazıya dökülüyor… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Bu sesli mesaj seçili olmayan %1 dilinde görünüyor.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Bu sesli mesajda konuşma bulunamadı.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Bu sesli mesaj yazıya dökülemedi.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Yazıya dök</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Şimdi yazıya dök</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Yine de yazıya dök</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Yeniden dene</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Bu telefonda yazıya döküldü</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Tümünü göster</translation>
     </message>
 </context>
 <context>

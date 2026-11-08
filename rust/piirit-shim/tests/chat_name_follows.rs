@@ -62,6 +62,7 @@ fn the_name_over_the_messages_follows_a_rename() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
+    let core_ptr = std::ptr::addr_of!(core_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -84,20 +85,29 @@ fn the_name_over_the_messages_follows_a_rename() {
 
     let mut plan = common::Plan::default();
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         record!("open", call!("open"));
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("name").is_empty() && !last {
+            return false;
+        }
         record!("loaded", call!("name"));
         record!("changes-loaded", call!("changed"));
         record!("rename", call!("rename", QString::from("Hikers")));
+        true
     });
 
-    plan.after(3, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("name") != "Hikers" && !last {
+            return false;
+        }
         record!("renamed", call!("name"));
         record!("changes-renamed", call!("changed"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

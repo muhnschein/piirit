@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Добавить профиль</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Далее</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Создать профиль</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Вы начинаете с новым адресом и без чатов.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Восстановить из резервной копии</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Вы импортируете профиль из файла резервной копии.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Добавить как второе устройство</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Вы используете один и тот же профиль на этом телефоне и на другом устройстве.</translation>
     </message>
 </context>
 <context>
@@ -574,6 +587,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Чаты</translation>
     </message>
     <message>
@@ -678,7 +692,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Нажмите «%1», чтобы показать все чаты</translation>
     </message>
     <message>
@@ -690,6 +704,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Создать</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Все местоположения</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Каналы</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Непрочитанных каналов нет</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Нажмите «%1», чтобы показать все каналы</translation>
     </message>
 </context>
 <context>
@@ -716,6 +750,29 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Удалить</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Расшифровать %n голосовое сообщение</numerusform>
+            <numerusform>Расшифровать %n голосовых сообщения</numerusform>
+            <numerusform>Расшифровать %n голосовых сообщений</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Копировать расшифровку</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Скопировано в буфер обмена</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Расшифровать</translation>
     </message>
 </context>
 <context>
@@ -833,6 +890,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Изменить</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Копировать расшифровку</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Расшифровать</translation>
     </message>
 </context>
 <context>
@@ -1244,6 +1311,86 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Поделиться</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Отправить текущее местоположение</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Ваше местоположение определено с точностью до %n метра.</numerusform>
+            <numerusform>Ваше местоположение определено с точностью до %n метров.</numerusform>
+            <numerusform>Ваше местоположение определено с точностью до %n метров.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Включите определение местоположения в Настройках, чтобы отправить его.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Определение вашего местоположения…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Делиться местоположением в реальном времени</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit продолжает отправлять ваше местоположение, пока работает в фоне.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>На 30 минут</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>На 1 час</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>На 2 часа</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>На 6 часов</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>На 24 часа</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Прекратить делиться местоположением</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Местоположение всё ещё определяется. Включено ли определение местоположения в Настройках?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Все местоположения</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Карта</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1290,6 +1437,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Звонков пока нет</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Карта</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1322,6 +1474,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Изменено</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Местоположение</translation>
     </message>
 </context>
 <context>
@@ -1512,6 +1669,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Название видят все в канале</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Пока нет местоположений</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Здесь показаны местоположения, отправленные за последние 24 часа.</translation>
     </message>
 </context>
 <context>
@@ -2297,6 +2467,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Запускает небольшие приложения внутри чатов.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Включить трансляцию местоположения (эксперимент)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Делится вашим местоположением в чатах и показывает переданные местоположения на карте.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Расшифровка голосовых сообщений (эксперимент)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Расшифровка голосовых сообщений</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Превращает голосовые сообщения в текст на этом телефоне.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Ничто не покидает телефон.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2309,6 +2504,36 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Отправить сообщением</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Вы делитесь своим местоположением</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>осталась %n минута</numerusform>
+            <numerusform>осталось %n минуты</numerusform>
+            <numerusform>осталось %n минут</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>остался %n час</numerusform>
+            <numerusform>осталось %n часа</numerusform>
+            <numerusform>осталось %n часов</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Ваше местоположение не отправляется. Включено ли определение местоположения в Настройках?</translation>
     </message>
 </context>
 <context>
@@ -2916,11 +3141,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Во время зарядки</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Всегда</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Никогда</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Новые голосовые сообщения расшифровываются, пока телефон заряжается.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Новые голосовые сообщения расшифровываются сразу после загрузки.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Это расходует заряд батареи.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Нажмите «Расшифровать» у голосового сообщения, чтобы превратить его в текст.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Далее</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Языки</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Пока недоступно</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>На этих языках расшифровка пока недостаточно точна.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit один раз загружает речевую модель и расшифровывает голосовые сообщения на этом телефоне.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Ничто из того, что вы отправляете или получаете, не покидает телефон.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Расшифровки на этом языке, вероятно, содержат больше ошибок.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Расшифровка голосовых сообщений</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Языки</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Когда</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Не удалось загрузить речевую модель.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Повторить</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Автоматически расшифровывать голосовые сообщения</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Расшифровать старые голосовые сообщения</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Голосовые сообщения, полученные до включения этой функции, расшифровываются, пока телефон заряжается.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Загрузка речевой модели… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Загрузка продолжится после закрытия этой страницы.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Не удалось загрузить речевую модель.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Повторить</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Запись %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Это голосовое сообщение будет расшифровано, когда телефон будет заряжаться.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Расшифровка приостановлена, пока включён режим энергосбережения.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Ожидает расшифровки других голосовых сообщений.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Загрузка речевой модели… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Расшифровка… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Похоже, это голосовое сообщение на языке %1, который не выбран.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>В этом голосовом сообщении не найдена речь.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Не удалось расшифровать это голосовое сообщение.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Расшифровать</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Расшифровать сейчас</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Всё равно расшифровать</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Повторить</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Расшифровано на этом телефоне</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Показать всё</translation>
     </message>
 </context>
 <context>

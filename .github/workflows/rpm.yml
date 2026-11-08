@@ -170,10 +170,10 @@ jobs:
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
           echo "RPM_RELEASE=$release" >> "$GITHUB_ENV"
 
-      # Submodule commits FFmpeg/x264 build from, for the cache key below.
+      # Submodule commits FFmpeg/x264/whisper.cpp build from, for the cache key below.
       - name: Name the C libraries' sources
         run: |
-          libs=$(git ls-tree HEAD third_party/ffmpeg third_party/x264 | sha256sum | cut -c1-16)
+          libs=$(git ls-tree HEAD third_party/ffmpeg third_party/x264 third_party/whisper.cpp | sha256sum | cut -c1-16)
           echo "C_LIBS=$libs" >> "$GITHUB_ENV"
 
       # ~56 crates (4 ours); deps rely only on lockfile + image toolchain: ~4
@@ -190,7 +190,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: rust/target
-          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-${{ env.C_LIBS }}-${{ hashFiles('rust/piirit-video/build.rs', 'rust/piirit-video/build_reuse.rs') }}
+          key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-${{ env.C_LIBS }}-${{ hashFiles('rust/piirit-video/build.rs', 'rust/piirit-video/build_reuse.rs', 'rust/piirit-speech/build.rs') }}
           restore-keys: |
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}-
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-

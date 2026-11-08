@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::process::Stdio;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -15,7 +15,10 @@ use tokio::task::JoinHandle;
 use crate::error::{RpcError, SpawnError};
 use crate::protocol::{RequestEnvelope, ResponseEnvelope};
 
-type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Result<serde_json::Value, RpcError>>>>>;
+/// Waiters by request id; `None` once transport gone, so later calls fail instead of waiting on
+/// answer nobody reads.
+type PendingMap = Arc<Mutex<Option<HashMap<u64, Answer>>>>;
+type Answer = oneshot::Sender<Result<serde_json::Value, RpcError>>;
 
 /// Lock ignoring poison: plain collections survive panic.
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
@@ -36,6 +39,20 @@ pub struct RpcClient {
     writer_task: Mutex<Option<JoinHandle<()>>>,
     /// Last stderr lines, capped.
     stderr_tail: Arc<Mutex<Vec<String>>>,
+    /// Timed calls unanswered; event polls not counted. See [`RpcClient::quiet_for`].
+    in_flight: AtomicUsize,
+    /// Last request sent or line read.
+    last_traffic: Arc<Mutex<Instant>>,
+}
+
+/// Counts one timed call in flight; drop (answer, timeout, cancel) ends it.
+struct InFlight<'a>(&'a RpcClient);
+
+impl Drop for InFlight<'_> {
+    fn drop(&mut self) {
+        self.0.in_flight.fetch_sub(1, Ordering::SeqCst);
+        *lock(&self.0.last_traffic) = Instant::now();
+    }
 }
 
 const STDERR_TAIL_CAPACITY: usize = 200;
@@ -63,7 +80,7 @@ async fn write_line(stdin: &mut ChildStdin, line: &str) -> std::io::Result<()> {
 /// Match stdout answers to waiters; wake them at end.
 ///
 /// EOF/read error: server gone. Bad UTF-8 line skipped (its call times out).
-async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
+async fn read_responses(stdout: ChildStdout, pending: &PendingMap, heard: &Mutex<Instant>) {
     let mut lines = BufReader::new(stdout).lines();
     loop {
         let line = match lines.next_line().await {
@@ -71,18 +88,22 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
             Err(err) if err.kind() == std::io::ErrorKind::InvalidData => continue,
             Ok(None) | Err(_) => break,
         };
+        *lock(heard) = Instant::now();
         let Some((id, outcome)) = parse_response(&line) else {
             continue;
         };
         // Remove first: no lock while sending.
-        let waiting = lock(pending).remove(&id);
+        let waiting = lock(pending)
+            .as_mut()
+            .and_then(|waiting| waiting.remove(&id));
         if let Some(sender) = waiting {
             // Closed receiver: caller timed out.
             sender.send(outcome).ok();
         }
     }
     // Transport gone: wake waiters.
-    for (_, sender) in lock(pending).drain() {
+    let waiting = lock(pending).take().unwrap_or_default();
+    for sender in waiting.into_values() {
         sender.send(Err(RpcError::TransportClosed)).ok();
     }
 }
@@ -164,15 +185,17 @@ impl RpcClient {
         let stdout = child.stdout.take().ok_or(SpawnError::MissingPipe)?;
         let stderr = child.stderr.take().ok_or(SpawnError::MissingPipe)?;
 
-        let pending: PendingMap = Arc::new(Mutex::new(HashMap::new()));
+        let pending: PendingMap = Arc::new(Mutex::new(Some(HashMap::new())));
         let stderr_tail = Arc::new(Mutex::new(Vec::new()));
 
         let (stdin_tx, stdin_rx) = mpsc::unbounded_channel::<String>();
         let writer_task = tokio::spawn(write_requests(stdin, stdin_rx));
 
         let reader_pending = pending.clone();
+        let last_traffic = Arc::new(Mutex::new(Instant::now()));
+        let heard = last_traffic.clone();
         let reader_task =
-            tokio::spawn(async move { read_responses(stdout, &reader_pending).await });
+            tokio::spawn(async move { read_responses(stdout, &reader_pending, &heard).await });
 
         let stderr_capture = stderr_tail.clone();
         tokio::spawn(async move { keep_stderr_tail(stderr, &stderr_capture).await });
@@ -185,6 +208,8 @@ impl RpcClient {
             reader_task: Mutex::new(Some(reader_task)),
             writer_task: Mutex::new(Some(writer_task)),
             stderr_tail,
+            in_flight: AtomicUsize::new(0),
+            last_traffic,
         })
     }
 
@@ -246,9 +271,16 @@ impl RpcClient {
             method: method.to_string(),
             source,
         })?;
+        let _counted = timeout.map(|_| {
+            self.in_flight.fetch_add(1, Ordering::SeqCst);
+            InFlight(self)
+        });
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let (tx, rx) = oneshot::channel();
-        lock(&self.pending).insert(id, tx);
+        match lock(&self.pending).as_mut() {
+            Some(waiting) => waiting.insert(id, tx),
+            None => return Err(RpcError::TransportClosed),
+        };
 
         let request = RequestEnvelope {
             jsonrpc: "2.0",
@@ -262,7 +294,7 @@ impl RpcClient {
         })?;
 
         if self.stdin_tx.send(line).is_err() {
-            lock(&self.pending).remove(&id);
+            self.forget(id);
             return Err(RpcError::TransportClosed);
         }
 
@@ -271,13 +303,30 @@ impl RpcClient {
         };
         let Ok(answer) = tokio::time::timeout(limit, rx).await else {
             // Nobody reads it now; drop sender.
-            lock(&self.pending).remove(&id);
+            self.forget(id);
             return Err(RpcError::Timeout {
                 method: method.to_string(),
                 seconds: limit.as_secs(),
             });
         };
         answer.unwrap_or(Err(RpcError::TransportClosed))
+    }
+
+    /// Drop waiter `id`; its answer, if any, goes nowhere.
+    fn forget(&self, id: u64) {
+        if let Some(waiting) = lock(&self.pending).as_mut() {
+            waiting.remove(&id);
+        }
+    }
+
+    /// How long no timed call has been open and server silent; `None` while one is open. Tests
+    /// wait on it instead of fixed delays.
+    #[must_use]
+    pub fn quiet_for(&self) -> Option<Duration> {
+        if self.in_flight.load(Ordering::SeqCst) > 0 {
+            return None;
+        }
+        Some(lock(&self.last_traffic).elapsed())
     }
 
     /// Last `STDERR_TAIL_CAPACITY` stderr lines, oldest first.

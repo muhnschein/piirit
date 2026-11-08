@@ -1,5 +1,5 @@
-//! Compile C++ of `cpp!` in `src/recorder.rs`, `src/pictures.rs`, `src/mic_watch.rs`; link
-//! `QtMultimedia` and libpulse they call.
+//! Compile C++ of `cpp!` in `src/recorder.rs`, `src/pictures.rs`, `src/mic_watch.rs`,
+//! `src/transcripts/download.rs`; link `QtMultimedia`, libpulse, `QtNetwork` they call.
 //!
 //! As `piirit-app/build.rs`: against Qt qttypes found. Sailfish: target's Qt via
 //! `QT_INCLUDE_PATH`, `QT_LIBRARY_PATH`.
@@ -12,6 +12,8 @@ fn main() {
     println!("cargo:rerun-if-changed=src/recorder.rs");
     println!("cargo:rerun-if-changed=src/pictures.rs");
     println!("cargo:rerun-if-changed=src/mic_watch.rs");
+    println!("cargo:rerun-if-changed=src/transcripts.rs");
+    println!("cargo:rerun-if-changed=src/transcripts/download.rs");
     println!("cargo:rerun-if-env-changed=PKG_CONFIG");
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR");
@@ -38,6 +40,9 @@ fn main() {
 
     // libpulse (`libpulse.so.0`, Harbour-allowed) for mic watch; by name.
     println!("cargo:rustc-link-lib=pulse");
+
+    // QtNetwork (Harbour-allowed) for speech model download.
+    println!("cargo:rustc-link-lib=Qt5Network");
 }
 
 /// Include dirs for `<pulse/pulseaudio.h>` from pkg-config.

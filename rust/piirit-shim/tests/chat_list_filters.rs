@@ -66,25 +66,46 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
+    let core_ptr = std::ptr::addr_of!(core_box);
 
     let mut plan = common::Plan::default();
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |_| unsafe { common::ready(&*core_ptr) });
+    plan.after(0, move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    plan.after(2, move || unsafe {
+    // Ordinary list asked first, then the search.
+    let asked = journal.clone();
+    plan.until(1, 30, move |_| !entry_calls(&asked).is_empty());
+    plan.after(0, move || unsafe {
         (*engine_ptr).invoke_method("search".into(), &[QVariant::from(QString::from("anna"))]);
     });
 
-    plan.after(2, move || unsafe {
+    let asked = journal.clone();
+    plan.until(1, 30, move |_| {
+        entry_calls(&asked)
+            .iter()
+            .any(|params| query_of(params) == Some("anna"))
+    });
+    plan.after(0, move || unsafe {
         (*engine_ptr).invoke_method("showArchived".into(), &[]);
         (*engine_ptr).invoke_method("accept".into(), &[QVariant::from(7u32)]);
         (*engine_ptr).invoke_method("block".into(), &[QVariant::from(9u32)]);
     });
 
-    plan.after(3, move || unsafe {
-        (*engine_ptr).quit();
+    let asked = journal.clone();
+    plan.until(1, 30, move |last| {
+        let methods = common::methods(&asked);
+        let done = entry_calls(&asked)
+            .iter()
+            .any(|params| flags_of(params) == Some(1))
+            && methods.iter().any(|name| name == "accept_chat")
+            && methods.iter().any(|name| name == "block_chat");
+        if done || last {
+            unsafe { (*engine_ptr).quit() };
+        }
+        done
     });
 
     plan.run();

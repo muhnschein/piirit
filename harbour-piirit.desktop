@@ -150,7 +150,11 @@ SupportsMultipleFiles=no
 # the shim serves it on, and a content-security-policy keeps it there
 # (webxdc_host.rs); the store is an ordinary website, and the app it
 # hands over is fetched by the core rather than downloaded by the engine.
+#
+# Location: reader's place into a chat, once or live for a set time. Read
+# only while LocationShareDialog.qml is up or a chat gets it live
+# (LocationFeed.qml).
 [X-Sailjail]
-Permissions=Internet;Pictures;MediaIndexing;UserDirs;Audio;Microphone;Camera;WebView
+Permissions=Internet;Pictures;MediaIndexing;UserDirs;Audio;Microphone;Camera;WebView;Location
 OrganizationName=piirit
 ApplicationName=piirit

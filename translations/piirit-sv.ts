@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Lägg till profil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Nästa</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Skapa en profil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Du börjar med en ny adress och inga chattar.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Återställ från en säkerhetskopia</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Du importerar en profil från en säkerhetskopiefil.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Du använder samma profil på den här telefonen och en annan enhet.</translation>
     </message>
 </context>
 <context>
@@ -568,6 +581,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Chattar</translation>
     </message>
     <message>
@@ -672,7 +686,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Tryck på ”%1” för att visa alla chattar</translation>
     </message>
     <message>
@@ -684,6 +698,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Ny</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Visa alla platser</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanaler</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Inga olästa kanaler</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Tryck på ”%1” för att visa alla kanaler</translation>
     </message>
 </context>
 <context>
@@ -710,6 +744,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Ta bort</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transkribera %n röstmeddelande</numerusform>
+            <numerusform>Transkribera %n röstmeddelanden</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopiera transkription</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Kopierat till urklipp</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribera</translation>
     </message>
 </context>
 <context>
@@ -827,6 +883,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>Redigera</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopiera transkription</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribera</translation>
     </message>
 </context>
 <context>
@@ -1235,6 +1301,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Dela</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Skicka nuvarande plats</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Din plats är exakt inom %n meter.</numerusform>
+            <numerusform>Din plats är exakt inom %n meter.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Slå på plats i Inställningar för att skicka den.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Letar efter din plats…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Dela plats live</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit fortsätter att skicka din plats medan det körs i bakgrunden.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>I 30 minuter</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>I 1 timme</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>I 2 timmar</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>I 6 timmar</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>I 24 timmar</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Sluta dela plats</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Letar fortfarande efter din plats. Är plats påslaget i Inställningar?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Visa alla platser</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Karta</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1281,6 +1426,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>Inga samtal än</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Karta</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1313,6 +1463,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigerat</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Plats</translation>
     </message>
 </context>
 <context>
@@ -1502,6 +1657,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Alla i kanalen ser namnet</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Inga platser än</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Platser som delats de senaste 24 timmarna visas här.</translation>
     </message>
 </context>
 <context>
@@ -2286,6 +2454,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>Kör små appar inuti chattar.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Aktivera platsströmning (experimentellt)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Delar din plats i chattar och visar delade platser på en karta.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Transkribera röstmeddelanden (experimentellt)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transkribering av röstmeddelanden</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Gör om röstmeddelanden till text på den här telefonen.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Ingenting lämnar telefonen.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2298,6 +2491,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Skicka som meddelande</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Du delar din plats</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minut kvar</numerusform>
+            <numerusform>%n minuter kvar</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n timme kvar</numerusform>
+            <numerusform>%n timmar kvar</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Din plats skickas inte. Är plats påslaget i Inställningar?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Väntar på att enheten hos %2$s ska svara...</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Vid laddning</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Alltid</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Aldrig</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Nya röstmeddelanden transkriberas medan telefonen laddas.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Nya röstmeddelanden transkriberas när de har laddats ned.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Det drar batteri.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Tryck på Transkribera på ett röstmeddelande för att göra om det till text.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Nästa</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Språk</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Inte tillgängligt än</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Transkriberingen är ännu inte tillräckligt exakt på de här språken.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit laddar ned en talmodell en gång och transkriberar röstmeddelanden på den här telefonen.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Ingenting du skickar eller tar emot lämnar telefonen.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transkriptioner på det här språket innehåller troligen fler fel.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transkribering av röstmeddelanden</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Språk</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>När</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Talmodellen kunde inte laddas ned.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Försök igen</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Transkribera röstmeddelanden automatiskt</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transkribera äldre röstmeddelanden</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Röstmeddelanden som kom innan du slog på detta transkriberas medan telefonen laddas.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Klar</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Laddar ned talmodellen… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Nedladdningen fortsätter när du stänger den här sidan.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Talmodellen kunde inte laddas ned.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Försök igen</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Spelar in %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Det här röstmeddelandet transkriberas när telefonen laddas.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Transkriberingen är pausad medan energisparläget är på.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Väntar på att andra röstmeddelanden ska transkriberas.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Laddar ned talmodellen… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Transkriberar… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Det här röstmeddelandet verkar vara på %1, som inte är valt.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Inget tal hittades i det här röstmeddelandet.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Det här röstmeddelandet kunde inte transkriberas.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transkribera</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transkribera nu</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Transkribera ändå</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Försök igen</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transkriberat på den här telefonen</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Visa allt</translation>
     </message>
 </context>
 <context>

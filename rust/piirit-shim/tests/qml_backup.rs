@@ -141,14 +141,16 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     let good = temp.join("Documents");
     let refused = temp.join("fail-Documents");
     let slow = temp.join("slow-Documents");
+    // Slow write held open till test removes it.
+    let gate = temp.join("slow-gate");
+    std::fs::write(&gate, "").expect("write the gate file");
 
     // SAFETY: single-threaded; all set pre-Qt and before shim spawns server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Slow write answers after reader gave up.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "2500");
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", &gate);
     }
 
     piirit_shim::register_qml_types();
@@ -242,7 +244,11 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         record!("write-slow", call!("click", QString::from("writeButton")));
     });
 
-    plan.after(1, move || unsafe {
+    // Held open: core never settles; wait on first progress report.
+    plan.until(1, 30, move |last| unsafe {
+        if get!("backup", "permille") == "0" && !last {
+            return false;
+        }
         // Mid-write: bar up, button gone, no way off. Asked of slow write: only one with a
         // middle (core reports export as it goes; write done before first poll says nothing).
         record!("running", get!("backup", "running"));
@@ -254,6 +260,20 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         );
         record!("reported", get!("backup", "permille"));
         record!("cancel", call!("click", QString::from("cancelButton")));
+        true
+    });
+    // Slow write ends once core told to stop: answers after reader gave up.
+    let stopped = journal.clone();
+    plan.until(1, 30, move |last| {
+        if !common::methods(&stopped)
+            .iter()
+            .any(|m| m == "stop_ongoing_process")
+            && !last
+        {
+            return false;
+        }
+        let _ = std::fs::remove_file(&gate);
+        true
     });
 
     // Past slow write's answer, which arrives after cancel.

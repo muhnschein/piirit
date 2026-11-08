@@ -21,6 +21,14 @@ SilicaListView {
     property bool canEdit: false
     /// Webxdc apps on; off draws `.xdc` as file. Bound from setting.
     property bool appsEnabled: false
+    /// Location on; off, location rows open no map. Bound from setting.
+    property bool locationsEnabled: false
+    /// Chat's profile, for voice transcripts.
+    property int accountId: 0
+    /// App-wide `Transcriber`; null (tests, loaded alone): no transcripts.
+    property QtObject transcriber: typeof appWindow !== "undefined" ? appWindow.transcriber : null
+    /// See AttachmentPreview.
+    property Component transcriptMaker: null
 
     property bool stickToBottom: true
 
@@ -102,6 +110,8 @@ SilicaListView {
     signal reactionPickerRequested(int messageId, string current)
     /// Quote tapped. `quotedId` 0: core has no original (deleted, never here).
     signal quoteRequested(int quotedId)
+    /// Row's location tapped: map on its point, or on sender.
+    signal locationRequested(int messageId, int senderId)
 
     /// Delete wait, ms; tests lower it.
     property alias pendingDelay: doomedMessages.delay
@@ -554,8 +564,13 @@ SilicaListView {
                     // Not on core notices.
                     visible: !model.is_info
                     text: qsTr("Reply")
-                    onClicked: root.replyRequested(model.message_id, model.text,
-                                                   model.sender_name)
+                    // Voice: done transcript, as chat list previews it. 3 = `Transcript` done.
+                    onClicked: root.replyRequested(
+                        model.message_id,
+                        messageRow.transcript !== null && messageRow.transcript.state === 3
+                        && messageRow.transcript.text.length > 0
+                        ? "🎤 " + messageRow.transcript.text : model.text,
+                        model.sender_name)
                 }
                 MenuItem {
                     objectName: "editItem"
@@ -572,6 +587,26 @@ SilicaListView {
                     visible: model.text.length > 0
                     text: qsTr("Copy")
                     onClicked: root.copyRequested(model.text)
+                }
+                MenuItem {
+                    objectName: "copyTranscriptItem"
+                    // 3 = `Transcript` done.
+                    visible: messageRow.transcript !== null && messageRow.transcript.state === 3
+                    //: Copies the text a voice message was turned into.
+                    text: qsTr("Copy transcript")
+                    onClicked: root.copyRequested(messageRow.transcript.text)
+                }
+                MenuItem {
+                    objectName: "transcribeItem"
+                    // Not done, not under way; failed tries again.
+                    visible: messageRow.transcript !== null
+                             && (messageRow.transcript.state === 0
+                                 || messageRow.transcript.state === 6
+                                 || (messageRow.transcript.state === 1
+                                     && !messageRow.transcript.manual))
+                    //: Turns a voice message into text on the phone.
+                    text: qsTr("Transcribe")
+                    onClicked: messageRow.transcript.transcribe(false)
                 }
                 MenuItem {
                     objectName: "openItem"
@@ -636,6 +671,9 @@ SilicaListView {
 
         /// Pending delete.
         readonly property bool doomed: doomedMessages.pending(model.message_id)
+
+        /// Voice message's `Transcript` (bubble's), or null; menu reads it.
+        readonly property QtObject transcript: body.item ? body.item.transcript : null
 
         /// Countdown up: answer and rebuild both raise it; second `execute` resets it.
         property bool countingDown: false
@@ -709,6 +747,9 @@ SilicaListView {
             // UTC date parts rebuilt as local; offset maths would bring back the DST error
             // model avoids.
             text: {
+                if (!dayHeading.shown) {
+                    return ""
+                }
                 var day = parseInt(messageRow.ListView.section, 10)
                 if (isNaN(day)) {
                     return ""
@@ -753,7 +794,7 @@ SilicaListView {
                 textFormat: Text.PlainText
                 //: The line in a conversation above the first message that
                 //: arrived while the reader was away.
-                text: qsTr("New messages")
+                text: unreadLine.shown ? qsTr("New messages") : ""
             }
 
             Rectangle {
@@ -804,6 +845,8 @@ SilicaListView {
                 showSender: root.showSender
                 quoteText: model.quote_text
                 quoteAuthor: model.quote_author
+                quoteIsVoice: model.quote_is_voice
+                quoteMessageId: model.quote_message_id || 0
                 filePath: model.file_path
                 fileName: model.file_name
                 fileMime: model.file_mime
@@ -822,10 +865,17 @@ SilicaListView {
                 webxdcSummary: model.webxdc_summary
                 webxdcIcon: model.webxdc_icon
                 appsEnabled: root.appsEnabled
+                locationsEnabled: root.locationsEnabled
                 scrolling: root.held
+                accountId: root.accountId
+                messageId: model.message_id
+                transcriber: root.transcriber
+                transcriptMaker: root.transcriptMaker
                 callState: model.call_state
                 callHasVideo: model.call_has_video
                 callDuration: model.call_duration
+                hasLocation: model.has_location
+                startsLocation: model.starts_location
                 reactions: model.reactions
                 onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
                                                     previewWidth, model.message_id)
@@ -840,6 +890,7 @@ SilicaListView {
                 onReactionRequested: root.reactionRequested(model.message_id, emoji)
                 // Read on tap, not bound: rows without role (tests' `ListModel`) stay quiet.
                 onQuoteRequested: root.quoteRequested(model.quote_message_id || 0)
+                onLocationRequested: root.locationRequested(model.message_id, model.sender_id)
                 // Long press on chip, download or play: row menu.
                 onMenuRequested: messageRow.openMenu()
             }

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Lisa profiil</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Edasi</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Loo profiil</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Alustad uue aadressiga ja ilma vestlusteta.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Taasta varukoopiast</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Impordid profiili varukoopiafailist.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Lisa teise seadmena</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Kasutad sama profiili selles telefonis ja teises seadmes.</translation>
     </message>
 </context>
 <context>
@@ -572,6 +585,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Vestlused</translation>
     </message>
     <message>
@@ -676,7 +690,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Kõigi vestluste nägemiseks puuduta „%1“</translation>
     </message>
     <message>
@@ -688,6 +702,26 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Uus</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Kõik asukohad</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanalid</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Lugemata kanaleid pole</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Kõigi kanalite nägemiseks puuduta „%1“</translation>
     </message>
 </context>
 <context>
@@ -714,6 +748,28 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Delete</source>
         <translation>Kustuta</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>Transkribeeri %n häälsõnum</numerusform>
+            <numerusform>Transkribeeri %n häälsõnumit</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopeeri transkriptsioon</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Kopeeritud lõikelauale</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribeeri</translation>
     </message>
 </context>
 <context>
@@ -831,6 +887,16 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edit</source>
         <translation>Muuda</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Kopeeri transkriptsioon</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribeeri</translation>
     </message>
 </context>
 <context>
@@ -1239,6 +1305,85 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Jaga</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Saada praegune asukoht</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Sinu asukoha täpsus on %n meeter.</numerusform>
+            <numerusform>Sinu asukoha täpsus on %n meetrit.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Asukoha saatmiseks lülita asukoht seadetes sisse.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Sinu asukohta otsitakse…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Jaga asukohta reaalajas</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit saadab sinu asukohta edasi ka siis, kui see töötab taustal.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Kestusega 30 minutit</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Kestusega 1 tund</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Kestusega 2 tundi</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Kestusega 6 tundi</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Kestusega 24 tundi</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Lõpeta asukoha jagamine</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Sinu asukohta otsitakse endiselt. Kas asukoht on seadetes sisse lülitatud?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Kõik asukohad</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Kaart</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1285,6 +1430,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>No calls yet</source>
         <translation>Kõnesid veel pole</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Kaart</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1317,6 +1467,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edited</source>
         <translation>Muudetud</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Asukoht</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1661,19 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Nime näevad kõik kanalis</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Asukohti veel pole</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Siin on viimase 24 tunni jooksul jagatud asukohad.</translation>
     </message>
 </context>
 <context>
@@ -2290,6 +2458,31 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Runs small apps inside chats.</source>
         <translation>Käitab vestlustes väikeseid rakendusi.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Luba asukoha jagamine (katseline)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Jagab sinu asukohta vestlustes ja näitab jagatud asukohti kaardil.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Häälsõnumite transkribeerimine (katseline)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Häälsõnumite transkribeerimine</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Muudab häälsõnumid selles telefonis tekstiks.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Midagi ei lahku telefonist.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2302,6 +2495,34 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Saada sõnumina</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Sa jagad oma asukohta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n minut jäänud</numerusform>
+            <numerusform>%n minutit jäänud</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n tund jäänud</numerusform>
+            <numerusform>%n tundi jäänud</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Sinu asukohta ei saadeta. Kas asukoht on seadetes sisse lülitatud?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Laadimise ajal</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Alati</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Mitte kunagi</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Uued häälsõnumid transkribeeritakse telefoni laadimise ajal.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Uued häälsõnumid transkribeeritakse, kui need on alla laaditud.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>See kulutab akut.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Puuduta häälsõnumi juures nuppu Transkribeeri, et see tekstiks muuta.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Edasi</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Keeled</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Veel pole saadaval</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>Nendes keeltes ei ole transkribeerimine veel piisavalt täpne.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit laadib kõnemudeli ühe korra alla ja transkribeerib häälsõnumid selles telefonis.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Midagi, mida saadad või saad, ei lahku telefonist.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Selle keele transkriptsioonides on tõenäoliselt rohkem vigu.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Häälsõnumite transkribeerimine</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Keeled</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Millal</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Proovi uuesti</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Transkribeeri häälsõnumid automaatselt</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Transkribeeri vanemad häälsõnumid</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Häälsõnumid, mis saabusid enne selle sisselülitamist, transkribeeritakse telefoni laadimise ajal.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Valmis</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Kõnemudeli allalaadimine… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Allalaadimine jätkub, kui selle lehe sulged.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Proovi uuesti</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Salvestan %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>See häälsõnum transkribeeritakse telefoni laadimise ajal.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Transkribeerimine on peatatud, kuni energiasäästurežiim on sees.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Ootab teiste häälsõnumite transkribeerimist.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Kõnemudeli allalaadimine… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Transkribeerimine… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>See häälsõnum näib olevat keeles %1, mida pole valitud.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>Selles häälsõnumis ei leitud kõnet.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Seda häälsõnumit ei õnnestunud transkribeerida.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transkribeeri</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Transkribeeri kohe</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Transkribeeri ikkagi</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Proovi uuesti</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Transkribeeritud selles telefonis</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Näita kõike</translation>
     </message>
 </context>
 <context>

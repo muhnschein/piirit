@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>சுயவிவரத்தைச் சேர்</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>அடுத்து</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>சுயவிவரத்தை உருவாக்கு</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>நீங்கள் புதிய முகவரியுடன், அரட்டைகள் எதுவும் இல்லாமல் தொடங்குகிறீர்கள்.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>நீங்கள் காப்புப் பிரதி கோப்பிலிருந்து ஒரு சுயவிவரத்தை இறக்குமதி செய்கிறீர்கள்.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>இந்த ஃபோனிலும் வேறொரு சாதனத்திலும் நீங்கள் ஒரே சுயவிவரத்தைப் பயன்படுத்துகிறீர்கள்.</translation>
     </message>
 </context>
 <context>
@@ -568,6 +581,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>அரட்டைகள்</translation>
     </message>
     <message>
@@ -672,7 +686,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>எல்லா அரட்டைகளையும் காட்ட &quot;%1&quot; என்பதைத் தட்டவும்</translation>
     </message>
     <message>
@@ -684,6 +698,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>புதிய</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>அனைத்து இருப்பிடங்களும்</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>சேனல்கள்</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>படிக்காத சேனல்கள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>எல்லா சேனல்களையும் காட்ட &quot;%1&quot; என்பதைத் தட்டவும்</translation>
     </message>
 </context>
 <context>
@@ -710,6 +744,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>நீக்கு</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n குரல் செய்தியை எழுத்தாக்கு</numerusform>
+            <numerusform>%n குரல் செய்திகளை எழுத்தாக்கு</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>எழுத்தாக்கத்தை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
     </message>
 </context>
 <context>
@@ -827,6 +883,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>திருத்து</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>எழுத்தாக்கத்தை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
     </message>
 </context>
 <context>
@@ -1235,6 +1301,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>பகிர்</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>தற்போதைய இடத்தை அனுப்பு</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>உங்கள் இடம் %n மீட்டர் வரை துல்லியமானது.</numerusform>
+            <numerusform>உங்கள் இடம் %n மீட்டர்கள் வரை துல்லியமானது.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>இடத்தை அனுப்ப, அமைப்புகளில் இடத்தை இயக்கவும்.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>உங்கள் இடம் தேடப்படுகிறது…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>நேரடி இடத்தைப் பகிர்</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit பின்னணியில் இயங்கும்போதும் உங்கள் இடத்தை அனுப்பிக்கொண்டே இருக்கும்.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 நிமிடங்களுக்கு</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 மணி நேரத்துக்கு</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>இடம் பகிர்வதை நிறுத்து</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>இன்னும் உங்கள் இடம் தேடப்படுகிறது. அமைப்புகளில் இடம் இயக்கப்பட்டுள்ளதா?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>அனைத்து இருப்பிடங்களும்</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>வரைபடம்</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1281,6 +1426,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>இதுவரை அழைப்புகள் இல்லை</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>வரைபடம்</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1313,6 +1463,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>திருத்தப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>இடம்</translation>
     </message>
 </context>
 <context>
@@ -1502,6 +1657,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>சேனலில் உள்ள அனைவரும் பெயரைப் பார்க்கிறார்கள்</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>இதுவரை இடங்கள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>கடந்த 24 மணிநேரத்தில் பகிரப்பட்ட இடங்கள் இங்கே காட்டப்படும்.</translation>
     </message>
 </context>
 <context>
@@ -2286,6 +2454,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>இருப்பிடப் பகிர்வை இயக்கு (சோதனை முறை)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>அரட்டைகளில் உங்கள் இருப்பிடத்தைப் பகிர்ந்து, பகிரப்பட்ட இருப்பிடங்களை வரைபடத்தில் காட்டுகிறது.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>குரல் செய்திகளை எழுத்தாக்கு (சோதனை முறை)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக மாற்றுகிறது.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2298,6 +2491,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>செய்தியாக அனுப்பு</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>நீங்கள் உங்கள் இடத்தைப் பகிர்கிறீர்கள்</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n நிமிடம் உள்ளது</numerusform>
+            <numerusform>%n நிமிடங்கள் உள்ளன</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n மணிநேரம் உள்ளது</numerusform>
+            <numerusform>%n மணிநேரம் உள்ளன</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>உங்கள் இடம் அனுப்பப்படவில்லை. அமைப்புகளில் இடம் இயக்கப்பட்டுள்ளதா?</translation>
     </message>
 </context>
 <context>
@@ -2905,11 +3126,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>சார்ஜ் ஆகும்போது</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>எப்போதும்</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ஒருபோதும் இல்லை</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>தொலைபேசி சார்ஜ் ஆகும்போது புதிய குரல் செய்திகள் எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>புதிய குரல் செய்திகள் பதிவிறங்கியதும் எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>இது மின்கலத்தைச் செலவழிக்கும்.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>குரல் செய்தியை எழுத்தாக மாற்ற அதில் எழுத்தாக்கு என்பதைத் தட்டவும்.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>அடுத்து</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>மொழிகள்</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>இன்னும் கிடைக்கவில்லை</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>இந்த மொழிகளில் எழுத்தாக்கம் இன்னும் போதுமான துல்லியமாக இல்லை.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ஒருமுறை பேச்சு மாதிரியைப் பதிவிறக்கி, இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>நீங்கள் அனுப்புவதும் பெறுவதும் எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>இந்த மொழியின் எழுத்தாக்கங்களில் அதிகப் பிழைகள் இருக்க வாய்ப்புள்ளது.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>மொழிகள்</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>எப்போது</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>குரல் செய்திகளைத் தானாக எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>பழைய குரல் செய்திகளை எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>இதை இயக்குவதற்கு முன் வந்த குரல் செய்திகள் தொலைபேசி சார்ஜ் ஆகும்போது எழுத்தாக்கப்படும்.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>முடிந்தது</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>இந்தப் பக்கத்தை மூடிய பிறகும் பதிவிறக்கம் தொடரும்.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>பதிவு செய்கிறது %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>தொலைபேசி சார்ஜ் ஆகும்போது இந்தக் குரல் செய்தி எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>மின்சேமிப்பு முறை இயங்கும்வரை எழுத்தாக்கம் நிறுத்தப்பட்டிருக்கும்.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>பிற குரல் செய்திகள் எழுத்தாக்கப்படக் காத்திருக்கிறது.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>பேச்சு மாதிரி பதிவிறங்குகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>எழுத்தாக்கப்படுகிறது… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>இந்தக் குரல் செய்தி %1 மொழியில் இருப்பதாகத் தெரிகிறது, அது தேர்ந்தெடுக்கப்படவில்லை.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>இந்தக் குரல் செய்தியில் பேச்சு எதுவும் கிடைக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>இந்தக் குரல் செய்தியை எழுத்தாக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>இப்போது எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>இருந்தாலும் எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>இந்தத் தொலைபேசியில் எழுத்தாக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>அனைத்தையும் காட்டு</translation>
     </message>
 </context>
 <context>

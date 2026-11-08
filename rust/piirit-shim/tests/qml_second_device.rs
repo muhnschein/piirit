@@ -149,6 +149,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     let temp = std::env::temp_dir().join(format!("piirit-second-device-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    // Device that turns up stays mid-transfer till test lets go.
+    let gate = temp.join("slow-gate");
+    std::fs::write(&gate, "").expect("write the gate file");
 
     // SAFETY: single-threaded; set before Qt init and server spawn.
     unsafe {
@@ -159,7 +162,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2,3,4,5,6");
         // Device turns up: progress step after first wait, taken after second.
         std::env::set_var("PIIRIT_FAKE_TAKEN", "1");
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "4000");
+        std::env::set_var("PIIRIT_FAKE_SLOW_GATE", &gate);
         // Refused at offer, or offered with no code ever.
         std::env::set_var("PIIRIT_FAKE_PROVIDE_FAIL", "2");
         std::env::set_var("PIIRIT_FAKE_NO_QR", "3");
@@ -230,7 +233,10 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("first-press", call!("click", QString::from("showButton")));
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pageProperty", QString::from("errorMessage")).is_empty() && !last {
+            return false;
+        }
         record!(
             "no-code-said",
             call!("pageProperty", QString::from("errorMessage"))
@@ -250,9 +256,13 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             )
         );
         record!("press-refused", call!("click", QString::from("showButton")));
+        true
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pageProperty", QString::from("errorMessage")).is_empty() && !last {
+            return false;
+        }
         record!(
             "refused-said",
             call!("pageProperty", QString::from("errorMessage"))
@@ -270,9 +280,16 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             )
         );
         record!("press-waiting", call!("click", QString::from("showButton")));
+        true
     });
 
-    plan.after(2, move || unsafe {
+    // Code and profile's row: each its own answer.
+    plan.until(1, 30, move |last| unsafe {
+        let shown = !get!("device", "code").is_empty()
+            && !call!("profileShows", QString::from("ownColor")).is_empty();
+        if !shown && !last {
+            return false;
+        }
         // Drawn like invite code, account colour.
         record!("colour", call!("profileShows", QString::from("ownColor")));
         record!("waiting-code", get!("device", "code"));
@@ -286,6 +303,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             call!("pageProperty", QString::from("backNavigation"))
         );
         record!("cancel", call!("click", QString::from("cancelButton")));
+        true
     });
 
     plan.after(2, move || unsafe {
@@ -315,7 +333,10 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-leaving", call!("click", QString::from("showButton")));
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        if get!("device", "code").is_empty() && !last {
+            return false;
+        }
         record!("leaving-code", get!("device", "code"));
         // Covered, not left: offer stays up under page.
         call!("cover", true);
@@ -323,6 +344,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("covered-code", get!("device", "code"));
         call!("cover", false);
         record!("leave", call!("leave"));
+        true
     });
 
     plan.after(2, move || unsafe {
@@ -339,7 +361,11 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("press-taken", call!("click", QString::from("showButton")));
     });
 
-    plan.after(4, move || unsafe {
+    let transfer_gate = gate.clone();
+    plan.until(1, 30, move |last| unsafe {
+        if get!("device", "permille") == "0" && !last {
+            return false;
+        }
         // Mid-transfer: bar up, no way off.
         record!("transfer-permille", get!("device", "permille"));
         record!("transfer-bar", get!("transferProgress", "visible"));
@@ -348,9 +374,15 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "transfer-pinned",
             call!("pageProperty", QString::from("backNavigation"))
         );
+        let _ = std::fs::remove_file(&transfer_gate);
+        true
     });
 
-    plan.after(4, move || unsafe {
+    let stall_gate = gate.clone();
+    plan.until(1, 30, move |last| unsafe {
+        if call!("pageProperty", QString::from("taken")) != "true" && !last {
+            return false;
+        }
         record!("taken", call!("pageProperty", QString::from("taken")));
         record!("taken-said", get!("takenLabel", "visible"));
         record!("taken-idle", get!("device", "running"));
@@ -361,7 +393,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "taken-leavable",
             call!("pageProperty", QString::from("backNavigation"))
         );
-        // Device starts, leaves: only progress tells apart.
+        // Device starts, leaves: only progress tells apart. Held till code is up.
+        std::fs::write(&stall_gate, "").expect("write the gate file");
         record!(
             "load-stalled",
             call!(
@@ -372,9 +405,22 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             )
         );
         record!("press-stalled", call!("click", QString::from("showButton")));
+        true
     });
 
-    plan.after(5, move || unsafe {
+    let arrive_gate = gate;
+    plan.until(1, 30, move |last| unsafe {
+        if get!("device", "code").is_empty() && !last {
+            return false;
+        }
+        let _ = std::fs::remove_file(&arrive_gate);
+        true
+    });
+
+    plan.until(1, 30, move |last| unsafe {
+        if get!("device", "running") != "false" && !last {
+            return false;
+        }
         record!(
             "stalled-taken",
             call!("pageProperty", QString::from("taken"))
@@ -387,6 +433,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("stalled-button", get!("showButton", "visible"));
         record!("stalled-label", get!("showButton", "text"));
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();

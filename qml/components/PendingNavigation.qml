@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import Sailfish.Silica 1.0
 
 /*
  * Page-stack move, held until stack can make it.
@@ -49,6 +50,11 @@ QtObject {
         root._hold({ kind: "pop" })
     }
 
+    /// Pop down to `target`, no slide, once owner on top.
+    function popTo(target) {
+        root._hold({ kind: "popTo", target: target })
+    }
+
     function _hold(move) {
         root._move = move
         root._waited = 0
@@ -82,6 +88,8 @@ QtObject {
         root._retry.stop()
         if (move.kind === "pop") {
             root.stack.pop()
+        } else if (move.kind === "popTo") {
+            root.stack.pop(move.target, PageStackAction.Immediate)
         } else if (move.kind === "replace") {
             root.stack.replace(move.page, move.properties)
         } else {

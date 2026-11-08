@@ -5,7 +5,7 @@ Standard: [clove](https://github.com/muhnschein/clove) §9: pinned toolchain, pe
 ## Toolchains
 
 - `rust-toolchain.toml` pins 1.94.1 (reproducible lints). Device floor **1.75.0** (CI `msrv`, warnings denied). rustup only; SDK cargo ignores pin.
-- FFmpeg, x264 = submodules in `third_party/`, built by `rust/piirit-video` build.rs; fresh clone needs them first:
+- FFmpeg, x264, whisper.cpp = submodules in `third_party/`, built by `rust/piirit-video` and `rust/piirit-speech` build.rs; fresh clone needs them first:
 
 ```sh
 git submodule update --init --depth 1
@@ -16,9 +16,10 @@ git submodule update --init --depth 1
 ## Lints
 
 - Workspace-level: bare `cargo clippy` fails like CI. Deny: `clippy::all`, `pedantic`, `unwrap_used`/`expect_used` (non-test), `missing_docs`, `unsafe_code`.
-- `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for `QTranslator` install, voice recording (`QAudioRecorder`), QML pictures (`QQuickImageProvider`), call mic watch (libpulse).
-- Hence four `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`; each crate's `build.rs` C++ step exists only for them. Each exception narrowest scope, reason stated, short enough to verify by reading.
+- `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for `QTranslator` install, voice recording (`QAudioRecorder`), QML pictures (`QQuickImageProvider`), call mic watch (libpulse), speech model download (`QNetworkAccessManager`).
+- Hence five `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`, `piirit-shim/src/transcripts/download.rs`; each crate's `build.rs` C++ step exists only for them. Each exception narrowest scope, reason stated, short enough to verify by reading.
 - Recorder: host `qtmultimedia5-dev` (`Makefile` lists packages), spec `pkgconfig(Qt5Multimedia)`, links `libQt5Multimedia`. Mic watch: host `libpulse-dev`, spec `pkgconfig(libpulse)`, links `libpulse.so.0`. Both Harbour-allowed. Mic-watch test runs own sound server: needs `pulseaudio`, `pulseaudio-utils`; skipped if absent, except CI fails.
+- Model download: Qt's network stack, not a Rust HTTP + TLS one (new, big, TLS certificates its own). Host `qtbase5-dev`, spec `pkgconfig(Qt5Network)`, links `libQt5Network`; Harbour-allowed. Tests point it at loopback host: `PIIRIT_SPEECH_MODEL_URL`, `PIIRIT_SPEECH_MODEL_SHA256`, `PIIRIT_SPEECH_MODEL_BYTES` (all three or none). Engine libraries: `PIIRIT_SPEECH_LIBS`, else package's `/usr/share/harbour-piirit/lib/speech/`, else `speech/` beside binary.
 - `rust/clippy.toml` bans:
   - `tokio::runtime::Runtime::new`: use `CoreRuntime` (device-only panic)
   - `qmetaobject::single_shot`: tests step via `common::Plan` (see Testing). Sub-second waits work: vendored copy patched (`third_party/qmetaobject.patch`; 0.2.10 zeroed fraction)
@@ -42,7 +43,12 @@ cargo install --locked cargo-nextest
 2. **Protocol-contract**: recording double journals requests; pins call sequence per onboarding action.
 3. **Qt event-loop**: `QT_QPA_PLATFORM=offscreen`.
    - Steps scheduled by `common::Plan` (`rust/piirit-shim/tests/common/mod.rs`): each a set wait after one before *ended*; `until` polls a condition. Fixed times from start let an overrunning step pull next one in right behind it, before async answer lands (flaked on loaded runners).
-   - Bare `single_shot` denied in tests (clippy ban below, no file-wide allow); only `Plan` and two self-rescheduling waits allow it.
+   - `after` also waits till core settled (`piirit_shim::core_settled`: server spawned, no `CoreRuntime::spawn` task unfinished, answer handed to Qt included, no timed call open, 100 ms quiet): late core or slow answer under load delays step, not fails it. Step acting while call held open: `after_busy`. Task living as long as server or sleeping on clock: `spawn_untracked`, or every step waits it out.
+   - Fake core holds, not sleeps, when step must act mid-call: `PIIRIT_FAKE_HOLD` (answers), `PIIRIT_FAKE_SLOW_GATE` (relay, backup, transfer), `PIIRIT_FAKE_SEND_GATE` (send's reply), `PIIRIT_FAKE_LATE_ARRIVAL` (message); test removes file once its step ran. Clock knobs (`*_DELAY_MS`) only for races played out inside one step or inside fake core: app's own round trip (event to Qt, next ask) takes what it takes.
+   - `until` waits on everything step reads, not just first sign: page up ≠ caller's name in, row there ≠ row filled. Probe stepping itself in QML: end waited on, not fixed backstop.
+   - Audit: `PIIRIT_FAKE_ANSWER_DELAY_MS=400` makes every answer late; suite must pass. Known exception: `io_pause_core_away` (fake server lives 300 ms by design).
+   - Absence checks ("nothing reported") wait on what must have happened first (e.g. `MicWatcher::attempts`), never a sleep: starved runner sleeps through it and passes.
+   - Bare `single_shot` denied in tests (clippy ban below, no file-wide allow); only `Plan`, one in-step wait (`calls_ring_setting.rs`) and `single_shot.rs` (tests vendored patch) allow it.
 4. **QML load**: stub Silica (`tests/silica-stubs/`), real pages, driven by `objectName`. Stubs have no layout: nothing proves page *looks* right.
    - Silica `EnterKey` attached prop unstubbable (QML forbids capitalised property names; `qmetaobject` can't register attached types): pages using it can't load. Put shown content in loadable component.
    - Lay that out with bindings, not `Column`: positioner sizes in polish pass, never runs windowless; geometry reads zero.
@@ -59,6 +65,8 @@ Aspiration, tracked not gated: test volume > source volume.
 ## Static analysis
 
 SonarQube Cloud reads every PR but docs-only (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides. Separate workflow: green `make check` on laptop = green CI, no hosted service.
+
+CodeQL: advanced setup (`.github/workflows/codeql.yml`), default setup off (GitHub refuses both). Languages, suite, categories as default setup; Rust swaps one query for ours (HARBOUR.md). Code-scanning ruleset blocks merge on any alert.
 
 - Coverage **imported**: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace), run before scan; without, confident 0.0%. Needs `cargo-llvm-cov`: opt-in, not in `make check`. Uses nextest if installed, profile `ci` as CI's `test` (else llvm-cov's `cargo test`, ~10 min instrumented).
 
@@ -109,13 +117,16 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 | `qrcode` | invite as code | one crate, no deps |
 | `rqrr` (+ `g2p`, `lru`) | code from camera | QR decoder too big to vendor |
 | `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | voice message MP3 (`voice.rs`) | phone recorder has no encoder iOS plays as voice; LAME = desktop client's; pure-Rust ones need Rust > 1.75 or are shine ports (no psychoacoustic model) |
+| whisper.cpp (submodule, not crate; ggml inside) | voice message to text (`piirit-speech`) | runs Whisper on phone CPU (ARM NEON, dotprod), quantised models, no runtime deps; MIT |
+| Silero VAD v5.1.2 (ggml model file, `vendor/silero-vad`) | "No speech" check before transcribing | whisper.cpp runs it, nothing new linked; tells short speech from beeps, whisper's own score can't; MIT |
+| `rusqlite` 0.31 (+ `libsqlite3-sys`, `hashlink`, `hashbrown` 0.14, `ahash`, `zerocopy`, `fallible-*`, `smallvec`, `bitflags`; build: `pkg-config`, `vcpkg`, `version_check`) | voice transcripts (`transcripts/store.rs`), full-text index for search later | standard SQLite binding; links phone's `libsqlite3.so.0` (Harbour-allowed), no bundled copy; 0.32+ use `c"…"` literals (Rust 1.77) |
 
 - `mp3lame-sys` carries LAME 3.100 C source, builds via its `configure` + `make` (C++ build host has both). Only non-Qt C dep; `rust/deny.toml` allows LGPL-3.0 for its two crates only (LGPL code conveyable in GPLv3 work).
 
 ### Making a video smaller
 
 - Picked video recoded before send when ≥ 4/5 of core's recommended message size or outgoing media quality set worse (`rust/piirit-shim/src/video.rs`, `plan` in `rust/piirit-video`, #111). Phone recorder writes several times that; core sends as-is. Nothing Harbour lets app link recodes (GStreamer, codec libs off list), so `rust/piirit-video` builds codecs in, as `mp3lame-sys` LAME.
-- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1`. `--disable-everything` plus: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. No network, devices, filters, autodetected libs: picked-file attack surface = few demuxers/decoders.
+- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1`. `--disable-everything` plus: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. For voice to text (`piirit-speech`): `mp3`, `aac` (ADTS), `ogg`, `wav` demuxers; MP3, Opus, Vorbis, 16-bit PCM decoders; their parsers. No network, devices, filters, autodetected libs: picked-file attack surface = few demuxers/decoders.
 - **x264** (GPL-2.0-or-later), `third_party/x264`, `stable`, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders wrap external libs; openh264 lacks B-frames, looked worse at same rate.
 - Both GPL-3.0-or-later compatible, built from source into one executable (not bundled binary like core). `build.rs` runs each `configure` with cargo's target compiler (under scratchbox2 = target's own: native, like LAME). ARM asm on; x86 off (needs nasm; x86 only test host).
 - Same x264 linked again into call H.264 encoder: Gecko encodes H.264 only via on-disk media plugin (`HARBOUR.md`).
@@ -124,7 +135,23 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
   - Only three entry points exported; x264 hidden. `gmp-check` (`tests/gmp_check.cpp`) = Gecko stand-in, run by `tests/gmp_h264.rs`.
 - Cost: binary few MB heavier; plugin ≈ x264; clean build ~1 min native at 4 jobs, ~8-12 min in SDK at one.
 - Kept across builds when unchanged (`rust/piirit-video/build_reuse.rs`). Cargo reruns `build.rs` on any newer mtime under `third_party/`, and fresh checkout (every CI run) makes all new: configure + make from zero, cached libs unused. Stamp beside each install instead: submodule commit, configure and make command, configure's env, compiler `--version`. Same = kept. No commit readable (tarball) = built every time. Edit inside submodule without commit unseen: `cargo clean -p piirit-video`. C glue `rust/piirit-video/csrc`, small; Rust tests (`rust/piirit-video/tests`) vs clips made by same libs, no binary fixtures. Dependabot moves submodules along branches.
-- `tokio` `net`: webxdc host loopback socket; adds only `socket2` (tokio's socket platform layer). Alternative was zip reader + inflate for archive core already reads. Call host (`call_host.rs`) same socket, adds nothing: calls-webapp committed as one released file, compiled in (`vendor/calls-webapp/`); no node toolchain.
+- `tokio` `net`: webxdc host loopback socket; adds only `socket2` (tokio's socket platform layer). Alternative was zip reader + inflate for archive core already reads. Call host (`call_host.rs`) same socket, adds nothing: calls-webapp committed as one released file, compiled in (`vendor/calls-webapp/`); no node toolchain. Map app same way: Desktop's `maps.xdc` (`vendor/maps/`), compiled in, handed to core; its tiles fetched by core through webxdc host.
+
+### Turning voice into text
+
+- Voice messages transcribed on phone, experimental switch (#133): `rust/piirit-speech`. Sound never leaves phone. Model (`ggml-small-q5_1.bin`) downloaded when switched on, not packaged.
+- **whisper.cpp 1.9.5** (MIT, ggml inside), `third_party/whisper.cpp`, tag `v1.9.5` commit. CPU only: Harbour allows no GPU/NPU path. Moved by hand, not Dependabot (no fix-only branch): measure accuracy, speed on phone first.
+- `build.rs` compiles whisper.cpp + ggml with cargo's target compiler (`cc` crate), no CMake: its configure probes host, fetches KleidiAI. Defines mirror whisper.cpp CMake defaults minus OpenMP (libgomp not Harbour-allowed; ggml's pthread pool instead), BLAS, GPU backends. `-O3`.
+- Shared lib, `dlopen()`ed: aarch64 phones differ, binary must run on all. `libpiirit-speech-v82.so` (`armv8.2-a+dotprod+fp16`: Jolla Phone 2026), `libpiirit-speech-v8.so` (`armv8-a`: Xperia 10 II, OnePlus 6: Snapdragon 845 lacks dotprod, SIGILL); `is_aarch64_feature_detected!` picks. x86_64 (tests only): one `libpiirit-speech.so`, `x86-64-v3` (AVX2: GitHub runners have it; SSE2 only: ~1 min per engine test).
+- Exports three functions (`csrc/speech.h`, version script); whisper.cpp, ggml hidden (`--exclude-libs,ALL`); `-z defs`, links libc, libm, libstdc++, libgcc_s, ld-linux only. Phone: `/usr/share/harbour-piirit/lib/speech/` (`HARBOUR.md`). Dev: `rust/target/<profile>/speech/`; tests: `PIIRIT_SPEECH_LIBS`.
+- Run on own thread, never caller's: pinned to given cores, nice 19 for background jobs (unprivileged thread can't raise nice back). ggml's worker threads inherit both.
+- Sound: piirit-video's FFmpeg (above) → 16 kHz mono float, capped.
+- Decoding: greedy, no timestamps, flash attention, whisper.cpp's temperature fallback kept. `audio_ctx` trimmed to clip plus ~2.5 s, in 256s, only up to 30 s: past that whisper.cpp moves 30 s windows, smaller context would skip sound. 256s because flash attention pads to 256 without mask: padding held an earlier encode's leftovers, same clip gave other text (FLEURS English, 100 clips: WER 6.9 % in 256s, 7.0-7.8 % in 64s).
+- Silence first: Silero VAD (`vendor/silero-vad`, 0.9 MB, beside libs) over whole clip, one thread (30 s: 0.3 s on x86). No 32 ms frame over 0.3 = "No speech", nothing decoded. Measured with shipped model, Opus: 24 noises (silence, white, pink, brown, hum, 50 Hz-1 kHz tones) at most 0.19; 100 FLEURS English clips (1.2 s, 2 s, 3 s cuts, whole) at least 0.38. Whisper's no-speech token can't: > 0.6 called 23/40 1.2 s and 8/40 3 s cuts silent; 440 Hz tone 0.44, decoded "I". whisper.cpp alone turns silence, hiss into "Thank you.".
+- Language: one detection step, every run (one language given too), trimmed to `audio_ctx` like decoding. Only whisper.cpp API that sets state's `audio_ctx` is `whisper_full`: glue runs it with encoder refused, then detects. FLEURS, 9 languages, 865 clips: whole sentences same pick as full 30 s window, half the time; 1.2 s, 2 s cuts 5x faster, up to 4 % more wrong picks.
+- Selectable languages (`qml/js/Speech.js`): FLEURS test WER ≤ 25 % (Mandarin: CER) with shipped model, decoded as app does, 25 clips each, OpenAI normalizers: 13 of 38 (#286 has table); over 15 % noted in list (7). Rest greyed; Cantonese also because `small` has no `yue` token, Tatar has no FLEURS set.
+- Kept across builds like FFmpeg (`build_reuse.rs` stamp, per CPU level); glue built every time. Clean build: whisper.cpp ~1 min native at 4 jobs per lib (aarch64: two). Lib x86_64 ~2.3 MB stripped.
+- Tests (`rust/piirit-speech/tests`): engine against whisper.cpp's weightless `models/for-tests-ggml-tiny.bin` (plumbing, never text), one at a time (nextest group `speech-engine`: ggml threads spin, starve each other); Silero model real there too (silence, noise, tones stop before decoding; 1 s, 2 s speech gets past). `PIIRIT_SPEECH_MODEL=<ggml model>` adds real-model tests: `samples/jfk.wav` whole, 2 s, 1 s cut, silence, hiss, tone. Decode: WAV and Ogg Opus written by test, AAC by same FFmpeg, MP3 = whisper.cpp's sample; no Vorbis (no encoder built).
 
 ## Comments
 
@@ -189,7 +216,7 @@ Release: build and rebuild side by side, then `compare`: ~17 min, longer when ru
 
 Payoffs, in order:
 
-- **Derived SDK image.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest → one arch not three, `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`; flattened (deleted files in layers still weigh). 5.04 GB pull → ~2.3 GB; `zypper` off critical path.
+- **Derived SDK image.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest → one arch not three, `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`; flattened (deleted files in layers still weigh), then cut into six layers (`ci/split-layers.py`): one 2 GB layer came down from ghcr as one stream, 0:29 to 3:49; six pull in parallel, 10–19 s. 5.04 GB pull → ~2.3 GB; `zypper` off critical path.
 - **FFmpeg/x264 kept when unchanged** (Making a video smaller): most of a build was them, rebuilt every run.
 - `rust/target`, crates carried between runs. Key: image, `Cargo.lock`, C lib sources and recipe; exact hit never re-saves, so key moves when there's something new to save.
 

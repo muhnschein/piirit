@@ -54,8 +54,14 @@ fn every_server_is_handed_the_stock_strings_before_anything_else() {
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     // SAFETY: fires only while `exec()` runs.
-    plan.after(5, move || unsafe {
+    // Second server handed its table.
+    let asked = journal.clone();
+    plan.until(1, 30, move |last| unsafe {
+        if common::calls(&asked).len() < 2 && !last {
+            return false;
+        }
         (*engine_ptr).quit();
+        true
     });
     plan.run();
     engine.exec();

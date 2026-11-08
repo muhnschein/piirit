@@ -29,6 +29,9 @@ const PROBE_QML: &str = r"
 
         Loader { id: loader }
         Transports { id: transports; account_id: 1 }
+        // Reads landed: next asked only once last one did (newer read drops older one's answer).
+        property int lists: 0
+        Connections { target: transports; onRows_changed: lists = lists + 1 }
         property int added: 0
         property string errors: ''
         Connections {
@@ -69,6 +72,7 @@ const PROBE_QML: &str = r"
         function pageProperty(property) { return '' + loader.item[property] }
         // Made before core was up; the list has to be asked for.
         function refresh() { transports.reload(); return 'ok' }
+        function landed() { return '' + lists }
         function listed() { return transports.count + ':' + transports.primary }
         function signalled() { return added + '/' + errors }
         function navigation() { return probe.pageStack.log }
@@ -90,8 +94,6 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // 3s, then answers whatever was said meanwhile.
-        std::env::set_var("PIIRIT_FAKE_SLOW_MS", "3000");
     }
 
     piirit_shim::register_qml_types();
@@ -162,19 +164,32 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         record!("nowhere", call!("nowhere"));
     });
 
-    // 7s: relay answered at 5s, to nobody.
-    plan.after(5, move || unsafe {
+    // Relay answered, to nobody: on profile's list once page asks again.
+    let mut listed = String::new();
+    let listed_ptr: *mut String = std::ptr::addr_of_mut!(listed);
+    let mut asked_at = String::new();
+    plan.until(1, 30, move |last| unsafe {
+        *listed_ptr = call!("listed");
+        if (*listed_ptr).starts_with("2:") || last {
+            return true;
+        }
+        let landed = call!("landed");
+        if landed != asked_at {
+            asked_at = landed;
+            call!("refresh");
+        }
+        false
+    });
+
+    // Settled: an answer still awaited would have landed.
+    plan.after(0, move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
             "late-error",
             call!("pageProperty", QString::from("errorMessage"))
         );
         record!("signalled", call!("signalled"));
-        record!("reload", call!("refresh"));
-    });
-
-    plan.after(2, move || unsafe {
-        record!("after", call!("listed"));
+        record!("after", (*listed_ptr).clone());
         record!("navigation", call!("navigation"));
         (*engine_ptr).quit();
     });

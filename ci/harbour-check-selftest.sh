@@ -30,6 +30,7 @@ fi
 
 status=0
 cases=0
+skipped=0
 
 # break <expected id> <description> <sed-ish command run inside the copy>
 break_and_expect() {
@@ -49,6 +50,10 @@ break_and_expect() {
     out=$("$dir/ci/harbour-check.sh" 2>&1)
     if grep -qF "FAIL [$expect]" <<< "$out"; then
         echo "selftest: ok   $what -> $expect"
+    elif sed -n 's/^harbour-check: SKIP \[\([^]]*\)\].*/ \1 /p' <<< "$out" |
+        grep -qF " $expect "; then
+        echo "selftest: SKIP $what -> $expect (check skipped for want of a tool)"
+        skipped=$((skipped + 1))
     else
         echo "selftest: FAIL $what should have been reported as $expect" >&2
         grep -E '^harbour-check: (FAIL|WAIVED)' <<< "$out" >&2 || echo "  (nothing failed)" >&2
@@ -248,16 +253,42 @@ dir="$work/case"
 rm -rf "$dir"
 cp -a "$pristine" "$dir"
 printf '9.9.9  /nowhere  # excuses nothing\n' >> "$dir/ci/harbour/waivers.conf"
-if "$dir/ci/harbour-check.sh" 2>&1 | grep -q 'stale waiver'; then
+if "$dir/ci/harbour-check.sh" 2>&1 | grep -q "stale waiver '9.9.9 "; then
     echo "selftest: ok   a waiver that matches nothing -> stale waiver"
 else
     echo "selftest: FAIL a waiver that matches nothing should be reported as stale" >&2
     status=1
 fi
 
+# Skipped check never looked: its waivers not stale, others still are. PATH
+# copy minus rpmspec stands in for machine without rpm.
+cases=$((cases + 1))
+norpm="$work/norpm"
+mkdir -p "$norpm"
+IFS=: read -ra path_dirs <<< "$PATH"
+for d in "${path_dirs[@]}"; do
+    for f in "$d"/*; do
+        n=${f##*/}
+        [[ $n = rpmspec || -e $norpm/$n || -L $norpm/$n || ! -x $f ]] && continue
+        ln -s "$f" "$norpm/$n"
+    done
+done
+out=$(PATH="$norpm" HARBOUR_CHECK_STRICT=0 "$dir/ci/harbour-check.sh" 2>&1)
+if ! grep -qE 'SKIP \[1\.2\.1[] ]' <<< "$out"; then
+    echo "selftest: FAIL could not hide rpmspec from the check" >&2
+    status=1
+elif grep 'stale waiver' <<< "$out" | grep -qv "stale waiver '9.9.9 " ||
+    ! grep -q "stale waiver '9.9.9 " <<< "$out"; then
+    echo "selftest: FAIL with rpmspec missing, only the waiver for a check that ran should be stale" >&2
+    grep 'stale waiver' <<< "$out" >&2 || echo "  (no stale waiver)" >&2
+    status=1
+else
+    echo "selftest: ok   rpmspec missing -> its waivers not stale, others still are"
+fi
+
 echo
 if [[ "$status" -eq 0 ]]; then
-    echo "selftest: ok ($cases cases)"
+    echo "selftest: ok ($cases cases, $skipped skipped for want of a tool)"
 else
     echo "selftest: FAILED" >&2
 fi

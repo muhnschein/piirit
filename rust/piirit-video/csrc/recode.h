@@ -72,4 +72,20 @@ struct piirit_clip {
 int piirit_video_synth(const char *path, const struct piirit_clip *clip,
                        char *error, size_t error_len);
 
+/* Mono float samples; valid during call only. */
+typedef void (*piirit_samples)(void *context, const float *samples,
+                               int32_t count);
+
+/* First sound stream of `path` as `rate` mono float, at most `max_samples`,
+ * to `sink` (audio.c). */
+int piirit_video_sound(const char *path, int32_t rate, int64_t max_samples,
+                       piirit_samples sink, void *context,
+                       char *error, size_t error_len);
+
+/* Test sound: `seconds` of 440 Hz tone, AAC at `rate`, `channels`; raw ADTS
+ * stream if `adts`, else M4A. As iOS and Android voice messages. */
+int piirit_video_synth_tone(const char *path, int32_t seconds, int32_t rate,
+                            int32_t channels, int32_t adts,
+                            char *error, size_t error_len);
+
 #endif

@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, Notify};
 
 fn main() {
     // Not `#[tokio::main]`: needs `macros`, a proc-macro crate.
@@ -26,6 +26,7 @@ async fn serve() {
     let mut lines = BufReader::new(stdin).lines();
     let stdout = Arc::new(Mutex::new(tokio::io::stdout()));
     let batch_counter = Arc::new(Mutex::new(0u32));
+    let released = Arc::new(Notify::new());
 
     while let Ok(Some(line)) = lines.next_line().await {
         if line.trim().is_empty() {
@@ -33,6 +34,7 @@ async fn serve() {
         }
         let stdout = stdout.clone();
         let batch_counter = batch_counter.clone();
+        let released = released.clone();
         tokio::spawn(async move {
             let request: Value = match serde_json::from_str(&line) {
                 Ok(v) => v,
@@ -66,15 +68,18 @@ async fn serve() {
                     drop(out);
                     ok(id, &json!("after-garbage"))
                 }
-                "slow" => {
-                    let ms = params
-                        .as_array()
-                        .and_then(|a| a.first())
-                        .and_then(Value::as_u64)
-                        .unwrap_or(0);
-                    tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
-                    ok(id, &json!("slow-done"))
+                // Answered once `release` came: order set by test, not clock.
+                "hold" => {
+                    released.notified().await;
+                    ok(id, &json!("held-done"))
                 }
+                "release" => {
+                    released.notify_one();
+                    ok(id, &json!("released"))
+                }
+                // No answer: exit closes pipe. Tests end here, not on `shutdown`'s kill, which
+                // loses this binary's coverage (written at exit).
+                "quit" => std::process::exit(0),
                 "get_next_event_batch" => {
                     let mut count = batch_counter.lock().await;
                     *count += 1;

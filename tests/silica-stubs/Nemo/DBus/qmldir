@@ -1,3 +1,4 @@
 module Nemo.DBus
 DBusAdaptor 2.0 DBusAdaptor.qml
 DBusInterface 2.0 DBusInterface.qml
+singleton StubBus 2.0 StubBus.qml

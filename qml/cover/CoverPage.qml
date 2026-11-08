@@ -33,6 +33,8 @@ CoverBackground {
     Repeater {
         id: lists
         model: core.account_list
+        // Row built after a rebuild skipped it (count runs ahead): gather again.
+        onItemAdded: cover.gather()
 
         delegate: Item {
             visible: false
@@ -44,6 +46,8 @@ CoverBackground {
                 id: chats
                 objectName: "coverChats"
                 account_id: model.is_configured ? model.account_id : 0
+                // Unseen cover reads nothing; app's page list shares the core meanwhile.
+                paused: !cover.gridSeen
                 onRows_changed: cover.gather()
             }
         }
@@ -54,7 +58,11 @@ CoverBackground {
         onAccounts_refreshed: cover.gather()
         onCore_event: {
             for (var i = 0; i < lists.count; i++) {
-                lists.itemAt(i).chats.handle_event(context_id, kind, payload_json)
+                var list = lists.itemAt(i)
+                // Not built yet: its list loads fresh anyway.
+                if (list) {
+                    list.chats.handle_event(context_id, kind, payload_json)
+                }
             }
         }
     }
@@ -278,6 +286,10 @@ CoverBackground {
         var everyone = []
         var total = 0
         for (var i = 0; i < lists.count; i++) {
+            // Not built yet: its onItemAdded gathers again.
+            if (!lists.itemAt(i)) {
+                continue
+            }
             var chats = lists.itemAt(i).chats
             total += chats.unread_total
             var some = []

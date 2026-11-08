@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>प्रोफाइल जोडा</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>पुढे</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>प्रोफाइल तयार करा</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>तुम्ही नवीन पत्त्यासह आणि कोणत्याही चॅटशिवाय सुरुवात करता.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>बॅकअपमधून पुनर्संचयित करा</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>तुम्ही बॅकअप फाइलमधून प्रोफाइल आयात करता.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>दुसरे उपकरण म्हणून जोडा</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>या फोनवर आणि दुसऱ्या डिव्हाइसवर तुम्ही एकच प्रोफाइल वापरता.</translation>
     </message>
 </context>
 <context>
@@ -572,6 +585,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>चॅट</translation>
     </message>
     <message>
@@ -676,7 +690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>सर्व चॅट दाखवण्यासाठी &quot;%1&quot; वर टॅप करा</translation>
     </message>
     <message>
@@ -688,6 +702,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>नवीन</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>सर्व ठिकाणे</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>चॅनेल</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>न वाचलेले चॅनेल नाहीत</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>सर्व चॅनेल दाखवण्यासाठी &quot;%1&quot; वर टॅप करा</translation>
     </message>
 </context>
 <context>
@@ -714,6 +748,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>हटवा</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n व्हॉइस संदेशाचे लिप्यंतरण करा</numerusform>
+            <numerusform>%n व्हॉइस संदेशांचे लिप्यंतरण करा</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>लिप्यंतरण कॉपी करा</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>क्लिपबोर्डवर कॉपी केले</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>लिप्यंतरण करा</translation>
     </message>
 </context>
 <context>
@@ -831,6 +887,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>संपादित करा</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>लिप्यंतरण कॉपी करा</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>लिप्यंतरण करा</translation>
     </message>
 </context>
 <context>
@@ -1239,6 +1305,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>शेअर करा</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>सध्याचे स्थान पाठवा</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>तुमचे स्थान %n मीटरपर्यंत अचूक आहे.</numerusform>
+            <numerusform>तुमचे स्थान %n मीटरपर्यंत अचूक आहे.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>स्थान पाठवण्यासाठी सेटिंग्जमध्ये स्थान चालू करा.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>तुमचे स्थान शोधत आहे…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>थेट स्थान शेअर करा</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit पार्श्वभूमीत चालू असतानाही तुमचे स्थान पाठवत राहते.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 मिनिटांसाठी</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 तासासाठी</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 तासांसाठी</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>स्थान शेअर करणे थांबवा</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>अजूनही तुमचे स्थान शोधत आहे. सेटिंग्जमध्ये स्थान चालू आहे का?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>सर्व ठिकाणे</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>नकाशा</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1285,6 +1430,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>अद्याप कोणतेही कॉल नाहीत</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>नकाशा</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1317,6 +1467,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>संपादित</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>स्थान</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1661,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>चॅनेलमधील सर्वांना नाव दिसते</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>अद्याप कोणतीही स्थाने नाहीत</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>मागील 24 तासांत शेअर केलेली स्थाने येथे दिसतात.</translation>
     </message>
 </context>
 <context>
@@ -2290,6 +2458,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>संभाषणांमध्ये छोटे अॅप चालवते.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ठिकाण स्ट्रीमिंग सक्षम करा (प्रायोगिक)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>संभाषणांमध्ये तुमचे ठिकाण शेअर करते आणि शेअर केलेली ठिकाणे नकाशावर दाखवते.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>व्हॉइस संदेशांचे लिप्यंतरण करा (प्रायोगिक)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>व्हॉइस संदेश लिप्यंतरण</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>या फोनवर व्हॉइस संदेशांचे मजकुरात रूपांतर करते.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>काहीही फोनबाहेर जात नाही.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2302,6 +2495,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>संदेश म्हणून पाठवा</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>तुम्ही तुमचे स्थान शेअर करत आहात</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n मिनिट बाकी</numerusform>
+            <numerusform>%n मिनिटे बाकी</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n तास बाकी</numerusform>
+            <numerusform>%n तास बाकी</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>तुमचे स्थान पाठवले जात नाही. सेटिंग्जमध्ये स्थान चालू आहे का?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>चार्ज होताना</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>नेहमी</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>कधीही नाही</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>फोन चार्ज होत असताना नवीन व्हॉइस संदेशांचे लिप्यंतरण होते.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>नवीन व्हॉइस संदेश डाउनलोड होताच त्यांचे लिप्यंतरण होते.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>यामुळे बॅटरी खर्च होते.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>व्हॉइस संदेशाचे मजकुरात रूपांतर करण्यासाठी त्यावर लिप्यंतरण करा टॅप करा.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>पुढे</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>भाषा</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>अद्याप उपलब्ध नाही</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>या भाषांमध्ये लिप्यंतरण अद्याप पुरेसे अचूक नाही.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit एकदा स्पीच मॉडेल डाउनलोड करते आणि या फोनवर व्हॉइस संदेशांचे लिप्यंतरण करते.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>तुम्ही पाठवता किंवा मिळवता त्यातील काहीही फोनबाहेर जात नाही.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>या भाषेतील लिप्यंतरणांमध्ये अधिक चुका असण्याची शक्यता आहे.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>व्हॉइस संदेश लिप्यंतरण</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>भाषा</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>केव्हा</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>स्पीच मॉडेल डाउनलोड करता आले नाही.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>पुन्हा प्रयत्न करा</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>व्हॉइस संदेशांचे स्वयं लिप्यंतरण करा</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>जुन्या व्हॉइस संदेशांचे लिप्यंतरण करा</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>हे चालू करण्यापूर्वी आलेल्या व्हॉइस संदेशांचे लिप्यंतरण फोन चार्ज होत असताना होते.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>झाले</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>स्पीच मॉडेल डाउनलोड होत आहे… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>हे पान बंद केल्यानंतरही डाउनलोड सुरू राहते.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>स्पीच मॉडेल डाउनलोड करता आले नाही.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>पुन्हा प्रयत्न करा</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>रेकॉर्डिंग %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>या व्हॉइस संदेशाचे लिप्यंतरण फोन चार्ज होत असताना होईल.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>बॅटरी बचत मोड चालू असेपर्यंत लिप्यंतरण थांबलेले असते.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>इतर व्हॉइस संदेशांच्या लिप्यंतरणाची वाट पाहत आहे.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>स्पीच मॉडेल डाउनलोड होत आहे… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>लिप्यंतरण होत आहे… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>हा व्हॉइस संदेश %1 मध्ये असल्याचे दिसते, जी निवडलेली भाषा नाही.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>या व्हॉइस संदेशात बोलणे आढळले नाही.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>या व्हॉइस संदेशाचे लिप्यंतरण करता आले नाही.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>लिप्यंतरण करा</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>आता लिप्यंतरण करा</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>तरीही लिप्यंतरण करा</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>पुन्हा प्रयत्न करा</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>या फोनवर लिप्यंतरित</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>सर्व दाखवा</translation>
     </message>
 </context>
 <context>

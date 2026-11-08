@@ -137,8 +137,10 @@ Page {
                 objectName: "memberRow" + model.contact_id
                 contentHeight: body.height
                 // Already in, or address contact refused in encrypted group.
+                // `member_count` read so members heard later re-grey: QML can't watch a call.
                 readonly property bool addable:
-                    model.is_key_contact && !page.chat.is_member(model.contact_id)
+                    model.is_key_contact && page.chat.member_count !== -1
+                    && !page.chat.is_member(model.contact_id)
                 enabled: addable
 
                 ContactRow {

@@ -65,7 +65,7 @@ isn't in the Store yet).
   set by `scripts/build-in-container.sh`); build host fixed (spec).
 - Build environment: SDK image pinned by digest (`ci/sdk-images`); same build
   path inside it.
-- Inputs pinned: `rust/Cargo.lock`, FFmpeg and x264 submodule commits,
+- Inputs pinned: `rust/Cargo.lock`, FFmpeg, x264 and whisper.cpp submodule commits,
   deltachat-rpc-server by sha256 (`scripts/fetch-rpc-server.sh`).
 
 Releases pass this same check in CI before publishing (`reproduce` in

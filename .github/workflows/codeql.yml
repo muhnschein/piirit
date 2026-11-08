@@ -1,0 +1,51 @@
+# CodeQL, advanced setup. Languages, suite, categories as default setup had;
+# Rust swaps rust/access-invalid-pointer for our copy, silent on code
+# `#[derive(QObject)]` writes (.github/codeql/rust-config.yml, docs/HARBOUR.md).
+# Default setup must be off: GitHub refuses SARIF from both.
+#
+# Actions pinned to commit, not tag: tags move; this job gets a token.
+name: codeql
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, c-cpp, javascript-typescript, python, rust]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: init
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          config-file: ${{ matrix.language == 'rust' && './.github/codeql/rust-config.yml' || '' }}
+      - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          category: /language:${{ matrix.language }}
+      # Our query against planted bugs: real ones reported, derive silent.
+      - if: matrix.language == 'rust'
+        run: '"$CODEQL" test run --additional-packs .github/codeql .github/codeql/rust-queries-tests'
+        env:
+          CODEQL: ${{ steps.init.outputs.codeql-path }}

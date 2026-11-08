@@ -19,6 +19,9 @@ const SELF: u32 = 1;
 const RECOMMENDED_SIZE_KEY: &str = "sys.msgsize_max_recommended";
 const RECOMMENDED_SIZE: u64 = (30 - 1) * 1024 * 1024 / 4 * 3;
 
+/// Own address key core 2.66 dropped; read or written, refused (pinned in `real_server.rs`).
+const REMOVED_KEY: &str = "configured_addr";
+
 /// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it: oversize tests write KiB, not ~20 MiB.
 fn recommended_size() -> String {
     std::env::var("PIIRIT_FAKE_MSGSIZE_MAX")
@@ -154,8 +157,19 @@ struct State {
     /// Calls by message; placed here or via `PIIRIT_FAKE_INCOMING_CALL_MS`.
     calls: std::collections::BTreeMap<u32, FakeCall>,
     /// Transports per account, add order (core's `transports` table, `list_transports`).
-    /// Own-address one is `configured_addr` in `config`, as core.
+    /// Own address = first's, as core 2.66+ (own contact's address).
     transports: std::collections::BTreeMap<u32, Vec<String>>,
+    /// Chats getting reader's location live, per account.
+    sharing: std::collections::BTreeSet<(u32, u32)>,
+    /// Of those, ones asked for under a minute: run out unannounced by next position, as a
+    /// core whose `ChatModified` got lost.
+    expiring: std::collections::BTreeSet<(u32, u32)>,
+    /// Points sent here once, by message: latitude, longitude.
+    points: std::collections::BTreeMap<u32, (f64, f64)>,
+    /// Map app (webxdc integration) per account: its message.
+    integrations: std::collections::BTreeMap<u32, u32>,
+    /// Map app's chat (0: all), as core's `WebxdcIntegrateFor`.
+    integrated_for: std::collections::BTreeMap<u32, u32>,
 }
 
 impl State {
@@ -169,22 +183,18 @@ impl State {
         self.transports.get(&account).cloned().unwrap_or_default()
     }
 
-    /// Keep new transport once, as core; own address if none yet (second = second address, not
-    /// change of first).
+    /// Keep new transport once, as core (second = second address, not change of first).
     fn add_transport(&mut self, account: u32, addr: &str) {
         let list = self.transports.entry(account).or_default();
         if !list.iter().any(|known| known == addr) {
             list.push(addr.to_string());
         }
-        self.config
-            .entry((account, "configured_addr".to_string()))
-            .or_insert_with(|| addr.to_string());
         self.transports_modified(account);
     }
 
     /// Configured profiles from `PIIRIT_FAKE_ACCOUNTS` (unset in onboarding tests), seeded before
     /// first request so early profile asks find transports. `PIIRIT_FAKE_OLDER_RELAY` seeds relay
-    /// listed before own address's (profile set up twice).
+    /// set up before `account<N>@example.org`; core 2.66+ makes it own address.
     fn seed_accounts(&mut self) {
         let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
@@ -199,10 +209,7 @@ impl State {
             if let Some(older) = &older {
                 list.push(older.clone());
             }
-            let own = format!("account{account}@example.org");
-            list.push(own.clone());
-            self.config
-                .insert((account, "configured_addr".to_string()), own);
+            list.push(format!("account{account}@example.org"));
         }
     }
 
@@ -251,9 +258,17 @@ impl State {
                 long.map_or_else(|| vec![1, 2], |count| (1..=count).collect()),
             );
             self.chats.insert(2, vec![10]);
+            // Ada's point sent once, then her live sharing's start notice.
+            if std::env::var_os("PIIRIT_FAKE_LOCATIONS").is_some() {
+                self.chats.insert(1, vec![1, 2, 30, 31]);
+            }
             // Other media kinds on request: file, voice, app, video.
             if std::env::var_os("PIIRIT_FAKE_MEDIA").is_some() {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
+            }
+            // Voice message last: chat-list row previews it.
+            if std::env::var_os("PIIRIT_FAKE_VOICE_LAST").is_some() {
+                self.chats.insert(2, vec![10, 13]);
             }
             // Not yet downloaded too (`pre_message`), plus plain text. 16 sent before 14 and 15
             // (conversation order, not id): gallery must merge by it.
@@ -285,6 +300,17 @@ impl State {
             self.contacts.insert(11, "grace@example.org".to_string());
             // Chat 2 group: self + one contact; test adds other, removes this one.
             self.group_members.insert(2, vec![SELF, 10]);
+            // Big group on request: `PIIRIT_FAKE_CROWD=N` adds N members (ids from 1000).
+            let crowd = std::env::var("PIIRIT_FAKE_CROWD")
+                .ok()
+                .and_then(|value| value.parse::<u32>().ok())
+                .unwrap_or(0);
+            for index in 0..crowd {
+                let contact = 1000 + index;
+                self.contacts
+                    .insert(contact, format!("member{index}@example.org"));
+                self.group_members.entry(2).or_default().push(contact);
+            }
             self.next_chat_id = 500;
             // Received replies, on request: `PIIRIT_FAKE_QUOTES=120:1,119:10` (message:quoted).
             if let Ok(pairs) = std::env::var("PIIRIT_FAKE_QUOTES") {
@@ -359,10 +385,12 @@ impl State {
     /// Contact as `get_contacts`: own unlisted, askable by id (members). Ada has bio. Names:
     /// `authName` theirs, `name` given here, `displayName` `name` else `authName`. Every 2.62 key,
     /// unseen values (`lastSeen` 0, "Old"; own "Normal"). Picture only via
-    /// `PIIRIT_FAKE_CONTACT_PICTURE` (Ada, core-style path).
-    fn contact_object(&self, contact: u32) -> Option<Value> {
+    /// `PIIRIT_FAKE_CONTACT_PICTURE` (Ada, core-style path). Own address = first relay's;
+    /// `me@example.org` without one (core 2.66 refuses there; chat tests seed no relay).
+    fn contact_object(&self, account: u32, contact: u32) -> Option<Value> {
+        let own = self.transports.get(&account).and_then(|list| list.first());
         let address = if contact == SELF {
-            "me@example.org"
+            own.map_or("me@example.org", String::as_str)
         } else {
             self.contacts.get(&contact)?
         };
@@ -464,6 +492,10 @@ impl State {
                 message["fileName"] = json!(file_name);
             }
         }
+        if self.points.contains_key(&id) {
+            message["hasLocation"] = json!(true);
+            message["fromId"] = json!(SELF);
+        }
         if std::env::var_os("PIIRIT_FAKE_SELF_SENT").is_some() && self.sent.contains(&id) {
             message["fromId"] = json!(SELF);
         }
@@ -479,12 +511,18 @@ impl State {
             }
         }
         if let Some(quoted) = self.quotes.get(&id) {
-            // Core's `WithMessage` quote: id, chat, text, author.
+            // Core's `WithMessage` quote: id, chat, text, author, kind; voice worded as core.
+            let view_type = message_object(u64::from(*quoted))["viewType"].clone();
             message["quote"] = json!({
                 "kind": "WithMessage",
                 "messageId": quoted,
                 "chatId": self.chat_of(*quoted),
-                "text": wordy(u64::from(*quoted)),
+                "text": if view_type == "Voice" {
+                    VOICE_SUMMARY.to_string()
+                } else {
+                    wordy(u64::from(*quoted))
+                },
+                "viewType": view_type,
                 "authorDisplayName": "Ada Lovelace",
             });
         }
@@ -502,6 +540,12 @@ impl State {
             pre_message(&mut message, msg, fetched);
         }
         message["reactions"] = self.reactions_object(id);
+        // Sender's contact object, as core: says if blocked.
+        let sender = message["fromId"]
+            .as_u64()
+            .and_then(|from| u32::try_from(from).ok())
+            .unwrap_or_default();
+        message["sender"]["isBlocked"] = json!(self.blocked.contains(&sender));
         message
     }
 
@@ -690,6 +734,20 @@ fn webxdc_file(path: &str) -> Option<Vec<u8>> {
     }
 }
 
+/// Fake map app: tile address as upstream's `index.js` writes it; other app's never touched.
+fn map_file(path: &str) -> Option<Vec<u8>> {
+    match path {
+        "index.html" => Some(
+            b"<html><head></head><body><script src=\"index.js\"></script></body></html>".to_vec(),
+        ),
+        "index.js" => {
+            Some(b"let url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';\n".to_vec())
+        }
+        "notes.txt" => Some(b"https://tile.openstreetmap.org/ stays\n".to_vec()),
+        _ => None,
+    }
+}
+
 /// Standard base64, unpadded, as core encodes blobs.
 fn base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -705,6 +763,9 @@ fn base64(bytes: &[u8]) -> String {
     }
     out
 }
+
+/// Core's preview of a voice message without text (pinned in `real_server.rs`).
+const VOICE_SUMMARY: &str = "🎤 Voice message";
 
 /// Message shaped like core's. Seeded 1 quotes, 2 unread, 10 image: one fetch covers view.
 fn message_object(msg: u64) -> Value {
@@ -744,6 +805,19 @@ fn message_object(msg: u64) -> Value {
         message["dimensionsWidth"] = json!(640);
         message["dimensionsHeight"] = json!(480);
     }
+    // `PIIRIT_FAKE_LOCATIONS`: point sent once, live sharing's start notice. Ada's both.
+    let locations = std::env::var_os("PIIRIT_FAKE_LOCATIONS").is_some();
+    if locations && msg == 30 {
+        message["text"] = json!(
+            "https://www.openstreetmap.org/?mlat=60.10000&mlon=24.90000#map=16/60.10000/24.90000"
+        );
+        message["hasLocation"] = json!(true);
+    }
+    if locations && msg == 31 {
+        message["text"] = json!("Location streaming enabled by Ada Lovelace.");
+        message["isInfo"] = json!(true);
+        message["systemMessageType"] = json!("LocationStreamingEnabled");
+    }
     // One of each other media kind, plus video second picture: in group under
     // `PIIRIT_FAKE_MEDIA`, by id always. Sizes/types as core.
     match msg {
@@ -757,7 +831,9 @@ fn message_object(msg: u64) -> Value {
         }
         13 => {
             message["viewType"] = json!("Voice");
-            message["file"] = json!("/tmp/piirit-fake/voice.aac");
+            // Real file for tests that transcribe it.
+            message["file"] = std::env::var("PIIRIT_FAKE_VOICE_FILE")
+                .map_or_else(|_| json!("/tmp/piirit-fake/voice.aac"), |file| json!(file));
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
@@ -877,7 +953,7 @@ fn env_ids(var: &str) -> Vec<u64> {
         .unwrap_or_default()
 }
 
-/// Ask relay in `qr` for account. Instant unless `slow`: after `PIIRIT_FAKE_SLOW_MS` (3 s
+/// Ask relay in `qr` for account. Instant unless `slow`: after [`slow_work`] (gate or 3 s
 /// default), as down relay holds core. Pending = configuring: second transport call refused
 /// (core's words); `stop_ongoing_process` fails it unless `deaf` (stop too late).
 async fn add_transport_from_qr(
@@ -893,7 +969,7 @@ async fn add_transport_from_qr(
         return err(id, "There is already another ongoing process running.");
     }
     let stopped = if qr.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !qr.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -972,7 +1048,7 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     }
     state.lock().await.imex(account, 300);
     let stopped = if from.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !from.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -987,9 +1063,6 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     state.imex(account, 1000);
     // Backup carries address: same backup twice = same address, keyed on import argument.
     let addr = backup_addr(from);
-    state
-        .config
-        .insert((account, "configured_addr".to_string()), addr.clone());
     state.add_transport(account, &addr);
     state.configure(account);
     ok(id, &Value::Null)
@@ -1045,7 +1118,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     }
     state.lock().await.imex(account, 300);
     let stopped = if folder.contains("slow") {
-        tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await;
+        slow_work().await;
         !folder.contains("deaf") && state.lock().await.stopped.contains(&account)
     } else {
         false
@@ -1083,7 +1156,7 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
 
 /// Offer profile to second device, as `provide_backup`: open until taken or stopped.
 /// `ImexProgress` 1000 taken, 0 stopped; unread code emits nothing. By account:
-/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken `PIIRIT_FAKE_SLOW_MS` later,
+/// `PIIRIT_FAKE_PROVIDE_FAIL` refuses, `PIIRIT_FAKE_TAKEN` taken after [`slow_work`],
 /// `PIIRIT_FAKE_STALLED` arrives then leaves; others wait for stop.
 async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
     if env_ids("PIIRIT_FAKE_PROVIDE_FAIL").contains(&u64::from(account)) {
@@ -1094,16 +1167,16 @@ async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> 
     }
     let stalls = env_ids("PIIRIT_FAKE_STALLED").contains(&u64::from(account));
     let taken = if stalls || env_ids("PIIRIT_FAKE_TAKEN").contains(&u64::from(account)) {
-        // Device arrives half a wait in: transfer has a middle (page bar, mid-transfer test).
-        let wait = delay_or("PIIRIT_FAKE_SLOW_MS", 3000);
-        tokio::time::sleep(wait / 2).await;
-        state.lock().await.imex(account, 300);
+        // Device arrives at once: transfer has a middle (page bar, mid-transfer test). Taken done
+        // when slow work ends; stalled arrives only then, and leaves.
         if stalls {
-            false
-        } else {
-            tokio::time::sleep(wait).await;
-            true
+            slow_work().await;
         }
+        state.lock().await.imex(account, 300);
+        if !stalls {
+            slow_work().await;
+        }
+        !stalls
     } else {
         wait_for_stop(state, account).await;
         false
@@ -1149,6 +1222,23 @@ async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value
     err(id, "no backup provider is running")
 }
 
+/// Slow relay, backup, transfer: until test removes `PIIRIT_FAKE_SLOW_GATE` file if set (test
+/// acts mid-call on condition, not clock), else `PIIRIT_FAKE_SLOW_MS` (3 s default).
+async fn slow_work() {
+    match std::env::var_os("PIIRIT_FAKE_SLOW_GATE") {
+        Some(gate) => file_present(std::path::Path::new(&gate), false).await,
+        None => tokio::time::sleep(delay_or("PIIRIT_FAKE_SLOW_MS", 3000)).await,
+    }
+}
+
+/// Send's reply held: while `PIIRIT_FAKE_SEND_GATE` file there, else `PIIRIT_FAKE_SEND_DELAY_MS`.
+async fn send_wait() {
+    match std::env::var_os("PIIRIT_FAKE_SEND_GATE") {
+        Some(gate) => file_present(std::path::Path::new(&gate), false).await,
+        None => tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await,
+    }
+}
+
 /// Reply delay in ms from `var`, or `default`.
 fn delay_or(var: &str, default: u64) -> std::time::Duration {
     std::time::Duration::from_millis(
@@ -1162,6 +1252,13 @@ fn delay_or(var: &str, default: u64) -> std::time::Duration {
 /// Reply delay in ms from `var`: fixes reply order.
 fn delay(var: &str) -> std::time::Duration {
     delay_or(var, 0)
+}
+
+/// Until `path` is there (`true`) or gone (`false`). Test's clock: dropped or removed file.
+async fn file_present(path: &std::path::Path, present: bool) {
+    while tokio::fs::metadata(path).await.is_ok() != present {
+        tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+    }
 }
 
 fn main() {
@@ -1243,6 +1340,14 @@ async fn serve() {
             });
         }
     }
+    // Same, once test drops `PIIRIT_FAKE_LATE_ARRIVAL` file.
+    if let Some(path) = std::env::var_os("PIIRIT_FAKE_LATE_ARRIVAL") {
+        let state = state.clone();
+        tokio::spawn(async move {
+            file_present(std::path::Path::new(&path), true).await;
+            state.lock().await.add_late_message(1, 1);
+        });
+    }
     // Pictures arriving in gallery group (chat 2) when test says: `PIIRIT_FAKE_ARRIVALS` = file
     // test drops, a line per picture (`quiet`: events lost, core's overflow case; only reread
     // finds it). Landed before next request read: on test's clock, not this process's.
@@ -1279,6 +1384,11 @@ async fn serve() {
     // `"value"`); next request holding it takes it (here, in order read), waits 1 s, then
     // journaled and done. Later ones overtake it.
     let slow_once = std::env::var_os("PIIRIT_FAKE_SLOW_ONCE").map(std::path::PathBuf::from);
+    // Next request holding `PIIRIT_FAKE_FAIL_ONCE` file's text gets error answer; file taken.
+    let fail_once = std::env::var_os("PIIRIT_FAKE_FAIL_ONCE").map(std::path::PathBuf::from);
+    // Answers held while `PIIRIT_FAKE_HOLD` file there: requests whose line holds its text
+    // (journaled on arrival) wait till test removes it.
+    let hold = std::env::var_os("PIIRIT_FAKE_HOLD").map(std::path::PathBuf::from);
     // Server dies on next request once test drops `PIIRIT_FAKE_EXIT_ONCE` file; replacement lives.
     let exit_once = std::env::var_os("PIIRIT_FAKE_EXIT_ONCE").map(std::path::PathBuf::from);
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
@@ -1301,6 +1411,20 @@ async fn serve() {
                 slow = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
             }
         }
+        let mut failing = false;
+        if let Some(path) = &fail_once {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                failing = line.contains(text.trim()) && tokio::fs::remove_file(path).await.is_ok();
+            }
+        }
+        let mut held_by = None;
+        if let Some(path) = &hold {
+            if let Ok(text) = tokio::fs::read_to_string(path).await {
+                if line.contains(text.trim()) {
+                    held_by = Some(path.clone());
+                }
+            }
+        }
         let state = state.clone();
         let stdout = stdout.clone();
         tokio::spawn(async move {
@@ -1319,7 +1443,25 @@ async fn serve() {
             if slow {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
+            // Stop noted before journaled: test that sees it there may end slow work, which must
+            // find it.
+            if method == "stop_ongoing_process" {
+                let account = params.get(0).and_then(Value::as_u64).unwrap_or_default();
+                state
+                    .lock()
+                    .await
+                    .stopped
+                    .insert(u32::try_from(account).unwrap_or_default());
+            }
             journal(&method, &params);
+            if let Some(path) = held_by {
+                file_present(&path, false).await;
+            }
+            // Audit, not set by tests: every answer late. Test reading before its answer fails.
+            let late = delay("PIIRIT_FAKE_ANSWER_DELAY_MS");
+            if !late.is_zero() && method != "get_next_event_batch" {
+                tokio::time::sleep(late).await;
+            }
 
             let positional = |index: usize| -> Value {
                 params
@@ -1346,6 +1488,131 @@ async fn serve() {
                     let list = state.account_list();
                     ok(&id, &list)
                 }
+                "get_all_account_ids" => {
+                    let mut state = state.lock().await;
+                    if state.accounts.is_empty() {
+                        state.seed_accounts();
+                    }
+                    let ids: Vec<u32> = state.accounts.iter().map(|account| account.id).collect();
+                    ok(&id, &json!(ids))
+                }
+                // Live location, as core: chat on or off, `ChatModified` either way.
+                "send_locations_to_chat" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let seconds = positional(2).as_i64().unwrap_or_default();
+                    let mut state = state.lock().await;
+                    if seconds > 0 {
+                        state.sharing.insert((account, chat));
+                    } else {
+                        state.sharing.remove(&(account, chat));
+                    }
+                    if (1..60).contains(&seconds) {
+                        state.expiring.insert((account, chat));
+                    }
+                    state.events.push_back(json!({
+                        "contextId": account,
+                        "event": {"kind": "ChatModified", "chatId": chat},
+                    }));
+                    ok(&id, &Value::Null)
+                }
+                "is_sending_locations" => {
+                    let account = account_id();
+                    let sharing = state.lock().await.sharing.iter().any(|(on, _)| *on == account);
+                    ok(&id, &json!(sharing))
+                }
+                "is_sending_locations_to_chat" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let sharing = state.lock().await.sharing.contains(&(account, chat));
+                    ok(&id, &json!(sharing))
+                }
+                // Stored only while some chat shares; answers whether any does.
+                "set_location" => {
+                    let mut state = state.lock().await;
+                    let expired = std::mem::take(&mut state.expiring);
+                    state.sharing.retain(|on| !expired.contains(on));
+                    let accounts: std::collections::BTreeSet<u32> =
+                        state.sharing.iter().map(|(account, _)| *account).collect();
+                    for account in &accounts {
+                        state.events.push_back(json!({
+                            "contextId": account,
+                            "event": {"kind": "LocationChanged", "contactId": SELF},
+                        }));
+                        // Core tells map app too (`emit_location_changed`).
+                        if let Some(map) = state.integrations.get(account).copied() {
+                            state.events.push_back(json!({
+                                "contextId": account,
+                                "event": {"kind": "WebxdcStatusUpdate", "msgId": map,
+                                          "statusUpdateSerial": 0},
+                            }));
+                        }
+                    }
+                    ok(&id, &json!(!accounts.is_empty()))
+                }
+                // Core copies file in: unreadable or no zip refused. New app, new message.
+                "set_webxdc_integration" => {
+                    let account = account_id();
+                    let path = positional(1).as_str().unwrap_or_default().to_string();
+                    match tokio::fs::read(&path).await {
+                        Ok(bytes) if bytes.starts_with(b"PK\x03\x04") => {
+                            let mut state = state.lock().await;
+                            state.next_message_id += 1;
+                            let app = state.next_message_id;
+                            state.integrations.insert(account, app);
+                            ok(&id, &Value::Null)
+                        }
+                        _ => err(&id, "not a webxdc file"),
+                    }
+                }
+                // Account's map app, pointed at chat; null if none.
+                "init_webxdc_integration" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    match state.integrations.get(&account).copied() {
+                        Some(app) => {
+                            state.integrated_for.insert(app, chat);
+                            ok(&id, &json!(app))
+                        }
+                        None => ok(&id, &Value::Null),
+                    }
+                }
+                // Newest first. Ada: streamed point after her one-off (message 30); own one-offs.
+                // Chat 1 (Ada, contact 10) has locations; other chats none. Null: all.
+                "get_locations" => {
+                    let chat = positional(1).as_u64();
+                    let any = positional(2).is_null() && chat.map_or(true, |chat| chat == 1);
+                    let contact = positional(2).as_u64().unwrap_or_default();
+                    let state = state.lock().await;
+                    let mut found = Vec::new();
+                    if contact == 10 || any {
+                        found.push(json!({"latitude": 60.2, "longitude": 25.0, "accuracy": 12.0,
+                                          "timestamp": 1_700_090_600, "contactId": 10,
+                                          "msgId": 0, "isIndependent": false}));
+                        found.push(json!({"latitude": 60.1, "longitude": 24.9, "accuracy": 0.0,
+                                          "timestamp": 1_700_090_000, "contactId": 10,
+                                          "msgId": 30, "isIndependent": true}));
+                    }
+                    if contact == u64::from(SELF) || any {
+                        for (msg, (latitude, longitude)) in state.points.iter().rev() {
+                            found.push(json!({"latitude": latitude, "longitude": longitude,
+                                              "accuracy": 0.0, "timestamp": 1_700_090_000,
+                                              "contactId": SELF, "msgId": msg,
+                                              "isIndependent": true}));
+                        }
+                    }
+                    ok(&id, &json!(found))
+                }
                 "remove_account" => {
                     let mut state = state.lock().await;
                     let gone = positional(0).as_u64().unwrap_or(0);
@@ -1357,6 +1624,11 @@ async fn serve() {
                     if state.selected == Some(gone) {
                         state.selected = state.accounts.first().map(|account| account.id);
                     }
+                    // Account manager's event: no account context.
+                    state.events.push_back(json!({
+                        "contextId": 0,
+                        "event": {"kind": "AccountsChanged"},
+                    }));
                     ok(&id, &Value::Null)
                 }
                 "add_account" => {
@@ -1399,24 +1671,7 @@ async fn serve() {
                     // Null clears, as core; "" is a value. Core refuses "" for `selfavatar`: app
                     // sends null.
                     match positional(2).as_str() {
-                        // Own address: core takes only one it has transport for (its words); since
-                        // 2.61, with none too, writing neither makes nor clears one. Pinned vs
-                        // binary.
-                        Some(value) if key == "configured_addr" => {
-                            if state
-                                .transports_for(account)
-                                .iter()
-                                .any(|addr| addr == value)
-                            {
-                                state.config.insert((account, key), value.to_string());
-                                ok(&id, &Value::Null)
-                            } else {
-                                err(&id, "Address does not belong to any transport.")
-                            }
-                        }
-                        None if key == "configured_addr" => {
-                            err(&id, "Cannot unset configured_addr")
-                        }
+                        _ if key == REMOVED_KEY => err(&id, &unknown_key(&key)),
                         Some(value) => {
                             state.config.insert((account, key), value.to_string());
                             ok(&id, &Value::Null)
@@ -1436,13 +1691,17 @@ async fn serve() {
                     let state = state.lock().await;
                     // `sys.` keys computed, not stored.
                     let default = (key == RECOMMENDED_SIZE_KEY).then(recommended_size);
-                    let value = state
-                        .config
-                        .get(&(account, key))
-                        .cloned()
-                        .or(default)
-                        .map_or(Value::Null, Value::String);
-                    ok(&id, &value)
+                    if key == REMOVED_KEY {
+                        err(&id, &unknown_key(&key))
+                    } else {
+                        let value = state
+                            .config
+                            .get(&(account, key))
+                            .cloned()
+                            .or(default)
+                            .map_or(Value::Null, Value::String);
+                        ok(&id, &value)
+                    }
                 }
                 // Read/unread from list. Core announces both (badges follow); profiles page counts
                 // `get_fresh_msgs`.
@@ -1515,8 +1774,6 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
-                    // Held back on request: events arrive while count read.
-                    tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
                         .fresh
@@ -1537,13 +1794,11 @@ async fn serve() {
                 | "set_chat_visibility"
                 | "resend_messages"
                 // Forgotten; tests read journal.
-                | "set_stock_strings" => ok(&id, &Value::Null),
+                | "set_stock_strings"
+                // Noted before journal.
+                | "stop_ongoing_process" => ok(&id, &Value::Null),
                 "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
                     state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
-                    ok(&id, &Value::Null)
-                }
-                "stop_ongoing_process" => {
-                    state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
                 }
                 // Core picks relays: first answering, second once up (background). Keyed on
@@ -1610,8 +1865,7 @@ async fn serve() {
                         .collect();
                     ok(&id, &Value::Array(listed))
                 }
-                // Last or unknown transport refused (core's words). Removing own-address one elects
-                // newest of rest: upstream `maybe_update_sending_transport`.
+                // Last or unknown transport refused (core's words). Own address moves with order.
                 "delete_transport" => {
                     let account = account_id();
                     let addr = positional(1).as_str().unwrap_or_default().to_string();
@@ -1624,14 +1878,6 @@ async fn serve() {
                     } else {
                         let kept: Vec<String> =
                             known.into_iter().filter(|kept| *kept != addr).collect();
-                        if let Some(newest) = kept.last().filter(|_| {
-                            state.config(account, "configured_addr").as_deref()
-                                == Some(addr.as_str())
-                        }) {
-                            state
-                                .config
-                                .insert((account, "configured_addr".to_string()), newest.clone());
-                        }
                         state.transports.insert(account, kept);
                         state.transports_modified(account);
                         ok(&id, &Value::Null)
@@ -1657,7 +1903,7 @@ async fn serve() {
                     }
                     let contacts: Vec<Value> = ids
                         .iter()
-                        .filter_map(|contact| state.contact_object(*contact))
+                        .filter_map(|contact| state.contact_object(account_id(), *contact))
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
@@ -1674,7 +1920,7 @@ async fn serve() {
                     let ids: Vec<u32> = state.blocked.iter().copied().collect();
                     let contacts: Vec<Value> = ids
                         .iter()
-                        .filter_map(|contact| state.contact_object(*contact))
+                        .filter_map(|contact| state.contact_object(account_id(), *contact))
                         .collect();
                     ok(&id, &Value::Array(contacts))
                 }
@@ -1749,6 +1995,26 @@ async fn serve() {
                     )
                 }
                 "get_account_file_size" => ok(&id, &json!(123_456)),
+                // Those still in some chat (accounts share chats here).
+                "get_existing_msg_ids" => {
+                    let asked: Vec<u32> = positional(1)
+                        .as_array()
+                        .map(|array| {
+                            array
+                                .iter()
+                                .filter_map(Value::as_u64)
+                                .filter_map(|value| u32::try_from(value).ok())
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let existing: Vec<u32> = asked
+                        .into_iter()
+                        .filter(|msg| state.chat_of(*msg) != 0)
+                        .collect();
+                    ok(&id, &json!(existing))
+                }
                 // As `get_messages`: reader asks before download-limited rest.
                 "get_message" => {
                     let msg = positional(1).as_u64().unwrap_or_default();
@@ -1961,7 +2227,7 @@ async fn serve() {
                     state.seed_chats();
                     let mut found = serde_json::Map::new();
                     for contact in ids {
-                        if let Some(object) = state.contact_object(contact) {
+                        if let Some(object) = state.contact_object(account_id(), contact) {
                             found.insert(contact.to_string(), object);
                         }
                     }
@@ -2162,6 +2428,16 @@ async fn serve() {
                     let account = account_id();
                     let mut state = state.lock().await;
                     state.seed_chats();
+                    // Core's per-message event too, on request (other suites pinned without).
+                    if std::env::var_os("PIIRIT_FAKE_MSG_DELETED").is_some() {
+                        for msg in &ids {
+                            let chat = state.chat_of(*msg);
+                            state.events.push_back(json!({
+                                "contextId": account,
+                                "event": {"kind": "MsgDeleted", "chatId": chat, "msgId": msg},
+                            }));
+                        }
+                    }
                     for messages in state.chats.values_mut() {
                         messages.retain(|msg| !ids.contains(msg));
                     }
@@ -2333,7 +2609,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    match state.contact_object(contact) {
+                    match state.contact_object(account_id(), contact) {
                         Some(object) => ok(&id, &object),
                         None => err(&id, "contact not found"),
                     }
@@ -2399,6 +2675,12 @@ async fn serve() {
                             .ok()
                             .and_then(|chat| state.drafts.get(&chat))
                             .filter(|text| !text.is_empty());
+                        let last = u32::try_from(chat)
+                            .ok()
+                            .and_then(|chat| state.chats.get(&chat))
+                            .and_then(|messages| messages.last().copied());
+                        let last_type = last.map(|msg| message_object(u64::from(msg))["viewType"].clone());
+                        let voice = draft.is_none() && last_type.as_ref().is_some_and(|kind| kind == "Voice");
                         items.insert(
                             chat.to_string(),
                             json!({
@@ -2406,24 +2688,25 @@ async fn serve() {
                                 "name": format!("chat {chat}"),
                                 "summaryText1": draft.map(|_| "Draft"),
                                 "summaryText2": draft.map_or_else(
-                                    || format!("last in {chat}"),
+                                    || if voice {
+                                        VOICE_SUMMARY.to_string()
+                                    } else {
+                                        format!("last in {chat}")
+                                    },
                                     Clone::clone,
                                 ),
+                                "lastMessageId": last,
+                                "lastMessageType": last_type,
                                 "summaryStatus": if draft.is_some() { 19 } else { 0 },
                                 "freshMessageCounter": u32::from(fresh),
                                 "isEncrypted": true,
                                 "isMuted": u32::try_from(chat)
                                     .is_ok_and(|chat| state.muted.contains(&chat)),
-                                "chatType": if u32::try_from(chat)
-                                    .is_ok_and(|chat| state.is_group(chat))
-                                {
-                                    "Group"
-                                } else {
-                                    "Single"
-                                },
                                 // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
+                                "chatType": u32::try_from(chat)
+                                    .map_or("Single", |chat| state.chat_type(chat)),
                                 // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
                                 "isContactRequest": u32::try_from(chat)
@@ -2570,6 +2853,7 @@ async fn serve() {
                     // Core picks view type from file; echoed to sender's row.
                     let file = positional(3);
                     let file_name = positional(4);
+                    let point = positional(5);
                     let quoted = positional(6);
                     if should_fail(&text) {
                         // Failed send also reports Error event.
@@ -2583,11 +2867,17 @@ async fn serve() {
                             let mut state = state.lock().await;
                             let msg = state.add_message(account, chat);
                             state.note_quote(msg, &quoted);
+                            if let (Some(latitude), Some(longitude)) = (
+                                point.get(0).and_then(Value::as_f64),
+                                point.get(1).and_then(Value::as_f64),
+                            ) {
+                                state.points.insert(msg, (latitude, longitude));
+                            }
                             msg
                         };
-                        // Queued above: delay puts event before reply (core can); it duplicated a
+                        // Queued above: held reply comes after event (core can); it duplicated a
                         // sent row.
-                        tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
+                        send_wait().await;
                         // Extension, not content: image vs paperclip.
                         let extension = file.as_str().and_then(|path| {
                             std::path::Path::new(path)
@@ -2619,7 +2909,8 @@ async fn serve() {
                                 {"text": text, "fromId": 1, "timestamp": 0,
                                  "showPadlock": true, "state": 20,
                                  "file": file, "fileName": file_name,
-                                 "viewType": view_type}
+                                 "viewType": view_type,
+                                 "hasLocation": point.is_array()}
                             ]),
                         )
                     }
@@ -2651,7 +2942,7 @@ async fn serve() {
                         err(&id, "send_msg without a file is not what the app sends")
                     } else {
                         // Held back like other send: in-flight tests.
-                        tokio::time::sleep(delay("PIIRIT_FAKE_SEND_DELAY_MS")).await;
+                        send_wait().await;
                         let mut state = state.lock().await;
                         let msg = state.add_message(account, chat);
                         state.sent_files.insert(
@@ -2670,7 +2961,19 @@ async fn serve() {
                 // Core fetches off web, not app: store install.
                 "get_http_response" => {
                     let url = positional(1).as_str().unwrap_or_default().to_string();
-                    if should_fail(&url) {
+                    // Map tiles: `7/…` answered by server's error page, as a blocked one.
+                    if let Some(tile) = url.strip_prefix("https://tile.openstreetmap.org/") {
+                        let (body, mimetype) = if tile.starts_with("7/") {
+                            (b"<html>blocked</html>".to_vec(), "text/html")
+                        } else {
+                            (format!("\u{89}PNG tile {tile}").into_bytes(), "image/png")
+                        };
+                        ok(
+                            &id,
+                            &json!({"blob": base64(&body), "mimetype": mimetype,
+                                    "encoding": Value::Null}),
+                        )
+                    } else if should_fail(&url) {
                         err(&id, "could not reach the store")
                     } else {
                         ok(
@@ -2689,15 +2992,21 @@ async fn serve() {
                         .as_u64()
                         .and_then(|value| u32::try_from(value).ok())
                         .unwrap_or_default();
-                    let sent = state
-                        .lock()
-                        .await
-                        .webxdc_updates
-                        .get(&msg)
-                        .map_or(0, Vec::len);
-                    ok(
-                        &id,
-                        &json!({
+                    let state_now = state.lock().await;
+                    let sent = state_now.webxdc_updates.get(&msg).map_or(0, Vec::len);
+                    let map = state_now.integrations.values().any(|app| *app == msg);
+                    drop(state_now);
+                    let answer = if map {
+                        // Integration: core lets it online.
+                        json!({
+                            "name": "Maps", "icon": "", "document": null, "summary": null,
+                            "sourceCodeUrl": "https://github.com/deltachat/maps",
+                            "internetAccess": true, "selfAddr": "self@example.org",
+                            "isAppSender": true, "isBroadcast": false,
+                            "sendUpdateInterval": 1000, "sendUpdateMaxSize": 102_400,
+                        })
+                    } else {
+                        json!({
                             "name": "Checkers",
                             "icon": "icon.png",
                             "document": null,
@@ -2713,13 +3022,20 @@ async fn serve() {
                             "isBroadcast": false,
                             "sendUpdateInterval": 1000,
                             "sendUpdateMaxSize": 102_400,
-                        }),
-                    )
+                        })
+                    };
+                    ok(&id, &answer)
                 }
                 // One archive file, base64 STANDARD_NO_PAD as core; page, icon only.
                 "get_webxdc_blob" => {
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
                     let path = positional(2).as_str().unwrap_or_default().to_string();
-                    match webxdc_file(&path) {
+                    let map = state.lock().await.integrations.values().any(|app| *app == msg);
+                    let file = if map { map_file(&path) } else { webxdc_file(&path) };
+                    match file {
                         Some(bytes) => ok(&id, &json!(base64(&bytes))),
                         None => err(&id, "no such file in the webxdc"),
                     }
@@ -2735,7 +3051,24 @@ async fn serve() {
                         .and_then(|value| usize::try_from(value).ok())
                         .unwrap_or_default();
                     let state = state.lock().await;
-                    let updates = state.webxdc_updates.get(&msg).cloned().unwrap_or_default();
+                    // Map app: core's points (`maps_integration`): one-off place's label is its
+                    // message text, Piirit's link; a place named in Desktop's map; a track.
+                    let updates = if state.integrations.values().any(|app| *app == msg) {
+                        let point = |label: &str, independent: bool, serial: u32| {
+                            json!({"payload": {"action": "pos", "contactId": 10,
+                                               "lat": 60.1, "lng": 24.9, "independent": independent,
+                                               "timestamp": 1_700_090_000, "label": label,
+                                               "name": "Ada", "color": "#ff8080"},
+                                   "serial": serial, "max_serial": 3})
+                        };
+                        vec![
+                            point("https://www.openstreetmap.org/?mlat=60.1&mlon=24.9", true, 1),
+                            point("Café", true, 2),
+                            point("", false, 3),
+                        ]
+                    } else {
+                        state.webxdc_updates.get(&msg).cloned().unwrap_or_default()
+                    };
                     let after: Vec<Value> = updates.iter().skip(serial).cloned().collect();
                     ok(
                         &id,
@@ -2912,6 +3245,11 @@ async fn serve() {
                 _ => err(&id, "method not found"),
             };
 
+            let response = if failing {
+                err(&id, "fake failure")
+            } else {
+                response
+            };
             let mut out = stdout.lock().await;
             let _ = out.write_all(response.to_string().as_bytes()).await;
             let _ = out.write_all(b"\n").await;
@@ -2922,6 +3260,11 @@ async fn serve() {
 
 fn ok(id: &Value, result: &Value) -> Value {
     json!({"jsonrpc": "2.0", "id": id, "result": result})
+}
+
+/// Core's words for config key it lacks.
+fn unknown_key(key: &str) -> String {
+    format!("unknown key {key:?}: Matching variant not found")
 }
 
 fn err(id: &Value, message: &str) -> Value {

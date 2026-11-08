@@ -225,6 +225,7 @@ Page {
                     initial: nameField.text.length > 0
                              ? nameField.text
                              : profile.address
+                    ownColor: profile.color
                     picturePath: profile.avatar_path
                 }
 

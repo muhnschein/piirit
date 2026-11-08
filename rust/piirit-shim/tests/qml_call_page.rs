@@ -246,7 +246,13 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("idle-mce", get!("mce", "called"));
     });
 
-    plan.after(2, move || unsafe {
+    // Rings when fake core's timer fires: wait for its page and caller's name (core's later
+    // answer), not the clock.
+    plan.until(1, 30, move |last| unsafe {
+        let up = call!("pushes") != "0" && !get!("ringNote", "summary").is_empty();
+        if !up && !last {
+            return false;
+        }
         record!("pushes", call!("pushes"));
         record!("status", get!("callStatus", "text"));
         record!("ringing-buttons", get!("ringingButtons", "visible"));
@@ -264,10 +270,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("clock", get!("callClock", "text"));
         record!("mute-ringing", get!("muteSwitch", "visible"));
         record!("answer", call!("tap", QString::from("answerButton")));
+        true
     });
 
-    // Answered: page up, mic granted, nothing rings.
-    plan.after(1, move || unsafe {
+    // Answered: page up, mic granted, nothing rings. Call host starts off core: waited on.
+    plan.until(1, 30, move |last| unsafe {
+        let up = get!("callView", "url").starts_with("http")
+            && call!("engine").contains("embedui:perms");
+        if !up && !last {
+            return false;
+        }
         record!("answered", call!("callState"));
         record!("view", get!("callView", "url"));
         record!("engine", call!("engine"));
@@ -283,6 +295,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("muted", get!("muteSwitch", "checked"));
         // Unseen, under a shield: stray tap reaches none of call page's controls.
         record!("view-opacity", get!("callViewLoader", "opacity"));
+        true
     });
 
     plan.after(1, move || unsafe {
@@ -292,13 +305,18 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("revoked", call!("engine"));
     });
 
-    // Said for a moment, then gone.
-    plan.after(2, move || unsafe {
+    // Said for a moment, then gone: page's own timer, started once core said how call ended.
+    plan.until(1, 30, move |last| unsafe {
+        let gone = call!("popped").matches("pop;").count() >= 1 && piirit_shim::core_settled();
+        if !gone && !last {
+            return false;
+        }
         record!("popped", call!("popped"));
         record!("after", call!("callState"));
         record!("after-mce", get!("mce", "called"));
         record!("after-awake", get!("callKeepAlive", "enabled"));
         call!("dropPage");
+        true
     });
 
     // Rings out after last page gone.
@@ -334,11 +352,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     });
 
     // Fourth rings while that page leaves: that page goes, not fourth's, which gets its own.
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let gone = call!("popped").matches("pop;").count() >= 2 && piirit_shim::core_settled();
+        if !gone && !last {
+            return false;
+        }
         record!("popped-third", call!("popped"));
         record!("ring-fourth", call!("ring", 9300));
         call!("dropPage");
         record!("fourth-kept", call!("callState"));
+        true
     });
 
     plan.after(1, move || unsafe {
@@ -350,9 +373,14 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         );
     });
 
-    plan.after(3, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let gone = call!("popped").matches("pop;").count() >= 3 && piirit_shim::core_settled();
+        if !gone && !last {
+            return false;
+        }
         record!("popped-fourth", call!("popped"));
         call!("dropPage");
+        true
     });
 
     // Fifth declined from notification before page up, stack still busy: page still comes, says
@@ -369,7 +397,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("fifth-status", call!("saidOnPush", 4));
     });
 
-    plan.after(1, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let gone = call!("popped").matches("pop;").count() >= 4 && piirit_shim::core_settled();
+        if !gone && !last {
+            return false;
+        }
         record!("popped-fifth", call!("popped"));
         record!("after-fifth", call!("callState"));
         // Sixth rings while fifth's page is popped but not yet gone, declined before it goes
@@ -378,6 +410,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("pushes-sixth-ringing", call!("pushes"));
         record!("declined-sixth", call!("decline"));
         call!("dropPage");
+        true
     });
 
     // Its page comes once old one gone, says so, goes.
@@ -386,10 +419,15 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("sixth-status", call!("saidOnPush", 5));
     });
 
-    plan.after(2, move || unsafe {
+    plan.until(1, 30, move |last| unsafe {
+        let gone = call!("popped").matches("pop;").count() >= 5 && piirit_shim::core_settled();
+        if !gone && !last {
+            return false;
+        }
         record!("popped-sixth", call!("popped"));
         record!("after-sixth", call!("callState"));
         call!("dropPage");
+        true
     });
 
     // Seventh, ngfd not answering (#98, #99): mce told it rings only once ngfd picked ringtone

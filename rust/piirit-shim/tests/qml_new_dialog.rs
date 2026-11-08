@@ -25,6 +25,17 @@ const PROBE_QML: &str = r"
             function replace(page, properties) { note('replace', page, properties) }
         }
         Loader { id: loader }
+        /// Silica builds destination when URL changes, with properties as they stand then;
+        /// key page lacks = non-existent property warning on phone. `Page.qml{...}|...`
+        property string built: ''
+        Connections {
+            target: loader.item
+            ignoreUnknownSignals: true
+            onAcceptDestinationChanged: {
+                var name = ('' + loader.item.acceptDestination).split('/').pop()
+                built = built + name + JSON.stringify(loader.item.acceptDestinationProperties) + '|'
+            }
+        }
         // What Silica built as destination: once per URL, so group page built for group is
         // the one channel goes to.
         QtObject { id: builtChat }
@@ -78,6 +89,7 @@ const PROBE_QML: &str = r"
         }
         function header(property) { return '' + findIn(loader.item, 'header')[property] }
         function navigation() { return pageStack.log }
+        function builds() { return built }
     }
 ";
 
@@ -146,6 +158,7 @@ fn the_new_dialog_offers_chat_group_and_channel() {
         record("channel", call!("switches"));
         record("channel-swipe", call!("swipeForward"));
         record("navigation", call!("navigation"));
+        record("builds", call!("builds"));
         (*engine_ptr).quit();
     });
 
@@ -213,7 +226,7 @@ fn the_new_dialog_offers_chat_group_and_channel() {
     );
     assert_eq!(
         value("group-swipe"),
-        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":false}|built-channel:false"#,
+        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list"}|built-channel:false"#,
         "group does not push the new group page in group mode. {context}"
     );
     assert_eq!(
@@ -223,9 +236,16 @@ fn the_new_dialog_offers_chat_group_and_channel() {
     );
     assert_eq!(
         value("channel-swipe"),
-        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list","channel":true}|built-channel:true"#,
+        r#"push:NewGroupPage.qml{"accountId":3,"landOn":"chat-list"}|built-channel:true"#,
         "channel does not push the group page in channel mode, or the group page Silica \
          built for group stays in group mode. {context}"
+    );
+    // Group page gets `channel` in `onAccepted`; chat page has none.
+    assert_eq!(
+        value("builds"),
+        r#"NewChatPage.qml{"accountId":3,"landOn":"chat-list"}|{"accountId":3,"landOn":"chat-list"}|NewGroupPage.qml{"accountId":3,"landOn":"chat-list"}|NewGroupPage.qml{"accountId":3,"landOn":"chat-list"}|"#,
+        "Silica builds a page with a property it lacks, so the phone logs \
+         \"Cannot assign to non-existent property\". {context}"
     );
     // Pushed, not replaced: back from picked page comes to this dialog.
     assert!(

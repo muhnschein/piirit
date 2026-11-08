@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>Profil hinzufügen</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>Weiter</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>Profil erstellen</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>Du beginnst mit einer neuen Adresse und ohne Chats.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>Aus einem Backup wiederherstellen</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>Du importierst ein Profil aus einer Backup-Datei.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>Als Zweitgerät hinzufügen</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>Du nutzt dasselbe Profil auf diesem Telefon und einem anderen Gerät.</translation>
     </message>
 </context>
 <context>
@@ -572,6 +585,7 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Chats</translation>
     </message>
     <message>
@@ -676,7 +690,7 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Tippen Sie auf „%1“, um alle Chats anzuzeigen</translation>
     </message>
     <message>
@@ -688,6 +702,26 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>Neu</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Alle Standorte</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanäle</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Keine ungelesenen Kanäle</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Tippen Sie auf „%1“, um alle Kanäle anzuzeigen</translation>
     </message>
 </context>
 <context>
@@ -714,6 +748,28 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n Sprachnachricht transkribieren</numerusform>
+            <numerusform>%n Sprachnachrichten transkribieren</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Transkript kopieren</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>In die Zwischenablage kopiert</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribieren</translation>
     </message>
 </context>
 <context>
@@ -831,6 +887,16 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>Transkript kopieren</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>Transkribieren</translation>
     </message>
 </context>
 <context>
@@ -1239,6 +1305,85 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>Teilen</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>Aktuellen Standort senden</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>Dein Standort ist auf %n Meter genau.</numerusform>
+            <numerusform>Dein Standort ist auf %n Meter genau.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>Schalte die Standortbestimmung in den Einstellungen ein, um den Standort zu senden.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>Dein Standort wird ermittelt…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>Live-Standort teilen</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>Piirit sendet deinen Standort weiter, während es im Hintergrund läuft.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>Für 30 Minuten</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>Für 1 Stunde</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>Für 2 Stunden</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>Für 6 Stunden</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>Für 24 Stunden</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>Teilen des Standorts beenden</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>Dein Standort wird noch gesucht. Ist die Standortbestimmung in den Einstellungen eingeschaltet?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>Alle Standorte</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>Karte</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1285,6 +1430,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>No calls yet</source>
         <translation>Noch keine Anrufe</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>Karte</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1317,6 +1467,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Edited</source>
         <translation>Bearbeitet</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>Standort</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1661,19 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>Alle im Kanal sehen den Namen</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>Noch keine Standorte</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>Hier erscheinen Standorte, die in den letzten 24 Stunden geteilt wurden.</translation>
     </message>
 </context>
 <context>
@@ -2290,6 +2458,31 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Runs small apps inside chats.</source>
         <translation>Führt kleine Apps in Chats aus.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Standortübertragung aktivieren (experimentell)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Teilt deinen Standort in Chats und zeigt geteilte Standorte auf einer Karte.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>Sprachnachrichten transkribieren (experimentell)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transkription von Sprachnachrichten</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Wandelt Sprachnachrichten auf diesem Telefon in Text um.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nichts verlässt das Telefon.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2302,6 +2495,34 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Als Nachricht senden</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>Du teilst deinen Standort</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>noch %n Minute</numerusform>
+            <numerusform>noch %n Minuten</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>noch %n Stunde</numerusform>
+            <numerusform>noch %n Stunden</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>Dein Standort wird nicht gesendet. Ist die Standortbestimmung in den Einstellungen eingeschaltet?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Warte auf die Antwort des Gerätes von %2$s…</translation>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>Beim Laden</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>Immer</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>Nie</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>Neue Sprachnachrichten werden transkribiert, während das Telefon lädt.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>Neue Sprachnachrichten werden transkribiert, sobald sie heruntergeladen sind.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>Das verbraucht Akku.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>Tippe bei einer Sprachnachricht auf „Transkribieren“, um sie in Text umzuwandeln.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>Weiter</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>Sprachen</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>Noch nicht verfügbar</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>In diesen Sprachen ist die Transkription noch nicht genau genug.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit lädt einmalig ein Sprachmodell herunter und transkribiert Sprachnachrichten auf diesem Telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>Nichts, was du sendest oder empfängst, verlässt das Telefon.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>Transkripte in dieser Sprache enthalten wahrscheinlich mehr Fehler.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>Transkription von Sprachnachrichten</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>Sprachen</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>Wann</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Das Sprachmodell konnte nicht heruntergeladen werden.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Erneut versuchen</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>Sprachnachrichten automatisch transkribieren</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>Ältere Sprachnachrichten transkribieren</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>Sprachnachrichten, die vor dem Einschalten angekommen sind, werden transkribiert, während das Telefon lädt.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Sprachmodell wird heruntergeladen… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>Der Download läuft weiter, wenn du diese Seite schließt.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Das Sprachmodell konnte nicht heruntergeladen werden.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Erneut versuchen</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Aufnahme %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>Diese Sprachnachricht wird transkribiert, wenn das Telefon lädt.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>Die Transkription pausiert, solange der Energiesparmodus an ist.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>Andere Sprachnachrichten werden zuerst transkribiert.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>Sprachmodell wird heruntergeladen… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>Wird transkribiert… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>Diese Sprachnachricht scheint auf %1 zu sein, das nicht ausgewählt ist.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>In dieser Sprachnachricht wurde keine Sprache gefunden.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>Diese Sprachnachricht konnte nicht transkribiert werden.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>Transkribieren</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>Jetzt transkribieren</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>Trotzdem transkribieren</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Erneut versuchen</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>Auf diesem Telefon transkribiert</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>Alles anzeigen</translation>
     </message>
 </context>
 <context>

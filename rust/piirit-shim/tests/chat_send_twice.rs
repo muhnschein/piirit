@@ -3,7 +3,7 @@
 //! Compose clears on core answer, not tap: failed send keeps text. Window with text+file still set
 //! (seconds, big video copy): second tap must not resend.
 //!
-//! Slow fake server makes window reproducible.
+//! Fake server holds first send's answer: window stays open as long as test needs.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -45,14 +45,15 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     let temp = std::env::temp_dir().join(format!("piirit-send-twice-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
+    let hold = temp.join("hold");
+    std::fs::write(&hold, "send_msg").expect("write the hold file");
 
     // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Long: all taps hit one send. Short: answered before next read.
-        std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "1500");
+        std::env::set_var("PIIRIT_FAKE_HOLD", &hold);
     }
 
     piirit_shim::register_qml_types();
@@ -87,9 +88,10 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     plan.after(2, move || unsafe {
         (*steps_ptr).push(("text-taps", call!("hammerText")));
     });
-    // Still in first send.
-    plan.after(1, move || unsafe {
+    // Still in first send: held.
+    plan.after_busy(1, move || unsafe {
         (*steps_ptr).push(("busy-during", call!("busy")));
+        let _ = std::fs::remove_file(&hold);
     });
     plan.after(2, move || unsafe {
         (*steps_ptr).push(("busy-after", call!("busy")));

@@ -84,22 +84,35 @@
     </message>
 </context>
 <context>
-    <name>AddProfilePage</name>
+    <name>AddProfileWaysDialog</name>
     <message>
-        <source>Add profile</source>
-        <translation>പ്രൊഫൈൽ ചേർക്കുക</translation>
+        <source>Next</source>
+        <extracomment>Goes on to the page for the picked way of adding a profile.</extracomment>
+        <translation>അടുത്തത്</translation>
     </message>
     <message>
         <source>Create a profile</source>
         <translation>പ്രൊഫൈൽ ഉണ്ടാക്കുക</translation>
     </message>
     <message>
+        <source>You start with a new address and no chats.</source>
+        <translation>നിങ്ങൾ ഒരു പുതിയ വിലാസവുമായി, ചാറ്റുകളൊന്നുമില്ലാതെ തുടങ്ങുന്നു.</translation>
+    </message>
+    <message>
         <source>Restore from a backup</source>
         <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
     </message>
     <message>
+        <source>You import a profile from a backup file.</source>
+        <translation>നിങ്ങൾ ഒരു ബാക്കപ്പ് ഫയലിൽ നിന്ന് ഒരു പ്രൊഫൈൽ ഇംപോർട്ട് ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
         <source>Add as second device</source>
         <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>You use the same profile on this phone and another device.</source>
+        <translation>ഈ ഫോണിലും മറ്റൊരു ഉപകരണത്തിലും നിങ്ങൾ ഒരേ പ്രൊഫൈൽ ഉപയോഗിക്കുന്നു.</translation>
     </message>
 </context>
 <context>
@@ -572,6 +585,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>ചാറ്റുകൾ</translation>
     </message>
     <message>
@@ -676,7 +690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>എല്ലാ ചാറ്റുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
     </message>
     <message>
@@ -688,6 +702,26 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>New</source>
         <extracomment>Pull-down item. Opens a dialog to pick a new chat, group or channel.</extracomment>
         <translation>പുതിയത്</translation>
+    </message>
+    <message>
+        <source>All locations</source>
+        <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>ചാനലുകൾ</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>വായിക്കാത്ത ചാനലുകളില്ല</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>എല്ലാ ചാനലുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
     </message>
 </context>
 <context>
@@ -714,6 +748,28 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message numerus="yes">
+        <source>Transcribe %n voice message(s)</source>
+        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <translation>
+            <numerusform>%n ശബ്ദ സന്ദേശം എഴുത്താക്കുക</numerusform>
+            <numerusform>%n ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>എഴുത്തുരൂപം പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
     </message>
 </context>
 <context>
@@ -831,6 +887,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edit</source>
         <translation>തിരുത്തുക</translation>
+    </message>
+    <message>
+        <source>Copy transcript</source>
+        <extracomment>Copies the text a voice message was turned into.</extracomment>
+        <translation>എഴുത്തുരൂപം പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Turns a voice message into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
     </message>
 </context>
 <context>
@@ -1239,6 +1305,85 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>LocationShareDialog</name>
+    <message>
+        <source>Share</source>
+        <extracomment>Sends the picked location, or starts or stops sharing it.</extracomment>
+        <translation>പങ്കിടുക</translation>
+    </message>
+    <message>
+        <source>Send current location</source>
+        <translation>നിലവിലെ ലൊക്കേഷൻ അയയ്ക്കുക</translation>
+    </message>
+    <message numerus="yes">
+        <source>Your location is accurate to %n metre(s).</source>
+        <extracomment>%n is how far off, in metres, the phone&apos;s position may be.</extracomment>
+        <translation>
+            <numerusform>നിങ്ങളുടെ ലൊക്കേഷൻ %n മീറ്റർ വരെ കൃത്യമാണ്.</numerusform>
+            <numerusform>നിങ്ങളുടെ ലൊക്കേഷൻ %n മീറ്റർ വരെ കൃത്യമാണ്.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Turn on location in Settings to send it.</source>
+        <translation>ലൊക്കേഷൻ അയയ്ക്കാൻ ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാക്കുക.</translation>
+    </message>
+    <message>
+        <source>Finding your location…</source>
+        <translation>നിങ്ങളുടെ ലൊക്കേഷൻ കണ്ടെത്തുന്നു…</translation>
+    </message>
+    <message>
+        <source>Share live location</source>
+        <extracomment>Above the times for which the reader can share their location live.</extracomment>
+        <translation>തത്സമയ ലൊക്കേഷൻ പങ്കിടുക</translation>
+    </message>
+    <message>
+        <source>Piirit keeps sending your location while it runs in the background.</source>
+        <translation>പശ്ചാത്തലത്തിൽ പ്രവർത്തിക്കുമ്പോഴും Piirit നിങ്ങളുടെ ലൊക്കേഷൻ അയച്ചുകൊണ്ടിരിക്കും.</translation>
+    </message>
+    <message>
+        <source>For 30 minutes</source>
+        <translation>30 മിനിറ്റത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 1 hour</source>
+        <translation>1 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 2 hours</source>
+        <translation>2 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 6 hours</source>
+        <translation>6 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>For 24 hours</source>
+        <translation>24 മണിക്കൂറത്തേക്ക്</translation>
+    </message>
+    <message>
+        <source>Stop sharing location</source>
+        <translation>ലൊക്കേഷൻ പങ്കിടുന്നത് നിർത്തുക</translation>
+    </message>
+    <message>
+        <source>Still looking for your location. Is location turned on in Settings?</source>
+        <extracomment>No position for a while: location likely turned off since.</extracomment>
+        <translation>ഇപ്പോഴും നിങ്ങളുടെ ലൊക്കേഷൻ തിരയുന്നു. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
+    </message>
+</context>
+<context>
+    <name>MapOpener</name>
+    <message>
+        <source>All locations</source>
+        <extracomment>Heading of the map of every chat&apos;s shared locations.</extracomment>
+        <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
+    </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Under a chat&apos;s name above the map of its shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
+    </message>
+</context>
+<context>
     <name>Media</name>
     <message>
         <source>Gallery</source>
@@ -1285,6 +1430,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No calls yet</source>
         <translation>ഇതുവരെ കോളുകളൊന്നുമില്ല</translation>
     </message>
+    <message>
+        <source>Map</source>
+        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <translation>ഭൂപടം</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -1317,6 +1467,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>തിരുത്തിയത്</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>In a message that carries a place; tapping it shows the place on a map.</extracomment>
+        <translation>ലൊക്കേഷൻ</translation>
     </message>
 </context>
 <context>
@@ -1506,6 +1661,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Everyone in the channel sees the name</source>
         <translation>ചാനലിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
+    </message>
+</context>
+<context>
+    <name>NoLocationsPage</name>
+    <message>
+        <source>No locations yet</source>
+        <extracomment>Map of a chat&apos;s or every chat&apos;s shared locations, when there are none.</extracomment>
+        <translation>ഇതുവരെ ലൊക്കേഷനുകളൊന്നുമില്ല</translation>
+    </message>
+    <message>
+        <source>Locations shared in the last 24 hours show here.</source>
+        <extracomment>Under &quot;No locations yet&quot;: the map shows only the last day&apos;s locations.</extracomment>
+        <translation>കഴിഞ്ഞ 24 മണിക്കൂറിൽ പങ്കിട്ട ലൊക്കേഷനുകൾ ഇവിടെ കാണാം.</translation>
     </message>
 </context>
 <context>
@@ -2290,6 +2458,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
     </message>
+    <message>
+        <source>Enable location streaming (experimental)</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ് പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages (experimental)</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
@@ -2302,6 +2495,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>സന്ദേശമായി അയയ്ക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>SharingBar</name>
+    <message>
+        <source>You are sharing your location</source>
+        <translation>നിങ്ങൾ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുന്നു</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) left</source>
+        <extracomment>Time until live location sharing ends, under an hour.</extracomment>
+        <translation>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+            <numerusform>%n മിനിറ്റ് ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s) left</source>
+        <extracomment>Time until live location sharing ends, an hour or more.</extracomment>
+        <translation>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+            <numerusform>%n മണിക്കൂർ ബാക്കി</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Your location is not being sent. Is location turned on in Settings?</source>
+        <extracomment>Live location on, but the phone hands no position: nothing goes out.</extracomment>
+        <translation>നിങ്ങളുടെ ലൊക്കേഷൻ അയയ്ക്കുന്നില്ല. ക്രമീകരണങ്ങളിൽ ലൊക്കേഷൻ ഓണാണോ?</translation>
     </message>
 </context>
 <context>
@@ -2909,11 +3130,211 @@ Waiting for the device of %2$s to reply…</source>
     </message>
 </context>
 <context>
+    <name>Transcription</name>
+    <message>
+        <source>While charging</source>
+        <extracomment>Auto-transcribe voice messages: only while the phone is on its charger.</extracomment>
+        <translation>ചാർജ് ചെയ്യുമ്പോൾ</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <extracomment>Auto-transcribe voice messages: as soon as they have downloaded.</extracomment>
+        <translation>എപ്പോഴും</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <extracomment>Auto-transcribe voice messages: never, only by a tap on the message.</extracomment>
+        <translation>ഒരിക്കലും വേണ്ട</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed while the phone is charging.</source>
+        <translation>ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ പുതിയ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>New voice messages are transcribed once they have downloaded.</source>
+        <translation>പുതിയ ശബ്ദ സന്ദേശങ്ങൾ ഡൗൺലോഡ് ആയ ഉടൻ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>This uses battery.</source>
+        <translation>ഇത് ബാറ്ററി ഉപയോഗിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Tap Transcribe on a voice message to turn it into text.</source>
+        <translation>ഒരു ശബ്ദ സന്ദേശം എഴുത്താക്കാൻ അതിലെ എഴുത്താക്കുക ടാപ്പ് ചെയ്യുക.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionLanguagesDialog</name>
+    <message>
+        <source>Next</source>
+        <extracomment>Accepts the languages; the timing choice comes next.</extracomment>
+        <translation>അടുത്തത്</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages can be transcribed in.</extracomment>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+    <message>
+        <source>Not available yet</source>
+        <extracomment>Heading over languages transcription does not offer yet.</extracomment>
+        <translation>ഇതുവരെ ലഭ്യമല്ല</translation>
+    </message>
+    <message>
+        <source>Transcription is not accurate enough in these languages yet.</source>
+        <translation>ഈ ഭാഷകളിൽ എഴുത്താക്കൽ ഇതുവരെ മതിയായ കൃത്യതയിലല്ല.</translation>
+    </message>
+    <message>
+        <source>Piirit downloads a speech model once and transcribes voice messages on this phone.</source>
+        <translation>Piirit ഒരിക്കൽ ഒരു സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്ത് ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing you send or receive leaves the phone.</source>
+        <translation>നിങ്ങൾ അയയ്ക്കുന്നതോ സ്വീകരിക്കുന്നതോ ആയ ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
+    <message>
+        <source>Transcripts in this language are likely to contain more mistakes.</source>
+        <translation>ഈ ഭാഷയിലെ എഴുത്തുരൂപങ്ങളിൽ കൂടുതൽ തെറ്റുകൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionPage</name>
+    <message>
+        <source>Voice message transcription</source>
+        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <extracomment>Heading over when voice messages are transcribed.</extracomment>
+        <translation>എപ്പോൾ</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhen</name>
+    <message>
+        <source>Auto-transcribe voice messages</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ സ്വയമേവ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe older voice messages</source>
+        <translation>പഴയ ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation>ഇത് ഓണാക്കുന്നതിന് മുമ്പ് വന്ന ശബ്ദ സന്ദേശങ്ങൾ ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+</context>
+<context>
+    <name>TranscriptionWhenDialog</name>
+    <message>
+        <source>Done</source>
+        <extracomment>Closes transcription setup.</extracomment>
+        <translation>പൂർത്തിയായി</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>The download continues after you close this page.</source>
+        <translation>ഈ പേജ് അടച്ച ശേഷവും ഡൗൺലോഡ് തുടരും.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+</context>
+<context>
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
         <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>റെക്കോർഡിംഗ് %1</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceTranscript</name>
+    <message>
+        <source>This voice message is transcribed when the phone is charging.</source>
+        <translation>ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ ഈ ശബ്ദ സന്ദേശം എഴുത്താക്കും.</translation>
+    </message>
+    <message>
+        <source>Transcription is paused while battery saving mode is on.</source>
+        <translation>ബാറ്ററി ലാഭിക്കൽ മോഡ് ഓണായിരിക്കുന്നിടത്തോളം എഴുത്താക്കൽ നിർത്തിവച്ചിരിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Waiting for other voice messages to be transcribed.</source>
+        <translation>മറ്റ് ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുന്നതിനായി കാത്തിരിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Downloading the speech model… %1%</source>
+        <extracomment>%1 is a percentage of the speech model downloaded so far.</extracomment>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>Transcribing… %1%</source>
+        <extracomment>%1 is how much of the voice message is transcribed, as a percentage.</extracomment>
+        <translation>എഴുത്താക്കുന്നു… %1%</translation>
+    </message>
+    <message>
+        <source>This voice message seems to be in %1, which is not selected.</source>
+        <extracomment>%1 is a language&apos;s own name, such as &quot;Svenska&quot;.</extracomment>
+        <translation>ഈ ശബ്ദ സന്ദേശം %1 ഭാഷയിലാണെന്ന് തോന്നുന്നു, അത് തിരഞ്ഞെടുത്തിട്ടില്ല.</translation>
+    </message>
+    <message>
+        <source>No speech was found in this voice message.</source>
+        <translation>ഈ ശബ്ദ സന്ദേശത്തിൽ സംസാരം കണ്ടെത്തിയില്ല.</translation>
+    </message>
+    <message>
+        <source>This voice message could not be transcribed.</source>
+        <translation>ഈ ശബ്ദ സന്ദേശം എഴുത്താക്കാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Transcribe</source>
+        <extracomment>Button on a voice message: turns it into text on the phone.</extracomment>
+        <translation>എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe now</source>
+        <translation>ഇപ്പോൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribe anyway</source>
+        <translation>എന്നാലും എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribed on this phone</source>
+        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
+        <translation>ഈ ഫോണിൽ എഴുത്താക്കിയത്</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation>എല്ലാം കാണിക്കുക</translation>
     </message>
 </context>
 <context>

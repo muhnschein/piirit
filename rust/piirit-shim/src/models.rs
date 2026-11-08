@@ -34,10 +34,14 @@ pub struct ChatListItem {
     pub is_self_talk: bool,
     /// Core's device chat. Not a person.
     pub is_device_talk: bool,
+    /// Channel, own or joined (`OutBroadcast`, `InBroadcast`): kind filter splits on it.
+    pub is_channel: bool,
     /// Chat colour, `#rrggbb`.
     pub color: QString,
     /// Picture path; empty if none.
     pub avatar_path: QString,
+    /// Last message, if voice: its transcript previews it. 0 otherwise.
+    pub voice_message_id: u32,
 }
 
 /// Chat-list model.
@@ -79,6 +83,8 @@ pub struct MessageListItem {
     pub quote_author: QString,
     /// Quoted message (`WithMessage` quote); 0 if core has none (deleted, never here).
     pub quote_message_id: u32,
+    /// Quoted message is voice (its transcript stands in for core's words).
+    pub quote_is_voice: bool,
     /// Absolute attachment path in blob dir.
     pub file_path: QString,
     /// Attachment name.
@@ -134,6 +140,12 @@ pub struct MessageListItem {
     pub call_has_video: bool,
     /// Call length, seconds; 0 if never connected.
     pub call_duration: i32,
+    /// `hasLocation`: carries a point (sent once, or streamed beside it).
+    pub has_location: bool,
+    /// Core's notice that sender shares location live; tap shows their newest.
+    pub starts_location: bool,
+    /// Sender's contact id (`fromId`); 1 = reader.
+    pub sender_id: u32,
 }
 
 /// Conversation model.
@@ -146,7 +158,7 @@ pub struct AccountItem {
     pub account_id: u32,
     /// Profile name; empty if unset.
     pub display_name: QString,
-    /// `configured_addr`; empty if unconfigured or unknown.
+    /// Own contact's address; empty if unconfigured or unknown.
     pub addr: QString,
     /// Has a usable transport.
     pub is_configured: bool,
@@ -171,7 +183,7 @@ pub struct TransportItem {
     pub addr: QString,
     /// Relay domain (after `@`).
     pub domain: QString,
-    /// `configured_addr`: one per profile, first row. Not necessarily send relay (core picks
+    /// Own contact's address: one per profile, first row. Not necessarily send relay (core picks
     /// per connect, unsaid).
     pub is_primary: bool,
     /// Dot colour: `green`, `yellow`, `red`, `grey`; empty before reported.

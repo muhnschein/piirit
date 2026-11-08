@@ -4,7 +4,7 @@ import Nemo.Configuration 1.0
 
 /*
  * Profile-less settings (drawing, links, media, notifications, calls, cover,
- * camera) plus read-only lens labels; dconf under app path (outlives app).
+ * camera, transcription) plus read-only lens labels; dconf under app path (outlives app).
  * qml/pages/SettingsPage.qml writes; pages read here, each value following its
  * key, so changes reach open pages. Singleton: deep row, loaded alone in
  * tests, needs same answer.
@@ -33,6 +33,8 @@ QtObject {
     property alias lastAccountId: lastAccountValue.value
     /// Webxdc apps offered (tray, store, running). Off until asked.
     property alias webxdcEnabled: webxdcEnabledValue.value
+    /// Location offered (tray, maps). Off until asked, as reference clients.
+    property alias locationStreamingEnabled: locationStreamingEnabledValue.value
     /// Contact calls ring here. Core's `who_can_call_me`, all profiles. On for all
     /// since #119; old key /apps/harbour-piirit/calls_enabled unread.
     property alias callsRing: callsRingValue.value
@@ -59,6 +61,14 @@ QtObject {
     property alias cameraFlash: cameraFlashValue.value
     property alias cameraTimer: cameraTimerValue.value
     property alias cameraGrid: cameraGridValue.value
+    /// Voice message transcription on (experimental). Off: model deleted, transcripts kept.
+    property alias transcriptionEnabled: transcriptionEnabledValue.value
+    /// Whisper codes, comma list (qml/js/Speech.js).
+    property alias transcriptionLanguages: transcriptionLanguagesValue.value
+    /// Auto-transcribe: 0 never (tap only), 1 while charging, 2 always.
+    property alias transcriptionMode: transcriptionModeValue.value
+    /// Voice messages from before switch-on too, while charging.
+    property alias transcriptionOlder: transcriptionOlderValue.value
     /// Back lens labels platform camera writes ("1.0", "0.5"); empty if none.
     readonly property var backLensLabels: backLensLabelsValue.value || []
 
@@ -127,6 +137,13 @@ QtObject {
         key: "/apps/harbour-piirit/webxdc_enabled"
         // Off until asked: others' code, however sandboxed, not for unasked readers;
         // our half still new, finding bugs.
+        defaultValue: false
+    }
+
+    property ConfigurationValue locationStreamingEnabledConfig: ConfigurationValue {
+        id: locationStreamingEnabledValue
+        key: "/apps/harbour-piirit/location_streaming_enabled"
+        // Experimental in Delta Chat Android and Desktop too.
         defaultValue: false
     }
 
@@ -226,6 +243,31 @@ QtObject {
         id: cameraGridValue
         key: "/apps/harbour-piirit/camera_grid"
         defaultValue: false
+    }
+
+    property ConfigurationValue transcriptionEnabledConfig: ConfigurationValue {
+        id: transcriptionEnabledValue
+        key: "/apps/harbour-piirit/transcription/enabled"
+        // Off until asked: 190 MB download, experimental.
+        defaultValue: false
+    }
+
+    property ConfigurationValue transcriptionLanguagesConfig: ConfigurationValue {
+        id: transcriptionLanguagesValue
+        key: "/apps/harbour-piirit/transcription/languages"
+        defaultValue: ""
+    }
+
+    property ConfigurationValue transcriptionModeConfig: ConfigurationValue {
+        id: transcriptionModeValue
+        key: "/apps/harbour-piirit/transcription/mode"
+        defaultValue: 1
+    }
+
+    property ConfigurationValue transcriptionOlderConfig: ConfigurationValue {
+        id: transcriptionOlderValue
+        key: "/apps/harbour-piirit/transcription/older"
+        defaultValue: true
     }
 
     property ConfigurationValue backLensLabelsConfig: ConfigurationValue {

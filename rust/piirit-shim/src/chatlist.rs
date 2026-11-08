@@ -14,6 +14,7 @@ use crate::chat::{chat_is_group, is_group_info};
 use crate::core::connection;
 use crate::json;
 use crate::models::{ChatListItem, ChatListModel};
+use crate::transcripts::{self, Change, Previews};
 
 /// One account's chats, most recent first.
 ///
@@ -22,7 +23,7 @@ use crate::models::{ChatListItem, ChatListModel};
 /// SilicaListView { model: chats.rows }
 /// ```
 #[derive(QObject, Default)]
-// Four QML-set properties; folding them hides them from QML.
+// Bools are QML properties; folding them hides them from QML.
 #[allow(clippy::struct_excessive_bools)]
 pub struct ChatList {
     base: qt_base_class!(trait QObject),
@@ -55,11 +56,25 @@ pub struct ChatList {
     /// Release chats read since filter on (app resume).
     pub forget_read: qt_method!(fn(&mut self)),
 
+    /// Chats only, no channels. Turning on turns `channels_only` off.
+    pub chats_only: qt_property!(bool; WRITE set_chats_only NOTIFY kind_filter_changed),
+    /// Channels only. Turning on turns `chats_only` off.
+    pub channels_only: qt_property!(bool; WRITE set_channels_only NOTIFY kind_filter_changed),
+    /// Either kind filter changed.
+    pub kind_filter_changed: qt_signal!(),
+    /// List holds a channel: kind filters offered. Last one gone turns them off.
+    pub has_channels: qt_property!(bool; NOTIFY rows_changed),
+
     /// Reader setting: announce muted-group reply to own message (reference clients' mentions).
     /// Groups only: muted 1:1 was muted for that person.
     pub notify_mentions: qt_property!(bool; NOTIFY notify_mentions_changed),
     /// Setting changed.
     pub notify_mentions_changed: qt_signal!(),
+
+    /// Events only noted, no core reads; one refresh once false. Cover off screen.
+    pub paused: qt_property!(bool; WRITE set_paused NOTIFY paused_changed),
+    /// Paused changed.
+    pub paused_changed: qt_signal!(),
 
     /// Rows for `SilicaListView`.
     pub rows: qt_property!(RefCell<ChatListModel>; CONST),
@@ -137,15 +152,34 @@ pub struct ChatList {
     /// `archived`, each fetching; search per keystroke).
     generation: u64,
 
-    /// Asked, unanswered (stale-dropped too). Reused rows are as old as last kept answer (mark
-    /// read, message elsewhere: badge back for good): owed chats refetched until one lands.
+    /// Owed, not yet asked. Reused rows are as old as last kept answer (mark read, message
+    /// elsewhere: badge back for good): owed chats refetched until one lands.
     awaiting: Awaiting,
+
+    /// What refresh in flight asks; back to `awaiting` if it fails or a newer one replaces it.
+    asking: Awaiting,
+
+    /// Generation of refresh in flight. One at a time: arrival is three events, burst hundreds;
+    /// those wait in `awaiting` for one refresh after it lands (`again`).
+    in_flight: Option<u64>,
+
+    /// Asked while one in flight or paused.
+    again: bool,
+
+    /// Account, query or filter changed: answer in flight is for old ones. Acted on from event
+    /// loop, once QML has set every property (`paused` may come after `account_id`).
+    restart_due: bool,
 
     /// Every chat core listed, unfiltered: refresh, announcements read here. Cover reads `rows`.
     all_rows: Vec<ChatListItem>,
 
     /// Unread since filter on. Cleared on filter on and by `forget_read`.
     kept: HashSet<u32>,
+
+    /// Told of transcript changes (`transcripts::follow`).
+    following: bool,
+    /// `transcripts::epoch` when refresh in flight read transcripts.
+    asked_epoch: u64,
 }
 
 impl ChatList {
@@ -187,7 +221,7 @@ impl ChatList {
         if self.account_id != account_id {
             self.account_id = account_id;
             self.account_changed();
-            self.reload();
+            self.restart(Refresh::All);
         }
     }
 
@@ -293,7 +327,7 @@ impl ChatList {
         if self.query.to_string() != query.to_string() {
             self.query = query;
             self.query_changed();
-            self.refresh(Refresh::Order);
+            self.restart(Refresh::Order);
         }
     }
 
@@ -302,7 +336,7 @@ impl ChatList {
         if self.archived != archived {
             self.archived = archived;
             self.archived_changed();
-            self.refresh(Refresh::All);
+            self.restart(Refresh::All);
         }
     }
 
@@ -311,7 +345,19 @@ impl ChatList {
         if self.for_forwarding != for_forwarding {
             self.for_forwarding = for_forwarding;
             self.for_forwarding_changed();
-            self.refresh(Refresh::All);
+            self.restart(Refresh::All);
+        }
+    }
+
+    /// Pause, or resume with one refresh of what was owed meanwhile.
+    pub fn set_paused(&mut self, paused: bool) {
+        if self.paused != paused {
+            self.paused = paused;
+            self.paused_changed();
+            if !paused && (self.restart_due || (self.again && self.in_flight.is_none())) {
+                self.restart_due = false;
+                self.start_refresh();
+            }
         }
     }
 
@@ -322,6 +368,26 @@ impl ChatList {
             // Turned on afresh: from current unread.
             self.kept.clear();
             self.unread_only_changed();
+            self.show_later();
+        }
+    }
+
+    /// Show only chats without channels, or all.
+    pub fn set_chats_only(&mut self, on: bool) {
+        if self.chats_only != on {
+            self.chats_only = on;
+            self.channels_only &= !on;
+            self.kind_filter_changed();
+            self.show_later();
+        }
+    }
+
+    /// Show only channels, or all.
+    pub fn set_channels_only(&mut self, on: bool) {
+        if self.channels_only != on {
+            self.channels_only = on;
+            self.chats_only &= !on;
+            self.kind_filter_changed();
             self.show_later();
         }
     }
@@ -346,10 +412,25 @@ impl ChatList {
         show(());
     }
 
-    /// Rows filter passes, core order.
+    /// Rows filters pass, core order.
     fn shown(&mut self) -> Vec<ChatListItem> {
+        let (chats_only, channels_only) = (self.chats_only, self.channels_only);
+        let kind = move |row: &ChatListItem| {
+            if chats_only {
+                !row.is_channel
+            } else if channels_only {
+                row.is_channel
+            } else {
+                true
+            }
+        };
         if !self.unread_only {
-            return self.all_rows.clone();
+            return self
+                .all_rows
+                .iter()
+                .filter(|row| kind(row))
+                .cloned()
+                .collect();
         }
         // Gone chats' ids dropped too.
         let listed: HashSet<u32> = self.all_rows.iter().map(|row| row.chat_id).collect();
@@ -361,22 +442,30 @@ impl ChatList {
         }
         self.all_rows
             .iter()
-            .filter(|row| self.kept.contains(&row.chat_id))
+            .filter(|row| kind(row) && self.kept.contains(&row.chat_id))
             .cloned()
             .collect()
     }
 
     /// Bring model in line with `all_rows` and filter.
     fn show(this: QObjectPinned<'_, Self>) {
-        let target = {
+        let (target, kind_dropped) = {
             let mut this_mut = this.borrow_mut();
+            this_mut.has_channels = this_mut.all_rows.iter().any(|row| row.is_channel);
+            // Pills hide with last channel: filter they'd turn off goes too.
+            let kind_dropped =
+                !this_mut.has_channels && (this_mut.chats_only || this_mut.channels_only);
+            if kind_dropped {
+                this_mut.chats_only = false;
+                this_mut.channels_only = false;
+            }
             let target = this_mut.shown();
             // Count before setting rows: setting makes QML read counts.
             let pinned = target.iter().filter(|row| row.is_pinned).count();
             this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
             this_mut.unpinned_count =
                 u32::try_from(target.len().saturating_sub(pinned)).unwrap_or(u32::MAX);
-            target
+            (target, kind_dropped)
         };
         {
             let this_ref = this.borrow();
@@ -384,6 +473,56 @@ impl ChatList {
             reconcile(&mut rows, target);
         }
         this.borrow().rows_changed();
+        if kind_dropped {
+            this.borrow().kind_filter_changed();
+        }
+    }
+
+    /// Register once for transcript changes; registration ends with this object.
+    fn follow_transcripts(&mut self) {
+        if std::mem::replace(&mut self.following, true) {
+            return;
+        }
+        let alive: QPointer<Self> = QPointer::from(&*self);
+        let ptr = alive.clone();
+        // Deferred: teller's stack may hold this object.
+        let changed = queued_callback(move |change: Change| {
+            if let Some(this) = ptr.as_pinned() {
+                if this.borrow_mut().owe_voice_rows(change) {
+                    this.borrow_mut().refresh(Refresh::Order);
+                }
+            }
+        });
+        transcripts::follow(move |change| {
+            if alive.is_null() {
+                return false;
+            }
+            changed(change);
+            true
+        });
+    }
+
+    /// Owe rows whose last message is voice `change` touches. False: none.
+    fn owe_voice_rows(&mut self, change: Change) -> bool {
+        let account = self.account_id;
+        let chats: Vec<u32> = self
+            .all_rows
+            .iter()
+            .filter(|row| {
+                row.voice_message_id != 0
+                    && match change {
+                        Change::All => true,
+                        Change::Message(key) => key == (account, row.voice_message_id),
+                    }
+            })
+            .map(|row| row.chat_id)
+            .collect();
+        for chat_id in &chats {
+            self.awaiting.add(Refresh::One(*chat_id));
+            // Notification up shows row's text: transcript in, or core's words back.
+            self.pending_restatements.insert(*chat_id);
+        }
+        !chats.is_empty()
     }
 
     /// Accept contact request; chat becomes ordinary.
@@ -495,9 +634,10 @@ impl ChatList {
         announcements
     }
 
-    /// Waiting restatements, rows current. Unlisted chats dropped.
+    /// Waiting restatements, rows current. Unlisted chats dropped; filtered-out ones kept: their
+    /// notifications stay up.
     fn settled_restatements(&mut self) -> Vec<(u32, QString, QString, QString, u32)> {
-        let rows = self.rows.borrow();
+        let rows = &self.all_rows;
         self.pending_restatements
             .drain()
             .filter_map(|chat_id| rows.iter().find(|row| row.chat_id == chat_id))
@@ -534,13 +674,103 @@ impl ChatList {
 
     /// [`Self::refresh`], announcing `announce` once row holds new preview.
     fn refresh_announcing(&mut self, scope: Refresh, announce: Option<u32>) {
+        if self.account_id == 0 {
+            return;
+        }
+        if let Some(chat_id) = announce {
+            self.pending_announcements.insert(chat_id);
+        }
+        self.awaiting.add(scope);
+        if self.paused || self.in_flight.is_some() || self.restart_due {
+            self.again = true;
+            return;
+        }
+        self.start_refresh();
+    }
+
+    /// Account, query, filter changed: answer in flight is for old ones, ask anew.
+    fn restart(&mut self, scope: Refresh) {
+        self.awaiting.add(scope);
+        if self.restart_due {
+            return;
+        }
+        self.restart_due = true;
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let kick = queued_callback(move |(): ()| {
+            if let Some(this) = ptr.as_pinned() {
+                let mut this_mut = this.borrow_mut();
+                if !this_mut.paused {
+                    this_mut.restart_due = false;
+                    this_mut.start_refresh();
+                }
+            }
+        });
+        kick(());
+    }
+
+    /// Refresh `generation` answered: rows and announcements, then refresh owed meanwhile.
+    fn landed(
+        this: QObjectPinned<'_, Self>,
+        generation: u64,
+        result: Result<Vec<ChatListItem>, String>,
+    ) {
+        // Superseded: newer one asks this one's chats too.
+        if this.borrow().in_flight != Some(generation) {
+            return;
+        }
+        {
+            let mut this_mut = this.borrow_mut();
+            this_mut.in_flight = None;
+            let asked = std::mem::take(&mut this_mut.asking);
+            if result.is_err() {
+                this_mut.awaiting.merge(asked);
+            }
+        }
+        match result {
+            Ok(target) => {
+                this.borrow_mut().all_rows = target;
+                Self::show(this);
+                let announcements = this.borrow_mut().settled_announcements();
+                for (chat_id, name, sender, preview) in announcements {
+                    this.borrow()
+                        .message_arrived(chat_id, name, sender, preview);
+                }
+                let restatements = this.borrow_mut().settled_restatements();
+                for (chat_id, name, sender, preview, unread) in restatements {
+                    this.borrow()
+                        .message_restated(chat_id, name, sender, preview, unread);
+                }
+                // Transcript written or switch flipped meanwhile: voice rows read again. After
+                // restatements: those owed now wait for re-read rows.
+                let stale = this.borrow().asked_epoch != transcripts::epoch();
+                if stale && this.borrow_mut().owe_voice_rows(Change::All) {
+                    this.borrow_mut().again = true;
+                }
+            }
+            Err(err) => this.borrow().error(err.into()),
+        }
+        let again = {
+            let this_ref = this.borrow();
+            this_ref.again && !this_ref.paused && !this_ref.restart_due
+        };
+        if again {
+            this.borrow_mut().start_refresh();
+        }
+    }
+
+    /// Ask core for `awaiting` (plus what replaced refresh asked); one in flight after.
+    fn start_refresh(&mut self) {
         let account_id = self.account_id;
+        self.again = false;
         if account_id == 0 {
             return;
         }
         let Some((rpc, runtime)) = connection() else {
             return;
         };
+        self.follow_transcripts();
+        let previews = transcripts::previews();
+        self.asked_epoch = transcripts::epoch();
         let query = self.query.to_string();
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
@@ -549,49 +779,26 @@ impl ChatList {
         let first_load = cached.is_empty();
         // Set: list scan per entry is quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
-        if let Some(chat_id) = announce {
-            self.pending_announcements.insert(chat_id);
-        }
 
-        // Re-read: this refresh's ids plus unanswered `awaiting`.
-        self.awaiting.add(scope);
-        let refetch_all = matches!(self.awaiting, Awaiting::Everything);
-        let awaiting = match &self.awaiting {
+        let mut asked = std::mem::take(&mut self.awaiting);
+        if self.in_flight.is_some() {
+            asked.merge(std::mem::take(&mut self.asking));
+        }
+        self.asking = asked.clone();
+        let refetch_all = matches!(asked, Awaiting::Everything);
+        let awaiting = match &asked {
             Awaiting::Chats(chats) => chats.clone(),
             Awaiting::Nothing | Awaiting::Everything => HashSet::new(),
         };
 
         self.generation = self.generation.wrapping_add(1);
         let generation = self.generation;
+        self.in_flight = Some(generation);
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<ChatListItem>, String>| {
-            let Some(this) = ptr.as_pinned() else { return };
-            // Superseded.
-            if this.borrow().generation != generation {
-                return;
-            }
-            match result {
-                Ok(target) => {
-                    {
-                        let mut this_mut = this.borrow_mut();
-                        this_mut.all_rows = target;
-                        // All waiting re-read; failed one waits again.
-                        this_mut.awaiting = Awaiting::Nothing;
-                    }
-                    Self::show(this);
-                    let announcements = this.borrow_mut().settled_announcements();
-                    for (chat_id, name, sender, preview) in announcements {
-                        this.borrow()
-                            .message_arrived(chat_id, name, sender, preview);
-                    }
-                    let restatements = this.borrow_mut().settled_restatements();
-                    for (chat_id, name, sender, preview, unread) in restatements {
-                        this.borrow()
-                            .message_restated(chat_id, name, sender, preview, unread);
-                    }
-                }
-                Err(err) => this.borrow().error(err.into()),
+            if let Some(this) = ptr.as_pinned() {
+                Self::landed(this, generation, result);
             }
         });
 
@@ -618,6 +825,7 @@ impl ChatList {
                 } else {
                     chat_items(&rpc, account_id, first).await?
                 };
+                with_transcripts(previews.as_ref(), account_id, &mut fresh).await;
                 if !rest.is_empty() {
                     early(
                         entries
@@ -625,7 +833,9 @@ impl ChatList {
                             .filter_map(|chat_id| fresh.get(chat_id).cloned())
                             .collect(),
                     );
-                    fresh.extend(chat_items(&rpc, account_id, rest).await?);
+                    let mut more = chat_items(&rpc, account_id, rest).await?;
+                    with_transcripts(previews.as_ref(), account_id, &mut more).await;
+                    fresh.extend(more);
                 }
                 // Order from core; contents from fetch, else model.
                 Ok::<_, String>(
@@ -680,7 +890,7 @@ async fn is_mention(rpc: &RpcClient, account_id: u32, chat_id: u32, message_id: 
 }
 
 /// Unanswered core asks. See field.
-#[derive(Default)]
+#[derive(Clone, Default)]
 enum Awaiting {
     /// Every question answered.
     #[default]
@@ -692,6 +902,19 @@ enum Awaiting {
 }
 
 impl Awaiting {
+    /// Owe both.
+    fn merge(&mut self, other: Awaiting) {
+        match other {
+            Awaiting::Nothing => {}
+            Awaiting::Everything => *self = Awaiting::Everything,
+            Awaiting::Chats(chats) => {
+                for chat_id in chats {
+                    self.add(Refresh::One(chat_id));
+                }
+            }
+        }
+    }
+
     /// Add what refresh will ask for.
     fn add(&mut self, scope: Refresh) {
         match (&mut *self, scope) {
@@ -873,17 +1096,62 @@ pub(crate) async fn chat_items(
                     is_contact_request: json::flag(&item, "isContactRequest"),
                     is_self_talk: json::flag(&item, "isSelfTalk"),
                     is_device_talk: json::flag(&item, "isDeviceTalk"),
+                    is_channel: matches!(
+                        json::str_at(&item, "chatType"),
+                        "OutBroadcast" | "InBroadcast"
+                    ),
                     color: json::text(&item, "color"),
                     avatar_path: json::text(&item, "avatarPath"),
+                    voice_message_id: if json::str_at(&item, "lastMessageType") == "Voice" {
+                        json::u32_at(&item, "lastMessageId")
+                    } else {
+                        0
+                    },
                 },
             )
         })
         .collect())
 }
 
+/// Core's mark on voice previews (`🎤 Voice message`); transcript follows it as text would.
+const VOICE_MARK: &str = "🎤";
+
+/// Voice rows with done transcript preview it in place of core's words.
+async fn with_transcripts(
+    previews: Option<&Previews>,
+    account_id: u32,
+    items: &mut HashMap<u32, ChatListItem>,
+) {
+    let Some(previews) = previews else { return };
+    let voice: Vec<u32> = items
+        .values()
+        .map(|item| item.voice_message_id)
+        .filter(|msg| *msg != 0)
+        .collect();
+    let texts = previews.texts(account_id, voice).await;
+    for item in items.values_mut() {
+        if let Some(text) = texts.get(&item.voice_message_id) {
+            item.preview = voice_preview(text).into();
+        }
+    }
+}
+
+/// `🎤 text`, one line as core previews text (`real_server.rs`).
+pub(crate) fn voice_preview(text: &str) -> String {
+    let line = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    format!("{VOICE_MARK} {line}")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_transcript_previews_on_one_line() {
+        assert_eq!(voice_preview(" hello\n there\t "), "🎤 hello there");
+        let long = "word ".repeat(400);
+        assert_eq!(voice_preview(&long), format!("🎤 {}", long.trim_end()));
+    }
 
     #[test]
     fn mute_seconds_become_the_cores_tagged_duration() {
