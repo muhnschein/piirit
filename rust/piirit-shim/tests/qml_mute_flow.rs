@@ -239,7 +239,8 @@ const CHANNEL: &str = r"[
                run: function() {
                    record('channel-load', load('{group}', { accountId: 1, chatId: 2, chatName: 'Channel' }))
                } },
-            { until: function() { return rowValue() === 'On' },
+            // 'On' also before core answers; is_channel only after.
+            { until: function() { return get('chat', 'loaded') === 'true' && rowValue() === 'On' },
                run: function() {
                    stack.props = null
                    click('notifications')
