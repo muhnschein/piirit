@@ -641,8 +641,9 @@ Page {
                                                        : Theme.primaryColor)
                 }
 
-                // Four words outgrow phone width: strip scrolls sideways.
+                // Too wide even with Search as icon (long words, big text): strip scrolls sideways.
                 Flickable {
+                    id: pillStrip
                     objectName: "chatListPills"
                     width: parent.width
                     height: pills.height
@@ -658,13 +659,26 @@ Page {
 
                     Row {
                         id: pills
+                        objectName: "chatListPillRow"
                         x: Theme.horizontalPageMargin
                         spacing: Theme.paddingMedium
 
+                        // All pills worded. Kind pills by flag, not `visible`: hidden strip
+                        // hides them too.
+                        readonly property real wordedWidth: searchPill.fullWidth + spacing
+                            + unreadFilter.width
+                            + (chats.has_channels ? 2 * spacing + chatsFilter.width
+                                                    + channelsFilter.width : 0)
+
+                        // Gives up its word first: magnifier says it, filters need theirs.
                         PillButton {
+                            id: searchPill
                             objectName: "chatSearchPill"
                             icon: "image://theme/icon-m-search"
                             text: qsTr("Search")
+                            compact: pillStrip.width > 0
+                                     && pills.wordedWidth + 2 * Theme.horizontalPageMargin
+                                        > pillStrip.width
                             onClicked: page.openSearch()
                         }
 
@@ -694,6 +708,7 @@ Page {
                         }
 
                         PillButton {
+                            id: channelsFilter
                             objectName: "channelsFilterButton"
                             visible: chats.has_channels
                             //: Turns the chat list's filter to channels on and
