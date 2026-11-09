@@ -218,7 +218,7 @@ fn the_encryption_page_lays_keys_out_to_compare() {
         (
             "own-fingerprint",
             fingerprint(1).as_str(),
-            "the reader's key is not first",
+            "core's key order is not kept",
         ),
         (
             "their-fingerprint",
