@@ -4,6 +4,13 @@
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+    # SQLite < 3.54 page-cache leak via crafted DB + `-wal` pair. Hits bundled copy in
+    # `libsqlite3-sys`; Piirit links phone's system SQLite (`rusqlite` without `bundled`).
+    # Fixed crate needs Rust 1.88, SDK cargo is 1.75. Only file opened: own transcript DB in
+    # app's sandboxed data dir.
+    { id = "RUSTSEC-2026-0459", reason = "system SQLite linked, not bundled; fix needs Rust 1.88" },
+]
 
 [licenses]
 version = 2
