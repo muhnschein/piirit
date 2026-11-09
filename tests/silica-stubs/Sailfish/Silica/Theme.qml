@@ -39,8 +39,6 @@ QtObject {
     property int iconSizeMedium: 64
     property int iconSizeLarge: 96
     property size coverSizeLarge: Qt.size(234, 374)
-    // Silica's thin rule (tab underline, separators).
-    property int _lineWidth: 2
 
     function rgba(color, opacity) {
         return Qt.rgba(color.r, color.g, color.b, opacity)

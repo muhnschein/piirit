@@ -47,6 +47,18 @@ Page {
         anchors.fill: parent
         model: info.parsed ? info.keys : []
 
+        /// Reader scrolled: header changes leave place alone.
+        property bool moved: false
+        onMovementStarted: list.moved = true
+
+        // Qt 5.6: header growing (core's answer in) keeps contentY; with rows past screen,
+        // header's top stays above it. Back to top once header has its height.
+        Timer {
+            id: toTop
+            interval: 0
+            onTriggered: list.positionViewAtBeginning()
+        }
+
         PullDownMenu {
             objectName: "encryptionMenu"
             visible: info.parsed && info.keys.length > 0
@@ -65,6 +77,12 @@ Page {
         header: Column {
             width: list.width
             spacing: Theme.paddingMedium
+
+            onHeightChanged: {
+                if (!list.moved) {
+                    toTop.restart()
+                }
+            }
 
             PageHeader {
                 //: Heading of the page with the keys' fingerprints. Delta

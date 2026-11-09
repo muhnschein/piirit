@@ -9,7 +9,6 @@ Item {
     property bool canNavigateForward: false
     property int allowedOrientations: 1
     property int orientation
-    property bool isPortrait: true
     // Silica's turn: fade out, resize, fade in. Test sets it round a resize.
     property bool orientationTransitionRunning: false
     property bool backNavigation: true
