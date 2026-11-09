@@ -224,7 +224,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "off-entry",
-            call!("get", q!("page"), q!("transcriptionSettings"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
 
         // First try: question, languages, cancel.
@@ -382,7 +387,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "on-entry",
-            call!("get", q!("page"), q!("transcriptionSettings"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
         common::record(
             &s,
@@ -412,7 +422,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "off-entry-again",
-            call!("get", q!("page"), q!("transcriptionSettings"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
     });
 

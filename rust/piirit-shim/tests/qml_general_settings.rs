@@ -17,6 +17,7 @@ use std::path::PathBuf;
 mod common;
 
 /// Probe imports components by absolute URL: data has no dir.
+#[allow(clippy::too_many_lines)]
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(

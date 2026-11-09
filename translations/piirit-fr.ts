@@ -2421,23 +2421,23 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Up to 256 kB</source>
-        <translation>Jusqu'à 256 ko</translation>
+        <translation>Jusqu&apos;à 256 ko</translation>
     </message>
     <message>
         <source>Up to 512 kB</source>
-        <translation>Jusqu'à 512 ko</translation>
+        <translation>Jusqu&apos;à 512 ko</translation>
     </message>
     <message>
         <source>Up to 1 MB</source>
-        <translation>Jusqu'à 1 Mo</translation>
+        <translation>Jusqu&apos;à 1 Mo</translation>
     </message>
     <message>
         <source>Up to 2 MB</source>
-        <translation>Jusqu'à 2 Mo</translation>
+        <translation>Jusqu&apos;à 2 Mo</translation>
     </message>
     <message>
         <source>Up to 5 MB</source>
-        <translation>Jusqu'à 5 Mo</translation>
+        <translation>Jusqu&apos;à 5 Mo</translation>
     </message>
     <message>
         <source>Always</source>

@@ -312,6 +312,7 @@ fn the_introduction_from_about_ends_on_its_last_fact() {
         r.push(("facts", call!("facts")));
         r.push(("swipe", call!("swipeTo", "4")));
         r.push(("hint", call!("get", "swipeHint", "visible")));
+        r.push(("pull", call!("pullPastEnd", "240")));
         r.push(("by-hand", call!("pullByHand")));
     });
     plan.after(1, move || unsafe {
@@ -330,8 +331,14 @@ fn the_introduction_from_about_ends_on_its_last_fact() {
             .map_or("<step did not run>", |(_, value)| value.as_str())
     };
     assert_eq!(
-        (value("load"), value("facts"), value("swipe"), value("by-hand")),
-        ("ok", "5", "4", "ok"),
+        (
+            value("load"),
+            value("facts"),
+            value("swipe"),
+            value("pull"),
+            value("by-hand")
+        ),
+        ("ok", "5", "4", "ok", "ok"),
         "the introduction from About did not walk its five facts. {context}"
     );
     assert_eq!(

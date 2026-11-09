@@ -2607,7 +2607,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Fjerner klik-id'er og kampagnemærker fra links, du sender.</translation>
+        <translation>Fjerner klik-id&apos;er og kampagnemærker fra links, du sender.</translation>
     </message>
     <message>
         <source>Profile: %1</source>

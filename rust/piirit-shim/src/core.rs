@@ -1709,9 +1709,9 @@ pub(crate) fn reconcile_rows<T, K>(
 #[cfg(test)]
 mod tests {
     use super::{
-        core_version_of, is_relayed, last_words, reconcile_accounts, restart_delay, resume_account, server_path,
-        AccountItem, AccountListModel, BUNDLED_SERVER, HANDLED_EVENT_KINDS, RESTART_DELAY_MAX,
-        RESTART_DELAY_MIN, RESTART_LIMIT,
+        core_version_of, is_relayed, last_words, reconcile_accounts, restart_delay, resume_account,
+        server_path, AccountItem, AccountListModel, BUNDLED_SERVER, HANDLED_EVENT_KINDS,
+        RESTART_DELAY_MAX, RESTART_DELAY_MIN, RESTART_LIMIT,
     };
 
     #[test]

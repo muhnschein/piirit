@@ -2383,7 +2383,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Turns voice messages into text on this phone.</source>
-        <translation>ਇਸ ਫ਼ੋਨ 'ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
+        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
     </message>
     <message>
         <source>Nothing leaves the phone.</source>

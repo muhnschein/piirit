@@ -140,7 +140,11 @@ fn the_about_page_names_both_versions_and_copies_them_for_a_report() {
     let context = format!("steps: {steps:?}");
 
     let app_line = format!("Piirit {}", env!("CARGO_PKG_VERSION"));
-    assert_eq!(value("load"), "ok", "the About page did not load. {context}");
+    assert_eq!(
+        value("load"),
+        "ok",
+        "the About page did not load. {context}"
+    );
     assert_eq!(
         (value("app-early"), value("core-early")),
         (app_line.clone(), String::new()),

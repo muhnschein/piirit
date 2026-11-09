@@ -2412,23 +2412,23 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Up to 256 kB</source>
-        <translation>256 kB'a kadar</translation>
+        <translation>256 kB&apos;a kadar</translation>
     </message>
     <message>
         <source>Up to 512 kB</source>
-        <translation>512 kB'a kadar</translation>
+        <translation>512 kB&apos;a kadar</translation>
     </message>
     <message>
         <source>Up to 1 MB</source>
-        <translation>1 MB'a kadar</translation>
+        <translation>1 MB&apos;a kadar</translation>
     </message>
     <message>
         <source>Up to 2 MB</source>
-        <translation>2 MB'a kadar</translation>
+        <translation>2 MB&apos;a kadar</translation>
     </message>
     <message>
         <source>Up to 5 MB</source>
-        <translation>5 MB'a kadar</translation>
+        <translation>5 MB&apos;a kadar</translation>
     </message>
     <message>
         <source>Always</source>

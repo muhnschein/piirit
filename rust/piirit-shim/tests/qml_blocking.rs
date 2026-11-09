@@ -20,6 +20,7 @@ mod common;
 /// Page stack is a QML object (context property), not Rust: object a method hands to QML is QML's
 /// to delete (as `qml_auto_delete_flow`). Fresh dialog per push: accepting one can't fire a handler
 /// another page connected earlier.
+#[allow(clippy::too_many_lines)]
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -108,6 +109,23 @@ fn probe_qml() -> String {
             return '' + (kept !== null && findIn(loader.item, name) === kept)
         }}
         function refreshAccounts() {{ core.refresh_accounts(); return 'ok' }}
+        function removeAccount(id) {{ core.remove_account(id); return 'ok' }}
+        function collect(node, name, found) {{
+            if (!node) {{ return }}
+            if (node.objectName === name && found.indexOf(node) < 0) {{ found.push(node) }}
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) {{ collect(kids[i], name, found) }}
+            if (node.contentItem && node.contentItem !== node) {{
+                collect(node.contentItem, name, found)
+            }}
+        }}
+        /// Rows by that name on screen (one per profile), as `a|b`.
+        function shown(name, property) {{
+            var found = []
+            collect(loader.item, name, found)
+            return found.filter(function (item) {{ return item.visible }})
+                        .map(function (item) {{ return '' + item[property] }}).join('|')
+        }}
         function reload(name) {{
             var list = findIn(loader.item, name)
             if (!list) {{ return 'missing:' + name }}
@@ -202,6 +220,14 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         }
         record!("load-settings", loaded);
         record!(
+            "profile-rows",
+            call!(
+                "shown",
+                QString::from("profileEntry"),
+                QString::from("objectName")
+            )
+        );
+        record!(
             "profile-row",
             call!(
                 "get",
@@ -249,7 +275,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!(
             "privacy-profile",
             call!(
-                "get",
+                "shown",
                 QString::from("blockedProfileLabel"),
                 QString::from("text")
             )
@@ -441,7 +467,27 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
                 QString::from("enabled")
             )
         );
+        record!("remove-second", call!("removeAccount", 2));
+    });
+    // One profile left: no need to say whose block list it is.
+    plan.until(1, 40, move |last| unsafe {
+        let loaded = call!(
+            "load",
+            QString::from(common::page_url("SettingsPrivacyPage.qml")),
+            1
+        );
+        let label = call!(
+            "shown",
+            QString::from("blockedProfileLabel"),
+            QString::from("text")
+        );
+        if !label.is_empty() && !last {
+            return false;
+        }
+        record!("load-one-profile", loaded);
+        record!("one-profile-label", label);
         (*engine_ptr).quit();
+        true
     });
 
     plan.run();
@@ -526,6 +572,20 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         ),
         "the block list row did not count who is blocked, or counted before the core \
          answered. {context}"
+    );
+    assert_eq!(
+        value("profile-rows"),
+        "profileEntry",
+        "the settings list other profiles than the one it was opened for. {context}"
+    );
+    assert_eq!(
+        (
+            value("remove-second"),
+            value("load-one-profile"),
+            value("one-profile-label")
+        ),
+        ("ok".to_string(), "ok".to_string(), String::new()),
+        "with one profile left, the block list still names it. {context}"
     );
     assert_eq!(
         value("privacy-profile"),

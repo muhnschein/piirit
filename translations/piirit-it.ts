@@ -2366,7 +2366,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message>
         <source>Runs small apps inside chats.</source>
-        <translation>Esegue piccole app all'interno delle chat.</translation>
+        <translation>Esegue piccole app all&apos;interno delle chat.</translation>
     </message>
     <message>
         <source>Location streaming</source>
