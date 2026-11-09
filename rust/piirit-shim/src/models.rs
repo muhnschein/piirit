@@ -26,6 +26,8 @@ pub struct ChatListItem {
     pub is_pinned: bool,
     /// Muted; badge too.
     pub is_muted: bool,
+    /// Group, mailing list or broadcast: mentions pass mute (`notify_mentions`).
+    pub is_group: bool,
     /// From unaccepted contact.
     pub is_contact_request: bool,
     /// "Saved messages". Not a person: cover skips it.

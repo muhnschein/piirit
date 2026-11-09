@@ -370,6 +370,15 @@ Page {
                     onChosen: chat.set_ephemeral_timer(seconds)
                 }
 
+                ChatNotifications {
+                    objectName: "notifications"
+                    muted: chat.is_muted
+                    // Nobody replies to reader in a channel. `=== true`: dconf undefined till read.
+                    mentionsStillNotify: !chat.is_channel && Settings.notificationsEnabled === true
+                                         && Settings.mentionNotifications === true
+                    onPicked: chat.set_mute_duration(seconds)
+                }
+
                 SectionHeader {
                     objectName: "membersHeader"
                     //: Heading over the member list. %n is how many there are.

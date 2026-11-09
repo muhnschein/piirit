@@ -77,6 +77,19 @@ Page {
         prefetch.start(chatId, messageId ? messageId : 0)
     }
 
+    // Id, not row: arrivals recreate rows. `=== true`: dconf undefined till read.
+    function askMute(chatId, isGroup) {
+        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"), {
+            mentionsStillNotify: isGroup && Settings.notificationsEnabled === true
+                                 && Settings.mentionNotifications === true
+        })
+        if (dialog) {
+            dialog.picked.connect(function(seconds) {
+                chats.set_mute_duration(chatId, seconds)
+            })
+        }
+    }
+
     function openLoadedChat(chatId) {
         // Only on screen: Profiles visit during load cancels chat.
         if (page.status !== PageStatus.Active) {
@@ -818,7 +831,13 @@ Page {
                             objectName: "muteItem"
                             visible: !page.archived
                             text: model.is_muted ? qsTr("Unmute") : qsTr("Mute")
-                            onClicked: chats.set_muted(model.chat_id, !model.is_muted)
+                            onClicked: {
+                                if (model.is_muted) {
+                                    chats.set_mute_duration(model.chat_id, 0)
+                                } else {
+                                    page.askMute(model.chat_id, model.is_group && !model.is_channel)
+                                }
+                            }
                         }
                         // Request: no reply till accepted, so yes or no.
                         MenuItem {

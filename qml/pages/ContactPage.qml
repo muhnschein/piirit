@@ -325,6 +325,12 @@ Page {
                 onChosen: chat.set_ephemeral_timer(seconds)
             }
 
+            ChatNotifications {
+                objectName: "notifications"
+                muted: chat.is_muted
+                onPicked: chat.set_mute_duration(seconds)
+            }
+
             SectionHeader {
                 objectName: "commonChatsHeader"
                 visible: commonChats.count > 0
