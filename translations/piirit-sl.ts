@@ -1352,6 +1352,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Posrednik hrani sporočilo samo, dokler ga prejemnik ne prevzame.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Podrsajte naprej in se vrnite na O aplikaciji.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2408,10 +2412,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Nič ne zapusti telefona.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Jeziki</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Govornega modela ni bilo mogoče prenesti.</translation>
     </message>
@@ -2419,6 +2419,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Poskusi znova</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Jeziki prepisa</translation>
     </message>
 </context>
 <context>
@@ -2598,11 +2603,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Zasebnost in varnost</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Ovitek</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Poskusno</translation>
@@ -2615,6 +2615,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Vaš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Hitra dejanja</translation>
     </message>
 </context>
 <context>

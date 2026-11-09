@@ -1340,6 +1340,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Ein Relay speichert eine Nachricht nur zwischen, bis der Empfänger sie abholt.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Weiter wischen, um zu „Über“ zurückzukehren.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Nichts verlässt das Telefon.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Sprachen</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Das Sprachmodell konnte nicht heruntergeladen werden.</translation>
     </message>
@@ -2401,6 +2401,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Erneut versuchen</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Sprachen für Transkription</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Datenschutz und Sicherheit</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Cover</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Experimentell</translation>
@@ -2597,6 +2597,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Dein Profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Schnellaktionen</translation>
     </message>
 </context>
 <context>

@@ -1336,6 +1336,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>గ్రహీత తీసుకునే వరకు మాత్రమే రిలే సందేశాన్ని ఉంచుతుంది.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„గురించి“ పేజీకి తిరిగి వెళ్లడానికి స్వైప్ చేస్తూ ఉండండి.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2386,10 +2390,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఏదీ ఫోన్ బయటకు వెళ్లదు.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>భాషలు</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>స్పీచ్ మోడల్‌ను డౌన్‌లోడ్ చేయలేకపోయాం.</translation>
     </message>
@@ -2397,6 +2397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>మళ్లీ ప్రయత్నించండి</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>లిప్యంతరీకరించే భాషలు</translation>
     </message>
 </context>
 <context>
@@ -2576,11 +2581,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>గోప్యత మరియు భద్రత</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>కవర్</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>ప్రయోగాత్మకం</translation>
@@ -2593,6 +2593,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>మీ ప్రొఫైల్</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>త్వరిత చర్యలు</translation>
     </message>
 </context>
 <context>

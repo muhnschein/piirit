@@ -240,7 +240,7 @@ install -Dm 644 vendor/silero-vad/ggml-silero-v5.1.2.bin \
 
 # QML under app data dir: piirit-app's qml_dir() finds it (PIIRIT_QML_DIR, then this path, then
 # source-tree fallback). Only engine-read files: stray backups would ship and draw Harbour's eye.
-# qml/art/ .png files: first-screen mark and intro pictures; .svg: emoji.
+# qml/art/ .png files: first-screen mark and intro pictures; .svg: emoji, settings icons.
 (cd qml && find . -type f \( -name '*.qml' -o -name '*.js' -o -name '*.png' -o -name '*.svg' -o -name qmldir \) -exec \
     install -Dm 644 "{}" "%{buildroot}%{appdatadir}/qml/{}" \; )
 

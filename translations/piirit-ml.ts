@@ -1340,6 +1340,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>സ്വീകർത്താവ് എടുക്കുന്നതുവരെ മാത്രമേ റിലേ സന്ദേശം സൂക്ഷിക്കൂ.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„വിവരം“ എന്നതിലേക്ക് മടങ്ങാൻ സ്വൈപ്പ് ചെയ്തുകൊണ്ടിരിക്കുക.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>ഭാഷകൾ</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
     </message>
@@ -2401,6 +2401,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>പകർത്തിയെഴുതുന്ന ഭാഷകൾ</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സ്വകാര്യതയും സുരക്ഷയും</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>കവർ</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>പരീക്ഷണാത്മകം</translation>
@@ -2597,6 +2597,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>നിങ്ങളുടെ പ്രൊഫൈൽ</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
     </message>
 </context>
 <context>

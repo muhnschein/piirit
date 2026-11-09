@@ -1334,6 +1334,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Реле хәбәрне алучы аны алганчы гына саклый.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>«Кушымта турында» битенә кайту өчен свайп итүне дәвам итегез.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2381,10 +2385,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Бернәрсә дә телефоннан чыкмый.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Телләр</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Сөйләм моделен йөкләп булмады.</translation>
     </message>
@@ -2392,6 +2392,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Кабатлау</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Текстка күчерелә торган телләр</translation>
     </message>
 </context>
 <context>
@@ -2571,11 +2576,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Хосусыйлык һәм куркынычсызлык</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Тышлык</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Сынау режимы</translation>
@@ -2588,6 +2588,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Сезнең профиль</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Тиз гамәлләр</translation>
     </message>
 </context>
 <context>

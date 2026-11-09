@@ -296,8 +296,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
 
         // Settings page: the Cover row leads to them.
-        record!("cover-label", get!("coverLabel", "text"));
-        record!("open", click!("coverEntry"));
+        record!("cover-label", get!("quickActionsLabel", "text"));
+        record!("open", click!("quickActionsEntry"));
         record!("opened", call!("stackLog"));
 
         record!(
@@ -597,8 +597,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("cover-label"),
-        "Cover",
-        "the settings have no Cover row. {context}"
+        "Quick actions",
+        "the settings have no Quick actions row. {context}"
     );
     assert_eq!(
         value("opened"),

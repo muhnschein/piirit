@@ -271,9 +271,9 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
     assert_walk(&steps.borrow(), &navigation);
 }
 
-/// From About: same facts, but the walk leads nowhere past them; back is the way out.
+/// From About: same facts; a pull past the last goes back to About, once, never into setup.
 #[test]
-fn the_introduction_from_about_ends_on_its_last_fact() {
+fn the_introduction_from_about_returns_there_past_its_last_fact() {
     // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -312,8 +312,11 @@ fn the_introduction_from_about_ends_on_its_last_fact() {
         r.push(("facts", call!("facts")));
         r.push(("swipe", call!("swipeTo", "4")));
         r.push(("hint", call!("get", "swipeHint", "visible")));
+        r.push(("hint-text", call!("get", "swipeHint", "text")));
+        r.push(("clipped", call!("get", "slides", "clip")));
         r.push(("pull", call!("pullPastEnd", "240")));
         r.push(("by-hand", call!("pullByHand")));
+        r.push(("by-hand-again", call!("pullByHand")));
     });
     plan.after(1, move || unsafe {
         (*engine_ptr).quit();
@@ -342,13 +345,19 @@ fn the_introduction_from_about_ends_on_its_last_fact() {
         "the introduction from About did not walk its five facts. {context}"
     );
     assert_eq!(
-        value("hint"),
-        "false",
-        "the last fact offered profile setup to someone who has a profile. {context}"
+        (value("hint"), value("hint-text")),
+        ("true", "Keep swiping to go back to About."),
+        "the last fact does not say a swipe leads back to About. {context}"
+    );
+    // Unclipped, facts beside the shown one showed over About while the page slid away.
+    assert_eq!(
+        value("clipped"),
+        "true",
+        "the facts are drawn outside the page. {context}"
     );
     assert_eq!(
-        navigation, "",
-        "a pull past the last fact from About left for the setup path. {context}"
+        navigation, "pop:<none>|",
+        "a pull past the last fact from About did not go back there once. {context}"
     );
 }
 

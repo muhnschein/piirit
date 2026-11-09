@@ -5,7 +5,7 @@ import "../components"
 /*
  * What Delta Chat is: five facts, one per swiped screen. Wording from
  * delta.chat/en/help minus tech half (FAQ has it). Swipe past last: setup;
- * first swipes back too. From About (`tour`): facts only. No faces field:
+ * first swipes back too. From About (`tour`): past last returns there. No faces field:
  * pictures are the look. Masks from components/InkArt.qml, painted by
  * tools/faces/scenes.py.
  */
@@ -18,7 +18,7 @@ Page {
     // Set past end: one drag cannot ask twice.
     property bool leaving: false
 
-    /// From About: facts only; past last leads nowhere, back is the way out.
+    /// From About: past last goes back there, not into setup.
     property bool tour: false
 
     /// Facts in order. Plain array: ListElement takes literals only; translated.
@@ -55,11 +55,15 @@ Page {
 
     // Setup starts after facts. replace: back from setup shows first screen.
     function goOn() {
-        if (page.leaving || page.tour) {
+        if (page.leaving) {
             return
         }
         page.leaving = true
-        pageStack.replace(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        if (page.tour) {
+            pageStack.pop()
+        } else {
+            pageStack.replace(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        }
     }
 
     // Asks on move, not after rubber band settles.
@@ -76,6 +80,8 @@ Page {
         id: slides
         objectName: "slides"
         anchors.fill: parent
+        // Facts beside the shown one would show over the page under it while this slides away.
+        clip: true
         orientation: ListView.Horizontal
         // One fact at a time; one always on screen.
         snapMode: ListView.SnapOneItem
@@ -175,13 +181,14 @@ Page {
         Label {
             objectName: "swipeHint"
             width: parent.width
-            visible: !page.tour && slides.currentIndex === page.facts.length - 1
+            visible: slides.currentIndex === page.facts.length - 1
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             textFormat: Text.PlainText
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("Keep swiping to set up your profile.")
+            text: page.tour ? qsTr("Keep swiping to go back to About.")
+                            : qsTr("Keep swiping to set up your profile.")
 
             // Tap does what line says: for thumb that finds it, not second pull.
             MouseArea {

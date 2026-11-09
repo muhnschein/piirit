@@ -1346,6 +1346,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relejs glabā ziņu tikai tik ilgi, līdz saņēmējs to paņem.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Velciet tālāk, lai atgrieztos sadaļā „Par“.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2399,10 +2403,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Nekas neatstāj tālruni.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Valodas</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Runas modeli neizdevās lejupielādēt.</translation>
     </message>
@@ -2410,6 +2410,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Mēģināt vēlreiz</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Transkribējamās valodas</translation>
     </message>
 </context>
 <context>
@@ -2589,11 +2594,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Privātums un drošība</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Vāciņš</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Eksperimentāli</translation>
@@ -2606,6 +2606,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Jūsu profils</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Ātrās darbības</translation>
     </message>
 </context>
 <context>

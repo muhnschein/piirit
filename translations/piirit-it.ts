@@ -1340,6 +1340,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Un relay conserva un messaggio solo finché il destinatario non lo preleva.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Continua a scorrere per tornare a Informazioni.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Niente lascia il telefono.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Lingue</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Non è stato possibile scaricare il modello vocale.</translation>
     </message>
@@ -2401,6 +2401,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Riprova</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Lingue trascritte</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Privacy e sicurezza</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Copertina</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Sperimentale</translation>
@@ -2597,6 +2597,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Il tuo profilo</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Azioni rapide</translation>
     </message>
 </context>
 <context>

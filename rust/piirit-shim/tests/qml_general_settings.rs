@@ -260,12 +260,15 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("opens", QString::from("notifications"))
         );
         record!("opens-privacy", call!("opens", QString::from("privacy")));
-        record!("opens-cover", call!("opens", QString::from("cover")));
+        record!("opens-cover", call!("opens", QString::from("quickActions")));
         record!(
             "opens-experimental",
             call!("opens", QString::from("experimental"))
         );
         record!("opens-about", call!("opens", QString::from("about")));
+        record!("bell", get!("notificationsIcon", "source"));
+        record!("flask", get!("experimentalIcon", "source"));
+        record!("cover-icon", get!("quickActionsIcon", "source"));
 
         // Messages: what leaves the phone first, how a message is drawn, then what this phone
         // keeps under its own heading.
@@ -610,10 +613,23 @@ fn the_settings_page_writes_what_the_app_reads() {
         "ok",
         "the settings page did not load. {context}"
     );
+    // Icons as designed: bell from the theme; flask and cover with action drawn here.
+    assert!(
+        value("bell").starts_with("image://theme/icon-m-browser-notifications?"),
+        "Notifications has no bell. {context}"
+    );
+    for (label, file) in [("flask", "flask.svg"), ("cover-icon", "quick-actions.svg")] {
+        let source = value(label);
+        assert!(
+            source.starts_with("image://piirit/ink?file=")
+                && source.contains(&format!("/qml/art/settings/{file}&ink=")),
+            "{label} is not the drawing {file}, inked. {context}"
+        );
+    }
     for (label, expected) in [
         (
             "top-rows",
-            "messagesEntry,notificationsEntry,privacyEntry,coverEntry,experimentalEntry,aboutEntry",
+            "messagesEntry,notificationsEntry,privacyEntry,quickActionsEntry,experimentalEntry,aboutEntry",
         ),
         ("top-switch", "missing:markdownSwitch"),
         (
@@ -628,7 +644,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "opens-privacy",
             "Privacy and security>SettingsPrivacyPage.qml:accountId=4",
         ),
-        ("opens-cover", "Cover>QuickActionsPage.qml:accountId=4"),
+        ("opens-cover", "Quick actions>QuickActionsPage.qml:accountId=4"),
         (
             "opens-experimental",
             "Experimental>SettingsExperimentalPage.qml:accountId=4",

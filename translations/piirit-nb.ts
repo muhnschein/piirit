@@ -1336,6 +1336,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Et relé lagrer en melding bare til mottakeren henter den.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Sveip videre for å gå tilbake til Om.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2386,10 +2390,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingenting forlater telefonen.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Språk</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Talemodellen kunne ikke lastes ned.</translation>
     </message>
@@ -2397,6 +2397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Prøv igjen</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Språk som transkriberes</translation>
     </message>
 </context>
 <context>
@@ -2576,11 +2581,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Personvern og sikkerhet</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Cover</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Eksperimentelt</translation>
@@ -2593,6 +2593,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Profilen din</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Hurtighandlinger</translation>
     </message>
 </context>
 <context>

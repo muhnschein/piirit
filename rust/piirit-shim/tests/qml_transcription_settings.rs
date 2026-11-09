@@ -1,7 +1,7 @@
 //! Turning transcription on: Experimental settings switch asks the experimental question, then
 //! languages (phone's first and picked; greyed ones can't be picked; Next needs one), which turn
 //! the feature on, then when to transcribe; Done returns to the settings. Cancel on languages
-//! leaves it off. Once on, its settings stand indented under the switch: languages, timing, and a
+//! leaves it off. Once on, its settings stand flush under the switch: languages, timing, and a
 //! failed model download with Try again.
 //!
 //! Real pages vs stub Silica; page stack here builds pages it is asked for, as Silica does.
@@ -399,6 +399,11 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
             "settings-x",
             call!("get", q!("page"), q!("transcriptionSettings"), q!("x")),
         );
+        common::record(
+            &s,
+            "languages-label",
+            call!("get", q!("page"), q!("languagesEntry"), q!("label")),
+        );
 
         // Off: at once, nothing asked; languages kept for next time.
         call!("pop");
@@ -645,9 +650,15 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         ("true".to_string(), "true".to_string()),
         "after setup the switch is off, or its settings missing. {context}"
     );
-    assert!(
-        value("settings-x").parse::<f64>().unwrap_or(0.0) > 0.0,
-        "transcription's settings are not indented under its switch. {context}"
+    assert_eq!(
+        value("settings-x"),
+        "0",
+        "transcription's settings are indented under its switch. {context}"
+    );
+    assert_eq!(
+        value("languages-label"),
+        "Transcribed languages",
+        "the languages row does not say they are the transcribed ones. {context}"
     );
     assert_eq!(
         (

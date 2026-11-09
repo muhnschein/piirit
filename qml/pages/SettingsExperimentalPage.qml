@@ -110,14 +110,14 @@ Page {
             Column {
                 objectName: "transcriptionSettings"
                 visible: Settings.transcriptionEnabled === true
-                x: Theme.paddingLarge
-                width: parent.width - x
+                width: parent.width
                 spacing: Theme.paddingMedium
 
                 ValueButton {
                     objectName: "languagesEntry"
                     width: parent.width
-                    label: qsTr("Languages")
+                    //: Which languages voice messages are transcribed in.
+                    label: qsTr("Transcribed languages")
                     value: Speech.names(Settings.transcriptionLanguages)
                     onClicked: pageStack.push(Qt.resolvedUrl("TranscriptionLanguagesDialog.qml"))
                 }

@@ -1346,6 +1346,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay uchová správu len dovtedy, kým si ju príjemca nevyzdvihne.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Potiahnite ďalej a vráťte sa na stránku O aplikácii.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2399,10 +2403,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Nič neopustí telefón.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Jazyky</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Rečový model sa nepodarilo stiahnuť.</translation>
     </message>
@@ -2410,6 +2410,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Skúsiť znova</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Jazyky prepisu</translation>
     </message>
 </context>
 <context>
@@ -2589,11 +2594,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Súkromie a zabezpečenie</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Obal</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Experimentálne</translation>
@@ -2606,6 +2606,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Váš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Rýchle akcie</translation>
     </message>
 </context>
 <context>

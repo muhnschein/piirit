@@ -1334,6 +1334,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>中继只在收件人取走消息之前保存它。</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>继续滑动即可返回“关于”。</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2381,10 +2385,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>任何内容都不会离开手机。</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>语言</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>无法下载语音模型。</translation>
     </message>
@@ -2392,6 +2392,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>重试</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>转写语言</translation>
     </message>
 </context>
 <context>
@@ -2571,11 +2576,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>隐私与安全</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>封面</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>实验性</translation>
@@ -2588,6 +2588,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>你的个人资料</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>快捷操作</translation>
     </message>
 </context>
 <context>

@@ -1346,6 +1346,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay przechowuje wiadomość tylko do czasu, aż odbiorca ją pobierze.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Przesuwaj dalej, aby wrócić do strony O aplikacji.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2399,10 +2403,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Nic nie opuszcza telefonu.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Języki</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Nie udało się pobrać modelu mowy.</translation>
     </message>
@@ -2410,6 +2410,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Spróbuj ponownie</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Języki transkrypcji</translation>
     </message>
 </context>
 <context>
@@ -2589,11 +2594,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Prywatność i bezpieczeństwo</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Okładka</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Eksperymentalne</translation>
@@ -2606,6 +2606,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Twój profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Szybkie akcje</translation>
     </message>
 </context>
 <context>

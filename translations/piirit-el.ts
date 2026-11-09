@@ -1336,6 +1336,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Ένας αναμεταδότης κρατά ένα μήνυμα μόνο μέχρι να το παραλάβει ο παραλήπτης.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Συνεχίστε να σύρετε για να επιστρέψετε στο «Σχετικά».</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2386,10 +2390,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Τίποτα δεν φεύγει από το τηλέφωνο.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Γλώσσες</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Δεν ήταν δυνατή η λήψη του μοντέλου ομιλίας.</translation>
     </message>
@@ -2397,6 +2397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Δοκιμάστε ξανά</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Γλώσσες μεταγραφής</translation>
     </message>
 </context>
 <context>
@@ -2576,11 +2581,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ιδιωτικότητα και ασφάλεια</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Εξώφυλλο</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Πειραματικά</translation>
@@ -2593,6 +2593,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Το προφίλ σας</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Γρήγορες ενέργειες</translation>
     </message>
 </context>
 <context>

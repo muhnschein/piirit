@@ -1336,6 +1336,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>பெறுநர் எடுத்துக்கொள்ளும் வரை மட்டுமே ரிலே செய்தியை வைத்திருக்கும்.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„பற்றி“ பக்கத்துக்குத் திரும்பத் தொடர்ந்து விரலை இழுக்கவும்.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2386,10 +2390,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>மொழிகள்</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
     </message>
@@ -2397,6 +2397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>மீண்டும் முயல்க</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>படியெடுக்கும் மொழிகள்</translation>
     </message>
 </context>
 <context>
@@ -2576,11 +2581,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>தனியுரிமை மற்றும் பாதுகாப்பு</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>கவர்</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>சோதனை முறை</translation>
@@ -2593,6 +2593,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>உங்கள் சுயவிவரம்</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>விரைவுச் செயல்கள்</translation>
     </message>
 </context>
 <context>

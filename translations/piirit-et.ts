@@ -1340,6 +1340,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relee hoiab sõnumit alles ainult seni, kuni saaja selle järele tuleb.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Libista edasi, et naasta lehele Teave.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Midagi ei lahku telefonist.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Keeled</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
     </message>
@@ -2401,6 +2401,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Proovi uuesti</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Transkribeeritavad keeled</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Privaatsus ja turvalisus</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Kaas</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Katseline</translation>
@@ -2597,6 +2597,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Sinu profiil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Kiirtoimingud</translation>
     </message>
 </context>
 <context>

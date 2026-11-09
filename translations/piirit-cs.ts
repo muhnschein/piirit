@@ -1346,6 +1346,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay uchová zprávu jen do chvíle, než si ji příjemce vyzvedne.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Přejeďte dál a vraťte se na stránku O aplikaci.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2399,10 +2403,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Nic neopustí telefon.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Jazyky</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Řečový model se nepodařilo stáhnout.</translation>
     </message>
@@ -2410,6 +2410,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Zkusit znovu</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Jazyky přepisu</translation>
     </message>
 </context>
 <context>
@@ -2589,11 +2594,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Soukromí a zabezpečení</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Obálka</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Experimentální</translation>
@@ -2606,6 +2606,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Váš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Rychlé akce</translation>
     </message>
 </context>
 <context>

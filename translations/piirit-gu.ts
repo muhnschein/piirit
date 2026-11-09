@@ -1340,6 +1340,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>રિલે સંદેશ ફક્ત ત્યાં સુધી રાખે છે જ્યાં સુધી પ્રાપ્તકર્તા તેને લઈ ન લે.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„વિશે“ પર પાછા જવા માટે સ્વાઇપ કરતા રહો.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કંઈ પણ ફોનની બહાર જતું નથી.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>ભાષાઓ</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>સ્પીચ મૉડલ ડાઉનલોડ થઈ શક્યું નહીં.</translation>
     </message>
@@ -2401,6 +2401,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>ફરી પ્રયાસ કરો</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>લિપ્યંતરિત ભાષાઓ</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ગોપનીયતા અને સુરક્ષા</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>કવર</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>પ્રાયોગિક</translation>
@@ -2597,6 +2597,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>તમારી પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ઝડપી ક્રિયાઓ</translation>
     </message>
 </context>
 <context>

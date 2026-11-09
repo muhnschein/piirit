@@ -1340,6 +1340,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Un relais ne conserve un message que jusqu&apos;à ce que le destinataire le récupère.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Continuez à faire glisser pour revenir à « À propos ».</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2390,10 +2394,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Rien ne quitte le téléphone.</translation>
     </message>
     <message>
-        <source>Languages</source>
-        <translation>Langues</translation>
-    </message>
-    <message>
         <source>The speech model could not be downloaded.</source>
         <translation>Le modèle vocal n’a pas pu être téléchargé.</translation>
     </message>
@@ -2401,6 +2401,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Try again</source>
         <extracomment>Starts the speech model download again.</extracomment>
         <translation>Réessayer</translation>
+    </message>
+    <message>
+        <source>Transcribed languages</source>
+        <extracomment>Which languages voice messages are transcribed in.</extracomment>
+        <translation>Langues transcrites</translation>
     </message>
 </context>
 <context>
@@ -2580,11 +2585,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Vie privée et sécurité</translation>
     </message>
     <message>
-        <source>Cover</source>
-        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
-        <translation>Vignette</translation>
-    </message>
-    <message>
         <source>Experimental</source>
         <extracomment>Settings topic: features that may still change or go away.</extracomment>
         <translation>Expérimental</translation>
@@ -2597,6 +2597,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Your profile</source>
         <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
         <translation>Votre profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Actions rapides</translation>
     </message>
 </context>
 <context>
