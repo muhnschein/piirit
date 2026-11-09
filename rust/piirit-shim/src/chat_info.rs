@@ -105,6 +105,8 @@ pub struct ChatInfo {
     pub member_count: qt_property!(u32; READ member_count NOTIFY loaded_changed),
     /// First three members but reader, as maps (`ContactList` row keys): group page's preview.
     pub preview: qt_property!(QVariantList; NOTIFY loaded_changed),
+    /// More members but reader than `preview` holds: row's names end in "…".
+    pub preview_more: qt_property!(bool; NOTIFY loaded_changed),
     /// Members page's search: `members` keeps names containing it, any case. Empty: all.
     pub member_filter: qt_property!(QString; WRITE set_member_filter NOTIFY member_filter_changed),
     /// Search changed.
@@ -273,6 +275,8 @@ impl ChatInfo {
                             .take(3)
                             .map(|item| QVariant::from(row_map(item)))
                             .collect();
+                        this_mut.preview_more =
+                            found.members.iter().filter(|item| !item.is_self).count() > 3;
                         this_mut.all_members = found.members;
                         // In place: runs on every contact change in account, mostly no member
                         // change; reset rebuilt every row.

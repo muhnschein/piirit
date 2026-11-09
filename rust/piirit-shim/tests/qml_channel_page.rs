@@ -95,9 +95,9 @@ const PROBE_QML: &str = r"
                     if (!chat || !chat.loaded) { return }
                     probe.readings['channel-title'] = read('pageHeader', 'title')
                     probe.readings['channel-menu'] = read('groupMenu', 'visible')
-                    probe.readings['channel-invite'] = read('inviteButton', 'visible')
+                    probe.readings['channel-invite'] = read('inviteRow', 'visible')
                     probe.readings['channel-leave'] = read('leaveButton', 'visible')
-                    findIn(loader.item, 'inviteButton').clicked()
+                    findIn(loader.item, 'inviteRow').clicked()
                     probe.readings['navigation'] = pageStack.log
                     // What the push hands QR page.
                     loader.setSource('', {})
@@ -121,9 +121,9 @@ const PROBE_QML: &str = r"
                     var group = findIn(loader.item, 'chat')
                     if (!group || !group.loaded) { return }
                     probe.readings['group-title'] = read('pageHeader', 'title')
-                    probe.readings['group-invite'] = read('inviteButton', 'visible')
+                    probe.readings['group-invite'] = read('inviteRow', 'visible')
                     pageStack.log = ''
-                    findIn(loader.item, 'inviteButton').clicked()
+                    findIn(loader.item, 'inviteRow').clicked()
                     probe.readings['group-navigation'] = pageStack.log
                     loader.setSource('', {})
                     loader.setSource(probe.qrUrl, {

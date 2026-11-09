@@ -1316,7 +1316,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n membre</numerusform>
             <numerusform>%n membres</numerusform>
@@ -1353,22 +1353,9 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Chiffré de bout en bout</translation>
     </message>
     <message>
-        <source>Invite</source>
-        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Inviter</translation>
-    </message>
-    <message>
         <source>Members</source>
-        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
         <translation>Membres</translation>
-    </message>
-    <message numerus="yes">
-        <source>All %n member(s)</source>
-        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
-        <translation>
-            <numerusform>%n membre</numerusform>
-            <numerusform>Les %n membres</numerusform>
-        </translation>
     </message>
     <message>
         <source>In this chat</source>
@@ -1377,6 +1364,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Settings</source>
         <translation>Paramètres</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>Inviter avec un code QR</translation>
     </message>
 </context>
 <context>
@@ -1550,7 +1542,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galerie</translation>
     </message>
     <message>
@@ -1586,7 +1578,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Appels</translation>
     </message>
     <message>
@@ -1595,13 +1587,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Carte</translation>
-    </message>
-    <message>
-        <source>Media and files</source>
-        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
-        <translation>Médias et fichiers</translation>
     </message>
     <message>
         <source>Today</source>

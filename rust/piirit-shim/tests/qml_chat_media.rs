@@ -4,7 +4,8 @@
 //! gallery draws a tile per picture/video, tap opens the page the conversation opens for that kind;
 //! files list names file and size, keeps a copy under sender's name where reader saves files; audio
 //! and apps lists draw conversation's own rows, tap on app runs it; kind with none says so; rows
-//! on both detail pages open media tabs or apps, no Apps row while apps off.
+//! on both detail pages open each kind's own page or apps, no Apps row while apps off; audio and
+//! files rows sit under age headings.
 //!
 //! Long press on tile or row offers Show in chat and Delete. Show in chat walks stack down to the
 //! conversation this page was opened over, tells it the message, pops to it (stack here hands back
@@ -64,22 +65,9 @@ impl PageStackProbe {
     fn push(&mut self, page: QString, properties: QVariantMap) -> QVariant {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
-        // Tabbed page: kinds it tabs, in order.
-        let kinds = QVariantList::from_qvariant(
-            properties.value(QString::from("kinds"), QVariant::default()),
-        )
-        .map(|kinds| {
-            let names: Vec<String> = kinds
-                .into_iter()
-                .filter_map(|kind| QString::from_qvariant(kind.clone()))
-                .map(|kind| kind.to_string())
-                .collect();
-            format!("kinds={}", names.join(","))
-        })
-        .unwrap_or_default();
         let kind =
             QString::from_qvariant(properties.value(QString::from("kind"), QVariant::default()))
-                .map_or(kinds, |kind| kind.to_string());
+                .map_or(String::new(), |kind| kind.to_string());
         // Delete dialog carries no kind; it's asked with whether core would take a deletion for
         // everyone of this message, all of it worth reading back.
         let everyone = bool::from_qvariant(
@@ -143,9 +131,6 @@ const PROBE_QML: &str = r"
         function loadMedia(url, chatId, kind) {
             return load(url, { accountId: 1, chatId: chatId, kind: kind })
         }
-        function loadTabs(url, chatId) {
-            return load(url, { accountId: 1, chatId: chatId, kinds: ['gallery', 'audio', 'files'] })
-        }
         function loadDetail(url, chatId) {
             return load(url, { accountId: 1, chatId: chatId, chatName: 'from the list' })
         }
@@ -177,6 +162,8 @@ const PROBE_QML: &str = r"
         function shownInChat() { return '' + chatBelow.shown }
         // The wait before a deletion, turned down from four seconds.
         function hurry(ms) { loader.item.pendingDelay = ms; return 'ok' }
+        // Swipe back: Deactivating is when waits end.
+        function leave() { loader.item.status = PageStatus.Deactivating; return 'ok' }
         // Where the platform says downloads go, pointed at a directory
         // of this test's own: a saved file goes there.
         function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
@@ -245,7 +232,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
+fn a_chats_media_has_pages_of_its_own_behind_rows() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-media-page-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -405,8 +392,21 @@ fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
         record!("file-size", get!("fileDetail", "text"));
         record!("file-icon", get!("fileIcon", "source"));
         record!("file-caption", get!("rowCaption", "text"));
+        record!("files-title", get!("pageHeader", "title"));
         call!("setDownloads", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
+        // Delete, then leave before the wait is up: goes on the way out, not lost.
+        record!("long-wait", call!("hurry", 600_000));
+        record!(
+            "delete-file",
+            call!(
+                "clickIn",
+                QString::from("mediaRow12"),
+                QString::from("deleteItem")
+            )
+        );
+        record!("pick-file-delete", call!("pickDelete", false));
+        record!("leave-files", call!("leave"));
     });
 
     // Copy made off Qt thread; notice comes at least a loop turn later, so read here, not right
@@ -414,6 +414,7 @@ fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
     let page = media_page.clone();
     plan.after(1, move || unsafe {
         record!("saved-notice", get!("noticeLabel", "text"));
+        record!("files-after-leave", get!("media", "count"));
         record!(
             "load-audio",
             call!(
@@ -465,21 +466,19 @@ fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
         record!("empty-count", get!("media", "count"));
         record!("empty-placeholder", get!("placeholder", "enabled"));
         record!("empty-text", get!("placeholder", "text"));
-        // Media and files: one page, a tab per kind.
         record!(
-            "load-tabs",
-            call!("loadTabs", QString::from(page.clone()), 2)
+            "load-sections",
+            call!(
+                "loadMedia",
+                QString::from(page.clone()),
+                2,
+                QString::from("audio")
+            )
         );
     });
 
     let page = contact_page;
     plan.after(2, move || unsafe {
-        record!("tab-gallery", get!("tab0", "title"));
-        record!("tab-audio", get!("tab1", "title"));
-        record!("tab-files", get!("tab2", "title"));
-        record!("tab-start", get!("pager", "currentIndex"));
-        record!("open-files-tab", call!("click", QString::from("tab2")));
-        record!("tab-moved", get!("pager", "currentIndex"));
         // Fake core's messages are from 2023: all under one heading.
         record!(
             "date-section",
@@ -494,18 +493,23 @@ fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
 
     let page = group_page;
     plan.after(2, move || unsafe {
-        record!("contact-media", get!("mediaRow", "visible"));
         record!(
-            "contact-media-name",
-            call!(
-                "getIn",
-                QString::from("mediaRow"),
-                QString::from("doorLabel"),
-                QString::from("text")
-            )
+            "contact-media-names",
+            ["galleryRow", "audioRow", "filesRow"]
+                .map(|row| {
+                    call!(
+                        "getIn",
+                        QString::from(row),
+                        QString::from("doorLabel"),
+                        QString::from("text")
+                    )
+                })
+                .join(",")
         );
         record!("contact-apps", get!("appsRow", "visible"));
-        record!("open-media", call!("click", QString::from("mediaRow")));
+        for row in ["galleryRow", "audioRow", "filesRow"] {
+            record!(row, call!("click", QString::from(row)));
+        }
         // Location streaming off (experimental, as in Delta Chat): no map row.
         record!("contact-map-off", get!("mapRow", "visible"));
         record!("locations-on", call!("setLocations", true));
@@ -546,7 +550,7 @@ fn a_chats_media_has_pages_of_its_own_behind_rows_and_tabs() {
         );
         record!(
             "open-group-media",
-            call!("click", QString::from("mediaRow"))
+            call!("click", QString::from("audioRow"))
         );
         record!("open-apps", call!("click", QString::from("appsRow")));
         call!("setLocations", false);
@@ -605,14 +609,19 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "pick-delete",
         "load-files",
         "save",
+        "long-wait",
+        "delete-file",
+        "pick-file-delete",
+        "leave-files",
         "load-audio",
         "load-apps",
         "open-app",
         "load-empty",
-        "load-tabs",
-        "open-files-tab",
+        "load-sections",
         "load-contact",
-        "open-media",
+        "galleryRow",
+        "audioRow",
+        "filesRow",
         "apps-on",
         "load-group",
         "open-group-media",
@@ -723,6 +732,12 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "the files list does not hold the document",
         ),
         ("file-name", "notes.pdf", "the file is not named"),
+        ("files-title", "Files", "the files page is not headed Files"),
+        (
+            "files-after-leave",
+            "0",
+            "a delete still waiting when the page was left was lost",
+        ),
         ("file-size", "20.5 kB", "the file's size is not said"),
         (
             "saved-notice",
@@ -784,45 +799,34 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Tabs: one per kind, Delta Chat's order; tap moves pager; rows under age headings.
-    for (label, expected, complaint) in [
-        ("tab-gallery", "Gallery", "the first tab is not the gallery"),
-        ("tab-audio", "Audio", "the second tab is not audio"),
-        ("tab-files", "Files", "the third tab is not files"),
-        ("tab-start", "0", "the page does not open on its first tab"),
-        ("tab-moved", "2", "a tap on a tab did not move to it"),
-        // One heading per list (audio, files; gallery has none), each its group's name.
-        (
-            "date-section",
-            "Older,Older",
-            "rows sit under no age heading, or one per row",
-        ),
-    ] {
-        assert_eq!(value(label), expected, "{complaint}. {context}");
-    }
+    // Rows under age headings: one heading over the list, its group's name.
+    assert_eq!(
+        value("date-section"),
+        "Older",
+        "audio sits under no age heading, or one per row. {context}"
+    );
 
     // Rows on both detail pages: no Apps row while apps off, nor Map while streaming off.
     for (label, expected, complaint) in [
-        ("contact-media", "true", "the contact page has no media row"),
         (
-            "contact-media-name",
-            "Media and files",
-            "the media row is named wrong",
+            "contact-media-names",
+            "Gallery,Audio,Files",
+            "the contact page has no Gallery, Audio and Files rows",
         ),
         (
             "contact-apps",
-            "false",
+            "missing:appsRow",
             "the contact page offers apps while they are off",
         ),
         (
             "contact-map-off",
-            "false",
+            "missing:mapRow",
             "the contact page offers the map while location streaming is off",
         ),
         ("locations-on", "ok", "location streaming was not turned on"),
         (
             "group-map-off",
-            "false",
+            "missing:mapRow",
             "the group page offers the map while location streaming is off",
         ),
         (
@@ -841,11 +845,13 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         navigation,
         "push:GalleryPage.qml(at=10,newestFirst=true)|\
          push:GalleryPage.qml(at=15,newestFirst=true)|pop|\
+         push:DeleteMessageDialog.qml(everyone=false)|\
          push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml(at=14)|\
-         push:ChatMediaPage.qml(kinds=gallery,audio,files)|\
+         push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(audio)|\
+         push:ChatMediaPage.qml(files)|\
          push:WebxdcPage.qml(at=101,query=?bounds=60.1,24.9,60.2,25,heading=from the list,\
          subheading=Map)|\
-         push:ChatMediaPage.qml(kinds=gallery,audio,files)|push:ChatMediaPage.qml(apps)|\
+         push:ChatMediaPage.qml(audio)|push:ChatMediaPage.qml(apps)|\
          push:NoLocationsPage.qml(,heading=from the list,subheading=Map)|",
         "a tap did not open the right page, or Show in chat did not pop \
          back to the conversation, or the map row opened no chat map framing its locations, \

@@ -1309,7 +1309,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n üye</numerusform>
         </translation>
@@ -1345,21 +1345,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Uçtan uca şifreli</translation>
     </message>
     <message>
-        <source>Invite</source>
-        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Davet et</translation>
-    </message>
-    <message>
         <source>Members</source>
-        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
         <translation>Üyeler</translation>
-    </message>
-    <message numerus="yes">
-        <source>All %n member(s)</source>
-        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
-        <translation>
-            <numerusform>Tüm üyeler (%n)</numerusform>
-        </translation>
     </message>
     <message>
         <source>In this chat</source>
@@ -1368,6 +1356,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Settings</source>
         <translation>Ayarlar</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>QR koduyla davet et</translation>
     </message>
 </context>
 <context>
@@ -1540,7 +1533,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galeri</translation>
     </message>
     <message>
@@ -1576,7 +1569,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Aramalar</translation>
     </message>
     <message>
@@ -1585,13 +1578,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Harita</translation>
-    </message>
-    <message>
-        <source>Media and files</source>
-        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
-        <translation>Medya ve dosyalar</translation>
     </message>
     <message>
         <source>Today</source>

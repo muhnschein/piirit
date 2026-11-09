@@ -1305,7 +1305,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n 位成員</numerusform>
         </translation>
@@ -1341,21 +1341,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>端對端加密</translation>
     </message>
     <message>
-        <source>Invite</source>
-        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>邀請</translation>
-    </message>
-    <message>
         <source>Members</source>
-        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
         <translation>成員</translation>
-    </message>
-    <message numerus="yes">
-        <source>All %n member(s)</source>
-        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
-        <translation>
-            <numerusform>全部 %n 位成員</numerusform>
-        </translation>
     </message>
     <message>
         <source>In this chat</source>
@@ -1364,6 +1352,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Settings</source>
         <translation>設定</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>用 QR 碼邀請</translation>
     </message>
 </context>
 <context>
@@ -1536,7 +1529,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>圖庫</translation>
     </message>
     <message>
@@ -1572,7 +1565,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>通話</translation>
     </message>
     <message>
@@ -1581,13 +1574,8 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>地圖</translation>
-    </message>
-    <message>
-        <source>Media and files</source>
-        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
-        <translation>媒體及檔案</translation>
     </message>
     <message>
         <source>Today</source>

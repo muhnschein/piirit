@@ -226,6 +226,7 @@ fn the_members_page_finds_opens_and_removes_members() {
             call!("setText", QString::from("searchField"), QString::from(""))
         );
         record!("all-again", get!("memberList", "count"));
+        record!("invite-icon", get!("inviteRow", "iconSource"));
         record!("invite", call!("click", QString::from("inviteRow")));
         // Ada: chat with her exists, her page.
         record!("tap-ada", call!("click", QString::from("memberRow10")));
@@ -343,6 +344,11 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
             "the heading does not count every member",
         ),
         ("count", "4", "the page does not list every member"),
+        (
+            "invite-icon",
+            "image://theme/icon-m-qr",
+            "the invite row does not show the QR icon",
+        ),
         ("add-row", "true", "the page does not offer to add members"),
         ("invite-row", "true", "the page does not offer an invite"),
         ("self-menu", "null", "the reader's own row has a menu"),

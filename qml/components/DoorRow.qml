@@ -4,12 +4,16 @@ import "../js/Media.js" as Media
 
 /*
  * One-line row on contact and group pages: kind's icon and name; page opens what it
- * names. Kinds as Media.js, plus "media" (Media and files). AppMark draws apps' icon.
+ * names. Kinds as Media.js. AppMark draws apps' icon. Half a line in DoorGrid.
  */
 BackgroundItem {
     id: row
 
     property string kind
+    property real leftMargin: Theme.horizontalPageMargin
+    property real rightMargin: Theme.horizontalPageMargin
+    /// Name's own width, unclipped: DoorGrid checks it fits.
+    readonly property real labelWidth: label.implicitWidth
 
     readonly property color tint: row.highlighted ? Theme.highlightColor : Theme.primaryColor
 
@@ -17,7 +21,7 @@ BackgroundItem {
 
     Image {
         id: icon
-        x: Theme.horizontalPageMargin
+        x: row.leftMargin
         anchors.verticalCenter: parent.verticalCenter
         width: Theme.iconSizeMedium
         height: width
@@ -35,9 +39,10 @@ BackgroundItem {
     }
 
     Label {
+        id: label
         objectName: "doorLabel"
         x: icon.x + icon.width + Theme.paddingLarge
-        width: parent.width - x - Theme.horizontalPageMargin
+        width: parent.width - x - row.rightMargin
         anchors.verticalCenter: parent.verticalCenter
         truncationMode: TruncationMode.Fade
         color: row.tint

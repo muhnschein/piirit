@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Every member of a group, from its page's "All members". Search on top, then Add
+ * Every member of a group, from its page's Members row. Search on top, then Add
  * members and Invite, then members built as they scroll in (groups reach
  * hundreds). Tap opens a member, hold for Send message and Remove.
  */
@@ -126,6 +126,7 @@ Page {
                     visible: (page.chat.can_edit && !page.chat.is_channel)
                              || page.chat.is_own_channel
                     width: parent.width
+                    iconSource: "image://theme/icon-m-qr"
                     //: Row on a group's member list: opens the QR code others scan to join.
                     text: qsTr("Invite with a QR code")
                     onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"), {

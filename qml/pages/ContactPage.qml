@@ -103,12 +103,6 @@ Page {
                 chatId: page.chatId,
                 contactName: page.displayName
             })
-        } else if (kind === "media") {
-            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
-                accountId: page.accountId,
-                chatId: page.chatId,
-                kinds: ["gallery", "audio", "files"]
-            })
         } else {
             pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
                 accountId: page.accountId,
@@ -366,6 +360,7 @@ Page {
                     objectName: "callButton"
                     x: Theme.horizontalPageMargin
                     width: (parent.width - 2 * Theme.horizontalPageMargin - Theme.paddingLarge) / 2
+                    icon.source: "image://theme/icon-m-call"
                     //: Button on a contact's page: starts a voice call.
                     text: qsTr("Call")
                     onClicked: page.placeCall(false)
@@ -374,6 +369,7 @@ Page {
                     objectName: "videoCallButton"
                     x: callButton.x + callButton.width + Theme.paddingLarge
                     width: callButton.width
+                    icon.source: "image://theme/icon-m-video"
                     //: Button on a contact's page: starts a call with camera on.
                     text: qsTr("Video call")
                     onClicked: page.placeCall(true)
@@ -385,29 +381,12 @@ Page {
                 text: qsTr("In this chat")
             }
 
-            DoorRow {
-                objectName: "mediaRow"
-                kind: "media"
-                onClicked: page.openMedia("media")
-            }
             // `=== true`: dconf gives undefined before read.
-            DoorRow {
-                objectName: "appsRow"
-                visible: Settings.webxdcEnabled === true
-                kind: "apps"
-                onClicked: page.openMedia("apps")
-            }
-            DoorRow {
-                objectName: "callsRow"
-                visible: chat.can_call
-                kind: "calls"
-                onClicked: page.openMedia("calls")
-            }
-            DoorRow {
-                objectName: "mapRow"
-                visible: Settings.locationStreamingEnabled === true
-                kind: "map"
-                onClicked: page.openMedia("map")
+            DoorGrid {
+                objectName: "doors"
+                kinds: Media.doors(Settings.webxdcEnabled === true, chat.can_call,
+                                   Settings.locationStreamingEnabled === true)
+                onOpened: page.openMedia(kind)
             }
 
             SectionHeader {

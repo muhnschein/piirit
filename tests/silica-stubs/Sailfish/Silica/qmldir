@@ -45,5 +45,4 @@ singleton Clipboard 1.0 Clipboard.qml
 TruncationMode 1.0 TruncationMode.qml
 PageStatus 1.0 PageStatus.qml
 PageStackAction 1.0 PageStackAction.qml
-PagedView 1.0 PagedView.qml
 singleton StandardPaths 1.0 StandardPaths.qml

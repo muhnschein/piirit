@@ -1323,7 +1323,7 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n člen</numerusform>
             <numerusform>%n členové</numerusform>
@@ -1361,23 +1361,9 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Šifrováno mezi koncovými body</translation>
     </message>
     <message>
-        <source>Invite</source>
-        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Pozvat</translation>
-    </message>
-    <message>
         <source>Members</source>
-        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
         <translation>Členové</translation>
-    </message>
-    <message numerus="yes">
-        <source>All %n member(s)</source>
-        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
-        <translation>
-            <numerusform>%n člen</numerusform>
-            <numerusform>Všichni %n členové</numerusform>
-            <numerusform>Všech %n členů</numerusform>
-        </translation>
     </message>
     <message>
         <source>In this chat</source>
@@ -1386,6 +1372,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Settings</source>
         <translation>Nastavení</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>Pozvat QR kódem</translation>
     </message>
 </context>
 <context>
@@ -1560,7 +1551,7 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galerie</translation>
     </message>
     <message>
@@ -1596,7 +1587,7 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Hovory</translation>
     </message>
     <message>
@@ -1605,13 +1596,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Mapa</translation>
-    </message>
-    <message>
-        <source>Media and files</source>
-        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
-        <translation>Média a soubory</translation>
     </message>
     <message>
         <source>Today</source>

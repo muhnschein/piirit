@@ -6,9 +6,9 @@ import Piirit 1.0
 
 /*
  * Group or channel: swipe left from conversation or tap header. Read first, as
- * contact page: picture with name and member count beside it, description, Invite
- * and Add members, three members and a row to all, rows to what the chat holds and
- * how it behaves. Name, description, picture on Edit group (pulley). Core owns
+ * contact page: picture with name beside it, description, rows to what the chat
+ * holds and how it behaves, members as one row (as Chats in common) with Add members
+ * and Invite under it. Name, description, picture on Edit group (pulley). Core owns
  * data (ChatInfo); not joined: core refuses edits, entries hidden.
  */
 Page {
@@ -79,12 +79,6 @@ Page {
     function openMedia(kind) {
         if (kind === "map") {
             map.show(page.chatId, 0, 0)
-        } else if (kind === "media") {
-            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
-                accountId: page.accountId,
-                chatId: page.chatId,
-                kinds: ["gallery", "audio", "files"]
-            })
         } else {
             pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
                 accountId: page.accountId,
@@ -164,13 +158,6 @@ Page {
         deleteRemorse.execute(qsTr("Deleting chat"), function() { chat.delete_chat() })
     }
 
-    /// Tap on member: their page, or menu. See MemberOpener.
-    MemberOpener {
-        id: memberOpener
-        chatInfo: chat
-        accountId: page.accountId
-    }
-
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
@@ -234,18 +221,6 @@ Page {
                     name: chat.loaded ? chat.name : page.chatName
                 }
 
-                Label {
-                    objectName: "memberCount"
-                    visible: chat.loaded
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
-                    //: Under a group's name on its page. %n is how many people
-                    //: are in it.
-                    text: qsTr("%n member(s)", "", chat.member_count)
-                }
-
                 // Tap: members' keys.
                 Label {
                     objectName: "encryptionLabel"
@@ -274,101 +249,16 @@ Page {
                 text: chat.description
             }
 
-            // The two ways a group grows. Bindings, not Row: polish never runs headless.
-            Item {
-                objectName: "growButtons"
-                visible: page.offersInvite || page.offersAdd
-                width: parent.width
-                height: visible ? inviteButton.height : 0
-
-                readonly property real half: (width - 2 * Theme.horizontalPageMargin
-                                              - Theme.paddingLarge) / 2
-
-                Button {
-                    id: inviteButton
-                    objectName: "inviteButton"
-                    visible: page.offersInvite
-                    x: Theme.horizontalPageMargin
-                    width: page.offersAdd ? parent.half : 2 * parent.half + Theme.paddingLarge
-                    //: Button on a group's page: opens the QR code others scan to join.
-                    text: qsTr("Invite")
-                    onClicked: page.invite()
-                }
-                Button {
-                    id: addButton
-                    objectName: "addMembersButton"
-                    visible: page.offersAdd
-                    x: page.offersInvite ? inviteButton.x + inviteButton.width + Theme.paddingLarge
-                                         : Theme.horizontalPageMargin
-                    width: page.offersInvite ? parent.half : 2 * parent.half + Theme.paddingLarge
-                    text: qsTr("Add members")
-                    onClicked: page.addMembers()
-                }
-            }
-
-            SectionHeader {
-                objectName: "membersHeader"
-                visible: chat.member_count > 0
-                //: Over the first few members on a group's page.
-                text: qsTr("Members")
-            }
-
-            // Three, not all: page keeps its length with 4 or 400 members.
-            Repeater {
-                model: chat.preview
-
-                MemberRow {
-                    objectName: "memberRow" + modelData.contact_id
-                    width: column.width
-                    contactId: modelData.contact_id
-                    displayName: modelData.display_name
-                    ownColor: modelData.color
-                    picturePath: modelData.avatar_path
-                    isKeyContact: modelData.is_key_contact
-                    opener: memberOpener
-                }
-            }
-
-            BackgroundItem {
-                objectName: "allMembers"
-                visible: chat.member_count > 0
-                width: parent.width
-                height: Theme.itemSizeSmall
-                onClicked: page.showMembers()
-
-                Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    anchors.verticalCenter: parent.verticalCenter
-                    truncationMode: TruncationMode.Fade
-                    color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    //: Row under the first members on a group's page: opens the
-                    //: list of all. %n is how many.
-                    text: qsTr("All %n member(s)", "", chat.member_count)
-                }
-            }
-
             SectionHeader {
                 text: qsTr("In this chat")
             }
 
-            DoorRow {
-                objectName: "mediaRow"
-                kind: "media"
-                onClicked: page.openMedia("media")
-            }
             // `=== true`: dconf gives `undefined` until key read.
-            DoorRow {
-                objectName: "appsRow"
-                visible: Settings.webxdcEnabled === true
-                kind: "apps"
-                onClicked: page.openMedia("apps")
-            }
-            DoorRow {
-                objectName: "mapRow"
-                visible: Settings.locationStreamingEnabled === true
-                kind: "map"
-                onClicked: page.openMedia("map")
+            DoorGrid {
+                objectName: "doors"
+                kinds: Media.doors(Settings.webxdcEnabled === true, false,
+                                   Settings.locationStreamingEnabled === true)
+                onOpened: page.openMedia(kind)
             }
 
             SectionHeader {
@@ -389,6 +279,92 @@ Page {
                 seconds: chat.ephemeral_timer
                 canChange: chat.can_send
                 onChosen: chat.set_ephemeral_timer(seconds)
+            }
+
+            SectionHeader {
+                objectName: "membersHeader"
+                visible: chat.member_count > 0
+                //: Over the row to a group's members.
+                text: qsTr("Members")
+            }
+
+            // One row however many: three faces, count, first names; list behind it.
+            BackgroundItem {
+                id: membersRow
+                objectName: "membersRow"
+                visible: chat.member_count > 0
+                width: parent.width
+                height: Theme.itemSizeMedium
+                onClicked: page.showMembers()
+
+                readonly property real faceSize: Theme.itemSizeExtraSmall
+                readonly property int faceCount: chat.preview.length
+
+                Repeater {
+                    model: chat.preview
+
+                    Avatar {
+                        // Later faces under earlier ones, a third showing.
+                        z: 3 - index
+                        x: Theme.horizontalPageMargin + index * membersRow.faceSize * 2 / 3
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: membersRow.faceSize
+                        initial: modelData.display_name
+                        ownColor: modelData.color
+                        picturePath: modelData.avatar_path
+                    }
+                }
+
+                Label {
+                    id: memberCount
+                    objectName: "memberCount"
+                    x: Theme.horizontalPageMargin + (membersRow.faceCount > 0
+                        ? membersRow.faceSize
+                          + (membersRow.faceCount - 1) * membersRow.faceSize * 2 / 3
+                          + Theme.paddingLarge
+                        : 0)
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    y: (parent.height - height - memberNames.height) / 2
+                    truncationMode: TruncationMode.Fade
+                    color: membersRow.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //: Row on a group's page, opens the list of all. %n is how many
+                    //: people are in it.
+                    text: qsTr("%n member(s)", "", chat.member_count)
+                }
+
+                // Shown ones' names; "…" when more.
+                NameLabel {
+                    id: memberNames
+                    objectName: "memberNames"
+                    x: memberCount.x
+                    y: memberCount.y + memberCount.height
+                    width: memberCount.width
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: membersRow.highlighted ? Theme.secondaryHighlightColor
+                                                  : Theme.secondaryColor
+                    name: chat.preview.map(function(member) { return member.display_name })
+                              .join(", ")
+                          + (chat.preview_more ? ", …" : "")
+                }
+            }
+
+            // The two ways a group grows.
+            PlusRow {
+                objectName: "addMembersRow"
+                visible: page.offersAdd
+                width: parent.width
+                text: qsTr("Add members")
+                onClicked: page.addMembers()
+            }
+            PlusRow {
+                objectName: "inviteRow"
+                visible: page.offersInvite
+                width: parent.width
+                iconSource: "image://theme/icon-m-qr"
+                //: Row on a group's page: opens the QR code others scan to join.
+                text: qsTr("Invite with a QR code")
+                onClicked: page.invite()
             }
         }
 

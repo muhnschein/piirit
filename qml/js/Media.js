@@ -1,14 +1,18 @@
 // Chat's non-text kinds (gallery, audio, files, apps, calls, map): names, icons.
 // No `.pragma library`: qsTr() needs importing file's context.
 
+/// Rows on contact and group page, in order: apps, calls, map only when on.
+function doors(appsOn, callsOn, mapOn) {
+    return ["gallery", "audio", "files"]
+        .concat(appsOn ? ["apps"] : [])
+        .concat(callsOn ? ["calls"] : [])
+        .concat(mapOn ? ["map"] : [])
+}
+
 /// Kind's name: row word and page heading.
 function kindName(kind) {
-    if (kind === "media") {
-        //: Row on a contact's or group's page: opens its pictures, sounds and files.
-        return qsTr("Media and files")
-    }
     if (kind === "gallery") {
-        //: The pictures and videos of a chat: a tab, and a page heading.
+        //: The pictures and videos of a chat: a row, and a page heading.
         return qsTr("Gallery")
     }
     if (kind === "audio") {
@@ -24,11 +28,11 @@ function kindName(kind) {
         return qsTr("Apps")
     }
     if (kind === "calls") {
-        //: The calls made and received in a chat: a tab, and a page heading.
+        //: The calls made and received in a chat: a row, and a page heading.
         return qsTr("Calls")
     }
     if (kind === "map") {
-        //: Tile opening the map of a chat's shared locations.
+        //: Row opening the map of a chat's shared locations.
         return qsTr("Map")
     }
     return ""
@@ -56,7 +60,7 @@ function emptyText(kind) {
 
 /// Theme icon per kind. Empty for apps: AppMark draws one.
 function kindIcon(kind) {
-    if (kind === "gallery" || kind === "media") {
+    if (kind === "gallery") {
         return "icon-m-file-image"
     }
     if (kind === "audio") {

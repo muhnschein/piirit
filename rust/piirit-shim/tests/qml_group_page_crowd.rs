@@ -1,5 +1,6 @@
-//! Group of hundreds: group page shows three; members page builds rows near screen only, rest as
-//! scrolled to. Built all at page-in (751 members: page slid in and out at 35 fps on phone).
+//! Group of hundreds: group page shows one row (three faces, three names, "…"); members page
+//! builds rows near screen only, rest as scrolled to. Built all at page-in (751 members: page slid
+//! in and out at 35 fps on phone).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -23,7 +24,7 @@ const PROBE_QML: &str = r"
             loader.setSource(url, { accountId: 1, chatId: 2, chatName: 'crowd' })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
-        /// Members page, as All members opens it: on the group page's own chat.
+        /// Members page, as the Members row opens it: on the group page's own chat.
         function loadMembers(url) {
             var chat = walk(function(node) { return node.objectName === 'chat' })[0]
             membersLoader.setSource(url, { accountId: 1, chat: chat })
@@ -60,6 +61,10 @@ const PROBE_QML: &str = r"
             lists[0].positionViewAtEnd()
             return 'ok'
         }
+        function names() {
+            var found = walk(function(node) { return node.objectName === 'memberNames' })
+            return found.length > 0 ? '' + found[0].name : 'missing'
+        }
         function title() {
             var found = walk(function(node) { return node.objectName === 'membersHeader' })
             return found.length > 0 ? '' + found[0].title : 'missing'
@@ -72,6 +77,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_group_of_hundreds_builds_only_the_member_rows_on_screen() {
     let temp = std::env::temp_dir().join(format!("piirit-group-crowd-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
@@ -117,7 +123,7 @@ fn a_group_of_hundreds_builds_only_the_member_rows_on_screen() {
         let loaded = call!("load", QString::from(common::page_url("GroupPage.qml")));
         (*steps_ptr).push(("load", loaded));
     });
-    // Members in: count says all; three shown.
+    // Members in: count says all; three named.
     let expected = format!("{}", CROWD + 2);
     plan.until(1, 30, move |last| unsafe {
         let heading = call!("heading");
@@ -125,7 +131,8 @@ fn a_group_of_hundreds_builds_only_the_member_rows_on_screen() {
             return false;
         }
         (*steps_ptr).push(("heading", heading));
-        (*steps_ptr).push(("shown-on-group", call!("rowsBuilt")));
+        (*steps_ptr).push(("rows-on-group", call!("rowsBuilt")));
+        (*steps_ptr).push(("names-on-group", call!("names")));
         let loaded = call!(
             "loadMembers",
             QString::from(common::page_url("MembersPage.qml"))
@@ -161,10 +168,16 @@ fn a_group_of_hundreds_builds_only_the_member_rows_on_screen() {
             && value("title").starts_with(&(CROWD + 2).to_string()),
         "the group page or the members page does not count every member. {context}"
     );
+    let names = value("names-on-group");
     assert_eq!(
-        (value("shown-on-group"), value("load-members")),
-        ("3".to_string(), "ok".to_string()),
-        "the group page does not show just three members. {context}"
+        (
+            value("rows-on-group"),
+            names.matches(", ").count(),
+            names.ends_with(", …"),
+            value("load-members")
+        ),
+        ("0".to_string(), 3, true, "ok".to_string()),
+        "the group page does not name just three members and say there are more. {context}"
     );
     let built: usize = value("built").parse().unwrap_or(usize::MAX);
     assert!(

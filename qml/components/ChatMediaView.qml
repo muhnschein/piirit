@@ -21,10 +21,8 @@ Item {
     property string kind: "gallery"
     /// Page this sits on: "Show in chat" goes down stack from it.
     property Item host: null
-    /// List's header: PageHeader, or room for tab strip.
+    /// Grid's or list's header: page's PageHeader.
     property Component header: null
-    /// Grid or list, once built: tab strip follows its scroll.
-    readonly property Item flickable: loader.item
 
     /// Page should say this (saved, copied).
     signal noticed(string text)

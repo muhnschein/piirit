@@ -8,9 +8,9 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- Contact and group pages are laid out anew. The picture sits beside the name, with when they were last seen or how many members a group has under it, and "Media and files" opens one page with tabs for pictures, audio and files, grouped by age (Today, Yesterday, Last 7 days, Last 30 days, Older). Changing a name, a group's description or picture, leaving or deleting the chat, blocking and encryption info are in the pull-down menu.
+- Contact and group pages are laid out anew. The picture sits beside the name, with when they were last seen under it. Gallery, Audio, Files, Apps, Calls and Map sit two to a line, or one per line when a name is too long for half; audio and files are grouped by age (Today, Yesterday, Last 7 days, Last 30 days, Older). Call and Video call show their icons. Changing a name, a group's description or picture, leaving or deleting the chat, blocking and encryption info are in the pull-down menu.
 - **Chats in common.** A contact's page shows, at the bottom, the chats you share with them: your chat with them and each group they are in. Tap the row to see them all, and a chat to open it.
-- A group's page shows three members; "All members" opens the full list, where you can search members by name and remove one. Tapping a member opens their page if you already chat with them, otherwise offers Send message.
+- A group's members are one row near the end of its page, like Chats in common: three pictures, how many, and the first names. It opens the full list, where you can search members by name and remove one. Tapping a member opens their page if you already chat with them, otherwise offers Send message. Add members and Invite with a QR code sit under the row.
 - New Encryption info page for a contact or group: each key's fingerprint laid out to compare, the relays as domain names, and which group members' keys are missing. The pull-down menu copies the names and fingerprints.
 - Changing a group's name or description is saved when you swipe back from the Edit group page; a contact's nickname the same way from Edit name.
 - Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.

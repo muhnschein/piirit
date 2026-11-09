@@ -196,15 +196,19 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("loaded", get!("chat", "loaded"));
         record!("name", get!("nameLabel", "name"));
         record!("members", get!("memberCount", "text"));
-        record!("self-row", get!("memberRow1", "objectName"));
-        record!("contact-row", get!("memberRow10", "objectName"));
-        record!("all-members", get!("allMembers", "visible"));
-        record!("add-offered", get!("addMembersButton", "visible"));
-        record!("invite-offered", get!("inviteButton", "visible"));
+        record!("member-names", get!("memberNames", "name"));
+        record!("members-row", get!("membersRow", "visible"));
+        record!("add-offered", get!("addMembersRow", "visible"));
+        record!("invite-offered", get!("inviteRow", "visible"));
+        record!("invite-icon", get!("inviteRow", "iconSource"));
         record!("leave-offered", get!("leaveButton", "visible"));
         record!("menu-offered", get!("groupMenu", "visible"));
         record!("edit-offered", get!("editGroup", "visible"));
         record!("delete-offered", get!("deleteChat", "visible"));
+        // Members row, the two ways to grow, a media row: each opens its page.
+        for row in ["membersRow", "addMembersRow", "inviteRow", "galleryRow"] {
+            record!(row, call!("click", QString::from(row)));
+        }
         // Disappearing messages: off per core; duration tap goes to core.
         record!("timer-off", get!("disappearingCombo", "currentIndex"));
         record!("timer-offered", get!("disappearingCombo", "enabled"));
@@ -349,15 +353,15 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("left-edit", get!("editGroup", "visible"));
         record!("left-leave", get!("leaveButton", "visible"));
         record!("left-delete", get!("deleteChat", "visible"));
-        record!("left-add", get!("addMembersButton", "visible"));
+        record!("left-add", get!("addMembersRow", "visible"));
         // One-to-one chat: shown, nothing changeable.
         record!("load-single", call!("load", QString::from(url.clone()), 1));
     });
 
     plan.after(2, move || unsafe {
         record!("single-loaded", get!("chat", "loaded"));
-        record!("single-add", get!("addMembersButton", "visible"));
-        record!("single-invite", get!("inviteButton", "visible"));
+        record!("single-add", get!("addMembersRow", "visible"));
+        record!("single-invite", get!("inviteRow", "visible"));
         record!("single-leave", get!("leaveButton", "visible"));
         record!("single-edit", get!("editGroup", "visible"));
         record!("single-desc", get!("descriptionLabel", "visible"));
@@ -423,6 +427,10 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "confirm-leave",
         "load-single",
         "timer-pick",
+        "membersRow",
+        "addMembersRow",
+        "inviteRow",
+        "galleryRow",
         "desc-typed",
         "desc-cleared",
         "load-edit-empty",
@@ -440,18 +448,14 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "the page does not name the group and count its two members. {context}"
     );
     assert_eq!(
-        (
-            value("self-row"),
-            value("contact-row"),
-            value("all-members")
-        ),
-        (
-            "missing:memberRow1".to_string(),
-            "memberRow10".to_string(),
-            "true".to_string()
-        ),
-        "the page does not show the other member, without the reader, and a \
-         row to all of them. {context}"
+        (value("members-row"), value("member-names")),
+        ("true".to_string(), "ada".to_string()),
+        "the members row does not name the other member, without the reader. {context}"
+    );
+    assert_eq!(
+        value("invite-icon"),
+        "image://theme/icon-m-qr",
+        "the invite row does not show the QR icon. {context}"
     );
     for label in [
         "add-offered",
@@ -551,8 +555,11 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "leaving the edit page did not send each typed description, trimmed. {context}"
     );
     assert_eq!(
-        navigation, "push:LeaveGroupDialog.qml|",
-        "leaving the group is not asked about on a page of its own. {context}"
+        navigation,
+        "push:MembersPage.qml|push:AddMembersPage.qml|push:QrPage.qml|push:ChatMediaPage.qml|\
+         push:LeaveGroupDialog.qml|",
+        "the members row, Add members, Invite or Gallery opens no page of its own, or leaving \
+         the group is not asked about on one. {context}"
     );
     assert_eq!(
         (value("left-visible"), value("left-text")),

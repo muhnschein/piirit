@@ -73,10 +73,11 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        // `property` may be a path: 'icon.source'.
         function get(name, property) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
-            return '' + item[property]
+            return '' + property.split('.').reduce(function(at, key) { return at[key] }, item)
         }
         function editGet(name, property) {
             var item = findIn(editLoader.item, name)
@@ -214,7 +215,13 @@ fn the_contact_page_names_the_contact_and_no_address() {
             "tap-encryption",
             call!("tap", QString::from("encryptionTap"))
         );
-        record!("tap-media", call!("tap", QString::from("mediaRow")));
+        for row in ["galleryRow", "audioRow", "filesRow"] {
+            record!(row, call!("tap", QString::from(row)));
+        }
+        record!("paired", get!("doors", "columns"));
+        record!("calls-x", get!("callsRow", "x"));
+        record!("files-x", get!("filesRow", "x"));
+        record!("call-icon", get!("callButton", "icon.source"));
         record!("tap-edit", call!("tap", QString::from("editName")));
         record!("opened", call!("stackLog"));
         record!(
@@ -422,11 +429,28 @@ fn assert_actions(steps: &[(&str, String)], calls: &[(String, Value)]) {
         ),
         "the encryption line does not open the contact's keys. {context}"
     );
-    assert!(
-        opened.contains(
-            "push:ChatMediaPage.qml:{\"accountId\":1,\"chatId\":1,\"kinds\":[\"gallery\",\"audio\",\"files\"]}|"
+    for kind in ["gallery", "audio", "files"] {
+        assert!(
+            opened.contains(&format!(
+                "push:ChatMediaPage.qml:{{\"accountId\":1,\"chatId\":1,\"kind\":\"{kind}\"}}|"
+            )),
+            "the {kind} row does not open that kind's own page. {context}"
+        );
+    }
+    // Two to a line: Files ends the first pair's line, Calls starts no line.
+    assert_eq!(
+        (
+            value(steps, "paired"),
+            value(steps, "files-x"),
+            value(steps, "calls-x")
         ),
-        "Media and files does not open the three kinds as tabs. {context}"
+        ("2", "0", "270"),
+        "the rows in this chat are not two to a line. {context}"
+    );
+    assert_eq!(
+        value(steps, "call-icon"),
+        "image://theme/icon-m-call",
+        "Call button has no call icon. {context}"
     );
     assert!(
         opened.contains("push:EditNamePage.qml:"),
