@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ta">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat கோர் %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>பற்றி</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>மூலக் குறியீடும் உரிமமும்</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit என்பது GPL-3.0 உரிமத்தின் கீழ் உள்ள கட்டற்ற மென்பொருள்.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>சிக்கலைப் புகாரளி</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>உங்கள் புகாருக்காகப் பதிப்புகள் நகலெடுக்கப்படுகின்றன.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat பற்றி</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -2307,7 +2346,71 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>சோதனை முறை</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>இந்த அம்சங்கள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc செயலிகள்</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>இருப்பிடப் பகிர்வு</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>அரட்டைகளில் உங்கள் இருப்பிடத்தைப் பகிர்ந்து, பகிரப்பட்ட இருப்பிடங்களை வரைபடத்தில் காட்டுகிறது.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>குரல் செய்திகளை எழுத்தாக்கு</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக மாற்றுகிறது.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>மொழிகள்</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>மீண்டும் முயல்க</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>குறைந்த தரம், குறைந்த தரவு</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>சமநிலை</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ஒருபோதும் இல்லை</translation>
@@ -2337,29 +2440,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>எப்போதும்</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>அமைப்புகள்</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>செய்திகள்</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>இணைப்புகளைத் தானாகப் பதிவிறக்கு</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>இணைப்புகளிலிருந்து கண்காணிப்பை நீக்கு</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>அறிவிப்புகள்</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc செயலிகளை இயக்கு (சோதனை முறை)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>அணை</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2382,30 +2465,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 ஆண்டுக்குப் பிறகு</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>சாதனத்திலிருந்து செய்திகளை நீக்கு</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>குறிப்பிடல்கள்</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>மார்க்டௌன் வடிவமைப்பைப் பயன்படுத்து</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>தனியுரிமை</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>தடுக்கபட்ட தொடர்புகள்</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>சமநிலை</translation>
+        <source>Messages</source>
+        <translation>செய்திகள்</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2413,13 +2474,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அனுப்பப்படும் ஊடகத்தின் தரம்</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>அறிவிப்புகளைக் காட்டு</translation>
+        <source>Auto-download attachments</source>
+        <translation>இணைப்புகளைத் தானாகப் பதிவிறக்கு</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>குறைந்த தரம், குறைந்த தரவு</translation>
+        <source>Show Markdown formatting</source>
+        <translation>மார்க்டௌன் வடிவமைப்பைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>செய்திகளில் *தடிமன்*, _சாய்வு_ மற்றும் `குறியீடு` ஆகியவற்றை வடிவமைக்கிறது.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>இந்தத் தொலைபேசியில்</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>பழைய செய்திகளை நீக்கு</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>செய்திகள் இந்தத் தொலைபேசியிலிருந்து மட்டுமே நீக்கப்படும், ஒவ்வொரு சுயவிவரத்திலும்.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>மற்ற சாதனங்களும் உரையாடல் உறுப்பினர்களும் தங்கள் நகல்களை வைத்துக்கொள்வார்கள்.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>அறிவிப்புகள்</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>அறிவிப்புகளைக் காட்டு</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2438,64 +2531,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>விவரங்கள் இல்லை</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>ஒலியடக்கிய குழுக்களில் உங்கள் செய்திகளுக்கு வந்த பதில்களுக்கான அறிவிப்புகளைக் காட்டு</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து சொடுக்கு ஐடிகளையும் பிரச்சாரக் குறிச்சொற்களையும் நீக்குகிறது.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>விரைவுச் செயல்கள்</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>மேம்பட்டவை</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>ஒவ்வொரு சுயவிவரத்துக்கும் பொருந்தும், ஒரு அரட்டையின் சொந்த மறையும் செய்திகள் அமைப்பு எதுவாக இருந்தாலும்.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>அழைப்புகள்</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>உள்வரும் அழைப்புகளுக்கு ஒலி எழுப்பு</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>ஏற்கப்பட்ட தொடர்புகளுக்கு அழைப்புத் திரையைக் காட்டு</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
+        <source>Muted chats</source>
+        <translation>ஒலியடக்கப்பட்ட உரையாடல்கள்</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>இருப்பிடப் பகிர்வை இயக்கு (சோதனை முறை)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>ஒலியடக்கப்பட்ட குழுக்களில் பதில்கள்</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>அரட்டைகளில் உங்கள் இருப்பிடத்தைப் பகிர்ந்து, பகிரப்பட்ட இருப்பிடங்களை வரைபடத்தில் காட்டுகிறது.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>ஒலியடக்கிய குழுக்களில் உங்கள் செய்திகளுக்கு வந்த பதில்களுக்கான அறிவிப்புகளைக் காட்டு</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>அமைப்புகள்</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>குரல் செய்திகளை எழுத்தாக்கு (சோதனை முறை)</translation>
+        <source>Messages</source>
+        <translation>செய்திகள்</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
+        <source>Notifications</source>
+        <translation>அறிவிப்புகள்</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>இந்தத் தொலைபேசியிலேயே குரல் செய்திகளை எழுத்தாக மாற்றுகிறது.</translation>
+        <source>Privacy and security</source>
+        <translation>தனியுரிமை மற்றும் பாதுகாப்பு</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>எதுவும் தொலைபேசியை விட்டு வெளியேறாது.</translation>
+        <source>Cover</source>
+        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
+        <translation>கவர்</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>சோதனை முறை</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>பற்றி</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>உங்கள் சுயவிவரம்</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>தனியுரிமை மற்றும் பாதுகாப்பு</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>இணைப்புகளிலிருந்து கண்காணிப்பை நீக்கு</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து சொடுக்கு ஐடிகளையும் பிரச்சாரக் குறிச்சொற்களையும் நீக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>சுயவிவரம்: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>தடுக்கபட்ட தொடர்புகள்</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n தொடர்பு</numerusform>
+            <numerusform>%n தொடர்புகள்</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3209,32 +3337,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>இந்த மொழியின் எழுத்தாக்கங்களில் அதிகப் பிழைகள் இருக்க வாய்ப்புள்ளது.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>குரல் செய்தி எழுத்தாக்கம்</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>மொழிகள்</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>எப்போது</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>பேச்சு மாதிரியைப் பதிவிறக்க முடியவில்லை.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>மீண்டும் முயல்க</translation>
     </message>
 </context>
 <context>

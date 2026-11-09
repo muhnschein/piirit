@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tt">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat үзәге %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Кушымта турында</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Чыганак коды һәм лицензия</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit — GPL-3.0 лицензиясе астындагы ирекле программа.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Проблема турында хәбәр итү</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Версияләр сезнең хәбәрегез өчен күчерелә.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat турында</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -2302,7 +2341,71 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Сынау режимы</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Бу функцияләр тотрыксыз булырга, үзгәрергә яки бетерелергә мөмкин.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc кушымталары</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Урынны тапшыру</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Әңгәмәләрдә урыныгызны уртаклаша һәм уртаклашылган урыннарны картада күрсәтә.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Тавышлы хәбәрләрне язуга күчерү</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Бу телефонда тавышлы хәбәрләрне текстка әйләндерә.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Бернәрсә дә телефоннан чыкмый.</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Телләр</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Сөйләм моделен йөкләп булмады.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Кабатлау</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Түбәнрәк сыйфат, азрак трафик</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Тигезләнгән</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Беркайчан да</translation>
@@ -2332,29 +2435,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Һәрвакыт</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Көйләүләр</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Хәбәрләр</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Кушымталарны автоматик йөкләргә</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Сылтамалардан күзәтүне алырга</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Белдерүләр</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc кушымталарын кабызу (сынау режимы)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Сүнгән</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2377,30 +2460,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 елдан соң</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Хәбәрләрне җайланмадан бетерергә</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Искә алулар</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Markdown форматлавын кулланырга</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Хосусыйлык</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Блокланган контактлар</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Тигезләнгән</translation>
+        <source>Messages</source>
+        <translation>Хәбәрләр</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2408,13 +2469,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Җибәрелә торган медиа сыйфаты</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Белдерүләрне күрсәтү</translation>
+        <source>Auto-download attachments</source>
+        <translation>Кушымталарны автоматик йөкләргә</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Түбәнрәк сыйфат, азрак трафик</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Markdown форматлавын күрсәтергә</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Хәбәрләрдә *калын*, _курсив_ һәм `код` форматлый.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Бу телефонда</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Иске хәбәрләрне бетерергә</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Хәбәрләр бары тик бу телефоннан гына бетерелә, һәр профильдә.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Башка җайланмалар һәм чат әгъзалары үз күчермәләрен саклый.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Белдерүләр</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Белдерүләрне күрсәтү</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2433,64 +2526,98 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Тәфсилләрсез</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Тавышсыз төркемнәрдә сезнең хәбәрләргә килгән җаваплар турында белдерүләр күрсәтү</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Сез җибәргән сылтамалардан басу идентификаторларын һәм кампания билгеләрен бетерә.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Тиз гамәлләр</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Өстәмә</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Һәр профильгә кагыла, чатның үз юкка чыга торган хәбәрләр көйләвенә карамастан.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Шалтыратулар</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Керүче шалтыратуларда шалтырату</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Кабул ителгән контактлар өчен шалтырату экранын күрсәтү</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә.</translation>
+        <source>Muted chats</source>
+        <translation>Тавышсыз чатлар</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Урынны тапшыруны кабызу (сынау режимы)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Тавышсыз төркемнәрдәге җаваплар</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Әңгәмәләрдә урыныгызны уртаклаша һәм уртаклашылган урыннарны картада күрсәтә.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Тавышсыз төркемнәрдә сезнең хәбәрләргә килгән җаваплар турында белдерүләр күрсәтү</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Көйләүләр</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Тавышлы хәбәрләрне язуга күчерү (сынау режимы)</translation>
+        <source>Messages</source>
+        <translation>Хәбәрләр</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Тавышлы хәбәрләрне язуга күчерү</translation>
+        <source>Notifications</source>
+        <translation>Белдерүләр</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Бу телефонда тавышлы хәбәрләрне текстка әйләндерә.</translation>
+        <source>Privacy and security</source>
+        <translation>Хосусыйлык һәм куркынычсызлык</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Бернәрсә дә телефоннан чыкмый.</translation>
+        <source>Cover</source>
+        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
+        <translation>Тышлык</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Сынау режимы</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Кушымта турында</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Сезнең профиль</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Хосусыйлык һәм куркынычсызлык</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Сылтамалардан күзәтүне алырга</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Сез җибәргән сылтамалардан басу идентификаторларын һәм кампания билгеләрен бетерә.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Профиль: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Блокланган контактлар</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n контакт</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3202,32 +3329,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Бу телдәге язмаларда, мөгаен, хаталар күбрәк.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Тавышлы хәбәрләрне язуга күчерү</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Телләр</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Кайчан</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Сөйләм моделен йөкләп булмады.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Кабатлау</translation>
     </message>
 </context>
 <context>

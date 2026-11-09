@@ -237,6 +237,10 @@ pub struct DeltaChatCore {
     pub system_info: qt_property!(QString; NOTIFY system_info_changed),
     /// `system_info` refreshed.
     pub system_info_changed: qt_signal!(),
+    /// Core's version from `system_info`, no leading `v`; empty until known.
+    pub core_version: qt_property!(QString; NOTIFY system_info_changed),
+    /// Piirit's own version, as the crates and spec carry it.
+    pub app_version: qt_property!(QString; READ app_version CONST),
 
     /// Raw core event, whole as `payload_json`; untyped so QML reads any kind.
     pub core_event: qt_signal!(context_id: u32, kind: QString, payload_json: QString),
@@ -786,7 +790,11 @@ impl DeltaChatCore {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
                 Ok(info) => {
-                    this.borrow_mut().system_info = info.into();
+                    let version = core_version_of(&info);
+                    let mut core = this.borrow_mut();
+                    core.system_info = info.into();
+                    core.core_version = version.into();
+                    drop(core);
                     this.borrow().system_info_changed();
                 }
                 // Own signal: timed-out check isn't a gone core; ready-gated buttons would die.
@@ -802,6 +810,12 @@ impl DeltaChatCore {
                 .map_err(|err| err.to_string());
             done(result);
         });
+    }
+
+    /// Crate version: bumped with spec and the other crates on release.
+    #[allow(clippy::unused_self)]
+    fn app_version(&self) -> QString {
+        env!("CARGO_PKG_VERSION").into()
     }
 
     /// Create unconfigured account.
@@ -1542,6 +1556,15 @@ impl DeltaChatCore {
     }
 }
 
+/// `deltachat_core_version` out of `get_system_info` JSON, `v` dropped; empty if absent.
+fn core_version_of(info: &str) -> String {
+    serde_json::from_str::<BTreeMap<String, String>>(info)
+        .ok()
+        .and_then(|map| map.get("deltachat_core_version").cloned())
+        .map(|version| version.trim_start_matches('v').to_string())
+        .unwrap_or_default()
+}
+
 /// Read `set_stock_strings` input: id to text. Non-numeric key: error, not skipped.
 fn parse_stock_strings(text: &str) -> Result<BTreeMap<u32, String>, String> {
     let map: BTreeMap<String, String> =
@@ -1686,7 +1709,7 @@ pub(crate) fn reconcile_rows<T, K>(
 #[cfg(test)]
 mod tests {
     use super::{
-        is_relayed, last_words, reconcile_accounts, restart_delay, resume_account, server_path,
+        core_version_of, is_relayed, last_words, reconcile_accounts, restart_delay, resume_account, server_path,
         AccountItem, AccountListModel, BUNDLED_SERVER, HANDLED_EVENT_KINDS, RESTART_DELAY_MAX,
         RESTART_DELAY_MIN, RESTART_LIMIT,
     };
@@ -1705,6 +1728,15 @@ mod tests {
         ]) {
             assert!(is_relayed(kind), "{kind:?} would never reach the app");
         }
+    }
+
+    #[test]
+    fn the_core_version_is_read_without_its_v() {
+        let info = r#"{"arch":"64","deltachat_core_version":"v2.68.0","level":"awesome"}"#;
+        assert_eq!(core_version_of(info), "2.68.0");
+        // Older or odd core: nothing shown, not a wrong number.
+        assert_eq!(core_version_of(r#"{"name":"fake"}"#), "");
+        assert_eq!(core_version_of("not json"), "");
     }
 
     fn account(id: u32, name: &str) -> AccountItem {

@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat 核心 %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>源代码和许可证</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit 是基于 GPL-3.0 许可证的自由软件。</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>报告问题</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>版本信息会被复制，供你报告时使用。</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>关于 Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -2302,7 +2341,71 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>实验性</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>这些功能可能不稳定，可能会被更改或移除。</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc 应用</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>在聊天中运行小应用。</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>位置流</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>在聊天中分享你的位置，并在地图上显示分享的位置。</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>转写语音消息</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>在这部手机上把语音消息转成文字。</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>任何内容都不会离开手机。</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>语言</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>无法下载语音模型。</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>重试</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>较低画质，较少流量</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>平衡</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>从不</translation>
@@ -2332,29 +2435,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>总是</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>设置</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>消息</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>自动下载附件</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>去除链接中的跟踪参数</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>通知</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>启用 webxdc 应用（实验性）</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2377,30 +2460,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 年后</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>从设备删除消息</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>提及</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>使用 Markdown 格式</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>隐私</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>已屏蔽联系人</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>平衡</translation>
+        <source>Messages</source>
+        <translation>消息</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2408,13 +2469,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>发出媒体质量</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>显示通知</translation>
+        <source>Auto-download attachments</source>
+        <translation>自动下载附件</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>较低画质，较少流量</translation>
+        <source>Show Markdown formatting</source>
+        <translation>显示 Markdown 格式</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>在消息中显示 *粗体*、_斜体_ 和 `代码` 格式。</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>在此手机上</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>删除旧消息</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>消息只会从此手机上删除，适用于所有个人资料。</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>其他设备和聊天成员会保留各自的副本。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>通知</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>显示通知</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2433,64 +2526,98 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>不显示详情</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>在静音群中显示回复你消息的通知</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>从你发送的链接中移除点击 ID 和营销标签。</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>快捷操作</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>高级</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>适用于所有个人资料，无论各聊天自身的阅后即焚消息设置如何。</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>通话</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>来电时响铃</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>为已接受的联系人显示通话界面</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>在聊天中运行小应用。</translation>
+        <source>Muted chats</source>
+        <translation>已静音的聊天</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>启用位置流（实验性）</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>已静音群组中的回复</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>在聊天中分享你的位置，并在地图上显示分享的位置。</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>在静音群中显示回复你消息的通知</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>设置</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>转写语音消息（实验性）</translation>
+        <source>Messages</source>
+        <translation>消息</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>语音消息转写</translation>
+        <source>Notifications</source>
+        <translation>通知</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>在这部手机上把语音消息转成文字。</translation>
+        <source>Privacy and security</source>
+        <translation>隐私与安全</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>任何内容都不会离开手机。</translation>
+        <source>Cover</source>
+        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
+        <translation>封面</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>实验性</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>你的个人资料</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>隐私与安全</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>去除链接中的跟踪参数</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>从你发送的链接中移除点击 ID 和营销标签。</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>个人资料：%1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已屏蔽联系人</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n 个联系人</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3202,32 +3329,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>这种语言的转写可能有较多错误。</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>语音消息转写</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>语言</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>何时</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>无法下载语音模型。</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>重试</translation>
     </message>
 </context>
 <context>

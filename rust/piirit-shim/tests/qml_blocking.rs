@@ -1,8 +1,9 @@
 //! Way into block list, and the two pages behind it.
 //!
-//! Settings page's only page-opening row hands it the profile (core keeps block list per account).
-//! Behind it: blocked contacts, the picker its plus opens, and the question each asks before
-//! anything is sent. Drives all vs fake core; test accepts dialogs (as `qml_auto_delete_flow`).
+//! Settings top page hands its profile to Privacy and security (core keeps block list per
+//! account), whose row counts the blocked and names the profile when there are several. Behind
+//! it: blocked contacts, the picker its plus opens, and the question each asks before anything is
+//! sent. Drives all vs fake core; test accepts dialogs (as `qml_auto_delete_flow`).
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -106,6 +107,7 @@ fn probe_qml() -> String {
         function same(name) {{
             return '' + (kept !== null && findIn(loader.item, name) === kept)
         }}
+        function refreshAccounts() {{ core.refresh_accounts(); return 'ok' }}
         function reload(name) {{
             var list = findIn(loader.item, name)
             if (!list) {{ return 'missing:' + name }}
@@ -132,6 +134,8 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         // Profile whose block list core won't read.
         std::env::set_var("PIIRIT_FAKE_BLOCKED_FAIL", "7");
+        // Two profiles: the block list says whose it is.
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
     piirit_shim::register_qml_types();
@@ -176,23 +180,86 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
 
     let mut plan = common::Plan::default();
 
-    // The settings page: the row is there, between the notifications and
-    // the links, and it opens the block list of the profile it was given.
-    plan.after(2, move || unsafe {
+    plan.after(1, move || unsafe {
+        record!("refresh", call!("refreshAccounts"));
+    });
+    // Top page: own profile first, opening its page; Privacy and security gets the profile.
+    plan.until(1, 40, move |last| unsafe {
+        // Loaded afresh each try: account list fills behind it.
+        let loaded = call!(
+            "load",
+            QString::from(common::page_url("SettingsPage.qml")),
+            1
+        );
+        if call!(
+            "get",
+            QString::from("profileEntry"),
+            QString::from("visible")
+        ) != "true"
+            && !last
+        {
+            return false;
+        }
+        record!("load-settings", loaded);
         record!(
-            "load-settings",
+            "profile-row",
+            call!(
+                "get",
+                QString::from("contactAddress"),
+                QString::from("text")
+            )
+        );
+        record!(
+            "open-profile",
+            call!("click", QString::from("profileEntry"))
+        );
+        record!("pushed-profile", call!("pushed"));
+        record!(
+            "open-privacy",
+            call!("click", QString::from("privacyEntry"))
+        );
+        record!("pushed-privacy", call!("pushed"));
+        record!(
+            "load-privacy",
             call!(
                 "load",
-                QString::from(common::page_url("SettingsPage.qml")),
+                QString::from(common::page_url("SettingsPrivacyPage.qml")),
                 1
+            )
+        );
+        record!(
+            "count-before-answer",
+            call!(
+                "get",
+                QString::from("blockedContactsEntry"),
+                QString::from("value")
+            )
+        );
+        true
+    });
+    plan.after(1, move || unsafe {
+        record!(
+            "privacy-count",
+            call!(
+                "get",
+                QString::from("blockedContactsEntry"),
+                QString::from("value")
+            )
+        );
+        record!(
+            "privacy-profile",
+            call!(
+                "get",
+                QString::from("blockedProfileLabel"),
+                QString::from("text")
             )
         );
         record!(
             "settings-row",
             call!(
                 "get",
-                QString::from("blockedContactsLabel"),
-                QString::from("text")
+                QString::from("blockedContactsEntry"),
+                QString::from("label")
             )
         );
         record!(
@@ -274,6 +341,24 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!(
             "contacts-after",
             call!("get", QString::from("contacts"), QString::from("count"))
+        );
+        record!(
+            "load-privacy-again",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsPrivacyPage.qml")),
+                1
+            )
+        );
+    });
+    plan.after(1, move || unsafe {
+        record!(
+            "privacy-count-after",
+            call!(
+                "get",
+                QString::from("blockedContactsEntry"),
+                QString::from("value")
+            )
         );
         record!(
             "load-blocked-again",
@@ -389,7 +474,12 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     );
 
     for label in [
+        "refresh",
         "load-settings",
+        "open-profile",
+        "open-privacy",
+        "load-privacy",
+        "load-privacy-again",
         "load-blocked",
         "load-picker",
         "load-blocked-again",
@@ -406,9 +496,41 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     }
 
     assert_eq!(
+        (value("profile-row"), value("pushed-profile")),
+        (
+            "Your profile".to_string(),
+            "ProfilePage.qml:accountId=1".to_string()
+        ),
+        "the settings do not start with the chat list's profile, opening its page. {context}"
+    );
+    assert_eq!(
+        value("pushed-privacy"),
+        "SettingsPrivacyPage.qml:accountId=1",
+        "Privacy and security did not get the chat list's profile. {context}"
+    );
+    assert_eq!(
         value("settings-row"),
         "Blocked contacts",
-        "the settings page has no row leading to the block list. {context}"
+        "the privacy settings have no row leading to the block list. {context}"
+    );
+    assert_eq!(
+        (
+            value("count-before-answer"),
+            value("privacy-count"),
+            value("privacy-count-after")
+        ),
+        (
+            String::new(),
+            "0 contact(s)".to_string(),
+            "1 contact(s)".to_string()
+        ),
+        "the block list row did not count who is blocked, or counted before the core \
+         answered. {context}"
+    );
+    assert_eq!(
+        value("privacy-profile"),
+        "Profile: account1@example.org",
+        "with two profiles, the block list does not say whose it is. {context}"
     );
     assert_eq!(
         value("pushed-blocked"),

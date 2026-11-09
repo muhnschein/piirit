@@ -80,6 +80,11 @@ const PROBE_QML: &str = r"
             loader.setSource(url, { width: 1080, height: 2520 })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
+        // As About opens it.
+        function loadTour(url) {
+            loader.setSource(url, { width: 1080, height: 2520, tour: true })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -264,6 +269,80 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
 
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_walk(&steps.borrow(), &navigation);
+}
+
+/// From About: same facts, but the walk leads nowhere past them; back is the way out.
+#[test]
+fn the_introduction_from_about_ends_on_its_last_fact() {
+    // SAFETY: single thread; pre-Qt.
+    unsafe {
+        std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+    }
+
+    let stack_box = QObjectBox::new(PageStackProbe::default());
+
+    let mut engine = QmlEngine::new();
+    piirit_shim::install_pictures(&engine);
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
+    engine.set_object_property("pageStack".into(), stack_box.pinned());
+    engine.load_data(QByteArray::from(PROBE_QML));
+
+    let engine_ptr = std::ptr::addr_of_mut!(engine);
+    // SAFETY: callbacks run only inside `exec()`; `engine` outlives it.
+    macro_rules! call {
+        ($name:expr $(, $arg:expr)*) => {{
+            let result = unsafe {
+                (*engine_ptr).invoke_method(
+                    $name.into(),
+                    &[$(QVariant::from(QString::from($arg))),*],
+                )
+            };
+            QString::from_qvariant(result).unwrap_or_default().to_string()
+        }};
+    }
+
+    let steps = std::rc::Rc::new(std::cell::RefCell::new(Vec::<(&str, String)>::new()));
+    let r = steps.clone();
+    let mut plan = common::Plan::default();
+    plan.after(1, move || {
+        let mut r = r.borrow_mut();
+        r.push(("load", call!("loadTour", common::page_url("IntroPage.qml"))));
+        r.push(("facts", call!("facts")));
+        r.push(("swipe", call!("swipeTo", "4")));
+        r.push(("hint", call!("get", "swipeHint", "visible")));
+        r.push(("by-hand", call!("pullByHand")));
+    });
+    plan.after(1, move || unsafe {
+        (*engine_ptr).quit();
+    });
+    plan.run();
+    engine.exec();
+
+    let navigation = stack_box.pinned().borrow().log.to_string();
+    let steps = steps.borrow();
+    let context = format!("steps: {steps:?}\nnavigation: {navigation}");
+    let value = |label: &str| {
+        steps
+            .iter()
+            .find(|(name, _)| *name == label)
+            .map_or("<step did not run>", |(_, value)| value.as_str())
+    };
+    assert_eq!(
+        (value("load"), value("facts"), value("swipe"), value("by-hand")),
+        ("ok", "5", "4", "ok"),
+        "the introduction from About did not walk its five facts. {context}"
+    );
+    assert_eq!(
+        value("hint"),
+        "false",
+        "the last fact offered profile setup to someone who has a profile. {context}"
+    );
+    assert_eq!(
+        navigation, "",
+        "a pull past the last fact from About left for the setup path. {context}"
+    );
 }
 
 /// Each fact: picture and words; last offers way on; pull past asks setup once.

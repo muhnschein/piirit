@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fi">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat -ydin %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Tietoja</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Lähdekoodi ja lisenssi</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit on vapaa ohjelmisto GPL-3.0-lisenssillä.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Ilmoita ongelmasta</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versiot kopioidaan ilmoitustasi varten.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Tietoja Delta Chatista</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -2307,7 +2346,71 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Kokeellinen</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Nämä ominaisuudet voivat olla epävakaita, muuttua tai poistua.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc-sovellukset</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Sijainnin jatkuva jakaminen</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Jakaa sijaintisi keskusteluissa ja näyttää jaetut sijainnit kartalla.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Litteroi ääniviestit</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Muuttaa ääniviestit tekstiksi tässä puhelimessa.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Mikään ei lähde puhelimesta.</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Kielet</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Puhemallia ei voitu ladata.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Yritä uudelleen</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Heikompi laatu, vähemmän dataa</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Tasapainotettu</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Ei koskaan</translation>
@@ -2337,29 +2440,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Aina</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Asetukset</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Viestit</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Lataa liitteet automaattisesti</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Poista seuranta linkeistä</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Ilmoitukset</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Ota webxdc-sovellukset käyttöön (kokeellinen)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Pois</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2382,30 +2465,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 vuoden kuluttua</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Poista viestit laitteesta</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Maininnat</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Käytä Markdown-muotoilua</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Yksityisyys</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Estetyt yhteystiedot</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Tasapainotettu</translation>
+        <source>Messages</source>
+        <translation>Viestit</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2413,13 +2474,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lähtevän median laatu</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Näytä ilmoitukset</translation>
+        <source>Auto-download attachments</source>
+        <translation>Lataa liitteet automaattisesti</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Heikompi laatu, vähemmän dataa</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Näytä Markdown-muotoilu</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Muotoilee viesteissä *lihavoinnin*, _kursiivin_ ja `koodin`.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Tässä puhelimessa</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Poista vanhat viestit</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Viestit poistetaan vain tästä puhelimesta, jokaisesta profiilista.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Muut laitteet ja keskustelun jäsenet säilyttävät omat kopionsa.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Ilmoitukset</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Näytä ilmoitukset</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2438,64 +2531,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ei tietoja</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Näytä ilmoitukset vastauksista viesteihisi mykistetyissä ryhmissä</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Poistaa klikkaustunnisteet ja kampanjamerkinnät lähettämistäsi linkeistä.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Pikatoiminnot</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Lisäasetukset</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Koskee jokaista profiilia keskustelun omasta katoavien viestien asetuksesta riippumatta.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Puhelut</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Soita saapuvista puheluista</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Näytä puhelunäkymä hyväksytyiltä yhteystiedoilta</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
+        <source>Muted chats</source>
+        <translation>Mykistetyt keskustelut</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Ota sijainnin jatkuva jakaminen käyttöön (kokeellinen)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Vastaukset mykistetyissä ryhmissä</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Jakaa sijaintisi keskusteluissa ja näyttää jaetut sijainnit kartalla.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Näytä ilmoitukset vastauksista viesteihisi mykistetyissä ryhmissä</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Asetukset</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Litteroi ääniviestit (kokeellinen)</translation>
+        <source>Messages</source>
+        <translation>Viestit</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Ääniviestien litterointi</translation>
+        <source>Notifications</source>
+        <translation>Ilmoitukset</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Muuttaa ääniviestit tekstiksi tässä puhelimessa.</translation>
+        <source>Privacy and security</source>
+        <translation>Yksityisyys ja tietoturva</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Mikään ei lähde puhelimesta.</translation>
+        <source>Cover</source>
+        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
+        <translation>Kansi</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Kokeellinen</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Tietoja</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Oma profiili</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Yksityisyys ja tietoturva</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Poista seuranta linkeistä</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Poistaa klikkaustunnisteet ja kampanjamerkinnät lähettämistäsi linkeistä.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profiili: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Estetyt yhteystiedot</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n yhteystieto</numerusform>
+            <numerusform>%n yhteystietoa</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3209,32 +3337,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Tämän kielen litteroinneissa on todennäköisesti enemmän virheitä.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Ääniviestien litterointi</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Kielet</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Milloin</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Puhemallia ei voitu ladata.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Yritä uudelleen</translation>
     </message>
 </context>
 <context>

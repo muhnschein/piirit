@@ -5,8 +5,9 @@ import "../components"
 /*
  * What Delta Chat is: five facts, one per swiped screen. Wording from
  * delta.chat/en/help minus tech half (FAQ has it). Swipe past last: setup;
- * first swipes back too. No faces field: pictures are the look. Masks from
- * components/InkArt.qml, painted by tools/faces/scenes.py.
+ * first swipes back too. From About (`tour`): facts only. No faces field:
+ * pictures are the look. Masks from components/InkArt.qml, painted by
+ * tools/faces/scenes.py.
  */
 Page {
     id: page
@@ -16,6 +17,9 @@ Page {
 
     // Set past end: one drag cannot ask twice.
     property bool leaving: false
+
+    /// From About: facts only; past last leads nowhere, back is the way out.
+    property bool tour: false
 
     /// Facts in order. Plain array: ListElement takes literals only; translated.
     readonly property var facts: [
@@ -51,7 +55,7 @@ Page {
 
     // Setup starts after facts. replace: back from setup shows first screen.
     function goOn() {
-        if (page.leaving) {
+        if (page.leaving || page.tour) {
             return
         }
         page.leaving = true
@@ -171,7 +175,7 @@ Page {
         Label {
             objectName: "swipeHint"
             width: parent.width
-            visible: slides.currentIndex === page.facts.length - 1
+            visible: !page.tour && slides.currentIndex === page.facts.length - 1
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             textFormat: Text.PlainText

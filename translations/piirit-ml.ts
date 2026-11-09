@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ml">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat കോർ %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>വിവരം</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>സോഴ്സ് കോഡും ലൈസൻസും</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit GPL-3.0 പ്രകാരമുള്ള സ്വതന്ത്ര സോഫ്റ്റ്‌വെയറാണ്.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>നിങ്ങളുടെ റിപ്പോർട്ടിനായി പതിപ്പുകൾ പകർത്തുന്നു.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat -നെക്കുറിച്ച്</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -2311,7 +2350,71 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>പരീക്ഷണാത്മകം</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>ഈ സവിശേഷതകൾ അസ്ഥിരമാകാം, മാറ്റപ്പെടാം അല്ലെങ്കിൽ നീക്കം ചെയ്യപ്പെടാം.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc ആപ്പുകൾ</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ്</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>കുറഞ്ഞ ഗുണനിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>സന്തുലിതം</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ഒരിക്കലും വേണ്ട</translation>
@@ -2341,29 +2444,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>എപ്പോഴും</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>ക്രമീകരണങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>സന്ദേശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>അറ്റാച്ച്‌മെന്റുകൾ സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>ലിങ്കുകളിൽ നിന്ന് ട്രാക്കിംഗ് നീക്കുക</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>അറിയിപ്പുകൾ</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc ആപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>ഓഫ്</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2386,30 +2469,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 വർഷത്തിനു ശേഷം</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>ഉപകരണത്തിൽ നിന്ന് സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>പരാമർശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>സ്വകാര്യത</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>സന്തുലിതം</translation>
+        <source>Messages</source>
+        <translation>സന്ദേശങ്ങൾ</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2417,13 +2478,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അയയ്ക്കുന്ന മീഡിയയുടെ നിലവാരം</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
+        <source>Auto-download attachments</source>
+        <translation>അറ്റാച്ച്‌മെന്റുകൾ സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>കുറഞ്ഞ ഗുണനിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
+        <source>Show Markdown formatting</source>
+        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>സന്ദേശങ്ങളിൽ *ബോൾഡ്*, _ഇറ്റാലിക്_, `കോഡ്` എന്നിവ രൂപപ്പെടുത്തുന്നു.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>ഈ ഫോണിൽ</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>പഴയ സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>സന്ദേശങ്ങൾ ഈ ഫോണിൽ നിന്ന് മാത്രം ഇല്ലാതാക്കുന്നു, എല്ലാ പ്രൊഫൈലിലും.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>മറ്റ് ഉപകരണങ്ങളും ചാറ്റ് അംഗങ്ങളും അവരുടെ പകർപ്പുകൾ സൂക്ഷിക്കുന്നു.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>അറിയിപ്പുകൾ</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2442,64 +2535,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>വിശദാംശങ്ങളില്ല</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങളുടെ സന്ദേശങ്ങൾക്കുള്ള മറുപടികളുടെ അറിയിപ്പുകൾ കാണിക്കുക</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>വിപുലമായത്</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>ഓരോ പ്രൊഫൈലിനും ബാധകമാണ്, ഒരു ചാറ്റിന്റെ സ്വന്തം അപ്രത്യക്ഷമാകുന്ന സന്ദേശങ്ങളുടെ ക്രമീകരണം എന്തായാലും.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>കോളുകൾ</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>വരുന്ന കോളുകൾക്ക് റിംഗ് ചെയ്യുക</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>സ്വീകരിച്ച കോൺടാക്റ്റുകൾക്കായി കോൾ സ്ക്രീൻ കാണിക്കുക</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+        <source>Muted chats</source>
+        <translation>മ്യൂട്ട് ചെയ്ത ചാറ്റുകൾ</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ് പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>മ്യൂട്ട് ചെയ്ത ഗ്രൂപ്പുകളിലെ മറുപടികൾ</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങളുടെ സന്ദേശങ്ങൾക്കുള്ള മറുപടികളുടെ അറിയിപ്പുകൾ കാണിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>ക്രമീകരണങ്ങൾ</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Messages</source>
+        <translation>സന്ദേശങ്ങൾ</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+        <source>Notifications</source>
+        <translation>അറിയിപ്പുകൾ</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+        <source>Privacy and security</source>
+        <translation>സ്വകാര്യതയും സുരക്ഷയും</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+        <source>Cover</source>
+        <extracomment>Settings topic: what the app shows on its cover (the minimised app on the home screen).</extracomment>
+        <translation>കവർ</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>പരീക്ഷണാത്മകം</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>വിവരം</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>സ്വകാര്യതയും സുരക്ഷയും</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>ലിങ്കുകളിൽ നിന്ന് ട്രാക്കിംഗ് നീക്കുക</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>പ്രൊഫൈൽ: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n കോൺടാക്റ്റ്</numerusform>
+            <numerusform>%n കോൺടാക്റ്റുകൾ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3213,32 +3341,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>ഈ ഭാഷയിലെ എഴുത്തുരൂപങ്ങളിൽ കൂടുതൽ തെറ്റുകൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>ഭാഷകൾ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>എപ്പോൾ</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
     </message>
 </context>
 <context>
