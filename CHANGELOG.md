@@ -10,6 +10,7 @@ docs/BUILDING.md, "Cutting a release").
 
 - **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
 - Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.
+- The chat list's Search button shrinks to its magnifier when the buttons beside it wouldn't fit otherwise, such as with long words in your language or large text.
 - If the Delta Chat core stops while Piirit waits for news, Piirit notices, says it is reconnecting and starts the core again. Before, it could miss that and keep showing chats that no longer updated until restarted.
 - A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.
 - With voice messages turned into text, the chat list shows a voice message's text instead of just "Voice message", and so does a reply's quote of it and the reply bar while you answer one. Until the text is there, or with the feature off, they read as before.
