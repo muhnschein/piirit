@@ -1,7 +1,7 @@
-//! Members page: every member, search by name (never address), tap opens a member's page where a
-//! chat with them exists, else their menu; Send message makes the chat and opens it; Remove waits
-//! out platform's countdown, then asks core. Search cleared once page gone (model shared with
-//! group page).
+//! Members page: every member, search by name (never address), invite opens group's QR code, tap
+//! opens a member's page where a chat with them exists, else their menu; Send message makes the
+//! chat and opens it; Remove waits out platform's countdown, then asks core. Search cleared once
+//! page gone (model shared with group page).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -36,8 +36,12 @@ impl PageStackProbe {
         let chat =
             i32::from_qvariant(properties.value(QString::from("chatId"), QVariant::default()))
                 .unwrap_or_default();
+        // QR page only: says whether group or channel.
+        let kind =
+            bool::from_qvariant(properties.value(QString::from("isChannel"), QVariant::default()))
+                .map_or(String::new(), |channel| format!(",channel={channel}"));
         let current = self.log.to_string();
-        self.log = format!("{current}push:{name}(chat={chat})|").into();
+        self.log = format!("{current}push:{name}(chat={chat}{kind})|").into();
         self.log_changed();
         QVariant::default()
     }
@@ -222,6 +226,7 @@ fn the_members_page_finds_opens_and_removes_members() {
             call!("setText", QString::from("searchField"), QString::from(""))
         );
         record!("all-again", get!("memberList", "count"));
+        record!("invite", call!("click", QString::from("inviteRow")));
         // Ada: chat with her exists, her page.
         record!("tap-ada", call!("click", QString::from("memberRow10")));
         true
@@ -321,6 +326,7 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         "search-name",
         "search-address",
         "search-clear",
+        "invite",
         "tap-ada",
         "tap-stranger",
         "send-message",
@@ -398,9 +404,11 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Ada's page on her chat; member0's new chat opened, not their page.
+    // Group's own invite; Ada's page on her chat; member0's new chat opened, not their page.
     assert_eq!(
-        navigation, "push:ContactPage.qml(chat=1)|push:ConversationPage.qml(chat=501)|",
+        navigation,
+        "push:QrPage.qml(chat=2,channel=false)|push:ContactPage.qml(chat=1)|\
+         push:ConversationPage.qml(chat=501)|",
         "a tap did not open the right page. {context}"
     );
     let asked = |method: &str| -> Vec<Value> {
