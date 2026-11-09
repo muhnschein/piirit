@@ -8,7 +8,11 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
+- Contact and group pages are laid out anew. The picture sits beside the name, with when they were last seen or how many members a group has under it, and "Media and files" opens one page with tabs for pictures, audio and files, grouped by age (Today, Yesterday, Last 7 days, Last 30 days, Older). Changing a name, a group's description or picture, leaving or deleting the chat, blocking and encryption info are in the pull-down menu.
+- **Chats in common.** A contact's page shows, at the bottom, the chats you share with them: your chat with them and each group they are in. Tap the row to see them all, and a chat to open it.
+- A group's page shows three members; "All members" opens the full list, where you can search members by name and remove one. Tapping a member opens their page if you already chat with them, otherwise offers Send message.
+- New Encryption info page for a contact or group: each key's fingerprint laid out to compare, the relays as domain names, and which group members' keys are missing. The pull-down menu copies the names and fingerprints.
+- Changing a group's name or description is saved when you swipe back from the Edit group page; a contact's nickname the same way from Edit name.
 - Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.
 - If the Delta Chat core stops while Piirit waits for news, Piirit notices, says it is reconnecting and starts the core again. Before, it could miss that and keep showing chats that no longer updated until restarted.
 - A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.

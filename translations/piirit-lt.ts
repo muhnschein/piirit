@@ -723,16 +723,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Atverti kita programa</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Išsaugoti įrenginyje</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -749,7 +740,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Transkribuoti %n balso žinutę</numerusform>
             <numerusform>Transkribuoti %n balso žinutes</numerusform>
@@ -769,6 +760,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Transkribuoti</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Atverti kita programa</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Išsaugoti įrenginyje</translation>
     </message>
 </context>
 <context>
@@ -818,10 +818,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ContactPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Išsaugota</translation>
-    </message>
-    <message>
         <source>Contact</source>
         <translation>Kontaktas</translation>
     </message>
@@ -834,27 +830,72 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nešifruota: paprastas el. pašto kontaktas</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Vardas</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Palikite tuščią, kad būtų naudojamas jų pasirinktas vardas</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Matytas seniai</translation>
     </message>
     <message>
-        <source>Chats in common (%1)</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>Bendrinami pokalbiai (%1)</translation>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Pokalbis trinamas</translation>
     </message>
     <message>
-        <source>Show all</source>
-        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
-        <translation>Rodyti visus</translation>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Ištrinti pokalbį</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Užblokuoti adresatą</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Rodyti šifravimo informaciją</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Taisyti vardą</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Kontakto pasirinktas vardas: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Skambinti</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Vaizdo skambutis</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>Šiame pokalbyje</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Nustatymai</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Bendrinami pokalbiai</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n pokalbis</numerusform>
+            <numerusform>%n pokalbiai</numerusform>
+            <numerusform>%n pokalbių</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1099,9 +1140,104 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>Po %1 sekundžių</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Šie nustatymai taikomi visiems Delta Chat besinaudojantiems dalyviams. Vis dėlto, jie gali kopijuoti, įrašyti ir persiųsti žinutes arba naudoti kitas el. pašto kliento programas.</translation>
+        <source>Remove picture</source>
+        <translation>Pašalinti paveikslėlį</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Paveikslėlis šalinamas</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Keisti paveikslėlį</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Taisyti kanalą</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Taisyti grupę</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Kanalo pavadinimas</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Grupės pavadinimas</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Aprašas</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Šiuos pakeitimus mato visi kanalo nariai. Norėdami išsaugoti, braukite atgal.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Šiuos pakeitimus mato visi grupės nariai. Norėdami išsaugoti, braukite atgal.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Taisyti vardą</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>„%1“ slapyvardis</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Palikite tuščią, kad būtų naudojamas kontakto pasirinktas vardas. Šį vardą matote tik jūs. Norėdami išsaugoti, braukite atgal.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Kopijuoti kontrolinius kodus</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Nukopijuota į iškarpinę</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Šifravimo informacija</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n narys</numerusform>
+            <numerusform>%n nariai</numerusform>
+            <numerusform>%n narių</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Trūksta rakto</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Retransliatoriai</translation>
     </message>
 </context>
 <context>
@@ -1170,10 +1306,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Išsaugota</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Palikti grupę</translation>
     </message>
@@ -1185,17 +1317,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Group</source>
         <translation>Grupė</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Pašalinti paveikslėlį</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Grupės pavadinimas</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n narys</numerusform>
             <numerusform>%n nariai</numerusform>
@@ -1203,37 +1327,61 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Pašalinti iš grupės</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Šalinama</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Pavadinimą mato visi grupėje</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Aprašas</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Keisti paveikslėlį</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR pakvietimo kodas</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kanalas</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Pokalbis trinamas</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Ištrinti pokalbį</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Rodyti šifravimo informaciją</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Taisyti kanalą</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Taisyti grupę</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Šifruota ištisai</translation>
+    </message>
+    <message>
+        <source>Invite</source>
+        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>Pakviesti</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <translation>Nariai</translation>
+    </message>
+    <message numerus="yes">
+        <source>All %n member(s)</source>
+        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
+        <translation>
+            <numerusform>Visi nariai (%n)</numerusform>
+            <numerusform>Visi nariai (%n)</numerusform>
+            <numerusform>Visi nariai (%n)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>Šiame pokalbyje</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Nustatymai</translation>
     </message>
 </context>
 <context>
@@ -1408,7 +1556,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
         <translation>Galerija</translation>
     </message>
     <message>
@@ -1444,7 +1592,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
         <translation>Skambučiai</translation>
     </message>
     <message>
@@ -1455,6 +1603,83 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Map</source>
         <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Žemėlapis</translation>
+    </message>
+    <message>
+        <source>Media and files</source>
+        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
+        <translation>Medija ir failai</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Šiandien</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Vakar</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Paskutinės 7 dienos</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Paskutinės 30 dienų</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Senesni</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Siųsti žinutę</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Pašalinti iš grupės</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Jūs</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Šalinama</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n narys</numerusform>
+            <numerusform>%n nariai</numerusform>
+            <numerusform>%n narių</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Ieškoti narių</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Pridėti narių</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Pakviesti QR kodu</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Niekas neatitinka</translation>
     </message>
 </context>
 <context>
@@ -1932,6 +2157,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Nuskenuokite norėdami prisijungti prie kanalo „%1“</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Nuskenuokite, kad prisijungtumėte prie grupės „%1“</translation>
     </message>
 </context>
 <context>

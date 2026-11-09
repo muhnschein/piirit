@@ -725,16 +725,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>दूसरे ऐप में खोलें</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>डिवाइस में सहेजें</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -751,7 +742,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>%n वॉइस संदेश का लिप्यंतरण करें</numerusform>
             <numerusform>%n वॉइस संदेशों का लिप्यंतरण करें</numerusform>
@@ -770,6 +761,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>लिप्यंतरण करें</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>दूसरे ऐप में खोलें</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>डिवाइस में सहेजें</translation>
     </message>
 </context>
 <context>
@@ -819,10 +819,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ContactPage</name>
     <message>
-        <source>Saved</source>
-        <translation>सहेजा गया</translation>
-    </message>
-    <message>
         <source>Contact</source>
         <translation>संपर्क</translation>
     </message>
@@ -835,27 +831,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>एन्क्रिप्टेड नहीं: एक सादा ईमेल संपर्क</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>नाम</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>उनका चुना हुआ नाम इस्तेमाल करने के लिए खाली छोड़ दें</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>काफ़ी समय पहले देखा गया</translation>
     </message>
     <message>
-        <source>Chats in common (%1)</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>साझा चैट (%1)</translation>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>चैट हटाई जा रही है</translation>
     </message>
     <message>
-        <source>Show all</source>
-        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
-        <translation>सभी दिखाएँ</translation>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>चैट हटाएँ</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>संपर्क ब्लॉक करें</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>एन्क्रिप्शन जानकारी दिखाएँ</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>नाम संपादित करें</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>खुद का नाम: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>कॉल करें</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>वीडियो कॉल</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>इस चैट में</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>सेटिंग्स</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>साझा चैट</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n चैट</numerusform>
+            <numerusform>%n चैट</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1099,9 +1139,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>%1 सेकंड बाद</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>इस चैट के सभी सदस्यों पर लागू होता है; वे अब भी संदेश कॉपी, सहेज और अग्रेषित कर सकते हैं।</translation>
+        <source>Remove picture</source>
+        <translation>चित्र हटाएँ</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>चित्र हटाया जा रहा है</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>चित्र बदलें</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>चैनल संपादित करें</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>समूह संपादित करें</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>चैनल का नाम</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>समूह का नाम</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>विवरण</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>चैनल में सभी ये बदलाव देखते हैं। सहेजने के लिए वापस स्वाइप करें।</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>समूह में सभी ये बदलाव देखते हैं। सहेजने के लिए वापस स्वाइप करें।</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>नाम संपादित करें</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>&quot;%1&quot; के लिए उपनाम</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>संपर्क का अपना चुना हुआ नाम इस्तेमाल करने के लिए खाली छोड़ें। यह नाम सिर्फ़ आप देखते हैं। सहेजने के लिए वापस स्वाइप करें।</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>फ़िंगरप्रिंट कॉपी करें</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>क्लिपबोर्ड पर कॉपी किया गया</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>एन्क्रिप्शन जानकारी</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n सदस्य</numerusform>
+            <numerusform>%n सदस्य</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>कुंजी नहीं है</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>रिले</translation>
     </message>
 </context>
 <context>
@@ -1169,10 +1303,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>सहेजा गया</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>समूह छोड़ें</translation>
     </message>
@@ -1184,54 +1314,69 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Group</source>
         <translation>समूह</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>चित्र हटाएँ</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>समूह का नाम</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n सदस्य</numerusform>
             <numerusform>%n सदस्य</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>समूह से हटाएँ</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>हटाया जा रहा है</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>समूह में सभी नाम देखते हैं</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>विवरण</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>चित्र बदलें</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR आमंत्रण कोड</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>चैनल</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>चैट हटाई जा रही है</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>चैट हटाएँ</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>एन्क्रिप्शन जानकारी दिखाएँ</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>चैनल संपादित करें</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>समूह संपादित करें</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>एंड-टू-एंड एन्क्रिप्टेड</translation>
+    </message>
+    <message>
+        <source>Invite</source>
+        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>आमंत्रित करें</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <translation>सदस्य</translation>
+    </message>
+    <message numerus="yes">
+        <source>All %n member(s)</source>
+        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
+        <translation>
+            <numerusform>सभी %n सदस्य</numerusform>
+            <numerusform>सभी %n सदस्य</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>इस चैट में</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>सेटिंग्स</translation>
     </message>
 </context>
 <context>
@@ -1405,7 +1550,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
         <translation>गैलरी</translation>
     </message>
     <message>
@@ -1441,7 +1586,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
         <translation>कॉल</translation>
     </message>
     <message>
@@ -1452,6 +1597,82 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Map</source>
         <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>मानचित्र</translation>
+    </message>
+    <message>
+        <source>Media and files</source>
+        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
+        <translation>मीडिया और फ़ाइलें</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>आज</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>कल</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>पिछले 7 दिन</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>पिछले 30 दिन</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>पुराने</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>संदेश भेजें</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>समूह से हटाएँ</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>आप</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>हटाया जा रहा है</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n सदस्य</numerusform>
+            <numerusform>%n सदस्य</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>सदस्य खोजें</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>सदस्य जोड़ें</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>QR कोड से आमंत्रित करें</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>कोई मेल नहीं खाता</translation>
     </message>
 </context>
 <context>
@@ -1927,6 +2148,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>चैनल &quot;%1&quot; से जुड़ने के लिए स्कैन करें</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; समूह में शामिल होने के लिए स्कैन करें</translation>
     </message>
 </context>
 <context>

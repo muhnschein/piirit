@@ -2,9 +2,9 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Tiles for a page that asks: one per answer, icon over words. Looks like MediaKinds.qml's
- * media row: doors too. Push button suits acting on screen content; onboarding just has
- * places to go. Icon says which before reading: matters most on first screen.
+ * Tiles for a page that asks: one per answer, icon over words. Doors, not settings. Push
+ * button suits acting on screen content; onboarding just has places to go. Icon says which
+ * before reading: matters most on first screen.
  *
  * Icons: theme's (follow ambience), only names seen on a device (see AppMark: missing icon =
  * invisible tile, reader can't start). First-screen profile tile can't risk even that:

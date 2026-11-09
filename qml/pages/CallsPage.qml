@@ -7,7 +7,7 @@ import "../js/Emoji.js" as Emoji
 import Piirit 1.0
 
 /*
- * Calls with one contact, behind Calls tile (components/MediaKinds.qml).
+ * Calls with one contact, behind Calls row on contact page.
  *
  * Call messages (chat_media.rs, kind `calls`), newest first, wording from
  * Calls.js. Tap calls back (ringing: answers). Call row first.

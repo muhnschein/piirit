@@ -1,6 +1,6 @@
-//! Own channel's page: says Channel, offers its QR invite code (only way subscribers join: core
-//! takes no members added). QR page then shows that channel's code alone, no scanner. Group page
-//! beside it keeps its words, offers no code.
+//! Own channel's page: says Channel, offers Invite (only way subscribers join: core takes no
+//! members added). QR page then shows that channel's code alone, no scanner. Group page beside
+//! it keeps its words; its Invite opens the code as the group's.
 //!
 //! Steps run in probe off pages' own loads, not clock.
 
@@ -17,7 +17,7 @@ mod common;
 const PATIENCE: u32 = 59;
 
 /// Readings probe takes, by label.
-const READINGS: [&str; 13] = [
+const READINGS: [&str; 15] = [
     "channel-title",
     "channel-menu",
     "channel-invite",
@@ -31,6 +31,8 @@ const READINGS: [&str; 13] = [
     "code-link",
     "group-title",
     "group-invite",
+    "group-navigation",
+    "group-intro",
 ];
 
 // `pageStack` recorded, not performed; see qml_new_group.rs.
@@ -93,9 +95,9 @@ const PROBE_QML: &str = r"
                     if (!chat || !chat.loaded) { return }
                     probe.readings['channel-title'] = read('pageHeader', 'title')
                     probe.readings['channel-menu'] = read('groupMenu', 'visible')
-                    probe.readings['channel-invite'] = read('channelInvite', 'visible')
+                    probe.readings['channel-invite'] = read('inviteButton', 'visible')
                     probe.readings['channel-leave'] = read('leaveButton', 'visible')
-                    findIn(loader.item, 'channelInvite').clicked()
+                    findIn(loader.item, 'inviteButton').clicked()
                     probe.readings['navigation'] = pageStack.log
                     // What the push hands QR page.
                     loader.setSource('', {})
@@ -119,7 +121,16 @@ const PROBE_QML: &str = r"
                     var group = findIn(loader.item, 'chat')
                     if (!group || !group.loaded) { return }
                     probe.readings['group-title'] = read('pageHeader', 'title')
-                    probe.readings['group-invite'] = read('channelInvite', 'visible')
+                    probe.readings['group-invite'] = read('inviteButton', 'visible')
+                    pageStack.log = ''
+                    findIn(loader.item, 'inviteButton').clicked()
+                    probe.readings['group-navigation'] = pageStack.log
+                    loader.setSource('', {})
+                    loader.setSource(probe.qrUrl, {
+                        accountId: 1, chatId: 2, chatName: 'Hikers', isChannel: false,
+                        appActive: true
+                    })
+                    probe.readings['group-intro'] = read('intro', 'text')
                     probe.step = 3
                     poll.running = false
                 }
@@ -233,8 +244,9 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
         "an own channel's page offers to leave it as a group. {context}"
     );
     assert!(
-        value("navigation")
-            .ends_with(r#"push:QrPage.qml{"accountId":1,"chatId":1,"chatName":"chat 1"}|"#),
+        value("navigation").ends_with(
+            r#"push:QrPage.qml{"accountId":1,"chatId":1,"chatName":"chat 1","isChannel":true}|"#
+        ),
         "QR invite code does not open the QR page on this channel. {context}"
     );
 
@@ -292,8 +304,17 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
         "a group's page lost its heading. {context}"
     );
     assert_eq!(
-        value("group-invite"),
-        "false",
-        "a group's page offers a channel's invite. {context}"
+        (
+            value("group-invite"),
+            value("group-navigation"),
+            value("group-intro")
+        ),
+        (
+            "true".to_string(),
+            r#"push:QrPage.qml{"accountId":1,"chatId":2,"chatName":"chat 2","isChannel":false}|"#
+                .to_string(),
+            "Scan to join group \"Hikers\"".to_string()
+        ),
+        "a group's Invite does not open its code as the group's. {context}"
     );
 }

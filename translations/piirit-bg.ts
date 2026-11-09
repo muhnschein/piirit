@@ -721,16 +721,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Отваряне в друго приложение</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Запазване на устройството</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -747,7 +738,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Транскрибиране на %n гласово съобщение</numerusform>
             <numerusform>Транскрибиране на %n гласови съобщения</numerusform>
@@ -766,6 +757,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Транскрибиране</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Отваряне в друго приложение</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Запазване на устройството</translation>
     </message>
 </context>
 <context>
@@ -815,10 +815,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ContactPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Запазено</translation>
-    </message>
-    <message>
         <source>Contact</source>
         <translation>Контакт</translation>
     </message>
@@ -831,27 +827,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Без шифроване: обикновен имейл контакт</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Име</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Оставете празно, за да се използва избраното от него име</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Видян(а) преди много време</translation>
     </message>
     <message>
-        <source>Chats in common (%1)</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>Споделени чатове (%1)</translation>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Изтриване на чата</translation>
     </message>
     <message>
-        <source>Show all</source>
-        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
-        <translation>Покажи всички</translation>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Изтриване на чата</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Блокиране на контакт</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Показване на информацията за шифроването</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Редактиране на името</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Собствено име: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Обаждане</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Видеообаждане</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>В този чат</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Споделени чатове</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n чат</numerusform>
+            <numerusform>%n чата</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1095,9 +1135,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>След %1 секунди</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Приложимо за всички членове на този чат, ако използват Delta Chat; в противен случай те пак могат да копират, записват и препращат съобщения или да използват други клиенти за електронна поща.</translation>
+        <source>Remove picture</source>
+        <translation>Премахване на изображението</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Премахване на изображението</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Промяна на изображението</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Редактиране на канала</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Редактиране на групата</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Име на канала</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Име на групата</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Всички в канала виждат тези промени. Плъзнете назад, за да запазите.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Всички в групата виждат тези промени. Плъзнете назад, за да запазите.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Редактиране на името</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Псевдоним за „%1“</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Оставете празно, за да се показва името, което контактът си е избрал. Само вие виждате това име. Плъзнете назад, за да запазите.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Копиране на отпечатъците</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Копирано в клипборда</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Информация за шифроването</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n член</numerusform>
+            <numerusform>%n членове</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Липсва ключ</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Релеи</translation>
     </message>
 </context>
 <context>
@@ -1165,10 +1299,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Запазено</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Напускане на групата</translation>
     </message>
@@ -1180,54 +1310,69 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Group</source>
         <translation>Група</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Премахване на изображението</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Име на групата</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Under a group&apos;s name on its page. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n член</numerusform>
             <numerusform>%n членове</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Премахване от групата</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Премахва се</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Всички в групата виждат името</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Промяна на изображението</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR код за покана</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Канал</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Изтриване на чата</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Изтриване на чата</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Показване на информацията за шифроването</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Редактиране на канала</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Редактиране на групата</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Шифроване от край до край</translation>
+    </message>
+    <message>
+        <source>Invite</source>
+        <extracomment>Button on a group&apos;s page: opens the QR code others scan to join.</extracomment>
+        <translation>Поканване</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the first few members on a group&apos;s page.</extracomment>
+        <translation>Членове</translation>
+    </message>
+    <message numerus="yes">
+        <source>All %n member(s)</source>
+        <extracomment>Row under the first members on a group&apos;s page: opens the list of all. %n is how many.</extracomment>
+        <translation>
+            <numerusform>%n член</numerusform>
+            <numerusform>Всички %n членове</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>В този чат</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Настройки</translation>
     </message>
 </context>
 <context>
@@ -1401,7 +1546,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a tab, and a page heading.</extracomment>
         <translation>Галерия</translation>
     </message>
     <message>
@@ -1437,7 +1582,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a tab, and a page heading.</extracomment>
         <translation>Обаждания</translation>
     </message>
     <message>
@@ -1448,6 +1593,82 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Map</source>
         <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Карта</translation>
+    </message>
+    <message>
+        <source>Media and files</source>
+        <extracomment>Row on a contact&apos;s or group&apos;s page: opens its pictures, sounds and files.</extracomment>
+        <translation>Медия и файлове</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Днес</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Вчера</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Последните 7 дни</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Последните 30 дни</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>По-стари</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Изпращане на съобщение</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Премахване от групата</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Вие</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Премахва се</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n член</numerusform>
+            <numerusform>%n членове</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Търсене на членове</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Добавяне на членове</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Поканване с QR код</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Никой не отговаря на търсенето</translation>
     </message>
 </context>
 <context>
@@ -1923,6 +2144,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Сканирайте, за да се присъедините към канала „%1“</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Сканирайте, за да се присъедините към групата „%1“</translation>
     </message>
 </context>
 <context>

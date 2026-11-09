@@ -5,15 +5,13 @@ import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
- * One-to-one chat: picture, name, status, encryption. Swipe left from
- * conversation, as group page; tap picture to enlarge. No address: core's
- * contact words only.
- *
- * Name overridable (edit badge, field); blank reverts to theirs (core's
- * rule). Saved after pause and on leave, as group renames.
+ * One-to-one chat's contact. Swipe left from conversation, as group page. Read
+ * first: picture with facts beside it, their status, call buttons, rows to what
+ * the chat holds and how it behaves. Edits and actions in pulley. No address:
+ * core's contact words only.
  *
  * Same ChatInfo as group page; one member, the contact. Row read into
- * properties: save's reload must not rebuild field under thumb.
+ * properties: reload after a change rebuilds nothing on screen.
  */
 Page {
     id: page
@@ -30,7 +28,7 @@ Page {
         account_id: page.accountId
         chat_id: page.chatId
         onError: page.errorMessage = message
-        onSaved: notice.show(qsTr("Saved"))
+        onClosed: page.leaveChat()
     }
 
     Connections {
@@ -65,6 +63,7 @@ Page {
     }
 
     onContactIdChanged: page.loadCommonChats()
+    onStatusChanged: page.loadCommonChats()
 
     /// The one member, lifted from row.
     property int contactId: 0
@@ -82,74 +81,42 @@ Page {
     /// Not seen long, or never.
     property bool seenLongAgo: false
 
-    /// Typed since load: guards refill.
-    property bool edited: false
-    /// Refill writing field: not an edit.
-    property bool filling: false
-
-    // Filled from core. Not refilled while typing: reload resets cursor.
-    onGivenNameChanged: {
-        if (!page.edited) {
-            page.filling = true
-            nameField.text = page.givenName
-            page.filling = false
+    // Chat gone (deleted, contact blocked): conversation below goes too. Confirm or
+    // countdown may still run; Silica drops stack ops mid-transition: finish it.
+    function leaveChat() {
+        if (pageStack.completeAnimation) {
+            pageStack.completeAnimation()
         }
-    }
-
-    // Pause, not per keystroke: a round trip per letter.
-    Timer {
-        id: autosave
-        objectName: "autosave"
-        interval: 1200
-        onTriggered: page.applyEdits()
-    }
-
-    function applyEdits() {
-        if (!chat.loaded || !page.edited || page.contactId === 0) {
-            return
+        var below = pageStack.previousPage(page)
+        if (below && below.chatId === page.chatId) {
+            below = pageStack.previousPage(below)
         }
-        page.edited = false
-        chat.rename_contact(page.contactId, nameField.text)
+        pageStack.pop(below)
     }
 
-    function noteEdit() {
-        if (chat.loaded && !page.filling) {
-            page.edited = true
-            autosave.restart()
-        }
-    }
-
-    // Leaving saves too: back-swipe in pause would drop text. Cursor leaves first.
-    onStatusChanged: {
-        page.loadCommonChats()
-        if (status === PageStatus.Deactivating) {
-            page.applyEdits()
-            nameField.done()
-        }
-    }
-
-    // Each content kind on own page, pushed by name.
     function openMedia(kind) {
         if (kind === "map") {
             map.show(page.chatId, 0, 0)
-            return
-        }
-        if (kind === "calls") {
+        } else if (kind === "calls") {
             pageStack.push(Qt.resolvedUrl("CallsPage.qml"), {
                 accountId: page.accountId,
                 chatId: page.chatId,
                 contactName: page.displayName
             })
-            return
+        } else if (kind === "media") {
+            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                kinds: ["gallery", "audio", "files"]
+            })
+        } else {
+            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                kind: kind
+            })
         }
-        pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
-            accountId: page.accountId,
-            chatId: page.chatId,
-            kind: kind
-        })
     }
-
-    readonly property int commonChatsShown: 5
 
     // Own chat: back to it, also from the all-chats page.
     function openChat(chatId, chatName) {
@@ -172,6 +139,58 @@ Page {
             chatId: chatId,
             chatName: chatName
         })
+    }
+
+    /// Call them, or bring existing call to front. One call at a time.
+    function placeCall(video) {
+        if (typeof appWindow === "undefined") {
+            return
+        }
+        if (!appWindow.placeCall(page.accountId, page.chatId, video === true)) {
+            appWindow.showCall()
+        }
+    }
+
+    function showEncryption() {
+        pageStack.push(Qt.resolvedUrl("EncryptionPage.qml"), {
+            accountId: page.accountId,
+            contactId: page.contactId,
+            name: page.displayName
+        })
+    }
+
+    function editName() {
+        pageStack.push(Qt.resolvedUrl("EditNamePage.qml"), {
+            chat: chat,
+            contactId: page.contactId,
+            givenName: page.givenName,
+            ownName: page.ownName,
+            displayName: page.displayName
+        })
+    }
+
+    function confirmBlock() {
+        var dialog = pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
+            contactName: page.displayName,
+            blocking: true
+        })
+        if (dialog) {
+            dialog.accepted.connect(function() {
+                chat.block_contact(page.contactId)
+            })
+        }
+    }
+
+    // Silica's countdown, as chat list's delete; core's delete after it.
+    RemorsePopup {
+        id: deleteRemorse
+        objectName: "deleteRemorse"
+    }
+
+    function deleteChat() {
+        //: Silica's countdown over the contact page, before the chat with
+        //: them and its messages are deleted from this device.
+        deleteRemorse.execute(qsTr("Deleting chat"), function() { chat.delete_chat() })
     }
 
     MapOpener {
@@ -219,6 +238,37 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
+        // Farthest from finger: undone only by hand (Delete, Block).
+        PullDownMenu {
+            objectName: "contactMenu"
+            visible: page.contactId > 0
+
+            MenuItem {
+                objectName: "deleteChat"
+                //: Pulley on a contact's page: deletes the chat with them from this device.
+                text: qsTr("Delete chat")
+                onClicked: page.deleteChat()
+            }
+            MenuItem {
+                objectName: "blockContact"
+                text: qsTr("Block contact")
+                onClicked: page.confirmBlock()
+            }
+            MenuItem {
+                objectName: "encryptionInfo"
+                //: Pulley on a contact's or group's page: opens the page with
+                //: the keys' fingerprints.
+                text: qsTr("Show encryption info")
+                onClicked: page.showEncryption()
+            }
+            MenuItem {
+                objectName: "editName"
+                //: Pulley on a contact's page: opens the page to give them a nickname.
+                text: qsTr("Edit name")
+                onClicked: page.editName()
+            }
+        }
+
         Column {
             id: column
             width: parent.width
@@ -228,94 +278,147 @@ Page {
                 title: qsTr("Contact")
             }
 
-            Item {
-                width: parent.width
-                height: bigAvatar.height + 2 * Theme.paddingLarge
+            IdentityRow {
+                initial: page.displayName.length > 0 ? page.displayName : page.chatName
+                ownColor: page.contactColor
+                picturePath: page.avatarPath
+                onPictureClicked: page.showPicture()
 
-                Avatar {
-                    id: bigAvatar
-                    objectName: "contactAvatar"
-                    anchors.centerIn: parent
-                    width: 2 * Theme.itemSizeExtraLarge
-                    initial: page.displayName
-                    ownColor: page.contactColor
-                    picturePath: page.avatarPath
+                NameLabel {
+                    objectName: "nameLabel"
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
+                    name: page.displayName.length > 0 ? page.displayName : page.chatName
                 }
 
-                MouseArea {
-                    objectName: "pictureTap"
-                    anchors.fill: bigAvatar
-                    enabled: page.avatarPath.length > 0
-                    onClicked: page.showPicture()
+                // Their own name, under the one given here; only when it differs.
+                Label {
+                    objectName: "ownNameLabel"
+                    visible: page.givenName.length > 0 && page.ownName.length > 0
+                             && page.givenName !== page.ownName
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
+                    textFormat: Text.PlainText
+                    //: Under a nickname on a contact's page. %1 is the name
+                    //: the contact chose for themselves.
+                    text: qsTr("Calls themselves %1").arg(page.ownName)
+                }
+
+                // Tap: keys to compare.
+                Label {
+                    objectName: "encryptionLabel"
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: encryptionTap.pressed ? Theme.highlightColor
+                                                 : Theme.secondaryHighlightColor
+                    // Translated literals pinned: binding reads page to pick one.
+                    textFormat: Text.PlainText
+                    text: page.isKeyContact
+                          ? qsTr("End-to-end encrypted")
+                          : qsTr("Not encrypted: a plain email contact")
+
+                    MouseArea {
+                        id: encryptionTap
+                        objectName: "encryptionTap"
+                        anchors.fill: parent
+                        enabled: page.isKeyContact && page.contactId > 0
+                        onClicked: page.showEncryption()
+                    }
+                }
+
+                // Core asks: long-unseen contact may not read soon. Delta Chat's words, for
+                // translations.
+                Label {
+                    objectName: "seenLabel"
+                    visible: page.seenLongAgo
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
+                    //: Under a contact's name: the core has not seen them for
+                    //: a long time, or never.
+                    text: qsTr("Seen a long time ago")
                 }
             }
 
-            // Name to call them here. Field holds given name only; theirs shows when
-            // empty, and blank goes back to it.
-            EditableName {
-                id: nameField
-                objectName: "contactNameControl"
-                fieldObjectName: "contactNameField"
-                hintObjectName: "nameHint"
-                fallbackText: page.ownName
-                placeholderText: page.ownName.length > 0 ? page.ownName : qsTr("Name")
-                hint: qsTr("Leave blank to use the name they chose")
-                onTextChanged: page.noteEdit()
-            }
-
-            // Their own words about themselves. Plain text, as theirs.
-            Label {
+            // Their own words about themselves, full width: can run long.
+            ClampedText {
                 objectName: "statusLabel"
                 visible: page.statusLine.length > 0
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                textFormat: Text.PlainText
                 color: Theme.primaryColor
                 text: page.statusLine
             }
 
-            // Core asks: long-unseen contact may not read soon. Delta Chat's words, for
-            // translations.
-            Label {
-                objectName: "seenLabel"
-                visible: page.seenLongAgo
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryHighlightColor
-                //: Under a contact's name: the core has not seen them for
-                //: a long time, or never.
-                text: qsTr("Seen a long time ago")
+            // Two buttons, one width each. Bindings, not Row: polish never runs headless.
+            Item {
+                objectName: "callButtons"
+                visible: chat.can_call
+                width: parent.width
+                height: visible ? callButton.height : 0
+
+                Button {
+                    id: callButton
+                    objectName: "callButton"
+                    x: Theme.horizontalPageMargin
+                    width: (parent.width - 2 * Theme.horizontalPageMargin - Theme.paddingLarge) / 2
+                    //: Button on a contact's page: starts a voice call.
+                    text: qsTr("Call")
+                    onClicked: page.placeCall(false)
+                }
+                Button {
+                    objectName: "videoCallButton"
+                    x: callButton.x + callButton.width + Theme.paddingLarge
+                    width: callButton.width
+                    //: Button on a contact's page: starts a call with camera on.
+                    text: qsTr("Video call")
+                    onClicked: page.placeCall(true)
+                }
             }
 
-            // Encryption caption under the person, in caption style.
-            Label {
-                objectName: "encryptionLabel"
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryHighlightColor
-                // Translated literals pinned: binding reads page to pick one.
-                textFormat: Text.PlainText
-                text: page.isKeyContact
-                      ? qsTr("End-to-end encrypted")
-                      : qsTr("Not encrypted: a plain email contact")
+            SectionHeader {
+                //: Over the rows to a chat's pictures, files, apps, calls and map.
+                text: qsTr("In this chat")
             }
 
-            // Tiles per kind, each a way into its listing page.
-            MediaKinds {
-                objectName: "mediaKinds"
-                // `=== true`: dconf gives undefined before read.
-                appsAvailable: Settings.webxdcEnabled === true
-                callsAvailable: chat.can_call
-                mapAvailable: Settings.locationStreamingEnabled === true
-                onKindRequested: page.openMedia(kind)
+            DoorRow {
+                objectName: "mediaRow"
+                kind: "media"
+                onClicked: page.openMedia("media")
+            }
+            // `=== true`: dconf gives undefined before read.
+            DoorRow {
+                objectName: "appsRow"
+                visible: Settings.webxdcEnabled === true
+                kind: "apps"
+                onClicked: page.openMedia("apps")
+            }
+            DoorRow {
+                objectName: "callsRow"
+                visible: chat.can_call
+                kind: "calls"
+                onClicked: page.openMedia("calls")
+            }
+            DoorRow {
+                objectName: "mapRow"
+                visible: Settings.locationStreamingEnabled === true
+                kind: "map"
+                onClicked: page.openMedia("map")
+            }
+
+            SectionHeader {
+                //: Over a chat's notifications and disappearing messages.
+                text: qsTr("Settings")
+            }
+
+            ChatNotifications {
+                objectName: "notifications"
+                muted: chat.is_muted
+                onPicked: chat.set_mute_duration(seconds)
             }
 
             DisappearingMessages {
@@ -325,64 +428,90 @@ Page {
                 onChosen: chat.set_ephemeral_timer(seconds)
             }
 
-            ChatNotifications {
-                objectName: "notifications"
-                muted: chat.is_muted
-                onPicked: chat.set_mute_duration(seconds)
-            }
-
             SectionHeader {
                 objectName: "commonChatsHeader"
                 visible: commonChats.count > 0
-                //: Over the list of chats on a contact's page that the
-                //: contact is in too, with how many. Delta Chat's "Chats in
-                //: Common".
-                text: qsTr("Chats in common (%1)").arg(commonChats.count)
+                //: Over the row to the chats a contact is in too. Delta
+                //: Chat's "Chats in Common".
+                text: qsTr("Chats in common")
             }
 
-            Repeater {
-                model: commonChats.rows
-
-                delegate: ListItem {
-                    objectName: "commonChatRow" + model.chat_id
-                    width: column.width
-                    visible: index < page.commonChatsShown
-                    contentHeight: body.height
-
-                    ContactRow {
-                        id: body
-                        width: parent.width
-                        displayName: model.name
-                        ownColor: model.color
-                        picturePath: model.avatar_path
-                        isKeyContact: model.is_encrypted
-                    }
-
-                    onClicked: page.openChat(model.chat_id, model.name)
-                }
-            }
-
+            // One row however many: three faces, count, first names; list behind it.
             BackgroundItem {
-                objectName: "commonChatsAll"
-                visible: commonChats.count > page.commonChatsShown
+                id: commonRow
+                objectName: "commonChatsRow"
+                visible: commonChats.count > 0
                 width: parent.width
+                height: Theme.itemSizeMedium
                 onClicked: pageStack.push(Qt.resolvedUrl("CommonChatsPage.qml"), {
                     chats: commonChats,
                     contactPage: page
                 })
 
+                /// First chats' names, ", "-joined; "…" when more. Counts from `faces`: runs while
+                /// model inserts, `commonChats.count` then reads a borrowed model.
+                readonly property string names: {
+                    var shown = []
+                    for (var i = 0; i < faces.count && i < 3; i++) {
+                        var face = faces.itemAt(i)
+                        if (face) {
+                            shown.push(face.chatName)
+                        }
+                    }
+                    return shown.join(", ") + (faces.count > 3 ? ", …" : "")
+                }
+                readonly property real faceSize: Theme.itemSizeExtraSmall
+                readonly property int faceCount: Math.min(3, faces.count)
+
+                Repeater {
+                    id: faces
+                    model: commonChats.rows
+
+                    Avatar {
+                        property string chatName: model.name
+                        visible: index < 3
+                        // Later faces under earlier ones, a third showing.
+                        z: 3 - index
+                        x: Theme.horizontalPageMargin + index * commonRow.faceSize * 2 / 3
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: commonRow.faceSize
+                        initial: model.name
+                        ownColor: model.color
+                        // Hidden ones load nothing.
+                        picturePath: index < 3 ? model.avatar_path : ""
+                    }
+                }
+
                 Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    anchors.verticalCenter: parent.verticalCenter
+                    id: commonCount
+                    objectName: "commonChatsCount"
+                    x: Theme.horizontalPageMargin + commonRow.faceSize
+                       + (commonRow.faceCount - 1) * commonRow.faceSize * 2 / 3
+                       + Theme.paddingLarge
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    y: (parent.height - height - commonNames.height) / 2
                     truncationMode: TruncationMode.Fade
-                    color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    //: Under the first few chats in common on a contact's page:
-                    //: opens the list of all of them.
-                    text: qsTr("Show all")
+                    color: commonRow.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //: Row on a contact's page; %n is how many chats they are in too.
+                    text: qsTr("%n chat(s)", "", commonChats.count)
+                }
+
+                NameLabel {
+                    id: commonNames
+                    objectName: "commonChatsNames"
+                    x: commonCount.x
+                    y: commonCount.y + commonCount.height
+                    width: commonCount.width
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: commonRow.highlighted ? Theme.secondaryHighlightColor
+                                                 : Theme.secondaryColor
+                    name: commonRow.names
                 }
             }
         }
+
+        VerticalScrollDecorator {}
     }
 
     Banner {
@@ -390,24 +519,10 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: notice.top
+            bottom: parent.bottom
         }
         text: page.errorMessage
         timeout: 8
         onDismissed: page.errorMessage = ""
-    }
-
-    Banner {
-        id: notice
-        objectName: "notice"
-        labelObjectName: "noticeLabel"
-        tone: "info"
-        timeout: 2
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        onDismissed: notice.text = ""
     }
 }

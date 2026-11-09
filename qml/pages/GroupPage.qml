@@ -5,10 +5,11 @@ import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
- * Group page: picture, name, members; swipe left from conversation or tap
- * header. Core owns data (ChatInfo, get_full_chat_by_id); edits go at once:
- * name after typing pause and on leave, rest on tap. Not joined or not group:
- * core refuses edits, controls hidden.
+ * Group or channel: swipe left from conversation or tap header. Read first, as
+ * contact page: picture with name and member count beside it, description, Invite
+ * and Add members, three members and a row to all, rows to what the chat holds and
+ * how it behaves. Name, description, picture on Edit group (pulley). Core owns
+ * data (ChatInfo); not joined: core refuses edits, entries hidden.
  */
 Page {
     id: page
@@ -17,8 +18,9 @@ Page {
     property int chatId
     /// Name shown until core answers.
     property string chatName
+    property string errorMessage: ""
 
-    /// Renamed here.
+    /// Renamed here (Edit group page).
     signal renamed(string name)
 
     ChatInfo {
@@ -26,28 +28,8 @@ Page {
         objectName: "chat"
         account_id: page.accountId
         chat_id: page.chatId
-        onError: {
-            page.errorMessage = message
-            // Not sent to core: reset to core's value.
-            page.refillDescription()
-        }
-        // Filled from core, not while typing: reload would reset cursor.
-        onLoaded_changed: {
-            if (chat.loaded && !page.edited) {
-                // Setting field fires onTextChanged, like typing.
-                page.filling = true
-                page.nameField.text = chat.name
-                page.filling = false
-            }
-            if (chat.loaded && !page.descriptionEdited) {
-                page.refillDescription()
-            }
-        }
-        onSaved: notice.show(qsTr("Saved"))
-        onRenamed: {
-            notice.show(qsTr("Saved"))
-            page.renamed(name)
-        }
+        onError: page.errorMessage = message
+        onRenamed: page.renamed(name)
         // Left group still a chat: back goes to it, not list.
         // Confirm pop may still run; Silica drops stack ops mid-transition: finish it.
         onLeft: {
@@ -56,6 +38,7 @@ Page {
             }
             pageStack.pop()
         }
+        onClosed: page.leaveChat()
     }
 
     Connections {
@@ -70,96 +53,16 @@ Page {
         }
     }
 
-    /// Header's fields, set as made (ids stay inside list header).
-    property Item nameField
-    property Item descriptionField
-
-    /// Typed since load. Guards refill.
-    property bool edited: false
-    /// Refill write, not an edit.
-    property bool filling: false
-    /// Description typed since save/load. Guards refill, like `edited`.
-    property bool descriptionEdited: false
-    property string errorMessage: ""
-
-    // Pause, not keystroke: round trip per letter.
-    Timer {
-        id: autosave
-        objectName: "autosave"
-        interval: 1200
-        onTriggered: page.applyEdits()
-    }
-
-    function applyEdits() {
-        if (!chat.loaded || !page.edited) {
-            return
+    // Deleted: conversation below goes too. See ContactPage.leaveChat.
+    function leaveChat() {
+        if (pageStack.completeAnimation) {
+            pageStack.completeAnimation()
         }
-        page.edited = false
-        // Group needs a name: blank reverts to current, not sent as empty.
-        if (page.nameField.text.trim().length === 0) {
-            page.filling = true
-            page.nameField.text = chat.name
-            page.filling = false
-            return
+        var below = pageStack.previousPage(page)
+        if (below && below.chatId === page.chatId) {
+            below = pageStack.previousPage(below)
         }
-        chat.rename(page.nameField.text)
-    }
-
-    function refillDescription() {
-        page.filling = true
-        page.descriptionField.text = chat.description
-        page.filling = false
-        page.descriptionEdited = false
-    }
-
-    // Not on pause: each change messages all members. Saved on blur and leave.
-    function applyDescription() {
-        if (!chat.loaded || !page.descriptionEdited) {
-            return
-        }
-        page.descriptionEdited = false
-        chat.set_description(page.descriptionField.text)
-    }
-
-    function noteEdit() {
-        if (chat.loaded && !page.filling) {
-            page.edited = true
-            autosave.restart()
-        }
-    }
-
-    // Leave saves too (back-swipe in pause drops typing); pending removals go now.
-    onStatusChanged: {
-        page.showMembersOnceShown()
-        if (status === PageStatus.Deactivating) {
-            page.applyEdits()
-            page.applyDescription()
-            page.nameField.done()
-            doomedMembers.flush()
-        }
-    }
-
-    /// Member rows from first page-in, while Activating, so they're there as page slides in:
-    /// page is attached to its conversation as soon as that loads, mostly never swiped to.
-    property bool membersShown: false
-    function showMembersOnceShown() {
-        if (page.status === PageStatus.Activating
-                || page.status === PageStatus.Active) {
-            page.membersShown = true
-        }
-    }
-
-    // Page made on screen never sees status change on way in.
-    Component.onCompleted: page.showMembersOnceShown()
-
-    /// Removal wait, ms. Tests lower it.
-    property alias pendingDelay: doomedMembers.delay
-
-    /// Members asked to remove, in undo window. Not Silica `remorseAction`: its row
-    /// dies on reload. See PendingRemoval.
-    PendingRemoval {
-        id: doomedMembers
-        onRemove: chat.remove_member(id)
+        pageStack.pop(below)
     }
 
     // Picture large, on chat picture page. None if no picture (initial disc).
@@ -173,29 +76,22 @@ Page {
         })
     }
 
-    // Gallery by URL. Only Attach*Page files name `Sailfish.Pickers`: missing type
-    // costs button, not page.
-    function pickPicture() {
-        var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
-        if (picker) {
-            picker.picked.connect(function(path) {
-                // Core copies file to blob dir; picked file may vanish.
-                chat.set_picture(path)
-            })
-        }
-    }
-
-    // All chat content kinds; tile says kind.
     function openMedia(kind) {
         if (kind === "map") {
             map.show(page.chatId, 0, 0)
-            return
+        } else if (kind === "media") {
+            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                kinds: ["gallery", "audio", "files"]
+            })
+        } else {
+            pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                kind: kind
+            })
         }
-        pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
-            accountId: page.accountId,
-            chatId: page.chatId,
-            kind: kind
-        })
     }
 
     MapOpener {
@@ -206,11 +102,44 @@ Page {
         onError: page.errorMessage = message
     }
 
+    /// Own channel: invite only way subscribers join.
+    readonly property bool offersInvite: (chat.can_edit && !chat.is_channel) || chat.is_own_channel
+    /// Core takes no members added to a channel.
+    readonly property bool offersAdd: chat.can_edit && !chat.is_channel
+
     function addMembers() {
         pageStack.push(Qt.resolvedUrl("AddMembersPage.qml"), {
             accountId: page.accountId,
             chat: chat
         })
+    }
+
+    function invite() {
+        pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
+            accountId: page.accountId,
+            chatId: page.chatId,
+            chatName: chat.name,
+            isChannel: chat.is_channel
+        })
+    }
+
+    function showMembers() {
+        pageStack.push(Qt.resolvedUrl("MembersPage.qml"), {
+            accountId: page.accountId,
+            chat: chat
+        })
+    }
+
+    function showEncryption() {
+        pageStack.push(Qt.resolvedUrl("EncryptionPage.qml"), {
+            accountId: page.accountId,
+            chatId: page.chatId,
+            name: chat.name
+        })
+    }
+
+    function editGroup() {
+        pageStack.push(Qt.resolvedUrl("EditGroupPage.qml"), { chat: chat })
     }
 
     // Own page with platform accept, not countdown: no way back unless re-added,
@@ -225,33 +154,31 @@ Page {
         }
     }
 
-    // Members as list rows, built as they scroll in: groups reach hundreds; page and column
-    // ride along as header.
-    SilicaListView {
-        id: list
-        objectName: "memberList"
-        anchors.fill: parent
-        model: page.membersShown ? chat.members : null
-        // Row gap, as page column's.
-        spacing: Theme.paddingMedium
+    // Silica's countdown, as chat list's delete; core's delete after it.
+    RemorsePopup {
+        id: deleteRemorse
+        objectName: "deleteRemorse"
+    }
 
-        // Both entries for members: hidden for left/removed reader (empty pull-down). Own channel:
-        // its invite, only way subscribers join (core takes no members added).
+    function deleteChat() {
+        deleteRemorse.execute(qsTr("Deleting chat"), function() { chat.delete_chat() })
+    }
+
+    /// Tap on member: their page, or menu. See MemberOpener.
+    MemberOpener {
+        id: memberOpener
+        chatInfo: chat
+        accountId: page.accountId
+    }
+
+    SilicaFlickable {
+        anchors.fill: parent
+        contentHeight: column.height + Theme.paddingLarge
+
+        // Destructive farthest from finger. Left: Delete chat in Leave's place.
         PullDownMenu {
             objectName: "groupMenu"
-            visible: chat.can_edit || chat.is_own_channel
-
-            MenuItem {
-                objectName: "channelInvite"
-                visible: chat.is_own_channel
-                //: Delta Chat's "qrshow_title". Opens the code others scan to join the channel.
-                text: qsTr("QR invite code")
-                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
-                    accountId: page.accountId,
-                    chatId: page.chatId,
-                    chatName: chat.name
-                })
-            }
+            visible: chat.loaded
 
             MenuItem {
                 objectName: "leaveButton"
@@ -259,217 +186,209 @@ Page {
                 text: qsTr("Leave group")
                 onClicked: page.confirmLeave()
             }
-            // Only when there is a picture to remove.
             MenuItem {
-                objectName: "removePicture"
-                visible: chat.can_edit && chat.avatar_path.length > 0
-                text: qsTr("Remove picture")
-                onClicked: chat.clear_picture()
+                objectName: "deleteChat"
+                visible: !chat.can_edit
+                text: qsTr("Delete chat")
+                onClicked: page.deleteChat()
             }
-            // Here, not on picture (tap enlarges), as contact page.
             MenuItem {
-                objectName: "changePicture"
-                visible: chat.can_edit
-                //: Pull-down entry on a group's page: opens the gallery to
-                //: pick a new picture for the group.
-                text: qsTr("Change picture")
-                onClicked: page.pickPicture()
+                objectName: "encryptionInfo"
+                visible: chat.is_encrypted
+                text: qsTr("Show encryption info")
+                onClicked: page.showEncryption()
+            }
+            MenuItem {
+                objectName: "editGroup"
+                visible: chat.can_edit || chat.can_edit_description
+                //: Pulley on a group's page: opens the page to change its name,
+                //: description and picture. Delta Chat's "Edit Group".
+                text: chat.is_channel ? qsTr("Edit channel") : qsTr("Edit group")
+                onClicked: page.editGroup()
             }
         }
 
-        // Column's gap before first row too.
-        header: Item {
-            width: list.width
-            height: column.height + column.spacing
+        Column {
+            id: column
+            width: parent.width
+            spacing: Theme.paddingMedium
 
-            Column {
-                id: column
-                width: parent.width
-                spacing: Theme.paddingMedium
+            PageHeader {
+                objectName: "pageHeader"
+                //: Delta Chat's "channel". Heading of a channel's page.
+                title: chat.is_channel ? qsTr("Channel") : qsTr("Group")
+            }
 
-                PageHeader {
-                    objectName: "pageHeader"
-                    //: Delta Chat's "channel". Heading of a channel's page.
-                    title: chat.is_channel ? qsTr("Channel") : qsTr("Group")
-                }
+            IdentityRow {
+                initial: chat.loaded ? chat.name : page.chatName
+                ownColor: chat.color
+                picturePath: chat.avatar_path
+                onPictureClicked: page.showPicture()
 
-                // Tap enlarges; change via pull-down.
-                Item {
+                NameLabel {
+                    objectName: "nameLabel"
                     width: parent.width
-                    height: bigAvatar.height + 2 * Theme.paddingLarge
-
-                    Avatar {
-                        id: bigAvatar
-                        objectName: "groupAvatar"
-                        anchors.centerIn: parent
-                        width: 2 * Theme.itemSizeExtraLarge
-                        initial: chat.loaded ? chat.name : page.chatName
-                        ownColor: chat.color
-                        picturePath: chat.avatar_path
-                    }
-
-                    MouseArea {
-                        objectName: "pictureTap"
-                        anchors.fill: bigAvatar
-                        enabled: chat.avatar_path.length > 0
-                        onClicked: page.showPicture()
-                    }
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
+                    name: chat.loaded ? chat.name : page.chatName
                 }
 
-                // Name field while joined. See EditableName.qml.
-                EditableName {
-                    id: nameField
-                    objectName: "groupNameControl"
-                    fieldObjectName: "groupNameField"
-                    hintObjectName: "nameHint"
-                    placeholderText: qsTr("Group name")
-                    hint: qsTr("Everyone in the group sees the name")
-                    canEdit: chat.can_edit
-                    onTextChanged: page.noteEdit()
-                    Component.onCompleted: page.nameField = nameField
-                }
-
-                // Description: shown to all, editable where core allows, keeps line breaks.
-                // Hidden if empty and not editable.
-                TextArea {
-                    id: descriptionField
-                    objectName: "descriptionField"
-                    visible: chat.can_edit_description || chat.description.length > 0
+                Label {
+                    objectName: "memberCount"
+                    visible: chat.loaded
                     width: parent.width
-                    readOnly: !chat.can_edit_description
-                    //: Label of the text that says what a group or channel is
-                    //: for, on its info page, and the prompt in its empty field.
-                    label: qsTr("Description")
-                    placeholderText: label
-                    onTextChanged: {
-                        if (chat.loaded && !page.filling) {
-                            page.descriptionEdited = true
-                        }
-                    }
-                    onActiveFocusChanged: {
-                        if (!activeFocus) {
-                            page.applyDescription()
-                        }
-                    }
-                    Component.onCompleted: page.descriptionField = descriptionField
-                }
-
-                // Chat content tiles, each opens its list page.
-                MediaKinds {
-                    objectName: "mediaKinds"
-                    // `=== true`: dconf gives `undefined` until key read.
-                    appsAvailable: Settings.webxdcEnabled === true
-                    mapAvailable: Settings.locationStreamingEnabled === true
-                    onKindRequested: page.openMedia(kind)
-                }
-
-                DisappearingMessages {
-                    objectName: "disappearing"
-                    seconds: chat.ephemeral_timer
-                    canChange: chat.can_send
-                    onChosen: chat.set_ephemeral_timer(seconds)
-                }
-
-                ChatNotifications {
-                    objectName: "notifications"
-                    muted: chat.is_muted
-                    // Nobody replies to reader in a channel. `=== true`: dconf undefined till read.
-                    mentionsStillNotify: !chat.is_channel && Settings.notificationsEnabled === true
-                                         && Settings.mentionNotifications === true
-                    onPicked: chat.set_mute_duration(seconds)
-                }
-
-                SectionHeader {
-                    objectName: "membersHeader"
-                    //: Heading over the member list. %n is how many there are.
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
+                    //: Under a group's name on its page. %n is how many people
+                    //: are in it.
                     text: qsTr("%n member(s)", "", chat.member_count)
                 }
-            }
-        }
 
-        delegate: ListItem {
-            id: memberRow
-            // Named per member for tests.
-            objectName: "memberRow" + model.contact_id
-            width: list.width
-            contentHeight: body.height
+                // Tap: members' keys.
+                Label {
+                    objectName: "encryptionLabel"
+                    visible: chat.is_encrypted
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: encryptionTap.pressed ? Theme.highlightColor
+                                                 : Theme.secondaryHighlightColor
+                    text: qsTr("End-to-end encrypted")
 
-            /// Member being removed.
-            readonly property bool doomed:
-                doomedMembers.pending(model.contact_id)
-
-            /// Silica countdown on member; reports tap. Removal in
-            /// `doomedMembers` (rows die on change).
-            function raiseRemorse() {
-                remorse.active = true
-                //: What Silica's countdown says it is doing,
-                //: over a member the reader has asked to
-                //: remove from the group.
-                remorse.item.execute(
-                    body, qsTr("Removing"), function() {},
-                    doomedMembers.countdownFor(model.contact_id))
-            }
-
-            // Built on first removal, not with row.
-            Loader {
-                id: remorse
-                active: false
-                sourceComponent: RemorseItem {
-                    objectName: "memberRemorse"
-                    onCanceled: doomedMembers.spare(model.contact_id)
-                }
-            }
-
-            // Row rebuilt mid-wait comes back bare.
-            Component.onCompleted: {
-                if (memberRow.doomed) {
-                    memberRow.raiseRemorse()
-                }
-            }
-
-            // Self-removal is leaving: own pulley entry and dialog.
-            // Component built on first open (see ConversationList).
-            menu: Component {
-                ContextMenu {
-                    MenuItem {
-                        objectName: "removeItem"
-                        visible: chat.can_edit && !model.is_self
-                        text: qsTr("Remove from group")
-                        // Page told, not row: list change kills row's wait.
-                        onClicked: {
-                            doomedMembers.ask(model.contact_id)
-                            memberRow.raiseRemorse()
-                        }
+                    MouseArea {
+                        id: encryptionTap
+                        objectName: "encryptionTap"
+                        anchors.fill: parent
+                        onClicked: page.showEncryption()
                     }
                 }
             }
 
-            ContactRow {
-                id: body
-                // Remorse fades via own `opacity: 0.0`.
-                enabled: !memberRow.doomed
-                width: parent.width
-                displayName: model.display_name
-                ownColor: model.color
-                picturePath: model.avatar_path
-                isKeyContact: model.is_key_contact
+            // What the group is for, full width: can run long.
+            ClampedText {
+                objectName: "descriptionLabel"
+                visible: chat.description.length > 0
+                color: Theme.primaryColor
+                text: chat.description
             }
-        }
 
-        // Way to more members.
-        footer: Item {
-            width: list.width
-            height: (addMembers.visible ? addMembers.height + Theme.paddingMedium : 0)
-                    + Theme.paddingLarge
-
-            PlusRow {
-                id: addMembers
-                objectName: "addMembersButton"
-                y: Theme.paddingMedium
-                visible: chat.can_edit
+            // The two ways a group grows. Bindings, not Row: polish never runs headless.
+            Item {
+                objectName: "growButtons"
+                visible: page.offersInvite || page.offersAdd
                 width: parent.width
-                text: qsTr("Add members")
-                onClicked: page.addMembers()
+                height: visible ? inviteButton.height : 0
+
+                readonly property real half: (width - 2 * Theme.horizontalPageMargin
+                                              - Theme.paddingLarge) / 2
+
+                Button {
+                    id: inviteButton
+                    objectName: "inviteButton"
+                    visible: page.offersInvite
+                    x: Theme.horizontalPageMargin
+                    width: page.offersAdd ? parent.half : 2 * parent.half + Theme.paddingLarge
+                    //: Button on a group's page: opens the QR code others scan to join.
+                    text: qsTr("Invite")
+                    onClicked: page.invite()
+                }
+                Button {
+                    id: addButton
+                    objectName: "addMembersButton"
+                    visible: page.offersAdd
+                    x: page.offersInvite ? inviteButton.x + inviteButton.width + Theme.paddingLarge
+                                         : Theme.horizontalPageMargin
+                    width: page.offersInvite ? parent.half : 2 * parent.half + Theme.paddingLarge
+                    text: qsTr("Add members")
+                    onClicked: page.addMembers()
+                }
+            }
+
+            SectionHeader {
+                objectName: "membersHeader"
+                visible: chat.member_count > 0
+                //: Over the first few members on a group's page.
+                text: qsTr("Members")
+            }
+
+            // Three, not all: page keeps its length with 4 or 400 members.
+            Repeater {
+                model: chat.preview
+
+                MemberRow {
+                    objectName: "memberRow" + modelData.contact_id
+                    width: column.width
+                    contactId: modelData.contact_id
+                    displayName: modelData.display_name
+                    ownColor: modelData.color
+                    picturePath: modelData.avatar_path
+                    isKeyContact: modelData.is_key_contact
+                    opener: memberOpener
+                }
+            }
+
+            BackgroundItem {
+                objectName: "allMembers"
+                visible: chat.member_count > 0
+                width: parent.width
+                height: Theme.itemSizeSmall
+                onClicked: page.showMembers()
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    //: Row under the first members on a group's page: opens the
+                    //: list of all. %n is how many.
+                    text: qsTr("All %n member(s)", "", chat.member_count)
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("In this chat")
+            }
+
+            DoorRow {
+                objectName: "mediaRow"
+                kind: "media"
+                onClicked: page.openMedia("media")
+            }
+            // `=== true`: dconf gives `undefined` until key read.
+            DoorRow {
+                objectName: "appsRow"
+                visible: Settings.webxdcEnabled === true
+                kind: "apps"
+                onClicked: page.openMedia("apps")
+            }
+            DoorRow {
+                objectName: "mapRow"
+                visible: Settings.locationStreamingEnabled === true
+                kind: "map"
+                onClicked: page.openMedia("map")
+            }
+
+            SectionHeader {
+                text: qsTr("Settings")
+            }
+
+            ChatNotifications {
+                objectName: "notifications"
+                muted: chat.is_muted
+                // Nobody replies to reader in a channel. `=== true`: dconf undefined till read.
+                mentionsStillNotify: !chat.is_channel && Settings.notificationsEnabled === true
+                                     && Settings.mentionNotifications === true
+                onPicked: chat.set_mute_duration(seconds)
+            }
+
+            DisappearingMessages {
+                objectName: "disappearing"
+                seconds: chat.ephemeral_timer
+                canChange: chat.can_send
+                onChosen: chat.set_ephemeral_timer(seconds)
             }
         }
 
@@ -481,24 +400,10 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: notice.top
+            bottom: parent.bottom
         }
         text: page.errorMessage
         timeout: 8
         onDismissed: page.errorMessage = ""
-    }
-
-    Banner {
-        id: notice
-        objectName: "notice"
-        labelObjectName: "noticeLabel"
-        tone: "info"
-        timeout: 2
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        onDismissed: notice.text = ""
     }
 }

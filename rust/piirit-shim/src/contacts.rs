@@ -554,7 +554,7 @@ fn not_an_invite(what: &str) -> String {
 pub(crate) const SELF_CONTACT_ID: u32 = 1;
 
 /// Contact as QML map keyed by role names, so both row kinds read alike.
-fn row_map(item: &ContactItem) -> QVariantMap {
+pub(crate) fn row_map(item: &ContactItem) -> QVariantMap {
     let mut row = QVariantMap::default();
     row.insert("contact_id".into(), QVariant::from(item.contact_id));
     row.insert("display_name".into(), QVariant::from(&item.display_name));

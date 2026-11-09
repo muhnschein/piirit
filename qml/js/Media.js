@@ -1,18 +1,14 @@
 // Chat's non-text kinds (gallery, audio, files, apps, calls, map): names, icons.
 // No `.pragma library`: qsTr() needs importing file's context.
 
-/// Kinds in tile order. Apps first if on; calls, if chat can hold one; map last, if on.
-function kinds(appsAvailable, callsAvailable, mapAvailable) {
-    return (appsAvailable ? ["apps", "gallery", "audio", "files"]
-                          : ["gallery", "audio", "files"])
-        .concat(callsAvailable ? ["calls"] : [])
-        .concat(mapAvailable ? ["map"] : [])
-}
-
-/// Kind's name: tile word and page heading.
+/// Kind's name: row word and page heading.
 function kindName(kind) {
+    if (kind === "media") {
+        //: Row on a contact's or group's page: opens its pictures, sounds and files.
+        return qsTr("Media and files")
+    }
     if (kind === "gallery") {
-        //: The pictures and videos of a chat: a tile, and a page heading.
+        //: The pictures and videos of a chat: a tab, and a page heading.
         return qsTr("Gallery")
     }
     if (kind === "audio") {
@@ -28,7 +24,7 @@ function kindName(kind) {
         return qsTr("Apps")
     }
     if (kind === "calls") {
-        //: The calls made and received in a chat: a tile, and a page heading.
+        //: The calls made and received in a chat: a tab, and a page heading.
         return qsTr("Calls")
     }
     if (kind === "map") {
@@ -60,7 +56,7 @@ function emptyText(kind) {
 
 /// Theme icon per kind. Empty for apps: AppMark draws one.
 function kindIcon(kind) {
-    if (kind === "gallery") {
+    if (kind === "gallery" || kind === "media") {
         return "icon-m-file-image"
     }
     if (kind === "audio") {
@@ -124,4 +120,24 @@ function fileIcon(mime) {
 /// Peer's path as URL, encoded per segment (see AttachmentPreview.fileUrl).
 function fileUrl(path) {
     return "file://" + path.split("/").map(encodeURIComponent).join("/")
+}
+
+/// Media page's age section (ChatMedia row `date_group`), Salama history's words; "" if none.
+function dateGroupName(group) {
+    if (group === 1) {
+        return qsTr("Today")
+    }
+    if (group === 2) {
+        return qsTr("Yesterday")
+    }
+    if (group === 3) {
+        return qsTr("Last 7 days")
+    }
+    if (group === 4) {
+        return qsTr("Last 30 days")
+    }
+    if (group === 5) {
+        return qsTr("Older")
+    }
+    return ""
 }
