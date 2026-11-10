@@ -5,8 +5,9 @@ import "../components"
 /*
  * What Delta Chat is: five facts, one per swiped screen. Wording from
  * delta.chat/en/help minus tech half (FAQ has it). Swipe past last: setup;
- * first swipes back too. No faces field: pictures are the look. Masks from
- * components/InkArt.qml, painted by tools/faces/scenes.py.
+ * first swipes back too. From About (`tour`): past last returns there. No faces field:
+ * pictures are the look. Masks from components/InkArt.qml, painted by
+ * tools/faces/scenes.py.
  */
 Page {
     id: page
@@ -16,6 +17,9 @@ Page {
 
     // Set past end: one drag cannot ask twice.
     property bool leaving: false
+
+    /// From About: past last goes back there, not into setup.
+    property bool tour: false
 
     /// Facts in order. Plain array: ListElement takes literals only; translated.
     readonly property var facts: [
@@ -55,7 +59,11 @@ Page {
             return
         }
         page.leaving = true
-        pageStack.replace(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        if (page.tour) {
+            pageStack.pop()
+        } else {
+            pageStack.replace(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        }
     }
 
     // Asks on move, not after rubber band settles.
@@ -72,6 +80,8 @@ Page {
         id: slides
         objectName: "slides"
         anchors.fill: parent
+        // Facts beside the shown one would show over the page under it while this slides away.
+        clip: true
         orientation: ListView.Horizontal
         // One fact at a time; one always on screen.
         snapMode: ListView.SnapOneItem
@@ -177,7 +187,8 @@ Page {
             textFormat: Text.PlainText
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("Keep swiping to set up your profile.")
+            text: page.tour ? qsTr("Keep swiping to go back to About.")
+                            : qsTr("Keep swiping to set up your profile.")
 
             // Tap does what line says: for thumb that finds it, not second pull.
             MouseArea {

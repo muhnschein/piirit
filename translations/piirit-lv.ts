@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="lv">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat kodols %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Par</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Pirmkods un licence</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit ir brīva programmatūra ar GPL-3.0 licenci.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Ziņot par problēmu</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versijas tiek nokopētas jūsu ziņojumam.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Par Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1307,6 +1346,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relejs glabā ziņu tikai tik ilgi, līdz saņēmējs to paņem.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Velciet tālāk, lai atgrieztos sadaļā „Par“.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2320,7 +2363,76 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Eksperimentāli</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Šīs funkcijas var būt nestabilas, tikt mainītas vai noņemtas.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc lietotnes</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Darbina mazas lietotnes sarakstēs.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Atrašanās vietas straumēšana</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Kopīgo jūsu atrašanās vietu sarakstēs un rāda kopīgotās atrašanās vietas kartē.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Atšifrēt balss ziņas</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Šajā tālrunī pārvērš balss ziņas tekstā.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nekas neatstāj tālruni.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Runas modeli neizdevās lejupielādēt.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Mēģināt vēlreiz</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkripcija</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Valodas</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Zemāka kvalitāte, mazāk datu</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Līdzsvarota</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nekad</translation>
@@ -2350,29 +2462,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Vienmēr</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Iestatījumi</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Ziņas</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Automātiski lejupielādēt pielikumus</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Noņemt izsekošanu no saitēm</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Paziņojumi</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Iespējot webxdc lietotnes (eksperimentāli)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Izslēgts</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2395,30 +2487,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Pēc 1 gada</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Dzēst ziņas no ierīces</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Pieminējumi</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Lietot Markdown noformējumu</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Privātums</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Bloķētie kontakti</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Līdzsvarota</translation>
+        <source>Messages</source>
+        <translation>Ziņas</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2426,13 +2496,45 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Izejošo mediju kvalitāte</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Rādīt paziņojumus</translation>
+        <source>Auto-download attachments</source>
+        <translation>Automātiski lejupielādēt pielikumus</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Zemāka kvalitāte, mazāk datu</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Rādīt Markdown noformējumu</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Ziņās noformē *treknrakstu*, _slīprakstu_ un `kodu`.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Šajā tālrunī</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Dzēst vecās ziņas</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Ziņas tiek dzēstas tikai no šī tālruņa, katrā profilā.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Citas ierīces un tērzēšanas dalībnieki patur savas kopijas.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Paziņojumi</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Rādīt paziņojumus</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2451,64 +2553,100 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Bez detaļām</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Rādīt paziņojumus par atbildēm uz tavām ziņām apklusinātās grupās</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Noņem klikšķu identifikatorus un kampaņu birkas no saitēm, ko sūti.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Ātrās darbības</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Papildu</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Attiecas uz katru profilu neatkarīgi no sarunas pazūdošo ziņu iestatījuma.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Zvani</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Zvanīt ienākošiem zvaniem</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Rādīt zvana ekrānu apstiprinātiem kontaktiem</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Darbina mazas lietotnes sarakstēs.</translation>
+        <source>Muted chats</source>
+        <translation>Apklusinātas tērzēšanas</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Iespējot atrašanās vietas straumēšanu (eksperimentāli)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Atbildes apklusinātās grupās</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Kopīgo jūsu atrašanās vietu sarakstēs un rāda kopīgotās atrašanās vietas kartē.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Rādīt paziņojumus par atbildēm uz tavām ziņām apklusinātās grupās</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Iestatījumi</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Atšifrēt balss ziņas (eksperimentāli)</translation>
+        <source>Messages</source>
+        <translation>Ziņas</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Balss ziņu atšifrēšana</translation>
+        <source>Notifications</source>
+        <translation>Paziņojumi</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Šajā tālrunī pārvērš balss ziņas tekstā.</translation>
+        <source>Privacy and security</source>
+        <translation>Privātums un drošība</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nekas neatstāj tālruni.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Eksperimentāli</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Par</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Jūsu profils</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Ātrās darbības</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Privātums un drošība</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Noņemt izsekošanu no saitēm</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Noņem klikšķu identifikatorus un kampaņu birkas no saitēm, ko sūti.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profils: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Bloķētie kontakti</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakts</numerusform>
+            <numerusform>%n kontakti</numerusform>
+            <numerusform>%n kontaktu</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3224,32 +3362,6 @@ Gaida %2$s ierīces atbildi…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Šīs valodas atšifrējumos, visticamāk, būs vairāk kļūdu.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Balss ziņu atšifrēšana</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Valodas</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kad</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Runas modeli neizdevās lejupielādēt.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Mēģināt vēlreiz</translation>
     </message>
 </context>
 <context>

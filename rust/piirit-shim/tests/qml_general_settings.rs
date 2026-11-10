@@ -1,6 +1,7 @@
-//! Settings page and `Settings` singleton every page reads through. Each control writes one value;
-//! shown choice follows it back, so a change anywhere reaches page, and one on page reaches
-//! conversation. Both loaded vs stub `ConfigurationValue` that holds a value, stores nothing.
+//! Settings pages and `Settings` singleton every page reads through. Top page: one row per topic,
+//! each opening its page. Each control writes one value; shown choice follows it back, so a change
+//! anywhere reaches page, and one on page reaches conversation. Both loaded vs stub
+//! `ConfigurationValue` that holds a value, stores nothing.
 //!
 //! Deletion period is the one setting not written on tap: core asked how much would go first, and
 //! core here isn't started, so pinned: nothing written, page said why. Full flow, dialog included:
@@ -16,6 +17,7 @@ use std::path::PathBuf;
 mod common;
 
 /// Probe imports components by absolute URL: data has no dir.
+#[allow(clippy::too_many_lines)]
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -36,7 +38,9 @@ fn probe_qml() -> String {
                 signal accepted()
             }}
             function push(url, props) {{
-                pushed = ('' + url).split('/').pop() + ':title=' + props.title
+                pushed = ('' + url).split('/').pop()
+                         + (props.title !== undefined ? ':title=' + props.title
+                                                      : ':accountId=' + props.accountId)
                 return dialog
             }}
         }}
@@ -44,8 +48,33 @@ fn probe_qml() -> String {
         function pushed() {{ var was = stack.pushed; stack.pushed = ''; return was }}
         function acceptDialog() {{ stack.dialog.accepted(); return 'ok' }}
         function load(url) {{
-            loader.setSource(url, {{}})
+            loader.setSource(url, {{ accountId: 4 }})
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }}
+        // Rows that open a page, in the order they stand.
+        function entries(node) {{
+            if (!node) {{ return [] }}
+            var found = /Entry$/.test(node.objectName) ? [node.objectName] : []
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) {{
+                found = found.concat(entries(kids[i]))
+            }}
+            if (node.contentItem && node.contentItem !== node) {{
+                found = found.concat(entries(node.contentItem))
+            }}
+            return found
+        }}
+        // Flickable lists its rows under data and content item both: each once.
+        function rows() {{
+            return entries(loader.item).filter(function (name, at, all) {{
+                return all.indexOf(name) === at
+            }}).join(',')
+        }}
+        // What a row says and which page it opens.
+        function opens(key) {{
+            var label = get(key + 'Label', 'text')
+            click(key + 'Entry')
+            return label + '>' + pushed()
         }}
         function findIn(node, name) {{
             if (!node) {{ return null }}
@@ -110,6 +139,12 @@ fn probe_qml() -> String {
                 if (hit) {{ return hit }}
             }}
             return null
+        }}
+        // First control on the page: what stands after the header in the column holding `name`.
+        function firstBeside(name) {{
+            var item = findIn(loader.item, name)
+            if (!item || !item.parent) {{ return 'missing:' + name }}
+            return item.parent.children[1].objectName
         }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
         function appKey(name) {{ return '' + Settings[name].key }}
@@ -212,19 +247,47 @@ fn the_settings_page_writes_what_the_app_reads() {
             "app-notifications-key",
             call!("appKey", QString::from("notificationsEnabledConfig"))
         );
+        // Top page: topic rows only, nothing that changes a setting. No profile row: core not up.
         record!(
             "load",
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
-        // Fresh phone: what leaves the phone first under Messages, how a message is drawn last.
+        record!("top-rows", call!("rows"));
+        record!("top-switch", get!("markdownSwitch", "checked"));
+        record!("opens-messages", call!("opens", QString::from("messages")));
         record!(
-            "first-under-messages",
-            call!("firstUnder", QString::from("Messages"))
+            "opens-notifications",
+            call!("opens", QString::from("notifications"))
+        );
+        record!("opens-privacy", call!("opens", QString::from("privacy")));
+        record!("opens-cover", call!("opens", QString::from("quickActions")));
+        record!(
+            "opens-experimental",
+            call!("opens", QString::from("experimental"))
+        );
+        record!("opens-about", call!("opens", QString::from("about")));
+        record!("bell", get!("notificationsIcon", "source"));
+        record!("flask", get!("experimentalIcon", "source"));
+        record!("cover-icon", get!("quickActionsIcon", "source"));
+
+        // Messages: what leaves the phone first, how a message is drawn, then what this phone
+        // keeps under its own heading.
+        record!(
+            "load-messages",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsMessagesPage.qml"))
+            )
         );
         record!(
-            "last-under-messages",
-            call!("lastBefore", QString::from("Notifications"))
+            "first-under-phone",
+            call!("firstUnder", QString::from("On this phone"))
         );
+        record!(
+            "last-before-phone",
+            call!("lastBefore", QString::from("On this phone"))
+        );
+        record!("deletion-off-label", get!("deletionOption0", "text"));
         // Return key: line break only; no setting for it, on page or behind it.
         record!("enter-switch", get!("enterSendsSwitch", "checked"));
         record!(
@@ -252,34 +315,6 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("deletion-index", get!("deletionCombo", "currentIndex"));
         record!("deletion-label", get!("deletionCombo", "label"));
-        record!(
-            "links-default",
-            call!("appReads", QString::from("cleanLinks"))
-        );
-        record!("links-switch", get!("cleanLinksSwitch", "checked"));
-        record!(
-            "notification-default",
-            call!("appReads", QString::from("notificationDetail"))
-        );
-        record!(
-            "notification-index",
-            get!("notificationCombo", "currentIndex")
-        );
-        record!("notification-label", get!("notificationCombo", "label"));
-        record!(
-            "mentions-default",
-            call!("appReads", QString::from("mentionNotifications"))
-        );
-        record!("mentions-switch", get!("mentionsSwitch", "checked"));
-        record!(
-            "mentions-description",
-            get!("mentionsSwitch", "description")
-        );
-        record!(
-            "apps-default",
-            call!("appReads", QString::from("webxdcEnabled"))
-        );
-        record!("apps-switch", get!("webxdcSwitch", "checked"));
         // Each control writes its setting; shown choice follows.
         record!(
             "pick-markdown",
@@ -326,6 +361,19 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("downloadLimit"))
         );
         record!("always-shown", get!("downloadCombo", "currentIndex"));
+        // Privacy and security.
+        record!(
+            "load-privacy",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsPrivacyPage.qml"))
+            )
+        );
+        record!(
+            "links-default",
+            call!("appReads", QString::from("cleanLinks"))
+        );
+        record!("links-switch", get!("cleanLinksSwitch", "checked"));
         record!(
             "flip-links",
             call!("click", QString::from("cleanLinksSwitch"))
@@ -337,6 +385,84 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("click", QString::from("cleanLinksSwitch"))
         );
         record!("links-off", call!("appReads", QString::from("cleanLinks")));
+        // Notifications.
+        record!(
+            "load-notifications",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsNotificationsPage.qml"))
+            )
+        );
+        // Announce-at-all first under Notifications, default on; off greys two settings under it,
+        // not hides them.
+        record!(
+            "first-on-notifications",
+            call!("firstBeside", QString::from("notificationsSwitch"))
+        );
+        record!("calls-ring-usable", get!("callsRingSwitch", "enabled"));
+        record!("calls-ring-default", get!("callsRingSwitch", "checked"));
+        record!(
+            "first-under-calls",
+            call!("firstUnder", QString::from("Calls"))
+        );
+        record!(
+            "first-under-muted",
+            call!("firstUnder", QString::from("Muted chats"))
+        );
+        record!(
+            "notifications-default",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!(
+            "notifications-switch",
+            get!("notificationsSwitch", "checked")
+        );
+        record!("detail-usable", get!("notificationCombo", "enabled"));
+        record!("mentions-usable", get!("mentionsSwitch", "enabled"));
+        record!(
+            "flip-notifications",
+            call!("click", QString::from("notificationsSwitch"))
+        );
+        record!(
+            "notifications-off",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!(
+            "notifications-switch-off",
+            get!("notificationsSwitch", "checked")
+        );
+        record!("detail-greyed", get!("notificationCombo", "enabled"));
+        record!("mentions-greyed", get!("mentionsSwitch", "enabled"));
+        // Calls ring on their own switch, notifications or not (reader's pick).
+        record!("calls-ring-kept", get!("callsRingSwitch", "enabled"));
+        record!(
+            "flip-notifications-back",
+            call!("click", QString::from("notificationsSwitch"))
+        );
+        record!(
+            "notifications-on",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!("detail-usable-again", get!("notificationCombo", "enabled"));
+        record!(
+            "notification-default",
+            call!("appReads", QString::from("notificationDetail"))
+        );
+        record!(
+            "notification-index",
+            get!("notificationCombo", "currentIndex")
+        );
+        record!("notification-label", get!("notificationCombo", "label"));
+        record!(
+            "mentions-default",
+            call!("appReads", QString::from("mentionNotifications"))
+        );
+        record!("mentions-switch", get!("mentionsSwitch", "checked"));
+        record!("mentions-label", get!("mentionsSwitch", "text"));
+        record!(
+            "mentions-description",
+            get!("mentionsSwitch", "description")
+        );
         record!(
             "pick-notification",
             call!("click", QString::from("notificationOption2"))
@@ -367,6 +493,33 @@ fn the_settings_page_writes_what_the_app_reads() {
             "mentions-on",
             call!("appReads", QString::from("mentionNotifications"))
         );
+        // Experimental.
+        record!(
+            "load-experimental",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsExperimentalPage.qml"))
+            )
+        );
+        // Note under the header, as Quick actions'; transcription under its own heading.
+        record!(
+            "experimental-first",
+            call!("firstBeside", QString::from("webxdcSwitch"))
+        );
+        record!("experimental-note", get!("experimentalExplained", "text"));
+        record!(
+            "last-before-transcription",
+            call!("lastBefore", QString::from("Transcription"))
+        );
+        record!(
+            "first-under-transcription",
+            call!("firstUnder", QString::from("Transcription"))
+        );
+        record!(
+            "apps-default",
+            call!("appReads", QString::from("webxdcEnabled"))
+        );
+        record!("apps-switch", get!("webxdcSwitch", "checked"));
         // Apps: the one setting rest of app hides behind, so both directions matter. Off is what a
         // never-asked phone reads, and switch says so. Experimental on asks first; off doesn't.
         record!("flip-apps", call!("click", QString::from("webxdcSwitch")));
@@ -418,11 +571,17 @@ fn the_settings_page_writes_what_the_app_reads() {
             "location-off",
             call!("appReads", QString::from("locationStreamingEnabled"))
         );
-        // Calls not experimental (#119): no switch, nothing asked; ringing is own setting, usable
-        // on a never-asked phone.
+        // Calls not experimental (#119): no switch here, nothing asked.
         record!("calls-switch", get!("callsSwitch", "visible"));
-        record!("calls-ring-usable", get!("callsRingSwitch", "enabled"));
-        record!("calls-ring-default", get!("callsRingSwitch", "checked"));
+
+        // Back on Messages: deletion asks core first; error lands here.
+        record!(
+            "load-messages-again",
+            call!(
+                "load",
+                QString::from(common::page_url("SettingsMessagesPage.qml"))
+            )
+        );
         // Deletion period not written on tap: core asked first; absent here.
         record!(
             "pick-deletion",
@@ -444,46 +603,6 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appWrites", QString::from("deleteDeviceAfter"), 604_800)
         );
         record!("deletion-follows", get!("deletionCombo", "currentIndex"));
-
-        // Announce-at-all first under Notifications, default on; off greys two settings under it,
-        // not hides them.
-        record!(
-            "first-under-notifications",
-            call!("firstUnder", QString::from("Notifications"))
-        );
-        record!(
-            "notifications-default",
-            call!("appReads", QString::from("notificationsEnabled"))
-        );
-        record!(
-            "notifications-switch",
-            get!("notificationsSwitch", "checked")
-        );
-        record!("detail-usable", get!("notificationCombo", "enabled"));
-        record!("mentions-usable", get!("mentionsSwitch", "enabled"));
-        record!(
-            "flip-notifications",
-            call!("click", QString::from("notificationsSwitch"))
-        );
-        record!(
-            "notifications-off",
-            call!("appReads", QString::from("notificationsEnabled"))
-        );
-        record!(
-            "notifications-switch-off",
-            get!("notificationsSwitch", "checked")
-        );
-        record!("detail-greyed", get!("notificationCombo", "enabled"));
-        record!("mentions-greyed", get!("mentionsSwitch", "enabled"));
-        record!(
-            "flip-notifications-back",
-            call!("click", QString::from("notificationsSwitch"))
-        );
-        record!(
-            "notifications-on",
-            call!("appReads", QString::from("notificationsEnabled"))
-        );
-        record!("detail-usable-again", get!("notificationCombo", "enabled"));
     });
     // Core refusal arrives a turn later.
     plan.after(1, move || unsafe {
@@ -508,9 +627,51 @@ fn the_settings_page_writes_what_the_app_reads() {
         "ok",
         "the settings page did not load. {context}"
     );
+    // Icons as designed: bell from the theme; flask and cover with action drawn here.
+    assert!(
+        value("bell").starts_with("image://theme/icon-m-browser-notifications?"),
+        "Notifications has no bell. {context}"
+    );
+    for (label, file) in [("flask", "flask.svg"), ("cover-icon", "quick-actions.svg")] {
+        let source = value(label);
+        assert!(
+            source.starts_with("image://piirit/ink?file=")
+                && source.contains(&format!("/qml/art/settings/{file}&ink=")),
+            "{label} is not the drawing {file}, inked. {context}"
+        );
+    }
     for (label, expected) in [
-        ("first-under-messages", "qualityCombo"),
-        ("last-under-messages", "markdownSwitch"),
+        (
+            "top-rows",
+            "messagesEntry,notificationsEntry,privacyEntry,quickActionsEntry,experimentalEntry,aboutEntry",
+        ),
+        ("top-switch", "missing:markdownSwitch"),
+        (
+            "opens-messages",
+            "Messages>SettingsMessagesPage.qml:accountId=4",
+        ),
+        (
+            "opens-notifications",
+            "Notifications>SettingsNotificationsPage.qml:accountId=4",
+        ),
+        (
+            "opens-privacy",
+            "Privacy and security>SettingsPrivacyPage.qml:accountId=4",
+        ),
+        ("opens-cover", "Quick actions>QuickActionsPage.qml:accountId=4"),
+        (
+            "opens-experimental",
+            "Experimental>SettingsExperimentalPage.qml:accountId=4",
+        ),
+        ("opens-about", "About>AboutPage.qml:accountId=4"),
+        ("load-messages", "ok"),
+        ("load-privacy", "ok"),
+        ("load-notifications", "ok"),
+        ("load-experimental", "ok"),
+        ("load-messages-again", "ok"),
+        ("first-under-phone", "deletionCombo"),
+        ("last-before-phone", "markdownSwitch"),
+        ("deletion-off-label", "Off"),
         ("enter-switch", "missing:enterSendsSwitch"),
         ("enter-setting", "undefined"),
         ("markdown-default", "0"),
@@ -529,7 +690,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("download-index", "3"),
         ("deletion-default", "0"),
         ("deletion-index", "0"),
-        ("deletion-label", "Delete messages from device"),
+        ("deletion-label", "Delete old messages"),
         ("links-default", "false"),
         ("links-switch", "false"),
         ("pick-markdown", "ok"),
@@ -567,7 +728,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("flip-apps", "ok"),
         (
             "apps-asked",
-            "ExperimentalFeatureDialog.qml:title=Enable webxdc apps (experimental)",
+            "ExperimentalFeatureDialog.qml:title=Webxdc apps",
         ),
         ("apps-on-tap", "false"),
         ("accept-apps", "ok"),
@@ -586,7 +747,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("flip-location", "ok"),
         (
             "location-asked",
-            "ExperimentalFeatureDialog.qml:title=Enable location streaming (experimental)",
+            "ExperimentalFeatureDialog.qml:title=Location streaming",
         ),
         ("location-on-tap", "false"),
         ("accept-location", "ok"),
@@ -602,7 +763,21 @@ fn the_settings_page_writes_what_the_app_reads() {
             "app-notifications-key",
             "/apps/harbour-piirit/notifications_enabled",
         ),
-        ("first-under-notifications", "notificationsSwitch"),
+        ("first-on-notifications", "notificationsSwitch"),
+        ("first-under-calls", "callsRingSwitch"),
+        ("experimental-first", "experimentalExplained"),
+        (
+            "experimental-note",
+            "These features may be unstable, changed or removed.",
+        ),
+        ("last-before-transcription", "locationSwitch"),
+        ("first-under-transcription", "transcriptionSwitch"),
+        ("first-under-muted", "mentionsSwitch"),
+        ("calls-ring-kept", "true"),
+        ("notification-default", "0"),
+        ("notification-index", "0"),
+        ("notification-label", "Notification content"),
+        ("mentions-label", "Replies in muted groups"),
         ("notifications-default", "true"),
         ("notifications-switch", "true"),
         ("detail-usable", "true"),

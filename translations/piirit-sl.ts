@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sl">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Jedro Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikaciji</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Izvorna koda in licenca</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit je prosto programje pod licenco GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Prijavi težavo</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Različice se kopirajo za vašo prijavo.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>O Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1313,6 +1352,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Posrednik hrani sporočilo samo, dokler ga prejemnik ne prevzame.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Podrsajte naprej in se vrnite na O aplikaciji.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2329,7 +2372,76 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Poskusno</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Te funkcije so lahko nestabilne, se spremenijo ali odstranijo.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplikacije webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Pretakanje lokacije</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Deli vašo lokacijo v klepetih in prikaže deljene lokacije na zemljevidu.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Prepisuj glasovna sporočila</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Pretvori glasovna sporočila v besedilo na tem telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nič ne zapusti telefona.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Govornega modela ni bilo mogoče prenesti.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Poskusi znova</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Prepis</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Jeziki</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Nižja kakovost, manj podatkov</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Uravnoteženo</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nikoli</translation>
@@ -2359,29 +2471,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Vedno</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Nastavitve</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Sporočila</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Samodejno prenesi priloge</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Odstrani sledenje iz povezav</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Obvestila</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Omogoči aplikacije webxdc (poskusno)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Izklopljeno</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2404,30 +2496,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Po 1 letu</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Briši sporočila z naprave</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Omembe</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Uporabi oblikovanje Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Zasebnost</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blokirani stiki</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Uravnoteženo</translation>
+        <source>Messages</source>
+        <translation>Sporočila</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2435,13 +2505,45 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Kakovost odhodnih predstavnosti</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Prikaži obvestila</translation>
+        <source>Auto-download attachments</source>
+        <translation>Samodejno prenesi priloge</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Nižja kakovost, manj podatkov</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Prikaži oblikovanje Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Oblikuje *krepko*, _ležeče_ in `kodo` v sporočilih.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Na tem telefonu</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Briši stara sporočila</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Sporočila se brišejo samo s tega telefona, v vsakem profilu.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Druge naprave in člani klepeta obdržijo svoje kopije.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Obvestila</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Prikaži obvestila</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2460,64 +2562,101 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Brez podrobnosti</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Prikaži obvestila o odgovorih na tvoja sporočila v utišanih skupinah</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Iz povezav, ki jih pošiljaš, odstrani identifikatorje klikov in oznake kampanj.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Hitra dejanja</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Napredno</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Velja za vsak profil, ne glede na nastavitev izginjajočih sporočil posameznega klepeta.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Klici</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Zvoni ob dohodnih klicih</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Prikaži zaslon za klic za sprejete stike</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
+        <source>Muted chats</source>
+        <translation>Utišani klepeti</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Omogoči pretakanje lokacije (poskusno)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Odgovori v utišanih skupinah</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Deli vašo lokacijo v klepetih in prikaže deljene lokacije na zemljevidu.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Prikaži obvestila o odgovorih na tvoja sporočila v utišanih skupinah</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Nastavitve</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Prepisuj glasovna sporočila (poskusno)</translation>
+        <source>Messages</source>
+        <translation>Sporočila</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Prepis glasovnih sporočil</translation>
+        <source>Notifications</source>
+        <translation>Obvestila</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Pretvori glasovna sporočila v besedilo na tem telefonu.</translation>
+        <source>Privacy and security</source>
+        <translation>Zasebnost in varnost</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nič ne zapusti telefona.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Poskusno</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikaciji</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Vaš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Hitra dejanja</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Zasebnost in varnost</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Odstrani sledenje iz povezav</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Iz povezav, ki jih pošiljaš, odstrani identifikatorje klikov in oznake kampanj.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokirani stiki</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n stik</numerusform>
+            <numerusform>%n stika</numerusform>
+            <numerusform>%n stiki</numerusform>
+            <numerusform>%n stikov</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3235,32 +3374,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Prepisi v tem jeziku verjetno vsebujejo več napak.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Prepis glasovnih sporočil</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Jeziki</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kdaj</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Govornega modela ni bilo mogoče prenesti.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Poskusi znova</translation>
     </message>
 </context>
 <context>

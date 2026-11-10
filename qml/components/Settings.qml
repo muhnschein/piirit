@@ -5,7 +5,7 @@ import Nemo.Configuration 1.0
 /*
  * Profile-less settings (drawing, links, media, notifications, calls, cover,
  * camera, transcription) plus read-only lens labels; dconf under app path (outlives app).
- * qml/pages/SettingsPage.qml writes; pages read here, each value following its
+ * qml/pages/Settings*Page.qml write; pages read here, each value following its
  * key, so changes reach open pages. Singleton: deep row, loaded alone in
  * tests, needs same answer.
  */

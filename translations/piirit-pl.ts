@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Rdzeń Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikacji</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Kod źródłowy i licencja</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit to wolne oprogramowanie na licencji GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Zgłoś problem</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Wersje są kopiowane do Twojego zgłoszenia.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>O Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1307,6 +1346,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay przechowuje wiadomość tylko do czasu, aż odbiorca ją pobierze.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Przesuwaj dalej, aby wrócić do strony O aplikacji.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2320,7 +2363,76 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Eksperymentalne</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Te funkcje mogą być niestabilne, zmienione lub usunięte.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplikacje webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Strumieniowanie lokalizacji</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Udostępnia Twoją lokalizację w czatach i pokazuje udostępnione lokalizacje na mapie.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Transkrybuj wiadomości głosowe</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Zamienia wiadomości głosowe na tekst na tym telefonie.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nic nie opuszcza telefonu.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Nie udało się pobrać modelu mowy.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Spróbuj ponownie</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkrypcja</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Języki</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Niższa jakość, mniej danych</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Zrównoważona</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nigdy</translation>
@@ -2350,29 +2462,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zawsze</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Ustawienia</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Wiadomości</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Automatycznie pobieraj załączniki</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Usuwaj śledzenie z linków</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Powiadomienia</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Włącz aplikacje webxdc (eksperymentalne)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Wyłączone</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2395,30 +2487,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Po 1 roku</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Usuwaj wiadomości z urządzenia</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Wzmianki</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Używaj formatowania Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Prywatność</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Zablokowane kontakty</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Zrównoważona</translation>
+        <source>Messages</source>
+        <translation>Wiadomości</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2426,13 +2496,45 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Jakość mediów wychodzących</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Pokazuj powiadomienia</translation>
+        <source>Auto-download attachments</source>
+        <translation>Automatycznie pobieraj załączniki</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Niższa jakość, mniej danych</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Pokazuj formatowanie Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formatuje *pogrubienie*, _kursywę_ i `kod` w wiadomościach.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Na tym telefonie</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Usuwaj stare wiadomości</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Wiadomości są usuwane tylko z tego telefonu, w każdym profilu.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Inne urządzenia i członkowie czatu zachowują swoje kopie.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Powiadomienia</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Pokazuj powiadomienia</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2451,64 +2553,100 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Bez szczegółów</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Usuwa identyfikatory kliknięć i znaczniki kampanii z linków, które wysyłasz.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Szybkie akcje</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Zaawansowane</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Dotyczy każdego profilu, niezależnie od ustawienia znikających wiadomości w danym czacie.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Połączenia</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Dzwoń przy połączeniach przychodzących</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Pokaż ekran połączenia dla zaakceptowanych kontaktów</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
+        <source>Muted chats</source>
+        <translation>Wyciszone czaty</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Włącz strumieniowanie lokalizacji (eksperymentalne)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Odpowiedzi w wyciszonych grupach</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Udostępnia Twoją lokalizację w czatach i pokazuje udostępnione lokalizacje na mapie.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Ustawienia</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Transkrybuj wiadomości głosowe (eksperymentalne)</translation>
+        <source>Messages</source>
+        <translation>Wiadomości</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Transkrypcja wiadomości głosowych</translation>
+        <source>Notifications</source>
+        <translation>Powiadomienia</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Zamienia wiadomości głosowe na tekst na tym telefonie.</translation>
+        <source>Privacy and security</source>
+        <translation>Prywatność i bezpieczeństwo</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nic nie opuszcza telefonu.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Eksperymentalne</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikacji</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Twój profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Szybkie akcje</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Prywatność i bezpieczeństwo</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Usuwaj śledzenie z linków</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Usuwa identyfikatory kliknięć i znaczniki kampanii z linków, które wysyłasz.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Zablokowane kontakty</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakty</numerusform>
+            <numerusform>%n kontaktów</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3224,32 +3362,6 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Transkrypcje w tym języku prawdopodobnie zawierają więcej błędów.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Transkrypcja wiadomości głosowych</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Języki</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kiedy</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Nie udało się pobrać modelu mowy.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Spróbuj ponownie</translation>
     </message>
 </context>
 <context>

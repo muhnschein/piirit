@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="kn">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat ಕೋರ್ %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>ಬಗ್ಗೆ</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>ಮೂಲ ಕೋಡ್ ಮತ್ತು ಪರವಾನಗಿ</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit GPL-3.0 ಅಡಿಯಲ್ಲಿ ಮುಕ್ತ ತಂತ್ರಾಂಶವಾಗಿದೆ.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>ಸಮಸ್ಯೆಯನ್ನು ವರದಿ ಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>ನಿಮ್ಮ ವರದಿಗಾಗಿ ಆವೃತ್ತಿಗಳನ್ನು ನಕಲಿಸಲಾಗುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat ಕುರಿತು</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1301,6 +1340,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>ಸ್ವೀಕರಿಸುವವರು ಅದನ್ನು ತೆಗೆದುಕೊಳ್ಳುವವರೆಗೆ ಮಾತ್ರ ರಿಲೇ ಸಂದೇಶವನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„ಬಗ್ಗೆ“ ಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಲು ಸ್ವೈಪ್ ಮಾಡುತ್ತಿರಿ.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2311,7 +2354,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>ಪ್ರಯೋಗಾತ್ಮಕ</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>ಈ ವೈಶಿಷ್ಟ್ಯಗಳು ಅಸ್ಥಿರವಾಗಿರಬಹುದು, ಬದಲಾಗಬಹುದು ಅಥವಾ ತೆಗೆದುಹಾಕಲ್ಪಡಬಹುದು.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc ಅಪ್ಲಿಕೇಶನ್‌ಗಳು</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ಸ್ಥಳ ಸ್ಟ್ರೀಮಿಂಗ್</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹಂಚಿಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಹಂಚಿಕೊಂಡ ಸ್ಥಳಗಳನ್ನು ನಕ್ಷೆಯಲ್ಲಿ ತೋರಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಲಿಪ್ಯಂತರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ಈ ಫೋನ್‌ನಲ್ಲೇ ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಪಠ್ಯವಾಗಿ ಬದಲಾಯಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ಯಾವುದೂ ಫೋನ್‌ನಿಂದ ಹೊರಗೆ ಹೋಗುವುದಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>ಮಾತಿನ ಮಾದರಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>ಲಿಪ್ಯಂತರ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>ಭಾಷೆಗಳು</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ಕಡಿಮೆ ಗುಣಮಟ್ಟ, ಕಡಿಮೆ ದತ್ತಾಂಶ</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>ಸಮತೋಲಿತ</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ಎಂದಿಗೂ ಇಲ್ಲ</translation>
@@ -2341,29 +2453,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಯಾವಾಗಲೂ</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>ಸೆಟ್ಟಿಂಗ್‌ಗಳು</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>ಸಂದೇಶಗಳು</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>ಲಗತ್ತುಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>ಲಿಂಕ್‌ಗಳಿಂದ ಟ್ರ್ಯಾಕಿಂಗ್ ತೆಗೆದುಹಾಕಿ</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>ಅಧಿಸೂಚನೆಗಳು</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>ಆಫ್</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2386,30 +2478,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 ವರ್ಷದ ನಂತರ</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>ಸಾಧನದಿಂದ ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>ಉಲ್ಲೇಖಗಳು</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>ಮಾರ್ಕ್‌ಡೌನ್ ಸ್ವರೂಪ ಬಳಸಿ</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>ಗೌಪ್ಯತೆ</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>ಸಮತೋಲಿತ</translation>
+        <source>Messages</source>
+        <translation>ಸಂದೇಶಗಳು</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2417,13 +2487,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಕಳುಹಿಸುವ ಮಾಧ್ಯಮದ ಗುಣಮಟ್ಟ</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
+        <source>Auto-download attachments</source>
+        <translation>ಲಗತ್ತುಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>ಕಡಿಮೆ ಗುಣಮಟ್ಟ, ಕಡಿಮೆ ದತ್ತಾಂಶ</translation>
+        <source>Show Markdown formatting</source>
+        <translation>ಮಾರ್ಕ್‌ಡೌನ್ ಸ್ವರೂಪ ತೋರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>ಸಂದೇಶಗಳಲ್ಲಿ *ದಪ್ಪ*, _ಓರೆ_ ಮತ್ತು `ಕೋಡ್` ಅನ್ನು ಸ್ವರೂಪಗೊಳಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>ಈ ಫೋನ್‌ನಲ್ಲಿ</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>ಹಳೆಯ ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>ಸಂದೇಶಗಳನ್ನು ಈ ಫೋನ್‌ನಿಂದ ಮಾತ್ರ ಅಳಿಸಲಾಗುತ್ತದೆ, ಪ್ರತಿ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>ಇತರ ಸಾಧನಗಳು ಮತ್ತು ಚಾಟ್ ಸದಸ್ಯರು ತಮ್ಮ ಪ್ರತಿಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತಾರೆ.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>ಅಧಿಸೂಚನೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2442,64 +2544,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ವಿವರಗಳಿಲ್ಲ</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>ಮೌನಗೊಳಿಸಿದ ಗುಂಪುಗಳಲ್ಲಿ ನಿಮ್ಮ ಸಂದೇಶಗಳಿಗೆ ಬಂದ ಉತ್ತರಗಳ ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>ನೀವು ಕಳುಹಿಸುವ ಕೊಂಡಿಗಳಿಂದ ಕ್ಲಿಕ್ ಐಡಿಗಳನ್ನು ಮತ್ತು ಅಭಿಯಾನ ಟ್ಯಾಗುಗಳನ್ನು ತೆಗೆದುಹಾಕುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>ಸುಧಾರಿತ</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>ಪ್ರತಿ ಪ್ರೊಫೈಲ್‌ಗೆ ಅನ್ವಯಿಸುತ್ತದೆ, ಚಾಟ್‌ನ ಸ್ವಂತ ಮಾಯವಾಗುವ ಸಂದೇಶಗಳ ಸೆಟ್ಟಿಂಗ್ ಏನೇ ಇರಲಿ.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>ಕರೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>ಒಳಬರುವ ಕರೆಗಳಿಗೆ ರಿಂಗ್ ಮಾಡಿ</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>ಸ್ವೀಕರಿಸಿದ ಸಂಪರ್ಕಗಳಿಗೆ ಕರೆ ಪರದೆಯನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
+        <source>Muted chats</source>
+        <translation>ಮ್ಯೂಟ್ ಮಾಡಿದ ಚಾಟ್‌ಗಳು</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>ಸ್ಥಳ ಸ್ಟ್ರೀಮಿಂಗ್ ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>ಮ್ಯೂಟ್ ಮಾಡಿದ ಗುಂಪುಗಳಲ್ಲಿ ಉತ್ತರಗಳು</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹಂಚಿಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಹಂಚಿಕೊಂಡ ಸ್ಥಳಗಳನ್ನು ನಕ್ಷೆಯಲ್ಲಿ ತೋರಿಸುತ್ತದೆ.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>ಮೌನಗೊಳಿಸಿದ ಗುಂಪುಗಳಲ್ಲಿ ನಿಮ್ಮ ಸಂದೇಶಗಳಿಗೆ ಬಂದ ಉತ್ತರಗಳ ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>ಸೆಟ್ಟಿಂಗ್‌ಗಳು</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಲಿಪ್ಯಂತರಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
+        <source>Messages</source>
+        <translation>ಸಂದೇಶಗಳು</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>ಧ್ವನಿ ಸಂದೇಶ ಲಿಪ್ಯಂತರ</translation>
+        <source>Notifications</source>
+        <translation>ಅಧಿಸೂಚನೆಗಳು</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>ಈ ಫೋನ್‌ನಲ್ಲೇ ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಪಠ್ಯವಾಗಿ ಬದಲಾಯಿಸುತ್ತದೆ.</translation>
+        <source>Privacy and security</source>
+        <translation>ಗೌಪ್ಯತೆ ಮತ್ತು ಭದ್ರತೆ</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>ಯಾವುದೂ ಫೋನ್‌ನಿಂದ ಹೊರಗೆ ಹೋಗುವುದಿಲ್ಲ.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>ಪ್ರಯೋಗಾತ್ಮಕ</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>ಬಗ್ಗೆ</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>ನಿಮ್ಮ ಪ್ರೊಫೈಲ್</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>ಗೌಪ್ಯತೆ ಮತ್ತು ಭದ್ರತೆ</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>ಲಿಂಕ್‌ಗಳಿಂದ ಟ್ರ್ಯಾಕಿಂಗ್ ತೆಗೆದುಹಾಕಿ</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>ನೀವು ಕಳುಹಿಸುವ ಕೊಂಡಿಗಳಿಂದ ಕ್ಲಿಕ್ ಐಡಿಗಳನ್ನು ಮತ್ತು ಅಭಿಯಾನ ಟ್ಯಾಗುಗಳನ್ನು ತೆಗೆದುಹಾಕುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>ಪ್ರೊಫೈಲ್: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n ಸಂಪರ್ಕ</numerusform>
+            <numerusform>%n ಸಂಪರ್ಕಗಳು</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3213,32 +3350,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>ಈ ಭಾಷೆಯ ಲಿಪ್ಯಂತರಗಳಲ್ಲಿ ಹೆಚ್ಚು ತಪ್ಪುಗಳಿರುವ ಸಾಧ್ಯತೆ ಇದೆ.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>ಧ್ವನಿ ಸಂದೇಶ ಲಿಪ್ಯಂತರ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>ಭಾಷೆಗಳು</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ಯಾವಾಗ</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>ಮಾತಿನ ಮಾದರಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</translation>
     </message>
 </context>
 <context>

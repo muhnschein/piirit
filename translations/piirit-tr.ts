@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat çekirdeği %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Hakkında</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Kaynak kodu ve lisans</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit, GPL-3.0 lisanslı özgür bir yazılımdır.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Sorun bildir</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Sürümler bildiriminiz için kopyalanır.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat hakkında</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1295,6 +1334,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Bir röle iletiyi yalnızca alıcı onu alana kadar saklar.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Hakkında sayfasına dönmek için kaydırmaya devam edin.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2302,7 +2345,76 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Deneysel</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Bu özellikler kararsız olabilir, değiştirilebilir veya kaldırılabilir.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc uygulamaları</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Konum akışı</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Konumunuzu sohbetlerde paylaşır ve paylaşılan konumları bir haritada gösterir.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Sesli mesajları yazıya dök</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Sesli mesajları bu telefonda yazıya dönüştürür.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Hiçbir şey telefondan çıkmaz.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Konuşma modeli indirilemedi.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Yeniden dene</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Yazıya dökme</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Diller</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Daha düşük kalite, daha az veri</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Dengeli</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Hiçbir zaman</translation>
@@ -2332,29 +2444,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Her zaman</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Ayarlar</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Mesajlar</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Ekleri otomatik indir</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Bağlantılardan izlemeyi kaldır</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Bildirimler</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc uygulamalarını etkinleştir (deneysel)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Kapalı</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2377,30 +2469,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>1 yıl sonra</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Mesajları cihazdan sil</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Bahsetmeler</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Markdown biçimlendirmesini kullan</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Gizlilik</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Engellenen Kişiler</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Dengeli</translation>
+        <source>Messages</source>
+        <translation>Mesajlar</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2408,13 +2478,45 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Giden ortam kalitesi</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Bildirimleri göster</translation>
+        <source>Auto-download attachments</source>
+        <translation>Ekleri otomatik indir</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Daha düşük kalite, daha az veri</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Markdown biçimlendirmesini göster</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Mesajlarda *kalın*, _italik_ ve `kod` biçimlendirir.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Bu telefonda</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Eski mesajları sil</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Mesajlar yalnızca bu telefondan, her profilde silinir.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Diğer cihazlar ve sohbet üyeleri kendi kopyalarını saklar.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Bildirimler</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Bildirimleri göster</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2433,64 +2535,98 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Ayrıntı yok</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Sessize alınan gruplarda iletilerinize gelen yanıtların bildirimlerini göster</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Gönderdiğin bağlantılardan tıklama kimliklerini ve kampanya etiketlerini kaldırır.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Hızlı işlemler</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Gelişmiş</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Sohbetin kendi kaybolan mesajlar ayarından bağımsız olarak her profile uygulanır.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Aramalar</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Gelen aramalarda çal</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Kabul edilen kişiler için arama ekranını göster</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
+        <source>Muted chats</source>
+        <translation>Sessize alınan sohbetler</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Konum akışını etkinleştir (deneysel)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Sessize alınan gruplardaki yanıtlar</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Konumunuzu sohbetlerde paylaşır ve paylaşılan konumları bir haritada gösterir.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Sessize alınan gruplarda iletilerinize gelen yanıtların bildirimlerini göster</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Ayarlar</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Sesli mesajları yazıya dök (deneysel)</translation>
+        <source>Messages</source>
+        <translation>Mesajlar</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Sesli mesajları yazıya dökme</translation>
+        <source>Notifications</source>
+        <translation>Bildirimler</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Sesli mesajları bu telefonda yazıya dönüştürür.</translation>
+        <source>Privacy and security</source>
+        <translation>Gizlilik ve güvenlik</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Hiçbir şey telefondan çıkmaz.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Deneysel</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Hakkında</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Profiliniz</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Hızlı işlemler</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Gizlilik ve güvenlik</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Bağlantılardan izlemeyi kaldır</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Gönderdiğin bağlantılardan tıklama kimliklerini ve kampanya etiketlerini kaldırır.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Engellenen Kişiler</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kişi</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3202,32 +3338,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Bu dildeki dökümlerde muhtemelen daha fazla hata vardır.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Sesli mesajları yazıya dökme</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Diller</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Ne zaman</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Konuşma modeli indirilemedi.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Yeniden dene</translation>
     </message>
 </context>
 <context>
