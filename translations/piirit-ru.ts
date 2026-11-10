@@ -2412,9 +2412,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Повторить</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Языки расшифровки</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Расшифровка</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Языки</translation>
     </message>
 </context>
 <context>

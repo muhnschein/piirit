@@ -2408,9 +2408,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Încearcă din nou</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Limbi transcrise</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transcriere</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Limbi</translation>
     </message>
 </context>
 <context>

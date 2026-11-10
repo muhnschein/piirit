@@ -2403,9 +2403,13 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Riprova</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Lingue trascritte</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Trascrizione</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Lingue</translation>
     </message>
 </context>
 <context>

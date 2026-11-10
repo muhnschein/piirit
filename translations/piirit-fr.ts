@@ -2403,9 +2403,13 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Réessayer</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Langues transcrites</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transcription</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Langues</translation>
     </message>
 </context>
 <context>

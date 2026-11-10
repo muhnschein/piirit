@@ -2403,9 +2403,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>पुन्हा प्रयत्न करा</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>लिप्यंतरित भाषा</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>लिप्यंतरण</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>भाषा</translation>
     </message>
 </context>
 <context>

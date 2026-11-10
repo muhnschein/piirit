@@ -62,7 +62,18 @@ Page {
 
             PageHeader {
                 title: qsTr("Experimental")
-                description: qsTr("These features may be unstable, changed or removed.")
+            }
+
+            // As Quick actions' intro sentence.
+            Label {
+                objectName: "experimentalExplained"
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                textFormat: Text.PlainText
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                text: qsTr("These features may be unstable, changed or removed.")
             }
 
             // Off until asked: only place "webxdc" shows on fresh phone. Gates
@@ -93,6 +104,11 @@ Page {
                 onClicked: page.toggleExperimental(locationSwitch, "locationStreamingEnabled")
             }
 
+            SectionHeader {
+                //: Section of the experimental settings: voice messages turned into text.
+                text: qsTr("Transcription")
+            }
+
             // On: languages dialog writes it (TranscriptionLanguagesDialog.qml).
             TextSwitch {
                 id: transcriptionSwitch
@@ -106,7 +122,7 @@ Page {
                 onClicked: page.toggleTranscription()
             }
 
-            // Set up: its settings indented under switch, as setup asked them.
+            // Set up: its settings under switch, as setup asked them.
             Column {
                 objectName: "transcriptionSettings"
                 visible: Settings.transcriptionEnabled === true
@@ -116,8 +132,7 @@ Page {
                 ValueButton {
                     objectName: "languagesEntry"
                     width: parent.width
-                    //: Which languages voice messages are transcribed in.
-                    label: qsTr("Transcribed languages")
+                    label: qsTr("Languages")
                     value: Speech.names(Settings.transcriptionLanguages)
                     onClicked: pageStack.push(Qt.resolvedUrl("TranscriptionLanguagesDialog.qml"))
                 }

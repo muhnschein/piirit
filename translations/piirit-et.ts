@@ -2403,9 +2403,13 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Proovi uuesti</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Transkribeeritavad keeled</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkriptsioon</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Keeled</translation>
     </message>
 </context>
 <context>

@@ -2394,9 +2394,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>重试</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>转写语言</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>转写</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>语言</translation>
     </message>
 </context>
 <context>

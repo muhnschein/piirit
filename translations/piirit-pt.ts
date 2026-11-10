@@ -2403,9 +2403,13 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Tentar novamente</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Idiomas transcritos</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transcrição</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Idiomas</translation>
     </message>
 </context>
 <context>

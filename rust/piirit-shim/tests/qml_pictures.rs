@@ -242,6 +242,40 @@ fn an_emoji_drawn_above_its_natural_size_stays_sharp() {
     );
 }
 
+/// Line drawing in SVG that says it is small (24 px) still drawn sharp at 96 px, not blown up:
+/// settings icons were blurred so on the phone.
+#[test]
+fn a_vector_drawing_inked_above_its_stated_size_stays_sharp() {
+    let file = a_dir("ink-sharp").join("half.svg");
+    std::fs::write(
+        &file,
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\">\
+         <rect width=\"24\" height=\"24\" fill=\"#000000\"/>\
+         <rect fill=\"#ff0000\" width=\"12\" height=\"24\"/></svg>",
+    )
+    .expect("write the test picture");
+    let (pixels, width, height) = made_from(
+        &format!(
+            "ink?file={}&ink=%23ffffff&lit=%23ffffff&inkStrength=1&litStrength=1",
+            file.display()
+        ),
+        96,
+    );
+
+    assert_eq!(
+        (width, height),
+        (96, 96),
+        "the drawing is not made at its size"
+    );
+    let soft = (0..width)
+        .filter(|&x| (1..255).contains(&at(&pixels, width, x, 48).0))
+        .count();
+    assert!(
+        soft <= 2,
+        "a drawing inked at 4x was blown up from its 24 px size, edge {soft} px soft"
+    );
+}
+
 /// Settings rows' own icons (SettingsPage): line drawings inked like theme icons, at the size drawn.
 #[test]
 fn a_settings_icon_is_inked_at_its_size_with_soft_edges_on_clear_ground() {

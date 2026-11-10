@@ -2412,9 +2412,13 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zkusit znovu</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Jazyky přepisu</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Přepis</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Jazyky</translation>
     </message>
 </context>
 <context>

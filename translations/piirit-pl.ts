@@ -2412,9 +2412,13 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Spróbuj ponownie</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Języki transkrypcji</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkrypcja</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Języki</translation>
     </message>
 </context>
 <context>

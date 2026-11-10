@@ -61,12 +61,20 @@ cpp! {{
         // Decode at drawn size (12 MP photo = 48 MB for 200 px circle): covering draw in own
         // proportions, never above natural.
         QSize natural = reader.size();
-        if (natural.isValid() && !natural.isEmpty()) {
+        const bool vector = reader.format() == "svg" || reader.format() == "svgz";
+        if (vector) {
+            // SVG (emoji, settings icons): rendered at drawn size whatever size it says, so
+            // sharp; else read small and blown up.
+            QSize want = piirit_want(kind, natural, requested);
+            QSize decode = natural.isValid() && !natural.isEmpty()
+                           ? natural.scaled(want, Qt::KeepAspectRatioByExpanding) : want;
+            if (decode.isValid() && !decode.isEmpty()) {
+                reader.setScaledSize(decode);
+            }
+        } else if (natural.isValid() && !natural.isEmpty()) {
             QSize decode = natural.scaled(piirit_want(kind, natural, requested),
                                           Qt::KeepAspectRatioByExpanding);
-            // Emoji are SVG: rendered at drawn size, above natural too, so stay sharp.
-            if (!decode.isEmpty() && (kind == 3 || (decode.width() < natural.width()
-                                                    && decode.height() < natural.height()))) {
+            if (decode.width() < natural.width() && decode.height() < natural.height()) {
                 reader.setScaledSize(decode);
             }
         }

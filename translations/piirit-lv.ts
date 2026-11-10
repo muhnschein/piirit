@@ -2412,9 +2412,13 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Mēģināt vēlreiz</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Transkribējamās valodas</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkripcija</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Valodas</translation>
     </message>
 </context>
 <context>

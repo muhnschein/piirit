@@ -657,8 +657,8 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     );
     assert_eq!(
         value("languages-label"),
-        "Transcribed languages",
-        "the languages row does not say they are the transcribed ones. {context}"
+        "Languages",
+        "the languages row is not called Languages. {context}"
     );
     assert_eq!(
         (

@@ -501,6 +501,20 @@ fn the_settings_page_writes_what_the_app_reads() {
                 QString::from(common::page_url("SettingsExperimentalPage.qml"))
             )
         );
+        // Note under the header, as Quick actions'; transcription under its own heading.
+        record!(
+            "experimental-first",
+            call!("firstBeside", QString::from("webxdcSwitch"))
+        );
+        record!("experimental-note", get!("experimentalExplained", "text"));
+        record!(
+            "last-before-transcription",
+            call!("lastBefore", QString::from("Transcription"))
+        );
+        record!(
+            "first-under-transcription",
+            call!("firstUnder", QString::from("Transcription"))
+        );
         record!(
             "apps-default",
             call!("appReads", QString::from("webxdcEnabled"))
@@ -751,6 +765,13 @@ fn the_settings_page_writes_what_the_app_reads() {
         ),
         ("first-on-notifications", "notificationsSwitch"),
         ("first-under-calls", "callsRingSwitch"),
+        ("experimental-first", "experimentalExplained"),
+        (
+            "experimental-note",
+            "These features may be unstable, changed or removed.",
+        ),
+        ("last-before-transcription", "locationSwitch"),
+        ("first-under-transcription", "transcriptionSwitch"),
         ("first-under-muted", "mentionsSwitch"),
         ("calls-ring-kept", "true"),
         ("notification-default", "0"),

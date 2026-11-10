@@ -2390,9 +2390,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Thử lại</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Ngôn ngữ chép lời</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Chép lời</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Ngôn ngữ</translation>
     </message>
 </context>
 <context>

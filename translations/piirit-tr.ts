@@ -2394,9 +2394,13 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Yeniden dene</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Yazıya dökülen diller</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Yazıya dökme</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Diller</translation>
     </message>
 </context>
 <context>

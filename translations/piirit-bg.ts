@@ -2399,9 +2399,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Опитайте отново</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Езици за транскрипция</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Транскрипция</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Езици</translation>
     </message>
 </context>
 <context>

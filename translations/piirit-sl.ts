@@ -2421,9 +2421,13 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Poskusi znova</translation>
     </message>
     <message>
-        <source>Transcribed languages</source>
-        <extracomment>Which languages voice messages are transcribed in.</extracomment>
-        <translation>Jeziki prepisa</translation>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Prepis</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Jeziki</translation>
     </message>
 </context>
 <context>
