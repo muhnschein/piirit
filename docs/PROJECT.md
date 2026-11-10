@@ -51,6 +51,6 @@ Changed source string orphans translation in every catalog; `tests/translation_c
 
 By priority:
 
-1. **Harbour-readiness.** Source-checkable rules = mandatory CI gate (`ci/harbour-check.sh`, `HARBOUR.md`); real validator on each built RPM. One blocker, unfixable here: bundled `deltachat-rpc-server` = second ELF executable, permitted nowhere.
+1. **Harbour-readiness.** Source-checkable rules = mandatory CI gate (`ci/harbour-check.sh`, `HARBOUR.md`); real validator on each built RPM. One blocker, unfixable here: bundled `deltachat-rpc-server` = second ELF executable, allowed only once sailfishos/sdk-harbour-rpmvalidator#189 merges (`HARBOUR.md`).
 2. **Message polish**: avatars on bubbles.
 3. **Rest of webxdc API.** Apps sent, shown, run (`webxdc.rs`, `WebxdcPage.qml`); status updates both ways. Missing: `importFiles`, realtime channels; `source_code_url` not shown.

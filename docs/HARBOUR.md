@@ -24,7 +24,7 @@ Check IDs = Jolla's.
 - **.desktop** (1.3): non-empty `Name=`. `Exec=`, `Icon=` = package name. `Type=Application`. `X-Nemo-Application-Type=silica-qt5`. `[X-Sailjail]`, never `[Sailjail]` or empty.
 - **Sailjail** (1.4): 4 allowed keys only. `OrganizationName`, `ApplicationName` vs regex, reserved names. Permissions whitelisted. `ExecDBus` = `Exec`.
 - **Icons** (1.5): 4 sizes, real PNGs, pixel dims = dir names.
-- **QML** (1.6): imports vs allow-list, blocked prefixes. No absolute imports. Relative imports resolve in installed tree. No ELF outside 2 allowed places.
+- **QML** (1.6): imports vs allow-list, blocked prefixes. No absolute imports. Relative imports resolve in installed tree. No ELF outside 3 allowed places: binary, `*.so` under `/usr/share/<NAME>/lib/`, executables under `/usr/share/<NAME>/libexec/`.
 - **Binary** (1.6.1, 1.7): linked libs allowed. Links `__libc_start_main`. **Exports `main()` dynamic** (below). Symbol *version* (SDK's) visible only in built RPM.
 - **RPM metadata** (1.8): no `Vendor:`, `Provides:`, `Obsoletes:`, `Conflicts:`, `Recommends:`, `Suggests:`, `Supplements:`, `Enhances:`. `Requires:` unversioned, allowed. No scriptlets/triggers. `libsailfishapp-launcher` iff `sailfish-qml` launcher. `qt5-qtdeclarative-import-xmllistmodel` if `QtQuick.XmlListModel` imported.
 - **Runtime** (2.1, 2.5, 2.6): no hardcoded `/home/nemo`, `/home/defaultuser`. Data path spelled as sandbox grant. Nothing written to installed path.
@@ -47,7 +47,7 @@ Check IDs = Jolla's.
 
 ## The media plugin
 
-- `libpiirit.so` = H.264 encoder for video calls, at `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside `piirit.info` Gecko finds it by. `/usr/share/<name>/lib/` = only ELF place besides binary; links only libc, libm, libstdc++, libgcc_s; x264 built in. No waiver.
+- `libpiirit.so` = H.264 encoder for video calls, at `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside `piirit.info` Gecko finds it by. `/usr/share/<name>/lib/` = only place for shared libraries; links only libc, libm, libstdc++, libgcc_s; x264 built in. No waiver.
 - Validator warns "...then the rpath must be set accordingly": binary doesn't link it, no rpath. Gecko loads full path in own `plugin-container` (in app sandbox), dir from `MOZ_GMP_PATH` set before Gecko starts (`prepare_media_plugins`, `rust/piirit-shim/src/call_host.rs`). Env vars: Harbour silent.
 - Speech engine (voice to text): `libpiirit-speech-v8.so`, `-v82.so` at `/usr/share/harbour-piirit/lib/speech/` (with `ggml-silero-v5.1.2.bin`, speech detector model: data, not code), same rules: links only libc, libm, libstdc++, libgcc_s, ld-linux; whisper.cpp, ggml inside, hidden. App `dlopen()`s full path, no rpath; same validator warning, no waiver. No libgomp (not allowed): built without OpenMP.
 
@@ -56,6 +56,7 @@ Check IDs = Jolla's.
 - `ci/harbour/waivers.conf`: knowingly broken rules, one line + reason each. Every entry = submission blocker, so nothing fixable there.
 - Line: `<check id> <subject glob> <message glob>`. Source check matches id + subject; RPM check subject *and* message: one known error on one path, not all (setuid or dynamic link on bundled server still fails).
 - Waiver matching nothing fails check: can't outlive what it excuses.
+- None today.
 
 ## QtWidgets, and the vendored qmetaobject
 
@@ -65,13 +66,16 @@ Check IDs = Jolla's.
 - `ci/vendor-check.sh`: crates.io tarball + patch must equal vendored tree exactly. Crate `tests/` not vendored, dropped both sides: 1,200 lines cargo never builds; CodeQL would flag high-severity in uncompiled code.
 - `#[derive(QObject)]` = stock CodeQL "Access of invalid pointer" (`rust/access-invalid-pointer`) on derive line, struct with `qt_signal!` only: `qmetaobject_impl` takes signal's field offset as `&(*null).field` (old `offset_of` hack; no memory read). Not our code. Our copy of query (`.github/codeql/rust-queries/`, same id) drops sinks inside derive-written `impl qmetaobject::QObject` only; hand-written code, other macros still reported. Test `.github/codeql/rust-queries-tests/` plants real bugs beside a derive; `codeql.yml` runs it.
 
-## The open blockers
+## The open blocker
 
-**Piirit cannot be submitted to Harbour today.** One structural rule broken; unfixable in this repo.
+**Piirit passes the validator only with [sailfishos/sdk-harbour-rpmvalidator#189](https://github.com/sailfishos/sdk-harbour-rpmvalidator/pull/189) merged.** Unmerged as of 2026-11-06; Harbour rejected 2.2.0 on it.
 
 ### The bundled core
 
-- `deltachat-rpc-server` = ELF at `/usr/libexec/harbour-piirit/`, subprocess, JSON-RPC over stdio. Harbour allows ELF only at `/usr/bin/<NAME>`, `*.so` under `/usr/share/<NAME>/lib/`: 3 errors (path, binary, executable bit).
+- `deltachat-rpc-server` = static ELF executable, subprocess, JSON-RPC over stdio. At `/usr/share/harbour-piirit/libexec/` (`BUNDLED_SERVER`, `rust/piirit-shim/src/core.rs`; `ci/packaging-lint.sh` keeps spec equal).
+- sailfishos/sdk-harbour-rpmvalidator#189 allows ELF under `/usr/share/<NAME>/libexec/` if `file` says executable (`.so` there = error), and executable bit there. Jolla: right place is this one, not `/usr/libexec/<NAME>/` (where 2.2.0 had it).
+- CI targets PR as if merged: `ci/harbour/UPSTREAM` pins validator to PR head (`scripts/update-harbour-rules.sh pull/189/head`); `ci/harbour-check.sh` 1.6.7 mirrors it. Once merged: rerun script without argument (master).
+- Validator before sailfishos/sdk-harbour-rpmvalidator#189: 3 errors on server (path, ELF location, executable bit).
 
 | Core option | Current API? | Buildable here? |
 |---|---|---|
@@ -80,5 +84,4 @@ Check IDs = Jolla's.
 | `deltachat-rpc-server` subprocess *(today)* | **yes, upstream recommends** | yes |
 
 - Upstream: `libdeltachat` "is going to be deprecated and only exists because Android, iOS and Ubuntu Touch are still using it"; new projects: JSON-RPC.
-- Remaining move not technical: rule predates upstreams shipping self-contained helpers; ours reproducible, checksum-pinned (`scripts/fetch-rpc-server.sh`), in app's sandbox. Case for Jolla, on forum validator README links; don't engineer around.
 - `.so` rename passes validator, but README calls it circumvention; such apps removed even after approval. Not an option.

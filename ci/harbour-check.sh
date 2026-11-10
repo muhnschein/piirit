@@ -251,8 +251,10 @@ else
             [[ ${mode:2:1} == [2367] ]] && fail 1.2.7 "$dst" "group-writable (mode $mode)"
         done <<< "$install_section"
 
-        # 1.6.7: ELF only at /usr/bin/<NAME> or /usr/share/<NAME>/lib/. Read
-        # from install(1) calls: where tree source pairs with landing path.
+        # 1.6.7: ELF only at /usr/bin/<NAME>, /usr/share/<NAME>/lib/, or
+        # executables under /usr/share/<NAME>/libexec/
+        # (sailfishos/sdk-harbour-rpmvalidator#189). Read from install(1)
+        # calls: where tree source pairs with landing path.
         while read -r line; do
             case "$line" in install*) ;; *) continue ;; esac
             src=$(echo "$line" | awk '{print $(NF-1)}')
@@ -270,16 +272,26 @@ else
                 esac
                 continue
             fi
-            case "$(file -b "$root/$src" 2>/dev/null)" in
+            filetype=$(file -b "$root/$src" 2>/dev/null)
+            case "$filetype" in
                 ELF*) ;;
                 *) continue ;;
             esac
             case "$dst" in
                 "/usr/bin/$name") ;;
+                "/usr/share/$name/libexec/"*)
+                    case "$filetype" in
+                        *executable*) ;;
+                        *)
+                            fail 1.6.7 "$dst" \
+                                "only executables may be ELF under /usr/share/$name/libexec/; this is '$filetype' ($arch)"
+                            ;;
+                    esac
+                    ;;
                 "/usr/share/$name/lib/"*.so|"/usr/share/$name/lib/"*.so.*) ;;
                 *)
                     fail 1.6.7 "$dst" \
-                        "ELF binary in a location Harbour does not allow; only /usr/bin/$name and private shared libraries under /usr/share/$name/lib/ may be ELF ($arch)"
+                        "ELF binary in a location Harbour does not allow; only /usr/bin/$name, private shared libraries under /usr/share/$name/lib/ and executables under /usr/share/$name/libexec/ may be ELF ($arch)"
                     ;;
             esac
         done <<< "$install_section"
