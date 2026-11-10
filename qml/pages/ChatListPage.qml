@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import "../components"
 import Piirit 1.0
 import "../js/QuickActions.js" as QuickActions
+import "../js/Emoji.js" as Emoji
 
 Page {
     id: page
@@ -580,41 +581,59 @@ Page {
 
                 // Own profile left of title, opt-in. No model while off: nothing built. Core's
                 // list holds every profile; only page's shows (as SettingsPage).
-                Repeater {
-                    model: !page.archived && Settings.chatListProfile === true
-                           ? core.account_list : null
+                Item {
+                    parent: listHeader.extraContent
+                    anchors.fill: parent
 
-                    BackgroundItem {
-                        objectName: "headerProfile"
-                        visible: model.account_id === page.accountId
-                        width: visible ? listHeader.width - titleSpace.implicitWidth
-                                         - Theme.horizontalPageMargin : 0
-                        height: listHeader.height
+                    Repeater {
+                        model: !page.archived && Settings.chatListProfile === true
+                               ? core.account_list : null
 
-                        // PageHeader's title font: name fades before reaching title.
-                        Label {
-                            id: titleSpace
-                            visible: false
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.family: Theme.fontFamilyHeading
-                            text: listHeader.title
+                        MouseArea {
+                            id: profileMark
+                            objectName: "headerProfile"
+                            visible: model.account_id === page.accountId
+                            width: visible ? Math.min(profileName.x + profileName.implicitWidth,
+                                                      parent.width - Theme.paddingLarge) : 0
+                            height: parent.height
+
+                            readonly property string name: model.display_name.length > 0
+                                                           ? model.display_name : model.addr
+                            readonly property string drawnName:
+                                Emoji.inText(profileMark.name, false, profileName.font.pixelSize,
+                                             "", Emoji.nameSaturation)
+
+                            // On title's line: Silica sets title at `topMargin`, not centred.
+                            Avatar {
+                                id: profileAvatar
+                                objectName: "headerProfileAvatar"
+                                width: Theme.iconSizeSmallPlus
+                                y: listHeader.topMargin + (listHeader.titleHeight - height) / 2
+                                initial: profileMark.name
+                                ownColor: model.color
+                                picturePath: model.avatar_path
+                            }
+
+                            Label {
+                                id: profileName
+                                objectName: "headerProfileName"
+                                x: profileAvatar.width + Theme.paddingMedium
+                                width: profileMark.width - x
+                                anchors.verticalCenter: profileAvatar.verticalCenter
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: profileMark.pressed && profileMark.containsMouse
+                                       ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                                truncationMode: TruncationMode.Fade
+                                textFormat: profileMark.drawnName.length > 0 ? Text.StyledText
+                                                                             : Text.PlainText
+                                text: profileMark.drawnName.length > 0 ? profileMark.drawnName
+                                                                       : profileMark.name
+                            }
+
+                            // As Delta Chat's own picture over its chat list: switch profile.
+                            onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                                           { currentAccountId: page.accountId })
                         }
-
-                        ContactRow {
-                            objectName: "headerProfileRow"
-                            width: parent.width
-                            anchors.verticalCenter: parent.verticalCenter
-                            displayName: model.display_name.length > 0
-                                         ? model.display_name : model.addr
-                            ownColor: model.color
-                            picturePath: model.avatar_path
-                            // Header, not a search result.
-                            match: ""
-                        }
-
-                        // As Delta Chat's own picture over its chat list: switch profile.
-                        onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
-                                                       { currentAccountId: page.accountId })
                     }
                 }
             }

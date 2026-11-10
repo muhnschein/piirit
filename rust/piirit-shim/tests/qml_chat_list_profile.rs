@@ -12,6 +12,7 @@ mod common;
 
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import Sailfish.Silica 1.0
     import Piirit 1.0
     import 'file://__COMPONENTS__'
     Item {
@@ -43,18 +44,34 @@ const PROBE_QML: &str = r"
         }
         function profiles() { return all(loader.item, 'headerProfile', []) }
         function built() { return '' + profiles().length }
+        function shownOnes() { return profiles().filter(function (item) { return item.visible }) }
         // Each shown profile: name, picture, colour.
         function shown() {
-            return profiles().filter(function (item) { return item.visible })
-                .map(function (item) {
-                    var row = all(item, 'headerProfileRow', [])[0]
-                    return row.displayName + '|' + row.picturePath + '|' + row.ownColor
-                }).join(',')
+            return shownOnes().map(function (item) {
+                var avatar = all(item, 'headerProfileAvatar', [])[0]
+                return all(item, 'headerProfileName', [])[0].text + '|' + avatar.picturePath
+                    + '|' + avatar.ownColor
+            }).join(',')
+        }
+        // Left of title, picture centred on title's line, small, name quiet.
+        function look() {
+            var hit = shownOnes()
+            if (hit.length !== 1) { return 'shown:' + hit.length }
+            var header = all(loader.item, 'chatListHeader', [])[0]
+            var avatar = all(hit[0], 'headerProfileAvatar', [])[0]
+            var name = all(hit[0], 'headerProfileName', [])[0]
+            return [hit[0].parent.parent === header.extraContent,
+                    avatar.y + avatar.height / 2 === header.topMargin + header.titleHeight / 2,
+                    // Anchors snap to whole pixels.
+                    Math.abs(name.y + name.height / 2 - avatar.y - avatar.height / 2) <= 1,
+                    avatar.width === Theme.iconSizeSmallPlus,
+                    name.font.pixelSize === Theme.fontSizeSmall,
+                    Qt.colorEqual(name.color, Theme.secondaryColor)].join(',')
         }
         function tap() {
             var hit = profiles().filter(function (item) { return item.visible })
             if (hit.length !== 1) { return 'shown:' + hit.length }
-            hit[0].clicked()
+            hit[0].clicked(null)
             return 'ok'
         }
         function navigation() { return pageStack.log }
@@ -182,6 +199,7 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
         let done = shown.starts_with("Muhn|");
         if done || last {
             record!("renamed-shown", shown);
+            record!("look", call!("look"));
             record!("tap", call!("tap"));
             record!("tap-opens", call!("navigation"));
             record!("switch-off", call!("setShown", false));
@@ -246,6 +264,13 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
         value("renamed-shown"),
         format!("Muhn|{picture}|#4a90d9"),
         "the header does not follow the profile's new name and picture. {context}"
+    );
+    assert_eq!(
+        value("look"),
+        "true,true,true,true,true,true",
+        "the profile is not a small picture and quiet name left of the title, on its line \
+         (in header's space left of title, picture centred on title, name on picture, \
+         picture size, name size, name colour). {context}"
     );
     assert_eq!(value("tap"), "ok", "{context}");
     assert_eq!(
