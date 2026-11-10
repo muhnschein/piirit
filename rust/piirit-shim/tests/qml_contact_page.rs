@@ -245,7 +245,14 @@ fn the_contact_page_names_the_contact_and_no_address() {
             "menu-order",
             call!("menuOrder", QString::from("contactMenu"))
         );
-        record!("band", get!("headerBand", "visible"));
+        record!(
+            "band",
+            format!(
+                "{},{}",
+                get!("headerBand", "visible"),
+                get!("headerBand", "y")
+            )
+        );
         record!(
             "band-gap",
             format!(
@@ -497,7 +504,7 @@ fn assert_actions(steps: &[(&str, String)], calls: &[(String, Value)]) {
     );
     assert_eq!(
         value(steps, "band"),
-        "true",
+        "true,0",
         "no ambience band behind the contact's top block. {context}"
     );
     assert_eq!(

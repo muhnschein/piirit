@@ -213,7 +213,14 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("add-row", get!("addMembersRow", "visible"));
         record!("invite-row", get!("inviteRow", "visible"));
         record!("menu-order", call!("menuOrder", QString::from("groupMenu")));
-        record!("band", get!("headerBand", "visible"));
+        record!(
+            "band",
+            format!(
+                "{},{}",
+                get!("headerBand", "visible"),
+                get!("headerBand", "y")
+            )
+        );
         record!(
             "band-gap",
             format!(
@@ -478,7 +485,7 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
     );
     assert_eq!(
         value("band"),
-        "true",
+        "true,0",
         "no ambience band behind the group's top block. {context}"
     );
     assert_eq!(
