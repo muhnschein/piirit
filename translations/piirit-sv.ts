@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat-kärna %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Om</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Källkod och licens</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit är fri programvara under GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Rapportera ett problem</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versionerna kopieras till din rapport.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Om Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1434,6 +1473,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Ett relä lagrar ett meddelande bara tills mottagaren hämtar det.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Fortsätt svepa för att gå tillbaka till Om.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2520,7 +2563,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Experimentellt</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>De här funktionerna kan vara instabila, ändras eller tas bort.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc-appar</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kör små appar inuti chattar.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Platsströmning</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Delar din plats i chattar och visar delade platser på en karta.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Transkribera röstmeddelanden</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Gör om röstmeddelanden till text på den här telefonen.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Ingenting lämnar telefonen.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Talmodellen kunde inte laddas ned.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Försök igen</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkription</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Språk</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Lägre kvalitet, mindre data</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Balanserad</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Aldrig</translation>
@@ -2550,29 +2662,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Alltid</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Meddelanden</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Hämta bilagor automatiskt</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Ta bort spårning från länkar</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Aviseringar</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Aktivera webxdc-appar (experimentellt)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Av</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2595,30 +2687,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Efter 1 år</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Ta bort meddelanden från enheten</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Omnämnanden</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Använd Markdown-formatering</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Integritet</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blockerade kontakter</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Balanserad</translation>
+        <source>Messages</source>
+        <translation>Meddelanden</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2626,13 +2696,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kvalitet på utgående media</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Visa aviseringar</translation>
+        <source>Auto-download attachments</source>
+        <translation>Hämta bilagor automatiskt</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Lägre kvalitet, mindre data</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Visa Markdown-formatering</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formaterar *fetstil*, _kursiv_ och `kod` i meddelanden.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>På den här telefonen</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Ta bort gamla meddelanden</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Meddelanden tas bara bort från den här telefonen, i alla profiler.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Andra enheter och chattmedlemmar behåller sina kopior.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Aviseringar</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Visa aviseringar</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2651,64 +2753,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Inga detaljer</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Visa aviseringar om svar på dina meddelanden i tystade grupper</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Tar bort klick-ID:n och kampanjtaggar från länkar du skickar.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Snabbåtgärder</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Avancerat</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Gäller för varje profil, oavsett en chatts egen inställning för försvinnande meddelanden.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Samtal</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Ring vid inkommande samtal</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Visa samtalsskärm för godkända kontakter</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Kör små appar inuti chattar.</translation>
+        <source>Muted chats</source>
+        <translation>Tystade chattar</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Aktivera platsströmning (experimentellt)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Svar i tystade grupper</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Delar din plats i chattar och visar delade platser på en karta.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Visa aviseringar om svar på dina meddelanden i tystade grupper</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Inställningar</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Transkribera röstmeddelanden (experimentellt)</translation>
+        <source>Messages</source>
+        <translation>Meddelanden</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Transkribering av röstmeddelanden</translation>
+        <source>Notifications</source>
+        <translation>Aviseringar</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Gör om röstmeddelanden till text på den här telefonen.</translation>
+        <source>Privacy and security</source>
+        <translation>Integritet och säkerhet</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Ingenting lämnar telefonen.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Experimentellt</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Om</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Din profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Snabbåtgärder</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Integritet och säkerhet</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Ta bort spårning från länkar</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Tar bort klick-ID:n och kampanjtaggar från länkar du skickar.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blockerade kontakter</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakter</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3426,32 +3563,6 @@ Väntar på att enheten hos %2$s ska svara...</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Transkriptioner på det här språket innehåller troligen fler fel.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Transkribering av röstmeddelanden</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Språk</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>När</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Talmodellen kunde inte laddas ned.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Försök igen</translation>
     </message>
 </context>
 <context>

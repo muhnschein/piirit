@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat mag %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Névjegy</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Forráskód és licenc</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>A Piirit szabad szoftver a GPL-3.0 licenc alatt.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Hiba bejelentése</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>A verziók a bejelentéshez kimásolódnak.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>A Delta Chatról</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1426,6 +1465,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>A relé csak addig őrzi meg az üzenetet, amíg a címzett le nem tölti.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Lapozzon tovább a Névjegyhez való visszatéréshez.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2508,7 +2551,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Kísérleti</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Ezek a funkciók instabilak lehetnek, megváltozhatnak vagy megszűnhetnek.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc alkalmazások</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kis alkalmazásokat futtat a csevegéseken belül.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Folyamatos helymegosztás</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Megosztja a tartózkodási helyét a csevegésekben, és térképen mutatja a megosztott helyeket.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Hangüzenetek átírása</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Szöveggé alakítja a hangüzeneteket ezen a telefonon.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Semmi sem hagyja el a telefont.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>A beszédmodellt nem sikerült letölteni.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Újra</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Átírás</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Nyelvek</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Gyengébb minőség, kevesebb adat</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Kiegyensúlyozott</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Soha</translation>
@@ -2538,29 +2650,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mindig</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Beállítások</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Üzenetek</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Mellékletek automatikus letöltése</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Követés eltávolítása a hivatkozásokból</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Értesítések</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc alkalmazások engedélyezése (kísérleti)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Ki</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2583,30 +2675,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 év után</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Üzenetek törlése az eszközről</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Említések</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Markdown-formázás használata</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Adatvédelem</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Letiltott névjegyek</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Kiegyensúlyozott</translation>
+        <source>Messages</source>
+        <translation>Üzenetek</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2614,13 +2684,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kimenő média minősége</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Értesítések megjelenítése</translation>
+        <source>Auto-download attachments</source>
+        <translation>Mellékletek automatikus letöltése</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Gyengébb minőség, kevesebb adat</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Markdown-formázás megjelenítése</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formázza az üzenetekben a *félkövér*, _dőlt_ és `kód` részeket.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Ezen a telefonon</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Régi üzenetek törlése</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Az üzenetek csak erről a telefonról törlődnek, minden profilban.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>A többi eszköz és a csevegés tagjai megtartják a saját példányukat.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Értesítések</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Értesítések megjelenítése</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2639,64 +2741,98 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nincsenek részletek</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Értesítések megjelenítése az Ön üzeneteire érkező válaszokról a némított csoportokban</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Eltávolítja a kattintásazonosítókat és kampánycímkéket az általad küldött linkekből.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Gyorsműveletek</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Speciális</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Minden profilra vonatkozik, a csevegések saját eltűnő üzenetek beállításától függetlenül.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Hívások</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Csengés bejövő hívásnál</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Hívásképernyő megjelenítése az elfogadott partnereknél</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Kis alkalmazásokat futtat a csevegéseken belül.</translation>
+        <source>Muted chats</source>
+        <translation>Némított csevegések</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Folyamatos helymegosztás engedélyezése (kísérleti)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Válaszok némított csoportokban</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Megosztja a tartózkodási helyét a csevegésekben, és térképen mutatja a megosztott helyeket.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Értesítések megjelenítése az Ön üzeneteire érkező válaszokról a némított csoportokban</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Beállítások</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Hangüzenetek átírása (kísérleti)</translation>
+        <source>Messages</source>
+        <translation>Üzenetek</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Hangüzenetek átírása</translation>
+        <source>Notifications</source>
+        <translation>Értesítések</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Szöveggé alakítja a hangüzeneteket ezen a telefonon.</translation>
+        <source>Privacy and security</source>
+        <translation>Adatvédelem és biztonság</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Semmi sem hagyja el a telefont.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Kísérleti</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Névjegy</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Saját profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Gyorsműveletek</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Adatvédelem és biztonság</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Követés eltávolítása a hivatkozásokból</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Eltávolítja a kattintásazonosítókat és kampánycímkéket az általad küldött linkekből.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Letiltott névjegyek</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n névjegy</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3408,32 +3544,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Az ezen a nyelven készült átiratok valószínűleg több hibát tartalmaznak.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Hangüzenetek átírása</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Nyelvek</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Mikor</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>A beszédmodellt nem sikerült letölteni.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Újra</translation>
     </message>
 </context>
 <context>

@@ -1,7 +1,7 @@
 //! Picking a deletion period, from tap to core.
 //!
-//! Settings page writes nothing on tap: asks core how many messages are older, shows that count on
-//! its own page, writes setting only on accept. Core object then writes it to every account. Test
+//! Messages settings write nothing on tap: ask core how many messages are older, show that count
+//! on its own page, write setting only on accept. Core object then writes it to every account. Test
 //! accepts the page's dialog.
 //!
 //! Six periods: Silica lists them on a page of their own, popping as the count lands. Stack refuses
@@ -178,7 +178,7 @@ fn probe_qml() -> String {
     }}
 ",
         components.display(),
-        common::page_url("SettingsPage.qml")
+        common::page_url("SettingsMessagesPage.qml")
     )
 }
 

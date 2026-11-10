@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ro">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Nucleul Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Despre</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Cod sursă și licență</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit este software liber sub licența GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Raportează o problemă</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versiunile sunt copiate pentru raportul tău.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Despre Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1442,6 +1481,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Un releu păstrează un mesaj doar până când destinatarul îl preia.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Glisați mai departe pentru a reveni la Despre.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2532,7 +2575,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Experimental</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Aceste funcții pot fi instabile, modificate sau eliminate.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplicații webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Rulează aplicații mici în conversații.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Transmiterea locației</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Partajează locația ta în conversații și arată locațiile partajate pe o hartă.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Transcrie mesajele vocale</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Transformă mesajele vocale în text pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nimic nu părăsește telefonul.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Încearcă din nou</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transcriere</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Limbi</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Calitate mai slabă, mai puține date</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Echilibrată</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Niciodată</translation>
@@ -2562,29 +2674,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Întotdeauna</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Setări</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Mesaje</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Descarcă atașamentele automat</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Elimină urmărirea din linkuri</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Notificări</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Activează aplicațiile webxdc (experimental)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Dezactivat</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2607,30 +2699,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>După 1 an</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Șterge mesajele de pe dispozitiv</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Mențiuni</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Folosește formatarea Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Confidențialitate</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Contacte blocate</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Echilibrată</translation>
+        <source>Messages</source>
+        <translation>Mesaje</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2638,13 +2708,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Calitatea mediilor de ieșire</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Afișează notificările</translation>
+        <source>Auto-download attachments</source>
+        <translation>Descarcă atașamentele automat</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Calitate mai slabă, mai puține date</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Afișează formatarea Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formatează *aldin*, _cursiv_ și `cod` în mesaje.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Pe acest telefon</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Șterge mesajele vechi</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Mesajele sunt șterse doar de pe acest telefon, în fiecare profil.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Celelalte dispozitive și membrii conversației își păstrează copiile.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Notificări</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Afișează notificările</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2663,64 +2765,100 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fără detalii</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Afișează notificări pentru răspunsurile la mesajele tale în grupurile amuțite</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Elimină ID-urile de clic și etichetele de campanie din linkurile pe care le trimiți.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Acțiuni rapide</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Avansat</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Se aplică fiecărui profil, indiferent de setarea pentru mesaje care dispar a fiecărei conversații.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Apeluri</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Sună la apelurile primite</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Afișează ecranul de apel pentru contactele acceptate</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Rulează aplicații mici în conversații.</translation>
+        <source>Muted chats</source>
+        <translation>Conversații fără sunet</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Activează transmiterea locației (experimental)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Răspunsuri în grupurile fără sunet</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Partajează locația ta în conversații și arată locațiile partajate pe o hartă.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Afișează notificări pentru răspunsurile la mesajele tale în grupurile amuțite</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Setări</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Transcrie mesajele vocale (experimental)</translation>
+        <source>Messages</source>
+        <translation>Mesaje</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Transcrierea mesajelor vocale</translation>
+        <source>Notifications</source>
+        <translation>Notificări</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Transformă mesajele vocale în text pe acest telefon.</translation>
+        <source>Privacy and security</source>
+        <translation>Confidențialitate și securitate</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nimic nu părăsește telefonul.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Experimental</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Despre</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Profilul tău</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Acțiuni rapide</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Confidențialitate și securitate</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Elimină urmărirea din linkuri</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Elimină ID-urile de clic și etichetele de campanie din linkurile pe care le trimiți.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Contacte blocate</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n contact</numerusform>
+            <numerusform>%n contacte</numerusform>
+            <numerusform>%n de contacte</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3436,32 +3574,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Transcrierile în această limbă conțin probabil mai multe greșeli.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Transcrierea mesajelor vocale</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Limbi</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Când</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Modelul de vorbire nu a putut fi descărcat.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Încearcă din nou</translation>
     </message>
 </context>
 <context>

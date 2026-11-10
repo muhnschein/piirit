@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Ядро Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Про застосунок</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Вихідний код і ліцензія</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit — вільне програмне забезпечення за ліцензією GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Повідомити про проблему</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Версії копіюються для вашого повідомлення.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Про Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1446,6 +1485,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Релей зберігає повідомлення лише доти, доки отримувач його не забере.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Гортайте далі, щоб повернутися до «Про застосунок».</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2536,7 +2579,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Експериментальне</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Ці функції можуть бути нестабільними, змінитися або зникнути.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Застосунки webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Запускає невеликі застосунки всередині чатів.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Стримінг геоданих</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Ділиться вашим місцезнаходженням у чатах і показує спільні місцезнаходження на мапі.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Розшифровувати голосові повідомлення</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Перетворює голосові повідомлення на текст на цьому телефоні.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Ніщо не залишає телефон.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Не вдалося завантажити мовну модель.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Спробувати ще раз</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Розшифрування</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Мови</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Нижча якість, менше трафіку</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Збалансована</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Ніколи</translation>
@@ -2566,29 +2678,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Завжди</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Налаштування</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Повідомлення</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Автоматично завантажувати вкладення</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Прибирати відстеження з посилань</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Сповіщення</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Увімкнути застосунки webxdc (експериментально)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Вимк.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2611,30 +2703,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Через 1 рік</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Видаляти повідомлення з пристрою</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Згадки</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Використовувати розмітку Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Конфіденційність</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Заблоковані контакти</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Збалансована</translation>
+        <source>Messages</source>
+        <translation>Повідомлення</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2642,13 +2712,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Якість вихідних медіафайлів</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Показувати сповіщення</translation>
+        <source>Auto-download attachments</source>
+        <translation>Автоматично завантажувати вкладення</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Нижча якість, менше трафіку</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Показувати розмітку Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Форматує *жирний*, _курсив_ і `код` у повідомленнях.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>На цьому телефоні</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Видаляти старі повідомлення</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Повідомлення видаляються лише з цього телефона, в усіх профілях.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Інші пристрої та учасники чату зберігають свої копії.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Сповіщення</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Показувати сповіщення</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2667,64 +2769,100 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Без подробиць</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Показувати сповіщення про відповіді на ваші повідомлення в приглушених групах</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Вилучає ідентифікатори кліків і мітки кампаній із посилань, які ви надсилаєте.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Швидкі дії</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Додатково</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Діє для кожного профілю незалежно від налаштування зникаючих повідомлень у самому чаті.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Виклики</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Дзвонити при вхідних викликах</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Показувати екран виклику для прийнятих контактів</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Запускає невеликі застосунки всередині чатів.</translation>
+        <source>Muted chats</source>
+        <translation>Чати без звуку</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Увімкнути стримінг геоданих (експериментально)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Відповіді в групах без звуку</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Ділиться вашим місцезнаходженням у чатах і показує спільні місцезнаходження на мапі.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Показувати сповіщення про відповіді на ваші повідомлення в приглушених групах</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Налаштування</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Розшифровувати голосові повідомлення (експериментально)</translation>
+        <source>Messages</source>
+        <translation>Повідомлення</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Розшифрування голосових повідомлень</translation>
+        <source>Notifications</source>
+        <translation>Сповіщення</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Перетворює голосові повідомлення на текст на цьому телефоні.</translation>
+        <source>Privacy and security</source>
+        <translation>Конфіденційність і безпека</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Ніщо не залишає телефон.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Експериментальне</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Про застосунок</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Ваш профіль</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Швидкі дії</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Конфіденційність і безпека</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Прибирати відстеження з посилань</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Вилучає ідентифікатори кліків і мітки кампаній із посилань, які ви надсилаєте.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Профіль: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Заблоковані контакти</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n контакт</numerusform>
+            <numerusform>%n контакти</numerusform>
+            <numerusform>%n контактів</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3440,32 +3578,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Розшифровки цією мовою, ймовірно, містять більше помилок.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Розшифрування голосових повідомлень</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Мови</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Коли</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Не вдалося завантажити мовну модель.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Спробувати ще раз</translation>
     </message>
 </context>
 <context>

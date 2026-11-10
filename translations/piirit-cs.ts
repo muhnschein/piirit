@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Jádro Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikaci</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Zdrojový kód a licence</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit je svobodný software pod licencí GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Nahlásit problém</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Verze se zkopírují pro vaše hlášení.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>O Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1446,6 +1485,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay uchová zprávu jen do chvíle, než si ji příjemce vyzvedne.</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Přejeďte dál a vraťte se na stránku O aplikaci.</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2536,7 +2579,76 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Experimentální</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Tyto funkce mohou být nestabilní, změněné nebo odstraněné.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplikace webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Spouští malé aplikace uvnitř chatů.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Streamování polohy</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Sdílí vaši polohu v chatech a zobrazuje sdílené polohy na mapě.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Přepisovat hlasové zprávy</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Převádí hlasové zprávy na text v tomto telefonu.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nic neopustí telefon.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Řečový model se nepodařilo stáhnout.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Zkusit znovu</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Přepis</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Jazyky</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Nižší kvalita, méně dat</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Vyvážená</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nikdy</translation>
@@ -2566,29 +2678,9 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Vždy</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Nastavení</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Zprávy</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Automaticky stahovat přílohy</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Odstranit sledování z odkazů</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Oznámení</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Povolit aplikace webxdc (experimentální)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Vypnuto</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2611,30 +2703,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Po 1 roce</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Mazat zprávy ze zařízení</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Zmínky</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Používat formátování Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Soukromí</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blokované kontakty</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Vyvážená</translation>
+        <source>Messages</source>
+        <translation>Zprávy</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2642,13 +2712,45 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Kvalita odesílaných multimédií</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Zobrazovat oznámení</translation>
+        <source>Auto-download attachments</source>
+        <translation>Automaticky stahovat přílohy</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Nižší kvalita, méně dat</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Zobrazovat formátování Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formátuje *tučné*, _kurzívu_ a `kód` ve zprávách.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>V tomto telefonu</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Mazat staré zprávy</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Zprávy se mažou jen z tohoto telefonu, ve všech profilech.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Ostatní zařízení a členové chatu si své kopie ponechají.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Oznámení</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Zobrazovat oznámení</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2667,64 +2769,100 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Bez podrobností</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Zobrazovat oznámení o odpovědích na vaše zprávy ve ztlumených skupinách</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Odstraňuje z odkazů, které odesíláš, identifikátory kliknutí a kampaňové značky.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Rychlé akce</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Pokročilé</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Platí pro každý profil bez ohledu na nastavení mizejících zpráv v jednotlivých chatech.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Hovory</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Vyzvánět při příchozích hovorech</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Zobrazit obrazovku hovoru pro přijaté kontakty</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Spouští malé aplikace uvnitř chatů.</translation>
+        <source>Muted chats</source>
+        <translation>Ztlumené chaty</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Povolit streamování polohy (experimentální)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Odpovědi ve ztlumených skupinách</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Sdílí vaši polohu v chatech a zobrazuje sdílené polohy na mapě.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Zobrazovat oznámení o odpovědích na vaše zprávy ve ztlumených skupinách</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Nastavení</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Přepisovat hlasové zprávy (experimentální)</translation>
+        <source>Messages</source>
+        <translation>Zprávy</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Přepis hlasových zpráv</translation>
+        <source>Notifications</source>
+        <translation>Oznámení</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Převádí hlasové zprávy na text v tomto telefonu.</translation>
+        <source>Privacy and security</source>
+        <translation>Soukromí a zabezpečení</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nic neopustí telefon.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Experimentální</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikaci</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Váš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Rychlé akce</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Soukromí a zabezpečení</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Odstranit sledování z odkazů</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Odstraňuje z odkazů, které odesíláš, identifikátory kliknutí a kampaňové značky.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokované kontakty</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakty</numerusform>
+            <numerusform>%n kontaktů</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3440,32 +3578,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Přepisy v tomto jazyce pravděpodobně obsahují více chyb.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Přepis hlasových zpráv</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Jazyky</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kdy</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Řečový model se nepodařilo stáhnout.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Zkusit znovu</translation>
     </message>
 </context>
 <context>

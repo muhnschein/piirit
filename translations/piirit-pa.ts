@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pa">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat ਕੋਰ %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>ਬਾਰੇ</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>ਸਰੋਤ ਕੋਡ ਅਤੇ ਲਾਇਸੈਂਸ</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit GPL-3.0 ਅਧੀਨ ਮੁਫ਼ਤ ਸਾਫ਼ਟਵੇਅਰ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>ਸਮੱਸਿਆ ਦੀ ਰਿਪੋਰਟ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>ਤੁਹਾਡੀ ਰਿਪੋਰਟ ਲਈ ਵਰਜਨ ਕਾਪੀ ਕੀਤੇ ਜਾਂਦੇ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat ਬਾਰੇ</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -1438,6 +1477,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>ਰੀਲੇਅ ਸੁਨੇਹਾ ਸਿਰਫ਼ ਉਦੋਂ ਤੱਕ ਰੱਖਦਾ ਹੈ ਜਦੋਂ ਤੱਕ ਪ੍ਰਾਪਤਕਰਤਾ ਉਸਨੂੰ ਲੈ ਨਹੀਂ ਲੈਂਦਾ।</translation>
     </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„ਬਾਰੇ“ ’ਤੇ ਵਾਪਸ ਜਾਣ ਲਈ ਸਵਾਈਪ ਕਰਦੇ ਰਹੋ।</translation>
+    </message>
 </context>
 <context>
     <name>LeaveGroupDialog</name>
@@ -2524,7 +2567,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>ਪ੍ਰਯੋਗਾਤਮਕ</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>ਇਹ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਅਸਥਿਰ ਹੋ ਸਕਦੀਆਂ ਹਨ, ਬਦਲ ਸਕਦੀਆਂ ਹਨ ਜਾਂ ਹਟਾਈਆਂ ਜਾ ਸਕਦੀਆਂ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc ਐਪਾਂ</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ਟਿਕਾਣਾ ਸਟ੍ਰੀਮਿੰਗ</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰਦਾ ਹੈ ਅਤੇ ਸਾਂਝੇ ਟਿਕਾਣੇ ਨਕਸ਼ੇ ਉੱਤੇ ਦਿਖਾਉਂਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ਕੁਝ ਵੀ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਸਕਿਆ।</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>ਲਿਪੀਅੰਤਰਨ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>ਭਾਸ਼ਾਵਾਂ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ਘੱਟ ਗੁਣਵੱਤਾ, ਘੱਟ ਡਾਟਾ</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>ਸੰਤੁਲਿਤ</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ਕਦੇ ਨਹੀਂ</translation>
@@ -2554,29 +2666,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਹਮੇਸ਼ਾ</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>ਸੈਟਿੰਗਾਂ</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>ਸੁਨੇਹੇ</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>ਅਟੈਚਮੈਂਟ ਆਪਣੇ ਆਪ ਡਾਊਨਲੋਡ ਕਰੋ</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>ਲਿੰਕਾਂ ਵਿੱਚੋਂ ਟਰੈਕਿੰਗ ਹਟਾਓ</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>ਸੂਚਨਾਵਾਂ</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc ਐਪਾਂ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>ਬੰਦ</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2599,30 +2691,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 ਸਾਲ ਬਾਅਦ</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>ਡਿਵਾਈਸ ਤੋਂ ਸੁਨੇਹੇ ਹਟਾਓ</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>ਜ਼ਿਕਰ</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>ਮਾਰਕਡਾਊਨ ਫਾਰਮੈਟਿੰਗ ਵਰਤੋ</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>ਨਿੱਜਤਾ</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>ਬਲਾਕ ਕੀਤੇ ਸੰਪਰਕ</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>ਸੰਤੁਲਿਤ</translation>
+        <source>Messages</source>
+        <translation>ਸੁਨੇਹੇ</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2630,13 +2700,45 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਭੇਜੀ ਜਾਣ ਵਾਲੀ ਮੀਡੀਆ ਦੀ ਗੁਣਵੱਤਾ</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
+        <source>Auto-download attachments</source>
+        <translation>ਅਟੈਚਮੈਂਟ ਆਪਣੇ ਆਪ ਡਾਊਨਲੋਡ ਕਰੋ</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>ਘੱਟ ਗੁਣਵੱਤਾ, ਘੱਟ ਡਾਟਾ</translation>
+        <source>Show Markdown formatting</source>
+        <translation>ਮਾਰਕਡਾਊਨ ਫਾਰਮੈਟਿੰਗ ਦਿਖਾਓ</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>ਸੁਨੇਹਿਆਂ ਵਿੱਚ *ਬੋਲਡ*, _ਇਟੈਲਿਕ_ ਅਤੇ `ਕੋਡ` ਨੂੰ ਫਾਰਮੈਟ ਕਰਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>ਪੁਰਾਣੇ ਸੁਨੇਹੇ ਹਟਾਓ</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>ਸੁਨੇਹੇ ਸਿਰਫ਼ ਇਸ ਫ਼ੋਨ ਤੋਂ ਹਟਾਏ ਜਾਂਦੇ ਹਨ, ਹਰ ਪ੍ਰੋਫਾਈਲ ਵਿੱਚ।</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>ਹੋਰ ਡਿਵਾਈਸਾਂ ਅਤੇ ਚੈਟ ਮੈਂਬਰ ਆਪਣੀਆਂ ਕਾਪੀਆਂ ਰੱਖਦੇ ਹਨ।</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>ਸੂਚਨਾਵਾਂ</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2655,64 +2757,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਕੋਈ ਵੇਰਵਾ ਨਹੀਂ</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>ਚੁੱਪ ਕੀਤੇ ਸਮੂਹਾਂ ਵਿੱਚ ਤੁਹਾਡੇ ਸੁਨੇਹਿਆਂ ਦੇ ਜਵਾਬਾਂ ਦੀਆਂ ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>ਤੁਹਾਡੇ ਭੇਜੇ ਲਿੰਕਾਂ ਵਿੱਚੋਂ ਕਲਿੱਕ ਆਈਡੀ ਅਤੇ ਮੁਹਿੰਮ ਟੈਗ ਹਟਾਉਂਦਾ ਹੈ।</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>ਉੱਨਤ</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>ਹਰ ਪ੍ਰੋਫ਼ਾਈਲ &apos;ਤੇ ਲਾਗੂ ਹੁੰਦਾ ਹੈ, ਭਾਵੇਂ ਕਿਸੇ ਚੈਟ ਦੀ ਆਪਣੀ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦੀ ਸੈਟਿੰਗ ਕੁਝ ਵੀ ਹੋਵੇ।</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>ਕਾਲਾਂ</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>ਆਉਣ ਵਾਲੀਆਂ ਕਾਲਾਂ &apos;ਤੇ ਘੰਟੀ ਵਜਾਓ</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>ਸਵੀਕਾਰ ਕੀਤੇ ਸੰਪਰਕਾਂ ਲਈ ਕਾਲ ਸਕ੍ਰੀਨ ਦਿਖਾਓ</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
+        <source>Muted chats</source>
+        <translation>ਮਿਊਟ ਕੀਤੀਆਂ ਚੈਟਾਂ</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>ਟਿਕਾਣਾ ਸਟ੍ਰੀਮਿੰਗ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>ਮਿਊਟ ਕੀਤੇ ਗਰੁੱਪਾਂ ਵਿੱਚ ਜਵਾਬ</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਤੁਹਾਡਾ ਟਿਕਾਣਾ ਸਾਂਝਾ ਕਰਦਾ ਹੈ ਅਤੇ ਸਾਂਝੇ ਟਿਕਾਣੇ ਨਕਸ਼ੇ ਉੱਤੇ ਦਿਖਾਉਂਦਾ ਹੈ।</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>ਚੁੱਪ ਕੀਤੇ ਸਮੂਹਾਂ ਵਿੱਚ ਤੁਹਾਡੇ ਸੁਨੇਹਿਆਂ ਦੇ ਜਵਾਬਾਂ ਦੀਆਂ ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>ਸੈਟਿੰਗਾਂ</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+        <source>Messages</source>
+        <translation>ਸੁਨੇਹੇ</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ</translation>
+        <source>Notifications</source>
+        <translation>ਸੂਚਨਾਵਾਂ</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>ਇਸ ਫ਼ੋਨ &apos;ਤੇ ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।</translation>
+        <source>Privacy and security</source>
+        <translation>ਨਿੱਜਤਾ ਅਤੇ ਸੁਰੱਖਿਆ</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>ਕੁਝ ਵੀ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>ਪ੍ਰਯੋਗਾਤਮਕ</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>ਬਾਰੇ</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>ਤੁਹਾਡੀ ਪ੍ਰੋਫਾਈਲ</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>ਨਿੱਜਤਾ ਅਤੇ ਸੁਰੱਖਿਆ</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>ਲਿੰਕਾਂ ਵਿੱਚੋਂ ਟਰੈਕਿੰਗ ਹਟਾਓ</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>ਤੁਹਾਡੇ ਭੇਜੇ ਲਿੰਕਾਂ ਵਿੱਚੋਂ ਕਲਿੱਕ ਆਈਡੀ ਅਤੇ ਮੁਹਿੰਮ ਟੈਗ ਹਟਾਉਂਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>ਪ੍ਰੋਫਾਈਲ: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ਬਲਾਕ ਕੀਤੇ ਸੰਪਰਕ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n ਸੰਪਰਕ</numerusform>
+            <numerusform>%n ਸੰਪਰਕ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3426,32 +3563,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>ਇਸ ਭਾਸ਼ਾ ਦੀਆਂ ਲਿਖਤਾਂ ਵਿੱਚ ਵਧੇਰੇ ਗਲਤੀਆਂ ਹੋਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ।</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>ਆਵਾਜ਼ ਸੁਨੇਹਿਆਂ ਦੀ ਲਿਖਤ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>ਭਾਸ਼ਾਵਾਂ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ਕਦੋਂ</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>ਬੋਲੀ ਮਾਡਲ ਡਾਊਨਲੋਡ ਨਹੀਂ ਹੋ ਸਕਿਆ।</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ</translation>
     </message>
 </context>
 <context>

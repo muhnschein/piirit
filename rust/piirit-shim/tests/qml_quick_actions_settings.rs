@@ -1,4 +1,4 @@
-//! Cover quick actions in settings: one row under Advanced, opening their page. That page:
+//! Cover quick actions in settings: the Cover row on the settings page opens their page. That page:
 //! what they are, two cover pictures (room for one or two), then what each does.
 //!
 //! Each writes its choice and shows what settings hold; pictures redraw. A chat is picked on
@@ -192,10 +192,6 @@ const PROBE_QML: &str = r"
             var item = findIn(loader.item, name)
             return item ? describe(next(item)) : 'missing:' + name
         }
-        function underHeading(heading) {
-            var header = findText(loader.item, heading)
-            return header ? describe(next(header)) : 'missing:' + heading
-        }
         function next(item) {
             var kids = item.parent.children
             for (var i = 0; i + 1 < kids.length; i++) {
@@ -299,36 +295,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
 
-        // Settings page: one row under Advanced, then webxdc, location, transcription; nothing after.
-        record!(
-            "under-advanced",
-            call!("underHeading", QString::from("Advanced"))
-        );
-        record!(
-            "after-entry",
-            call!("after", QString::from("quickActionsEntry"))
-        );
-        record!(
-            "after-webxdc",
-            call!("after", QString::from("webxdcSwitch"))
-        );
-        record!(
-            "after-location",
-            call!("after", QString::from("locationSwitch"))
-        );
-        record!(
-            "after-transcription",
-            call!("after", QString::from("transcriptionSwitch"))
-        );
-        record!(
-            "after-transcription-entry",
-            call!("after", QString::from("transcriptionEntry"))
-        );
-        record!(
-            "old-heading",
-            call!("underHeading", QString::from("Quick actions"))
-        );
-        record!("apps-heading", call!("underHeading", QString::from("Apps")));
+        // Settings page: the Cover row leads to them.
+        record!("cover-label", get!("quickActionsLabel", "text"));
         record!("open", click!("quickActionsEntry"));
         record!("opened", call!("stackLog"));
 
@@ -628,45 +596,9 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the settings page did not load. {context}"
     );
     assert_eq!(
-        value("under-advanced"),
-        "quickActionsEntry",
-        "the quick actions are not the first thing under Advanced. {context}"
-    );
-    assert_eq!(
-        value("after-entry"),
-        "webxdcSwitch",
-        "the webxdc switch is not under Advanced with them. {context}"
-    );
-    assert_eq!(
-        value("after-webxdc"),
-        "locationSwitch",
-        "the location switch is not under Advanced with them. {context}"
-    );
-    assert_eq!(
-        value("after-location"),
-        "transcriptionSwitch",
-        "the transcription switch does not follow location. {context}"
-    );
-    assert_eq!(
-        value("after-transcription"),
-        "transcriptionEntry",
-        "the transcription entry does not follow its switch. {context}"
-    );
-    // Calls had a switch here while experimental (#119).
-    assert_eq!(
-        value("after-transcription-entry"),
-        "nothing",
-        "something follows Advanced. {context}"
-    );
-    assert_eq!(
-        value("old-heading"),
-        "missing:Quick actions",
-        "the quick actions still have a heading of their own. {context}"
-    );
-    assert_eq!(
-        value("apps-heading"),
-        "missing:Apps",
-        "Apps is still a heading of its own. {context}"
+        value("cover-label"),
+        "Quick actions",
+        "the settings have no Quick actions row. {context}"
     );
     assert_eq!(
         value("opened"),

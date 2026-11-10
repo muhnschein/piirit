@@ -241,3 +241,75 @@ fn an_emoji_drawn_above_its_natural_size_stays_sharp() {
         "an emoji drawn at 4x was blown up from its 36 px picture, edge {soft} px soft"
     );
 }
+
+/// Line drawing in SVG that says it is small (24 px) still drawn sharp at 96 px, not blown up:
+/// settings icons were blurred so on the phone.
+#[test]
+fn a_vector_drawing_inked_above_its_stated_size_stays_sharp() {
+    let file = a_dir("ink-sharp").join("half.svg");
+    std::fs::write(
+        &file,
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\">\
+         <rect width=\"24\" height=\"24\" fill=\"#000000\"/>\
+         <rect fill=\"#ff0000\" width=\"12\" height=\"24\"/></svg>",
+    )
+    .expect("write the test picture");
+    let (pixels, width, height) = made_from(
+        &format!(
+            "ink?file={}&ink=%23ffffff&lit=%23ffffff&inkStrength=1&litStrength=1",
+            file.display()
+        ),
+        96,
+    );
+
+    assert_eq!(
+        (width, height),
+        (96, 96),
+        "the drawing is not made at its size"
+    );
+    let soft = (0..width)
+        .filter(|&x| (1..255).contains(&at(&pixels, width, x, 48).0))
+        .count();
+    assert!(
+        soft <= 2,
+        "a drawing inked at 4x was blown up from its 24 px size, edge {soft} px soft"
+    );
+}
+
+/// Settings rows' own icons (SettingsPage): line drawings inked like theme icons, at the size drawn.
+#[test]
+fn a_settings_icon_is_inked_at_its_size_with_soft_edges_on_clear_ground() {
+    for name in ["flask", "quick-actions"] {
+        let art = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join(format!("../../qml/art/settings/{name}.svg"))
+            .canonicalize()
+            .expect("the committed icon is there");
+        let (pixels, width, height) = made_from(
+            &format!(
+                "ink?file={}&ink=%23336699&lit=%23336699&inkStrength=1&litStrength=1",
+                art.display()
+            ),
+            96,
+        );
+
+        assert_eq!((width, height), (96, 96), "{name} is not made at its size");
+        assert_eq!(
+            at(&pixels, width, 0, 0).0,
+            0,
+            "{name} has no clear ground: it is a square of ink"
+        );
+        let lines: Vec<_> = pixels.iter().filter(|pixel| pixel.0 > 200).collect();
+        assert!(!lines.is_empty(), "nothing of {name} is inked");
+        assert!(
+            lines
+                .iter()
+                .all(|&&(_, r, g, b)| (r, g, b) == (0x33, 0x66, 0x99)),
+            "{name} is inked in a colour it was not given"
+        );
+        // Drawn on black, red share is coverage: lines fade at their edges, not cut hard.
+        assert!(
+            pixels.iter().any(|pixel| (40..200).contains(&pixel.0)),
+            "{name}'s lines have hard edges"
+        );
+    }
+}
