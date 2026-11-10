@@ -3,6 +3,7 @@
 //! and failure: QR payload or address containing `fail` is rejected.
 
 use std::collections::VecDeque;
+use std::fmt::Write as _;
 use std::io::Write;
 use std::sync::Arc;
 
@@ -288,12 +289,16 @@ impl State {
             }
             // Chat 3 archived: else both lists alike.
             self.chats.insert(3, vec![30]);
-            // Empty archive: page hides search.
-            self.archived_order = if std::env::var("PIIRIT_FAKE_NO_ARCHIVED").is_ok() {
-                Vec::new()
-            } else {
-                vec![3]
-            };
+            self.archived_order = vec![3];
+            // Extra empty archived chats from 301, on request.
+            let many_archived = std::env::var("PIIRIT_FAKE_MANY_ARCHIVED")
+                .ok()
+                .and_then(|count| count.parse::<u32>().ok())
+                .unwrap_or(0);
+            for chat in 301..301u32.saturating_add(many_archived) {
+                self.chats.insert(chat, Vec::new());
+                self.archived_order.push(chat);
+            }
             // Above seeded ids: no collision.
             self.next_message_id = long.unwrap_or(0).max(100);
             self.contacts.insert(10, "ada@example.org".to_string());
@@ -372,6 +377,20 @@ impl State {
     /// Group if created here or seeded.
     fn is_group(&self, chat: u32) -> bool {
         self.group_members.contains_key(&chat)
+    }
+
+    /// Member ids: group's; own channel none yet, reader not among them, as core;
+    /// `PIIRIT_FAKE_SELF_TALK` chat self; other 1:1 Ada.
+    fn members(&self, chat: u32) -> Vec<u32> {
+        if self.is_group(chat) {
+            self.group_members.get(&chat).cloned().unwrap_or_default()
+        } else if self.is_own_channel(chat) {
+            Vec::new()
+        } else if env_ids("PIIRIT_FAKE_SELF_TALK").contains(&u64::from(chat)) {
+            vec![SELF]
+        } else {
+            vec![10]
+        }
     }
 
     /// Chat name: renamed, else seeded.
@@ -935,6 +954,18 @@ const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      Groceries<br/>\nmilk<br/>\nbread<br/>\nand a &amp; sign<br/>\n\
      </body></html>\n";
 
+/// Fingerprint per contact, core's `human_readable` shape: two lines of five groups.
+fn fake_fingerprint(contact: u32) -> String {
+    let hex = format!(
+        "{:040X}",
+        u128::from(contact).wrapping_mul(0x9E37_79B9_7F4A_7C15)
+    );
+    let groups: Vec<&str> = (0..10)
+        .map(|group| &hex[group * 4..group * 4 + 4])
+        .collect();
+    format!("{}\n{}", groups[..5].join(" "), groups[5..].join(" "))
+}
+
 /// Inputs standing for unreachable server.
 fn should_fail(value: &str) -> bool {
     value.contains("fail")
@@ -1478,7 +1509,10 @@ async fn serve() {
             };
 
             let response = match method.as_str() {
-                "get_system_info" => ok(&id, &json!({"name": "fake-core-server"})),
+                "get_system_info" => ok(
+                    &id,
+                    &json!({"name": "fake-core-server", "deltachat_core_version": "v2.69.0"}),
+                ),
                 "get_all_accounts" => {
                     let mut state = state.lock().await;
                     // Reseeded when empty: deleting all restores starting ones.
@@ -2160,14 +2194,7 @@ async fn serve() {
                     let is_group = state.is_group(chat);
                     // Channel subscriber: no writing, as left group.
                     let left = state.left_groups.contains(&chat) || state.is_channel(chat);
-                    // Own channel: subscribers only, none yet; reader not among them, as core.
-                    let members = if is_group {
-                        state.group_members.get(&chat).cloned().unwrap_or_default()
-                    } else if state.is_own_channel(chat) {
-                        Vec::new()
-                    } else {
-                        vec![10]
-                    };
+                    let members = state.members(chat);
                     // Core's words for a missing chat.
                     if state.deleted_chats.contains(&chat) {
                         err(
@@ -2192,6 +2219,7 @@ async fn serve() {
                                 "isSelfTalk": false,
                                 "isDeviceChat": false,
                                 "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
+                                "isMuted": state.muted.contains(&chat),
                             }),
                         )
                     }
@@ -2204,11 +2232,7 @@ async fn serve() {
                         .unwrap_or_default();
                     let mut state = state.lock().await;
                     state.seed_chats();
-                    let members = if state.is_group(chat) {
-                        state.group_members.get(&chat).cloned().unwrap_or_default()
-                    } else {
-                        vec![10]
-                    };
+                    let members = state.members(chat);
                     ok(&id, &json!(members))
                 }
                 "get_contacts_by_ids" => {
@@ -2391,6 +2415,73 @@ async fn serve() {
                     let content = positional(1).as_str().unwrap_or_default().to_string();
                     ok(&id, &qr_kind(&content))
                 }
+                // Core 2.68.0's text: keys sorted by fingerprint, relays as addresses.
+                "get_contact_encryption_info" => {
+                    let contact = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    match state.contact_object(account_id(), contact) {
+                        Some(object) => ok(
+                            &id,
+                            &json!(format!(
+                                "Messages are end-to-end encrypted.\nFingerprints:\n\nMe:\n{}\n\n{}:\n{}\n\nRelays:\n{}",
+                                fake_fingerprint(SELF),
+                                object["displayName"].as_str().unwrap_or_default(),
+                                fake_fingerprint(contact),
+                                object["address"].as_str().unwrap_or_default(),
+                            )),
+                        ),
+                        None => err(&id, &format!("Contact {contact} not found")),
+                    }
+                }
+                // Members but self; last member's key missing, as core's words.
+                "get_chat_encryption_info" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let members: Vec<u32> = state
+                        .members(chat)
+                        .into_iter()
+                        .filter(|member| *member != SELF)
+                        .collect();
+                    let mut text = String::from("Messages are end-to-end encrypted.\n");
+                    for (index, member) in members.iter().enumerate() {
+                        let Some(object) = state.contact_object(account_id(), *member) else {
+                            continue;
+                        };
+                        let name = object["displayName"].as_str().unwrap_or_default();
+                        let fingerprint = fake_fingerprint(*member);
+                        if index + 1 == members.len() && members.len() > 1 {
+                            let _ = write!(text, "\n{name}\n(key missing)\n{fingerprint}\n");
+                        } else {
+                            let address = object["address"].as_str().unwrap_or_default();
+                            let _ = write!(text, "\n{name}({address})\n{fingerprint}\n");
+                        }
+                    }
+                    ok(&id, &json!(text.trim()))
+                }
+                // Ada's first 1:1 chat; nobody else has one until made.
+                "get_chat_id_by_contact_id" => {
+                    let contact = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let found = state.chat_order.iter().copied().find(|chat| {
+                        !state.is_group(*chat)
+                            && !state.is_channel(*chat)
+                            && !state.deleted_chats.contains(chat)
+                            && state.members(*chat) == vec![contact]
+                    });
+                    ok(&id, &json!(found))
+                }
                 // Own invite, or own channel's (names channel in `b=`, as core).
                 "get_chat_securejoin_qr_code" => {
                     let chat = positional(1)
@@ -2456,6 +2547,7 @@ async fn serve() {
                     state.seed_chats();
                     state.chats.remove(&chat);
                     state.chat_order.retain(|id| *id != chat);
+                    state.archived_order.retain(|id| *id != chat);
                     state.deleted_chats.insert(chat);
                     ok(&id, &Value::Null)
                 }
@@ -2576,18 +2668,29 @@ async fn serve() {
                         .and_then(Value::as_str)
                         .unwrap_or_default()
                         .to_string();
-                    let mut state = state.lock().await;
-                    state.seed_chats();
-                    if kind == "NotMuted" {
-                        state.muted.remove(&chat);
+                    let duration = positional(2).get("duration").and_then(Value::as_i64);
+                    // Core's refusals: unknown kind (serde), `Until` without end ahead.
+                    let valid = match kind.as_str() {
+                        "NotMuted" | "Forever" => true,
+                        "Until" => duration.is_some_and(|seconds| seconds > 0),
+                        _ => false,
+                    };
+                    if valid {
+                        let mut state = state.lock().await;
+                        state.seed_chats();
+                        if kind == "NotMuted" {
+                            state.muted.remove(&chat);
+                        } else {
+                            state.muted.insert(chat);
+                        }
+                        state.events.push_back(json!({
+                            "contextId": account,
+                            "event": {"kind": "ChatModified", "chatId": chat},
+                        }));
+                        ok(&id, &Value::Null)
                     } else {
-                        state.muted.insert(chat);
+                        err(&id, "failed to read mute duration")
                     }
-                    state.events.push_back(json!({
-                        "contextId": account,
-                        "event": {"kind": "ChatModified", "chatId": chat},
-                    }));
-                    ok(&id, &Value::Null)
                 }
                 // One contact by id, self too: colour lookup.
                 "get_contact" => {
@@ -2601,6 +2704,19 @@ async fn serve() {
                         Some(object) => ok(&id, &object),
                         None => err(&id, "contact not found"),
                     }
+                }
+                // Contact given: chats they're in, archived too; flags, query ignored (core).
+                "get_chatlist_entries" if positional(3).is_u64() => {
+                    let contact = positional(3)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let mut entries = state.chat_order.clone();
+                    entries.extend(state.archived_order.iter().copied());
+                    entries.retain(|chat| state.members(*chat).contains(&contact));
+                    ok(&id, &json!(entries))
                 }
                 "get_chatlist_entries" => {
                     let mut state = state.lock().await;
@@ -2693,6 +2809,8 @@ async fn serve() {
                                 // Self and device chats when named; cover omits.
                                 "isSelfTalk": env_ids("PIIRIT_FAKE_SELF_TALK").contains(&chat),
                                 "isDeviceTalk": env_ids("PIIRIT_FAKE_DEVICE_TALK").contains(&chat),
+                                "chatType": u32::try_from(chat)
+                                    .map_or("Single", |chat| state.chat_type(chat)),
                                 // Chat 1 pinned: ordinary list has both kinds; archived one.
                                 "isPinned": chat == 1,
                                 "isContactRequest": u32::try_from(chat)

@@ -1,7 +1,6 @@
 //! Chat list's Search and Unread pills, and field Search brings out.
 //!
-//! On ordinary list, not archived one (own mode, only its field). Unread on leaves header
-//! alone; list with nothing unread says why empty and how back. Open search: pills give way
+//! Unread on leaves header alone; list with nothing unread says why empty and how back. Open search: pills give way
 //! to field, since search covers every chat.
 
 // Qt harness: see qml_chat_list.rs.
@@ -224,20 +223,6 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
     plan.after(1, move || unsafe {
         record!("pill-closed", get!("chatSearchPill", "visible"));
         record!("field-closed", get!("chatSearchField", "visible"));
-        record!(
-            "archived",
-            call!(
-                "load",
-                QString::from(common::page_url("ChatListPage.qml")),
-                1,
-                true
-            )
-        );
-    });
-
-    plan.after(2, move || unsafe {
-        record!("archived-switch", get!("unreadFilterButton", "visible"));
-        record!("archived-search-pill", get!("chatSearchPill", "visible"));
         (*engine_ptr).quit();
     });
 
@@ -386,23 +371,6 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         "the placeholder changed its words while the filter went off: it \
          reads \"No chats yet\" until it has faded from over the returning \
          chats. {context}"
-    );
-    assert_eq!(
-        value("archived"),
-        "ok",
-        "the archived list did not load. {context}"
-    );
-    assert_eq!(
-        value("archived-switch"),
-        "false",
-        "the archived list offers an unread filter, though it is a mode of \
-         its own. {context}"
-    );
-    assert_eq!(
-        value("archived-search-pill"),
-        "false",
-        "the archived list, which has its field, also got a Search pill. \
-         {context}"
     );
 
     let _ = std::fs::remove_dir_all(&temp);

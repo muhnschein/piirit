@@ -18,8 +18,8 @@ import Piirit 1.0
  * Scanned invite followed: chat replaces page (above opener). Relay codes (dcaccount:,
  * dclogin:): add-relay page replaces it, asks first.
  *
- * `chatId` set: own channel's invite only (from its page), no scanner. Only way subscribers
- * join: core takes no members added to channel.
+ * `chatId` set: that group's or own channel's invite only (from its page), no scanner. Only
+ * way subscribers join: core takes no members added to channel.
  */
 Page {
     id: page
@@ -43,6 +43,8 @@ Page {
     property int mode: 0
     /// Channel whose invite shows; 0 = profile's own, both sides.
     property int chatId: 0
+    /// Chat is a channel, else group: intro names which.
+    property bool isChannel: true
     /// Channel's name, for line over code.
     property string chatName: ""
     readonly property bool forChat: chatId !== 0
@@ -217,9 +219,12 @@ Page {
                     wrapMode: Text.Wrap
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
-                    readonly property string sentence: page.forChat
+                    readonly property string sentence: page.forChat && page.isChannel
                         //: Delta Chat's "qrshow_join_channel_hint". %1 is the channel's name.
                         ? qsTr("Scan to join channel \"%1\"").arg(page.chatName)
+                        : page.forChat
+                        //: Delta Chat's "qrshow_join_group_hint". %1 is the group's name.
+                        ? qsTr("Scan to join group \"%1\"").arg(page.chatName)
                         : qsTr("Let someone scan this code, or send them the link.")
                     /// Same, channel name's emoji as Twemoji; "" for plain.
                     readonly property string pictured: Emoji.inText(sentence, false,

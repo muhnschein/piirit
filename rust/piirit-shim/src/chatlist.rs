@@ -10,7 +10,7 @@ use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 use serde_json::json;
 
-use crate::chat::chat_is_group;
+use crate::chat::{chat_is_group, is_group_info};
 use crate::core::connection;
 use crate::json;
 use crate::models::{ChatListItem, ChatListModel};
@@ -23,7 +23,7 @@ use crate::transcripts::{self, Change, Previews};
 /// SilicaListView { model: chats.rows }
 /// ```
 #[derive(QObject, Default)]
-// Four QML-set properties; folding them hides them from QML.
+// Bools are QML properties; folding them hides them from QML.
 #[allow(clippy::struct_excessive_bools)]
 pub struct ChatList {
     base: qt_base_class!(trait QObject),
@@ -38,10 +38,18 @@ pub struct ChatList {
     /// Query changed.
     pub query_changed: qt_signal!(),
 
-    /// Show archived chats.
+    /// Show archived chats, not ordinary. Ordinary still listed, unshown: arrivals announce
+    /// from them. Turning on turns `unread_only`,
+    /// `chats_only`, `channels_only` off.
     pub archived: qt_property!(bool; WRITE set_archived NOTIFY archived_changed),
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
+
+    /// Chats this contact is in, archived too; 0: all.
+    /// Core ignores `query`, `archived` and `for_forwarding` then.
+    pub contact_id: qt_property!(u32; WRITE set_contact_id NOTIFY contact_changed),
+    /// Contact changed.
+    pub contact_changed: qt_signal!(),
 
     /// Forwardable chats only. Core drops ones forward would refuse (device chat).
     pub for_forwarding: qt_property!(bool; WRITE set_for_forwarding NOTIFY for_forwarding_changed),
@@ -55,6 +63,15 @@ pub struct ChatList {
     pub unread_only_changed: qt_signal!(),
     /// Release chats read since filter on (app resume).
     pub forget_read: qt_method!(fn(&mut self)),
+
+    /// Chats only, no channels. Turning on turns `channels_only` off.
+    pub chats_only: qt_property!(bool; WRITE set_chats_only NOTIFY kind_filter_changed),
+    /// Channels only. Turning on turns `chats_only` off.
+    pub channels_only: qt_property!(bool; WRITE set_channels_only NOTIFY kind_filter_changed),
+    /// Either kind filter changed.
+    pub kind_filter_changed: qt_signal!(),
+    /// List holds a channel: kind filters offered. Last one gone turns them off.
+    pub has_channels: qt_property!(bool; NOTIFY rows_changed),
 
     /// Reader setting: announce muted-group reply to own message (reference clients' mentions).
     /// Groups only: muted 1:1 was muted for that person.
@@ -116,8 +133,8 @@ pub struct ChatList {
     pub mark_unread: qt_method!(fn(&mut self, chat_id: u32)),
     /// Pin, or back to time order.
     pub set_pinned: qt_method!(fn(&mut self, chat_id: u32, pinned: bool)),
-    /// Mute or unmute.
-    pub set_muted: qt_method!(fn(&mut self, chat_id: u32, muted: bool)),
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub set_mute_duration: qt_method!(fn(&mut self, chat_id: u32, seconds: i32)),
     /// Move chat out of list.
     pub archive: qt_method!(fn(&mut self, chat_id: u32)),
     /// Accept contact request. QML calls.
@@ -139,7 +156,7 @@ pub struct ChatList {
     /// Edited/deleted chats awaiting read back. As `pending_announcements`.
     pending_restatements: HashSet<u32>,
 
-    /// Counts refreshes: stale answer must not land on newer (archived page sets `account_id`,
+    /// Counts refreshes: stale answer must not land on newer (page sets `account_id`,
     /// `archived`, each fetching; search per keystroke).
     generation: u64,
 
@@ -322,12 +339,33 @@ impl ChatList {
         }
     }
 
-    /// Show archived, or ordinary chats.
+    /// Show archived, or ordinary chats. Only order: held rows reused, shown once other
+    /// listing lands (filtering now would flash empty list).
     pub fn set_archived(&mut self, archived: bool) {
         if self.archived != archived {
             self.archived = archived;
             self.archived_changed();
-            self.restart(Refresh::All);
+            // Archive is short: no other filter over it.
+            if archived && self.unread_only {
+                self.unread_only = false;
+                self.kept.clear();
+                self.unread_only_changed();
+            }
+            if archived && (self.chats_only || self.channels_only) {
+                self.chats_only = false;
+                self.channels_only = false;
+                self.kind_filter_changed();
+            }
+            self.restart(Refresh::Order);
+        }
+    }
+
+    /// Only this contact's chats, or all.
+    pub fn set_contact_id(&mut self, contact_id: u32) {
+        if self.contact_id != contact_id {
+            self.contact_id = contact_id;
+            self.contact_changed();
+            self.refresh(Refresh::All);
         }
     }
 
@@ -363,6 +401,26 @@ impl ChatList {
         }
     }
 
+    /// Show only chats without channels, or all.
+    pub fn set_chats_only(&mut self, on: bool) {
+        if self.chats_only != on {
+            self.chats_only = on;
+            self.channels_only &= !on;
+            self.kind_filter_changed();
+            self.show_later();
+        }
+    }
+
+    /// Show only channels, or all.
+    pub fn set_channels_only(&mut self, on: bool) {
+        if self.channels_only != on {
+            self.channels_only = on;
+            self.chats_only &= !on;
+            self.kind_filter_changed();
+            self.show_later();
+        }
+    }
+
     /// Release chats read since filter on.
     pub fn forget_read(&mut self) {
         if self.unread_only && !self.kept.is_empty() {
@@ -383,10 +441,33 @@ impl ChatList {
         show(());
     }
 
-    /// Rows filter passes, core order.
+    /// Archived side shown. Contact's chats: one listing, none marked archived.
+    fn shows_archived(&self) -> bool {
+        self.archived && self.contact_id == 0
+    }
+
+    /// Rows filters pass, core order.
     fn shown(&mut self) -> Vec<ChatListItem> {
+        let (chats_only, channels_only) = (self.chats_only, self.channels_only);
+        let archived = self.shows_archived();
+        let kind = move |row: &ChatListItem| {
+            if row.is_archived != archived {
+                false
+            } else if chats_only {
+                !row.is_channel
+            } else if channels_only {
+                row.is_channel
+            } else {
+                true
+            }
+        };
         if !self.unread_only {
-            return self.all_rows.clone();
+            return self
+                .all_rows
+                .iter()
+                .filter(|row| kind(row))
+                .cloned()
+                .collect();
         }
         // Gone chats' ids dropped too.
         let listed: HashSet<u32> = self.all_rows.iter().map(|row| row.chat_id).collect();
@@ -398,22 +479,30 @@ impl ChatList {
         }
         self.all_rows
             .iter()
-            .filter(|row| self.kept.contains(&row.chat_id))
+            .filter(|row| kind(row) && self.kept.contains(&row.chat_id))
             .cloned()
             .collect()
     }
 
     /// Bring model in line with `all_rows` and filter.
     fn show(this: QObjectPinned<'_, Self>) {
-        let target = {
+        let (target, kind_dropped) = {
             let mut this_mut = this.borrow_mut();
+            this_mut.has_channels = this_mut.all_rows.iter().any(|row| row.is_channel);
+            // Pills hide with last channel: filter they'd turn off goes too.
+            let kind_dropped =
+                !this_mut.has_channels && (this_mut.chats_only || this_mut.channels_only);
+            if kind_dropped {
+                this_mut.chats_only = false;
+                this_mut.channels_only = false;
+            }
             let target = this_mut.shown();
             // Count before setting rows: setting makes QML read counts.
             let pinned = target.iter().filter(|row| row.is_pinned).count();
             this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
             this_mut.unpinned_count =
                 u32::try_from(target.len().saturating_sub(pinned)).unwrap_or(u32::MAX);
-            target
+            (target, kind_dropped)
         };
         {
             let this_ref = this.borrow();
@@ -421,6 +510,9 @@ impl ChatList {
             reconcile(&mut rows, target);
         }
         this.borrow().rows_changed();
+        if kind_dropped {
+            this.borrow().kind_filter_changed();
+        }
     }
 
     /// Register once for transcript changes; registration ends with this object.
@@ -497,10 +589,20 @@ impl ChatList {
         self.act(chat_id, "set_chat_visibility", json!([visibility]));
     }
 
-    /// Mute or unmute.
-    pub fn set_muted(&mut self, chat_id: u32, muted: bool) {
-        let kind = if muted { "Forever" } else { "NotMuted" };
-        self.act(chat_id, "set_chat_mute_duration", json!([{"kind": kind}]));
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub fn set_mute_duration(&mut self, chat_id: u32, seconds: i32) {
+        let account_id = self.account_id;
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.row_callback(chat_id);
+        runtime.spawn(async move {
+            done(crate::mute::apply(&rpc, account_id, chat_id, seconds).await);
+        });
     }
 
     /// Move chat out of list.
@@ -535,15 +637,7 @@ impl ChatList {
             params.extend(rest);
         }
 
-        let ptr: QPointer<Self> = QPointer::from(&*self);
-        let done = queued_callback(move |result: Result<(), String>| {
-            let Some(this) = ptr.as_pinned() else { return };
-            match result {
-                Ok(()) => this.borrow_mut().refresh(Refresh::One(chat_id)),
-                Err(err) => this.borrow().error(err.into()),
-            }
-        });
-
+        let done = self.row_callback(chat_id);
         runtime.spawn(async move {
             let result = rpc
                 .call::<_, ()>(method, params)
@@ -551,6 +645,18 @@ impl ChatList {
                 .map_err(|err| err.to_string());
             done(result);
         });
+    }
+
+    /// Done: refresh row (core doesn't announce all), or tell failure.
+    fn row_callback(&self, chat_id: u32) -> impl Fn(Result<(), String>) + Send + Sync + Clone {
+        let ptr: QPointer<Self> = QPointer::from(self);
+        queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => this.borrow_mut().refresh(Refresh::One(chat_id)),
+                Err(err) => this.borrow().error(err.into()),
+            }
+        })
     }
 
     /// Waiting announcements, rows current, unmuted chats; all waiting (`pending_announcements`).
@@ -576,9 +682,10 @@ impl ChatList {
         announcements
     }
 
-    /// Waiting restatements, rows current. Unlisted chats dropped.
+    /// Waiting restatements, rows current. Unlisted chats dropped; filtered-out ones kept: their
+    /// notifications stay up.
     fn settled_restatements(&mut self) -> Vec<(u32, QString, QString, QString, u32)> {
-        let rows = self.rows.borrow();
+        let rows = &self.all_rows;
         self.pending_restatements
             .drain()
             .filter_map(|chat_id| rows.iter().find(|row| row.chat_id == chat_id))
@@ -715,8 +822,9 @@ impl ChatList {
         let query = self.query.to_string();
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
+        let contact_id = self.contact_id;
         let cached: Vec<ChatListItem> = self.all_rows.clone();
-        // Nothing held: app start, profile switch, archived page.
+        // Nothing held: app start, profile switch.
         let first_load = cached.is_empty();
         // Set: list scan per entry is quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
@@ -747,16 +855,42 @@ impl ChatList {
 
         runtime.spawn(async move {
             let result = async {
-                let entries =
-                    chat_entries(&rpc, account_id, &query, archived, for_forwarding).await?;
+                let entries = if contact_id == 0 {
+                    chat_entries(&rpc, account_id, &query, archived, for_forwarding).await?
+                } else {
+                    Entries {
+                        ids: contact_entries(&rpc, account_id, contact_id).await?,
+                        archived: HashSet::new(),
+                    }
+                };
+                let Entries {
+                    ids: entries,
+                    archived: archived_ids,
+                } = entries;
+                // Order from core; contents from fetch, else model.
+                let rows = |fresh: &HashMap<u32, ChatListItem>| -> Vec<ChatListItem> {
+                    entries
+                        .iter()
+                        .filter_map(|chat_id| {
+                            fresh.get(chat_id).cloned().or_else(|| {
+                                cached.iter().find(|row| row.chat_id == *chat_id).cloned()
+                            })
+                        })
+                        .map(|mut row| {
+                            row.is_archived = archived_ids.contains(&row.chat_id);
+                            row
+                        })
+                        .collect()
+                };
                 let wanted: Vec<u32> = entries
                     .iter()
                     .copied()
                     .filter(|id| refetch_all || awaiting.contains(id) || !known.contains(id))
                     .collect();
                 // Core builds rows serially (1.9 s for 200 chats on desktop CPU, several times
-                // on phone): screenful first.
-                let (first, rest) = if first_load {
+                // on phone): screenful first. Archived turned on: its rows lead `wanted`.
+                let unheld = wanted.iter().filter(|id| !known.contains(id)).count();
+                let (first, rest) = if first_load || (archived && unheld > FIRST_SCREENFUL) {
                     wanted.split_at(wanted.len().min(FIRST_SCREENFUL))
                 } else {
                     (wanted.as_slice(), &[][..])
@@ -768,31 +902,25 @@ impl ChatList {
                 };
                 with_transcripts(previews.as_ref(), account_id, &mut fresh).await;
                 if !rest.is_empty() {
-                    early(
-                        entries
-                            .iter()
-                            .filter_map(|chat_id| fresh.get(chat_id).cloned())
-                            .collect(),
-                    );
+                    early(rows(&fresh));
                     let mut more = chat_items(&rpc, account_id, rest).await?;
                     with_transcripts(previews.as_ref(), account_id, &mut more).await;
                     fresh.extend(more);
                 }
-                // Order from core; contents from fetch, else model.
-                Ok::<_, String>(
-                    entries
-                        .into_iter()
-                        .filter_map(|chat_id| {
-                            fresh.get(&chat_id).cloned().or_else(|| {
-                                cached.iter().find(|row| row.chat_id == chat_id).cloned()
-                            })
-                        })
-                        .collect::<Vec<_>>(),
-                )
+                Ok::<_, String>(rows(&fresh))
             }
             .await;
             done(result);
         });
+    }
+}
+
+/// Core's tagged `MuteDuration`: negative forever, 0 unmuted, else seconds from now.
+pub(crate) fn mute_duration(seconds: i32) -> serde_json::Value {
+    match seconds {
+        0 => json!({"kind": "NotMuted"}),
+        forever if forever < 0 => json!({"kind": "Forever"}),
+        _ => json!({"kind": "Until", "duration": seconds}),
     }
 }
 
@@ -920,14 +1048,43 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     }
 }
 
-/// Account's chat ids, core display order. `DC_GCL_ARCHIVED_ONLY`: archived only (mode, not
-/// filter).
+/// `DC_GCL_ARCHIVED_ONLY`: archived only.
 const ARCHIVED_ONLY: u32 = 0x01;
+
+/// Listed chats, and which of them are archived.
+struct Entries {
+    /// Core display order; archived, if asked for, first.
+    ids: Vec<u32>,
+    archived: HashSet<u32>,
+}
 
 /// `DC_GCL_FOR_FORWARDING`: forwardable only.
 const FOR_FORWARDING: u32 = 0x08;
 
 async fn chat_entries(
+    rpc: &RpcClient,
+    account_id: u32,
+    query: &str,
+    archived: bool,
+    for_forwarding: bool,
+) -> Result<Entries, String> {
+    if !archived {
+        return Ok(Entries {
+            ids: listed_entries(rpc, account_id, query, false, for_forwarding).await?,
+            archived: HashSet::new(),
+        });
+    }
+    let mut ids = listed_entries(rpc, account_id, query, true, for_forwarding).await?;
+    let archived: HashSet<u32> = ids.iter().copied().collect();
+    // Ordinary too, unsearched: arrivals there announce while archive shows. A chat moved
+    // between calls is in both: once.
+    let ordinary = listed_entries(rpc, account_id, "", false, for_forwarding).await?;
+    ids.extend(ordinary.into_iter().filter(|id| !archived.contains(id)));
+    Ok(Entries { ids, archived })
+}
+
+/// One side's chat ids, core display order.
+async fn listed_entries(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
@@ -943,7 +1100,7 @@ async fn chat_entries(
 
     if archived && !query.is_empty() {
         // Two calls, no "archived matching": on pinned binary ARCHIVED_ONLY ignores query
-        // ("Beta" returns "Alpha group"); plain query searches all. Intersection is this page.
+        // ("Beta" returns "Alpha group"); plain query searches all. Intersection is wanted.
         let archived_only: Vec<u32> = rpc
             .call(
                 "get_chatlist_entries",
@@ -993,6 +1150,25 @@ async fn chat_entries(
     .map_err(|err| err.to_string())
 }
 
+/// Chats the contact is in, in core's order.
+async fn contact_entries(
+    rpc: &RpcClient,
+    account_id: u32,
+    contact_id: u32,
+) -> Result<Vec<u32>, String> {
+    rpc.call(
+        "get_chatlist_entries",
+        (
+            account_id,
+            Option::<u32>::None,
+            Option::<String>::None,
+            Some(contact_id),
+        ),
+    )
+    .await
+    .map_err(|err| err.to_string())
+}
+
 /// Rows first load reads: over a phone screen.
 const FIRST_SCREENFUL: usize = 20;
 
@@ -1024,9 +1200,16 @@ pub(crate) async fn chat_items(
                     is_encrypted: json::flag(&item, "isEncrypted"),
                     is_pinned: json::flag(&item, "isPinned"),
                     is_muted: json::flag(&item, "isMuted"),
+                    is_group: is_group_info(&item),
                     is_contact_request: json::flag(&item, "isContactRequest"),
                     is_self_talk: json::flag(&item, "isSelfTalk"),
                     is_device_talk: json::flag(&item, "isDeviceTalk"),
+                    is_channel: matches!(
+                        json::str_at(&item, "chatType"),
+                        "OutBroadcast" | "InBroadcast"
+                    ),
+                    // Listing's to say: `start_refresh`.
+                    is_archived: false,
                     color: json::text(&item, "color"),
                     avatar_path: json::text(&item, "avatarPath"),
                     voice_message_id: if json::str_at(&item, "lastMessageType") == "Voice" {
@@ -1071,12 +1254,24 @@ pub(crate) fn voice_preview(text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::voice_preview;
+    use super::*;
 
     #[test]
     fn a_transcript_previews_on_one_line() {
         assert_eq!(voice_preview(" hello\n there\t "), "🎤 hello there");
         let long = "word ".repeat(400);
         assert_eq!(voice_preview(&long), format!("🎤 {}", long.trim_end()));
+    }
+
+    #[test]
+    fn mute_seconds_become_the_cores_tagged_duration() {
+        assert_eq!(mute_duration(0), json!({"kind": "NotMuted"}));
+        assert_eq!(mute_duration(-1), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(i32::MIN), json!({"kind": "Forever"}));
+        assert_eq!(mute_duration(1), json!({"kind": "Until", "duration": 1}));
+        assert_eq!(
+            mute_duration(604_800),
+            json!({"kind": "Until", "duration": 604_800})
+        );
     }
 }

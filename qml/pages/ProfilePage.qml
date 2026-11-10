@@ -6,7 +6,7 @@ import Piirit 1.0
 
 /*
  * One profile's settings: picture, name, status, relays, read receipts,
- * storage. Opened from profiles page row (invite code, backup there); global
+ * storage. From profiles page row (invite code, backup there) and settings top; global
  * settings: SettingsPage.qml. Config via Profile get_config/set_config. No save
  * button: edits apply after pause and on exit, switches on tap.
  *

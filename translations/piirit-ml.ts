@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ml">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat കോർ %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>വിവരം</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>സോഴ്സ് കോഡും ലൈസൻസും</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit GPL-3.0 പ്രകാരമുള്ള സ്വതന്ത്ര സോഫ്റ്റ്‌വെയറാണ്.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>നിങ്ങളുടെ റിപ്പോർട്ടിനായി പതിപ്പുകൾ പകർത്തുന്നു.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat -നെക്കുറിച്ച്</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -576,15 +615,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>പ്രൊഫൈലുകൾ</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>ആർക്കൈവ് ചെയ്ത ചാറ്റുകൾ</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>ആർക്കൈവ് ചെയ്തവ</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>ചാറ്റുകൾ</translation>
     </message>
     <message>
@@ -606,14 +643,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pin</source>
         <translation>പിൻ ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>അൺമ്യൂട്ട് ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>മ്യൂട്ട് ചെയ്യുക</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -689,7 +718,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>എല്ലാ ചാറ്റുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
     </message>
     <message>
@@ -707,18 +736,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>എല്ലാ ലൊക്കേഷനുകളും</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>ചാനലുകൾ</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>വായിക്കാത്ത ചാനലുകളില്ല</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>എല്ലാ ചാനലുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>അറിയിപ്പുകൾ</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>മറ്റൊരു ആപ്പിൽ തുറക്കുക</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>ഉപകരണത്തിൽ സംരക്ഷിക്കുക</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -735,7 +775,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>%n ശബ്ദ സന്ദേശം എഴുത്താക്കുക</numerusform>
             <numerusform>%n ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</numerusform>
@@ -754,6 +794,35 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>മറ്റൊരു ആപ്പിൽ തുറക്കുക</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>ഉപകരണത്തിൽ സംരക്ഷിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>അറിയിപ്പുകൾ</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>അറിയിപ്പുകൾ</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>ഈ ഗ്രൂപ്പിൽ ആരെങ്കിലും നിങ്ങളുടെ ഒരു സന്ദേശത്തിന് മറുപടി നൽകുമ്പോൾ നിങ്ങൾക്ക് ഇപ്പോഴും അറിയിപ്പ് ലഭിക്കും.</translation>
     </message>
 </context>
 <context>
@@ -777,11 +846,15 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>സംരക്ഷിച്ചു</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>പങ്കിട്ട ചാറ്റുകൾ</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>കോൺടാക്റ്റ്</translation>
@@ -795,17 +868,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>എൻക്രിപ്റ്റ് ചെയ്തിട്ടില്ല: ഒരു സാധാരണ ഇമെയിൽ കോൺടാക്റ്റ്</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>പേര്</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>അവർ തിരഞ്ഞെടുത്ത പേര് ഉപയോഗിക്കാൻ ശൂന്യമായി വിടുക</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>വളരെ മുമ്പ് കണ്ടതാണ്</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>ചാറ്റ് ഇല്ലാതാക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>ചാറ്റ് ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>കോൺടാക്റ്റ് ബ്ലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>എൻക്രിപ്ഷൻ വിവരങ്ങൾ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>പേര് എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>സ്വന്തം പേര്: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>വിളിക്കുക</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>വീഡിയോ കോൾ</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>ഈ ചാറ്റിൽ</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>ക്രമീകരണങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>പങ്കിട്ട ചാറ്റുകൾ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n ചാറ്റ്</numerusform>
+            <numerusform>%n ചാറ്റുകൾ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1049,9 +1176,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>%1 സെക്കൻഡിനു ശേഷം</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>ഈ സംഭാഷണത്തിലെ എല്ലാ അംഗങ്ങൾക്കും ബാധകം; അവർക്ക് ഇപ്പോഴും സന്ദേശങ്ങൾ പകർത്താനും സൂക്ഷിക്കാനും കൈമാറാനും കഴിയും.</translation>
+        <source>Remove picture</source>
+        <translation>ചിത്രം നീക്കുക</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>ചിത്രം നീക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>ചിത്രം മാറ്റുക</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>ചാനൽ എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>ഗ്രൂപ്പ് എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>ചാനലിന്റെ പേര്</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>ഗ്രൂപ്പിന്റെ പേര്</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>വിവരണം</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>ചാനലിലെ എല്ലാവരും ഈ മാറ്റങ്ങൾ കാണും. സംരക്ഷിക്കാൻ പിന്നിലേക്ക് സ്വൈപ്പ് ചെയ്യുക.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>ഗ്രൂപ്പിലെ എല്ലാവരും ഈ മാറ്റങ്ങൾ കാണും. സംരക്ഷിക്കാൻ പിന്നിലേക്ക് സ്വൈപ്പ് ചെയ്യുക.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>പേര് എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>&quot;%1&quot; എന്നതിനുള്ള വിളിപ്പേര്</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>കോൺടാക്റ്റ് സ്വയം തിരഞ്ഞെടുത്ത പേര് ഉപയോഗിക്കാൻ ശൂന്യമായി വിടുക. ഈ പേര് നിങ്ങൾ മാത്രമേ കാണൂ. സംരക്ഷിക്കാൻ പിന്നിലേക്ക് സ്വൈപ്പ് ചെയ്യുക.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>ഫിംഗർപ്രിന്റുകൾ പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>എൻക്രിപ്ഷൻ വിവരങ്ങൾ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n അംഗം</numerusform>
+            <numerusform>%n അംഗങ്ങൾ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>കീ ഇല്ല</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>റിലേകൾ</translation>
     </message>
 </context>
 <context>
@@ -1119,69 +1340,63 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>സംരക്ഷിച്ചു</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>ഗ്രൂപ്പ് വിടുക</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>അംഗങ്ങളെ ചേർക്കുക</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>ഗ്രൂപ്പ്</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>ചിത്രം നീക്കുക</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>ഗ്രൂപ്പിന്റെ പേര്</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n അംഗം</numerusform>
             <numerusform>%n അംഗങ്ങൾ</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>ഗ്രൂപ്പിൽ നിന്ന് നീക്കുക</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>നീക്കുന്നു</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>ഗ്രൂപ്പിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>വിവരണം</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>ചിത്രം മാറ്റുക</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR ക്ഷണ കോഡ്</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>ചാനൽ</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>ചാറ്റ് ഇല്ലാതാക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>ചാറ്റ് ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>എൻക്രിപ്ഷൻ വിവരങ്ങൾ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>ചാനൽ എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>ഗ്രൂപ്പ് എഡിറ്റ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>എൻഡ്-ടു-എൻഡ് എൻക്രിപ്റ്റ് ചെയ്തത്</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>അംഗങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>ഈ ചാറ്റിൽ</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>ക്രമീകരണങ്ങൾ</translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1465,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>സ്വീകർത്താവ് എടുക്കുന്നതുവരെ മാത്രമേ റിലേ സന്ദേശം സൂക്ഷിക്കൂ.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„വിവരം“ എന്നതിലേക്ക് മടങ്ങാൻ സ്വൈപ്പ് ചെയ്തുകൊണ്ടിരിക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -1355,7 +1574,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>ഗാലറി</translation>
     </message>
     <message>
@@ -1391,7 +1610,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>കോളുകൾ</translation>
     </message>
     <message>
@@ -1400,8 +1619,79 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>ഭൂപടം</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>ഇന്ന്</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>ഇന്നലെ</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>കഴിഞ്ഞ 7 ദിവസം</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>കഴിഞ്ഞ 30 ദിവസം</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>പഴയവ</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>സന്ദേശം അയയ്ക്കുക</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>ഗ്രൂപ്പിൽ നിന്ന് നീക്കുക</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>നിങ്ങൾ</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>നീക്കുന്നു</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n അംഗം</numerusform>
+            <numerusform>%n അംഗങ്ങൾ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>അംഗങ്ങളെ തിരയുക</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>അംഗങ്ങളെ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>QR കോഡ് വഴി ക്ഷണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>ആരും പൊരുത്തപ്പെടുന്നില്ല</translation>
     </message>
 </context>
 <context>
@@ -1466,6 +1756,78 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>ടെക്സ്റ്റ് തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n ദിവസം</numerusform>
+            <numerusform>%n ദിവസം</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n മണിക്കൂർ</numerusform>
+            <numerusform>%n മണിക്കൂർ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 ദി %2 മണിക്കൂർ</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 ദി</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 മണിക്കൂർ %2 മിനിറ്റ്</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 മണിക്കൂർ</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 മിനിറ്റ്</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 ശേഷിക്കുന്നു)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>ഓൺ</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>ഓഫ്</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 നേരത്തേക്ക് ഓഫ്</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>ഓഫ് (%1 ശേഷിക്കുന്നു)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>%1 നേരത്തേക്ക് ഓഫ് (%2 ശേഷിക്കുന്നു)</translation>
     </message>
 </context>
 <context>
@@ -1836,6 +2198,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>&quot;%1&quot; ചാനലിൽ ചേരാൻ സ്കാൻ ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; ഗ്രൂപ്പിൽ ചേരാൻ സ്കാൻ ചെയ്യുക</translation>
     </message>
 </context>
 <context>
@@ -2220,7 +2587,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>പരീക്ഷണാത്മകം</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>ഈ സവിശേഷതകൾ അസ്ഥിരമാകാം, മാറ്റപ്പെടാം അല്ലെങ്കിൽ നീക്കം ചെയ്യപ്പെടാം.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc ആപ്പുകൾ</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ്</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>പകർത്തിയെഴുത്ത്</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>ഭാഷകൾ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>കുറഞ്ഞ ഗുണനിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>സന്തുലിതം</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ഒരിക്കലും വേണ്ട</translation>
@@ -2250,29 +2686,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>എപ്പോഴും</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>ക്രമീകരണങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>സന്ദേശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>അറ്റാച്ച്‌മെന്റുകൾ സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>ലിങ്കുകളിൽ നിന്ന് ട്രാക്കിംഗ് നീക്കുക</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>അറിയിപ്പുകൾ</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc ആപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>ഓഫ്</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2295,30 +2711,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 വർഷത്തിനു ശേഷം</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>ഉപകരണത്തിൽ നിന്ന് സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>പരാമർശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>സ്വകാര്യത</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>സന്തുലിതം</translation>
+        <source>Messages</source>
+        <translation>സന്ദേശങ്ങൾ</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2326,13 +2720,54 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അയയ്ക്കുന്ന മീഡിയയുടെ നിലവാരം</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
+        <source>Auto-download attachments</source>
+        <translation>അറ്റാച്ച്‌മെന്റുകൾ സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>കുറഞ്ഞ ഗുണനിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
+        <source>Show Markdown formatting</source>
+        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>സന്ദേശങ്ങളിൽ *ബോൾഡ്*, _ഇറ്റാലിക്_, `കോഡ്` എന്നിവ രൂപപ്പെടുത്തുന്നു.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>ഈ ഫോണിൽ</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>പഴയ സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>സന്ദേശങ്ങൾ ഈ ഫോണിൽ നിന്ന് മാത്രം ഇല്ലാതാക്കുന്നു, എല്ലാ പ്രൊഫൈലിലും.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>മറ്റ് ഉപകരണങ്ങളും ചാറ്റ് അംഗങ്ങളും അവരുടെ പകർപ്പുകൾ സൂക്ഷിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>സംഭാഷണപ്പട്ടികയിൽ നിങ്ങളുടെ പ്രൊഫൈൽ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>സംഭാഷണപ്പട്ടികയുടെ മുകളിൽ നിങ്ങളുടെ പ്രൊഫൈൽ ചിത്രവും പേരും കാണിക്കുന്നു.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>അറിയിപ്പുകൾ</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2351,64 +2786,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>വിശദാംശങ്ങളില്ല</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങളുടെ സന്ദേശങ്ങൾക്കുള്ള മറുപടികളുടെ അറിയിപ്പുകൾ കാണിക്കുക</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>വിപുലമായത്</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>ഓരോ പ്രൊഫൈലിനും ബാധകമാണ്, ഒരു ചാറ്റിന്റെ സ്വന്തം അപ്രത്യക്ഷമാകുന്ന സന്ദേശങ്ങളുടെ ക്രമീകരണം എന്തായാലും.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>കോളുകൾ</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>വരുന്ന കോളുകൾക്ക് റിംഗ് ചെയ്യുക</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>സ്വീകരിച്ച കോൺടാക്റ്റുകൾക്കായി കോൾ സ്ക്രീൻ കാണിക്കുക</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+        <source>Muted chats</source>
+        <translation>മ്യൂട്ട് ചെയ്ത ചാറ്റുകൾ</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>ലൊക്കേഷൻ സ്ട്രീമിംഗ് പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>മ്യൂട്ട് ചെയ്ത ഗ്രൂപ്പുകളിലെ മറുപടികൾ</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>സംഭാഷണങ്ങളിൽ നിങ്ങളുടെ ലൊക്കേഷൻ പങ്കിടുകയും പങ്കിട്ട ലൊക്കേഷനുകൾ ഭൂപടത്തിൽ കാണിക്കുകയും ചെയ്യുന്നു.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങളുടെ സന്ദേശങ്ങൾക്കുള്ള മറുപടികളുടെ അറിയിപ്പുകൾ കാണിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>ക്രമീകരണങ്ങൾ</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>ശബ്ദ സന്ദേശങ്ങൾ എഴുത്താക്കുക (പരീക്ഷണാത്മകം)</translation>
+        <source>Messages</source>
+        <translation>സന്ദേശങ്ങൾ</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
+        <source>Notifications</source>
+        <translation>അറിയിപ്പുകൾ</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>ഈ ഫോണിൽ തന്നെ ശബ്ദ സന്ദേശങ്ങളെ എഴുത്താക്കി മാറ്റുന്നു.</translation>
+        <source>Privacy and security</source>
+        <translation>സ്വകാര്യതയും സുരക്ഷയും</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>ഒന്നും ഫോണിൽ നിന്ന് പുറത്തുപോകുന്നില്ല.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>പരീക്ഷണാത്മകം</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>വിവരം</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>സ്വകാര്യതയും സുരക്ഷയും</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>ലിങ്കുകളിൽ നിന്ന് ട്രാക്കിംഗ് നീക്കുക</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>പ്രൊഫൈൽ: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n കോൺടാക്റ്റ്</numerusform>
+            <numerusform>%n കോൺടാക്റ്റുകൾ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3122,32 +3592,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>ഈ ഭാഷയിലെ എഴുത്തുരൂപങ്ങളിൽ കൂടുതൽ തെറ്റുകൾ ഉണ്ടാകാൻ സാധ്യതയുണ്ട്.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>ശബ്ദ സന്ദേശ എഴുത്താക്കൽ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>ഭാഷകൾ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>എപ്പോൾ</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>സംഭാഷണ മാതൃക ഡൗൺലോഡ് ചെയ്യാനായില്ല.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>വീണ്ടും ശ്രമിക്കുക</translation>
     </message>
 </context>
 <context>

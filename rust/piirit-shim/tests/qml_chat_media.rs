@@ -1,10 +1,11 @@
-//! Chat pictures, sounds, files, apps: pages of their own, from tiles on contact and group pages.
+//! Chat pictures, sounds, files, apps: pages of their own, from rows on contact and group pages.
 //!
 //! Headless vs stub Silica and recording double, group seeded with one of each kind. Checks wiring:
 //! gallery draws a tile per picture/video, tap opens the page the conversation opens for that kind;
 //! files list names file and size, keeps a copy under sender's name where reader saves files; audio
-//! and apps lists draw conversation's own rows, tap on app runs it; kind with none says so; tiles
-//! on both detail pages open page for tapped kind, no Apps tile while apps off.
+//! and apps lists draw conversation's own rows, tap on app runs it; kind with none says so; rows
+//! on both detail pages open each kind's own page or apps, no Apps row while apps off; audio and
+//! files rows sit under age headings.
 //!
 //! Long press on tile or row offers Show in chat and Delete. Show in chat walks stack down to the
 //! conversation this page was opened over, tells it the message, pops to it (stack here hands back
@@ -66,8 +67,7 @@ impl PageStackProbe {
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
         let kind =
             QString::from_qvariant(properties.value(QString::from("kind"), QVariant::default()))
-                .map(|kind| kind.to_string())
-                .unwrap_or_default();
+                .map_or(String::new(), |kind| kind.to_string());
         // Delete dialog carries no kind; it's asked with whether core would take a deletion for
         // everyone of this message, all of it worth reading back.
         let everyone = bool::from_qvariant(
@@ -121,6 +121,7 @@ const PROBE_QML: &str = r"
     import 'file://__COMPONENTS__'
     Item {
         function setLocations(on) { Settings.locationStreamingEnabled = on; return 'ok' }
+        function setApps(on) { Settings.webxdcEnabled = on; return 'ok' }
         Loader { id: loader }
         function load(url, properties) {
             loader.setSource('', {})
@@ -132,9 +133,6 @@ const PROBE_QML: &str = r"
         }
         function loadDetail(url, chatId) {
             return load(url, { accountId: 1, chatId: chatId, chatName: 'from the list' })
-        }
-        function loadTiles(url) {
-            return load(url, { width: 540, appsAvailable: true })
         }
         // The pages under the media page, as the stack answers for them:
         // the contact's page, which cannot show a message, and the
@@ -164,6 +162,8 @@ const PROBE_QML: &str = r"
         function shownInChat() { return '' + chatBelow.shown }
         // The wait before a deletion, turned down from four seconds.
         function hurry(ms) { loader.item.pendingDelay = ms; return 'ok' }
+        // Swipe back: Deactivating is when waits end.
+        function leave() { loader.item.status = PageStatus.Deactivating; return 'ok' }
         // Where the platform says downloads go, pointed at a directory
         // of this test's own: a saved file goes there.
         function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
@@ -198,6 +198,26 @@ const PROBE_QML: &str = r"
             item.clicked()
             return 'ok'
         }
+        // Every item named so, once each (walk meets list rows twice): headings share a name.
+        function allIn(node, name, found) {
+            if (!node) { return found }
+            if (node.objectName === name && found.indexOf(node) < 0) { found.push(node) }
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) { allIn(kids[i], name, found) }
+            if (node.contentItem && node.contentItem !== node) { allIn(node.contentItem, name, found) }
+            return found
+        }
+        /// Texts of the shown ones, joined.
+        function shownTexts(name) {
+            return allIn(loader.item, name, []).filter(function(item) { return item.visible })
+                .map(function(item) { return item.text }).join(',')
+        }
+        // A part of one particular row, since every row has one.
+        function getIn(rowName, name, property) {
+            var item = findIn(findIn(loader.item, rowName), name)
+            if (!item) { return 'missing:' + name }
+            return '' + item[property]
+        }
         // A menu item of one particular row, since every row has one.
         function clickIn(rowName, itemName) {
             var row = findIn(loader.item, rowName)
@@ -212,7 +232,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
+fn a_chats_media_has_pages_of_its_own_behind_rows() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-media-page-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -289,7 +309,6 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let media_page = common::page_url("ChatMediaPage.qml");
     let contact_page = common::page_url("ContactPage.qml");
     let group_page = common::page_url("GroupPage.qml");
-    let tiles = common::component_url("MediaKinds.qml");
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
 
     let mut plan = common::Plan::default();
@@ -373,8 +392,21 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("file-size", get!("fileDetail", "text"));
         record!("file-icon", get!("fileIcon", "source"));
         record!("file-caption", get!("rowCaption", "text"));
+        record!("files-title", get!("pageHeader", "title"));
         call!("setDownloads", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
+        // Delete, then leave before the wait is up: goes on the way out, not lost.
+        record!("long-wait", call!("hurry", 600_000));
+        record!(
+            "delete-file",
+            call!(
+                "clickIn",
+                QString::from("mediaRow12"),
+                QString::from("deleteItem")
+            )
+        );
+        record!("pick-file-delete", call!("pickDelete", false));
+        record!("leave-files", call!("leave"));
     });
 
     // Copy made off Qt thread; notice comes at least a loop turn later, so read here, not right
@@ -382,6 +414,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let page = media_page.clone();
     plan.after(1, move || unsafe {
         record!("saved-notice", get!("noticeLabel", "text"));
+        record!("files-after-leave", get!("media", "count"));
         record!(
             "load-audio",
             call!(
@@ -410,7 +443,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let page = media_page;
+    let page = media_page.clone();
     plan.after(2, move || unsafe {
         record!("apps-count", get!("media", "count"));
         record!("app-name", get!("webxdcName", "text"));
@@ -427,31 +460,61 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let page = contact_page;
+    let page = media_page;
     plan.after(2, move || unsafe {
         record!("empty-loaded", get!("media", "loaded"));
         record!("empty-count", get!("media", "count"));
         record!("empty-placeholder", get!("placeholder", "enabled"));
         record!("empty-text", get!("placeholder", "text"));
-        // Contact tiles, apps off.
+        record!(
+            "load-sections",
+            call!(
+                "loadMedia",
+                QString::from(page.clone()),
+                2,
+                QString::from("audio")
+            )
+        );
+    });
+
+    let page = contact_page;
+    plan.after(2, move || unsafe {
+        // Fake core's messages are from 2023: all under one heading.
+        record!(
+            "date-section",
+            call!("shownTexts", QString::from("dateSection"))
+        );
+        // Contact rows, apps off.
         record!(
             "load-contact",
             call!("loadDetail", QString::from(page.clone()), 1)
         );
     });
 
-    let tiles_url = tiles;
     let page = group_page;
     plan.after(2, move || unsafe {
-        record!("contact-tiles", get!("mediaKinds", "visible"));
-        record!("contact-apps", get!("appsTile", "objectName"));
-        record!("contact-gallery", get!("galleryTile", "objectName"));
-        record!("open-gallery", call!("click", QString::from("galleryTile")));
-        // Location streaming off (experimental, as in Delta Chat): no map tile.
-        record!("contact-map-off", get!("mapTile", "objectName"));
+        record!(
+            "contact-media-names",
+            ["galleryRow", "audioRow", "filesRow"]
+                .map(|row| {
+                    call!(
+                        "getIn",
+                        QString::from(row),
+                        QString::from("doorLabel"),
+                        QString::from("text")
+                    )
+                })
+                .join(",")
+        );
+        record!("contact-apps", get!("appsRow", "visible"));
+        for row in ["galleryRow", "audioRow", "filesRow"] {
+            record!(row, call!("click", QString::from(row)));
+        }
+        // Location streaming off (experimental, as in Delta Chat): no map row.
+        record!("contact-map-off", get!("mapRow", "visible"));
         record!("locations-on", call!("setLocations", true));
         // Chat's map: core readies app first, page follows.
-        record!("contact-map", call!("click", QString::from("mapTile")));
+        record!("contact-map", call!("click", QString::from("mapRow")));
     });
     let stack_early = std::ptr::addr_of!(stack_box);
     plan.until(1, 10, move |last| unsafe {
@@ -465,14 +528,8 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         if !(done || last) {
             return false;
         }
-        // Tiles on own, apps on.
-        record!(
-            "load-tiles",
-            call!("loadTiles", QString::from(tiles_url.clone()))
-        );
-        record!("tiles-apps", get!("appsTile", "objectName"));
-        record!("tiles-apps-mark", get!("tileMark", "visible"));
-        // Group page too.
+        // Group page, apps on.
+        record!("apps-on", call!("setApps", true));
         record!(
             "load-group",
             call!("loadDetail", QString::from(page.clone()), 2)
@@ -481,12 +538,25 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     plan.after(2, move || unsafe {
-        record!("group-tiles", get!("mediaKinds", "visible"));
-        record!("open-files", call!("click", QString::from("filesTile")));
+        record!("group-apps", get!("appsRow", "visible"));
+        record!(
+            "group-apps-mark",
+            call!(
+                "getIn",
+                QString::from("appsRow"),
+                QString::from("appMark"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "open-group-media",
+            call!("click", QString::from("audioRow"))
+        );
+        record!("open-apps", call!("click", QString::from("appsRow")));
         call!("setLocations", false);
-        record!("group-map-off", get!("mapTile", "objectName"));
+        record!("group-map-off", get!("mapRow", "visible"));
         call!("setLocations", true);
-        record!("open-map", call!("click", QString::from("mapTile")));
+        record!("open-map", call!("click", QString::from("mapRow")));
     });
     let stack_ptr = std::ptr::addr_of!(stack_box);
     plan.until(1, 10, move |last| {
@@ -539,15 +609,23 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "pick-delete",
         "load-files",
         "save",
+        "long-wait",
+        "delete-file",
+        "pick-file-delete",
+        "leave-files",
         "load-audio",
         "load-apps",
         "open-app",
         "load-empty",
+        "load-sections",
         "load-contact",
-        "open-gallery",
-        "load-tiles",
+        "galleryRow",
+        "audioRow",
+        "filesRow",
+        "apps-on",
         "load-group",
-        "open-files",
+        "open-group-media",
+        "open-apps",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -654,6 +732,12 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "the files list does not hold the document",
         ),
         ("file-name", "notes.pdf", "the file is not named"),
+        ("files-title", "Files", "the files page is not headed Files"),
+        (
+            "files-after-leave",
+            "0",
+            "a delete still waiting when the page was left was lost",
+        ),
         ("file-size", "20.5 kB", "the file's size is not said"),
         (
             "saved-notice",
@@ -715,41 +799,42 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Tiles on both detail pages: no Apps tile while apps off; one on row told apps are on.
+    // Rows under age headings: one heading over the list, its group's name.
+    assert_eq!(
+        value("date-section"),
+        "Older",
+        "audio sits under no age heading, or one per row. {context}"
+    );
+
+    // Rows on both detail pages: no Apps row while apps off, nor Map while streaming off.
     for (label, expected, complaint) in [
         (
-            "contact-tiles",
-            "true",
-            "the contact page has no media tiles",
+            "contact-media-names",
+            "Gallery,Audio,Files",
+            "the contact page has no Gallery, Audio and Files rows",
         ),
         (
             "contact-apps",
-            "missing:appsTile",
+            "missing:appsRow",
             "the contact page offers apps while they are off",
         ),
         (
-            "contact-gallery",
-            "galleryTile",
-            "the contact page has no gallery tile",
-        ),
-        (
             "contact-map-off",
-            "missing:mapTile",
+            "missing:mapRow",
             "the contact page offers the map while location streaming is off",
         ),
         ("locations-on", "ok", "location streaming was not turned on"),
         (
             "group-map-off",
-            "missing:mapTile",
+            "missing:mapRow",
             "the group page offers the map while location streaming is off",
         ),
         (
-            "tiles-apps",
-            "appsTile",
-            "the tiles offer no apps while they are on",
+            "group-apps",
+            "true",
+            "the group page offers no apps while they are on",
         ),
-        ("tiles-apps-mark", "true", "the apps tile draws no mark"),
-        ("group-tiles", "true", "the group page has no media tiles"),
+        ("group-apps-mark", "true", "the apps row draws no mark"),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
@@ -760,14 +845,16 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         navigation,
         "push:GalleryPage.qml(at=10,newestFirst=true)|\
          push:GalleryPage.qml(at=15,newestFirst=true)|pop|\
+         push:DeleteMessageDialog.qml(everyone=false)|\
          push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml(at=14)|\
-         push:ChatMediaPage.qml(gallery)|\
+         push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(audio)|\
+         push:ChatMediaPage.qml(files)|\
          push:WebxdcPage.qml(at=101,query=?bounds=60.1,24.9,60.2,25,heading=from the list,\
          subheading=Map)|\
-         push:ChatMediaPage.qml(files)|\
+         push:ChatMediaPage.qml(audio)|push:ChatMediaPage.qml(apps)|\
          push:NoLocationsPage.qml(,heading=from the list,subheading=Map)|",
         "a tap did not open the right page, or Show in chat did not pop \
-         back to the conversation, or the map tile opened no chat map framing its locations, \
+         back to the conversation, or the map row opened no chat map framing its locations, \
          or a chat with none a map all the same. {context}"
     );
 

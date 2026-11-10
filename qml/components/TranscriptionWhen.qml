@@ -6,7 +6,7 @@ import "../js/Transcription.js" as Transcription
 
 /*
  * When voice messages transcribe on their own: choice and backlog switch. Setup's second
- * dialog and transcription page both; each control writes its setting on tap.
+ * dialog and Experimental settings both; each control writes its setting on tap.
  */
 Column {
     id: when

@@ -1,7 +1,7 @@
-//! Archived list must not show ordinary chats.
+//! Archived list must not lose its chats to an older answer.
 //!
 //! `account_id` and `archived` set in different event-loop turns each start a fetch (same turn:
-//! one); slower answer must not win. Fake answers ordinary listing slowly to make order certain.
+//! one); slower answer must not win. Fake holds first fetch's listing to make order certain.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -11,19 +11,15 @@ use qmetaobject::*;
 
 mod common;
 
-// Account first; archived wanted a turn later, once ordinary list was asked for.
+// Account first; archived wanted later, once ordinary list was asked for.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
     Item {
         ChatList { id: chats }
-        Timer { id: later; interval: 100; onTriggered: chats.archived = true }
-        function open() {
-            chats.account_id = 1
-            later.start()
-        }
-        // The two listings differ in size -- one archived chat, two
-        // ordinary ones -- so the count alone says which answer landed.
+        function open() { chats.account_id = 1 }
+        function archive() { chats.archived = true }
+        // One archived chat; older answer knows none archived, shows none.
         function count() { return chats.count }
     }
 ";
@@ -33,7 +29,7 @@ const PROBE_QML: &str = r"
 fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
     let temp = std::env::temp_dir().join(format!("piirit-archived-race-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // Ordinary listing answered only once archived one landed.
+    // First ordinary listing answered only once archived fetch landed.
     let hold = temp.join("hold");
     std::fs::write(&hold, r#""get_chatlist_entries","params":[1,null"#)
         .expect("write the hold file");
@@ -82,7 +78,22 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         (*engine_ptr).invoke_method("open".into(), &[]);
     });
 
-    // Archived answer back; ordinary one held.
+    // First listing caught: hold nothing more (caught one waits for file to go), then archive.
+    let asked = journal.clone();
+    let caught = hold.clone();
+    plan.until(1, 30, move |last| unsafe {
+        let listed = common::methods(&asked)
+            .iter()
+            .any(|name| name == "get_chatlist_entries");
+        if !listed && !last {
+            return false;
+        }
+        std::fs::write(&caught, "nothing").expect("rewrite the hold file");
+        (*engine_ptr).invoke_method("archive".into(), &[]);
+        true
+    });
+
+    // Archived fetch back; first one held.
     plan.until(1, 30, move |last| unsafe {
         if call!("count") != "1" && !last {
             return false;
@@ -92,7 +103,7 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         true
     });
 
-    // Ordinary answer let go, its rows asked for (list's last request): lands next.
+    // First answer let go, its rows asked for (list's last request): lands next.
     plan.until(1, 30, move |_| {
         common::methods(&journal)
             .iter()
@@ -100,7 +111,7 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
             .count()
             >= 2
     });
-    // A late count of two is the bug: watch a while for it.
+    // A late count of none is the bug: watch a while for it.
     plan.until(1, 3, move |last| unsafe {
         let count = call!("count");
         if count == "1" && !last {
@@ -135,9 +146,9 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
     // No overlap, no race: test would pass on broken code.
     assert_eq!(
         listings.len(),
-        2,
-        "the model did not ask for both listings, so nothing here is being \
-         tested. {context}"
+        3,
+        "the model did not ask for the ordinary listing, then both, so nothing here is \
+         being tested. {context}"
     );
     assert!(
         listings.iter().any(|params| params.contains("[1,null")),
@@ -150,21 +161,20 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
 
     assert_eq!(
         rows,
-        ["[1,[3]]", "[1,[1,2]]"],
-        "the ordinary listing was not answered after the archived one, so \
+        ["[1,[3,1,2]]", "[1,[1,2]]"],
+        "the first fetch was not answered after the archived one, so \
          this test is no longer arranged the way the bug needs. {context}"
     );
     assert_eq!(
         value("early"),
         "1",
-        "the archived listing did not arrive first, so this test is no longer \
+        "the archived fetch did not arrive first, so this test is no longer \
          arranged the way the bug needs. {context}"
     );
     assert_eq!(
         value("late"),
         "1",
-        "a late answer to the ordinary listing replaced the archived one -- two \
-         chats where the archived list holds one -- so the archived page shows \
-         ordinary chats. {context}"
+        "a late answer to the first fetch replaced the archived one, so the \
+         archived list lost its chat. {context}"
     );
 }

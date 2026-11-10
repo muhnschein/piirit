@@ -1,4 +1,4 @@
-//! Searching chat list and archived list. Both must reach core.
+//! Searching chat list, archived list, one contact's chats. All must reach core.
 //!
 //! Filtering loaded rows finds only on-screen chats; archived is a disjoint list.
 
@@ -20,12 +20,27 @@ const PROBE_QML: &str = r"
         function showArchived() { chats.archived = true }
         function accept(chatId) { chats.accept_chat(chatId) }
         function block(chatId) { chats.block_chat(chatId) }
+        function byContact(contactId) { chats.contact_id = contactId }
+        Repeater {
+            id: rows
+            model: chats.rows
+            Item { property int cid: model.chat_id }
+        }
+        function ids() {
+            var ids = []
+            for (var i = 0; i < rows.count; i++) { ids.push(rows.itemAt(i).cid) }
+            return ids.join(',')
+        }
     }
 ";
 
 /// Parameters: (`accountId`, `listFlags`, `query`, `contactId`).
 fn query_of(params: &Value) -> Option<&str> {
     params.get(2).and_then(Value::as_str)
+}
+
+fn contact_of(params: &Value) -> Option<u64> {
+    params.get(3).and_then(Value::as_u64)
 }
 
 /// See [`query_of`].
@@ -43,6 +58,7 @@ fn entry_calls(journal: &std::path::Path) -> Vec<Value> {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_search_and_the_archived_list_are_asked_of_the_core() {
     let temp = std::env::temp_dir().join(format!("piirit-chat-filters-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
@@ -94,18 +110,33 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         (*engine_ptr).invoke_method("block".into(), &[QVariant::from(9u32)]);
     });
 
+    plan.after(1, move || unsafe {
+        (*engine_ptr).invoke_method("byContact".into(), &[QVariant::from(10u32)]);
+    });
+
     let asked = journal.clone();
     plan.until(1, 30, move |last| {
         let methods = common::methods(&asked);
-        let done = entry_calls(&asked)
-            .iter()
-            .any(|params| flags_of(params) == Some(1))
+        let entries = entry_calls(&asked);
+        let done = entries.iter().any(|params| flags_of(params) == Some(1))
+            && entries.iter().any(|params| contact_of(params) == Some(10))
             && methods.iter().any(|name| name == "accept_chat")
             && methods.iter().any(|name| name == "block_chat");
-        if done || last {
-            unsafe { (*engine_ptr).quit() };
+        done || last
+    });
+    // Archived still set: contact's chats show all the same (core ignores it for them).
+    let mut shown = String::new();
+    let shown_ptr = std::ptr::addr_of_mut!(shown);
+    plan.until(1, 30, move |last| unsafe {
+        let ids = QString::from_qvariant((*engine_ptr).invoke_method("ids".into(), &[]))
+            .map(|text| text.to_string())
+            .unwrap_or_default();
+        if ids != "1,2,3" && !last {
+            return false;
         }
-        done
+        *shown_ptr = ids;
+        (*engine_ptr).quit();
+        true
     });
 
     plan.run();
@@ -129,6 +160,10 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         "the archived list was never asked for with DC_GCL_ARCHIVED_ONLY, \
          so it would show the ordinary chats again. calls: {entries:?}"
     );
+    assert!(
+        entries.iter().any(|params| contact_of(params) == Some(10)),
+        "one contact's chats were never asked of the core by contact. calls: {entries:?}"
+    );
     // First load: neither search nor archive.
     let first = entries.first().cloned().unwrap_or(Value::Null);
     assert_eq!(
@@ -137,9 +172,15 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         "the ordinary list was loaded with a query. calls: {entries:?}"
     );
     assert_eq!(
-        flags_of(&first),
-        None,
-        "the ordinary list was loaded with list flags. calls: {entries:?}"
+        (flags_of(&first), contact_of(&first)),
+        (None, None),
+        "the ordinary list was loaded with list flags or for one contact. calls: {entries:?}"
+    );
+
+    assert_eq!(
+        shown, "1,2,3",
+        "one contact's chats, ordinary and archived, were not all shown while the \
+         archived flag was set. calls: {entries:?}"
     );
 
     let methods = common::methods(&journal);

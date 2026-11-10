@@ -4,6 +4,13 @@
 [advisories]
 version = 2
 yanked = "deny"
+ignore = [
+    # SQLite < 3.54 leaks page cache via crafted DB + `-wal` pair. Piirit's crate links phone's
+    # SQLite (no `bundled`), opens only own transcript DB in sandboxed dir. Fixed crate needs Rust
+    # 1.88, SDK cargo 1.75. Not covered here: bundled rpc-server's SQLCipher (core 2.69.0, < 3.54),
+    # reached by importing a crafted backup; needs core fix.
+    { id = "RUSTSEC-2026-0459", reason = "system SQLite linked, not bundled; fix needs Rust 1.88" },
+]
 
 [licenses]
 version = 2

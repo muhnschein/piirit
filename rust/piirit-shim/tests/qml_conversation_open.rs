@@ -66,6 +66,20 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        // Ambience band behind chat's name, page's top to header's bottom.
+        function band() {
+            var band = findIn(loader.item, 'headerBand')
+            var header = findIn(loader.item, 'conversationHeader')
+            if (!band || !header) { return 'missing' }
+            var kids = band.parent.children
+            return [band.parent === header.parent
+                        && Array.prototype.indexOf.call(kids, band)
+                            < Array.prototype.indexOf.call(kids, header),
+                    band.y === 0 && band.width === header.width && header.height > 0
+                        && band.height === header.y + header.height,
+                    Qt.colorEqual(band.color,
+                                  Theme.rgba(Theme.highlightBackgroundColor, 0.12))].join(',')
+        }
         function chatOfModel() {
             var model = findIn(loader.item, 'messages')
             return model ? '' + model.chat_id : 'missing:messages'
@@ -158,6 +172,7 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
 
     plan.after(2, move || unsafe {
         (*steps_ptr).push(("rows-after-arriving", call!("rowsOfModel")));
+        (*steps_ptr).push(("band", call!("band")));
         (*engine_ptr).quit();
     });
 
@@ -215,5 +230,11 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("rows-after-arriving"),
         SEEDED,
         "the messages did not survive the page arriving. {context}"
+    );
+    assert_eq!(
+        value("band"),
+        "true,true,true",
+        "the chat's name is not on the ambience band (behind it, page wide from top to header's \
+         bottom, band colour). {context}"
     );
 }

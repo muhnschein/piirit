@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nb">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat-kjerne %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Om</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Kildekode og lisens</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit er fri programvare under GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Rapporter et problem</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versjonene kopieres til rapporten din.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Om Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -572,15 +611,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Profiler</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arkiverte samtaler</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arkivert</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Samtaler</translation>
     </message>
     <message>
@@ -602,14 +639,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pin</source>
         <translation>Fest</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Slå på lyd</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Demp</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -685,7 +714,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Trykk på «%1» for å vise alle samtaler</translation>
     </message>
     <message>
@@ -703,18 +732,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Vis alle posisjoner</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanaler</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Ingen uleste kanaler</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Trykk på «%1» for å vise alle kanaler</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Varsler</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Åpne i en annen app</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Lagre på enheten</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -731,7 +771,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Transkriber %n talemelding</numerusform>
             <numerusform>Transkriber %n talemeldinger</numerusform>
@@ -750,6 +790,35 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Transkriber</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Åpne i en annen app</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Lagre på enheten</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Varsler</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Varsler</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Du får fortsatt et varsel når noen i denne gruppen svarer på en av meldingene dine.</translation>
     </message>
 </context>
 <context>
@@ -773,11 +842,15 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Lagret</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Delte chatter</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
@@ -791,17 +864,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ikke kryptert: en vanlig e-postkontakt</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Navn</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>La stå tomt for å bruke navnet de selv valgte</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Sist sett for lenge siden</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Sletter chat</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Slett chat</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokker kontakt</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Vis krypteringsinfo</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Rediger navn</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Kaller seg selv %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Ring</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Videoanrop</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>I denne chatten</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Innstillinger</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Delte chatter</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n chat</numerusform>
+            <numerusform>%n chatter</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1045,9 +1172,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>Etter %1 sekunder</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Disse innstillingene gjelder alle deltakerne som bruker Delta Chat. Men de kan kopiere, lagre og videresende meldinger eller bruke annen e-postklient.</translation>
+        <source>Remove picture</source>
+        <translation>Fjern bilde</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Fjerner bilde</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Endre bilde</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Rediger kanal</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Rediger gruppe</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Kanalnavn</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Gruppenavn</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Beskrivelse</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Alle i kanalen ser disse endringene. Sveip tilbake for å lagre.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Alle i gruppen ser disse endringene. Sveip tilbake for å lagre.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Rediger navn</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Kallenavn for «%1»</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>La feltet stå tomt for å bruke kontaktens eget navn. Bare du ser dette navnet. Sveip tilbake for å lagre.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Kopier fingeravtrykk</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Kopiert til utklippstavlen</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Krypteringsinfo</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n medlem</numerusform>
+            <numerusform>%n medlemmer</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Nøkkel mangler</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Reléer</translation>
     </message>
 </context>
 <context>
@@ -1115,69 +1336,63 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Lagret</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Forlat gruppe</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Legg til medlemmer</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Gruppe</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Fjern bilde</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Gruppenavn</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n medlem</numerusform>
             <numerusform>%n medlemmer</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Fjern fra gruppe</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Fjerner</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Alle i gruppen ser navnet</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Beskrivelse</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Endre bilde</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR-invitasjonskode</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kanal</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Sletter chat</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Slett chat</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Vis krypteringsinfo</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Rediger kanal</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Rediger gruppe</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Ende-til-ende-kryptert</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Medlemmer</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>I denne chatten</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Innstillinger</translation>
     </message>
 </context>
 <context>
@@ -1246,6 +1461,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Et relé lagrer en melding bare til mottakeren henter den.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Sveip videre for å gå tilbake til Om.</translation>
     </message>
 </context>
 <context>
@@ -1351,7 +1570,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galleri</translation>
     </message>
     <message>
@@ -1387,7 +1606,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Anrop</translation>
     </message>
     <message>
@@ -1396,8 +1615,79 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Kart</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>I dag</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>I går</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Siste 7 dager</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Siste 30 dager</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Eldre</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Send melding</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Fjern fra gruppe</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Deg</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Fjerner</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n medlem</numerusform>
+            <numerusform>%n medlemmer</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Søk etter medlemmer</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Legg til medlemmer</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Inviter med QR-kode</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Ingen passer</translation>
     </message>
 </context>
 <context>
@@ -1462,6 +1752,78 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Merk tekst</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n dag</numerusform>
+            <numerusform>%n dager</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n time</numerusform>
+            <numerusform>%n timer</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 d %2 t</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 t %2 min</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 t</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 igjen)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>På</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Av</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Av i %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Av (%1 igjen)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Av i %1 (%2 igjen)</translation>
     </message>
 </context>
 <context>
@@ -1832,6 +2194,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Skann for å bli med i kanalen &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Skann for å bli med i gruppen «%1»</translation>
     </message>
 </context>
 <context>
@@ -2216,7 +2583,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Eksperimentelt</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Disse funksjonene kan være ustabile, bli endret eller fjernet.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc-apper</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kjører små apper inne i samtaler.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Posisjonsdeling</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Deler posisjonen din i samtaler og viser delte posisjoner på et kart.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Transkriber talemeldinger</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Gjør talemeldinger om til tekst på denne telefonen.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Ingenting forlater telefonen.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Talemodellen kunne ikke lastes ned.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Prøv igjen</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkripsjon</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Språk</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Lavere kvalitet, mindre data</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Balansert</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Aldri</translation>
@@ -2246,29 +2682,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Alltid</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Innstillinger</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Meldinger</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Last ned vedlegg automatisk</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Fjern sporing fra lenker</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Varsler</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Slå på webxdc-apper (eksperimentelt)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Av</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2291,30 +2707,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Etter 1 år</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Slett meldinger fra enheten</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Omtaler</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Bruk Markdown-formatering</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Personvern</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blokkerte kontakter</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Balansert</translation>
+        <source>Messages</source>
+        <translation>Meldinger</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2322,13 +2716,54 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kvalitet på utgående media</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Vis varsler</translation>
+        <source>Auto-download attachments</source>
+        <translation>Last ned vedlegg automatisk</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Lavere kvalitet, mindre data</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Vis Markdown-formatering</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formaterer *fet*, _kursiv_ og `kode` i meldinger.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>På denne telefonen</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Slett gamle meldinger</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Meldinger slettes bare fra denne telefonen, i alle profiler.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Andre enheter og chattemedlemmer beholder kopiene sine.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Vis profilen din i chatlisten</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Viser profilbildet og navnet ditt øverst i chatlisten.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Varsler</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Vis varsler</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2347,64 +2782,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen detaljer</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Vis varsler om svar på meldingene dine i dempede grupper</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Fjerner klikk-ID-er og kampanjemerker fra lenker du sender.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Hurtighandlinger</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Avansert</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Gjelder for hver profil, uavhengig av en chats egen innstilling for forsvinnende meldinger.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Anrop</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Ring ved innkommende anrop</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Vis anropsskjerm for godkjente kontakter</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Kjører små apper inne i samtaler.</translation>
+        <source>Muted chats</source>
+        <translation>Dempede chatter</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Slå på posisjonsdeling (eksperimentelt)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Svar i dempede grupper</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Deler posisjonen din i samtaler og viser delte posisjoner på et kart.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Vis varsler om svar på meldingene dine i dempede grupper</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Innstillinger</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Transkriber talemeldinger (eksperimentelt)</translation>
+        <source>Messages</source>
+        <translation>Meldinger</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Transkribering av talemeldinger</translation>
+        <source>Notifications</source>
+        <translation>Varsler</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Gjør talemeldinger om til tekst på denne telefonen.</translation>
+        <source>Privacy and security</source>
+        <translation>Personvern og sikkerhet</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Ingenting forlater telefonen.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Eksperimentelt</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Om</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Profilen din</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Hurtighandlinger</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Personvern og sikkerhet</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Fjern sporing fra lenker</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Fjerner klikk-ID-er og kampanjemerker fra lenker du sender.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokkerte kontakter</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakter</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3122,32 +3592,6 @@ Venter på svar fra enheten til %2$s…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Transkripsjoner på dette språket inneholder sannsynligvis flere feil.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Transkribering av talemeldinger</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Språk</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Når</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Talemodellen kunne ikke lastes ned.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Prøv igjen</translation>
     </message>
 </context>
 <context>

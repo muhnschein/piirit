@@ -26,12 +26,18 @@ pub struct ChatListItem {
     pub is_pinned: bool,
     /// Muted; badge too.
     pub is_muted: bool,
+    /// Group, mailing list or broadcast: mentions pass mute (`notify_mentions`).
+    pub is_group: bool,
     /// From unaccepted contact.
     pub is_contact_request: bool,
     /// "Saved messages". Not a person: cover skips it.
     pub is_self_talk: bool,
     /// Core's device chat. Not a person.
     pub is_device_talk: bool,
+    /// Channel, own or joined (`OutBroadcast`, `InBroadcast`): kind filter splits on it.
+    pub is_channel: bool,
+    /// In archived listing. From listing, not row: row read before a move would lie.
+    pub is_archived: bool,
     /// Chat colour, `#rrggbb`.
     pub color: QString,
     /// Picture path; empty if none.
@@ -60,6 +66,10 @@ pub struct MessageListItem {
     pub timestamp: i64,
     /// Days since epoch, viewer's timezone. Section key.
     pub day_number: i64,
+    /// Media page's section (`chat_media::date_group`); 0 = not read yet.
+    pub date_group: i32,
+    /// Media page: row heads its age group (`chat_media::group_starts`).
+    pub starts_group: bool,
     /// `showPadlock`: encrypted and signed. False: mail icon.
     pub show_padlock: bool,
     /// `DC_STATE_*`: out 20 pending, 24 failed, 26 delivered, 28 read; in 10 fresh, 13 noticed,

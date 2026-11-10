@@ -1,8 +1,8 @@
-//! Turning transcription on: Settings switch asks the experimental question, then languages
-//! (phone's first and picked; greyed ones can't be picked; Next needs one), which turn the
-//! feature on, then when to transcribe; Done returns to Settings. Cancel on languages leaves it
-//! off. Once on, an entry under the switch, flush like Quick actions, opens the transcription
-//! page: languages, timing, and a failed model download with Try again.
+//! Turning transcription on: Experimental settings switch asks the experimental question, then
+//! languages (phone's first and picked; greyed ones can't be picked; Next needs one), which turn
+//! the feature on, then when to transcribe; Done returns to the settings. Cancel on languages
+//! leaves it off. Once on, its settings stand flush under the switch: languages, timing, and a
+//! failed model download with Try again.
 //!
 //! Real pages vs stub Silica; page stack here builds pages it is asked for, as Silica does.
 //! Phone language German (`LC_ALL`).
@@ -213,7 +213,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
 
     let s = steps.clone();
     plan.after(1, move || unsafe {
-        let url = q!(common::page_url("SettingsPage.qml"));
+        let url = q!(common::page_url("SettingsExperimentalPage.qml"));
         common::record(&s, "load", call!("load", url, q!("{}")));
         common::record(&s, "codes", call!("codes"));
         common::record(
@@ -224,7 +224,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "off-entry",
-            call!("get", q!("page"), q!("transcriptionEntry"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
 
         // First try: question, languages, cancel.
@@ -382,34 +387,23 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "on-entry",
-            call!("get", q!("page"), q!("transcriptionEntry"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
         common::record(
             &s,
-            "entry-x",
-            call!("get", q!("page"), q!("transcriptionLabel"), q!("x")),
+            "settings-x",
+            call!("get", q!("page"), q!("transcriptionSettings"), q!("x")),
         );
         common::record(
             &s,
-            "quick-x",
-            call!("get", q!("page"), q!("quickActionsLabel"), q!("x")),
+            "languages-label",
+            call!("get", q!("page"), q!("languagesEntry"), q!("label")),
         );
-        common::record(
-            &s,
-            "entry-height",
-            call!("get", q!("page"), q!("transcriptionEntry"), q!("height")),
-        );
-        common::record(
-            &s,
-            "quick-height",
-            call!("get", q!("page"), q!("quickActionsEntry"), q!("height")),
-        );
-        common::record(
-            &s,
-            "open-entry",
-            call!("click", q!("page"), q!("transcriptionEntry")),
-        );
-        common::record(&s, "to-page", call!("log"));
 
         // Off: at once, nothing asked; languages kept for next time.
         call!("pop");
@@ -433,15 +427,20 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         common::record(
             &s,
             "off-entry-again",
-            call!("get", q!("page"), q!("transcriptionEntry"), q!("visible")),
+            call!(
+                "get",
+                q!("page"),
+                q!("transcriptionSettings"),
+                q!("visible")
+            ),
         );
     });
 
-    // Transcription page alone.
+    // Set up already, opened afresh.
     let s = steps.clone();
     plan.after(1, move || unsafe {
         call!("appWrites", q!("transcriptionEnabled"), true);
-        let url = q!(common::page_url("TranscriptionPage.qml"));
+        let url = q!(common::page_url("SettingsExperimentalPage.qml"));
         common::record(&s, "page-load", call!("load", url, q!("{}")));
         common::record(
             &s,
@@ -529,7 +528,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (value("asked"), value("asked-title")),
         (
             "push:ExperimentalFeatureDialog.qml;".to_string(),
-            "Transcribe voice messages (experimental)".to_string()
+            "Transcribe voice messages".to_string()
         ),
         "turning transcription on did not first ask the experimental question. {context}"
     );
@@ -649,17 +648,17 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     assert_eq!(
         (value("on-switch"), value("on-entry")),
         ("true".to_string(), "true".to_string()),
-        "after setup the switch is off, or its entry missing. {context}"
+        "after setup the switch is off, or its settings missing. {context}"
     );
     assert_eq!(
-        (value("entry-x"), value("entry-height")),
-        (value("quick-x"), value("quick-height")),
-        "the entry is indented or taller than Quick actions. {context}"
+        value("settings-x"),
+        "0",
+        "transcription's settings are indented under its switch. {context}"
     );
     assert_eq!(
-        value("to-page"),
-        "push:TranscriptionPage.qml;",
-        "the entry did not open the transcription page. {context}"
+        value("languages-label"),
+        "Languages",
+        "the languages row is not called Languages. {context}"
     );
     assert_eq!(
         (
@@ -680,12 +679,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
     assert_eq!(
         value("page-load"),
         "ok",
-        "the transcription page did not load. {context}"
+        "the experimental settings did not load. {context}"
     );
     assert_eq!(
         value("page-languages"),
         "Deutsch, English",
-        "the transcription page does not name the languages. {context}"
+        "the settings do not name the languages. {context}"
     );
     assert_eq!(
         value("page-failed-while-loading"),
@@ -699,7 +698,7 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
             "New voice messages are transcribed once they have downloaded. This uses battery."
                 .to_string()
         ),
-        "the page's timing does not follow the setting. {context}"
+        "the shown timing does not follow the setting. {context}"
     );
     assert_eq!(
         (

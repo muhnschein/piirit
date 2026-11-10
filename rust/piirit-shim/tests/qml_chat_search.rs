@@ -1,15 +1,9 @@
-//! Typing in chat-list search reaches a model. Ordinary list: grouped search (chats, contacts,
-//! messages); chat list underneath left as is, so clearing costs nothing. Archived list filters
-//! itself.
+//! Typing in chat-list search reaches a model: grouped search (chats, contacts, messages); chat
+//! list underneath left as is, so clearing costs nothing.
 //!
 //! Field lives in list's `header` (Component property, own scope): page timer reading
 //! `searchField.text` threw `ReferenceError` per keystroke, query never set -- field looked live,
 //! did nothing.
-//!
-//! Archived pulley checked too: every item in it was hidden, so it opened onto nothing.
-//!
-//! Archived row's menu (Unarchive, Delete) not checked: `ContextMenu` held in a property, not among
-//! children, unreachable from probe. Rests on review and `qml-lint`.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -144,26 +138,6 @@ fn typing_in_the_search_field_reaches_the_model() {
             "list-untouched",
             call!("get", QString::from("chats"), QString::from("count")),
         ));
-        (*steps_ptr).push((
-            "archived-load",
-            call!(
-                "load",
-                QString::from(common::page_url("ChatListPage.qml")),
-                1,
-                true
-            ),
-        ));
-    });
-
-    plan.after(2, move || unsafe {
-        (*steps_ptr).push((
-            "pulley",
-            call!(
-                "get",
-                QString::from("chatListPulley"),
-                QString::from("visible")
-            ),
-        ));
         (*engine_ptr).quit();
     });
 
@@ -173,7 +147,7 @@ fn typing_in_the_search_field_reaches_the_model() {
     assert_outcome(&steps);
 }
 
-/// Field drives model; archived pulley not dead.
+/// Field drives model.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -214,17 +188,5 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "2",
         "searching refetched the chat list underneath, which is a round trip \
          per keystroke for a list nobody is looking at. {context}"
-    );
-
-    assert_eq!(
-        value("archived-load"),
-        "ok",
-        "the page did not load in archived mode. {context}"
-    );
-    assert_eq!(
-        value("pulley"),
-        "false",
-        "the archived list still has a pulley menu, and every item in it is \
-         hidden -- so it opens onto nothing. {context}"
     );
 }

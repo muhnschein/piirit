@@ -162,6 +162,8 @@ fn wrapping_list_rows_size_to_their_text() {
 
 /// Delegate's `model.<role>` must exist on model: rename = blank row, uncaught.
 #[test]
+// Long for its table: one row per page with a model.
+#[allow(clippy::too_many_lines)]
 fn delegates_bind_only_roles_their_models_have() {
     /// Roles a file reads.
     fn bound_roles(text: &str) -> Vec<String> {
@@ -177,23 +179,28 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let cases: [(&str, Vec<String>); 15] = [
+    let cases: [(&str, Vec<String>); 16] = [
         (
             "qml/components/ConversationList.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
         // Media pages: message rows.
         (
-            "qml/pages/ChatMediaPage.qml",
+            "qml/components/ChatMediaView.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
         (
             "qml/pages/GalleryPage.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
+        // Chats; own profile in header.
         (
             "qml/pages/ChatListPage.qml",
-            names_of::<piirit_shim::ChatListItem>(),
+            [
+                names_of::<piirit_shim::ChatListItem>(),
+                names_of::<piirit_shim::AccountItem>(),
+            ]
+            .concat(),
         ),
         // One chat list per profile: people as JSON, `modelData`.
         (
@@ -218,7 +225,7 @@ fn delegates_bind_only_roles_their_models_have() {
             names_of::<piirit_shim::ContactItem>(),
         ),
         (
-            "qml/pages/GroupPage.qml",
+            "qml/pages/MembersPage.qml",
             names_of::<piirit_shim::ContactItem>(),
         ),
         (
@@ -226,8 +233,16 @@ fn delegates_bind_only_roles_their_models_have() {
             names_of::<piirit_shim::ContactItem>(),
         ),
         (
+            "qml/pages/CommonChatsPage.qml",
+            names_of::<piirit_shim::ChatListItem>(),
+        ),
+        (
             "qml/pages/ContactPage.qml",
-            names_of::<piirit_shim::ContactItem>(),
+            [
+                names_of::<piirit_shim::ContactItem>(),
+                names_of::<piirit_shim::ChatListItem>(),
+            ]
+            .concat(),
         ),
         // Block list, picker: contacts.
         (

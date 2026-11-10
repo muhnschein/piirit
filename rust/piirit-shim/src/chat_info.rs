@@ -8,7 +8,7 @@ use std::cell::RefCell;
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
-use crate::contacts::contact_row;
+use crate::contacts::{contact_row, row_map};
 use crate::core::{connection, reconcile_rows};
 use crate::json;
 use crate::models::{ContactItem, ContactListModel};
@@ -25,10 +25,12 @@ struct Loaded {
     can_send: bool,
     can_call: bool,
     ephemeral_timer: u32,
+    is_muted: bool,
     description: String,
     can_edit_description: bool,
     is_channel: bool,
     is_own_channel: bool,
+    is_encrypted: bool,
     members: Vec<ContactItem>,
 }
 
@@ -37,6 +39,8 @@ enum Outcome {
     Saved,
     Renamed(String),
     Left,
+    /// Chat gone here (deleted, contact blocked): no reload.
+    Closed,
 }
 
 /// Chat name, picture, members, calls.
@@ -83,8 +87,12 @@ pub struct ChatInfo {
     pub is_channel: qt_property!(bool; NOTIFY loaded_changed),
     /// Own channel: page offers its invite, only way subscribers join.
     pub is_own_channel: qt_property!(bool; NOTIFY loaded_changed),
+    /// End-to-end encrypted (core's `isEncrypted`).
+    pub is_encrypted: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds until messages disappear; 0 = never. Core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
+    /// Muted now. Core's `isMuted`; no end time given, none shown.
+    pub is_muted: qt_property!(bool; NOTIFY loaded_changed),
     /// True after any load, good or bad. Re-emitted per reload (all fields change with it).
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
     /// Emitted per load.
@@ -94,6 +102,14 @@ pub struct ChatInfo {
     pub members: qt_property!(RefCell<ContactListModel>; CONST),
     /// Member count.
     pub member_count: qt_property!(u32; READ member_count NOTIFY loaded_changed),
+    /// First three members but reader, as maps (`ContactList` row keys): group page's preview.
+    pub preview: qt_property!(QVariantList; NOTIFY loaded_changed),
+    /// More members but reader than `preview` holds: row's names end in "…".
+    pub preview_more: qt_property!(bool; NOTIFY loaded_changed),
+    /// Members page's search: `members` keeps names containing it, any case. Empty: all.
+    pub member_filter: qt_property!(QString; WRITE set_member_filter NOTIFY member_filter_changed),
+    /// Search changed.
+    pub member_filter_changed: qt_signal!(),
 
     /// Error; core's message.
     pub error: qt_signal!(message: QString),
@@ -103,6 +119,8 @@ pub struct ChatInfo {
     pub renamed: qt_signal!(name: QString),
     /// Account left group.
     pub left: qt_signal!(),
+    /// Chat deleted or contact blocked: nothing left to show.
+    pub closed: qt_signal!(),
 
     /// Reload all.
     pub reload: qt_method!(fn(&mut self)),
@@ -126,19 +144,64 @@ pub struct ChatInfo {
     pub remove_member: qt_method!(fn(&mut self, contact_id: u32)),
     /// Leave group; `left`.
     pub leave: qt_method!(fn(&mut self)),
+    /// Delete chat on this device; `closed`.
+    pub delete_chat: qt_method!(fn(&mut self)),
+    /// Block contact (core hides their chat); `closed`.
+    pub block_contact: qt_method!(fn(&mut self, contact_id: u32)),
+    /// Member's one-to-one chat; made only if `create`. Answers `chat_found`.
+    pub chat_with: qt_method!(fn(&mut self, contact_id: u32, create: bool)),
+    /// `chat_with` answer; `chat_id` 0: none yet.
+    pub chat_found: qt_signal!(contact_id: u32, chat_id: u32),
     /// Local name; empty restores theirs; `saved`.
     pub rename_contact: qt_method!(fn(&mut self, contact_id: u32, name: QString)),
     /// Messages disappear after `seconds`, 0 = never; core tells every member. `saved`.
     pub set_ephemeral_timer: qt_method!(fn(&mut self, seconds: u32)),
+    /// Mute `seconds`; -1 forever, 0 unmute. `saved`.
+    pub set_mute_duration: qt_method!(fn(&mut self, seconds: i32)),
 
+    /// Every member, as loaded; `members` is these filtered.
+    all_members: Vec<ContactItem>,
     /// Stale-load guard. See `ContactList`.
     generation: u64,
+}
+
+/// Name contains `query`, any case; empty query: everyone.
+fn matches(item: &ContactItem, query: &str) -> bool {
+    query.is_empty()
+        || item
+            .display_name
+            .to_string()
+            .to_lowercase()
+            .contains(&query.to_lowercase())
 }
 
 impl ChatInfo {
     /// Member count.
     pub fn member_count(&self) -> u32 {
-        u32::try_from(self.members.borrow().iter().count()).unwrap_or(u32::MAX)
+        u32::try_from(self.all_members.len()).unwrap_or(u32::MAX)
+    }
+
+    /// Set search; `members` follows.
+    pub fn set_member_filter(&mut self, query: QString) {
+        if self.member_filter != query {
+            self.member_filter = query;
+            self.show_members();
+            self.member_filter_changed();
+        }
+    }
+
+    /// `members` from `all_members` and search, in place (rows kept, not rebuilt).
+    fn show_members(&mut self) {
+        let query = self.member_filter.to_string();
+        let shown: Vec<ContactItem> = self
+            .all_members
+            .iter()
+            .filter(|item| matches(item, query.trim()))
+            .cloned()
+            .collect();
+        reconcile_rows(&mut self.members.borrow_mut(), shown, |item| {
+            item.contact_id
+        });
     }
 
     /// Set account; reload if changed.
@@ -163,8 +226,7 @@ impl ChatInfo {
 
     /// Is member, as loaded.
     pub fn is_member(&self, contact_id: u32) -> bool {
-        self.members
-            .borrow()
+        self.all_members
             .iter()
             .any(|row| row.contact_id == contact_id)
     }
@@ -199,15 +261,25 @@ impl ChatInfo {
                         this_mut.can_send = found.can_send;
                         this_mut.can_call = found.can_call;
                         this_mut.ephemeral_timer = found.ephemeral_timer;
+                        this_mut.is_muted = found.is_muted;
                         this_mut.description = found.description.into();
                         this_mut.can_edit_description = found.can_edit_description;
                         this_mut.is_channel = found.is_channel;
                         this_mut.is_own_channel = found.is_own_channel;
+                        this_mut.is_encrypted = found.is_encrypted;
+                        this_mut.preview = found
+                            .members
+                            .iter()
+                            .filter(|item| !item.is_self)
+                            .take(3)
+                            .map(|item| QVariant::from(row_map(item)))
+                            .collect();
+                        this_mut.preview_more =
+                            found.members.iter().filter(|item| !item.is_self).count() > 3;
+                        this_mut.all_members = found.members;
                         // In place: runs on every contact change in account, mostly no member
                         // change; reset rebuilt every row.
-                        reconcile_rows(&mut this_mut.members.borrow_mut(), found.members, |item| {
-                            item.contact_id
-                        });
+                        this_mut.show_members();
                         this_mut.loaded = true;
                     }
                     this.borrow().loaded_changed();
@@ -235,7 +307,7 @@ impl ChatInfo {
         match kind.as_str() {
             // Contact's name/picture; core omits whose.
             "ContactsChanged" | "EventChannelOverflow" => self.reload(),
-            // Rename, picture, join/leave (any device), timer (any member).
+            // Rename, picture, join/leave (any device), timer (any member), mute.
             "ChatModified" | "ChatEphemeralTimerModified" => {
                 let payload: serde_json::Value =
                     serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
@@ -425,6 +497,20 @@ impl ChatInfo {
         });
     }
 
+    /// Mute `seconds`; -1 forever, 0 unmute.
+    pub fn set_mute_duration(&mut self, seconds: i32) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.stored_callback(Outcome::Saved);
+
+        runtime.spawn(async move {
+            done(crate::mute::apply(&rpc, account_id, chat_id, seconds).await);
+        });
+    }
+
     /// Local name, or clear.
     pub fn rename_contact(&mut self, contact_id: u32, name: QString) {
         let name = name.to_string().trim().to_string();
@@ -475,18 +561,82 @@ impl ChatInfo {
         });
     }
 
+    /// Delete chat here.
+    pub fn delete_chat(&mut self) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        self.call_then_close("delete_chat", (account_id, chat_id));
+    }
+
+    /// Block contact.
+    pub fn block_contact(&mut self, contact_id: u32) {
+        let account_id = self.account_id;
+        self.call_then_close("block_contact", (account_id, contact_id));
+    }
+
+    /// Find, or make, chat with member.
+    pub fn chat_with(&mut self, contact_id: u32, create: bool) {
+        let account_id = self.account_id;
+        if account_id == 0 || contact_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<Option<u32>, String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(chat_id) => this.borrow().chat_found(contact_id, chat_id.unwrap_or(0)),
+                Err(err) => this.borrow().error(err.into()),
+            }
+        });
+        runtime.spawn(async move {
+            let result = if create {
+                rpc.call::<_, u32>("create_chat_by_contact_id", (account_id, contact_id))
+                    .await
+                    .map(Some)
+            } else {
+                rpc.call::<_, Option<u32>>("get_chat_id_by_contact_id", (account_id, contact_id))
+                    .await
+            };
+            done(result.map_err(|err| err.to_string()));
+        });
+    }
+
+    /// `method` on `(account, id)`; `closed` once done.
+    fn call_then_close(&mut self, method: &'static str, args: (u32, u32)) {
+        if args.0 == 0 || args.1 == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.stored_callback(Outcome::Closed);
+        runtime.spawn(async move {
+            let result = rpc
+                .call::<_, ()>(method, args)
+                .await
+                .map_err(|err| err.to_string());
+            done(result);
+        });
+    }
+
     /// Report change, reread what core kept (picture rewritten into blob dir, current members).
     fn stored_callback(&self, outcome: Outcome) -> impl Fn(Result<(), String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<(), String>| {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
+                Ok(()) if matches!(outcome, Outcome::Closed) => this.borrow().closed(),
                 Ok(()) => {
                     this.borrow_mut().reload();
                     match &outcome {
                         Outcome::Saved => this.borrow().saved(),
                         Outcome::Renamed(name) => this.borrow().renamed(name.as_str().into()),
                         Outcome::Left => this.borrow().left(),
+                        Outcome::Closed => {}
                     }
                 }
                 Err(err) => this.borrow().error(err.into()),
@@ -550,10 +700,38 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         can_send,
         can_call: crate::chat::takes_calls(&chat, is_group, can_send),
         ephemeral_timer: json::u32_at(&chat, "ephemeralTimer"),
+        is_muted: json::flag(&chat, "isMuted"),
         description,
         can_edit_description: matches!(chat_type, "Group" | "OutBroadcast") && self_in_group,
         is_channel: matches!(chat_type, "OutBroadcast" | "InBroadcast"),
         is_own_channel: chat_type == "OutBroadcast",
+        is_encrypted: json::flag(&chat, "isEncrypted"),
         members,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::matches;
+    use crate::models::ContactItem;
+
+    fn named(name: &str) -> ContactItem {
+        ContactItem {
+            display_name: name.into(),
+            address: "someone@example.org".into(),
+            ..ContactItem::default()
+        }
+    }
+
+    #[test]
+    fn member_search_finds_names_in_any_case_never_addresses() {
+        assert!(matches(&named("Judith Iscariot"), "judith"));
+        assert!(matches(&named("Judith Iscariot"), "ISC"));
+        assert!(matches(&named("Brian"), ""));
+        assert!(!matches(&named("Brian"), "reg"));
+        assert!(
+            !matches(&named("Brian"), "example"),
+            "address is never shown, so never matched"
+        );
+    }
 }

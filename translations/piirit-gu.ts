@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="gu">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat કોર %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>વિશે</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>સોર્સ કોડ અને લાઇસન્સ</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit એ GPL-3.0 હેઠળનું મુક્ત સોફ્ટવેર છે.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>સમસ્યાની જાણ કરો</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>તમારા રિપોર્ટ માટે આવૃત્તિઓ કૉપિ થાય છે.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chat વિશે</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -576,15 +615,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>પ્રોફાઇલ</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>આર્કાઇવ કરેલ ચેટ</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>આર્કાઇવ કરેલ</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>ચેટ</translation>
     </message>
     <message>
@@ -606,14 +643,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pin</source>
         <translation>પિન કરો</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>અનમ્યૂટ કરો</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>મ્યૂટ કરો</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -689,7 +718,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>બધી ચેટ બતાવવા &quot;%1&quot; પર ટેપ કરો</translation>
     </message>
     <message>
@@ -707,18 +736,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>બધા સ્થાનો</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>ચેનલ</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>કોઈ ન વાંચેલી ચેનલ નથી</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>બધી ચેનલ બતાવવા &quot;%1&quot; પર ટેપ કરો</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>સૂચનાઓ</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>બીજી ઍપમાં ખોલો</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>ઉપકરણ પર સાચવો</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -735,7 +775,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>%n વૉઇસ સંદેશાનું લિપ્યંતરણ કરો</numerusform>
             <numerusform>%n વૉઇસ સંદેશાનું લિપ્યંતરણ કરો</numerusform>
@@ -754,6 +794,35 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>લિપ્યંતરણ કરો</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>બીજી ઍપમાં ખોલો</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>ઉપકરણ પર સાચવો</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>સૂચનાઓ</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>સૂચનાઓ</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>આ જૂથમાં કોઈ તમારા કોઈ સંદેશનો જવાબ આપે ત્યારે તમને હજુ પણ સૂચના મળશે.</translation>
     </message>
 </context>
 <context>
@@ -777,11 +846,15 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>સાચવ્યું</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>સહિયારી ચેટ</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>સંપર્ક</translation>
@@ -795,17 +868,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>એન્ક્રિપ્ટેડ નથી: સાદો ઈમેલ સંપર્ક</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>નામ</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>તેમણે પસંદ કરેલું નામ વાપરવા ખાલી રાખો</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>ઘણા સમય પહેલાં જોયા હતા</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>ચેટ ડિલીટ થઈ રહી છે</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>ચેટ ડિલીટ કરો</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>સંપર્કને બ્લૉક કરો</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>એન્ક્રિપ્શન માહિતી બતાવો</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>નામ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>પોતાનું નામ: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>કૉલ કરો</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>વિડિયો કૉલ</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>આ ચેટમાં</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>સેટિંગ્સ</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>સહિયારી ચેટ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n ચેટ</numerusform>
+            <numerusform>%n ચેટ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1049,9 +1176,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>%1 સેકન્ડ પછી</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>આ વાતચીતના બધા સભ્યોને લાગુ પડે છે; તેઓ હજી પણ સંદેશા નકલ, સાચવી અને આગળ મોકલી શકે છે.</translation>
+        <source>Remove picture</source>
+        <translation>ચિત્ર દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>ચિત્ર દૂર થઈ રહ્યું છે</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>ચિત્ર બદલો</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>ચેનલ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>જૂથ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>ચેનલનું નામ</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>જૂથનું નામ</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>વર્ણન</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>ચેનલમાં દરેક જણ આ ફેરફારો જુએ છે. સાચવવા માટે પાછા સ્વાઇપ કરો.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>જૂથમાં દરેક જણ આ ફેરફારો જુએ છે. સાચવવા માટે પાછા સ્વાઇપ કરો.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>નામ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>&quot;%1&quot; માટે ઉપનામ</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>સંપર્કે પોતે પસંદ કરેલું નામ વાપરવા માટે ખાલી છોડો. આ નામ ફક્ત તમે જ જુઓ છો. સાચવવા માટે પાછા સ્વાઇપ કરો.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>ફિંગરપ્રિન્ટ કૉપિ કરો</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ક્લિપબોર્ડ પર કૉપિ થયું</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>એન્ક્રિપ્શન માહિતી</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n સભ્ય</numerusform>
+            <numerusform>%n સભ્યો</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>કી ખૂટે છે</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>રિલે</translation>
     </message>
 </context>
 <context>
@@ -1119,69 +1340,63 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>સાચવ્યું</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>જૂથ છોડો</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>સભ્યો ઉમેરો</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>જૂથ</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>ચિત્ર દૂર કરો</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>જૂથનું નામ</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n સભ્ય</numerusform>
             <numerusform>%n સભ્યો</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>જૂથમાંથી દૂર કરો</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>દૂર કરવામાં આવે છે</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>જૂથમાં બધા નામ જુએ છે</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>વર્ણન</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>ચિત્ર બદલો</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR આમંત્રણ કોડ</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>ચેનલ</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>ચેટ ડિલીટ થઈ રહી છે</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>ચેટ ડિલીટ કરો</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>એન્ક્રિપ્શન માહિતી બતાવો</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>ચેનલ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>જૂથ સંપાદિત કરો</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>સભ્યો</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>આ ચેટમાં</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>સેટિંગ્સ</translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1465,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>રિલે સંદેશ ફક્ત ત્યાં સુધી રાખે છે જ્યાં સુધી પ્રાપ્તકર્તા તેને લઈ ન લે.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>„વિશે“ પર પાછા જવા માટે સ્વાઇપ કરતા રહો.</translation>
     </message>
 </context>
 <context>
@@ -1355,7 +1574,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>ગેલેરી</translation>
     </message>
     <message>
@@ -1391,7 +1610,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>કૉલ</translation>
     </message>
     <message>
@@ -1400,8 +1619,79 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>નકશો</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>આજે</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>ગઈકાલે</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>છેલ્લા 7 દિવસ</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>છેલ્લા 30 દિવસ</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>જૂના</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>સંદેશ મોકલો</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>જૂથમાંથી દૂર કરો</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>તમે</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>દૂર કરવામાં આવે છે</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n સભ્ય</numerusform>
+            <numerusform>%n સભ્યો</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>સભ્યો શોધો</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>સભ્યો ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>QR કોડથી આમંત્રિત કરો</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>કોઈ મેળ ખાતું નથી</translation>
     </message>
 </context>
 <context>
@@ -1466,6 +1756,78 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>ટેક્સ્ટ પસંદ કરો</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n દિવસ</numerusform>
+            <numerusform>%n દિવસ</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n કલાક</numerusform>
+            <numerusform>%n કલાક</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 દિ %2 કલાક</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 દિ</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 કલાક %2 મિનિટ</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 કલાક</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 મિનિટ</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 બાકી)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>ચાલુ</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>બંધ</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 માટે બંધ</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>બંધ (%1 બાકી)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>%1 માટે બંધ (%2 બાકી)</translation>
     </message>
 </context>
 <context>
@@ -1836,6 +2198,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>&quot;%1&quot; ચેનલમાં જોડાવા માટે સ્કૅન કરો</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>&quot;%1&quot; જૂથમાં જોડાવા માટે સ્કૅન કરો</translation>
     </message>
 </context>
 <context>
@@ -2220,7 +2587,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>પ્રાયોગિક</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>આ સુવિધાઓ અસ્થિર હોઈ શકે, બદલાઈ શકે અથવા દૂર થઈ શકે.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc એપ્સ</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>વાતચીતોની અંદર નાની ઍપ ચલાવે છે.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>સ્થાન સ્ટ્રીમિંગ</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>વાતચીતોમાં તમારું સ્થાન શેર કરે છે અને શેર કરેલાં સ્થાનો નકશા પર બતાવે છે.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>વૉઇસ સંદેશાનું લિપ્યંતરણ કરો</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>આ ફોન પર વૉઇસ સંદેશાને લખાણમાં ફેરવે છે.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>કંઈ પણ ફોનની બહાર જતું નથી.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>સ્પીચ મૉડલ ડાઉનલોડ થઈ શક્યું નહીં.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>ફરી પ્રયાસ કરો</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>લિપ્યંતરણ</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>ભાષાઓ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ઓછી ગુણવત્તા, ઓછો ડેટા</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>સંતુલિત</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>ક્યારેય નહીં</translation>
@@ -2250,29 +2686,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>હંમેશા</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>સેટિંગ્સ</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>સંદેશ</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>જોડાણો આપોઆપ ડાઉનલોડ કરો</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>લિંકમાંથી ટ્રૅકિંગ દૂર કરો</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>સૂચનાઓ</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>webxdc એપ્સ સક્રિય કરો (પ્રાયોગિક)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>બંધ</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2295,30 +2711,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 વર્ષ પછી</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>ઉપકરણમાંથી સંદેશ કાઢી નાખો</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>ઉલ્લેખો</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>માર્કડાઉન બંધારણ વાપરો</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>ગોપનીયતા</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>બ્લૉક કરેલા સંપર્કો</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>સંતુલિત</translation>
+        <source>Messages</source>
+        <translation>સંદેશ</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2326,13 +2720,54 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>મોકલવાના મીડિયાની ગુણવત્તા</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>સૂચનાઓ બતાવો</translation>
+        <source>Auto-download attachments</source>
+        <translation>જોડાણો આપોઆપ ડાઉનલોડ કરો</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>ઓછી ગુણવત્તા, ઓછો ડેટા</translation>
+        <source>Show Markdown formatting</source>
+        <translation>માર્કડાઉન બંધારણ બતાવો</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>સંદેશામાં *બોલ્ડ*, _ઇટાલિક_ અને `કોડ`નું બંધારણ કરે છે.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>આ ફોન પર</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>જૂના સંદેશા કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>સંદેશા ફક્ત આ ફોનમાંથી કાઢી નખાય છે, દરેક પ્રોફાઇલમાં.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>બીજાં ઉપકરણો અને ચેટના સભ્યો તેમની નકલો રાખે છે.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>વાતચીત યાદીમાં તમારી પ્રોફાઇલ બતાવો</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>વાતચીત યાદીની ટોચ પર તમારી પ્રોફાઇલ ફોટો અને નામ બતાવે છે.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>સૂચનાઓ</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>સૂચનાઓ બતાવો</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2351,64 +2786,99 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કોઈ વિગત નહીં</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>શાંત કરેલા જૂથોમાં તમારા સંદેશાના જવાબોની સૂચનાઓ બતાવો</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>તમે મોકલેલી લિંકમાંથી ક્લિક આઈડી અને ઝુંબેશ ટૅગ દૂર કરે છે.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>ઝડપી ક્રિયાઓ</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>અદ્યતન</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>દરેક પ્રોફાઇલ પર લાગુ થાય છે, ભલે કોઈ ચેટની પોતાની ગાયબ થતા સંદેશની સેટિંગ ગમે તે હોય.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>કૉલ</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>આવતા કૉલ પર રિંગ વગાડો</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>સ્વીકારેલા સંપર્કો માટે કૉલ સ્ક્રીન બતાવો</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>વાતચીતોની અંદર નાની ઍપ ચલાવે છે.</translation>
+        <source>Muted chats</source>
+        <translation>મ્યૂટ કરેલી ચેટ</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>સ્થાન સ્ટ્રીમિંગ સક્રિય કરો (પ્રાયોગિક)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>મ્યૂટ કરેલાં જૂથોમાં જવાબો</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>વાતચીતોમાં તમારું સ્થાન શેર કરે છે અને શેર કરેલાં સ્થાનો નકશા પર બતાવે છે.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>શાંત કરેલા જૂથોમાં તમારા સંદેશાના જવાબોની સૂચનાઓ બતાવો</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>સેટિંગ્સ</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>વૉઇસ સંદેશાનું લિપ્યંતરણ કરો (પ્રાયોગિક)</translation>
+        <source>Messages</source>
+        <translation>સંદેશ</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>વૉઇસ સંદેશ લિપ્યંતરણ</translation>
+        <source>Notifications</source>
+        <translation>સૂચનાઓ</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>આ ફોન પર વૉઇસ સંદેશાને લખાણમાં ફેરવે છે.</translation>
+        <source>Privacy and security</source>
+        <translation>ગોપનીયતા અને સુરક્ષા</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>કંઈ પણ ફોનની બહાર જતું નથી.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>પ્રાયોગિક</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>વિશે</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>તમારી પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>ઝડપી ક્રિયાઓ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>ગોપનીયતા અને સુરક્ષા</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>લિંકમાંથી ટ્રૅકિંગ દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>તમે મોકલેલી લિંકમાંથી ક્લિક આઈડી અને ઝુંબેશ ટૅગ દૂર કરે છે.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>પ્રોફાઇલ: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>બ્લૉક કરેલા સંપર્કો</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n સંપર્ક</numerusform>
+            <numerusform>%n સંપર્કો</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3122,32 +3592,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>આ ભાષાના લિપ્યંતરણમાં વધુ ભૂલો હોવાની શક્યતા છે.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>વૉઇસ સંદેશ લિપ્યંતરણ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>ભાષાઓ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>ક્યારે</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>સ્પીચ મૉડલ ડાઉનલોડ થઈ શક્યું નહીં.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>ફરી પ્રયાસ કરો</translation>
     </message>
 </context>
 <context>

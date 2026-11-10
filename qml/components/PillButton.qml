@@ -11,6 +11,14 @@ Item {
     property string icon: ""
     /// Filter on.
     property bool checked: false
+    /// Icon alone, word hidden. Needs `icon`.
+    property bool compact: false
+    /// Width with word shown, `compact` or not: lets row choose without binding loop.
+    readonly property real fullWidth: label.implicitWidth + Theme.paddingLarge
+        + (root.icon !== "" ? Theme.iconSizeSmallPlus + Theme.paddingSmall + Theme.paddingMedium
+                            : Theme.paddingLarge)
+    /// Icon's left edge in pill: search field puts its magnifier there.
+    readonly property real iconX: content.x
     /// Pressed.
     readonly property bool down: mouse.pressed && mouse.containsMouse
     signal clicked()
@@ -18,9 +26,8 @@ Item {
     readonly property bool lit: root.checked || root.down
     readonly property color ink: root.lit ? Theme.highlightColor : Theme.primaryColor
 
-    // Icon's clear space: less padding on its side.
-    width: content.width + Theme.paddingLarge
-           + (root.icon !== "" ? Theme.paddingMedium : Theme.paddingLarge)
+    // Icon's clear space: less padding on its side. Compact: round, icon centred.
+    width: root.compact ? root.height : root.fullWidth
     height: label.height + 2 * Theme.paddingMedium
 
     Rectangle {
@@ -36,7 +43,8 @@ Item {
 
     Row {
         id: content
-        x: root.icon !== "" ? Theme.paddingMedium : Theme.paddingLarge
+        x: root.compact ? (root.width - Theme.iconSizeSmallPlus) / 2
+                        : root.icon !== "" ? Theme.paddingMedium : Theme.paddingLarge
         anchors.verticalCenter: parent.verticalCenter
         // Icon margin alone crowds word.
         spacing: root.icon !== "" ? Theme.paddingSmall : 0
@@ -55,6 +63,7 @@ Item {
         Label {
             id: label
             objectName: "pillLabel"
+            visible: !root.compact
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: Theme.fontSizeMedium
             color: root.ink

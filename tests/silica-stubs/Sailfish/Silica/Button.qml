@@ -4,6 +4,7 @@ import QtQuick 2.0
 Item {
     property string text
     property bool down: false
+    property bool highlighted: false
     // Colour of label and outline.
     property color color
     signal clicked()

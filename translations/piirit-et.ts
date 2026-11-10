@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="et">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chati tuum %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Teave</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Lähtekood ja litsents</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit on vaba tarkvara GPL-3.0 litsentsi all.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Teata probleemist</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Versioonid kopeeritakse sinu teate jaoks.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Delta Chatist</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -576,15 +615,13 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Profiilid</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arhiveeritud vestlused</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arhiveeritud</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Vestlused</translation>
     </message>
     <message>
@@ -606,14 +643,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Pin</source>
         <translation>Kinnita</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Lõpeta vaigistus</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Vaigista</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -689,7 +718,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Kõigi vestluste nägemiseks puuduta „%1“</translation>
     </message>
     <message>
@@ -707,18 +736,29 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Kõik asukohad</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanalid</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Lugemata kanaleid pole</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Kõigi kanalite nägemiseks puuduta „%1“</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Teavitused</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Ava teises rakenduses</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Salvesta seadmesse</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -735,7 +775,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Transkribeeri %n häälsõnum</numerusform>
             <numerusform>Transkribeeri %n häälsõnumit</numerusform>
@@ -754,6 +794,35 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Transkribeeri</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Ava teises rakenduses</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Salvesta seadmesse</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Teavitused</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Teavitused</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Saad endiselt teavituse, kui keegi selles grupis vastab mõnele sinu sõnumile.</translation>
     </message>
 </context>
 <context>
@@ -777,11 +846,15 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Salvestatud</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Ühised vestlused</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
@@ -795,17 +868,71 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Krüpteerimata: tavaline e-posti kontakt</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Nimi</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Jäta tühjaks, et kasutada tema enda valitud nime</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Nähtud ammu</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Vestluse kustutamine</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Kustuta vestlus</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokeeri kontakt</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Näita krüptimise teavet</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Muuda nime</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Enda nimi: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Helista</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Videokõne</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>Selles vestluses</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Seaded</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Ühised vestlused</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n vestlus</numerusform>
+            <numerusform>%n vestlust</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1049,9 +1176,103 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>After %1 seconds</source>
         <translation>%1 sekundi pärast</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Kehtib kõikidele selles vestluses osalejatele - aga siiski saavad nad sõnumeid kopeerida, salvestada ja edastada.</translation>
+        <source>Remove picture</source>
+        <translation>Eemalda pilt</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Pildi eemaldamine</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Muuda pilti</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Muuda kanalit</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Muuda gruppi</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Kanali nimi</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Grupi nimi</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Kirjeldus</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Kõik kanalis näevad neid muudatusi. Salvestamiseks libista tagasi.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Kõik grupis näevad neid muudatusi. Salvestamiseks libista tagasi.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Muuda nime</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Hüüdnimi kontaktile „%1“</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Jäta tühjaks, et kasutada kontakti enda valitud nime. Seda nime näed ainult sina. Salvestamiseks libista tagasi.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Kopeeri sõrmejäljed</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Kopeeritud lõikelauale</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Krüptimise teave</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n liige</numerusform>
+            <numerusform>%n liiget</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Võti puudub</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Releed</translation>
     </message>
 </context>
 <context>
@@ -1119,69 +1340,63 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Salvestatud</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Lahku grupist</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Lisa liikmeid</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Grupp</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Eemalda pilt</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Grupi nimi</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n liige</numerusform>
             <numerusform>%n liiget</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Eemalda grupist</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Eemaldan</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Nime näevad kõik grupis</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Kirjeldus</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Muuda pilti</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>Kutse QR-koodina</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kanal</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Vestluse kustutamine</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Kustuta vestlus</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Näita krüptimise teavet</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Muuda kanalit</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Muuda gruppi</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Otsast otsani krüpteeritud</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Liikmed</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>Selles vestluses</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Seaded</translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1465,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relee hoiab sõnumit alles ainult seni, kuni saaja selle järele tuleb.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Libista edasi, et naasta lehele Teave.</translation>
     </message>
 </context>
 <context>
@@ -1355,7 +1574,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galerii</translation>
     </message>
     <message>
@@ -1391,7 +1610,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Kõned</translation>
     </message>
     <message>
@@ -1400,8 +1619,79 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Kaart</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Täna</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Eile</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Viimased 7 päeva</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Viimased 30 päeva</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Vanemad</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Saada sõnum</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Eemalda grupist</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Sina</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Eemaldan</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n liige</numerusform>
+            <numerusform>%n liiget</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Otsi liikmeid</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Lisa liikmeid</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Kutsu QR-koodiga</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Keegi ei sobi</translation>
     </message>
 </context>
 <context>
@@ -1466,6 +1756,78 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Vali tekst</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n päevaks</numerusform>
+            <numerusform>%n päevaks</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n tunniks</numerusform>
+            <numerusform>%n tunniks</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 p %2 h</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 p</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 h %2 min</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (jäänud %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>Sees</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Väljas</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Väljas %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Väljas (jäänud %1)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Väljas %1 (jäänud %2)</translation>
     </message>
 </context>
 <context>
@@ -1836,6 +2198,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Skaneeri liitumaks „%1“ kanaliga</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Skanni, et liituda grupiga „%1“</translation>
     </message>
 </context>
 <context>
@@ -2220,7 +2587,76 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Katseline</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Need funktsioonid võivad olla ebastabiilsed, muutuda või kaduda.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc rakendused</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Käitab vestlustes väikeseid rakendusi.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Asukoha jagamine</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Jagab sinu asukohta vestlustes ja näitab jagatud asukohti kaardil.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Häälsõnumite transkribeerimine</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Muudab häälsõnumid selles telefonis tekstiks.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Midagi ei lahku telefonist.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Proovi uuesti</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkriptsioon</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Keeled</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Madalam kvaliteet, vähem andmeid</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Tasakaalustatud</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Mitte kunagi</translation>
@@ -2250,29 +2686,9 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Alati</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Seaded</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Sõnumid</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Laadi manused automaatselt alla</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Eemalda linkidest jälgimine</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Teavitused</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Luba webxdc rakendused (katseline)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Väljas</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2295,30 +2711,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>1 aasta pärast</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Kustuta sõnumid seadmest</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Mainimised</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Kasuta Markdowni vormindust</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Privaatsus</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blokeeritud kontaktid</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Tasakaalustatud</translation>
+        <source>Messages</source>
+        <translation>Sõnumid</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2326,13 +2720,54 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Saadetava meediumi kvaliteet</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Näita teavitusi</translation>
+        <source>Auto-download attachments</source>
+        <translation>Laadi manused automaatselt alla</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Madalam kvaliteet, vähem andmeid</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Näita Markdowni vormindust</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Vormindab sõnumites *paksu*, _kaldkirja_ ja `koodi`.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Selles telefonis</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Kustuta vanad sõnumid</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Sõnumid kustutatakse ainult sellest telefonist, igas profiilis.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Teised seadmed ja vestluse liikmed jätavad oma koopiad alles.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Näita oma profiili vestluste loendis</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Näitab sinu profiilipilti ja nime vestluste loendi ülaosas.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Teavitused</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Näita teavitusi</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2351,64 +2786,99 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Üksikasjadeta</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Näita teavitusi vastustest sinu sõnumitele summutatud gruppides</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Eemaldab klikitunnused ja kampaaniasildid linkidelt, mida saadad.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Kiirtoimingud</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Täpsemad</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Kehtib igas profiilis, olenemata vestluse enda kaduvate sõnumite seadest.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Kõned</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Helise sissetulevate kõnede korral</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Näita kinnitatud kontaktide kõnede puhul kõneakent</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Käitab vestlustes väikeseid rakendusi.</translation>
+        <source>Muted chats</source>
+        <translation>Summutatud vestlused</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Luba asukoha jagamine (katseline)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Vastused summutatud gruppides</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Jagab sinu asukohta vestlustes ja näitab jagatud asukohti kaardil.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Näita teavitusi vastustest sinu sõnumitele summutatud gruppides</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Seaded</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Häälsõnumite transkribeerimine (katseline)</translation>
+        <source>Messages</source>
+        <translation>Sõnumid</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Häälsõnumite transkribeerimine</translation>
+        <source>Notifications</source>
+        <translation>Teavitused</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Muudab häälsõnumid selles telefonis tekstiks.</translation>
+        <source>Privacy and security</source>
+        <translation>Privaatsus ja turvalisus</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Midagi ei lahku telefonist.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Katseline</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Teave</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Sinu profiil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Kiirtoimingud</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Privaatsus ja turvalisus</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Eemalda linkidest jälgimine</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Eemaldab klikitunnused ja kampaaniasildid linkidelt, mida saadad.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profiil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokeeritud kontaktid</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakti</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3122,32 +3592,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Selle keele transkriptsioonides on tõenäoliselt rohkem vigu.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Häälsõnumite transkribeerimine</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Keeled</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Millal</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Kõnemudelit ei õnnestunud alla laadida.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Proovi uuesti</translation>
     </message>
 </context>
 <context>

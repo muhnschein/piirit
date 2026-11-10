@@ -1,7 +1,6 @@
-//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive,
-//! every chat's map, QR, new (chat, group, channel). Row menu: mark read or unread, never both. Hiding profiles with one
-//! profile would remove the only route to making one; archive search field over empty archive is
-//! dead. It comes back the moment something is typed, or clearing it would be impossible.
+//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, every chat's
+//! map, QR, new (chat, group, channel). Row menu: mark read or unread, never both. Hiding profiles
+//! with one profile would remove the only route to making one.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -94,8 +93,6 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // One profile, empty archive: state in which both were wrong on a device.
-        std::env::set_var("PIIRIT_FAKE_NO_ARCHIVED", "1");
     }
 
     piirit_shim::register_qml_types();
@@ -184,37 +181,9 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         let done = call!("navigation").contains("WebxdcPage");
         if done || last {
             record!("map-opens", call!("navigation"));
-            record!(
-                "archived",
-                call!(
-                    "load",
-                    QString::from(common::page_url("ChatListPage.qml")),
-                    1,
-                    true
-                )
-            );
+            (*engine_ptr).quit();
         }
         done
-    });
-
-    plan.after(3, move || unsafe {
-        record!("archived-count", get!("chats", "count"));
-        record!("archived-map", get!("mapMenuItem", "visible"));
-        record!(
-            "archived-laid-out",
-            call!("layout", QString::from("chatList"))
-        );
-        record!("archived-search", get!("chatSearchField", "visible"));
-        record!(
-            "typed",
-            call!(
-                "setText",
-                QString::from("chatSearchField"),
-                QString::from("a")
-            )
-        );
-        record!("search-after-typing", get!("chatSearchField", "visible"));
-        (*engine_ptr).quit();
     });
 
     plan.run();
@@ -273,11 +242,6 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         "All locations does not open every chat's map on this profile. {context}"
     );
     assert_eq!(
-        value("archived-map"),
-        "false",
-        "the archive's pulley offers a map. {context}"
-    );
-    assert_eq!(
         value("mark-unread"),
         "true",
         "a chat with nothing unread is not offered to be marked unread. {context}"
@@ -291,28 +255,5 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         value("ordinary-search"),
         "true",
         "the ordinary list lost its Search pill. {context}"
-    );
-    assert_eq!(
-        value("archived"),
-        "ok",
-        "the archived list did not load. {context}"
-    );
-    // Guard: with something archived, field shown either way and test proves nothing.
-    assert_eq!(
-        value("archived-count"),
-        "0",
-        "the archive is not empty, so nothing here is under test. {context}"
-    );
-    assert_eq!(
-        value("archived-search"),
-        "false",
-        "an empty archive still shows a search field, which can only ever \
-         return nothing. {context}"
-    );
-    assert_eq!(
-        value("search-after-typing"),
-        "true",
-        "the field vanished with text still in it, so there is no way to \
-         clear it and get the list back. {context}"
     );
 }

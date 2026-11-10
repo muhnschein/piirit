@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sk">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Jadro Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikácii</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Zdrojový kód a licencia</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit je slobodný softvér pod licenciou GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Nahlásiť problém</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Verzie sa skopírujú pre vaše hlásenie.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>O Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -578,15 +617,13 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Profily</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Archivované chaty</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Archivované</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Chaty</translation>
     </message>
     <message>
@@ -608,14 +645,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Pin</source>
         <translation>Pripnúť</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Zrušiť stlmenie</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Stlmiť</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -691,7 +720,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Ťuknutím na „%1“ zobrazíte všetky chaty</translation>
     </message>
     <message>
@@ -709,18 +738,29 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Zobraziť všetky polohy</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanály</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Žiadne neprečítané kanály</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Ťuknutím na „%1“ zobrazíte všetky kanály</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Oznámenia</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Otvoriť v inej aplikácii</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Uložiť do zariadenia</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -737,7 +777,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Prepísať %n hlasovú správu</numerusform>
             <numerusform>Prepísať %n hlasové správy</numerusform>
@@ -757,6 +797,35 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Prepísať</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Otvoriť v inej aplikácii</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Uložiť do zariadenia</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Oznámenia</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Oznámenia</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Upozornenie dostanete aj naďalej, keď niekto v tejto skupine odpovie na niektorú z vašich správ.</translation>
     </message>
 </context>
 <context>
@@ -780,11 +849,15 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Uložené</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Spoločné konverzácie</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
@@ -798,17 +871,72 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Nešifrované: bežný e-mailový kontakt</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Meno</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Nechajte prázdne, aby sa použilo meno, ktoré si zvolili</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Naposledy videný(á) dávno</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Odstraňuje sa konverzácia</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Odstrániť konverzáciu</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokovať kontakt</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Zobraziť informácie o šifrovaní</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Upraviť meno</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Vlastné meno: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Zavolať</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Videohovor</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>V tejto konverzácii</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Nastavenia</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Spoločné konverzácie</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n konverzácia</numerusform>
+            <numerusform>%n konverzácie</numerusform>
+            <numerusform>%n konverzácií</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1053,9 +1181,104 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>After %1 seconds</source>
         <translation>Po %1 sekundách</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Platí pre všetkých členov tejto konverzácie, ktorí si však stále môžu správy ukladať, kopírovať alebo preposlať.</translation>
+        <source>Remove picture</source>
+        <translation>Odstrániť obrázok</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Odstraňuje sa obrázok</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Zmeniť obrázok</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Upraviť kanál</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Upraviť skupinu</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Názov kanálu</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Názov skupiny</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Popis</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Tieto zmeny uvidia všetci v kanáli. Uložíte ich potiahnutím späť.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Tieto zmeny uvidia všetci v skupine. Uložíte ich potiahnutím späť.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Upraviť meno</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Prezývka pre „%1“</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Nechajte prázdne, ak chcete použiť meno, ktoré si kontakt vybral. Toto meno vidíte len vy. Uložíte ho potiahnutím späť.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Kopírovať odtlačky</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Skopírované do schránky</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Informácie o šifrovaní</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n člen</numerusform>
+            <numerusform>%n členovia</numerusform>
+            <numerusform>%n členov</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Chýba kľúč</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Relay</translation>
     </message>
 </context>
 <context>
@@ -1124,32 +1347,16 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Uložené</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Opustiť skupinu</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Pridať členov</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Skupina</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Odstrániť obrázok</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Názov skupiny</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n člen</numerusform>
             <numerusform>%n členovia</numerusform>
@@ -1157,37 +1364,47 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Odobrať zo skupiny</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Odoberá sa</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Meno vidia všetci v skupine</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Popis</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Zmeniť obrázok</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>QR pozývací kód</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kanál</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Odstraňuje sa konverzácia</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Odstrániť konverzáciu</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Zobraziť informácie o šifrovaní</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Upraviť kanál</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Upraviť skupinu</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Šifrované medzi koncovými bodmi</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Členovia</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>V tejto konverzácii</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Nastavenia</translation>
     </message>
 </context>
 <context>
@@ -1256,6 +1473,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay uchová správu len dovtedy, kým si ju príjemca nevyzdvihne.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Potiahnite ďalej a vráťte sa na stránku O aplikácii.</translation>
     </message>
 </context>
 <context>
@@ -1362,7 +1583,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galéria</translation>
     </message>
     <message>
@@ -1398,7 +1619,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Hovory</translation>
     </message>
     <message>
@@ -1407,8 +1628,80 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Mapa</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Dnes</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Včera</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Posledných 7 dní</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Posledných 30 dní</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Staršie</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Poslať správu</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Odobrať zo skupiny</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Vy</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Odoberá sa</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n člen</numerusform>
+            <numerusform>%n členovia</numerusform>
+            <numerusform>%n členov</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Hľadať členov</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Pridať členov</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Pozvať QR kódom</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Nikto nevyhovuje</translation>
     </message>
 </context>
 <context>
@@ -1473,6 +1766,80 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Označiť text</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n deň</numerusform>
+            <numerusform>%n dni</numerusform>
+            <numerusform>%n dní</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n hodinu</numerusform>
+            <numerusform>%n hodiny</numerusform>
+            <numerusform>%n hodín</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 d %2 h</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 h %2 min</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (zostáva %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>Zapnuté</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Vypnuté</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Vypnuté na %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Vypnuté (zostáva %1)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Vypnuté na %1 (zostáva %2)</translation>
     </message>
 </context>
 <context>
@@ -1845,6 +2212,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Naskenujte a pridajte sa ku kanálu „%1“</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Naskenujte a pridajte sa ku skupine „%1“</translation>
     </message>
 </context>
 <context>
@@ -2229,7 +2601,76 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Experimentálne</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Tieto funkcie môžu byť nestabilné, zmenené alebo odstránené.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplikácie webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Spúšťa malé aplikácie vnútri chatov.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Vysielanie polohy</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Zdieľa vašu polohu v chatoch a zobrazuje zdieľané polohy na mape.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Prepisovať hlasové správy</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Prevádza hlasové správy na text v tomto telefóne.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nič neopustí telefón.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Rečový model sa nepodarilo stiahnuť.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Skúsiť znova</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Prepis</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Jazyky</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Nižšia kvalita, menej dát</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Vyvážená</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nikdy</translation>
@@ -2259,29 +2700,9 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Vždy</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Nastavenia</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Správy</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Automaticky sťahovať prílohy</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Odstrániť sledovanie z odkazov</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Oznámenia</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Povoliť aplikácie webxdc (experimentálne)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Vypnuté</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2304,30 +2725,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Po 1 roku</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Mazať správy zo zariadenia</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Zmienky</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Používať formátovanie Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Ochrana osobných údajov</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Blokované kontakty</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Vyvážená</translation>
+        <source>Messages</source>
+        <translation>Správy</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2335,13 +2734,54 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Kvalita odchádzajúcich médií</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Zobrazovať upozornenia</translation>
+        <source>Auto-download attachments</source>
+        <translation>Automaticky sťahovať prílohy</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Nižšia kvalita, menej dát</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Zobrazovať formátovanie Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formátuje *tučné*, _kurzívu_ a `kód` v správach.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>V tomto telefóne</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Mazať staré správy</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Správy sa mažú len z tohto telefónu, vo všetkých profiloch.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Ostatné zariadenia a členovia četu si svoje kópie ponechajú.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Zobrazovať tvoj profil v zozname chatov</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Zobrazuje profilový obrázok a meno navrchu zoznamu chatov.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Oznámenia</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Zobrazovať upozornenia</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2360,64 +2800,100 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Bez podrobností</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Zobrazovať upozornenia na odpovede na vaše správy v stlmených skupinách</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Odstraňuje z odkazov, ktoré odosielaš, identifikátory kliknutí a kampaňové značky.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Rýchle akcie</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Rozšírené</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Platí pre každý profil bez ohľadu na nastavenie miznúcich správ v jednotlivých chatoch.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Hovory</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Zvoniť pri prichádzajúcich hovoroch</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Zobrazovať obrazovku hovoru pre prijaté kontakty</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Spúšťa malé aplikácie vnútri chatov.</translation>
+        <source>Muted chats</source>
+        <translation>Stlmené čety</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Povoliť vysielanie polohy (experimentálne)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Odpovede v stlmených skupinách</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Zdieľa vašu polohu v chatoch a zobrazuje zdieľané polohy na mape.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Zobrazovať upozornenia na odpovede na vaše správy v stlmených skupinách</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Nastavenia</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Prepisovať hlasové správy (experimentálne)</translation>
+        <source>Messages</source>
+        <translation>Správy</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Prepis hlasových správ</translation>
+        <source>Notifications</source>
+        <translation>Oznámenia</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Prevádza hlasové správy na text v tomto telefóne.</translation>
+        <source>Privacy and security</source>
+        <translation>Súkromie a zabezpečenie</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nič neopustí telefón.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Experimentálne</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikácii</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Váš profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Rýchle akcie</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Súkromie a zabezpečenie</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Odstrániť sledovanie z odkazov</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Odstraňuje z odkazov, ktoré odosielaš, identifikátory kliknutí a kampaňové značky.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokované kontakty</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakty</numerusform>
+            <numerusform>%n kontaktov</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3133,32 +3609,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Prepisy v tomto jazyku pravdepodobne obsahujú viac chýb.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Prepis hlasových správ</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Jazyky</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kedy</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Rečový model sa nepodarilo stiahnuť.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Skúsiť znova</translation>
     </message>
 </context>
 <context>

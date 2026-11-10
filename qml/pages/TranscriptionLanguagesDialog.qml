@@ -6,7 +6,7 @@ import "../js/Speech.js" as Speech
 /*
  * Languages voice messages are transcribed in. Setup (after "experimental" question):
  * Next turns feature on (Rust starts model download), opens TranscriptionWhenDialog;
- * cancel leaves it off. Later, from TranscriptionPage: languages only. Phone language
+ * cancel leaves it off. Later, from SettingsExperimentalPage: languages only. Phone language
  * first, picked at setup; greyed languages can't be picked.
  */
 Dialog {

@@ -74,6 +74,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 - Unrelated finding → tell user; separate PR or issue, not this PR.
 - Commit and PR titles: Conventional Commits, plain language, say outcome: `fix(cover): faces no longer turn into white squares`. Types `feat` `fix` `perf` `refactor` `test` `docs` `ci` `build` `chore`; scope = app area or subsystem (`chat`, `calls`, `rpm`, …). Body says why, plain prose; brief, to the point.
 - PR body: the problem in a sentence or two, then how you fixed it. End with the model and harness that did the work.
+- PR body describes PR as it is now. Updating it → rewrite to current state: no history, no earlier rounds or variants, no earlier runs.
 - Final diff: no debug logging, no leftovers.
 - Evidence shown in PR body, not just described:
   - UI → before/after device screenshots.

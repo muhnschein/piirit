@@ -1,9 +1,10 @@
-//! Calls with one contact, behind Calls tile on their page: chat's calls newest first, each saying
+//! Calls with one contact, behind Calls row on their page: chat's calls newest first, each saying
 //! which way it went and what became of it, plus a first row to call from.
 //!
-//! Vs fake core, call ringing in from contact before page opens. Checks wiring: tile there only
-//! while calls are on; page lists chat's call in chat's own words; call row names contact as plain
-//! text and places call through window; tap on a still-ringing call takes it up, not calls back.
+//! Vs fake core, call ringing in from contact before page opens. Checks wiring: page lists chat's
+//! call in chat's own words; call row names contact as plain text and places call through window;
+//! tap on a still-ringing call takes it up, not calls back. Row shown only while calls are on:
+//! `qml_contact_page.rs`.
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -33,7 +34,6 @@ const PROBE_QML: &str = r"
             }
         }
 
-        Loader { id: tiles; width: 540 }
         Loader { id: holder; width: 540; height: 960 }
 
         function findIn(node, test) {
@@ -51,10 +51,6 @@ const PROBE_QML: &str = r"
         }
         function named(root, name) {
             return findIn(root, function (node) { return node.objectName === name })
-        }
-        function tileKinds(url, calls) {
-            tiles.setSource(url, { callsAvailable: calls })
-            return tiles.item.kinds.join(',')
         }
         function load(url) {
             holder.setSource(url, { accountId: 1, chatId: 1, contactName: 'Ada <b>Lovelace</b>' })
@@ -148,12 +144,6 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
 
     // point at outlives it.
     plan.after(1, move || unsafe {
-        let tiles = common::component_url("MediaKinds.qml");
-        record!(
-            "tiles-off",
-            call!("tileKinds", QString::from(tiles.clone()), false)
-        );
-        record!("tiles-on", call!("tileKinds", QString::from(tiles), true));
         // No setting written first: calls on for everybody, as in reference clients (#119).
         record!(
             "load",
@@ -219,16 +209,6 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
     };
     let context = format!("steps: {steps:?}");
 
-    assert_eq!(
-        value("tiles-off"),
-        "gallery,audio,files",
-        "a Calls tile stands where calls are not on. {context}"
-    );
-    assert_eq!(
-        value("tiles-on"),
-        "gallery,audio,files,calls",
-        "no Calls tile where calls are on. {context}"
-    );
     assert_eq!(
         value("load"),
         "ok",

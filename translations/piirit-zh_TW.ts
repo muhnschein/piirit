@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Delta Chat 核心 %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>關於</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>原始碼與授權</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit 是以 GPL-3.0 授權的自由軟體。</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>回報問題</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>版本資訊會被複製，供你回報時使用。</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>關於 Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -570,15 +609,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>個人檔案</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>已封存的聊天</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>已封存</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>聊天</translation>
     </message>
     <message>
@@ -600,14 +637,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pin</source>
         <translation>釘選</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>取消靜音</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>靜音</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -683,7 +712,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>點按「%1」以顯示所有聊天</translation>
     </message>
     <message>
@@ -701,18 +730,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>顯示所有地點</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>頻道</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>沒有未讀頻道</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>點按「%1」以顯示所有頻道</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>通知</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>用其他應用程式開啟</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>儲存到裝置</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -729,7 +769,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>轉寫 %n 則語音訊息</numerusform>
         </translation>
@@ -747,6 +787,35 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>轉寫</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>用其他應用程式開啟</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>儲存到裝置</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>通知</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>通知</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>當此群組中有人回覆你的訊息時，你仍會收到通知。</translation>
     </message>
 </context>
 <context>
@@ -770,11 +839,15 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>已儲存</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>共享的對話</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>聯絡人</translation>
@@ -788,17 +861,70 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>未加密：一般電子郵件聯絡人</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>名字</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>留空則使用對方自己選擇的名字</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>很久以前上線</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>正在刪除對話</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>刪除對話</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>封鎖聯絡人</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>顯示加密資訊</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>編輯名稱</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>自己設定的名字：%1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>通話</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>視訊通話</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>此對話中</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>共享的對話</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n 個對話</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1041,9 +1167,102 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>%1 秒後</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>這些設定將會套用在所有使用 Delta Chat 的聊天成員上。但他們依然可以複製、儲存和轉發訊息，或使用其他的電子郵件客戶端。</translation>
+        <source>Remove picture</source>
+        <translation>移除圖片</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>正在移除圖片</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>變更圖片</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>編輯頻道</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>編輯群組</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>頻道名稱</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>群組名稱</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>描述</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>頻道中的每個人都會看到這些變更。向後滑動即可儲存。</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>群組中的每個人都會看到這些變更。向後滑動即可儲存。</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>編輯名稱</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>「%1」的暱稱</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>留空即使用聯絡人自己設定的名字。只有你會看到此名稱。向後滑動即可儲存。</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>複製指紋</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>已複製到剪貼簿</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>加密資訊</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n 位成員</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>缺少金鑰</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>中繼</translation>
     </message>
 </context>
 <context>
@@ -1110,68 +1329,62 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>已儲存</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>離開群組</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>新增成員</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>群組</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>移除圖片</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>群組名稱</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n 位成員</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>從群組中移除</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>正在移除</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>群組中的每個人都看得到名稱</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>描述</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>變更圖片</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>邀請 QR code</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>頻道</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>正在刪除對話</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>刪除對話</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>顯示加密資訊</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>編輯頻道</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>編輯群組</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>端對端加密</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>成員</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>此對話中</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
     </message>
 </context>
 <context>
@@ -1240,6 +1453,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>中繼只在收件者取走訊息之前保存它。</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>繼續滑動即可返回「關於」。</translation>
     </message>
 </context>
 <context>
@@ -1344,7 +1561,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>圖庫</translation>
     </message>
     <message>
@@ -1380,7 +1597,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>通話</translation>
     </message>
     <message>
@@ -1389,8 +1606,78 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>地圖</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>今天</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>昨天</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>過去 7 天</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>過去 30 天</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>較舊</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>傳送訊息</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>從群組中移除</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>你</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>正在移除</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n 位成員</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>搜尋成員</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>新增成員</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>用 QR 碼邀請</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>沒有相符的聯絡人</translation>
     </message>
 </context>
 <context>
@@ -1455,6 +1742,76 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>選取文字</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n 天</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n 小時</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 天 %2 小時</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 天</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 小時 %2 分鐘</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 小時</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 分鐘</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1（剩餘 %2）</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>開啟</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>關閉</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>關閉 %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>關閉（剩餘 %1）</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>關閉 %1（剩餘 %2）</translation>
     </message>
 </context>
 <context>
@@ -1823,6 +2180,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>掃描以加入頻道「%1」</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>掃描以加入群組「%1」</translation>
     </message>
 </context>
 <context>
@@ -2207,7 +2569,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>實驗性</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>這些功能可能不穩定，可能會被變更或移除。</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc 應用程式</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>在聊天中執行小型應用程式。</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>位置串流</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>在聊天中分享你的位置，並在地圖上顯示分享的位置。</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>轉寫語音訊息</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>在這支手機上把語音訊息轉成文字。</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>任何內容都不會離開手機。</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>無法下載語音模型。</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>重試</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>轉寫</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>語言</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>較低畫質，較少數據</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>普通</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>從不</translation>
@@ -2237,29 +2668,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>總是</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>設定</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>訊息</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>自動下載附件</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>移除連結中的追蹤參數</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>通知</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>啟用 webxdc 應用程式（實驗性）</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>關閉</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2282,30 +2693,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>1 年後</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>從裝置刪除訊息</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>提及</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>使用 Markdown 格式</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>隱私權設定</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>已封鎖的聯絡人</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>普通</translation>
+        <source>Messages</source>
+        <translation>訊息</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2313,13 +2702,54 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>傳送的媒體品質</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>顯示通知</translation>
+        <source>Auto-download attachments</source>
+        <translation>自動下載附件</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>較低畫質，較少數據</translation>
+        <source>Show Markdown formatting</source>
+        <translation>顯示 Markdown 格式</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>在訊息中顯示 *粗體*、_斜體_ 與 `程式碼` 格式。</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>在這支手機上</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>刪除舊訊息</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>訊息只會從這支手機上刪除，適用於所有個人檔案。</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>其他裝置與聊天成員會保留各自的副本。</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>在聊天清單中顯示你的個人檔案</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>在聊天清單頂部顯示你的頭像與名稱。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>通知</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>顯示通知</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2338,64 +2768,98 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>不顯示詳細資料</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>在勿擾的群組中顯示回覆您訊息的通知</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>從你傳送的連結中移除點擊 ID 和行銷標籤。</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>快速動作</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>進階</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>適用於所有個人檔案，無論各聊天本身的閱後即焚訊息設定為何。</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>通話</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>來電時響鈴</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>為已接受的聯絡人顯示通話畫面</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>在聊天中執行小型應用程式。</translation>
+        <source>Muted chats</source>
+        <translation>已勿擾的聊天</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>啟用位置串流（實驗性）</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>已勿擾群組中的回覆</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>在聊天中分享你的位置，並在地圖上顯示分享的位置。</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>在勿擾的群組中顯示回覆您訊息的通知</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>轉寫語音訊息（實驗性）</translation>
+        <source>Messages</source>
+        <translation>訊息</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>語音訊息轉寫</translation>
+        <source>Notifications</source>
+        <translation>通知</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>在這支手機上把語音訊息轉成文字。</translation>
+        <source>Privacy and security</source>
+        <translation>隱私權與安全性</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>任何內容都不會離開手機。</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>實驗性</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>關於</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>你的個人檔案</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>快速動作</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>隱私權與安全性</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>移除連結中的追蹤參數</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>從你傳送的連結中移除點擊 ID 和行銷標籤。</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>個人檔案：%1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已封鎖的聯絡人</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n 位聯絡人</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3105,32 +3569,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>這種語言的轉寫可能有較多錯誤。</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>語音訊息轉寫</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>語言</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>何時</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>無法下載語音模型。</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>重試</translation>
     </message>
 </context>
 <context>

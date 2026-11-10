@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Rdzeń Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikacji</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Kod źródłowy i licencja</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit to wolne oprogramowanie na licencji GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Zgłoś problem</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Wersje są kopiowane do Twojego zgłoszenia.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>O Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -578,15 +617,13 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Profile</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Zarchiwizowane czaty</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Zarchiwizowane</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Czaty</translation>
     </message>
     <message>
@@ -608,14 +645,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Pin</source>
         <translation>Przypnij</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Wyłącz wyciszenie</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Wycisz</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -691,7 +720,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Stuknij „%1”, aby pokazać wszystkie czaty</translation>
     </message>
     <message>
@@ -709,18 +738,29 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Wszystkie lokalizacje</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kanały</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Brak nieprzeczytanych kanałów</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Stuknij „%1”, aby pokazać wszystkie kanały</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Powiadomienia</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Otwórz w innej aplikacji</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Zapisz na urządzeniu</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -737,7 +777,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Transkrybuj %n wiadomość głosową</numerusform>
             <numerusform>Transkrybuj %n wiadomości głosowe</numerusform>
@@ -757,6 +797,35 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Transkrybuj</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Otwórz w innej aplikacji</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Zapisz na urządzeniu</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Powiadomienia</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Powiadomienia</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Nadal otrzymasz powiadomienie, gdy ktoś w tej grupie odpowie na jedną z twoich wiadomości.</translation>
     </message>
 </context>
 <context>
@@ -780,11 +849,15 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Zapisano</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Wspólne czaty</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
@@ -798,17 +871,72 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Bez szyfrowania: zwykły kontakt e-mail</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Nazwa</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Zostaw puste, aby użyć nazwy, którą sam wybrał</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Ostatnio widziany(-a) dawno temu</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Usuwanie czatu</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Usuń czat</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokuj kontakt</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Pokaż informacje o szyfrowaniu</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Edytuj nazwę</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Własna nazwa: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Zadzwoń</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Połączenie wideo</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>W tym czacie</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Ustawienia</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Wspólne czaty</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n czat</numerusform>
+            <numerusform>%n czaty</numerusform>
+            <numerusform>%n czatów</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1053,9 +1181,104 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>After %1 seconds</source>
         <translation>Po %1 sekundach</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Te ustawienia dotyczą wszystkich uczestników. Mogą jednak kopiować, zapisywać i przekazywać wiadomości.</translation>
+        <source>Remove picture</source>
+        <translation>Usuń obraz</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Usuwanie obrazu</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Zmień obraz</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Edytuj kanał</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Edytuj grupę</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Nazwa kanału</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Nazwa grupy</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Opis</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Wszyscy na kanale widzą te zmiany. Przesuń wstecz, aby zapisać.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Wszyscy w grupie widzą te zmiany. Przesuń wstecz, aby zapisać.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Edytuj nazwę</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Pseudonim dla „%1”</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Zostaw puste, aby używać nazwy wybranej przez kontakt. Tylko ty widzisz tę nazwę. Przesuń wstecz, aby zapisać.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Kopiuj odciski</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Skopiowano do schowka</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Informacje o szyfrowaniu</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n członek</numerusform>
+            <numerusform>%n członkowie</numerusform>
+            <numerusform>%n członków</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Brak klucza</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Relay</translation>
     </message>
 </context>
 <context>
@@ -1124,32 +1347,16 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Zapisano</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Opuść grupę</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Dodaj członków</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Grupa</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Usuń obraz</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Nazwa grupy</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n członek</numerusform>
             <numerusform>%n członkowie</numerusform>
@@ -1157,37 +1364,47 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Usuń z grupy</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Usuwanie</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Nazwę widzą wszyscy w grupie</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Opis</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Zmień obraz</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>Kod QR zaproszenia</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kanał</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Usuwanie czatu</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Usuń czat</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Pokaż informacje o szyfrowaniu</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Edytuj kanał</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Edytuj grupę</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Szyfrowanie od końca do końca</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Członkowie</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>W tym czacie</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Ustawienia</translation>
     </message>
 </context>
 <context>
@@ -1256,6 +1473,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Relay przechowuje wiadomość tylko do czasu, aż odbiorca ją pobierze.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Przesuwaj dalej, aby wrócić do strony O aplikacji.</translation>
     </message>
 </context>
 <context>
@@ -1362,7 +1583,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Galeria</translation>
     </message>
     <message>
@@ -1398,7 +1619,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Połączenia</translation>
     </message>
     <message>
@@ -1407,8 +1628,80 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Mapa</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Dzisiaj</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Wczoraj</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Ostatnie 7 dni</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Ostatnie 30 dni</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Starsze</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Wyślij wiadomość</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Usuń z grupy</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Ty</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Usuwanie</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n członek</numerusform>
+            <numerusform>%n członkowie</numerusform>
+            <numerusform>%n członków</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Szukaj członków</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Dodaj członków</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Zaproś kodem QR</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Nikt nie pasuje</translation>
     </message>
 </context>
 <context>
@@ -1473,6 +1766,80 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Zaznacz tekst</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n dzień</numerusform>
+            <numerusform>%n dni</numerusform>
+            <numerusform>%n dni</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n godzinę</numerusform>
+            <numerusform>%n godziny</numerusform>
+            <numerusform>%n godzin</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 d %2 godz.</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 godz. %2 min</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 godz.</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (pozostało %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>Włączone</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Wyłączone</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Wyłączone na %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Wyłączone (pozostało %1)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Wyłączone na %1 (pozostało %2)</translation>
     </message>
 </context>
 <context>
@@ -1845,6 +2212,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Zeskanuj go, aby dołączyć do kanału „%1”.</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Zeskanuj, aby dołączyć do grupy „%1”</translation>
     </message>
 </context>
 <context>
@@ -2229,7 +2601,76 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Eksperymentalne</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Te funkcje mogą być niestabilne, zmienione lub usunięte.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Aplikacje webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Strumieniowanie lokalizacji</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Udostępnia Twoją lokalizację w czatach i pokazuje udostępnione lokalizacje na mapie.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Transkrybuj wiadomości głosowe</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Zamienia wiadomości głosowe na tekst na tym telefonie.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Nic nie opuszcza telefonu.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Nie udało się pobrać modelu mowy.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Spróbuj ponownie</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Transkrypcja</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Języki</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Niższa jakość, mniej danych</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Zrównoważona</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Nigdy</translation>
@@ -2259,29 +2700,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zawsze</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Ustawienia</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Wiadomości</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Automatycznie pobieraj załączniki</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Usuwaj śledzenie z linków</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Powiadomienia</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Włącz aplikacje webxdc (eksperymentalne)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Wyłączone</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2304,30 +2725,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Po 1 roku</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Usuwaj wiadomości z urządzenia</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Wzmianki</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Używaj formatowania Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Prywatność</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Zablokowane kontakty</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Zrównoważona</translation>
+        <source>Messages</source>
+        <translation>Wiadomości</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2335,13 +2734,54 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Jakość mediów wychodzących</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Pokazuj powiadomienia</translation>
+        <source>Auto-download attachments</source>
+        <translation>Automatycznie pobieraj załączniki</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Niższa jakość, mniej danych</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Pokazuj formatowanie Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Formatuje *pogrubienie*, _kursywę_ i `kod` w wiadomościach.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Na tym telefonie</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Usuwaj stare wiadomości</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Wiadomości są usuwane tylko z tego telefonu, w każdym profilu.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Inne urządzenia i członkowie czatu zachowują swoje kopie.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Pokazuj swój profil na liście czatów</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Pokazuje Twoje zdjęcie profilowe i nazwę na górze listy czatów.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Powiadomienia</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Pokazuj powiadomienia</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2360,64 +2800,100 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Bez szczegółów</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Usuwa identyfikatory kliknięć i znaczniki kampanii z linków, które wysyłasz.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Szybkie akcje</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Zaawansowane</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Dotyczy każdego profilu, niezależnie od ustawienia znikających wiadomości w danym czacie.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Połączenia</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Dzwoń przy połączeniach przychodzących</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Pokaż ekran połączenia dla zaakceptowanych kontaktów</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
+        <source>Muted chats</source>
+        <translation>Wyciszone czaty</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Włącz strumieniowanie lokalizacji (eksperymentalne)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Odpowiedzi w wyciszonych grupach</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Udostępnia Twoją lokalizację w czatach i pokazuje udostępnione lokalizacje na mapie.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Pokazuj powiadomienia o odpowiedziach na twoje wiadomości w wyciszonych grupach</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Ustawienia</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Transkrybuj wiadomości głosowe (eksperymentalne)</translation>
+        <source>Messages</source>
+        <translation>Wiadomości</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Transkrypcja wiadomości głosowych</translation>
+        <source>Notifications</source>
+        <translation>Powiadomienia</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Zamienia wiadomości głosowe na tekst na tym telefonie.</translation>
+        <source>Privacy and security</source>
+        <translation>Prywatność i bezpieczeństwo</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Nic nie opuszcza telefonu.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Eksperymentalne</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>O aplikacji</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Twój profil</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Szybkie akcje</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Prywatność i bezpieczeństwo</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Usuwaj śledzenie z linków</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Usuwa identyfikatory kliknięć i znaczniki kampanii z linków, które wysyłasz.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Profil: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Zablokowane kontakty</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n kontakt</numerusform>
+            <numerusform>%n kontakty</numerusform>
+            <numerusform>%n kontaktów</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3133,32 +3609,6 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Transkrypcje w tym języku prawdopodobnie zawierają więcej błędów.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Transkrypcja wiadomości głosowych</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Języki</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Kiedy</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Nie udało się pobrać modelu mowy.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Spróbuj ponownie</translation>
     </message>
 </context>
 <context>

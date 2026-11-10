@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>Piirit %1</source>
+        <extracomment>%1 is the version number, such as 2.2.0.</extracomment>
+        <translation>Piirit %1</translation>
+    </message>
+    <message>
+        <source>Delta Chat core %1</source>
+        <extracomment>%1 is the version number of the Delta Chat core, such as 2.68.0.</extracomment>
+        <translation>Lõi Delta Chat %1</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Giới thiệu</translation>
+    </message>
+    <message>
+        <source>Source code and licence</source>
+        <translation>Mã nguồn và giấy phép</translation>
+    </message>
+    <message>
+        <source>Piirit is free software under the GPL-3.0.</source>
+        <extracomment>Under &quot;Source code and licence&quot;. GPL-3.0 is the licence&apos;s short name.</extracomment>
+        <translation>Piirit là phần mềm tự do theo giấy phép GPL-3.0.</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Báo cáo sự cố</translation>
+    </message>
+    <message>
+        <source>The versions are copied for your report.</source>
+        <translation>Các phiên bản được sao chép cho báo cáo của bạn.</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <extracomment>Opens the intro slides that explain what Delta Chat is.</extracomment>
+        <translation>Giới thiệu về Delta Chat</translation>
+    </message>
+</context>
+<context>
     <name>AddMembersPage</name>
     <message>
         <source>Add to group</source>
@@ -570,15 +609,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hồ sơ</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Cuộc trò chuyện đã lưu trữ</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Đã lưu trữ</translation>
     </message>
     <message>
         <source>Chats</source>
+        <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
         <translation>Trò chuyện</translation>
     </message>
     <message>
@@ -600,14 +637,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pin</source>
         <translation>Ghim</translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation>Bật thông báo</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Tắt thông báo</translation>
     </message>
     <message>
         <source>Accept</source>
@@ -683,7 +712,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap %1 to show all chats</source>
-        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <extracomment>%1 is the label of a filter, a button beside the search button.</extracomment>
         <translation>Chạm vào “%1” để hiện tất cả cuộc trò chuyện</translation>
     </message>
     <message>
@@ -701,18 +730,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Pull-down item. Opens the map of every chat&apos;s shared locations.</extracomment>
         <translation>Tất cả vị trí</translation>
     </message>
+    <message>
+        <source>Channels</source>
+        <extracomment>Turns the chat list&apos;s filter to channels on and off.</extracomment>
+        <translation>Kênh</translation>
+    </message>
+    <message>
+        <source>No unread channels</source>
+        <extracomment>The unread and channels filters are on and every channel has been read.</extracomment>
+        <translation>Không có kênh chưa đọc</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all channels</source>
+        <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
+        <translation>Chạm vào “%1” để hiện tất cả kênh</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Thông báo</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Mở bằng ứng dụng khác</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Lưu vào thiết bị</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -729,7 +769,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Chép lời %n tin nhắn thoại</numerusform>
         </translation>
@@ -747,6 +787,35 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Transcribe</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Chép lời</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Mở bằng ứng dụng khác</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Lưu vào thiết bị</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotifications</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Thông báo</translation>
+    </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Thông báo</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Bạn vẫn nhận được thông báo khi có người trong nhóm này trả lời một tin nhắn của bạn.</translation>
     </message>
 </context>
 <context>
@@ -770,11 +839,15 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>ContactPage</name>
+    <name>CommonChatsPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Đã lưu</translation>
+        <source>Chats in common</source>
+        <extracomment>Over the list of all chats a contact is in too, opened from their page. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Cuộc trò chuyện được chia sẻ</translation>
     </message>
+</context>
+<context>
+    <name>ContactPage</name>
     <message>
         <source>Contact</source>
         <translation>Liên hệ</translation>
@@ -788,17 +861,70 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Không mã hóa: một liên hệ email thông thường</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Tên</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Để trống để dùng tên họ tự chọn</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Đã thấy cách đây rất lâu</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Đang xóa cuộc trò chuyện</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Xóa cuộc trò chuyện</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Chặn liên hệ</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Hiện thông tin mã hóa</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Sửa tên</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Tên tự đặt: %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Gọi</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Cuộc gọi video</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>Trong cuộc trò chuyện này</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Cài đặt</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Cuộc trò chuyện được chia sẻ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n cuộc trò chuyện</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1041,9 +1167,102 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>Sau %1 giây</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Áp dụng cho tất cả thành viên của cuộc trò chuyện này nếu họ sử dụng Delta Chat; họ vẫn có thể sao chép, lưu và chuyển tiếp thư hoặc sử dụng các ứng dụng e-mail khác.</translation>
+        <source>Remove picture</source>
+        <translation>Gỡ ảnh</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Đang gỡ ảnh</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Đổi ảnh</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Sửa kênh</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Sửa nhóm</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Tên kênh</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Tên nhóm</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Mô tả</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Mọi người trong kênh đều thấy những thay đổi này. Vuốt lại để lưu.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Mọi người trong nhóm đều thấy những thay đổi này. Vuốt lại để lưu.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Sửa tên</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Biệt danh cho “%1”</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Để trống để dùng tên do liên hệ tự đặt. Chỉ bạn thấy tên này. Vuốt lại để lưu.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Sao chép dấu vân tay</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Đã sao chép vào bộ nhớ tạm</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Thông tin mã hóa</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n thành viên</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Thiếu khóa</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Máy chuyển tiếp</translation>
     </message>
 </context>
 <context>
@@ -1110,68 +1329,62 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Đã lưu</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Rời nhóm</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Thêm thành viên</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Nhóm</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Gỡ ảnh</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Tên nhóm</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n thành viên</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Xóa khỏi nhóm</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Đang xóa</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Mọi người trong nhóm đều thấy tên</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Mô tả</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Đổi ảnh</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>Mã mời QR</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Kênh</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Đang xóa cuộc trò chuyện</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Xóa cuộc trò chuyện</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Hiện thông tin mã hóa</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Sửa kênh</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Sửa nhóm</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Mã hóa đầu cuối</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Thành viên</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>Trong cuộc trò chuyện này</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Cài đặt</translation>
     </message>
 </context>
 <context>
@@ -1240,6 +1453,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A relay stores a message only until the recipient fetches it.</source>
         <translation>Máy chuyển tiếp chỉ lưu tin nhắn cho đến khi người nhận lấy về.</translation>
+    </message>
+    <message>
+        <source>Keep swiping to go back to About.</source>
+        <translation>Cứ vuốt tiếp để quay lại Giới thiệu.</translation>
     </message>
 </context>
 <context>
@@ -1344,7 +1561,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Thư viện</translation>
     </message>
     <message>
@@ -1380,7 +1597,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Cuộc gọi</translation>
     </message>
     <message>
@@ -1389,8 +1606,78 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Bản đồ</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Hôm nay</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Hôm qua</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>7 ngày qua</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>30 ngày qua</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Cũ hơn</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Gửi tin nhắn</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Xóa khỏi nhóm</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Bạn</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Đang xóa</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n thành viên</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Tìm thành viên</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Thêm thành viên</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Mời bằng mã QR</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Không ai khớp</translation>
     </message>
 </context>
 <context>
@@ -1455,6 +1742,76 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Select text</source>
         <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
         <translation>Chọn văn bản</translation>
+    </message>
+</context>
+<context>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n ngày</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n giờ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 ngày %2 giờ</translation>
+    </message>
+    <message>
+        <source>%1 d</source>
+        <translation>%1 ngày</translation>
+    </message>
+    <message>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 giờ %2 phút</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 giờ</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 phút</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (còn %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>Bật</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Tắt</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Tắt trong %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Tắt (còn %1)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Tắt trong %1 (còn %2)</translation>
     </message>
 </context>
 <context>
@@ -1823,6 +2180,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Quét để tham gia kênh &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Quét để tham gia nhóm “%1”</translation>
     </message>
 </context>
 <context>
@@ -2207,7 +2569,76 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SettingsPage</name>
+    <name>SettingsExperimentalPage</name>
+    <message>
+        <source>Experimental</source>
+        <translation>Thử nghiệm</translation>
+    </message>
+    <message>
+        <source>These features may be unstable, changed or removed.</source>
+        <translation>Các tính năng này có thể chưa ổn định, bị thay đổi hoặc bị gỡ bỏ.</translation>
+    </message>
+    <message>
+        <source>Webxdc apps</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>Ứng dụng webxdc</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats.</source>
+        <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>Location streaming</source>
+        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
+        <translation>Truyền phát vị trí</translation>
+    </message>
+    <message>
+        <source>Shares your location in chats and shows shared locations on a map.</source>
+        <translation>Chia sẻ vị trí của bạn trong cuộc trò chuyện và hiển thị các vị trí được chia sẻ trên bản đồ.</translation>
+    </message>
+    <message>
+        <source>Transcribe voice messages</source>
+        <translation>Chép lời tin nhắn thoại</translation>
+    </message>
+    <message>
+        <source>Turns voice messages into text on this phone.</source>
+        <translation>Chuyển tin nhắn thoại thành văn bản trên điện thoại này.</translation>
+    </message>
+    <message>
+        <source>Nothing leaves the phone.</source>
+        <translation>Không có gì rời khỏi điện thoại.</translation>
+    </message>
+    <message>
+        <source>The speech model could not be downloaded.</source>
+        <translation>Không thể tải mô hình giọng nói.</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <extracomment>Starts the speech model download again.</extracomment>
+        <translation>Thử lại</translation>
+    </message>
+    <message>
+        <source>Transcription</source>
+        <extracomment>Section of the experimental settings: voice messages turned into text.</extracomment>
+        <translation>Chép lời</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Ngôn ngữ</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsMessagesPage</name>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Chất lượng thấp hơn, ít dữ liệu hơn</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Cân bằng</translation>
+    </message>
     <message>
         <source>Never</source>
         <translation>Không bao giờ</translation>
@@ -2237,29 +2668,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Luôn luôn</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Cài đặt</translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation>Tin nhắn</translation>
-    </message>
-    <message>
-        <source>Auto-download attachments</source>
-        <translation>Tự động tải tệp đính kèm</translation>
-    </message>
-    <message>
-        <source>Remove tracking from links</source>
-        <translation>Gỡ theo dõi khỏi liên kết</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Thông báo</translation>
-    </message>
-    <message>
-        <source>Enable webxdc apps (experimental)</source>
-        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
-        <translation>Bật ứng dụng webxdc (thử nghiệm)</translation>
+        <source>Off</source>
+        <extracomment>Deleting old messages from this phone is turned off. As a chat&apos;s own disappearing messages setting says it.</extracomment>
+        <translation>Tắt</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -2282,30 +2693,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sau 1 năm</translation>
     </message>
     <message>
-        <source>Delete messages from device</source>
-        <translation>Xóa tin nhắn khỏi thiết bị</translation>
-    </message>
-    <message>
-        <source>Mentions</source>
-        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
-        <translation>Nhắc đến</translation>
-    </message>
-    <message>
-        <source>Use Markdown formatting</source>
-        <translation>Dùng định dạng Markdown</translation>
-    </message>
-    <message>
-        <source>Privacy</source>
-        <translation>Quyền riêng tư</translation>
-    </message>
-    <message>
-        <source>Blocked contacts</source>
-        <translation>Liên hệ bị chặn</translation>
-    </message>
-    <message>
-        <source>Balanced</source>
-        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
-        <translation>Cân bằng</translation>
+        <source>Messages</source>
+        <translation>Tin nhắn</translation>
     </message>
     <message>
         <source>Outgoing media quality</source>
@@ -2313,13 +2702,54 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chất lượng phương tiện gửi đi</translation>
     </message>
     <message>
-        <source>Show notifications</source>
-        <translation>Hiện thông báo</translation>
+        <source>Auto-download attachments</source>
+        <translation>Tự động tải tệp đính kèm</translation>
     </message>
     <message>
-        <source>Lower quality, less data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Chất lượng thấp hơn, ít dữ liệu hơn</translation>
+        <source>Show Markdown formatting</source>
+        <translation>Hiển thị định dạng Markdown</translation>
+    </message>
+    <message>
+        <source>Formats *bold*, _italic_ and `code` in messages.</source>
+        <extracomment>Under &quot;Show Markdown formatting&quot;. The marks stay as typed: they are what a sender writes.</extracomment>
+        <translation>Định dạng *đậm*, _nghiêng_ và `mã` trong tin nhắn.</translation>
+    </message>
+    <message>
+        <source>On this phone</source>
+        <extracomment>Heading over what the phone itself keeps of messages.</extracomment>
+        <translation>Trên điện thoại này</translation>
+    </message>
+    <message>
+        <source>Delete old messages</source>
+        <translation>Xóa tin nhắn cũ</translation>
+    </message>
+    <message>
+        <source>Messages are deleted from this phone only, in every profile.</source>
+        <translation>Tin nhắn chỉ bị xóa khỏi điện thoại này, trong mọi hồ sơ.</translation>
+    </message>
+    <message>
+        <source>Other devices and chat members keep their copies.</source>
+        <translation>Các thiết bị khác và thành viên trò chuyện vẫn giữ bản sao của họ.</translation>
+    </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Hiển thị hồ sơ của bạn trong danh sách trò chuyện</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Hiển thị ảnh hồ sơ và tên của bạn ở đầu danh sách trò chuyện.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsNotificationsPage</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Thông báo</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Hiện thông báo</translation>
     </message>
     <message>
         <source>Notification content</source>
@@ -2338,64 +2768,98 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Không chi tiết</translation>
     </message>
     <message>
-        <source>Show notifications for replies to your messages in muted groups</source>
-        <translation>Hiện thông báo về các trả lời cho tin nhắn của bạn trong các nhóm đã tắt tiếng</translation>
-    </message>
-    <message>
-        <source>Removes click IDs and campaign tags from links you send.</source>
-        <translation>Loại bỏ ID nhấp chuột và thẻ chiến dịch khỏi các liên kết bạn gửi.</translation>
-    </message>
-    <message>
-        <source>Quick actions</source>
-        <translation>Thao tác nhanh</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <extracomment>The settings most readers never need to change.</extracomment>
-        <translation>Nâng cao</translation>
-    </message>
-    <message>
-        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
-        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
-        <translation>Áp dụng cho mọi hồ sơ, bất kể cài đặt tin nhắn tự hủy riêng của từng cuộc trò chuyện.</translation>
-    </message>
-    <message>
         <source>Calls</source>
-        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <extracomment>Heading over whether calls ring. A plural noun.</extracomment>
         <translation>Cuộc gọi</translation>
+    </message>
+    <message>
+        <source>Ring for incoming calls</source>
+        <translation>Đổ chuông khi có cuộc gọi đến</translation>
     </message>
     <message>
         <source>Show call screen for accepted contacts</source>
         <translation>Hiện màn hình cuộc gọi cho các liên hệ đã chấp nhận</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats.</source>
-        <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện.</translation>
+        <source>Muted chats</source>
+        <translation>Cuộc trò chuyện đã tắt tiếng</translation>
     </message>
     <message>
-        <source>Enable location streaming (experimental)</source>
-        <extracomment>Delta Chat&apos;s name for sharing your location in a chat, once or live.</extracomment>
-        <translation>Bật truyền phát vị trí (thử nghiệm)</translation>
+        <source>Replies in muted groups</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>Trả lời trong nhóm đã tắt tiếng</translation>
     </message>
     <message>
-        <source>Shares your location in chats and shows shared locations on a map.</source>
-        <translation>Chia sẻ vị trí của bạn trong cuộc trò chuyện và hiển thị các vị trí được chia sẻ trên bản đồ.</translation>
+        <source>Show notifications for replies to your messages in muted groups</source>
+        <translation>Hiện thông báo về các trả lời cho tin nhắn của bạn trong các nhóm đã tắt tiếng</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation>Cài đặt</translation>
     </message>
     <message>
-        <source>Transcribe voice messages (experimental)</source>
-        <translation>Chép lời tin nhắn thoại (thử nghiệm)</translation>
+        <source>Messages</source>
+        <translation>Tin nhắn</translation>
     </message>
     <message>
-        <source>Voice message transcription</source>
-        <translation>Chép lời tin nhắn thoại</translation>
+        <source>Notifications</source>
+        <translation>Thông báo</translation>
     </message>
     <message>
-        <source>Turns voice messages into text on this phone.</source>
-        <translation>Chuyển tin nhắn thoại thành văn bản trên điện thoại này.</translation>
+        <source>Privacy and security</source>
+        <translation>Quyền riêng tư và bảo mật</translation>
     </message>
     <message>
-        <source>Nothing leaves the phone.</source>
-        <translation>Không có gì rời khỏi điện thoại.</translation>
+        <source>Experimental</source>
+        <extracomment>Settings topic: features that may still change or go away.</extracomment>
+        <translation>Thử nghiệm</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Giới thiệu</translation>
+    </message>
+    <message>
+        <source>Your profile</source>
+        <extracomment>Under the reader&apos;s own name at the top of the settings.</extracomment>
+        <translation>Hồ sơ của bạn</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <extracomment>Settings topic: the actions offered on the app&apos;s cover (the minimised app on the home screen).</extracomment>
+        <translation>Thao tác nhanh</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPrivacyPage</name>
+    <message>
+        <source>Privacy and security</source>
+        <translation>Quyền riêng tư và bảo mật</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>Gỡ theo dõi khỏi liên kết</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Loại bỏ ID nhấp chuột và thẻ chiến dịch khỏi các liên kết bạn gửi.</translation>
+    </message>
+    <message>
+        <source>Profile: %1</source>
+        <extracomment>Heading over the block list when there are several profiles. %1 is the profile&apos;s name.</extracomment>
+        <translation>Hồ sơ: %1</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Liên hệ bị chặn</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s)</source>
+        <translation>
+            <numerusform>%n liên hệ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3107,32 +3571,6 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Transcripts in this language are likely to contain more mistakes.</source>
         <translation>Bản chép lời bằng ngôn ngữ này có thể chứa nhiều lỗi hơn.</translation>
-    </message>
-</context>
-<context>
-    <name>TranscriptionPage</name>
-    <message>
-        <source>Voice message transcription</source>
-        <translation>Chép lời tin nhắn thoại</translation>
-    </message>
-    <message>
-        <source>Languages</source>
-        <extracomment>Heading over the languages voice messages are transcribed in.</extracomment>
-        <translation>Ngôn ngữ</translation>
-    </message>
-    <message>
-        <source>When</source>
-        <extracomment>Heading over when voice messages are transcribed.</extracomment>
-        <translation>Khi nào</translation>
-    </message>
-    <message>
-        <source>The speech model could not be downloaded.</source>
-        <translation>Không thể tải mô hình giọng nói.</translation>
-    </message>
-    <message>
-        <source>Try again</source>
-        <extracomment>Starts the speech model download again.</extracomment>
-        <translation>Thử lại</translation>
     </message>
 </context>
 <context>

@@ -3,8 +3,7 @@
 //! and label is its child, so text stayed drawn over first row. Plain Item collapses and clips.
 //!
 //! Two lists, one process: ordinary list has a pinned and an unpinned chat; archived list a single
-//! unpinned one. Nothing sets `PIIRIT_FAKE_NO_ARCHIVED`: list with no rows has no headings either
-//! way, proving nothing.
+//! unpinned one.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
