@@ -150,17 +150,18 @@ fn the_about_page_names_both_versions_and_copies_them_for_a_report() {
         (app_line.clone(), String::new()),
         "Piirit's version is not there at once, or core's is guessed before core says. {context}"
     );
-    // Fake core says what the pinned real one says (`real_server.rs` holds that to the pin).
+    // Fake core answers the pinned version, as the real one does (`real_server.rs`).
+    let pin = pinned_core_version();
     assert_eq!(
         value("core-line"),
-        "Delta Chat core 2.68.0",
+        format!("Delta Chat core {pin}"),
         "core's version was not asked once core came up, or not shown without its v. {context}"
     );
     assert_eq!(
         (value("report"), value("copied")),
         (
             "ok".to_string(),
-            format!("{app_line}\nDelta Chat core 2.68.0")
+            format!("{app_line}\nDelta Chat core {pin}")
         ),
         "Report a problem did not copy both versions. {context}"
     );
@@ -169,4 +170,18 @@ fn the_about_page_names_both_versions_and_copies_them_for_a_report() {
         "IntroPage.qml:tour=true",
         "About Delta Chat did not open the intro slides as a tour. {context}"
     );
+}
+
+/// Core version pinned in `scripts/fetch-rpc-server.sh`.
+fn pinned_core_version() -> String {
+    let script = std::fs::read_to_string(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../scripts/fetch-rpc-server.sh"),
+    )
+    .expect("read scripts/fetch-rpc-server.sh");
+    script
+        .lines()
+        .find_map(|line| line.strip_prefix("VERSION=\""))
+        .and_then(|rest| rest.strip_suffix('"'))
+        .expect("scripts/fetch-rpc-server.sh has a VERSION=\"...\" line")
+        .to_string()
 }

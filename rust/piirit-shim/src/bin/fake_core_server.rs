@@ -1494,7 +1494,7 @@ async fn serve() {
             let response = match method.as_str() {
                 "get_system_info" => ok(
                     &id,
-                    &json!({"name": "fake-core-server", "deltachat_core_version": "v2.68.0"}),
+                    &json!({"name": "fake-core-server", "deltachat_core_version": "v2.69.0"}),
                 ),
                 "get_all_accounts" => {
                     let mut state = state.lock().await;
