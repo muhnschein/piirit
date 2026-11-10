@@ -1,5 +1,5 @@
 //! Own profile, picture and name, top left of chat list: off until switched on in settings.
-//! Header and pills sit on frosted band either way.
+//! Header and pills sit on ambience band either way.
 //! Shows the list's own profile only (core's list holds all), follows a new name or picture,
 //! taps through to profiles. Archived list: none (a mode, not where profiles switch).
 
@@ -69,9 +69,9 @@ const PROBE_QML: &str = r"
                     name.font.pixelSize === Theme.fontSizeSmall,
                     Qt.colorEqual(name.color, Theme.secondaryColor)].join(',')
         }
-        // Frosted band behind header and pills, no shadow on list below.
+        // Ambience band behind header and pills, no shadow on list below.
         function frost() {
-            var frost = all(loader.item, 'chatListFrost', [])[0]
+            var frost = all(loader.item, 'headerBand', [])[0]
             if (!frost) { return 'missing' }
             var heading = all(loader.item, 'chatListHeader', [])[0].parent
             // Column lays out on polish, which a windowless test never runs.
@@ -81,8 +81,7 @@ const PROBE_QML: &str = r"
             var behind = frost.z < heading.z || frost.z === heading.z
                 && Array.prototype.indexOf.call(kids, frost)
                     < Array.prototype.indexOf.call(kids, heading)
-            var veil = Theme.rgba(Qt.tint(Theme.primaryColor,
-                                          Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
+            var veil = Theme.rgba(Theme.highlightBackgroundColor, 0.12)
             return [frost.parent === heading.parent && behind,
                     frost.y === 0 && frost.width === heading.width
                         && frost.height === heading.height,
@@ -302,8 +301,8 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
         assert_eq!(
             value(label),
             "true,true,true,true",
-            "{label}: the header and pills are not on a plain frosted band \
-             (behind them, page wide from top to pills' bottom, veil colour, no shadow). \
+            "{label}: the header and pills are not on a plain ambience band \
+             (behind them, page wide from top to pills' bottom, band colour, no shadow). \
              {context}"
         );
     }

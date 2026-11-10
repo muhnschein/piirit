@@ -364,6 +364,10 @@ Page {
         }
     }
 
+    HeaderBand {
+        lastBottom: conversationHeader.y + conversationHeader.height
+    }
+
     // Outside list (would scroll off). Not PageHeader: can't show other end's
     // chosen name as plain text.
     ConversationHeader {

@@ -565,16 +565,9 @@ Page {
             }
         }
 
-        // Frosted band behind title and pills. Wallpaper blur (Sailfish.Silica.Background) not
-        // Harbour-allowed; page background already blurred and nothing scrolls under band, so
-        // light veil looks same.
-        Rectangle {
-            id: frost
-            objectName: "chatListFrost"
-            width: parent.width
-            height: heading.height
-            color: Theme.rgba(Qt.tint(Theme.primaryColor,
-                                      Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
+        // Behind title and pills; nothing scrolls under it.
+        HeaderBand {
+            lastBottom: heading.height
         }
 
         // Outside list, not header: in view's flickable Silica hides keyboard when content moves
