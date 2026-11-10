@@ -562,6 +562,29 @@ Page {
             }
         }
 
+        // Accent glow behind title and pills, gone below them. Ends at own colour, not
+        // "transparent": that fades through black.
+        Rectangle {
+            id: glow
+            objectName: "chatListGlow"
+            width: parent.width
+            height: heading.height + Theme.itemSizeLarge
+            gradient: Gradient {
+                GradientStop {
+                    position: 0
+                    color: Theme.rgba(Theme.highlightBackgroundColor, 0.22)
+                }
+                GradientStop {
+                    position: heading.height / glow.height
+                    color: Theme.rgba(Theme.highlightBackgroundColor, 0.19)
+                }
+                GradientStop {
+                    position: 1
+                    color: Theme.rgba(Theme.highlightBackgroundColor, 0)
+                }
+            }
+        }
+
         // Outside list, not header: in view's flickable Silica hides keyboard when content moves
         // (every keystroke), and focus scope can pass focus to delegate: lost mid-search.
         Column {
@@ -603,11 +626,12 @@ Page {
                                 Emoji.inText(profileMark.name, false, profileName.font.pixelSize,
                                              "", Emoji.nameSaturation)
 
-                            // On title's line: Silica sets title at `topMargin`, not centred.
+                            // Search pill's size, on title's line: Silica sets title at
+                            // `topMargin`, not centred.
                             Avatar {
                                 id: profileAvatar
                                 objectName: "headerProfileAvatar"
-                                width: Theme.iconSizeSmallPlus
+                                width: searchPill.height
                                 y: listHeader.topMargin + (listHeader.titleHeight - height) / 2
                                 initial: profileMark.name
                                 ownColor: model.color

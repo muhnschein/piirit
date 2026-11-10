@@ -1,4 +1,5 @@
 //! Own profile, picture and name, top left of chat list: off until switched on in settings.
+//! Header and pills sit on accent glow either way.
 //! Shows the list's own profile only (core's list holds all), follows a new name or picture,
 //! taps through to profiles. Archived list: none (a mode, not where profiles switch).
 
@@ -64,9 +65,33 @@ const PROBE_QML: &str = r"
                     avatar.y + avatar.height / 2 === header.topMargin + header.titleHeight / 2,
                     // Anchors snap to whole pixels.
                     Math.abs(name.y + name.height / 2 - avatar.y - avatar.height / 2) <= 1,
-                    avatar.width === Theme.iconSizeSmallPlus,
+                    avatar.width === all(loader.item, 'chatSearchPill', [])[0].height,
                     name.font.pixelSize === Theme.fontSizeSmall,
                     Qt.colorEqual(name.color, Theme.secondaryColor)].join(',')
+        }
+        // Accent glow behind header and pills: from top, still on at their bottom, gone below.
+        function glow() {
+            var glow = all(loader.item, 'chatListGlow', [])[0]
+            if (!glow) { return 'missing' }
+            var heading = all(loader.item, 'chatListHeader', [])[0].parent
+            var stops = glow.gradient.stops
+            var accent = Theme.highlightBackgroundColor
+            var tinted = function (color) {
+                return Qt.colorEqual(Qt.rgba(color.r, color.g, color.b, 1), accent)
+            }
+            var kids = glow.parent.children
+            var order = glow.z < heading.z || glow.z === heading.z
+                && Array.prototype.indexOf.call(kids, glow)
+                    < Array.prototype.indexOf.call(kids, heading)
+            return [glow.parent === heading.parent && order,
+                    glow.y === 0 && glow.width === heading.width,
+                    glow.height > heading.height,
+                    stops.length === 3,
+                    tinted(stops[0].color) && stops[0].color.a > 0,
+                    Math.abs(stops[1].position * glow.height - heading.height) < 0.5
+                        && tinted(stops[1].color) && stops[1].color.a > 0,
+                    stops[2].position === 1 && tinted(stops[2].color)
+                        && stops[2].color.a === 0].join(',')
         }
         function tap() {
             var hit = profiles().filter(function (item) { return item.visible })
@@ -164,6 +189,7 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
     // Off: nothing built, not just hidden.
     plan.after(1, move || unsafe {
         record!("off-built", call!("built"));
+        record!("glow", call!("glow"));
         record!("switch-on", call!("setShown", true));
     });
 
@@ -204,6 +230,7 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
             record!("tap-opens", call!("navigation"));
             record!("switch-off", call!("setShown", false));
             record!("off-again-built", call!("built"));
+            record!("glow-on", call!("glow"));
             record!("switch-on-again", call!("setShown", true));
             record!(
                 "archived",
@@ -268,10 +295,19 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
     assert_eq!(
         value("look"),
         "true,true,true,true,true,true",
-        "the profile is not a small picture and quiet name left of the title, on its line \
+        "the profile is not a picture and quiet name left of the title, on its line \
          (in header's space left of title, picture centred on title, name on picture, \
-         picture size, name size, name colour). {context}"
+         picture as tall as search pill, name size, name colour). {context}"
     );
+    for label in ["glow", "glow-on"] {
+        assert_eq!(
+            value(label),
+            "true,true,true,true,true,true,true",
+            "{label}: the header and pills are not on an accent glow that fades out below them \
+             (behind them, page wide from top, reaches past pills, three stops, accent at top, \
+             still on at pills' bottom, gone at end). {context}"
+        );
+    }
     assert_eq!(value("tap"), "ok", "{context}");
     assert_eq!(
         value("tap-opens"),

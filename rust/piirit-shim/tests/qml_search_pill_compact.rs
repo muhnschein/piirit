@@ -68,8 +68,8 @@ const PROBE_QML: &str = r"
             }
             return '' + total
         }
-        // compact, word shown, pill narrower than worded, content padded right: worded = word
-        // then paddingLarge, compact = icon centred.
+        // compact, word shown, pill narrower than worded, content padded right (worded = word
+        // then paddingLarge, compact = icon centred), round.
         function search() {
             var pill = findIn(loader.item, 'chatSearchPill')
             var label = findIn(pill, 'pillLabel')
@@ -83,7 +83,7 @@ const PROBE_QML: &str = r"
             var right = pill.width - content.x - used
             var padded = Math.abs(right - (pill.compact ? content.x : Theme.paddingLarge)) < 0.5
             return pill.compact + ' ' + label.visible + ' ' + (pill.width < pill.fullWidth)
-                + ' ' + padded
+                + ' ' + padded + ' ' + (pill.width === pill.height)
         }
         function deleteChat(chatId) {
             var chats = findIn(loader.item, 'chats')
@@ -94,9 +94,9 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// `search()`: compact, word shown, narrower than worded, padded right.
-const WORDED: &str = "false true false true";
-const COMPACT: &str = "true false true true";
+/// `search()`: compact, word shown, narrower than worded, padded right, round.
+const WORDED: &str = "false true false true false";
+const COMPACT: &str = "true false true true true";
 
 #[test]
 #[allow(clippy::too_many_lines)]
