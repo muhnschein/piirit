@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * How messages look, what leaves and stays on this phone. From SettingsPage.
+ * How messages and chat list look, what leaves and stays on this phone. From SettingsPage.
  * Controls write on tap; deletion period asks first (deletes at once, with
  * count).
  */
@@ -230,6 +230,16 @@ Page {
                 automaticCheck: false
                 checked: Settings.markdownMode === 0
                 onClicked: Settings.markdownMode = checked ? 1 : 0
+            }
+
+            TextSwitch {
+                objectName: "chatListProfileSwitch"
+                text: qsTr("Show your profile in the chat list")
+                //: Under "Show your profile in the chat list".
+                description: qsTr("Shows your profile picture and name at the top of the chat list.")
+                automaticCheck: false
+                checked: Settings.chatListProfile === true
+                onClicked: Settings.chatListProfile = !checked
             }
 
             SectionHeader {

@@ -2512,6 +2512,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Os outros dispositivos e membros do chat mantêm suas cópias.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Mostrar seu perfil na lista de conversas</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Mostra sua foto de perfil e seu nome no topo da lista de conversas.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

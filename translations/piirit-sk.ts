@@ -2525,6 +2525,15 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Other devices and chat members keep their copies.</source>
         <translation>Ostatné zariadenia a členovia četu si svoje kópie ponechajú.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Zobrazovať tvoj profil v zozname chatov</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Zobrazuje profilový obrázok a meno navrchu zoznamu chatov.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>
