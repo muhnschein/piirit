@@ -683,7 +683,7 @@ Page {
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                     // Pill's word, magnifier at pill size, place: one fades into other.
                     font.pixelSize: Theme.fontSizeMedium
-                    textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
+                    textLeftMargin: Theme.horizontalPageMargin + searchPill.iconX
                                     + Theme.iconSizeSmallPlus + Theme.paddingSmall
                     // Own magnifier beside field; Silica's slot empty.
                     leftItem: Item {}
@@ -714,7 +714,8 @@ Page {
 
                 // Magnifier over field, not leftItem (Silica puts that off-pill).
                 Image {
-                    x: Theme.horizontalPageMargin + Theme.paddingMedium
+                    objectName: "chatSearchMagnifier"
+                    x: Theme.horizontalPageMargin + searchPill.iconX
                     anchors.verticalCenter: parent.verticalCenter
                     visible: searchField.visible
                     opacity: searchField.opacity

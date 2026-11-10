@@ -17,6 +17,8 @@ Item {
     readonly property real fullWidth: label.implicitWidth + Theme.paddingLarge
         + (root.icon !== "" ? Theme.iconSizeSmallPlus + Theme.paddingSmall + Theme.paddingMedium
                             : Theme.paddingLarge)
+    /// Icon's left edge in pill: search field puts its magnifier there.
+    readonly property real iconX: content.x
     /// Pressed.
     readonly property bool down: mouse.pressed && mouse.containsMouse
     signal clicked()
