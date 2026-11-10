@@ -9,7 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - The chat list can show your profile picture and name in its top left corner: turn it on in Settings, Messages (off by default). Tap it to open your profiles.
-- The chat list's title and filter buttons sit on a soft glow in your ambience's colour. The search button is round when it shows only its icon.
+- The chat list's title and filter buttons sit on a frosted band. The search button is round when it shows only its icon.
 - **Settings, one page per topic.** Settings now lists your profile and then Messages, Notifications, Privacy and security, Quick actions, Experimental and About, each on its own page. Blocked contacts sit under Privacy and security, and say how many there are. Voice-message transcription is set up right under its switch in Experimental. The new About page shows the versions of Piirit and the Delta Chat core, copies them for a bug report, links the source code and replays the intro slides; swiping past the last one returns to About.
 - **Chats in common.** A contact's page lists, at the bottom, the chats you share with them: your chat with them and each group they are in. The heading says how many; past five, "Show all" opens the full list. Tap a chat to open it.
 - Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.

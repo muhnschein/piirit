@@ -562,26 +562,28 @@ Page {
             }
         }
 
-        // Accent glow behind title and pills, gone below them. Ends at own colour, not
-        // "transparent": that fades through black.
+        // Frosted band behind title and pills. Wallpaper blur (Sailfish.Silica.Background) not
+        // Harbour-allowed; page background already blurred and nothing scrolls under band, so
+        // light veil looks same.
         Rectangle {
-            id: glow
-            objectName: "chatListGlow"
+            id: frost
+            objectName: "chatListFrost"
             width: parent.width
-            height: heading.height + Theme.itemSizeLarge
+            height: heading.height
+            color: Theme.rgba(Qt.tint(Theme.primaryColor,
+                                      Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
+        }
+
+        // Shadow band casts on list: above list, takes no touch.
+        Rectangle {
+            objectName: "chatListFrostShadow"
+            anchors.top: frost.bottom
+            width: parent.width
+            height: Theme.paddingLarge
+            z: 1
             gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: Theme.rgba(Theme.highlightBackgroundColor, 0.22)
-                }
-                GradientStop {
-                    position: heading.height / glow.height
-                    color: Theme.rgba(Theme.highlightBackgroundColor, 0.19)
-                }
-                GradientStop {
-                    position: 1
-                    color: Theme.rgba(Theme.highlightBackgroundColor, 0)
-                }
+                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0.45) }
+                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
             }
         }
 

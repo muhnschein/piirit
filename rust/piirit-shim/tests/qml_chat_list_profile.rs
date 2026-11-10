@@ -1,5 +1,5 @@
 //! Own profile, picture and name, top left of chat list: off until switched on in settings.
-//! Header and pills sit on accent glow either way.
+//! Header and pills sit on frosted band either way.
 //! Shows the list's own profile only (core's list holds all), follows a new name or picture,
 //! taps through to profiles. Archived list: none (a mode, not where profiles switch).
 
@@ -69,29 +69,32 @@ const PROBE_QML: &str = r"
                     name.font.pixelSize === Theme.fontSizeSmall,
                     Qt.colorEqual(name.color, Theme.secondaryColor)].join(',')
         }
-        // Accent glow behind header and pills: from top, still on at their bottom, gone below.
-        function glow() {
-            var glow = all(loader.item, 'chatListGlow', [])[0]
-            if (!glow) { return 'missing' }
+        // Frosted band behind header and pills, shadow cast on list below.
+        function frost() {
+            var frost = all(loader.item, 'chatListFrost', [])[0]
+            var shadow = all(loader.item, 'chatListFrostShadow', [])[0]
+            if (!frost || !shadow) { return 'missing' }
             var heading = all(loader.item, 'chatListHeader', [])[0].parent
-            var stops = glow.gradient.stops
-            var accent = Theme.highlightBackgroundColor
-            var tinted = function (color) {
-                return Qt.colorEqual(Qt.rgba(color.r, color.g, color.b, 1), accent)
-            }
-            var kids = glow.parent.children
-            var order = glow.z < heading.z || glow.z === heading.z
-                && Array.prototype.indexOf.call(kids, glow)
+            // Column lays out on polish, which a windowless test never runs.
+            heading.forceLayout()
+            if (heading.height <= 0) { return 'heading-unlaid' }
+            var list = all(loader.item, 'chatList', [])[0]
+            var kids = frost.parent.children
+            var behind = frost.z < heading.z || frost.z === heading.z
+                && Array.prototype.indexOf.call(kids, frost)
                     < Array.prototype.indexOf.call(kids, heading)
-            return [glow.parent === heading.parent && order,
-                    glow.y === 0 && glow.width === heading.width,
-                    glow.height > heading.height,
-                    stops.length === 3,
-                    tinted(stops[0].color) && stops[0].color.a > 0,
-                    Math.abs(stops[1].position * glow.height - heading.height) < 0.5
-                        && tinted(stops[1].color) && stops[1].color.a > 0,
-                    stops[2].position === 1 && tinted(stops[2].color)
-                        && stops[2].color.a === 0].join(',')
+            var veil = Theme.rgba(Qt.tint(Theme.primaryColor,
+                                          Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
+            var stops = shadow.gradient.stops
+            return [frost.parent === heading.parent && behind,
+                    frost.y === 0 && frost.width === heading.width
+                        && frost.height === heading.height,
+                    Qt.colorEqual(frost.color, veil),
+                    shadow.parent === frost.parent && shadow.y === frost.y + frost.height
+                        && shadow.width === frost.width && shadow.height > 0,
+                    shadow.z > list.z,
+                    stops.length === 2 && stops[0].position === 0 && stops[0].color.a > 0
+                        && stops[1].position === 1 && stops[1].color.a === 0].join(',')
         }
         function tap() {
             var hit = profiles().filter(function (item) { return item.visible })
@@ -189,7 +192,7 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
     // Off: nothing built, not just hidden.
     plan.after(1, move || unsafe {
         record!("off-built", call!("built"));
-        record!("glow", call!("glow"));
+        record!("frost", call!("frost"));
         record!("switch-on", call!("setShown", true));
     });
 
@@ -230,7 +233,7 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
             record!("tap-opens", call!("navigation"));
             record!("switch-off", call!("setShown", false));
             record!("off-again-built", call!("built"));
-            record!("glow-on", call!("glow"));
+            record!("frost-on", call!("frost"));
             record!("switch-on-again", call!("setShown", true));
             record!(
                 "archived",
@@ -299,13 +302,13 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
          (in header's space left of title, picture centred on title, name on picture, \
          picture as tall as search pill, name size, name colour). {context}"
     );
-    for label in ["glow", "glow-on"] {
+    for label in ["frost", "frost-on"] {
         assert_eq!(
             value(label),
-            "true,true,true,true,true,true,true",
-            "{label}: the header and pills are not on an accent glow that fades out below them \
-             (behind them, page wide from top, reaches past pills, three stops, accent at top, \
-             still on at pills' bottom, gone at end). {context}"
+            "true,true,true,true,true,true",
+            "{label}: the header and pills are not on a frosted band with a shadow on the list \
+             (behind them, page wide from top to pills' bottom, veil colour, shadow right under \
+             band, shadow over list, shadow fades out). {context}"
         );
     }
     assert_eq!(value("tap"), "ok", "{context}");
