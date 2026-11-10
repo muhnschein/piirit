@@ -20,7 +20,7 @@ use std::sync::{Arc, Mutex};
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
-use crate::chat::{act_on_message, fetch_messages, message_entries};
+use crate::chat::{act_on_message, fetch_messages, local_day_number, message_entries};
 use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
@@ -343,6 +343,7 @@ impl ChatMedia {
                 for (index, id) in insertions {
                     rows.insert(index, placeholder(id));
                 }
+                mark_group_starts(&mut rows);
             } else {
                 let kept: BTreeMap<u32, MessageListItem> = self
                     .rows
@@ -355,7 +356,9 @@ impl ChatMedia {
                     .iter()
                     .map(|id| kept.get(id).cloned().unwrap_or_else(|| placeholder(*id)))
                     .collect();
-                self.rows.borrow_mut().reset_data(rows);
+                let mut model = self.rows.borrow_mut();
+                model.reset_data(rows);
+                mark_group_starts(&mut model);
             }
             self.rows_changed();
         }
@@ -372,13 +375,16 @@ impl ChatMedia {
             .collect();
         let mut landed: usize = 0;
         let gallery = self.kind.to_string() == "gallery";
-        for item in items {
+        let today = local_day_number(chrono::Utc::now().timestamp());
+        for mut item in items {
             if let Some(index) = index_of.get(&item.message_id).copied() {
+                item.date_group = date_group(item.day_number, today);
                 // Reread held-back one (fetching, failed) stays gallery's kind.
                 rows.change_line(index, if gallery { as_gallery(item) } else { item });
                 landed = landed.saturating_add(1);
             }
         }
+        mark_group_starts(&mut rows);
         landed
     }
 
@@ -564,66 +570,145 @@ impl Load {
             Vec::new()
         };
         // Held before, still Text: stays where it was until reread.
-        let held: BTreeSet<u32> = texts
+        let mut shown_held: BTreeSet<u32> = texts
             .iter()
             .copied()
             .filter(|id| self.held_before.contains(id))
             .collect();
-        let ids = in_order(rpc, account_id, chat_id, &media, &held).await?;
+        let unread = if self.gallery {
+            self.unread_texts(&texts)
+        } else {
+            Vec::new()
+        };
+        let mut text_pages = unread.chunks(PAGE);
+        // Newest Text page before first ids: held-back ones near the top come with the first
+        // screen, while page slides in, not after every picture is read.
+        let mut found = match text_pages.next() {
+            Some(page) => self.held_among(page, &mut shown_held).await?,
+            None => Vec::new(),
+        };
+        let ids = in_order(rpc, account_id, chat_id, &media, &shown_held).await?;
+        step(Step::Ids(self.shown(ids)));
         let wanted: Vec<u32> = self
             .shown(media.clone())
             .into_iter()
             .filter(|id| !self.known.contains(id))
             .collect();
-        step(Step::Ids(self.shown(ids)));
-        for page in wanted.chunks(PAGE) {
-            if self.superseded() {
-                return Ok(());
-            }
-            step(Step::Rows(fetch_messages(rpc, account_id, page).await?));
-        }
-        if self.gallery {
-            let Some(found) = self.find_held(&texts).await? else {
-                return Ok(());
-            };
-            let now: BTreeSet<u32> = found.iter().map(|row| row.message_id).collect();
-            if now != held {
-                let ids = in_order(rpc, account_id, chat_id, &media, &now).await?;
-                step(Step::Ids(self.shown(ids)));
-            }
+        let mut media_pages = wanted.chunks(PAGE);
+        // Media page, then Text page, in turn.
+        loop {
             if !found.is_empty() {
-                step(Step::Rows(found));
+                step(Step::Rows(std::mem::take(&mut found)));
+            }
+            let media_page = media_pages.next();
+            if let Some(page) = media_page {
+                if self.superseded() {
+                    return Ok(());
+                }
+                step(Step::Rows(fetch_messages(rpc, account_id, page).await?));
+            }
+            let text_page = text_pages.next();
+            if let Some(page) = text_page {
+                if self.superseded() {
+                    return Ok(());
+                }
+                let before = shown_held.clone();
+                found = self.held_among(page, &mut shown_held).await?;
+                if shown_held != before {
+                    let ids = in_order(rpc, account_id, chat_id, &media, &shown_held).await?;
+                    step(Step::Ids(self.shown(ids)));
+                }
+            }
+            if media_page.is_none() && text_page.is_none() {
+                if !found.is_empty() {
+                    step(Step::Rows(found));
+                }
+                break;
             }
         }
         step(Step::Done);
         Ok(())
     }
 
-    /// Held-back gallery rows among chat's Text messages not read before (held ones reread:
-    /// state moves); plain ones noted (`PLAIN`). Newest first: recent ones found first. `None`:
-    /// superseded.
-    async fn find_held(&self, texts: &[u32]) -> Result<Option<Vec<MessageListItem>>, String> {
-        let key = (self.account_id, self.chat_id);
-        let plain = plain_of(key);
-        let unread: Vec<u32> = texts
+    /// Chat's Text messages to read for held-back ones, newest first (recent ones found
+    /// first): not read before, or held (reread: state moves). Plain ones noted (`PLAIN`).
+    fn unread_texts(&self, texts: &[u32]) -> Vec<u32> {
+        let plain = plain_of((self.account_id, self.chat_id));
+        texts
             .iter()
             .rev()
             .copied()
             .filter(|id| !self.known.contains(id) && !plain.contains(id))
-            .collect();
-        let mut found: Vec<MessageListItem> = Vec::new();
-        for page in unread.chunks(PAGE) {
-            if self.superseded() {
-                return Ok(None);
-            }
-            let items = fetch_messages(&self.rpc, self.account_id, page).await?;
-            let (gallery_rows, others): (Vec<MessageListItem>, Vec<MessageListItem>) =
-                items.into_iter().partition(|row| held_kind(row).is_some());
-            note_plain(key, others.iter().map(|row| row.message_id));
-            // As kind to come: `fill`.
-            found.extend(gallery_rows);
+            .collect()
+    }
+
+    /// Held-back gallery rows in one page of Text messages; `held` follows (page's plain ones
+    /// out, held ones in). Plain ones noted.
+    async fn held_among(
+        &self,
+        page: &[u32],
+        held: &mut BTreeSet<u32>,
+    ) -> Result<Vec<MessageListItem>, String> {
+        let items = fetch_messages(&self.rpc, self.account_id, page).await?;
+        let (gallery_rows, others): (Vec<MessageListItem>, Vec<MessageListItem>) =
+            items.into_iter().partition(|row| held_kind(row).is_some());
+        for row in &others {
+            held.remove(&row.message_id);
         }
-        Ok(Some(found))
+        held.extend(gallery_rows.iter().map(|row| row.message_id));
+        note_plain(
+            (self.account_id, self.chat_id),
+            others.iter().map(|row| row.message_id),
+        );
+        // As kind to come: `fill`.
+        Ok(gallery_rows)
+    }
+}
+
+/// Age section, as Salama's history: 1 today, 2 yesterday, 3 last 7 days, 4 last 30 days,
+/// 5 older. Today counts toward 7 and 30.
+fn date_group(day: i64, today: i64) -> i32 {
+    match today.saturating_sub(day) {
+        ..=0 => 1,
+        1 => 2,
+        2..=6 => 3,
+        7..=29 => 4,
+        _ => 5,
+    }
+}
+
+/// Which rows head their age group: first read row of each. Unread rows (0) between two of
+/// one group don't split it. QML's `ListView.section` keeps a row's first value (0, unread).
+fn group_starts(groups: &[i32]) -> Vec<bool> {
+    let mut previous = 0;
+    groups
+        .iter()
+        .map(|&group| {
+            let starts = group != 0 && group != previous;
+            if group != 0 {
+                previous = group;
+            }
+            starts
+        })
+        .collect()
+}
+
+/// `starts_group` per `group_starts`; touches only rows that flip.
+fn mark_group_starts(rows: &mut MessageListModel) {
+    let groups: Vec<i32> = rows.iter().map(|row| row.date_group).collect();
+    let flips: Vec<(usize, MessageListItem)> = rows
+        .iter()
+        .zip(group_starts(&groups))
+        .enumerate()
+        .filter(|(_, (row, starts))| row.starts_group != *starts)
+        .map(|(index, (row, starts))| {
+            let mut row = row.clone();
+            row.starts_group = starts;
+            (index, row)
+        })
+        .collect();
+    for (index, row) in flips {
+        rows.change_line(index, row);
     }
 }
 
@@ -702,7 +787,7 @@ async fn fetch_ids(
 
 #[cfg(test)]
 mod tests {
-    use super::{as_gallery, edits, held_kind, view_types};
+    use super::{as_gallery, date_group, edits, group_starts, held_kind, view_types};
     use crate::models::MessageListItem;
 
     /// Row as core's pre-message reads: Text, name, size if sender gave one.
@@ -715,6 +800,33 @@ mod tests {
             image_height: height,
             ..MessageListItem::default()
         }
+    }
+
+    /// Salama's history groups: today, yesterday, then under 7 and under 30 days ago.
+    #[test]
+    fn rows_group_by_age_as_salama_s_history() {
+        let today = 20_000;
+        let group = |days_ago: i64| date_group(today - days_ago, today);
+        assert_eq!(group(-1), 1, "clock behind sender: today, not lost");
+        assert_eq!(group(0), 1);
+        assert_eq!(group(1), 2);
+        assert_eq!(group(2), 3);
+        assert_eq!(group(6), 3);
+        assert_eq!(group(7), 4);
+        assert_eq!(group(29), 4);
+        assert_eq!(group(30), 5);
+        assert_eq!(group(3000), 5);
+    }
+
+    #[test]
+    fn each_age_group_gets_one_heading_on_its_first_read_row() {
+        // Newest first; 0 = not read yet, never headed, never splits a group.
+        assert_eq!(
+            group_starts(&[1, 1, 0, 1, 3, 0, 0, 5, 5]),
+            [true, false, false, false, true, false, false, true, false]
+        );
+        assert_eq!(group_starts(&[0, 0, 4]), [false, false, true]);
+        assert!(group_starts(&[]).is_empty());
     }
 
     #[test]

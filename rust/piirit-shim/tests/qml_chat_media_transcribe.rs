@@ -129,11 +129,10 @@ const PROBE_QML: &str = r"
         // Message arrives or goes: model says so, count not pushed.
         function arrives(n) {
             transcriber.untranscribed = n
-            var kids = loader.item.resources
-            for (var i = 0; i < kids.length; i++) {
-                if (kids[i].objectName === 'media') { kids[i].rows_changed(); return 'ok' }
-            }
-            return 'no-media'
+            var media = findIn(loader.item, 'media')
+            if (!media) { return 'no-media' }
+            media.rows_changed()
+            return 'ok'
         }
         function setEnabled(on) { transcriber.enabled = on; return 'ok' }
         function heard() { var was = calls; calls = ''; return was }

@@ -1,6 +1,6 @@
-//! Own channel's page: says Channel, offers its QR invite code (only way subscribers join: core
-//! takes no members added). QR page then shows that channel's code alone, no scanner. Group page
-//! beside it keeps its words, offers no code.
+//! Own channel's page: says Channel, Members row leads to Invite in members pulley (only way
+//! subscribers join: core takes no members added). QR page then shows that channel's code
+//! alone, no scanner. Group page beside it keeps its words; its Invite opens code as group's.
 //!
 //! Steps run in probe off pages' own loads, not clock.
 
@@ -17,10 +17,13 @@ mod common;
 const PATIENCE: u32 = 59;
 
 /// Readings probe takes, by label.
-const READINGS: [&str; 13] = [
+const READINGS: [&str; 19] = [
     "channel-title",
     "channel-menu",
+    "channel-members",
+    "channel-to-members",
     "channel-invite",
+    "channel-add",
     "channel-leave",
     "navigation",
     "code-title",
@@ -30,20 +33,28 @@ const READINGS: [&str; 13] = [
     "code-intro-styled",
     "code-link",
     "group-title",
+    "group-members",
     "group-invite",
+    "group-navigation",
+    "group-intro",
 ];
 
 // `pageStack` recorded, not performed; see qml_new_group.rs.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
+    import Piirit 1.0
     Item {
         id: probe
         property var readings: ({})
         property string groupUrl: ''
+        property string membersUrl: ''
         property string qrUrl: ''
-        // 0 channel page, 1 channel's code, 2 group page, 3 done.
+        // 0 channel page, 10 its members, 1 channel's code, 2 group page, 20 its members,
+        // 3 done.
         property int step: 0
+        /// Chat model the members page gets from its group page.
+        ChatInfo { id: members; account_id: 1 }
         property QtObject pageStack: QtObject {
             property string log: ''
             function note(verb, page, properties) {
@@ -76,8 +87,13 @@ const PROBE_QML: &str = r"
             loader.setSource('', {})
             loader.setSource(probe.groupUrl, { accountId: 1, chatId: chatId, chatName: '' })
         }
-        function start(groupUrl, qrUrl) {
+        function openMembers(chatId) {
+            loader.setSource('', {})
+            members.chat_id = chatId
+        }
+        function start(groupUrl, membersUrl, qrUrl) {
             probe.groupUrl = groupUrl
+            probe.membersUrl = membersUrl
             probe.qrUrl = qrUrl
             probe.openGroup(1)
             poll.running = loader.status === Loader.Ready
@@ -93,9 +109,19 @@ const PROBE_QML: &str = r"
                     if (!chat || !chat.loaded) { return }
                     probe.readings['channel-title'] = read('pageHeader', 'title')
                     probe.readings['channel-menu'] = read('groupMenu', 'visible')
-                    probe.readings['channel-invite'] = read('channelInvite', 'visible')
+                    probe.readings['channel-members'] = read('membersRow', 'visible')
                     probe.readings['channel-leave'] = read('leaveButton', 'visible')
-                    findIn(loader.item, 'channelInvite').clicked()
+                    findIn(loader.item, 'membersRow').clicked()
+                    probe.readings['channel-to-members'] = pageStack.log
+                    pageStack.log = ''
+                    probe.openMembers(1)
+                    probe.step = 10
+                } else if (probe.step === 10) {
+                    if (!members.loaded || members.chat_id !== 1) { return }
+                    loader.setSource(probe.membersUrl, { accountId: 1, chat: members })
+                    probe.readings['channel-invite'] = read('inviteItem', 'visible')
+                    probe.readings['channel-add'] = read('addMembersItem', 'visible')
+                    findIn(loader.item, 'inviteItem').clicked()
                     probe.readings['navigation'] = pageStack.log
                     // What the push hands QR page.
                     loader.setSource('', {})
@@ -119,7 +145,22 @@ const PROBE_QML: &str = r"
                     var group = findIn(loader.item, 'chat')
                     if (!group || !group.loaded) { return }
                     probe.readings['group-title'] = read('pageHeader', 'title')
-                    probe.readings['group-invite'] = read('channelInvite', 'visible')
+                    probe.readings['group-members'] = read('membersRow', 'visible')
+                    probe.openMembers(2)
+                    probe.step = 20
+                } else if (probe.step === 20) {
+                    if (!members.loaded || members.chat_id !== 2) { return }
+                    loader.setSource(probe.membersUrl, { accountId: 1, chat: members })
+                    probe.readings['group-invite'] = read('inviteItem', 'visible')
+                    pageStack.log = ''
+                    findIn(loader.item, 'inviteItem').clicked()
+                    probe.readings['group-navigation'] = pageStack.log
+                    loader.setSource('', {})
+                    loader.setSource(probe.qrUrl, {
+                        accountId: 1, chatId: 2, chatName: 'Hikers', isChannel: false,
+                        appActive: true
+                    })
+                    probe.readings['group-intro'] = read('intro', 'text')
                     probe.step = 3
                     poll.running = false
                 }
@@ -183,6 +224,7 @@ fn an_own_channel_offers_the_code_subscribers_join_by() {
         let started = call!(
             "start",
             QString::from(common::page_url("GroupPage.qml")),
+            QString::from(common::page_url("MembersPage.qml")),
             QString::from(common::page_url("QrPage.qml"))
         );
         common::record(&loading, "load", started.into());
@@ -209,6 +251,7 @@ fn an_own_channel_offers_the_code_subscribers_join_by() {
 }
 
 /// Channel page and its code; group page unchanged.
+#[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("steps: {steps:?}\ncalls: {names:?}");
@@ -220,21 +263,32 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
         "Channel",
         "an own channel's page is headed as a group. {context}"
     );
-    for label in ["channel-menu", "channel-invite"] {
+    // No subscribers yet: Members row still there, the way to Invite.
+    for label in ["channel-menu", "channel-members", "channel-invite"] {
         assert_eq!(
             value(label),
             "true",
-            "an own channel's page offers no QR invite code ({label}). {context}"
+            "an own channel's pages offer no QR invite code ({label}). {context}"
         );
     }
+    assert!(
+        value("channel-to-members").starts_with("push:MembersPage.qml"),
+        "the channel's Members row does not open its members. {context}"
+    );
+    assert_eq!(
+        value("channel-add"),
+        "false",
+        "a channel offers to add members, which core refuses. {context}"
+    );
     assert_eq!(
         value("channel-leave"),
         "false",
         "an own channel's page offers to leave it as a group. {context}"
     );
     assert!(
-        value("navigation")
-            .ends_with(r#"push:QrPage.qml{"accountId":1,"chatId":1,"chatName":"chat 1"}|"#),
+        value("navigation").ends_with(
+            r#"push:QrPage.qml{"accountId":1,"chatId":1,"chatName":"chat 1","isChannel":true}|"#
+        ),
         "QR invite code does not open the QR page on this channel. {context}"
     );
 
@@ -292,8 +346,19 @@ fn assert_outcome(steps: &[(String, String)], calls: &[(String, Value)]) {
         "a group's page lost its heading. {context}"
     );
     assert_eq!(
-        value("group-invite"),
-        "false",
-        "a group's page offers a channel's invite. {context}"
+        (
+            value("group-members"),
+            value("group-invite"),
+            value("group-navigation"),
+            value("group-intro")
+        ),
+        (
+            "true".to_string(),
+            "true".to_string(),
+            r#"push:QrPage.qml{"accountId":1,"chatId":2,"chatName":"chat 2","isChannel":false}|"#
+                .to_string(),
+            "Scan to join group \"Hikers\"".to_string()
+        ),
+        "a group's Invite does not open its code as the group's. {context}"
     );
 }

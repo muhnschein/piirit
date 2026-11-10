@@ -64,6 +64,10 @@ pub struct MessageListItem {
     pub timestamp: i64,
     /// Days since epoch, viewer's timezone. Section key.
     pub day_number: i64,
+    /// Media page's section (`chat_media::date_group`); 0 = not read yet.
+    pub date_group: i32,
+    /// Media page: row heads its age group (`chat_media::group_starts`).
+    pub starts_group: bool,
     /// `showPadlock`: encrypted and signed. False: mail icon.
     pub show_padlock: bool,
     /// `DC_STATE_*`: out 20 pending, 24 failed, 26 delivered, 28 read; in 10 fresh, 13 noticed,

@@ -569,11 +569,18 @@ impl ChatList {
 
     /// Mute `seconds`; -1 forever, 0 unmute.
     pub fn set_mute_duration(&mut self, chat_id: u32, seconds: i32) {
-        self.act(
-            chat_id,
-            "set_chat_mute_duration",
-            json!([mute_duration(seconds)]),
-        );
+        let account_id = self.account_id;
+        if account_id == 0 || chat_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.row_callback(chat_id);
+        runtime.spawn(async move {
+            done(crate::mute::apply(&rpc, account_id, chat_id, seconds).await);
+        });
     }
 
     /// Move chat out of list.
@@ -608,15 +615,7 @@ impl ChatList {
             params.extend(rest);
         }
 
-        let ptr: QPointer<Self> = QPointer::from(&*self);
-        let done = queued_callback(move |result: Result<(), String>| {
-            let Some(this) = ptr.as_pinned() else { return };
-            match result {
-                Ok(()) => this.borrow_mut().refresh(Refresh::One(chat_id)),
-                Err(err) => this.borrow().error(err.into()),
-            }
-        });
-
+        let done = self.row_callback(chat_id);
         runtime.spawn(async move {
             let result = rpc
                 .call::<_, ()>(method, params)
@@ -624,6 +623,18 @@ impl ChatList {
                 .map_err(|err| err.to_string());
             done(result);
         });
+    }
+
+    /// Done: refresh row (core doesn't announce all), or tell failure.
+    fn row_callback(&self, chat_id: u32) -> impl Fn(Result<(), String>) + Send + Sync + Clone {
+        let ptr: QPointer<Self> = QPointer::from(self);
+        queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => this.borrow_mut().refresh(Refresh::One(chat_id)),
+                Err(err) => this.borrow().error(err.into()),
+            }
+        })
     }
 
     /// Waiting announcements, rows current, unmuted chats; all waiting (`pending_announcements`).

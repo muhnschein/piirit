@@ -3,6 +3,7 @@
 //! and failure: QR payload or address containing `fail` is rejected.
 
 use std::collections::VecDeque;
+use std::fmt::Write as _;
 use std::io::Write;
 use std::sync::Arc;
 
@@ -948,6 +949,18 @@ const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      </head><body dir=\"auto\" style=\"unicode-bidi: plaintext\">\n\
      Groceries<br/>\nmilk<br/>\nbread<br/>\nand a &amp; sign<br/>\n\
      </body></html>\n";
+
+/// Fingerprint per contact, core's `human_readable` shape: two lines of five groups.
+fn fake_fingerprint(contact: u32) -> String {
+    let hex = format!(
+        "{:040X}",
+        u128::from(contact).wrapping_mul(0x9E37_79B9_7F4A_7C15)
+    );
+    let groups: Vec<&str> = (0..10)
+        .map(|group| &hex[group * 4..group * 4 + 4])
+        .collect();
+    format!("{}\n{}", groups[..5].join(" "), groups[5..].join(" "))
+}
 
 /// Inputs standing for unreachable server.
 fn should_fail(value: &str) -> bool {
@@ -2397,6 +2410,73 @@ async fn serve() {
                 "check_qr" => {
                     let content = positional(1).as_str().unwrap_or_default().to_string();
                     ok(&id, &qr_kind(&content))
+                }
+                // Core 2.68.0's text: keys sorted by fingerprint, relays as addresses.
+                "get_contact_encryption_info" => {
+                    let contact = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    match state.contact_object(account_id(), contact) {
+                        Some(object) => ok(
+                            &id,
+                            &json!(format!(
+                                "Messages are end-to-end encrypted.\nFingerprints:\n\nMe:\n{}\n\n{}:\n{}\n\nRelays:\n{}",
+                                fake_fingerprint(SELF),
+                                object["displayName"].as_str().unwrap_or_default(),
+                                fake_fingerprint(contact),
+                                object["address"].as_str().unwrap_or_default(),
+                            )),
+                        ),
+                        None => err(&id, &format!("Contact {contact} not found")),
+                    }
+                }
+                // Members but self; last member's key missing, as core's words.
+                "get_chat_encryption_info" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let members: Vec<u32> = state
+                        .members(chat)
+                        .into_iter()
+                        .filter(|member| *member != SELF)
+                        .collect();
+                    let mut text = String::from("Messages are end-to-end encrypted.\n");
+                    for (index, member) in members.iter().enumerate() {
+                        let Some(object) = state.contact_object(account_id(), *member) else {
+                            continue;
+                        };
+                        let name = object["displayName"].as_str().unwrap_or_default();
+                        let fingerprint = fake_fingerprint(*member);
+                        if index + 1 == members.len() && members.len() > 1 {
+                            let _ = write!(text, "\n{name}\n(key missing)\n{fingerprint}\n");
+                        } else {
+                            let address = object["address"].as_str().unwrap_or_default();
+                            let _ = write!(text, "\n{name}({address})\n{fingerprint}\n");
+                        }
+                    }
+                    ok(&id, &json!(text.trim()))
+                }
+                // Ada's first 1:1 chat; nobody else has one until made.
+                "get_chat_id_by_contact_id" => {
+                    let contact = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let found = state.chat_order.iter().copied().find(|chat| {
+                        !state.is_group(*chat)
+                            && !state.is_channel(*chat)
+                            && !state.deleted_chats.contains(chat)
+                            && state.members(*chat) == vec![contact]
+                    });
+                    ok(&id, &json!(found))
                 }
                 // Own invite, or own channel's (names channel in `b=`, as core).
                 "get_chat_securejoin_qr_code" => {

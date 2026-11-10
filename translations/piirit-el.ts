@@ -644,14 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Καρφίτσωμα</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Κατάργηση σίγασης</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Σίγαση</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>Αποδοχή</translation>
     </message>
@@ -758,18 +750,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>Πατήστε «%1» για να εμφανιστούν όλα τα κανάλια</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Ειδοποιήσεις</translation>
+    </message>
 </context>
 <context>
-    <name>ChatMediaPage</name>
-    <message>
-        <source>Open in another app</source>
-        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation>Άνοιγμα σε άλλη εφαρμογή</translation>
-    </message>
-    <message>
-        <source>Save to device</source>
-        <translation>Αποθήκευση στη συσκευή</translation>
-    </message>
+    <name>ChatMediaView</name>
     <message>
         <source>Deleting</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
@@ -786,7 +774,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>Transcribe %n voice message(s)</source>
-        <extracomment>Pulley on a chat&apos;s Audio page. %n is how many voice messages have no transcript yet.</extracomment>
+        <extracomment>Pulley on a chat&apos;s Audio view. %n is how many voice messages have no transcript yet.</extracomment>
         <translation>
             <numerusform>Μεταγραφή %n φωνητικού μηνύματος</numerusform>
             <numerusform>Μεταγραφή %n φωνητικών μηνυμάτων</numerusform>
@@ -806,6 +794,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Turns a voice message into text on the phone.</extracomment>
         <translation>Μεταγραφή</translation>
     </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>Άνοιγμα σε άλλη εφαρμογή</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>Αποθήκευση στη συσκευή</translation>
+    </message>
 </context>
 <context>
     <name>ChatNotifications</name>
@@ -813,14 +810,18 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Notifications</source>
         <translation>Ειδοποιήσεις</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>Σε σίγαση</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Ειδοποιήσεις</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>Ενεργοποιημένο</translation>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Θα λαμβάνετε ακόμα ειδοποίηση όταν κάποιος σε αυτή την ομάδα απαντά σε ένα από τα μηνύματά σας.</translation>
     </message>
 </context>
 <context>
@@ -854,10 +855,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ContactPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Αποθηκεύτηκε</translation>
-    </message>
-    <message>
         <source>Contact</source>
         <translation>Επαφή</translation>
     </message>
@@ -870,27 +867,71 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Χωρίς κρυπτογράφηση: μια απλή επαφή email</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Όνομα</translation>
-    </message>
-    <message>
-        <source>Leave blank to use the name they chose</source>
-        <translation>Αφήστε κενό για να χρησιμοποιηθεί το όνομα που επέλεξε</translation>
-    </message>
-    <message>
         <source>Seen a long time ago</source>
         <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
         <translation>Τελευταία εμφάνιση πριν από πολύ καιρό</translation>
     </message>
     <message>
-        <source>Chats in common (%1)</source>
-        <extracomment>Over the list of chats on a contact&apos;s page that the contact is in too, with how many. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
-        <translation>Κοινόχρηστες συνομιλίες (%1)</translation>
+        <source>Deleting chat</source>
+        <extracomment>Silica&apos;s countdown over the contact page, before the chat with them and its messages are deleted from this device.</extracomment>
+        <translation>Διαγραφή συνομιλίας</translation>
     </message>
     <message>
-        <source>Show all</source>
-        <extracomment>Under the first few chats in common on a contact&apos;s page: opens the list of all of them.</extracomment>
-        <translation>Εμφάνιση όλων</translation>
+        <source>Delete chat</source>
+        <extracomment>Pulley on a contact&apos;s page: deletes the chat with them from this device.</extracomment>
+        <translation>Διαγραφή συνομιλίας</translation>
+    </message>
+    <message>
+        <source>Block contact</source>
+        <translation>Αποκλεισμός Επαφής</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <extracomment>Pulley on a contact&apos;s or group&apos;s page: opens the page with the keys&apos; fingerprints.</extracomment>
+        <translation>Εμφάνιση πληροφοριών κρυπτογράφησης</translation>
+    </message>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Pulley on a contact&apos;s page: opens the page to give them a nickname.</extracomment>
+        <translation>Επεξεργασία ονόματος</translation>
+    </message>
+    <message>
+        <source>Calls themselves %1</source>
+        <extracomment>Under a nickname on a contact&apos;s page. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Αυτοαποκαλείται %1</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <extracomment>Button on a contact&apos;s page: starts a voice call.</extracomment>
+        <translation>Κλήση</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <extracomment>Button on a contact&apos;s page: starts a call with camera on.</extracomment>
+        <translation>Βιντεοκλήση</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <extracomment>Over the rows to a chat&apos;s pictures, files, apps, calls and map.</extracomment>
+        <translation>Σε αυτή τη συνομιλία</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <extracomment>Over a chat&apos;s notifications and disappearing messages.</extracomment>
+        <translation>Ρυθμίσεις</translation>
+    </message>
+    <message>
+        <source>Chats in common</source>
+        <extracomment>Over the row to the chats a contact is in too. Delta Chat&apos;s &quot;Chats in Common&quot;.</extracomment>
+        <translation>Κοινόχρηστες συνομιλίες</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chat(s)</source>
+        <extracomment>Row on a contact&apos;s page; %n is how many chats they are in too.</extracomment>
+        <translation>
+            <numerusform>%n συνομιλία</numerusform>
+            <numerusform>%n συνομιλίες</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1134,9 +1175,103 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>After %1 seconds</source>
         <translation>Μετά από %1 δευτερόλεπτα</translation>
     </message>
+</context>
+<context>
+    <name>EditGroupPage</name>
     <message>
-        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
-        <translation>Ισχύει για όλα τα μέλη της συνομιλίας αν χρησιμοποιούν Delta Chat: έχουν την δυνατότητα αντιγραφής, αποθήκευσης, και κοινοποίησης μηνυμάτων ή χρήση άλλων e-mail πελατών.</translation>
+        <source>Remove picture</source>
+        <translation>Αφαίρεση εικόνας</translation>
+    </message>
+    <message>
+        <source>Removing picture</source>
+        <extracomment>Silica&apos;s countdown before a group&apos;s picture is removed.</extracomment>
+        <translation>Αφαίρεση εικόνας</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Αλλαγή εικόνας</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <translation>Επεξεργασία καναλιού</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Επεξεργασία ομάδας</translation>
+    </message>
+    <message>
+        <source>Channel name</source>
+        <translation>Όνομα καναλιού</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>Όνομα ομάδας</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Περιγραφή</translation>
+    </message>
+    <message>
+        <source>Everyone in the channel sees these changes. Swipe back to save.</source>
+        <translation>Όλοι στο κανάλι βλέπουν αυτές τις αλλαγές. Σύρετε πίσω για αποθήκευση.</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees these changes. Swipe back to save.</source>
+        <translation>Όλοι στην ομάδα βλέπουν αυτές τις αλλαγές. Σύρετε πίσω για αποθήκευση.</translation>
+    </message>
+</context>
+<context>
+    <name>EditNamePage</name>
+    <message>
+        <source>Edit name</source>
+        <extracomment>Heading of the page that gives a contact a nickname.</extracomment>
+        <translation>Επεξεργασία ονόματος</translation>
+    </message>
+    <message>
+        <source>Nickname for &quot;%1&quot;</source>
+        <extracomment>Label of the nickname field. %1 is the name the contact chose for themselves.</extracomment>
+        <translation>Ψευδώνυμο για «%1»</translation>
+    </message>
+    <message>
+        <source>Leave blank to use their own name. Only you see this name. Swipe back to save.</source>
+        <translation>Αφήστε το κενό για να χρησιμοποιείται το όνομα που επέλεξε η επαφή. Μόνο εσείς βλέπετε αυτό το όνομα. Σύρετε πίσω για αποθήκευση.</translation>
+    </message>
+</context>
+<context>
+    <name>EncryptionPage</name>
+    <message>
+        <source>Copy fingerprints</source>
+        <extracomment>Pulley on the encryption page: copies names and fingerprints.</extracomment>
+        <translation>Αντιγραφή αποτυπωμάτων</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>Αντιγράφηκε στο πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Encryption info</source>
+        <extracomment>Heading of the page with the keys&apos; fingerprints. Delta Chat&apos;s &quot;Encryption Info&quot;.</extracomment>
+        <translation>Πληροφορίες κρυπτογράφησης</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Over the members&apos; keys on a group&apos;s encryption page. %n is how many are listed.</extracomment>
+        <translation>
+            <numerusform>%n μέλος</numerusform>
+            <numerusform>%n μέλη</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Key missing</source>
+        <extracomment>On a group&apos;s encryption page, under a member whose key this phone does not have.</extracomment>
+        <translation>Λείπει το κλειδί</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <extracomment>Over the relays a contact&apos;s key names. Delta Chat&apos;s &quot;Relays&quot;.</extracomment>
+        <translation>Αναμεταδότες</translation>
     </message>
 </context>
 <context>
@@ -1204,69 +1339,63 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>GroupPage</name>
     <message>
-        <source>Saved</source>
-        <translation>Αποθηκεύτηκε</translation>
-    </message>
-    <message>
         <source>Leave group</source>
         <translation>Αποχώρηση από την ομάδα</translation>
-    </message>
-    <message>
-        <source>Add members</source>
-        <translation>Προσθήκη μελών</translation>
     </message>
     <message>
         <source>Group</source>
         <translation>Ομάδα</translation>
     </message>
-    <message>
-        <source>Remove picture</source>
-        <translation>Αφαίρεση εικόνας</translation>
-    </message>
-    <message>
-        <source>Group name</source>
-        <translation>Όνομα ομάδας</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
-        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <extracomment>Row on a group&apos;s page, opens the list of all. %n is how many people are in it.</extracomment>
         <translation>
             <numerusform>%n μέλος</numerusform>
             <numerusform>%n μέλη</numerusform>
         </translation>
     </message>
     <message>
-        <source>Remove from group</source>
-        <translation>Αφαίρεση από την ομάδα</translation>
-    </message>
-    <message>
-        <source>Removing</source>
-        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
-        <translation>Αφαίρεση σε εξέλιξη</translation>
-    </message>
-    <message>
-        <source>Everyone in the group sees the name</source>
-        <translation>Όλοι στην ομάδα βλέπουν το όνομα</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
-        <translation>Περιγραφή</translation>
-    </message>
-    <message>
-        <source>Change picture</source>
-        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
-        <translation>Αλλαγή εικόνας</translation>
-    </message>
-    <message>
-        <source>QR invite code</source>
-        <extracomment>Delta Chat&apos;s &quot;qrshow_title&quot;. Opens the code others scan to join the channel.</extracomment>
-        <translation>Κωδικός πρόσκλησης QR</translation>
-    </message>
-    <message>
         <source>Channel</source>
         <extracomment>Delta Chat&apos;s &quot;channel&quot;. Heading of a channel&apos;s page.</extracomment>
         <translation>Κανάλι</translation>
+    </message>
+    <message>
+        <source>Deleting chat</source>
+        <translation>Διαγραφή συνομιλίας</translation>
+    </message>
+    <message>
+        <source>Delete chat</source>
+        <translation>Διαγραφή συνομιλίας</translation>
+    </message>
+    <message>
+        <source>Show encryption info</source>
+        <translation>Εμφάνιση πληροφοριών κρυπτογράφησης</translation>
+    </message>
+    <message>
+        <source>Edit channel</source>
+        <extracomment>Pulley on a group&apos;s page: opens the page to change its name, description and picture. Delta Chat&apos;s &quot;Edit Group&quot;.</extracomment>
+        <translation>Επεξεργασία καναλιού</translation>
+    </message>
+    <message>
+        <source>Edit group</source>
+        <translation>Επεξεργασία ομάδας</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>Κρυπτογράφηση από άκρο σε άκρο</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <extracomment>Over the row to a group&apos;s members.</extracomment>
+        <translation>Μέλη</translation>
+    </message>
+    <message>
+        <source>In this chat</source>
+        <translation>Σε αυτή τη συνομιλία</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Ρυθμίσεις</translation>
     </message>
 </context>
 <context>
@@ -1444,7 +1573,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Media</name>
     <message>
         <source>Gallery</source>
-        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The pictures and videos of a chat: a row, and a page heading.</extracomment>
         <translation>Συλλογή</translation>
     </message>
     <message>
@@ -1480,7 +1609,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Calls</source>
-        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <extracomment>The calls made and received in a chat: a row, and a page heading.</extracomment>
         <translation>Κλήσεις</translation>
     </message>
     <message>
@@ -1489,8 +1618,79 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Map</source>
-        <extracomment>Tile opening the map of a chat&apos;s shared locations.</extracomment>
+        <extracomment>Row opening the map of a chat&apos;s shared locations.</extracomment>
         <translation>Χάρτης</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Σήμερα</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Χθες</translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation>Τελευταίες 7 ημέρες</translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation>Τελευταίες 30 ημέρες</translation>
+    </message>
+    <message>
+        <source>Older</source>
+        <translation>Παλαιότερα</translation>
+    </message>
+</context>
+<context>
+    <name>MemberRow</name>
+    <message>
+        <source>Send message</source>
+        <extracomment>Menu on a group member: opens the chat with them, made if needed. Delta Chat&apos;s &quot;Send Message&quot;.</extracomment>
+        <translation>Αποστολή μηνύματος</translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>Αφαίρεση από την ομάδα</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <extracomment>Under the reader&apos;s own name in a group&apos;s member list.</extracomment>
+        <translation>Εσείς</translation>
+    </message>
+</context>
+<context>
+    <name>MembersPage</name>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>Αφαίρεση σε εξέλιξη</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading of a group&apos;s member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n μέλος</numerusform>
+            <numerusform>%n μέλη</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Search members</source>
+        <extracomment>Prompt in the search field over a group&apos;s member list.</extracomment>
+        <translation>Αναζήτηση μελών</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>Προσθήκη μελών</translation>
+    </message>
+    <message>
+        <source>Invite with a QR code</source>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <translation>Πρόσκληση με κωδικό QR</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Κανείς δεν ταιριάζει</translation>
     </message>
 </context>
 <context>
@@ -1558,44 +1758,75 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>Σίγαση</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n ημέρα</numerusform>
+            <numerusform>%n ημέρες</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n ώρα</numerusform>
+            <numerusform>%n ώρες</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Ακύρωση</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 ημ. %2 ώ.</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>Για 1 ώρα</translation>
+        <source>%1 d</source>
+        <translation>%1 ημ.</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>Για 8 ώρες</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 ώ. %2 λ.</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>Για 1 ημέρα</translation>
+        <source>%1 h</source>
+        <translation>%1 ώ.</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>Για 7 ημέρες</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 λ.</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>Για πάντα</translation>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (απομένουν %2)</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>Θα λαμβάνετε ακόμα ειδοποίηση όταν κάποιος σε αυτή την ομάδα απαντά σε ένα από τα μηνύματά σας.</translation>
+        <source>On</source>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
+        <translation>Ενεργοποιημένο</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Κατάργηση σίγασης</translation>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Απενεργοποιημένο</translation>
+    </message>
+    <message>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Απενεργοποιημένο για %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Απενεργοποιημένο (απομένουν %1)</translation>
+    </message>
+    <message>
+        <source>Off for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Απενεργοποιημένο για %1 (απομένουν %2)</translation>
     </message>
 </context>
 <context>
@@ -1966,6 +2197,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Scan to join channel &quot;%1&quot;</source>
         <extracomment>Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;. %1 is the channel&apos;s name.</extracomment>
         <translation>Σαρώστε για να μπείτε στο κανάλι &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Scan to join group &quot;%1&quot;</source>
+        <extracomment>Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;. %1 is the group&apos;s name.</extracomment>
+        <translation>Σαρώστε για να μπείτε στην ομάδα «%1»</translation>
     </message>
 </context>
 <context>

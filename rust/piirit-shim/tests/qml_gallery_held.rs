@@ -8,7 +8,7 @@
 //! Download, which fetches and turns slide into picture in place; grid tile marks it with size to
 //! fetch, tap opens viewer there, with nothing drawn till list has it; fetch under way keeps slide
 //! the video it will be; Download's words per state; Text messages read once per process, not per
-//! gallery opened.
+//! gallery opened; held ones among gallery's first rows, not after (they popped in late).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -42,6 +42,21 @@ const PROBE_QML: &str = r"
             onCore_event: oldest.handle_event(context_id, kind, payload_json)
             onStatus_changed: if (core.status === 'ready') { oldest.reload() }
         }
+        /// Ids of the first rows the gallery shows (page sliding in): held ones among them?
+        property string firstIds: ''
+        Connections {
+            target: oldest
+            onRows_changed: {
+                if (probe.firstIds === '' && oldest.count > 0) {
+                    var ids = []
+                    for (var id = 10; id <= 20; id++) {
+                        if (oldest.index_of(id) >= 0) { ids.push(id) }
+                    }
+                    probe.firstIds = ids.join(',')
+                }
+            }
+        }
+        function first() { return probe.firstIds }
         Repeater {
             id: oldestRows
             model: oldest.rows
@@ -242,6 +257,7 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     // Model read; second reader, viewer from chat at picture 10.
     plan.after(2, move || unsafe {
         record!("oldest", call!("oldestList"));
+        record!("first-ids", call!("first"));
         record!("oldest-said", call!("oldestText", 1));
         record!("make-newest", call!("makeNewest"));
         record!("load-gallery", call!("loadGallery", s!(gallery.clone())));
@@ -382,6 +398,12 @@ fn pictures_not_yet_downloaded_are_in_the_gallery_with_download() {
     let context = format!("steps: {steps:?}");
 
     for (label, expected, complaint) in [
+        (
+            "first-ids",
+            "10,15,16,17",
+            "not yet downloaded ones come only after the gallery's first rows, so they \
+             pop in once the page has slid in",
+        ),
         (
             "oldest",
             "10:Image:Done:0,16:Image:Available:2516582,15:Video:Done:1048576,\

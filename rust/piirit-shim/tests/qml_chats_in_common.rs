@@ -1,5 +1,6 @@
-//! Contact page's "Chats in common": asked of core by contact, never as the whole list.
-//! Tap opens the chat via the list page; the own chat goes back.
+//! Contact page's "Chats in common": asked of core by contact, never as the whole list. One
+//! row (count, first names) opens the list; tap there opens the chat via the list page, the
+//! own chat goes back.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -97,18 +98,6 @@ const PROBE_QML: &str = r"
             var chats = findIn(loader.item, 'commonChats')
             return chats ? chats.count : -1
         }
-        function rows() {
-            var header = findIn(loader.item, 'commonChatsHeader')
-            var out = []
-            var kids = header ? header.parent.children : []
-            for (var i = 0; i < kids.length; i++) {
-                var name = kids[i].objectName
-                if (name.indexOf('commonChatRow') === 0 && kids[i].visible) {
-                    out.push(name.substring('commonChatRow'.length))
-                }
-            }
-            return out.join(',')
-        }
         function allText(node) {
             if (!node) { return '' }
             var out = node.text !== undefined ? node.text + '|' : ''
@@ -160,16 +149,11 @@ const PROBE_QML: &str = r"
             } else if (step === 2 && count() === 6) {
                 record('header', get('commonChatsHeader', 'visible'))
                 record('header-text', get('commonChatsHeader', 'text'))
-                record('rows', rows())
-                record('all-shown', get('commonChatsAll', 'visible'))
-                record('row-text', rowText('commonChatRow2'))
-                record('row-name', get('commonChatRow2', 'height') > 0 ? 'sized' : 'flat')
-                record('tap-other', tap('commonChatRow2'))
-                record('list-log', listPage.log)
-                record('tap-own', tap('commonChatRow1'))
-                record('stack-own', pageStack.log)
-                pageStack.log = ''
-                record('tap-all', tap('commonChatsAll'))
+                record('count-text', get('commonChatsCount', 'text'))
+                record('names', get('commonChatsNames', 'name'))
+                record('row-shown', get('commonChatsRow', 'visible'))
+                record('row-size', get('commonChatsRow', 'height') > 0 ? 'sized' : 'flat')
+                record('tap-all', tap('commonChatsRow'))
                 record('stack-all', pageStack.log)
                 record('all-rows', allRows())
                 listPage.log = ''
@@ -181,19 +165,18 @@ const PROBE_QML: &str = r"
                 pageStack.currentPage = loader.item
                 pageStack.log = ''
                 listPage.accountId = 2
-                record('tap-other-profile', tap('commonChatRow201'))
+                record('tap-other-profile', tapAll('allCommonChatRow201'))
                 record('stack-other-profile', pageStack.log)
                 pageStack.log = ''
                 appWindow.chatList = null
-                record('tap-no-list', tap('commonChatRow201'))
+                record('tap-no-list', tapAll('allCommonChatRow201'))
                 record('stack-no-list', pageStack.log)
                 record('list-log-after', listPage.log)
                 group.remove_member(10)
                 step = 3
             } else if (step === 3 && count() === 5) {
-                record('rows-after-leave', rows())
-                record('all-after-leave', get('commonChatsAll', 'visible'))
-                record('header-after-leave', get('commonChatsHeader', 'text'))
+                record('count-after-leave', get('commonChatsCount', 'text'))
+                record('names-after-leave', get('commonChatsNames', 'name'))
                 record('load-self', load(7))
                 record('show-self', show())
                 step = 4
@@ -262,44 +245,27 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
         (
             value("header"),
             value("header-text"),
-            value("rows"),
-            value("all-shown")
+            value("count-text"),
+            value("names"),
+            value("row-shown"),
+            value("row-size")
         ),
         (
             "true".to_string(),
-            "Chats in common (6)".to_string(),
-            "1,2,201,202,203".to_string(),
-            "true".to_string()
+            "Chats in common".to_string(),
+            "6 chat(s)".to_string(),
+            "chat 1, chat 2, chat 201, …".to_string(),
+            "true".to_string(),
+            "sized".to_string()
         ),
-        "the contact page does not list the first five chats shared with \
-         the contact under a heading counting all, with Show all below. \
-         {context}"
+        "the contact page does not sum up the chats shared with the contact \
+         in one row: how many, and the first three names. {context}"
     );
     assert_eq!(
         (value("unshown"), value("show")),
         ("0:0".to_string(), "ok".to_string()),
         "the chats in common were loaded before the page was shown; it sits \
          beside every one-to-one chat, mostly never opened. {context}"
-    );
-    assert!(
-        value("row-text").contains("chat 2") && !value("row-text").contains("last in"),
-        "a common chat's row does not show just its name. {context}"
-    );
-    assert_eq!(
-        value("row-name"),
-        "sized",
-        "a common chat's row has no height. {context}"
-    );
-    assert_eq!(
-        (value("tap-other"), value("list-log")),
-        ("ok".to_string(), "above:2:chat 2|".to_string()),
-        "tapping a common chat did not open it through the chat list, which \
-         knows which chat is open. {context}"
-    );
-    assert_eq!(
-        (value("tap-own"), value("stack-own")),
-        ("ok".to_string(), "back|".to_string()),
-        "tapping the chat the page belongs to did not go back to it. {context}"
     );
     assert_eq!(
         (value("tap-all"), value("stack-all"), value("all-rows")),
@@ -308,7 +274,7 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
             "push:CommonChatsPage.qml:undefined|".to_string(),
             "1,2,3,201,202,203".to_string()
         ),
-        "Show all does not open a page listing every chat in common. \
+        "the row does not open a page listing every chat in common. \
          {context}"
     );
     assert_eq!(
@@ -324,8 +290,8 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
             "ok".to_string(),
             "pop:conversation|".to_string()
         ),
-        "a chat tapped on the Show all page does not open as on the contact \
-         page, or the contact's own chat is not gone back to. {context}"
+        "a chat tapped on the all-chats page does not open through the chat \
+         list, or the contact's own chat is not gone back to. {context}"
     );
     assert_eq!(
         (
@@ -346,18 +312,12 @@ fn a_contacts_page_lists_the_chats_shared_with_them() {
          did not open over the page, or went to the wrong list. {context}"
     );
     assert_eq!(
+        (value("count-after-leave"), value("names-after-leave")),
         (
-            value("rows-after-leave"),
-            value("all-after-leave"),
-            value("header-after-leave")
+            "5 chat(s)".to_string(),
+            "chat 1, chat 201, chat 202, …".to_string()
         ),
-        (
-            "1,201,202,203,3".to_string(),
-            "false".to_string(),
-            "Chats in common (5)".to_string()
-        ),
-        "the group the contact left stays among the chats in common, or \
-         Show all stays with five left. {context}"
+        "the group the contact left stays among the chats in common. {context}"
     );
     assert_eq!(
         (value("self-count"), value("self-header")),

@@ -89,14 +89,4 @@ Column {
             }
         }
     }
-
-    Label {
-        objectName: "disappearingNote"
-        x: Theme.horizontalPageMargin
-        width: parent.width - 2 * Theme.horizontalPageMargin
-        wrapMode: Text.Wrap
-        font.pixelSize: Theme.fontSizeExtraSmall
-        color: Theme.secondaryColor
-        text: qsTr("Applies to all members of this chat; they can still copy, save, and forward messages.")
-    }
 }

@@ -39,6 +39,7 @@ mod chatlist;
 mod connectivity;
 mod contacts;
 mod core;
+mod encryption;
 mod full_text;
 mod html;
 mod json;
@@ -49,6 +50,7 @@ mod markdown;
 mod media;
 mod mic_watch;
 mod models;
+mod mute;
 mod pictures;
 mod prefetch;
 mod profile;
@@ -79,10 +81,12 @@ pub use crate::core::{
     core_settled, server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER,
     DEFAULT_PROVIDER_QR, HANDLED_EVENT_KINDS,
 };
+pub use crate::encryption::EncryptionInfo;
 pub use crate::full_text::FullText;
 pub use crate::location::LiveLocation;
 pub use crate::maps::LocationMap;
 pub use crate::mic_watch::{MicState, MicWatch, MicWatcher};
+pub use crate::mute::MuteState;
 pub use crate::pictures::{install as install_pictures, render as render_picture};
 pub use crate::prefetch::ChatPrefetch;
 pub use crate::profile::Profile;
@@ -156,6 +160,12 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
+    let (Ok(encryption), Ok(mute)) = (
+        std::ffi::CStr::from_bytes_with_nul(b"EncryptionInfo\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"MuteState\0"),
+    ) else {
+        return;
+    };
     qmetaobject::qml_register_type::<ChatMessages>(uri, 1, 0, messages);
     qmetaobject::qml_register_type::<ChatList>(uri, 1, 0, list);
     qmetaobject::qml_register_type::<ContactList>(uri, 1, 0, contacts);
@@ -181,6 +191,8 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<LiveLocation>(uri, 1, 0, live_location);
     qmetaobject::qml_register_type::<Transcriber>(uri, 1, 0, transcriber);
     qmetaobject::qml_register_type::<Transcript>(uri, 1, 0, transcript);
+    qmetaobject::qml_register_type::<EncryptionInfo>(uri, 1, 0, encryption);
+    qmetaobject::qml_register_type::<MuteState>(uri, 1, 0, mute);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,

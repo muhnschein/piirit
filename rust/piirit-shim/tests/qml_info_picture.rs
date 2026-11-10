@@ -1,7 +1,6 @@
 //! Tap on contact/group picture opens it larger. Ada has picture
 //! (`PIIRIT_FAKE_CONTACT_PICTURE`): opens on that file. Group has none: tap opens
-//! nothing until pull-down sets one. Changing group picture is in pull-down; no edit badge on
-//! picture.
+//! nothing until Edit group's pull-down sets one; removing it there waits out a countdown.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -22,6 +21,7 @@ const PROBE_QML: &str = r"
     import Sailfish.Silica 1.0
     Item {
         Loader { id: loader }
+        Loader { id: editLoader }
         // Silica's `pageStack`, recorded rather than performed: which page
         // each tap opens, and on which file. The pages find it by id, up
         // the loader's context.
@@ -75,6 +75,23 @@ const PROBE_QML: &str = r"
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
             item.clicked(null)
+            return 'ok'
+        }
+        // Edit group page, as the group page's pulley opens it: on the page's own chat.
+        function loadEdit(url) {
+            editLoader.setSource('', {})
+            editLoader.setSource(url, { chat: findIn(loader.item, 'chat') })
+            return editLoader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        function editGet(name, property) {
+            var item = findIn(editLoader.item, name)
+            if (!item) { return 'missing:' + name }
+            return '' + item[property]
+        }
+        function editClick(name) {
+            var item = findIn(editLoader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.clicked()
             return 'ok'
         }
         // What the page stack has been asked for since the last look.
@@ -164,7 +181,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
     });
 
     plan.after(2, move || unsafe {
-        record!("contact-picture", get!("contactAvatar", "picturePath"));
+        record!("contact-picture", get!("identityAvatar", "picturePath"));
         record!("contact-tappable", get!("pictureTap", "enabled"));
         record!("contact-tap", call!("tap", QString::from("pictureTap")));
         record!("contact-opened", call!("pushed"));
@@ -181,18 +198,62 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("group-tappable", get!("pictureTap", "enabled"));
         record!("group-tap", call!("tap", QString::from("pictureTap")));
         record!("group-opened-bare", call!("pushed"));
-        // Picture change in pull-down, opens gallery.
-        record!("change-offered", get!("changePicture", "visible"));
-        record!("change", call!("click", QString::from("changePicture")));
+        // Picture change in Edit group's pull-down, opens gallery.
+        record!(
+            "load-edit",
+            call!(
+                "loadEdit",
+                QString::from(common::page_url("EditGroupPage.qml"))
+            )
+        );
+        record!(
+            "change-offered",
+            call!(
+                "editGet",
+                QString::from("changePicture"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "remove-before",
+            call!(
+                "editGet",
+                QString::from("removePicture"),
+                QString::from("visible")
+            )
+        );
+        record!("change", call!("editClick", QString::from("changePicture")));
         record!("change-opened", call!("pushed"));
         record!("pick", call!("pick", QString::from(GROUP_PICTURE)));
     });
 
     plan.after(2, move || unsafe {
-        record!("group-picture", get!("groupAvatar", "picturePath"));
+        record!("group-picture", get!("identityAvatar", "picturePath"));
         record!("group-tappable-now", get!("pictureTap", "enabled"));
         record!("group-tap-now", call!("tap", QString::from("pictureTap")));
         record!("group-opened", call!("pushed"));
+        record!(
+            "remove-offered",
+            call!(
+                "editGet",
+                QString::from("removePicture"),
+                QString::from("visible")
+            )
+        );
+        record!("remove", call!("editClick", QString::from("removePicture")));
+        record!(
+            "counting",
+            call!(
+                "editGet",
+                QString::from("pictureRemorse"),
+                QString::from("active")
+            )
+        );
+    });
+
+    // Countdown (stub: 50 ms), then core clears it.
+    plan.after(2, move || unsafe {
+        record!("group-picture-gone", get!("identityAvatar", "picturePath"));
         // One-to-one chat has nothing to change.
         record!(
             "load-single",
@@ -202,7 +263,21 @@ fn a_tap_on_the_picture_shows_it_larger() {
 
     plan.after(2, move || unsafe {
         record!("single-loaded", get!("chat", "loaded"));
-        record!("single-change", get!("changePicture", "visible"));
+        record!(
+            "load-edit-single",
+            call!(
+                "loadEdit",
+                QString::from(common::page_url("EditGroupPage.qml"))
+            )
+        );
+        record!(
+            "single-change",
+            call!(
+                "editGet",
+                QString::from("pictureMenu"),
+                QString::from("visible")
+            )
+        );
         (*engine_ptr).quit();
     });
 
@@ -212,6 +287,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
     assert_taps(&steps);
 }
 
+#[allow(clippy::too_many_lines)]
 fn assert_taps(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -227,10 +303,13 @@ fn assert_taps(steps: &[(&str, String)]) {
         "contact-tap",
         "load-group",
         "group-tap",
+        "load-edit",
         "change",
         "pick",
         "group-tap-now",
+        "remove",
         "load-single",
+        "load-edit-single",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -281,6 +360,11 @@ fn assert_taps(steps: &[(&str, String)]) {
         "the pull-down does not offer to change the group's picture. {context}"
     );
     assert_eq!(
+        value("remove-before"),
+        "false",
+        "Remove picture is offered for a group with no picture. {context}"
+    );
+    assert_eq!(
         value("change-opened"),
         "push:AttachPhotoPage.qml=|",
         "changing the picture does not open the gallery. {context}"
@@ -303,6 +387,16 @@ fn assert_taps(steps: &[(&str, String)]) {
         "a tap on a group's picture does not open it large. {context}"
     );
 
+    assert_eq!(
+        (
+            value("remove-offered"),
+            value("counting"),
+            value("group-picture-gone")
+        ),
+        ("true".to_string(), "true".to_string(), String::new()),
+        "Remove picture is not offered once there is one, or does not count \
+         down before the core clears it. {context}"
+    );
     assert_eq!(
         value("single-loaded"),
         "true",

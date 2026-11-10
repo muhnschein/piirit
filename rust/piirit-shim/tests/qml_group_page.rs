@@ -1,9 +1,7 @@
-//! Group page shows what core holds, writes name back. Members shown; name filled from core, not
-//! from opening page; typed name saved on leave; blanked one reverts to group's, not sent to core
-//! empty. Leaving group asked on own page. Non-group chat: no edits.
-//!
-//! Member rows wait for page to come on screen: page is attached to its conversation as soon as
-//! that loads, and mostly nobody swipes to it.
+//! Group page shows what core holds: name, count, description, first members. Edit group page
+//! writes name and description back on the way out; blanked name reverts to group's, not sent to
+//! core empty. Leaving group asked on own page; once left, Delete chat stands in its place.
+//! Non-group chat: no edits.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -52,21 +50,28 @@ const PROBE_QML: &str = r"
             loader.setSource(url, { accountId: 1, chatId: chatId, chatName: 'from the list' })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
-        /// Made the way `pushAttached` makes it: off the screen until the
-        /// reader swipes across.
-        function loadUnseen(url, chatId) {
-            loader.setSource('', {})
-            loader.setSource(url, {
-                accountId: 1,
-                chatId: chatId,
-                chatName: 'from the list',
-                status: PageStatus.Inactive
-            })
-            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        Loader { id: editLoader }
+        /// Edit group page, as the pulley opens it: on the group page's own chat.
+        function loadEdit(url) {
+            editLoader.setSource('', {})
+            editLoader.setSource(url, { chat: findIn(loader.item, 'chat') })
+            return editLoader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
-        /// The swipe across: the page on its way onto the screen.
-        function show() {
-            loader.item.status = PageStatus.Activating
+        function editGet(name, property) {
+            var item = findIn(editLoader.item, name)
+            if (!item) { return 'missing:' + name }
+            return '' + item[property]
+        }
+        function editSet(name, value) {
+            var item = findIn(editLoader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.text = value
+            return 'ok'
+        }
+        /// Swipe back: Deactivating is what saves.
+        function leaveEdit() {
+            editLoader.item.status = PageStatus.Active
+            editLoader.item.status = PageStatus.Deactivating
             return 'ok'
         }
         // `data` rather than `children`: the model is a plain QObject, so
@@ -115,12 +120,16 @@ const PROBE_QML: &str = r"
             item.clicked()
             return 'ok'
         }
-        /// Leaving the page is what applies what was typed. Back on
-        /// screen first: the status has to change for the page to notice.
-        function leave() {
-            loader.item.status = PageStatus.Active
-            loader.item.status = PageStatus.Deactivating
-            return 'ok'
+        // Pulley entries top to bottom, as declared: objectNames.
+        function menuOrder(name) {
+            var walk = function(node) {
+                var out = node.text !== undefined && node.objectName ? node.objectName + '|' : ''
+                var kids = node.data !== undefined ? node.data : node.children
+                for (var i = 0; kids && i < kids.length; i++) { out += walk(kids[i]) }
+                return out
+            }
+            var menu = findIn(loader.item, name)
+            return menu ? walk(menu) : 'missing:' + name
         }
     }
 ";
@@ -184,35 +193,43 @@ fn the_group_page_shows_the_group_and_renames_it() {
     }
 
     let mut plan = common::Plan::default();
+    let page = common::page_url("GroupPage.qml");
+    let edit = common::page_url("EditGroupPage.qml");
 
-    // Group: chat 2, account and one contact, off-screen.
+    // Group: chat 2, account and one contact.
+    let url = page.clone();
     plan.after(1, move || unsafe {
-        record!(
-            "load",
-            call!(
-                "loadUnseen",
-                QString::from(common::page_url("GroupPage.qml")),
-                2
-            )
-        );
+        record!("load", call!("load", QString::from(url.clone()), 2));
     });
 
+    let edit_url = edit.clone();
     plan.after(2, move || unsafe {
         record!("loaded", get!("chat", "loaded"));
-        // Loaded, counted in heading; no rows until page on way in.
-        record!("unseen-members", get!("membersHeader", "text"));
-        record!("unseen-row", get!("memberRow10", "objectName"));
-        record!("show", call!("show"));
-        record!("name", get!("groupNameField", "text"));
-        record!("editable", get!("groupNameField", "readOnly"));
-        record!("members", get!("membersHeader", "text"));
-        record!("self-row", get!("memberRow1", "objectName"));
-        record!("contact-row", get!("memberRow10", "objectName"));
-        record!("add-offered", get!("addMembersButton", "visible"));
+        record!("name", get!("nameLabel", "name"));
+        record!("members", get!("memberCount", "text"));
+        record!("member-names", get!("memberNames", "name"));
+        record!("members-row", get!("membersRow", "visible"));
+        // Add members and Invite moved to the members page's pulley.
+        record!("add-row", get!("addMembersRow", "visible"));
+        record!("invite-row", get!("inviteRow", "visible"));
+        record!("menu-order", call!("menuOrder", QString::from("groupMenu")));
+        record!("band", get!("headerBand", "visible"));
+        record!(
+            "band-gap",
+            format!(
+                "{},{}",
+                get!("bandGap", "visible"),
+                get!("bandGap", "height")
+            )
+        );
         record!("leave-offered", get!("leaveButton", "visible"));
         record!("menu-offered", get!("groupMenu", "visible"));
-        record!("change-picture", get!("changePicture", "visible"));
-        record!("remove-picture", get!("removePicture", "visible"));
+        record!("edit-offered", get!("editGroup", "visible"));
+        record!("delete-offered", get!("deleteChat", "visible"));
+        // Members row, a media row: each opens its page.
+        for row in ["membersRow", "galleryRow"] {
+            record!(row, call!("click", QString::from(row)));
+        }
         // Disappearing messages: off per core; duration tap goes to core.
         record!("timer-off", get!("disappearingCombo", "currentIndex"));
         record!("timer-offered", get!("disappearingCombo", "enabled"));
@@ -220,39 +237,78 @@ fn the_group_page_shows_the_group_and_renames_it() {
             "timer-pick",
             call!("click", QString::from("timerOption86400"))
         );
-        // Description: line break shown; editable on a group account is in.
-        record!("desc-visible", get!("descriptionField", "visible"));
-        record!("desc-text", get!("descriptionField", "text"));
-        record!("desc-readonly", get!("descriptionField", "readOnly"));
-        // New one applied on way out, with name.
+        // Description: line break shown.
+        record!("desc-visible", get!("descriptionLabel", "visible"));
+        record!("desc-text", get!("descriptionLabel", "text"));
+        record!(
+            "load-edit",
+            call!("loadEdit", QString::from(edit_url.clone()))
+        );
+        record!(
+            "edit-name",
+            call!(
+                "editGet",
+                QString::from("groupNameField"),
+                QString::from("text")
+            )
+        );
+        record!(
+            "edit-desc",
+            call!(
+                "editGet",
+                QString::from("descriptionField"),
+                QString::from("text")
+            )
+        );
+        record!(
+            "change-picture",
+            call!(
+                "editGet",
+                QString::from("changePicture"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "remove-picture",
+            call!(
+                "editGet",
+                QString::from("removePicture"),
+                QString::from("visible")
+            )
+        );
+        // New ones applied on way out, together.
         record!(
             "desc-typed",
             call!(
-                "setText",
+                "editSet",
                 QString::from("descriptionField"),
                 QString::from("  Bring water\nand boots \n")
             )
         );
-        // New name applied on way out, not a pause later.
         record!(
             "typed",
             call!(
-                "setText",
+                "editSet",
                 QString::from("groupNameField"),
                 QString::from("Hikers")
             )
         );
-        record!("leave", call!("leave"));
+        record!("leave", call!("leaveEdit"));
     });
 
+    let edit_url = edit.clone();
     plan.after(2, move || unsafe {
-        // Sent value comes back trimmed; field shows that.
-        record!("desc-saved", get!("descriptionField", "text"));
-        // Cleared: field blanked, page left.
+        // Sent value comes back trimmed; page shows that.
+        record!("desc-saved", get!("descriptionLabel", "text"));
+        record!("renamed", get!("nameLabel", "name"));
+        record!(
+            "load-edit-again",
+            call!("loadEdit", QString::from(edit_url.clone()))
+        );
         record!(
             "desc-cleared",
             call!(
-                "setText",
+                "editSet",
                 QString::from("descriptionField"),
                 QString::from("")
             )
@@ -261,70 +317,100 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!(
             "blanked",
             call!(
-                "setText",
+                "editSet",
                 QString::from("groupNameField"),
                 QString::from("")
             )
         );
-        record!("leave-blank", call!("leave"));
-        record!("refilled", get!("groupNameField", "text"));
+        record!("leave-blank", call!("leaveEdit"));
         // Leave asked on own page.
         record!(
             "confirm-leave",
             call!("click", QString::from("leaveButton"))
         );
-        // One-to-one chat: shown, nothing changeable.
-        record!(
-            "load-single",
-            call!("load", QString::from(common::page_url("GroupPage.qml")), 1)
-        );
     });
 
+    let edit_url = edit.clone();
     plan.after(2, move || unsafe {
-        record!("single-loaded", get!("chat", "loaded"));
-        record!("single-readonly", get!("groupNameField", "readOnly"));
-        record!("single-add", get!("addMembersButton", "visible"));
-        record!("single-leave", get!("leaveButton", "visible"));
-        // Nothing applies: menu absent (empty pull-down does nothing).
-        record!("single-menu", get!("groupMenu", "visible"));
-        record!("single-change-picture", get!("changePicture", "visible"));
-        // Nothing to show or add: no field.
-        record!("single-desc", get!("descriptionField", "visible"));
-        record!("single-desc-edit", get!("chat", "can_edit_description"));
+        record!("refilled", get!("nameLabel", "name"));
+        record!("blank-error", get!("errorBanner", "text"));
+        record!("empty-visible", get!("descriptionLabel", "visible"));
         record!(
-            "load-again",
-            call!("load", QString::from(common::page_url("GroupPage.qml")), 2)
+            "load-edit-empty",
+            call!("loadEdit", QString::from(edit_url.clone()))
         );
-    });
-
-    plan.after(2, move || unsafe {
-        // Group again, description empty: field present to write one.
-        record!("empty-visible", get!("descriptionField", "visible"));
-        record!("empty-text", get!("descriptionField", "text"));
-        record!("empty-readonly", get!("descriptionField", "readOnly"));
+        // Empty description: field there to write one.
+        record!(
+            "empty-field",
+            call!(
+                "editGet",
+                QString::from("descriptionField"),
+                QString::from("visible")
+            )
+        );
         record!(
             "desc-retyped",
             call!(
-                "setText",
+                "editSet",
                 QString::from("descriptionField"),
                 QString::from("Back soon")
             )
         );
-        record!("leave-again", call!("leave"));
+        record!("leave-again", call!("leaveEdit"));
     });
 
     plan.after(2, move || unsafe {
-        // After leaving, description readable, not writable.
         record!(
             "leave-group",
             call!("ask", QString::from("chat"), QString::from("leave"))
         );
     });
 
+    let url = page;
     plan.after(2, move || unsafe {
-        record!("left-visible", get!("descriptionField", "visible"));
-        record!("left-text", get!("descriptionField", "text"));
-        record!("left-readonly", get!("descriptionField", "readOnly"));
+        // After leaving: description readable; edits gone, Delete chat instead of Leave.
+        record!("left-visible", get!("descriptionLabel", "visible"));
+        record!("left-text", get!("descriptionLabel", "text"));
+        record!("left-edit", get!("editGroup", "visible"));
+        record!("left-leave", get!("leaveButton", "visible"));
+        record!("left-delete", get!("deleteChat", "visible"));
+        // One-to-one chat: shown, nothing changeable.
+        record!("load-single", call!("load", QString::from(url.clone()), 1));
+    });
+
+    plan.after(2, move || unsafe {
+        record!("single-loaded", get!("chat", "loaded"));
+        record!("single-leave", get!("leaveButton", "visible"));
+        record!("single-edit", get!("editGroup", "visible"));
+        record!("single-desc", get!("descriptionLabel", "visible"));
+        record!(
+            "load-edit-single",
+            call!("loadEdit", QString::from(edit.clone()))
+        );
+        record!(
+            "single-change-picture",
+            call!(
+                "editGet",
+                QString::from("pictureMenu"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "single-name-field",
+            call!(
+                "editGet",
+                QString::from("groupNameField"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "single-desc-field",
+            call!(
+                "editGet",
+                QString::from("descriptionField"),
+                QString::from("visible")
+            )
+        );
         (*engine_ptr).quit();
     });
 
@@ -350,39 +436,79 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
 
     for label in [
         "load",
-        "show",
+        "load-edit",
         "typed",
         "leave",
+        "load-edit-again",
         "blanked",
         "leave-blank",
         "confirm-leave",
         "load-single",
         "timer-pick",
+        "membersRow",
+        "galleryRow",
         "desc-typed",
         "desc-cleared",
-        "load-again",
+        "load-edit-empty",
         "desc-retyped",
         "leave-again",
         "leave-group",
+        "load-edit-single",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
+    assert_eq!(value("loaded"), "true", "the group never loaded. {context}");
     assert_eq!(
-        value("refilled"),
-        "Hikers",
-        "a blanked name was not put back to the group's own. {context}"
+        (value("name"), value("members")),
+        ("chat 2".to_string(), "2 member(s)".to_string()),
+        "the page does not name the group and count its two members. {context}"
     );
     assert_eq!(
-        calls
-            .iter()
-            .filter(|(name, _)| name == "set_chat_name")
-            .count(),
-        1,
-        "a blanked name reached the core, or the typed one did not. {context}"
+        (value("members-row"), value("member-names")),
+        ("true".to_string(), "ada".to_string()),
+        "the members row does not name the other member, without the reader. {context}"
     );
     assert_eq!(
-        navigation, "push:LeaveGroupDialog.qml|",
-        "leaving the group is not asked about on a page of its own. {context}"
+        (value("add-row"), value("invite-row")),
+        (
+            "missing:addMembersRow".to_string(),
+            "missing:inviteRow".to_string()
+        ),
+        "Add members or Invite still a row on the group page. {context}"
+    );
+    assert_eq!(
+        value("band"),
+        "true",
+        "no ambience band behind the group's top block. {context}"
+    );
+    assert_eq!(
+        value("band-gap"),
+        "true,4",
+        "no extra air between the band and the first heading. {context}"
+    );
+    // Top to bottom; Delete chat only once left.
+    assert_eq!(
+        value("menu-order"),
+        "encryptionInfo|leaveButton|deleteChat|editGroup|",
+        "the pulley is not encryption info, leave, edit, top to bottom. {context}"
+    );
+    for label in [
+        "leave-offered",
+        "menu-offered",
+        "edit-offered",
+        "change-picture",
+    ] {
+        assert_eq!(
+            value(label),
+            "true",
+            "{label} is not offered on a group the account is in. {context}"
+        );
+    }
+    assert_eq!(
+        (value("delete-offered"), value("remove-picture")),
+        ("false".to_string(), "false".to_string()),
+        "a group the account is in offers Delete chat, or one with no picture \
+         offers to remove it. {context}"
     );
     assert_eq!(
         value("timer-off"),
@@ -404,70 +530,48 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         serde_json::json!([1, 2, 86400]),
         "picking a duration did not reach the core. {context}"
     );
-    assert_eq!(value("loaded"), "true", "the group never loaded. {context}");
 
-    // Description: shown as core holds it, line break kept, writable in group; sent trimmed and
-    // came back; cleared still a field; gone from chat with nothing to show or add; read-only
-    // after leaving.
+    // Description: shown as core holds it, line break kept; edited on its page, sent trimmed
+    // and came back; read-only after leaving.
     assert_eq!(
-        value("desc-visible"),
-        "true",
-        "a group with a description does not show it. {context}"
-    );
-    assert_eq!(
-        value("desc-text"),
-        "Walks\nBring boots",
+        (value("desc-visible"), value("desc-text")),
+        ("true".to_string(), "Walks\nBring boots".to_string()),
         "the description is not the core's, line break and all. {context}"
     );
     assert_eq!(
-        value("desc-readonly"),
-        "false",
-        "the description cannot be edited on a group the account is in. {context}"
+        (value("edit-name"), value("edit-desc")),
+        ("chat 2".to_string(), "Walks\nBring boots".to_string()),
+        "the edit page does not start from the core's name and description. {context}"
     );
     assert_eq!(
-        value("desc-saved"),
-        "Bring water\nand boots",
-        "the saved description did not come back trimmed. {context}"
+        (value("desc-saved"), value("renamed")),
+        ("Bring water\nand boots".to_string(), "Hikers".to_string()),
+        "the saved name and description did not come back. {context}"
     );
     assert_eq!(
-        value("single-desc"),
-        "false",
-        "a one-to-one chat shows a description field. {context}"
+        value("refilled"),
+        "Hikers",
+        "a blanked name did not keep the group's own. {context}"
     );
     assert_eq!(
-        value("single-desc-edit"),
-        "false",
-        "a one-to-one chat offers a description edit. {context}"
-    );
-    assert_eq!(
-        value("empty-visible"),
-        "true",
-        "an empty description gives a group member no field to write in. {context}"
-    );
-    assert_eq!(
-        value("empty-text"),
+        value("blank-error"),
         "",
-        "the cleared description is still showing. {context}"
+        "a blanked name was sent anyway and core's refusal shown. {context}"
     );
     assert_eq!(
-        value("empty-readonly"),
-        "false",
-        "the empty description cannot be written to. {context}"
+        calls
+            .iter()
+            .filter(|(name, _)| name == "set_chat_name")
+            .map(|(_, params)| params.clone())
+            .collect::<Vec<_>>(),
+        vec![serde_json::json!([1, 2, "Hikers"])],
+        "a blanked name reached the core, or the typed one did not. {context}"
     );
     assert_eq!(
-        value("left-visible"),
-        "true",
-        "a description is hidden once the group is left. {context}"
-    );
-    assert_eq!(
-        value("left-text"),
-        "Back soon",
-        "the group's description is not the last one written. {context}"
-    );
-    assert_eq!(
-        value("left-readonly"),
-        "true",
-        "a group the account has left still offers to edit the description. {context}"
+        (value("empty-visible"), value("empty-field")),
+        ("false".to_string(), "true".to_string()),
+        "an empty description is drawn, or the edit page gives no field to \
+         write one. {context}"
     );
     let described: Vec<Value> = calls
         .iter()
@@ -481,69 +585,26 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
             serde_json::json!([1, 2, ""]),
             serde_json::json!([1, 2, "Back soon"]),
         ],
-        "leaving the page did not send each typed description, trimmed. {context}"
+        "leaving the edit page did not send each typed description, trimmed. {context}"
     );
     assert_eq!(
-        value("name"),
-        "chat 2",
-        "the name field shows something other than the core's name. {context}"
+        navigation, "push:MembersPage.qml|push:ChatMediaPage.qml|push:LeaveGroupDialog.qml|",
+        "the members row or Gallery opens no page of its own, or leaving the group is not \
+         asked about on one. {context}"
     );
     assert_eq!(
-        value("editable"),
-        "false",
-        "a group the account is in cannot be renamed. {context}"
-    );
-    assert!(
-        value("unseen-members").starts_with('2'),
-        "the heading of a page not yet shown does not count the two \
-         members. {context}"
+        (value("left-visible"), value("left-text")),
+        ("true".to_string(), "Back soon".to_string()),
+        "a description is hidden once the group is left. {context}"
     );
     assert_eq!(
-        value("unseen-row"),
-        "missing:memberRow10",
-        "the member rows were built before the page was shown. {context}"
-    );
-    assert!(
-        value("members").starts_with('2'),
-        "the heading does not count the two members. {context}"
-    );
-    assert_eq!(
-        value("self-row"),
-        "memberRow1",
-        "the account's own row is missing. {context}"
-    );
-    assert_eq!(
-        value("contact-row"),
-        "memberRow10",
-        "the other member's row is missing. {context}"
-    );
-    for label in [
-        "add-offered",
-        "leave-offered",
-        "menu-offered",
-        "change-picture",
-    ] {
-        assert_eq!(
-            value(label),
-            "true",
-            "{label} is not offered on a group the account is in. {context}"
-        );
-    }
-    assert_eq!(
-        value("remove-picture"),
-        "false",
-        "a group with no picture offers to remove one. {context}"
-    );
-
-    let rename = calls
-        .iter()
-        .find(|(name, _)| name == "set_chat_name")
-        .map(|(_, params)| params.clone())
-        .unwrap_or_default();
-    assert_eq!(
-        rename,
-        serde_json::json!([1, 2, "Hikers"]),
-        "leaving the page did not save the typed name. {context}"
+        (
+            value("left-edit"),
+            value("left-leave"),
+            value("left-delete")
+        ),
+        ("false".to_string(), "false".to_string(), "true".to_string()),
+        "a group the account has left still offers edits, or no Delete chat. {context}"
     );
 
     assert_eq!(
@@ -551,16 +612,13 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "true",
         "the one-to-one chat never loaded. {context}"
     );
-    assert_eq!(
-        value("single-readonly"),
-        "true",
-        "a one-to-one chat offers renaming, which the core refuses. {context}"
-    );
     for label in [
-        "single-add",
         "single-leave",
-        "single-menu",
+        "single-edit",
+        "single-desc",
         "single-change-picture",
+        "single-name-field",
+        "single-desc-field",
     ] {
         assert_eq!(
             value(label),

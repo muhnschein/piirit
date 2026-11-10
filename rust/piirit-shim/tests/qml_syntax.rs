@@ -186,7 +186,7 @@ fn delegates_bind_only_roles_their_models_have() {
         ),
         // Media pages: message rows.
         (
-            "qml/pages/ChatMediaPage.qml",
+            "qml/components/ChatMediaView.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
         (
@@ -225,7 +225,7 @@ fn delegates_bind_only_roles_their_models_have() {
             names_of::<piirit_shim::ContactItem>(),
         ),
         (
-            "qml/pages/GroupPage.qml",
+            "qml/pages/MembersPage.qml",
             names_of::<piirit_shim::ContactItem>(),
         ),
         (
