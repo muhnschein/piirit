@@ -289,12 +289,16 @@ impl State {
             }
             // Chat 3 archived: else both lists alike.
             self.chats.insert(3, vec![30]);
-            // Empty archive: page hides search.
-            self.archived_order = if std::env::var("PIIRIT_FAKE_NO_ARCHIVED").is_ok() {
-                Vec::new()
-            } else {
-                vec![3]
-            };
+            self.archived_order = vec![3];
+            // Extra empty archived chats from 301, on request.
+            let many_archived = std::env::var("PIIRIT_FAKE_MANY_ARCHIVED")
+                .ok()
+                .and_then(|count| count.parse::<u32>().ok())
+                .unwrap_or(0);
+            for chat in 301..301u32.saturating_add(many_archived) {
+                self.chats.insert(chat, Vec::new());
+                self.archived_order.push(chat);
+            }
             // Above seeded ids: no collision.
             self.next_message_id = long.unwrap_or(0).max(100);
             self.contacts.insert(10, "ada@example.org".to_string());
@@ -2543,6 +2547,7 @@ async fn serve() {
                     state.seed_chats();
                     state.chats.remove(&chat);
                     state.chat_order.retain(|id| *id != chat);
+                    state.archived_order.retain(|id| *id != chat);
                     state.deleted_chats.insert(chat);
                     ok(&id, &Value::Null)
                 }

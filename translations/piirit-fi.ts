@@ -611,11 +611,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Profiilit</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arkistoidut keskustelut</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arkistoidut</translation>
     </message>
     <message>

@@ -609,11 +609,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>個人檔案</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>已封存的聊天</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>已封存</translation>
     </message>
     <message>

@@ -615,11 +615,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Profiilid</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arhiveeritud vestlused</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arhiveeritud</translation>
     </message>
     <message>

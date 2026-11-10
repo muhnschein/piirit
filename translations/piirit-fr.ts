@@ -615,11 +615,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Profils</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Discussions archivées</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Archivées</translation>
     </message>
     <message>

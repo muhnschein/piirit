@@ -606,15 +606,12 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Chats</source>
         <extracomment>Title of the chat list, and its filter button that shows only chats that are not channels.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archived chats</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

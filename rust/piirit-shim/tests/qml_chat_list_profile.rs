@@ -1,7 +1,7 @@
 //! Own profile, picture and name, top left of chat list: off until switched on in settings.
 //! Header and pills sit on ambience band either way.
 //! Shows the list's own profile only (core's list holds all), follows a new name or picture,
-//! taps through to profiles. Archived list: none (a mode, not where profiles switch).
+//! taps through to profiles.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -229,23 +229,9 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
             record!("switch-off", call!("setShown", false));
             record!("off-again-built", call!("built"));
             record!("frost-on", call!("frost"));
-            record!("switch-on-again", call!("setShown", true));
-            record!(
-                "archived",
-                call!(
-                    "load",
-                    QString::from(common::page_url("ChatListPage.qml")),
-                    1,
-                    true
-                )
-            );
+            (*engine_ptr).quit();
         }
         done
-    });
-
-    plan.after(1, move || unsafe {
-        record!("archived-built", call!("built"));
-        (*engine_ptr).quit();
     });
 
     plan.run();
@@ -316,10 +302,5 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
         value("off-again-built"),
         "0",
         "switched off, the profile stays in the header. {context}"
-    );
-    assert_eq!(
-        value("archived-built"),
-        "0",
-        "the archived list shows the profile too. {context}"
     );
 }

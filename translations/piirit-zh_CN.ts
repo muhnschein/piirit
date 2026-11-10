@@ -613,11 +613,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>个人资料</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>已归档的聊天</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>已归档</translation>
     </message>
     <message>

@@ -609,11 +609,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hồ sơ</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Cuộc trò chuyện đã lưu trữ</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Đã lưu trữ</translation>
     </message>
     <message>

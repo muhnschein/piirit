@@ -615,11 +615,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>പ്രൊഫൈലുകൾ</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>ആർക്കൈവ് ചെയ്ത ചാറ്റുകൾ</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>ആർക്കൈവ് ചെയ്തവ</translation>
     </message>
     <message>

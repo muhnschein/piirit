@@ -617,11 +617,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Profile</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Zarchiwizowane czaty</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Zarchiwizowane</translation>
     </message>
     <message>
