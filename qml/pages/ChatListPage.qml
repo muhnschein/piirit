@@ -622,8 +622,8 @@ Page {
                 }
             }
 
-            // Search, Unread, Chats, Channels, Archived pills; field fades in on Search, out when
-            // closed or left empty.
+            // Search, Unread, Chats, Channels, Archived pills (archive: Search, Archived); field
+            // fades in on Search, out when closed or left empty.
             Item {
                 width: parent.width
                 height: searchField.height
@@ -718,9 +718,11 @@ Page {
                             objectName: "chatSearchPill"
                             icon: "image://theme/icon-m-search"
                             text: qsTr("Search")
-                            compact: pillStrip.width > 0
-                                     && pills.wordedWidth + 2 * Theme.horizontalPageMargin
-                                        > pillStrip.width
+                            // Archive: always icon, beside Archived alone.
+                            compact: page.archived
+                                     || (pillStrip.width > 0
+                                         && pills.wordedWidth + 2 * Theme.horizontalPageMargin
+                                            > pillStrip.width)
                             onClicked: page.openSearch()
                         }
 
@@ -733,6 +735,7 @@ Page {
                             //: and off.
                             text: qsTr("Unread")
                             checked: chats.unread_only
+                            visible: !page.archived
                             onClicked: chats.unread_only = !chats.unread_only
                         }
 
@@ -741,7 +744,7 @@ Page {
                         PillButton {
                             id: chatsFilter
                             objectName: "chatsFilterButton"
-                            visible: chats.has_channels
+                            visible: chats.has_channels && !page.archived
                             //: Title of the chat list, and its filter button
                             //: that shows only chats that are not channels.
                             text: qsTr("Chats")
@@ -752,7 +755,7 @@ Page {
                         PillButton {
                             id: channelsFilter
                             objectName: "channelsFilterButton"
-                            visible: chats.has_channels
+                            visible: chats.has_channels && !page.archived
                             //: Turns the chat list's filter to channels on and
                             //: off.
                             text: qsTr("Channels")
@@ -760,7 +763,7 @@ Page {
                             onClicked: chats.channels_only = !chats.channels_only
                         }
 
-                        // Last: least used. Either with Unread or a kind.
+                        // Last: least used. On: other filters off (`ChatList`) and hidden.
                         PillButton {
                             id: archivedFilter
                             objectName: "archivedFilterButton"

@@ -1,6 +1,6 @@
 //! Chat list's Archived pill: archived chats in place of ordinary, same page. Pulley, title stay;
-//! pulley has no archive item. Kind pills stay, so Archived keeps its place. Search under it
-//! searches everything. Empty archive says so, and how back.
+//! pulley has no archive item. Other filters go off and hide, Search shrinks to its icon. Search
+//! under it searches everything. Empty archive says so, and how back.
 //!
 //! Unarchive in row menu not checked: `ContextMenu` is a `Component`, never built headless. Row's
 //! `is_archived`, which it reads, is.
@@ -98,6 +98,8 @@ const PROBE_QML: &str = r"
             peek.model = null
             return marks.join(',')
         }
+        // Room for every worded pill: Search an icon only where page says so.
+        function widen() { loader.item.width = 10000; return 'ok' }
         function setText(name, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -161,16 +163,21 @@ fn the_archived_pill_swaps_the_list_in_place() {
             call!("click", QString::from($name))
         };
     }
-    // What page offers around list: archived lit / kind pills / pulley's New / title / sides.
+    // What page offers around list: archived lit / kind pills / pulley's New / title / sides /
+    // Unread and Channels lit, Unread shown, Search icon alone.
     macro_rules! chrome {
         () => {
             format!(
-                "{}/{}/{}/{}/{}",
+                "{}/{}/{}/{}/{}/{},{},{},{}",
                 get!("archivedFilterButton", "checked"),
                 get!("chatsFilterButton", "visible"),
                 get!("newMenuItem", "visible"),
                 get!("chatListHeader", "title"),
-                call!("sides")
+                call!("sides"),
+                get!("unreadFilterButton", "checked"),
+                get!("channelsFilterButton", "checked"),
+                get!("unreadFilterButton", "visible"),
+                get!("chatSearchPill", "compact")
             )
         };
     }
@@ -220,9 +227,27 @@ fn the_archived_pill_swaps_the_list_in_place() {
         1,
         30,
         at_count!("2", {
+            call!("widen");
             record!("ordinary", chrome!());
             record!("pulley-item", get!("archivedMenuItem", "visible"));
             record!("pill", get!("archivedFilterButton", "text"));
+            // Nothing unread, archived chat no channel: Archived must turn both off to show it.
+            click!("unreadFilterButton");
+            click!("channelsFilterButton");
+        }),
+    );
+    plan.until(
+        1,
+        30,
+        at_count!("0", {
+            record!(
+                "filters",
+                format!(
+                    "{},{}",
+                    get!("unreadFilterButton", "checked"),
+                    get!("channelsFilterButton", "checked")
+                )
+            );
             click!("archivedFilterButton");
         }),
     );
@@ -284,7 +309,7 @@ fn the_archived_pill_swaps_the_list_in_place() {
     );
     assert_eq!(
         value("ordinary"),
-        "false/true/true/Chats/1o,2o",
+        "false/true/true/Chats/1o,2o/false,false,true,false",
         "the list did not start on ordinary chats with the Archived pill unlit. {context}"
     );
     assert_eq!(
@@ -299,10 +324,16 @@ fn the_archived_pill_swaps_the_list_in_place() {
     );
     assert_eq!(
         value("archived"),
-        "true/true/true/Chats/3a",
+        "true/false/true/Chats/3a/false,false,false,true",
         "tapping Archived did not show the archived chat alone, marked archived, with the \
-         pill lit, and the pull-down menu, title and kind pills kept: pills that went \
-         would move Archived from under the finger. {context}"
+         pill lit, the pull-down menu and title kept, the other filters off and \
+         hidden, and Search as its icon. {context}"
+    );
+    assert_eq!(
+        value("filters"),
+        "true,true",
+        "Unread and Channels did not turn on before Archived, so nothing shows Archived \
+         turning them off. {context}"
     );
     assert_eq!(
         value("search"),
@@ -316,7 +347,7 @@ fn the_archived_pill_swaps_the_list_in_place() {
     );
     assert_eq!(
         value("back"),
-        "false/true/true/Chats/1o,2o",
+        "false/true/true/Chats/1o,2o/false,false,true,false",
         "tapping a lit Archived did not bring the ordinary chats back. {context}"
     );
 

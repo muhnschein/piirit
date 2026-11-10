@@ -39,7 +39,8 @@ pub struct ChatList {
     pub query_changed: qt_signal!(),
 
     /// Show archived chats, not ordinary. Ordinary still listed, unshown: arrivals announce
-    /// from them.
+    /// from them. Turning on turns `unread_only`,
+    /// `chats_only`, `channels_only` off.
     pub archived: qt_property!(bool; WRITE set_archived NOTIFY archived_changed),
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
@@ -344,6 +345,17 @@ impl ChatList {
         if self.archived != archived {
             self.archived = archived;
             self.archived_changed();
+            // Archive is short: no other filter over it.
+            if archived && self.unread_only {
+                self.unread_only = false;
+                self.kept.clear();
+                self.unread_only_changed();
+            }
+            if archived && (self.chats_only || self.channels_only) {
+                self.chats_only = false;
+                self.channels_only = false;
+                self.kind_filter_changed();
+            }
             self.restart(Refresh::Order);
         }
     }
@@ -476,8 +488,6 @@ impl ChatList {
     fn show(this: QObjectPinned<'_, Self>) {
         let (target, kind_dropped) = {
             let mut this_mut = this.borrow_mut();
-            // Either side's: pills that came and went with Archived would move it from under
-            // the finger.
             this_mut.has_channels = this_mut.all_rows.iter().any(|row| row.is_channel);
             // Pills hide with last channel: filter they'd turn off goes too.
             let kind_dropped =

@@ -8,7 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- Archived chats moved from the pull-down menu to an Archived button in the chat list's row of filter buttons. Tap it to see your archived chats in place of the others, alone or with Unread, and tap it again to go back. Search finds chats and messages everywhere, whichever buttons are lit.
+- Archived chats moved from the pull-down menu to an Archived button in the chat list's row of filter buttons. Tap it to see your archived chats in place of the others; the other filter buttons step aside until you tap it again. Search finds chats and messages everywhere either way.
 - The chat list can show your profile picture and name in its top left corner: turn it on in Settings, Messages (off by default). Tap it to open your profiles.
 - The chat list's title and filter buttons, a chat's title, and the top of contact and group pages all sit on the same faint band in your ambience colour, from the top of the screen. The search button is round when it shows only its icon.
 - **Settings, one page per topic.** Settings now lists your profile and then Messages, Notifications, Privacy and security, Quick actions, Experimental and About, each on its own page. Blocked contacts sit under Privacy and security, and say how many there are. Voice-message transcription is set up right under its switch in Experimental. The new About page shows the versions of Piirit and the Delta Chat core, copies them for a bug report, links the source code and replays the intro slides; swiping past the last one returns to About.
