@@ -1,6 +1,6 @@
 //! Chat list's Archived pill: archived chats in place of ordinary, same page. Pulley, title stay;
-//! pulley has no archive item. Kind pills follow shown side. Search under it searches everything.
-//! Empty archive says so, and how back.
+//! pulley has no archive item. Kind pills stay, so Archived keeps its place. Search under it
+//! searches everything. Empty archive says so, and how back.
 //!
 //! Unarchive in row menu not checked: `ContextMenu` is a `Component`, never built headless. Row's
 //! `is_archived`, which it reads, is.
@@ -299,10 +299,10 @@ fn the_archived_pill_swaps_the_list_in_place() {
     );
     assert_eq!(
         value("archived"),
-        "true/false/true/Chats/3a",
+        "true/true/true/Chats/3a",
         "tapping Archived did not show the archived chat alone, marked archived, with the \
-         pill lit, the pull-down menu and title kept, and no kind pills over a list \
-         without channels. {context}"
+         pill lit, and the pull-down menu, title and kind pills kept: pills that went \
+         would move Archived from under the finger. {context}"
     );
     assert_eq!(
         value("search"),

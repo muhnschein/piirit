@@ -476,12 +476,9 @@ impl ChatList {
     fn show(this: QObjectPinned<'_, Self>) {
         let (target, kind_dropped) = {
             let mut this_mut = this.borrow_mut();
-            let archived = this_mut.shows_archived();
-            // Shown side's channels: other side's can't be filtered to.
-            this_mut.has_channels = this_mut
-                .all_rows
-                .iter()
-                .any(|row| row.is_channel && row.is_archived == archived);
+            // Either side's: pills that came and went with Archived would move it from under
+            // the finger.
+            this_mut.has_channels = this_mut.all_rows.iter().any(|row| row.is_channel);
             // Pills hide with last channel: filter they'd turn off goes too.
             let kind_dropped =
                 !this_mut.has_channels && (this_mut.chats_only || this_mut.channels_only);
