@@ -617,11 +617,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Profili</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arhivētās sarunas</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arhivētās</translation>
     </message>
     <message>

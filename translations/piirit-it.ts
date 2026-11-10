@@ -615,11 +615,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Profili</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Chat archiviate</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Archiviate</translation>
     </message>
     <message>

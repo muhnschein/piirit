@@ -56,11 +56,11 @@ const PROBE_QML: &str = r"
             return '' + item[property]
         }
         function setWidth(width) { loader.item.width = width; return 'ok' }
-        // Width four worded pills take, margins both sides: read off the pills themselves.
+        // Width five worded pills take, margins both sides: read off the pills themselves.
         function need() {
             var row = findIn(loader.item, 'chatListPillRow')
             var names = ['chatSearchPill', 'unreadFilterButton', 'chatsFilterButton',
-                         'channelsFilterButton']
+                         'channelsFilterButton', 'archivedFilterButton']
             var total = 2 * row.x + (names.length - 1) * row.spacing
             for (var i = 0; i < names.length; i++) {
                 var pill = findIn(loader.item, names[i])
@@ -215,7 +215,7 @@ fn the_search_pill_shrinks_to_its_icon_only_when_the_pills_would_not_fit() {
         30,
         once!("wide", WORDED, call!("setWidth", *need_ptr - 1.0)),
     );
-    // Last channel gone: two pills fit where four did not, word comes back.
+    // Last channel gone: three pills fit where five did not, word comes back.
     plan.until(1, 30, once!("narrow", COMPACT, call!("deleteChat", 2u32)));
     plan.until(1, 30, move |last| unsafe {
         if get!("channelsFilterButton", "visible") != "false" && !last {
@@ -266,7 +266,7 @@ fn the_search_pill_shrinks_to_its_icon_only_when_the_pills_would_not_fit() {
     assert_eq!(
         value("two-pills"),
         WORDED,
-        "with only Search and Unread left, which fit, Search stayed an icon. {context}"
+        "with only Search, Unread and Archived left, which fit, Search stayed an icon. {context}"
     );
 
     let loops = LOOPS.lock().expect("lock").clone();

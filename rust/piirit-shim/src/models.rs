@@ -36,6 +36,8 @@ pub struct ChatListItem {
     pub is_device_talk: bool,
     /// Channel, own or joined (`OutBroadcast`, `InBroadcast`): kind filter splits on it.
     pub is_channel: bool,
+    /// In archived listing. From listing, not row: row read before a move would lie.
+    pub is_archived: bool,
     /// Chat colour, `#rrggbb`.
     pub color: QString,
     /// Picture path; empty if none.

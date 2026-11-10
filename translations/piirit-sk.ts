@@ -617,11 +617,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Profily</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Archivované chaty</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Archivované</translation>
     </message>
     <message>

@@ -615,11 +615,8 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Perfis</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Conversas arquivadas</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arquivadas</translation>
     </message>
     <message>

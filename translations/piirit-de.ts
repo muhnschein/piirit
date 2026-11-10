@@ -615,11 +615,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Profile</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Archivierte Chats</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Archiviert</translation>
     </message>
     <message>

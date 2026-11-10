@@ -619,11 +619,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Profili</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arhivirani klepeti</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arhivirano</translation>
     </message>
     <message>

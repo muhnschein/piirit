@@ -611,11 +611,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>சுயவிவரங்கள்</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>காப்பகப்படுத்தப்பட்ட அரட்டைகள்</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>காப்பகப்படுத்தப்பட்டவை</translation>
     </message>
     <message>

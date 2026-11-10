@@ -617,11 +617,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Профили</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Архивные чаты</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>В архиве</translation>
     </message>
     <message>

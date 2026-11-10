@@ -38,7 +38,9 @@ pub struct ChatList {
     /// Query changed.
     pub query_changed: qt_signal!(),
 
-    /// Show archived chats.
+    /// Show archived chats, not ordinary. Ordinary still listed, unshown: arrivals announce
+    /// from them. Turning on turns `unread_only`,
+    /// `chats_only`, `channels_only` off.
     pub archived: qt_property!(bool; WRITE set_archived NOTIFY archived_changed),
     /// Archived flag changed.
     pub archived_changed: qt_signal!(),
@@ -154,7 +156,7 @@ pub struct ChatList {
     /// Edited/deleted chats awaiting read back. As `pending_announcements`.
     pending_restatements: HashSet<u32>,
 
-    /// Counts refreshes: stale answer must not land on newer (archived page sets `account_id`,
+    /// Counts refreshes: stale answer must not land on newer (page sets `account_id`,
     /// `archived`, each fetching; search per keystroke).
     generation: u64,
 
@@ -337,12 +339,24 @@ impl ChatList {
         }
     }
 
-    /// Show archived, or ordinary chats.
+    /// Show archived, or ordinary chats. Only order: held rows reused, shown once other
+    /// listing lands (filtering now would flash empty list).
     pub fn set_archived(&mut self, archived: bool) {
         if self.archived != archived {
             self.archived = archived;
             self.archived_changed();
-            self.restart(Refresh::All);
+            // Archive is short: no other filter over it.
+            if archived && self.unread_only {
+                self.unread_only = false;
+                self.kept.clear();
+                self.unread_only_changed();
+            }
+            if archived && (self.chats_only || self.channels_only) {
+                self.chats_only = false;
+                self.channels_only = false;
+                self.kind_filter_changed();
+            }
+            self.restart(Refresh::Order);
         }
     }
 
@@ -427,11 +441,19 @@ impl ChatList {
         show(());
     }
 
+    /// Archived side shown. Contact's chats: one listing, none marked archived.
+    fn shows_archived(&self) -> bool {
+        self.archived && self.contact_id == 0
+    }
+
     /// Rows filters pass, core order.
     fn shown(&mut self) -> Vec<ChatListItem> {
         let (chats_only, channels_only) = (self.chats_only, self.channels_only);
+        let archived = self.shows_archived();
         let kind = move |row: &ChatListItem| {
-            if chats_only {
+            if row.is_archived != archived {
+                false
+            } else if chats_only {
                 !row.is_channel
             } else if channels_only {
                 row.is_channel
@@ -802,7 +824,7 @@ impl ChatList {
         let for_forwarding = self.for_forwarding;
         let contact_id = self.contact_id;
         let cached: Vec<ChatListItem> = self.all_rows.clone();
-        // Nothing held: app start, profile switch, archived page.
+        // Nothing held: app start, profile switch.
         let first_load = cached.is_empty();
         // Set: list scan per entry is quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
@@ -836,7 +858,29 @@ impl ChatList {
                 let entries = if contact_id == 0 {
                     chat_entries(&rpc, account_id, &query, archived, for_forwarding).await?
                 } else {
-                    contact_entries(&rpc, account_id, contact_id).await?
+                    Entries {
+                        ids: contact_entries(&rpc, account_id, contact_id).await?,
+                        archived: HashSet::new(),
+                    }
+                };
+                let Entries {
+                    ids: entries,
+                    archived: archived_ids,
+                } = entries;
+                // Order from core; contents from fetch, else model.
+                let rows = |fresh: &HashMap<u32, ChatListItem>| -> Vec<ChatListItem> {
+                    entries
+                        .iter()
+                        .filter_map(|chat_id| {
+                            fresh.get(chat_id).cloned().or_else(|| {
+                                cached.iter().find(|row| row.chat_id == *chat_id).cloned()
+                            })
+                        })
+                        .map(|mut row| {
+                            row.is_archived = archived_ids.contains(&row.chat_id);
+                            row
+                        })
+                        .collect()
                 };
                 let wanted: Vec<u32> = entries
                     .iter()
@@ -844,8 +888,9 @@ impl ChatList {
                     .filter(|id| refetch_all || awaiting.contains(id) || !known.contains(id))
                     .collect();
                 // Core builds rows serially (1.9 s for 200 chats on desktop CPU, several times
-                // on phone): screenful first.
-                let (first, rest) = if first_load {
+                // on phone): screenful first. Archived turned on: its rows lead `wanted`.
+                let unheld = wanted.iter().filter(|id| !known.contains(id)).count();
+                let (first, rest) = if first_load || (archived && unheld > FIRST_SCREENFUL) {
                     wanted.split_at(wanted.len().min(FIRST_SCREENFUL))
                 } else {
                     (wanted.as_slice(), &[][..])
@@ -857,27 +902,12 @@ impl ChatList {
                 };
                 with_transcripts(previews.as_ref(), account_id, &mut fresh).await;
                 if !rest.is_empty() {
-                    early(
-                        entries
-                            .iter()
-                            .filter_map(|chat_id| fresh.get(chat_id).cloned())
-                            .collect(),
-                    );
+                    early(rows(&fresh));
                     let mut more = chat_items(&rpc, account_id, rest).await?;
                     with_transcripts(previews.as_ref(), account_id, &mut more).await;
                     fresh.extend(more);
                 }
-                // Order from core; contents from fetch, else model.
-                Ok::<_, String>(
-                    entries
-                        .into_iter()
-                        .filter_map(|chat_id| {
-                            fresh.get(&chat_id).cloned().or_else(|| {
-                                cached.iter().find(|row| row.chat_id == chat_id).cloned()
-                            })
-                        })
-                        .collect::<Vec<_>>(),
-                )
+                Ok::<_, String>(rows(&fresh))
             }
             .await;
             done(result);
@@ -1018,14 +1048,43 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     }
 }
 
-/// Account's chat ids, core display order. `DC_GCL_ARCHIVED_ONLY`: archived only (mode, not
-/// filter).
+/// `DC_GCL_ARCHIVED_ONLY`: archived only.
 const ARCHIVED_ONLY: u32 = 0x01;
+
+/// Listed chats, and which of them are archived.
+struct Entries {
+    /// Core display order; archived, if asked for, first.
+    ids: Vec<u32>,
+    archived: HashSet<u32>,
+}
 
 /// `DC_GCL_FOR_FORWARDING`: forwardable only.
 const FOR_FORWARDING: u32 = 0x08;
 
 async fn chat_entries(
+    rpc: &RpcClient,
+    account_id: u32,
+    query: &str,
+    archived: bool,
+    for_forwarding: bool,
+) -> Result<Entries, String> {
+    if !archived {
+        return Ok(Entries {
+            ids: listed_entries(rpc, account_id, query, false, for_forwarding).await?,
+            archived: HashSet::new(),
+        });
+    }
+    let mut ids = listed_entries(rpc, account_id, query, true, for_forwarding).await?;
+    let archived: HashSet<u32> = ids.iter().copied().collect();
+    // Ordinary too, unsearched: arrivals there announce while archive shows. A chat moved
+    // between calls is in both: once.
+    let ordinary = listed_entries(rpc, account_id, "", false, for_forwarding).await?;
+    ids.extend(ordinary.into_iter().filter(|id| !archived.contains(id)));
+    Ok(Entries { ids, archived })
+}
+
+/// One side's chat ids, core display order.
+async fn listed_entries(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
@@ -1041,7 +1100,7 @@ async fn chat_entries(
 
     if archived && !query.is_empty() {
         // Two calls, no "archived matching": on pinned binary ARCHIVED_ONLY ignores query
-        // ("Beta" returns "Alpha group"); plain query searches all. Intersection is this page.
+        // ("Beta" returns "Alpha group"); plain query searches all. Intersection is wanted.
         let archived_only: Vec<u32> = rpc
             .call(
                 "get_chatlist_entries",
@@ -1149,6 +1208,8 @@ pub(crate) async fn chat_items(
                         json::str_at(&item, "chatType"),
                         "OutBroadcast" | "InBroadcast"
                     ),
+                    // Listing's to say: `start_refresh`.
+                    is_archived: false,
                     color: json::text(&item, "color"),
                     avatar_path: json::text(&item, "avatarPath"),
                     voice_message_id: if json::str_at(&item, "lastMessageType") == "Voice" {

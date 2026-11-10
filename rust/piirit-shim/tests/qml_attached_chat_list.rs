@@ -159,15 +159,6 @@ fn swiping_to_the_attached_chat_list_leaves_the_finished_flow_behind() {
         call!("arrive", QString::from("attached"));
         record!("arrived", call!("stackLog"));
 
-        // Archived list (pushed over window's, same profile) back on screen: not a flow end.
-        call!(
-            "attach",
-            url(),
-            QString::from(r#"{"accountId": 1, "archived": true}"#)
-        );
-        call!("arrive", QString::from("attached"));
-        record!("archived-arrived", call!("stackLog"));
-
         // Swiped to while stack still settling: waits, back closed. Call page comes over
         // before it settles: move waits for list on top again.
         call!(
@@ -240,12 +231,6 @@ fn swiping_to_the_attached_chat_list_leaves_the_finished_flow_behind() {
         "pop:window-list:immediate|",
         "swiping on from a finished backup left it one swipe back: the stack \
          did not drop at once to the window's chat list. {context}"
-    );
-    assert_eq!(
-        value("archived-arrived"),
-        "",
-        "the archived chat list popped the window's list away on coming back. \
-         {context}"
     );
     assert_eq!(
         (value("busy-arrived").as_str(), value("busy-back").as_str()),

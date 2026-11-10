@@ -613,11 +613,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Profiller</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Arşivlenmiş sohbetler</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Arşivlenmiş</translation>
     </message>
     <message>

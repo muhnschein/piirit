@@ -613,11 +613,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Профильләр</translation>
     </message>
     <message>
-        <source>Archived chats</source>
-        <translation>Архивтагы чатлар</translation>
-    </message>
-    <message>
         <source>Archived</source>
+        <extracomment>Turns the chat list&apos;s filter to archived chats on and off.</extracomment>
         <translation>Архивта</translation>
     </message>
     <message>
