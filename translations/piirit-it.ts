@@ -823,11 +823,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Notifiche</translation>
     </message>
     <message>
-        <source>Swipe back to save.</source>
-        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
-        <translation>Scorri indietro per salvare.</translation>
-    </message>
-    <message>
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Riceverai comunque una notifica quando qualcuno in questo gruppo risponde a uno dei tuoi messaggi.</translation>
@@ -1770,7 +1765,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <name>Mute</name>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n giorno</numerusform>
             <numerusform>%n giorni</numerusform>
@@ -1778,7 +1773,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n ora</numerusform>
             <numerusform>%n ore</numerusform>
@@ -1808,47 +1803,34 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>%1 min</translation>
     </message>
     <message>
-        <source>Notifications active</source>
-        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
-        <translation>Notifiche attive</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Silenzia per sempre</translation>
-    </message>
-    <message>
-        <source>Mute for %1</source>
-        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
-        <translation>Silenzia per %1</translation>
-    </message>
-    <message>
         <source>%1 (%2 remaining)</source>
-        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
         <translation>%1 (ancora %2)</translation>
     </message>
     <message>
         <source>On</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
         <translation>Acceso</translation>
     </message>
     <message>
-        <source>Muted forever</source>
-        <translation>Silenziata per sempre</translation>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Spento</translation>
     </message>
     <message>
-        <source>Muted (%1 remaining)</source>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Spento per %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
         <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
-        <translation>Silenziata (ancora %1)</translation>
+        <translation>Spento (ancora %1)</translation>
     </message>
     <message>
-        <source>Muted for %1 (%2 remaining)</source>
+        <source>Off for %1 (%2 remaining)</source>
         <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
-        <translation>Silenziata per %1 (ancora %2)</translation>
-    </message>
-    <message>
-        <source>Muted</source>
-        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
-        <translation>Silenziato</translation>
+        <translation>Spento per %1 (ancora %2)</translation>
     </message>
 </context>
 <context>

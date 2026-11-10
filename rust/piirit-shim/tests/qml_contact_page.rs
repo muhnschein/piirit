@@ -246,6 +246,14 @@ fn the_contact_page_names_the_contact_and_no_address() {
             call!("menuOrder", QString::from("contactMenu"))
         );
         record!("band", get!("headerBand", "visible"));
+        record!(
+            "band-gap",
+            format!(
+                "{},{}",
+                get!("bandGap", "visible"),
+                get!("bandGap", "height")
+            )
+        );
         record!("tap-edit", call!("tap", QString::from("editName")));
         record!("opened", call!("stackLog"));
         record!(
@@ -545,6 +553,11 @@ fn assert_page(steps: &[(&str, String)]) {
         value(steps, "loaded"),
         "true",
         "the chat never loaded. {context}"
+    );
+    assert_eq!(
+        value(steps, "band-gap"),
+        "true,4",
+        "no extra air between the band and the first heading. {context}"
     );
     assert_eq!(
         (value(steps, "name"), value(steps, "own-name-shown")),

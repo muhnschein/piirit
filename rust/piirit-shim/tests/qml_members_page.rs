@@ -193,6 +193,7 @@ fn the_members_page_finds_opens_and_removes_members() {
             return false;
         }
         record!("title", get!("membersHeader", "title"));
+        record!("subtitle", get!("membersHeader", "description"));
         record!("count", get!("memberList", "count"));
         record!("add-item", get!("addMembersItem", "visible"));
         record!("invite-item", get!("inviteItem", "visible"));
@@ -345,6 +346,7 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
             "4 member(s)",
             "the heading does not count every member",
         ),
+        ("subtitle", "", "the heading has a second line"),
         ("count", "4", "the page does not list every member"),
         (
             "add-item",

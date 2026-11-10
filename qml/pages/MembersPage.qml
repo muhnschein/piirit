@@ -116,7 +116,6 @@ Page {
                 objectName: "membersHeader"
                 //: Heading of a group's member list. %n is how many there are.
                 title: qsTr("%n member(s)", "", page.chat ? page.chat.member_count : 0)
-                description: page.chat ? page.chat.name : ""
             }
 
             SearchField {

@@ -39,7 +39,7 @@ const PROBE_QML: &str = r"
             picked = []
             loader.setSource('', {})
             loader.setSource(url, {
-                accountId: 1, chatId: chatId, chatName: 'Hikers', muted: muted,
+                accountId: 1, chatId: chatId, muted: muted,
                 mentionsStillNotify: mentions
             })
             if (loader.status !== Loader.Ready) { return 'load-failed' }
@@ -49,7 +49,7 @@ const PROBE_QML: &str = r"
         function loadRow(url, width) {
             rowLoader.setSource('', {})
             rowLoader.setSource(url, {
-                accountId: 1, chatId: 2, chatName: 'Hikers', chat: chat, width: width
+                accountId: 1, chatId: 2, chat: chat, width: width
             })
             if (rowLoader.status !== Loader.Ready) { return 'load-failed' }
             // As the group page binds it.
@@ -57,6 +57,7 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function rowValue() { return rowLoader.item ? rowLoader.item.value : 'missing' }
+        function setRowMuted(on) { rowLoader.item.muted = on; return rowLoader.item.value }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -171,13 +172,12 @@ fn the_page_offers_the_choices_and_saves_another_one_on_leaving() {
             call("get", &[named("pageHeader"), named("title")]),
             call("get", &[named("pageHeader"), named("description")]),
         ),
-        ("Notifications".to_string(), "Hikers".to_string()),
-        "the page is not headed Notifications, with the chat's name"
+        ("Notifications".to_string(), String::new()),
+        "the page is not headed Notifications alone"
     );
     assert_eq!(
         call("labels", &[]),
-        "Notifications active|Mute for 1 hour(s)|Mute for 8 hour(s)|Mute for 1 day(s)|\
-         Mute for 7 day(s)|Mute forever",
+        "On|Off for 1 hour(s)|Off for 8 hour(s)|Off for 1 day(s)|Off for 7 day(s)|Off",
         "the page does not offer on, then the reference clients' lengths, in their order"
     );
     assert_eq!(
@@ -195,8 +195,8 @@ fn the_page_offers_the_choices_and_saves_another_one_on_leaving() {
             call("get", &[named("saveHint"), named("text")]),
             call("get", &[named("mentionsNote"), named("visible")]),
         ),
-        ("Swipe back to save.".to_string(), "false".to_string()),
-        "the page does not say how it saves, or shows the mentions note uncalled for"
+        ("missing:saveHint".to_string(), "false".to_string()),
+        "the page spells out how it saves, or shows the mentions note uncalled for"
     );
 
     // Tap marks, sends nothing; another tap moves the mark.
@@ -232,8 +232,7 @@ fn the_page_offers_the_choices_and_saves_another_one_on_leaving() {
         (call("options", &[]), call("labels", &[])),
         (
             marked(None),
-            "Notifications active|Mute for 1 hour(s)|Mute for 8 hour(s)|Mute for 1 day(s)|\
-             Mute for 7 day(s)|Mute forever"
+            "On|Off for 1 hour(s)|Off for 8 hour(s)|Off for 1 day(s)|Off for 7 day(s)|Off"
                 .to_string()
         ),
         "a mute of unknown length marks a choice, or claims time left"
@@ -248,6 +247,18 @@ fn the_page_offers_the_choices_and_saves_another_one_on_leaving() {
         call("leave", &[]),
         "0",
         "notifications active on a muted chat did not unmute"
+    );
+
+    // Row of a chat muted elsewhere: off, no length or time claimed.
+    let row = QString::from(common::component_url("ChatNotifications.qml"));
+    assert_eq!(call("loadRow", &[row.into(), 2000.into()]), "ok");
+    assert_eq!(
+        (
+            call("setRowMuted", &[false.into()]),
+            call("setRowMuted", &[true.into()])
+        ),
+        ("On".to_string(), "Off".to_string()),
+        "the row does not say On, or plain Off for a mute this app did not keep"
     );
 }
 
@@ -347,7 +358,7 @@ fn a_mute_set_here_shows_its_length_and_time_left() {
     });
     let at = steps.clone();
     plan.until(1, 20, move |last| unsafe {
-        if call!("rowValue") != "Muted forever" && !last {
+        if call!("rowValue") != "Off" && !last {
             return false;
         }
         common::record(&at, "forever-value", call!("rowValue").into());
@@ -416,8 +427,8 @@ fn a_mute_set_here_shows_its_length_and_time_left() {
         (value("options"), value("labels")),
         (
             marked(Some(28800)),
-            "Notifications active|Mute for 1 hour(s)|Mute for 8 hour(s) (8 h remaining)|\
-             Mute for 1 day(s)|Mute for 7 day(s)|Mute forever"
+            "On|Off for 1 hour(s)|Off for 8 hour(s) (8 h remaining)|Off for 1 day(s)|\
+             Off for 7 day(s)|Off"
                 .to_string()
         ),
         "the page does not mark the kept length with its time left. {context}"
@@ -425,15 +436,15 @@ fn a_mute_set_here_shows_its_length_and_time_left() {
     assert_eq!(
         (value("wide-value"), value("narrow-value")),
         (
-            "Muted for 8 hour(s) (8 h remaining)".to_string(),
-            "Muted (8 h remaining)".to_string()
+            "Off for 8 hour(s) (8 h remaining)".to_string(),
+            "Off (8 h remaining)".to_string()
         ),
         "the row does not show length and time left, or time left alone when narrow. \
          {context}"
     );
     assert_eq!(
         (value("forever-value"), value("forever-options")),
-        ("Muted forever".to_string(), marked(Some(-1))),
+        ("Off".to_string(), marked(Some(-1))),
         "a mute forever is not shown as such. {context}"
     );
     assert_eq!(

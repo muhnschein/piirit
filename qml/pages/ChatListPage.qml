@@ -78,11 +78,10 @@ Page {
     }
 
     // Id, not row: arrivals recreate rows. `=== true`: dconf undefined till read.
-    function askMute(chatId, chatName, muted, isGroup) {
+    function askMute(chatId, muted, isGroup) {
         var notifications = pageStack.push(Qt.resolvedUrl("ChatNotificationsPage.qml"), {
             accountId: page.accountId,
             chatId: chatId,
-            chatName: chatName,
             muted: muted,
             mentionsStillNotify: isGroup && Settings.notificationsEnabled === true
                                  && Settings.mentionNotifications === true
@@ -852,7 +851,7 @@ Page {
                             //: Row menu in the chat list: opens the chat's notifications page
                             //: (on, or muted for how long). Delta Chat's "Notifications".
                             text: qsTr("Notifications")
-                            onClicked: page.askMute(model.chat_id, model.name, model.is_muted,
+                            onClicked: page.askMute(model.chat_id, model.is_muted,
                                                     model.is_group && !model.is_channel)
                         }
                         // Request: no reply till accepted, so yes or no.

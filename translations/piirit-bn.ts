@@ -823,11 +823,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>বিজ্ঞপ্তি</translation>
     </message>
     <message>
-        <source>Swipe back to save.</source>
-        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
-        <translation>সংরক্ষণ করতে পেছনে সোয়াইপ করুন।</translation>
-    </message>
-    <message>
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>এই গ্রুপে কেউ আপনার কোনো বার্তার উত্তর দিলে আপনি তবুও বিজ্ঞপ্তি পাবেন।</translation>
@@ -1770,7 +1765,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Mute</name>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n দিন</numerusform>
             <numerusform>%n দিন</numerusform>
@@ -1778,7 +1773,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n ঘণ্টা</numerusform>
             <numerusform>%n ঘণ্টা</numerusform>
@@ -1808,47 +1803,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 মিনিট</translation>
     </message>
     <message>
-        <source>Notifications active</source>
-        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
-        <translation>বিজ্ঞপ্তি চালু</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>সবসময়ের জন্য মিউট করুন</translation>
-    </message>
-    <message>
-        <source>Mute for %1</source>
-        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
-        <translation>%1 এর জন্য মিউট করুন</translation>
-    </message>
-    <message>
         <source>%1 (%2 remaining)</source>
-        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
         <translation>%1 (%2 বাকি)</translation>
     </message>
     <message>
         <source>On</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
         <translation>চালু</translation>
     </message>
     <message>
-        <source>Muted forever</source>
-        <translation>সবসময়ের জন্য মিউট করা</translation>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>বন্ধ</translation>
     </message>
     <message>
-        <source>Muted (%1 remaining)</source>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 এর জন্য বন্ধ</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
         <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
-        <translation>মিউট করা (%1 বাকি)</translation>
+        <translation>বন্ধ (%1 বাকি)</translation>
     </message>
     <message>
-        <source>Muted for %1 (%2 remaining)</source>
+        <source>Off for %1 (%2 remaining)</source>
         <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
-        <translation>%1 এর জন্য মিউট করা (%2 বাকি)</translation>
-    </message>
-    <message>
-        <source>Muted</source>
-        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
-        <translation>মিউট করা</translation>
+        <translation>%1 এর জন্য বন্ধ (%2 বাকি)</translation>
     </message>
 </context>
 <context>

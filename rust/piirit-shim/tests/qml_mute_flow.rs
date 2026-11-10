@@ -217,7 +217,7 @@ const EVERY_ENTRY: &str = r"[
                } },
             { until: function() { return rowValue() === 'On' },
                run: function() { rowVia('group', 86400) } },
-            { until: function() { return rowValue().indexOf('Muted') === 0 },
+            { until: function() { return rowValue().indexOf('remaining') > 0 },
                run: function() { rowVia('group-muted', 0) } },
             { until: function() { return rowValue() === 'On' },
                run: function() {
@@ -231,7 +231,7 @@ const EVERY_ENTRY: &str = r"[
                } },
             { until: function() { return rowValue() === 'On' },
                run: function() { rowVia('contact', 604800) } },
-            { until: function() { return rowValue().indexOf('Muted') === 0 },
+            { until: function() { return rowValue().indexOf('remaining') > 0 },
                run: function() { rowVia('contact-muted', 0) } },
             { until: function() { return rowValue() === 'On' },
                run: function() { finished = true } }
@@ -446,13 +446,8 @@ fn every_mute_entry_opens_the_notifications_page_and_sends_the_choice() {
         "the group page's note shows though Mentions is off. {context}"
     );
     for (page, chat, note, left) in [
-        ("group", "2", "true", "Muted for 1 day(s) (1 d remaining)"),
-        (
-            "contact",
-            "1",
-            "false",
-            "Muted for 7 day(s) (7 d remaining)",
-        ),
+        ("group", "2", "true", "Off for 1 day(s) (1 d remaining)"),
+        ("contact", "1", "false", "Off for 7 day(s) (7 d remaining)"),
     ] {
         assert_eq!(
             value(&format!("{page}-load")),

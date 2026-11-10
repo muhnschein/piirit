@@ -214,6 +214,14 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("invite-row", get!("inviteRow", "visible"));
         record!("menu-order", call!("menuOrder", QString::from("groupMenu")));
         record!("band", get!("headerBand", "visible"));
+        record!(
+            "band-gap",
+            format!(
+                "{},{}",
+                get!("bandGap", "visible"),
+                get!("bandGap", "height")
+            )
+        );
         record!("leave-offered", get!("leaveButton", "visible"));
         record!("menu-offered", get!("groupMenu", "visible"));
         record!("edit-offered", get!("editGroup", "visible"));
@@ -472,6 +480,11 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         value("band"),
         "true",
         "no ambience band behind the group's top block. {context}"
+    );
+    assert_eq!(
+        value("band-gap"),
+        "true,4",
+        "no extra air between the band and the first heading. {context}"
     );
     // Top to bottom; Delete chat only once left.
     assert_eq!(

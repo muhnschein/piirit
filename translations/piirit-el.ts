@@ -819,11 +819,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ειδοποιήσεις</translation>
     </message>
     <message>
-        <source>Swipe back to save.</source>
-        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
-        <translation>Σύρετε πίσω για αποθήκευση.</translation>
-    </message>
-    <message>
         <source>You still get a notification when someone in this group replies to one of your messages.</source>
         <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
         <translation>Θα λαμβάνετε ακόμα ειδοποίηση όταν κάποιος σε αυτή την ομάδα απαντά σε ένα από τα μηνύματά σας.</translation>
@@ -1766,7 +1761,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>Mute</name>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n ημέρα</numerusform>
             <numerusform>%n ημέρες</numerusform>
@@ -1774,7 +1769,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <extracomment>How long a chat stays muted, in &quot;Off for %1&quot;.</extracomment>
         <translation>
             <numerusform>%n ώρα</numerusform>
             <numerusform>%n ώρες</numerusform>
@@ -1804,47 +1799,34 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 λ.</translation>
     </message>
     <message>
-        <source>Notifications active</source>
-        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
-        <translation>Ειδοποιήσεις ενεργές</translation>
-    </message>
-    <message>
-        <source>Mute forever</source>
-        <translation>Σίγαση για πάντα</translation>
-    </message>
-    <message>
-        <source>Mute for %1</source>
-        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
-        <translation>Σίγαση για %1</translation>
-    </message>
-    <message>
         <source>%1 (%2 remaining)</source>
-        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <extracomment>The active choice. %1 is the choice, e.g. &quot;Off for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
         <translation>%1 (απομένουν %2)</translation>
     </message>
     <message>
         <source>On</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <extracomment>First choice on a chat&apos;s notifications page, and Notifications row: not muted.</extracomment>
         <translation>Ενεργοποιημένο</translation>
     </message>
     <message>
-        <source>Muted forever</source>
-        <translation>Σε σίγαση για πάντα</translation>
+        <source>Off</source>
+        <extracomment>Last choice on a chat&apos;s notifications page: muted until turned on again. Also Notifications row when muted with no end known.</extracomment>
+        <translation>Απενεργοποιημένο</translation>
     </message>
     <message>
-        <source>Muted (%1 remaining)</source>
+        <source>Off for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Απενεργοποιημένο για %1</translation>
+    </message>
+    <message>
+        <source>Off (%1 remaining)</source>
         <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
-        <translation>Σε σίγαση (απομένουν %1)</translation>
+        <translation>Απενεργοποιημένο (απομένουν %1)</translation>
     </message>
     <message>
-        <source>Muted for %1 (%2 remaining)</source>
+        <source>Off for %1 (%2 remaining)</source>
         <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
-        <translation>Σε σίγαση για %1 (απομένουν %2)</translation>
-    </message>
-    <message>
-        <source>Muted</source>
-        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
-        <translation>Σε σίγαση</translation>
+        <translation>Απενεργοποιημένο για %1 (απομένουν %2)</translation>
     </message>
 </context>
 <context>

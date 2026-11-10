@@ -4,7 +4,7 @@ import Piirit 1.0
 import "../js/Mute.js" as Mute
 
 /*
- * Chat's notifications: on, or muted for how long. Active choice marked, with time left.
+ * Chat's notifications: on, or off for how long. Active choice marked, with time left.
  * Swipe back saves, once, if changed. Muted with end not known (other device): none marked.
  */
 Page {
@@ -14,8 +14,6 @@ Page {
     property int chatId
     /// Core's word: muted now.
     property bool muted: false
-    /// Header's second line.
-    property string chatName
     /// Core's `notify_mentions`: replies still notify. Caller decides.
     property bool mentionsStillNotify: false
 
@@ -64,7 +62,6 @@ Page {
                 objectName: "pageHeader"
                 //: Heading of a chat's notifications page.
                 title: qsTr("Notifications")
-                description: page.chatName
             }
 
             // Silica switch self-flips; page decides.
@@ -80,17 +77,6 @@ Page {
                           : Mute.choiceName(modelData)
                     onClicked: page.chosen = modelData
                 }
-            }
-
-            Label {
-                objectName: "saveHint"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryHighlightColor
-                //: Under the choices on a chat's notifications page.
-                text: qsTr("Swipe back to save.")
             }
 
             Item {

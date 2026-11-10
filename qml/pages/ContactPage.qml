@@ -390,6 +390,13 @@ Page {
                 }
             }
 
+            // More air between band's edge and first heading. Not 0 high: Column skips it.
+            Item {
+                objectName: "bandGap"
+                width: 1
+                height: Theme.paddingSmall
+            }
+
             SectionHeader {
                 //: Over the rows to a chat's pictures, files, apps, calls and map.
                 text: qsTr("In this chat")
@@ -413,7 +420,6 @@ Page {
                 width: parent.width
                 accountId: page.accountId
                 chatId: page.chatId
-                chatName: page.displayName.length > 0 ? page.displayName : page.chatName
                 chat: chat
                 muted: chat.is_muted
                 onPicked: chat.set_mute_duration(seconds)

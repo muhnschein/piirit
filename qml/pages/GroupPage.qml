@@ -241,6 +241,13 @@ Page {
                 text: chat.description
             }
 
+            // More air between band's edge and first heading. Not 0 high: Column skips it.
+            Item {
+                objectName: "bandGap"
+                width: 1
+                height: Theme.paddingSmall
+            }
+
             SectionHeader {
                 text: qsTr("In this chat")
             }
@@ -262,7 +269,6 @@ Page {
                 width: parent.width
                 accountId: page.accountId
                 chatId: page.chatId
-                chatName: chat.loaded ? chat.name : page.chatName
                 chat: chat
                 muted: chat.is_muted
                 // Nobody replies to reader in a channel. `=== true`: dconf undefined till read.

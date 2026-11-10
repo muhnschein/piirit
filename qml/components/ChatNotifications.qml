@@ -3,14 +3,13 @@ import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../js/Mute.js" as Mute
 
-// Muted for how long and time left, as kept when muted here; length dropped when the line
+// Off for how long and time left, as kept when muted here; length dropped when the line
 // would not fit.
 ValueButton {
     id: root
 
     property int accountId
     property int chatId
-    property string chatName
     /// Chat's ChatInfo: its reload after a save rereads the kept mute.
     property QtObject chat
     property bool muted: false
@@ -58,7 +57,6 @@ ValueButton {
         var page = pageStack.push(Qt.resolvedUrl("../pages/ChatNotificationsPage.qml"), {
             accountId: root.accountId,
             chatId: root.chatId,
-            chatName: root.chatName,
             muted: root.muted,
             mentionsStillNotify: root.mentionsStillNotify
         })

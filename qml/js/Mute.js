@@ -7,10 +7,10 @@ var choices = [0, 3600, 28800, 86400, 604800, -1]
 /// "8 hours", "7 days".
 function lengthName(seconds) {
     if (seconds % 86400 === 0) {
-        //: How long a chat stays muted, in "Mute for %1".
+        //: How long a chat stays muted, in "Off for %1".
         return qsTr("%n day(s)", "", seconds / 86400)
     }
-    //: How long a chat stays muted, in "Mute for %1".
+    //: How long a chat stays muted, in "Off for %1".
     return qsTr("%n hour(s)", "", Math.round(seconds / 3600))
 }
 
@@ -36,20 +36,22 @@ function timeLeft(until, now) {
 /// Choice's line on the notifications page.
 function choiceName(seconds) {
     if (seconds === 0) {
-        //: First choice on a chat's notifications page: not muted.
-        return qsTr("Notifications active")
+        //: First choice on a chat's notifications page, and Notifications row: not muted.
+        return qsTr("On")
     }
     if (seconds < 0) {
-        return qsTr("Mute forever")
+        //: Last choice on a chat's notifications page: muted until turned on again. Also
+        //: Notifications row when muted with no end known.
+        return qsTr("Off")
     }
     //: Choice on a chat's notifications page. %1 is how long, e.g. "8 hours".
-    return qsTr("Mute for %1").arg(lengthName(seconds))
+    return qsTr("Off for %1").arg(lengthName(seconds))
 }
 
 /// Same, for the active choice: time left after it when known.
 function activeChoiceName(seconds, until, now) {
     if (seconds > 0 && until > now) {
-        //: The active mute choice. %1 is the choice, e.g. "Mute for 8 hours";
+        //: The active choice. %1 is the choice, e.g. "Off for 8 hours";
         //: %2 the time left, e.g. "5 h 12 min".
         return qsTr("%1 (%2 remaining)").arg(choiceName(seconds)).arg(timeLeft(until, now))
     }
@@ -58,21 +60,13 @@ function activeChoiceName(seconds, until, now) {
 
 /// Notifications row value; `short`: without the length, for a narrow row.
 function rowValue(muted, seconds, until, now, short) {
-    if (!muted) {
-        //: Value of the Notifications row on a contact's or group's page.
-        return qsTr("On")
+    if (!muted || !(seconds > 0 && until > now)) {
+        return choiceName(muted ? -1 : 0)
     }
-    if (seconds < 0) {
-        return qsTr("Muted forever")
-    }
-    if (seconds > 0 && until > now) {
-        return short
-               //: Notifications row when the full line doesn't fit. %1: time left.
-               ? qsTr("Muted (%1 remaining)").arg(timeLeft(until, now))
-               //: Notifications row. %1: how long, e.g. "8 hours"; %2: time left.
-               : qsTr("Muted for %1 (%2 remaining)").arg(lengthName(seconds))
-                                                   .arg(timeLeft(until, now))
-    }
-    //: Notifications row: muted, end not known (muted on another device).
-    return qsTr("Muted")
+    return short
+           //: Notifications row when the full line doesn't fit. %1: time left.
+           ? qsTr("Off (%1 remaining)").arg(timeLeft(until, now))
+           //: Notifications row. %1: how long, e.g. "8 hours"; %2: time left.
+           : qsTr("Off for %1 (%2 remaining)").arg(lengthName(seconds))
+                                             .arg(timeLeft(until, now))
 }
