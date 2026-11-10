@@ -69,32 +69,28 @@ const PROBE_QML: &str = r"
                     name.font.pixelSize === Theme.fontSizeSmall,
                     Qt.colorEqual(name.color, Theme.secondaryColor)].join(',')
         }
-        // Frosted band behind header and pills, shadow cast on list below.
+        // Frosted band behind header and pills, no shadow on list below.
         function frost() {
             var frost = all(loader.item, 'chatListFrost', [])[0]
-            var shadow = all(loader.item, 'chatListFrostShadow', [])[0]
-            if (!frost || !shadow) { return 'missing' }
+            if (!frost) { return 'missing' }
             var heading = all(loader.item, 'chatListHeader', [])[0].parent
             // Column lays out on polish, which a windowless test never runs.
             heading.forceLayout()
             if (heading.height <= 0) { return 'heading-unlaid' }
-            var list = all(loader.item, 'chatList', [])[0]
             var kids = frost.parent.children
             var behind = frost.z < heading.z || frost.z === heading.z
                 && Array.prototype.indexOf.call(kids, frost)
                     < Array.prototype.indexOf.call(kids, heading)
             var veil = Theme.rgba(Qt.tint(Theme.primaryColor,
                                           Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
-            var stops = shadow.gradient.stops
             return [frost.parent === heading.parent && behind,
                     frost.y === 0 && frost.width === heading.width
                         && frost.height === heading.height,
                     Qt.colorEqual(frost.color, veil),
-                    shadow.parent === frost.parent && shadow.y === frost.y + frost.height
-                        && shadow.width === frost.width && shadow.height > 0,
-                    shadow.z > list.z,
-                    stops.length === 2 && stops[0].position === 0 && stops[0].color.a > 0
-                        && stops[1].position === 1 && stops[1].color.a === 0].join(',')
+                    // No gradient beside band: no shadow under it.
+                    Array.prototype.filter.call(frost.parent.children, function (kid) {
+                        return kid !== frost && kid.gradient !== undefined && kid.gradient !== null
+                    }).length === 0].join(',')
         }
         function tap() {
             var hit = profiles().filter(function (item) { return item.visible })
@@ -305,10 +301,10 @@ fn the_chat_list_shows_its_own_profile_once_asked() {
     for label in ["frost", "frost-on"] {
         assert_eq!(
             value(label),
-            "true,true,true,true,true,true",
-            "{label}: the header and pills are not on a frosted band with a shadow on the list \
-             (behind them, page wide from top to pills' bottom, veil colour, shadow right under \
-             band, shadow over list, shadow fades out). {context}"
+            "true,true,true,true",
+            "{label}: the header and pills are not on a plain frosted band \
+             (behind them, page wide from top to pills' bottom, veil colour, no shadow). \
+             {context}"
         );
     }
     assert_eq!(value("tap"), "ok", "{context}");

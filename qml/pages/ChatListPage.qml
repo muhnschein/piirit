@@ -574,19 +574,6 @@ Page {
                                       Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
         }
 
-        // Shadow band casts on list: above list, takes no touch.
-        Rectangle {
-            objectName: "chatListFrostShadow"
-            anchors.top: frost.bottom
-            width: parent.width
-            height: Theme.paddingLarge
-            z: 1
-            gradient: Gradient {
-                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0.45) }
-                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
-            }
-        }
-
         // Outside list, not header: in view's flickable Silica hides keyboard when content moves
         // (every keystroke), and focus scope can pass focus to delegate: lost mid-search.
         Column {
