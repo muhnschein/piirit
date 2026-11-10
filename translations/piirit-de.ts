@@ -2752,6 +2752,15 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Other devices and chat members keep their copies.</source>
         <translation>Andere Geräte und Chatmitglieder behalten ihre Kopien.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Dein Profil in der Chatliste anzeigen</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Zeigt dein Profilbild und deinen Namen oben in der Chatliste.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

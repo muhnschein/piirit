@@ -2766,6 +2766,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Other devices and chat members keep their copies.</source>
         <translation>Ostatní zařízení a členové chatu si své kopie ponechají.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Zobrazovat tvůj profil v seznamu chatů</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Zobrazuje profilový obrázek a jméno nahoře v seznamu chatů.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

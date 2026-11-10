@@ -2752,6 +2752,15 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Other devices and chat members keep their copies.</source>
         <translation>Gli altri dispositivi e i membri della chat conservano le loro copie.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Mostra il tuo profilo nella lista chat</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Mostra la tua immagine del profilo e il tuo nome in cima alla lista chat.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

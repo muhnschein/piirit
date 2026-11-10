@@ -2766,6 +2766,15 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Other devices and chat members keep their copies.</source>
         <translation>Citas ierīces un tērzēšanas dalībnieki patur savas kopijas.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Rādīt tavu profilu sarunu sarakstā</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Rāda tava profila attēlu un vārdu sarunu saraksta augšā.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

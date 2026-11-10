@@ -2762,6 +2762,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Kiti įrenginiai ir pokalbio nariai pasilieka savo kopijas.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Rodyti tavo profilį pokalbių sąraše</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Rodo tavo profilio nuotrauką ir vardą pokalbių sąrašo viršuje.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

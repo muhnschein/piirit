@@ -29,6 +29,8 @@ QtObject {
     property alias notificationDetail: notificationDetailValue.value
     /// Reply to own message announced even from muted group (on by default).
     property alias mentionNotifications: mentionNotificationsValue.value
+    /// Own picture and name top left of chat list. Off until asked.
+    property alias chatListProfile: chatListProfileValue.value
     /// Last chat-list profile, 0 = none. Read before core starts (slow).
     property alias lastAccountId: lastAccountValue.value
     /// Webxdc apps offered (tray, store, running). Off until asked.
@@ -123,6 +125,12 @@ QtObject {
         id: mentionNotificationsValue
         key: "/apps/harbour-piirit/mention_notifications"
         defaultValue: true
+    }
+
+    property ConfigurationValue chatListProfileConfig: ConfigurationValue {
+        id: chatListProfileValue
+        key: "/apps/harbour-piirit/chat_list_profile"
+        defaultValue: false
     }
 
     property ConfigurationValue lastAccountConfig: ConfigurationValue {

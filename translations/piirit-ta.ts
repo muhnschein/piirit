@@ -2748,6 +2748,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>மற்ற சாதனங்களும் உரையாடல் உறுப்பினர்களும் தங்கள் நகல்களை வைத்துக்கொள்வார்கள்.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>அரட்டைப் பட்டியலில் உங்கள் சுயவிவரத்தைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>அரட்டைப் பட்டியலின் மேலே உங்கள் சுயவிவரப் படத்தையும் பெயரையும் காட்டுகிறது.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

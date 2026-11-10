@@ -68,8 +68,8 @@ const PROBE_QML: &str = r"
             }
             return '' + total
         }
-        // compact, word shown, pill narrower than worded, content padded right: worded = word
-        // then paddingLarge, compact = icon centred.
+        // compact, word shown, pill narrower than worded, content padded right (worded = word
+        // then paddingLarge, compact = icon centred), round, field's magnifier on pill's.
         function search() {
             var pill = findIn(loader.item, 'chatSearchPill')
             var label = findIn(pill, 'pillLabel')
@@ -81,9 +81,16 @@ const PROBE_QML: &str = r"
                 if (kid.visible) { used += kid.width + content.spacing }
             }
             var right = pill.width - content.x - used
+            // Field's magnifier where pill's is: cross-fade must not jump.
+            var pillIcon = content.children[0].mapToItem(loader.item, 0, 0)
+            var fieldIcon = findIn(loader.item, 'chatSearchMagnifier').mapToItem(loader.item, 0, 0)
+            var field = findIn(loader.item, 'chatSearchField')
+            var aligned = Math.abs(pillIcon.x - fieldIcon.x) < 0.5
+                && Math.abs(field.textLeftMargin - (fieldIcon.x + Theme.iconSizeSmallPlus
+                                                    + Theme.paddingSmall)) < 0.5
             var padded = Math.abs(right - (pill.compact ? content.x : Theme.paddingLarge)) < 0.5
             return pill.compact + ' ' + label.visible + ' ' + (pill.width < pill.fullWidth)
-                + ' ' + padded
+                + ' ' + padded + ' ' + (pill.width === pill.height) + ' ' + aligned
         }
         function deleteChat(chatId) {
             var chats = findIn(loader.item, 'chats')
@@ -94,9 +101,10 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// `search()`: compact, word shown, narrower than worded, padded right.
-const WORDED: &str = "false true false true";
-const COMPACT: &str = "true false true true";
+/// `search()`: compact, word shown, narrower than worded, padded right, round, field's magnifier
+/// on pill's.
+const WORDED: &str = "false true false true false true";
+const COMPACT: &str = "true false true true true true";
 
 #[test]
 #[allow(clippy::too_many_lines)]

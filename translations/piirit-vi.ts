@@ -2734,6 +2734,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Các thiết bị khác và thành viên trò chuyện vẫn giữ bản sao của họ.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Hiển thị hồ sơ của bạn trong danh sách trò chuyện</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Hiển thị ảnh hồ sơ và tên của bạn ở đầu danh sách trò chuyện.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

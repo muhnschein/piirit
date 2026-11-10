@@ -2780,6 +2780,15 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Other devices and chat members keep their copies.</source>
         <translation>Druge naprave in člani klepeta obdržijo svoje kopije.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Prikaži tvoj profil v seznamu klepetov</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Prikaže tvojo profilno sliko in ime na vrhu seznama klepetov.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

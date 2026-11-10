@@ -2748,6 +2748,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>ఇతర పరికరాలు మరియు చాట్ సభ్యులు తమ కాపీలను ఉంచుకుంటారు.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>సంభాషణల జాబితాలో మీ ప్రొఫైల్ చూపు</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>సంభాషణల జాబితా పైభాగంలో మీ ప్రొఫైల్ చిత్రాన్ని, పేరును చూపిస్తుంది.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

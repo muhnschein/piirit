@@ -326,6 +326,28 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("markdown-shown", get!("markdownSwitch", "checked"));
         record!(
+            "app-profile-key",
+            call!("appKey", QString::from("chatListProfileConfig"))
+        );
+        record!("profile-switch", get!("chatListProfileSwitch", "checked"));
+        record!(
+            "pick-profile",
+            call!("click", QString::from("chatListProfileSwitch"))
+        );
+        record!(
+            "profile-picked",
+            call!("appReads", QString::from("chatListProfile"))
+        );
+        record!("profile-shown", get!("chatListProfileSwitch", "checked"));
+        record!(
+            "unpick-profile",
+            call!("click", QString::from("chatListProfileSwitch"))
+        );
+        record!(
+            "profile-unpicked",
+            call!("appReads", QString::from("chatListProfile"))
+        );
+        record!(
             "pick-worse",
             call!("click", QString::from("qualityOption1"))
         );
@@ -670,7 +692,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("load-experimental", "ok"),
         ("load-messages-again", "ok"),
         ("first-under-phone", "deletionCombo"),
-        ("last-before-phone", "markdownSwitch"),
+        ("last-before-phone", "chatListProfileSwitch"),
         ("deletion-off-label", "Off"),
         ("enter-switch", "missing:enterSendsSwitch"),
         ("enter-setting", "undefined"),
@@ -696,6 +718,14 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("pick-markdown", "ok"),
         ("markdown-picked", "1"),
         ("markdown-shown", "false"),
+        ("app-profile-key", "/apps/harbour-piirit/chat_list_profile"),
+        // Off until asked.
+        ("profile-switch", "false"),
+        ("pick-profile", "ok"),
+        ("profile-picked", "true"),
+        ("profile-shown", "true"),
+        ("unpick-profile", "ok"),
+        ("profile-unpicked", "false"),
         ("pick-download", "ok"),
         ("download-picked", "32768"),
         ("download-shown", "0"),

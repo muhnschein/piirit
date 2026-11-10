@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import "../components"
 import Piirit 1.0
 import "../js/QuickActions.js" as QuickActions
+import "../js/Emoji.js" as Emoji
 
 Page {
     id: page
@@ -564,6 +565,18 @@ Page {
             }
         }
 
+        // Frosted band behind title and pills. Wallpaper blur (Sailfish.Silica.Background) not
+        // Harbour-allowed; page background already blurred and nothing scrolls under band, so
+        // light veil looks same.
+        Rectangle {
+            id: frost
+            objectName: "chatListFrost"
+            width: parent.width
+            height: heading.height
+            color: Theme.rgba(Qt.tint(Theme.primaryColor,
+                                      Theme.rgba(Theme.highlightBackgroundColor, 0.4)), 0.2)
+        }
+
         // Outside list, not header: in view's flickable Silica hides keyboard when content moves
         // (every keystroke), and focus scope can pass focus to delegate: lost mid-search.
         Column {
@@ -575,10 +588,70 @@ Page {
             }
 
             PageHeader {
+                id: listHeader
                 objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
                 // Nothing under title while filter on: lit pill says so; text would push search
                 // row under finger.
+
+                // Own profile left of title, opt-in. No model while off: nothing built. Core's
+                // list holds every profile; only page's shows (as SettingsPage).
+                Item {
+                    parent: listHeader.extraContent
+                    anchors.fill: parent
+
+                    Repeater {
+                        model: !page.archived && Settings.chatListProfile === true
+                               ? core.account_list : null
+
+                        MouseArea {
+                            id: profileMark
+                            objectName: "headerProfile"
+                            visible: model.account_id === page.accountId
+                            width: visible ? Math.min(profileName.x + profileName.implicitWidth,
+                                                      parent.width - Theme.paddingLarge) : 0
+                            height: parent.height
+
+                            readonly property string name: model.display_name.length > 0
+                                                           ? model.display_name : model.addr
+                            readonly property string drawnName:
+                                Emoji.inText(profileMark.name, false, profileName.font.pixelSize,
+                                             "", Emoji.nameSaturation)
+
+                            // Search pill's size, on title's line: Silica sets title at
+                            // `topMargin`, not centred.
+                            Avatar {
+                                id: profileAvatar
+                                objectName: "headerProfileAvatar"
+                                width: searchPill.height
+                                y: listHeader.topMargin + (listHeader.titleHeight - height) / 2
+                                initial: profileMark.name
+                                ownColor: model.color
+                                picturePath: model.avatar_path
+                            }
+
+                            Label {
+                                id: profileName
+                                objectName: "headerProfileName"
+                                x: profileAvatar.width + Theme.paddingMedium
+                                width: profileMark.width - x
+                                anchors.verticalCenter: profileAvatar.verticalCenter
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: profileMark.pressed && profileMark.containsMouse
+                                       ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                                truncationMode: TruncationMode.Fade
+                                textFormat: profileMark.drawnName.length > 0 ? Text.StyledText
+                                                                             : Text.PlainText
+                                text: profileMark.drawnName.length > 0 ? profileMark.drawnName
+                                                                       : profileMark.name
+                            }
+
+                            // As Delta Chat's own picture over its chat list: switch profile.
+                            onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                                           { currentAccountId: page.accountId })
+                        }
+                    }
+                }
             }
 
             // Ordinary: Search, Unread, Chats, Channels pills; field fades in on Search, out when
@@ -600,7 +673,7 @@ Page {
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                     // Pill's word, magnifier at pill size, place: one fades into other.
                     font.pixelSize: Theme.fontSizeMedium
-                    textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
+                    textLeftMargin: Theme.horizontalPageMargin + searchPill.iconX
                                     + Theme.iconSizeSmallPlus + Theme.paddingSmall
                     // Own magnifier beside field; Silica's slot empty.
                     leftItem: Item {}
@@ -631,7 +704,8 @@ Page {
 
                 // Magnifier over field, not leftItem (Silica puts that off-pill).
                 Image {
-                    x: Theme.horizontalPageMargin + Theme.paddingMedium
+                    objectName: "chatSearchMagnifier"
+                    x: Theme.horizontalPageMargin + searchPill.iconX
                     anchors.verticalCenter: parent.verticalCenter
                     visible: searchField.visible
                     opacity: searchField.opacity

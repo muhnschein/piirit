@@ -2752,6 +2752,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>മറ്റ് ഉപകരണങ്ങളും ചാറ്റ് അംഗങ്ങളും അവരുടെ പകർപ്പുകൾ സൂക്ഷിക്കുന്നു.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>സംഭാഷണപ്പട്ടികയിൽ നിങ്ങളുടെ പ്രൊഫൈൽ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>സംഭാഷണപ്പട്ടികയുടെ മുകളിൽ നിങ്ങളുടെ പ്രൊഫൈൽ ചിത്രവും പേരും കാണിക്കുന്നു.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

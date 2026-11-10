@@ -2748,6 +2748,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Οι άλλες συσκευές και τα μέλη των συνομιλιών κρατούν τα αντίγραφά τους.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Εμφάνιση του προφίλ σου στη λίστα συνομιλιών</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Εμφανίζει την εικόνα και το όνομα του προφίλ σου στην κορυφή της λίστας συνομιλιών.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>
