@@ -1,7 +1,7 @@
 //! Encryption page: status line and fingerprints, per contact or per group.
 //!
 //! Core gives text, not fields (`get_contact_encryption_info`, `get_chat_encryption_info`);
-//! parsed into blocks split by blank lines. Shape pinned below at core 2.68.0; unknown shape =
+//! parsed into blocks split by blank lines. Shape pinned below at core 2.69.0; unknown shape =
 //! raw text shown instead. Relays: domain only, never the address before `@` (app shows none).
 
 use qmetaobject::*;
@@ -293,7 +293,7 @@ mod tests {
     const FP_ME: &str = "2F91 C04E 6B7D A315 8C2E\n90F4 D16B 3A7E 05C9 B842";
     const FP_THEM: &str = "7C3A 9E15 D0B4 462F 8E1A\nC93B 0F5D 27E6 A41C 88D2";
 
-    /// As core 2.68.0 `Contact::get_encrinfo` writes it.
+    /// As core 2.69.0 `Contact::get_encrinfo` writes it.
     fn contact_text(relays: &str) -> String {
         format!(
             "Messages are end-to-end encrypted.\nFingerprints:\n\nMe:\n{FP_ME}\n\nRandy:\n{FP_THEM}{relays}"
@@ -360,7 +360,7 @@ mod tests {
 
     #[test]
     fn a_group_s_text_names_each_member_with_relays_and_missing_keys() {
-        // As core 2.68.0 `ChatId::get_encryption_info`, after its final trim.
+        // As core 2.69.0 `ChatId::get_encryption_info`, after its final trim.
         let text = format!(
             "Messages are end-to-end encrypted.\n\nBrian(b@relay.example.net,b2@x.example.org)\n{FP_ME}\n\n\
              Judith\n(key missing)\n{FP_THEM}\n\nThe (other) Reg\n{FP_ME}"
