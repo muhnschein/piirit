@@ -2507,6 +2507,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>其他设备和聊天成员会保留各自的副本。</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>在聊天列表中显示你的个人资料</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>在聊天列表顶部显示你的头像和名字。</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

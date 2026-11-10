@@ -2507,6 +2507,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Other devices and chat members keep their copies.</source>
         <translation>Diğer cihazlar ve sohbet üyeleri kendi kopyalarını saklar.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Profilini sohbet listesinde göster</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Profil resmini ve adını sohbet listesinin en üstünde gösterir.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

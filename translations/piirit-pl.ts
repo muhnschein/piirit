@@ -2525,6 +2525,15 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Other devices and chat members keep their copies.</source>
         <translation>Inne urządzenia i członkowie czatu zachowują swoje kopie.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Pokazuj swój profil na liście czatów</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Pokazuje Twoje zdjęcie profilowe i nazwę na górze listy czatów.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

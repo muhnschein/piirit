@@ -2516,6 +2516,15 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Other devices and chat members keep their copies.</source>
         <translation>Teised seadmed ja vestluse liikmed jätavad oma koopiad alles.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Näita oma profiili vestluste loendis</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Näitab sinu profiilipilti ja nime vestluste loendi ülaosas.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

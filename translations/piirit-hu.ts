@@ -2503,6 +2503,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>A többi eszköz és a csevegés tagjai megtartják a saját példányukat.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Saját profil megjelenítése a csevegéslistában</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Megjeleníti a profilképedet és a nevedet a csevegéslista tetején.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

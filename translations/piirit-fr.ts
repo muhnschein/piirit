@@ -2516,6 +2516,15 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Other devices and chat members keep their copies.</source>
         <translation>Les autres appareils et les membres des discussions gardent leurs copies.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Afficher votre profil dans la liste des discussions</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Affiche votre photo de profil et votre nom en haut de la liste des discussions.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

@@ -2507,6 +2507,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Башка җайланмалар һәм чат әгъзалары үз күчермәләрен саклый.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Профилегезне әңгәмәләр исемлегендә күрсәтергә</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Профиль рәсемегезне һәм исемегезне әңгәмәләр исемлегенең өстендә күрсәтә.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

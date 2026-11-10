@@ -193,9 +193,14 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/GalleryPage.qml",
             names_of::<piirit_shim::MessageListItem>(),
         ),
+        // Chats; own profile in header.
         (
             "qml/pages/ChatListPage.qml",
-            names_of::<piirit_shim::ChatListItem>(),
+            [
+                names_of::<piirit_shim::ChatListItem>(),
+                names_of::<piirit_shim::AccountItem>(),
+            ]
+            .concat(),
         ),
         // One chat list per profile: people as JSON, `modelData`.
         (

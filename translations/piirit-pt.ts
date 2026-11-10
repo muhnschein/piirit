@@ -2516,6 +2516,15 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Other devices and chat members keep their copies.</source>
         <translation>Os outros dispositivos e membros da conversa mantêm as suas cópias.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Mostrar o seu perfil na lista de conversas</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Mostra a sua foto de perfil e o seu nome no topo da lista de conversas.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

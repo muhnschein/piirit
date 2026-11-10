@@ -2521,6 +2521,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>Celelalte dispozitive și membrii conversației își păstrează copiile.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>Afișează profilul tău în lista de conversații</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>Afișează poza de profil și numele tău în partea de sus a listei de conversații.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>

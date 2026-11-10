@@ -572,10 +572,51 @@ Page {
             }
 
             PageHeader {
+                id: listHeader
                 objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
                 // Nothing under title while filter on: lit pill says so; text would push search
                 // row under finger.
+
+                // Own profile left of title, opt-in. No model while off: nothing built. Core's
+                // list holds every profile; only page's shows (as SettingsPage).
+                Repeater {
+                    model: !page.archived && Settings.chatListProfile === true
+                           ? core.account_list : null
+
+                    BackgroundItem {
+                        objectName: "headerProfile"
+                        visible: model.account_id === page.accountId
+                        width: visible ? listHeader.width - titleSpace.implicitWidth
+                                         - Theme.horizontalPageMargin : 0
+                        height: listHeader.height
+
+                        // PageHeader's title font: name fades before reaching title.
+                        Label {
+                            id: titleSpace
+                            visible: false
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.family: Theme.fontFamilyHeading
+                            text: listHeader.title
+                        }
+
+                        ContactRow {
+                            objectName: "headerProfileRow"
+                            width: parent.width
+                            anchors.verticalCenter: parent.verticalCenter
+                            displayName: model.display_name.length > 0
+                                         ? model.display_name : model.addr
+                            ownColor: model.color
+                            picturePath: model.avatar_path
+                            // Header, not a search result.
+                            match: ""
+                        }
+
+                        // As Delta Chat's own picture over its chat list: switch profile.
+                        onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                                       { currentAccountId: page.accountId })
+                    }
+                }
             }
 
             // Ordinary: Search, Unread, Chats, Channels pills; field fades in on Search, out when

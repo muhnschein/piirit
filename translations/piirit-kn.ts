@@ -2516,6 +2516,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Other devices and chat members keep their copies.</source>
         <translation>ಇತರ ಸಾಧನಗಳು ಮತ್ತು ಚಾಟ್ ಸದಸ್ಯರು ತಮ್ಮ ಪ್ರತಿಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತಾರೆ.</translation>
     </message>
+    <message>
+        <source>Show your profile in the chat list</source>
+        <translation>ಸಂಭಾಷಣೆ ಪಟ್ಟಿಯಲ್ಲಿ ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ತೋರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Shows your profile picture and name at the top of the chat list.</source>
+        <extracomment>Under &quot;Show your profile in the chat list&quot;.</extracomment>
+        <translation>ಸಂಭಾಷಣೆ ಪಟ್ಟಿಯ ಮೇಲ್ಭಾಗದಲ್ಲಿ ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಚಿತ್ರ ಮತ್ತು ಹೆಸರನ್ನು ತೋರಿಸುತ್ತದೆ.</translation>
+    </message>
 </context>
 <context>
     <name>SettingsNotificationsPage</name>
