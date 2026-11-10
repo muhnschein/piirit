@@ -3,7 +3,7 @@ verbatim from
 
     https://github.com/sailfishos/sdk-harbour-rpmvalidator.git
 
-at commit 7dd7dd5d62aa3e814c92ade089fdca4c3872b8ac (2026-09-10), by scripts/update-harbour-rules.sh.
+at commit 07c66c7253aeb009d4f3049300839c1d1d8e59af (2026-10-17, pull/189/head), by scripts/update-harbour-rules.sh.
 ci/harbour-validate-rpm.sh runs the validator from that same commit.
 
 They carry that project's licence, GPL-2.0-or-later, which Piirit's own
