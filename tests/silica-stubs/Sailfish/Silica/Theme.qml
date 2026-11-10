@@ -40,6 +40,10 @@ QtObject {
     property int iconSizeLarge: 96
     property size coverSizeLarge: Qt.size(234, 374)
 
+    // Device pixels for `v` at ratio 1.
+    function dp(v) {
+        return v
+    }
     function rgba(color, opacity) {
         return Qt.rgba(color.r, color.g, color.b, opacity)
     }

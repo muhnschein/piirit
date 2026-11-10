@@ -570,66 +570,98 @@ impl Load {
             Vec::new()
         };
         // Held before, still Text: stays where it was until reread.
-        let held: BTreeSet<u32> = texts
+        let mut shown_held: BTreeSet<u32> = texts
             .iter()
             .copied()
             .filter(|id| self.held_before.contains(id))
             .collect();
-        let ids = in_order(rpc, account_id, chat_id, &media, &held).await?;
+        let unread = if self.gallery {
+            self.unread_texts(&texts)
+        } else {
+            Vec::new()
+        };
+        let mut text_pages = unread.chunks(PAGE);
+        // Newest Text page before first ids: held-back ones near the top come with the first
+        // screen, while page slides in, not after every picture is read.
+        let mut found = match text_pages.next() {
+            Some(page) => self.held_among(page, &mut shown_held).await?,
+            None => Vec::new(),
+        };
+        let ids = in_order(rpc, account_id, chat_id, &media, &shown_held).await?;
+        step(Step::Ids(self.shown(ids)));
         let wanted: Vec<u32> = self
             .shown(media.clone())
             .into_iter()
             .filter(|id| !self.known.contains(id))
             .collect();
-        step(Step::Ids(self.shown(ids)));
-        for page in wanted.chunks(PAGE) {
-            if self.superseded() {
-                return Ok(());
-            }
-            step(Step::Rows(fetch_messages(rpc, account_id, page).await?));
-        }
-        if self.gallery {
-            let Some(found) = self.find_held(&texts).await? else {
-                return Ok(());
-            };
-            let now: BTreeSet<u32> = found.iter().map(|row| row.message_id).collect();
-            if now != held {
-                let ids = in_order(rpc, account_id, chat_id, &media, &now).await?;
-                step(Step::Ids(self.shown(ids)));
-            }
+        let mut media_pages = wanted.chunks(PAGE);
+        // Media page, then Text page, in turn.
+        loop {
             if !found.is_empty() {
-                step(Step::Rows(found));
+                step(Step::Rows(std::mem::take(&mut found)));
+            }
+            let media_page = media_pages.next();
+            if let Some(page) = media_page {
+                if self.superseded() {
+                    return Ok(());
+                }
+                step(Step::Rows(fetch_messages(rpc, account_id, page).await?));
+            }
+            let text_page = text_pages.next();
+            if let Some(page) = text_page {
+                if self.superseded() {
+                    return Ok(());
+                }
+                let before = shown_held.clone();
+                found = self.held_among(page, &mut shown_held).await?;
+                if shown_held != before {
+                    let ids = in_order(rpc, account_id, chat_id, &media, &shown_held).await?;
+                    step(Step::Ids(self.shown(ids)));
+                }
+            }
+            if media_page.is_none() && text_page.is_none() {
+                if !found.is_empty() {
+                    step(Step::Rows(found));
+                }
+                break;
             }
         }
         step(Step::Done);
         Ok(())
     }
 
-    /// Held-back gallery rows among chat's Text messages not read before (held ones reread:
-    /// state moves); plain ones noted (`PLAIN`). Newest first: recent ones found first. `None`:
-    /// superseded.
-    async fn find_held(&self, texts: &[u32]) -> Result<Option<Vec<MessageListItem>>, String> {
-        let key = (self.account_id, self.chat_id);
-        let plain = plain_of(key);
-        let unread: Vec<u32> = texts
+    /// Chat's Text messages to read for held-back ones, newest first (recent ones found
+    /// first): not read before, or held (reread: state moves). Plain ones noted (`PLAIN`).
+    fn unread_texts(&self, texts: &[u32]) -> Vec<u32> {
+        let plain = plain_of((self.account_id, self.chat_id));
+        texts
             .iter()
             .rev()
             .copied()
             .filter(|id| !self.known.contains(id) && !plain.contains(id))
-            .collect();
-        let mut found: Vec<MessageListItem> = Vec::new();
-        for page in unread.chunks(PAGE) {
-            if self.superseded() {
-                return Ok(None);
-            }
-            let items = fetch_messages(&self.rpc, self.account_id, page).await?;
-            let (gallery_rows, others): (Vec<MessageListItem>, Vec<MessageListItem>) =
-                items.into_iter().partition(|row| held_kind(row).is_some());
-            note_plain(key, others.iter().map(|row| row.message_id));
-            // As kind to come: `fill`.
-            found.extend(gallery_rows);
+            .collect()
+    }
+
+    /// Held-back gallery rows in one page of Text messages; `held` follows (page's plain ones
+    /// out, held ones in). Plain ones noted.
+    async fn held_among(
+        &self,
+        page: &[u32],
+        held: &mut BTreeSet<u32>,
+    ) -> Result<Vec<MessageListItem>, String> {
+        let items = fetch_messages(&self.rpc, self.account_id, page).await?;
+        let (gallery_rows, others): (Vec<MessageListItem>, Vec<MessageListItem>) =
+            items.into_iter().partition(|row| held_kind(row).is_some());
+        for row in &others {
+            held.remove(&row.message_id);
         }
-        Ok(Some(found))
+        held.extend(gallery_rows.iter().map(|row| row.message_id));
+        note_plain(
+            (self.account_id, self.chat_id),
+            others.iter().map(|row| row.message_id),
+        );
+        // As kind to come: `fill`.
+        Ok(gallery_rows)
     }
 }
 

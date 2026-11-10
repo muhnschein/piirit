@@ -122,6 +122,17 @@ const PROBE_QML: &str = r"
             return out
         }
         function texts() { return allText(loader.item) }
+        // Pulley entries top to bottom, as declared: objectNames.
+        function menuOrder(name) {
+            var walk = function(node) {
+                var out = node.text !== undefined && node.objectName ? node.objectName + '|' : ''
+                var kids = node.data !== undefined ? node.data : node.children
+                for (var i = 0; kids && i < kids.length; i++) { out += walk(kids[i]) }
+                return out
+            }
+            var menu = findIn(loader.item, name)
+            return menu ? walk(menu) : 'missing:' + name
+        }
     }
 ";
 
@@ -221,7 +232,20 @@ fn the_contact_page_names_the_contact_and_no_address() {
         record!("paired", get!("doors", "columns"));
         record!("calls-x", get!("callsRow", "x"));
         record!("files-x", get!("filesRow", "x"));
-        record!("call-icon", get!("callButton", "icon.source"));
+        record!("call-icon", get!("callButtonIcon", "source"));
+        record!("call-icon-size", get!("callButtonIcon", "sourceSize.width"));
+        record!("call-shift", get!("callButton", "inkShift"));
+        record!("video-shift", get!("videoCallButton", "inkShift"));
+        record!(
+            "call-offset",
+            get!("callButtonContent", "anchors.horizontalCenterOffset")
+        );
+        record!("call-label", get!("callButtonLabel", "text"));
+        record!(
+            "menu-order",
+            call!("menuOrder", QString::from("contactMenu"))
+        );
+        record!("band", get!("headerBand", "visible"));
         record!("tap-edit", call!("tap", QString::from("editName")));
         record!("opened", call!("stackLog"));
         record!(
@@ -448,9 +472,30 @@ fn assert_actions(steps: &[(&str, String)], calls: &[(String, Value)]) {
         "the rows in this chat are not two to a line. {context}"
     );
     assert_eq!(
-        value(steps, "call-icon"),
-        "image://theme/icon-m-call",
-        "Call button has no call icon. {context}"
+        (value(steps, "call-icon"), value(steps, "call-label")),
+        ("image://theme/icon-m-call", "Call"),
+        "Call button has no call icon or label. {context}"
+    );
+    // Stub Theme: iconSizeSmallPlus, dp(n) = n.
+    assert_eq!(
+        (
+            value(steps, "call-icon-size"),
+            value(steps, "call-shift"),
+            value(steps, "video-shift"),
+            value(steps, "call-offset")
+        ),
+        ("48", "2", "1", "-2"),
+        "call icons not small, or icon and label not pulled to the button's centre. {context}"
+    );
+    assert_eq!(
+        value(steps, "band"),
+        "true",
+        "no ambience band behind the contact's top block. {context}"
+    );
+    assert_eq!(
+        value(steps, "menu-order"),
+        "encryptionInfo|deleteChat|blockContact|editName|",
+        "the pulley is not encryption info, delete, block, edit name, top to bottom. {context}"
     );
     assert!(
         opened.contains("push:EditNamePage.qml:"),

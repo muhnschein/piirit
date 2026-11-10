@@ -15,6 +15,9 @@ Item {
 
     signal pictureClicked()
 
+    /// Picture's top in row; as much room under it (centred).
+    readonly property real pictureTop: avatar.y
+
     width: parent ? parent.width : 0
     height: Math.max(avatar.height, lines.height) + 2 * Theme.paddingLarge
 

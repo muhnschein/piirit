@@ -644,14 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>పిన్ చేయి</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>అన్‌మ్యూట్ చేయి</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>మ్యూట్ చేయి</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>అంగీకరించు</translation>
     </message>
@@ -758,6 +750,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>అన్ని ఛానల్‌లను చూపించడానికి &quot;%1&quot;ను నొక్కండి</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>నోటిఫికేషన్‌లు</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -813,14 +810,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Notifications</source>
         <translation>నోటిఫికేషన్‌లు</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>మ్యూట్ చేయబడింది</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>నోటిఫికేషన్‌లు</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>ఆన్</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>సేవ్ చేయడానికి వెనక్కి స్వైప్ చేయండి.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>ఈ గుంపులో ఎవరైనా మీ సందేశాల్లో ఒకదానికి జవాబిస్తే మీకు ఇంకా నోటిఫికేషన్ వస్తుంది.</translation>
     </message>
 </context>
 <context>
@@ -1342,10 +1348,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>గుంపు నుండి నిష్క్రమించు</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>సభ్యులను చేర్చు</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>గుంపు</translation>
     </message>
@@ -1399,11 +1401,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Settings</source>
         <translation>సెట్టింగ్‌లు</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>QR కోడ్‌తో ఆహ్వానించు</translation>
     </message>
 </context>
 <context>
@@ -1693,7 +1690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>QR కోడ్‌తో ఆహ్వానించు</translation>
     </message>
     <message>
@@ -1766,44 +1763,88 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>మ్యూట్ చేయి</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n రోజు</numerusform>
+            <numerusform>%n రోజుల</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n గంట</numerusform>
+            <numerusform>%n గంటల</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>రద్దు చేయి</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 రో %2 గం</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>1 గంట పాటు</translation>
+        <source>%1 d</source>
+        <translation>%1 రో</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>8 గంటల పాటు</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 గం %2 నిమి</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>1 రోజు పాటు</translation>
+        <source>%1 h</source>
+        <translation>%1 గం</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>7 రోజుల పాటు</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 నిమి</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>ఎప్పటికీ</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>నోటిఫికేషన్‌లు ఆన్</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>ఈ గుంపులో ఎవరైనా మీ సందేశాల్లో ఒకదానికి జవాబిస్తే మీకు ఇంకా నోటిఫికేషన్ వస్తుంది.</translation>
+        <source>Mute forever</source>
+        <translation>ఎప్పటికీ మ్యూట్ చేయి</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>అన్‌మ్యూట్ చేయి</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 పాటు మ్యూట్ చేయి</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 మిగిలి ఉంది)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>ఆన్</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>ఎప్పటికీ మ్యూట్ చేయబడింది</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>మ్యూట్ చేయబడింది (%1 మిగిలి ఉంది)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>%1 పాటు మ్యూట్ చేయబడింది (%2 మిగిలి ఉంది)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>మ్యూట్ చేయబడింది</translation>
     </message>
 </context>
 <context>

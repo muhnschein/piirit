@@ -648,14 +648,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Fixar</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Reativar notificações</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Silenciar</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>Aceitar</translation>
     </message>
@@ -762,6 +754,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>Toque em «%1» para mostrar todos os canais</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Notificações</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -817,14 +814,23 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Notifications</source>
         <translation>Notificações</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>Silenciado</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Notificações</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>Ligado</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>Deslize para trás para guardar.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Continuará a receber uma notificação quando alguém neste grupo responder a uma das suas mensagens.</translation>
     </message>
 </context>
 <context>
@@ -1346,10 +1352,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Sair do grupo</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>Adicionar membros</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>Grupo</translation>
     </message>
@@ -1403,11 +1405,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Settings</source>
         <translation>Definições</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Convidar com um código QR</translation>
     </message>
 </context>
 <context>
@@ -1697,7 +1694,7 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>Convidar com um código QR</translation>
     </message>
     <message>
@@ -1770,44 +1767,88 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>Silenciar</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n dia</numerusform>
+            <numerusform>%n dias</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n hora</numerusform>
+            <numerusform>%n horas</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 d %2 h</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>Por 1 hora</translation>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>Por 8 horas</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 h %2 min</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>Por 1 dia</translation>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>Por 7 dias</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>Para sempre</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>Notificações ativas</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>Continuará a receber uma notificação quando alguém neste grupo responder a uma das suas mensagens.</translation>
+        <source>Mute forever</source>
+        <translation>Silenciar para sempre</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Reativar notificações</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Silenciar durante %1</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (faltam %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>Ligado</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>Silenciado para sempre</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Silenciado (faltam %1)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Silenciado durante %1 (faltam %2)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>Silenciado</translation>
     </message>
 </context>
 <context>

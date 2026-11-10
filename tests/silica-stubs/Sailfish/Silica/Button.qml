@@ -1,14 +1,12 @@
 import QtQuick 2.0
 
-// Label plus clicked(), which harness emits for tap. `icon` aliases real item, as
-// IconButton's.
+// Label plus clicked(), which harness emits for tap.
 Item {
     property string text
     property bool down: false
+    property bool highlighted: false
     // Colour of label and outline.
     property color color
-    property alias icon: iconImage
-    Image { id: iconImage; visible: false }
     signal clicked()
     implicitWidth: 200
     implicitHeight: 60

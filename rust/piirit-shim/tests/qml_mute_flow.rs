@@ -1,10 +1,10 @@
 //! Muting from every place offering it, tap to core.
 //!
-//! Chat list row menu: Mute opens the length dialog, sends nothing until a length comes back;
-//! Unmute sends at once, no dialog. Group and contact page Notifications row: opens the dialog
-//! either way, told whether muted (Unmute offered), sends the pick. Each entry picks another
-//! length, so none stands in for another; each reads core's answer back (label or value flips).
-//! Dialog itself: `qml_mute_dialog.rs`.
+//! Chat list row menu's Notifications, group and contact page Notifications row: each opens the
+//! notifications page, told chat and whether muted, sends nothing until a choice comes back.
+//! Each entry picks another length, so none stands in for another; each reads core's answer
+//! back (row's mute mark, row value with time left). Length and end kept before core mutes.
+//! Page itself: `qml_chat_notifications_page.rs`.
 
 // Qt harness: see qml_pages.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -19,7 +19,7 @@ mod common;
 
 /// Steps run in order, each once its condition holds (polled; core answers async).
 ///
-/// Page stack is a QML object (context property), not Rust: as `qml_blocking`. Fresh dialog per
+/// Page stack is a QML object (context property), not Rust: as `qml_blocking`. Fresh page per
 /// push: a pick can't reach handler an earlier page connected.
 #[allow(clippy::too_many_lines)]
 fn probe_qml(script: &str) -> String {
@@ -29,6 +29,7 @@ fn probe_qml(script: &str) -> String {
     import Sailfish.Silica 1.0
     import 'file://{components}'
     Item {{
+        id: probe
         Loader {{ id: loader }}
 
         Component {{
@@ -107,33 +108,43 @@ fn probe_qml(script: &str) -> String {
         function muteItem() {{ return findAll(loader.item, 'muteItem', [])[row] }}
         function muteText() {{ var item = muteItem(); return item ? item.text : 'missing' }}
         function rowCount() {{ return findAll(loader.item, 'muteItem', []).length }}
+        /// Chat rows' `isMuted`, tree order as `muteItem`.
+        function delegates(node, found) {{
+            if (!node) {{ return found }}
+            if (node.isMuted !== undefined && found.indexOf(node) < 0) {{ found.push(node) }}
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) {{ delegates(kids[i], found) }}
+            if (node.contentItem && node.contentItem !== node) {{
+                delegates(node.contentItem, found)
+            }}
+            return found
+        }}
+        function rowMuted() {{
+            var row = delegates(loader.item, [])[probe.row]
+            return row ? '' + row.isMuted : 'missing'
+        }}
 
         property var steps: []
         function record(label, value) {{ steps.push([label, '' + value]) }}
         function stepsJson() {{ return JSON.stringify(steps) }}
 
-        /// Mute via dialog: tap, see what opened, pick `seconds`.
+        /// Row menu's entry: tap, see what opened and was said, pick `seconds`.
         function muteVia(prefix, seconds) {{
             stack.pushed = ''
+            stack.props = null
             record(prefix + '-mute-label', muteText())
             muteItem().clicked()
             record(prefix + '-pushed', stack.pushed)
+            record(prefix + '-muted', stack.props ? stack.props.muted : 'none')
+            record(prefix + '-chat', stack.props ? stack.props.chatId : 'none')
             record(prefix + '-note', stack.props ? stack.props.mentionsStillNotify : 'none')
             stack.dialog.picked(seconds)
         }}
-        /// Mute tapped, dialog backed out of.
+        /// Entry tapped, page backed out of.
         function openOnly(prefix) {{
             stack.props = null
             muteItem().clicked()
             record(prefix + '-note', stack.props ? stack.props.mentionsStillNotify : 'none')
-        }}
-        /// Unmute: tap; nothing should open.
-        function unmuteVia(prefix) {{
-            stack.pushed = ''
-            stack.dialog = null
-            record(prefix + '-unmute-label', muteText())
-            muteItem().clicked()
-            record(prefix + '-unmute-pushed', stack.pushed)
         }}
 
         /// Page's Notifications row: tap, see what opened and was said, pick `seconds`.
@@ -144,6 +155,7 @@ fn probe_qml(script: &str) -> String {
             record(prefix + '-click', click('notifications'))
             record(prefix + '-pushed', stack.pushed)
             record(prefix + '-muted', stack.props ? stack.props.muted : 'none')
+            record(prefix + '-chat', stack.props ? stack.props.chatId : 'none')
             record(prefix + '-note', stack.props ? stack.props.mentionsStillNotify : 'none')
             stack.dialog.picked(seconds)
         }}
@@ -184,15 +196,15 @@ const EVERY_ENTRY: &str = r"[
                    Settings.mentionNotifications = true
                    record('list-load', load('{list}', { accountId: 1, archived: false }))
                } },
-            { until: function() { layout(); return rowCount() === 2 && muteText() === 'Mute' },
+            { until: function() { layout(); return rowCount() === 2 && rowMuted() === 'false' },
                run: function() { muteVia('row0', 28800) } },
-            { until: function() { return muteText() === 'Unmute' },
-               run: function() { unmuteVia('row0') } },
-            { until: function() { return muteText() === 'Mute' },
+            { until: function() { return rowMuted() === 'true' },
+               run: function() { muteVia('row0-muted', 0) } },
+            { until: function() { return rowMuted() === 'false' },
                run: function() { row = 1; muteVia('row1', 3600) } },
-            { until: function() { return muteText() === 'Unmute' },
-               run: function() { unmuteVia('row1') } },
-            { until: function() { return muteText() === 'Mute' },
+            { until: function() { return rowMuted() === 'true' },
+               run: function() { muteVia('row1-muted', 0) } },
+            { until: function() { return rowMuted() === 'false' },
                run: function() {
                    // Mentions off: no note even in a group. Backed out: nothing sent.
                    Settings.mentionNotifications = false
@@ -205,7 +217,7 @@ const EVERY_ENTRY: &str = r"[
                } },
             { until: function() { return rowValue() === 'On' },
                run: function() { rowVia('group', 86400) } },
-            { until: function() { return rowValue() === 'Muted' },
+            { until: function() { return rowValue().indexOf('Muted') === 0 },
                run: function() { rowVia('group-muted', 0) } },
             { until: function() { return rowValue() === 'On' },
                run: function() {
@@ -219,7 +231,7 @@ const EVERY_ENTRY: &str = r"[
                } },
             { until: function() { return rowValue() === 'On' },
                run: function() { rowVia('contact', 604800) } },
-            { until: function() { return rowValue() === 'Muted' },
+            { until: function() { return rowValue().indexOf('Muted') === 0 },
                run: function() { rowVia('contact-muted', 0) } },
             { until: function() { return rowValue() === 'On' },
                run: function() { finished = true } }
@@ -233,7 +245,7 @@ const CHANNEL: &str = r"[
                    Settings.mentionNotifications = true
                    record('list-load', load('{list}', { accountId: 1, archived: false }))
                } },
-            { until: function() { layout(); return rowCount() === 2 && muteText() === 'Mute' },
+            { until: function() { layout(); return rowCount() === 2 && rowMuted() === 'false' },
                run: function() { row = 1; openOnly('channel-row') } },
             { until: function() { return true },
                run: function() {
@@ -318,7 +330,7 @@ fn run(name: &str, script: &str, channels: &str) -> Run {
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
+fn every_mute_entry_opens_the_notifications_page_and_sends_the_choice() {
     let run = run("mute-flow", EVERY_ENTRY, "");
     let value = |label: &str| run.value(label);
     let (calls, context) = (&run.calls, &run.context);
@@ -328,29 +340,31 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
         "ok",
         "the chat list did not load. {context}"
     );
-    for entry in ["row0", "row1"] {
+    // Same entry muted or not: page told which; core's answer read back (mute mark flips).
+    for (entry, muted) in [
+        ("row0", "false"),
+        ("row0-muted", "true"),
+        ("row1", "false"),
+        ("row1-muted", "true"),
+    ] {
         assert_eq!(
             (
                 value(&format!("{entry}-mute-label")),
-                value(&format!("{entry}-pushed"))
+                value(&format!("{entry}-pushed")),
+                value(&format!("{entry}-muted")),
             ),
-            ("Mute".to_string(), "MuteDialog.qml".to_string()),
-            "Mute in the {entry} menu did not open the length dialog. {context}"
-        );
-        // Label flipped: core's answer read back. Unmute opens nothing.
-        assert_eq!(
             (
-                value(&format!("{entry}-unmute-label")),
-                value(&format!("{entry}-unmute-pushed")),
+                "Notifications".to_string(),
+                "ChatNotificationsPage.qml".to_string(),
+                muted.to_string()
             ),
-            ("Unmute".to_string(), String::new()),
-            "once muted, the {entry} menu did not offer Unmute, or it opened a \
-             page. {context}"
+            "Notifications in the {entry} menu did not open the notifications page told \
+             whether muted. {context}"
         );
     }
 
-    // Only the picked lengths, in order; nothing sent on the tap that opened the dialog, nor
-    // for a dialog backed out of.
+    // Only the picked lengths, in order; nothing sent on the tap that opened the page, nor
+    // for a page backed out of.
     let mutes: Vec<Value> = calls
         .iter()
         .filter(|(method, _)| method == "set_chat_mute_duration")
@@ -372,15 +386,74 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
         ],
         "the menus and rows did not send exactly the reader's picks to the core. {context}"
     );
+    for (entry, chat) in [("row0", &first), ("row1", &second)] {
+        assert_eq!(
+            Some(json!(value(&format!("{entry}-chat"))
+                .parse::<u32>()
+                .unwrap_or_default())),
+            *chat,
+            "the {entry} menu's page was told another chat. {context}"
+        );
+    }
 
-    // Page rows: value says core's state, dialog told whether muted. Group with mentions on gets
-    // the note; contact never.
+    // Each mute's length and end kept just before core mutes, so its ChatModified finds it;
+    // unmute clears it. Other chats' calls may come between.
+    let mut pending: Vec<(Value, Value)> = Vec::new();
+    let mut kept = Vec::new();
+    for (method, params) in calls {
+        let key = params[1].as_str().unwrap_or_default();
+        if method == "set_config" && key.starts_with("ui.piirit.mute.") {
+            pending.push((json!(key), params[2].clone()));
+        } else if method == "set_chat_mute_duration" {
+            let key = json!(format!("ui.piirit.mute.{}", params[1]));
+            let found = pending.iter().position(|(pending, _)| *pending == key);
+            let value = found.map(|at| pending.remove(at).1);
+            let length = params[2].get("duration").map(ToString::to_string);
+            // "LENGTH:END": end now plus length, so well past 2023.
+            let shown = value.map(|value| {
+                value.as_str().map(|kept| {
+                    let (length, end) = kept.split_once(':').unwrap_or_default();
+                    (
+                        length.to_string(),
+                        end.parse::<u64>().unwrap_or_default() > 1_700_000_000,
+                    )
+                })
+            });
+            kept.push((length, shown));
+        }
+    }
+    assert_eq!(
+        kept,
+        [28800, 3600, 86400, 604_800]
+            .into_iter()
+            .flat_map(|seconds| [
+                (
+                    Some(seconds.to_string()),
+                    Some(Some((seconds.to_string(), true)))
+                ),
+                (None, Some(None))
+            ])
+            .collect::<Vec<_>>(),
+        "a mute reached core without its length and end kept first, or an unmute without \
+         clearing them. {context}"
+    );
+
+    // Page rows: value says core's state and time left, page told chat and whether muted.
+    // Group with mentions on gets the note; contact never.
     assert_eq!(
         value("group-quiet-note"),
         "false",
         "the group page's note shows though Mentions is off. {context}"
     );
-    for (page, note) in [("group", "true"), ("contact", "false")] {
+    for (page, chat, note, left) in [
+        ("group", "2", "true", "Muted for 1 day(s) (1 d remaining)"),
+        (
+            "contact",
+            "1",
+            "false",
+            "Muted for 7 day(s) (7 d remaining)",
+        ),
+    ] {
         assert_eq!(
             value(&format!("{page}-load")),
             "ok",
@@ -388,31 +461,33 @@ fn every_mute_entry_asks_how_long_and_only_the_list_unmutes_without_asking() {
         );
         for (prefix, shown, muted) in [
             (page.to_string(), "On", "false"),
-            (format!("{page}-muted"), "Muted", "true"),
+            (format!("{page}-muted"), left, "true"),
         ] {
             assert_eq!(
                 (
                     value(&format!("{prefix}-value")),
                     value(&format!("{prefix}-click")),
                     value(&format!("{prefix}-pushed")),
+                    value(&format!("{prefix}-chat")),
                     value(&format!("{prefix}-muted")),
                     value(&format!("{prefix}-note")),
                 ),
                 (
                     shown.to_string(),
                     "ok".to_string(),
-                    "MuteDialog.qml".to_string(),
+                    "ChatNotificationsPage.qml".to_string(),
+                    chat.to_string(),
                     muted.to_string(),
                     note.to_string()
                 ),
                 "the {page} page's Notifications row ({prefix}) did not show core's state \
-                 and open the dialog told so. {context}"
+                 and time left, and open the page told so. {context}"
             );
         }
     }
     assert_ne!(first, second, "both picks went to one chat. {context}");
 
-    // Chat 2 is the group: only its dialog says replies still notify, and only while the
+    // Chat 2 is the group: only its page says replies still notify, and only while the
     // setting is on.
     let note = |prefix: &str, row: Option<Value>| {
         (
@@ -452,7 +527,8 @@ fn a_channel_gets_no_note_on_replies() {
             "ok".to_string(),
             "false".to_string()
         ),
-        "a channel's mute dialog says replies still notify; nobody replies there. {context}"
+        "a channel's notifications page says replies still notify; nobody replies there. \
+         {context}"
     );
 }
 

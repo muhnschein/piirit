@@ -78,13 +78,17 @@ Page {
     }
 
     // Id, not row: arrivals recreate rows. `=== true`: dconf undefined till read.
-    function askMute(chatId, isGroup) {
-        var dialog = pageStack.push(Qt.resolvedUrl("MuteDialog.qml"), {
+    function askMute(chatId, chatName, muted, isGroup) {
+        var notifications = pageStack.push(Qt.resolvedUrl("ChatNotificationsPage.qml"), {
+            accountId: page.accountId,
+            chatId: chatId,
+            chatName: chatName,
+            muted: muted,
             mentionsStillNotify: isGroup && Settings.notificationsEnabled === true
                                  && Settings.mentionNotifications === true
         })
-        if (dialog) {
-            dialog.picked.connect(function(seconds) {
+        if (notifications) {
+            notifications.picked.connect(function(seconds) {
                 chats.set_mute_duration(chatId, seconds)
             })
         }
@@ -845,14 +849,11 @@ Page {
                         MenuItem {
                             objectName: "muteItem"
                             visible: !page.archived
-                            text: model.is_muted ? qsTr("Unmute") : qsTr("Mute")
-                            onClicked: {
-                                if (model.is_muted) {
-                                    chats.set_mute_duration(model.chat_id, 0)
-                                } else {
-                                    page.askMute(model.chat_id, model.is_group && !model.is_channel)
-                                }
-                            }
+                            //: Row menu in the chat list: opens the chat's notifications page
+                            //: (on, or muted for how long). Delta Chat's "Notifications".
+                            text: qsTr("Notifications")
+                            onClicked: page.askMute(model.chat_id, model.name, model.is_muted,
+                                                    model.is_group && !model.is_channel)
                         }
                         // Request: no reply till accepted, so yes or no.
                         MenuItem {

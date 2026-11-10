@@ -648,14 +648,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>पिन करा</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>अनम्यूट करा</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>म्यूट करा</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>स्वीकारा</translation>
     </message>
@@ -762,6 +754,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>सर्व चॅनेल दाखवण्यासाठी &quot;%1&quot; वर टॅप करा</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>सूचना</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -817,14 +814,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Notifications</source>
         <translation>सूचना</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>म्यूट</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>सूचना</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>चालू</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>जतन करण्यासाठी मागे स्वाइप करा.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>या गटात कोणी तुमच्या एखाद्या संदेशाला उत्तर दिल्यास तुम्हाला तरीही सूचना मिळेल.</translation>
     </message>
 </context>
 <context>
@@ -1346,10 +1352,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>गट सोडा</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>सदस्य जोडा</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>गट</translation>
     </message>
@@ -1403,11 +1405,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Settings</source>
         <translation>सेटिंग्ज</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>QR कोडने आमंत्रित करा</translation>
     </message>
 </context>
 <context>
@@ -1697,7 +1694,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>QR कोडने आमंत्रित करा</translation>
     </message>
     <message>
@@ -1770,44 +1767,88 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>म्यूट करा</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n दिवस</numerusform>
+            <numerusform>%n दिवस</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n तास</numerusform>
+            <numerusform>%n तास</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>रद्द करा</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 दि %2 ता</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>1 तासासाठी</translation>
+        <source>%1 d</source>
+        <translation>%1 दि</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>8 तासांसाठी</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 ता %2 मि</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>1 दिवसासाठी</translation>
+        <source>%1 h</source>
+        <translation>%1 ता</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>7 दिवसांसाठी</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 मि</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>कायमचे</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>सूचना सुरू</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>या गटात कोणी तुमच्या एखाद्या संदेशाला उत्तर दिल्यास तुम्हाला तरीही सूचना मिळेल.</translation>
+        <source>Mute forever</source>
+        <translation>कायमचे म्यूट करा</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>अनम्यूट करा</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 साठी म्यूट करा</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 बाकी)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>चालू</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>कायमचे म्यूट</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>म्यूट (%1 बाकी)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>%1 साठी म्यूट (%2 बाकी)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>म्यूट</translation>
     </message>
 </context>
 <context>

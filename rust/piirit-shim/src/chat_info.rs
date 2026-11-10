@@ -8,7 +8,6 @@ use std::cell::RefCell;
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
-use crate::chatlist::mute_duration;
 use crate::contacts::{contact_row, row_map};
 use crate::core::{connection, reconcile_rows};
 use crate::json;
@@ -508,14 +507,7 @@ impl ChatInfo {
         let done = self.stored_callback(Outcome::Saved);
 
         runtime.spawn(async move {
-            let result = rpc
-                .call::<_, ()>(
-                    "set_chat_mute_duration",
-                    (account_id, chat_id, mute_duration(seconds)),
-                )
-                .await
-                .map_err(|err| err.to_string());
-            done(result);
+            done(crate::mute::apply(&rpc, account_id, chat_id, seconds).await);
         });
     }
 

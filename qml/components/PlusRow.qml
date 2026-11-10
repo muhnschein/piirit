@@ -11,8 +11,6 @@ ListItem {
 
     /// Row text, such as "Add profile".
     property alias text: label.text
-    /// Theme icon where picture stands; default the plus.
-    property alias iconSource: plus.source
 
     contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
 

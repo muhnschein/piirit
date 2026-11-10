@@ -648,14 +648,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Épingler</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Réactiver les notifications</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Mettre en sourdine</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>Accepter</translation>
     </message>
@@ -762,6 +754,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>Touchez « %1 » pour afficher tous les canaux</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Notifications</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -817,14 +814,23 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Notifications</source>
         <translation>Notifications</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>En sourdine</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Notifications</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>Activé</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>Glissez en arrière pour enregistrer.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Vous recevrez quand même une notification si quelqu&apos;un dans ce groupe répond à l&apos;un de vos messages.</translation>
     </message>
 </context>
 <context>
@@ -1346,10 +1352,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Quitter le groupe</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>Ajouter des membres</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>Groupe</translation>
     </message>
@@ -1403,11 +1405,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Settings</source>
         <translation>Paramètres</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Inviter avec un code QR</translation>
     </message>
 </context>
 <context>
@@ -1697,7 +1694,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>Inviter avec un code QR</translation>
     </message>
     <message>
@@ -1770,44 +1767,88 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>Mettre en sourdine</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n jour</numerusform>
+            <numerusform>%n jours</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n heure</numerusform>
+            <numerusform>%n heures</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 j %2 h</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>Pendant 1 heure</translation>
+        <source>%1 d</source>
+        <translation>%1 j</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>Pendant 8 heures</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 h %2 min</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>Pendant 1 jour</translation>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>Pendant 7 jours</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>Pour toujours</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>Notifications activées</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>Vous recevrez quand même une notification si quelqu&apos;un dans ce groupe répond à l&apos;un de vos messages.</translation>
+        <source>Mute forever</source>
+        <translation>Mettre en sourdine pour toujours</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Réactiver les notifications</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Mettre en sourdine pendant %1</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (reste %2)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>En sourdine pour toujours</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>En sourdine (reste %1)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>En sourdine pendant %1 (reste %2)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>En sourdine</translation>
     </message>
 </context>
 <context>

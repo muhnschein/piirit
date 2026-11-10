@@ -120,6 +120,17 @@ const PROBE_QML: &str = r"
             item.clicked()
             return 'ok'
         }
+        // Pulley entries top to bottom, as declared: objectNames.
+        function menuOrder(name) {
+            var walk = function(node) {
+                var out = node.text !== undefined && node.objectName ? node.objectName + '|' : ''
+                var kids = node.data !== undefined ? node.data : node.children
+                for (var i = 0; kids && i < kids.length; i++) { out += walk(kids[i]) }
+                return out
+            }
+            var menu = findIn(loader.item, name)
+            return menu ? walk(menu) : 'missing:' + name
+        }
     }
 ";
 
@@ -198,15 +209,17 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("members", get!("memberCount", "text"));
         record!("member-names", get!("memberNames", "name"));
         record!("members-row", get!("membersRow", "visible"));
-        record!("add-offered", get!("addMembersRow", "visible"));
-        record!("invite-offered", get!("inviteRow", "visible"));
-        record!("invite-icon", get!("inviteRow", "iconSource"));
+        // Add members and Invite moved to the members page's pulley.
+        record!("add-row", get!("addMembersRow", "visible"));
+        record!("invite-row", get!("inviteRow", "visible"));
+        record!("menu-order", call!("menuOrder", QString::from("groupMenu")));
+        record!("band", get!("headerBand", "visible"));
         record!("leave-offered", get!("leaveButton", "visible"));
         record!("menu-offered", get!("groupMenu", "visible"));
         record!("edit-offered", get!("editGroup", "visible"));
         record!("delete-offered", get!("deleteChat", "visible"));
-        // Members row, the two ways to grow, a media row: each opens its page.
-        for row in ["membersRow", "addMembersRow", "inviteRow", "galleryRow"] {
+        // Members row, a media row: each opens its page.
+        for row in ["membersRow", "galleryRow"] {
             record!(row, call!("click", QString::from(row)));
         }
         // Disappearing messages: off per core; duration tap goes to core.
@@ -353,15 +366,12 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("left-edit", get!("editGroup", "visible"));
         record!("left-leave", get!("leaveButton", "visible"));
         record!("left-delete", get!("deleteChat", "visible"));
-        record!("left-add", get!("addMembersRow", "visible"));
         // One-to-one chat: shown, nothing changeable.
         record!("load-single", call!("load", QString::from(url.clone()), 1));
     });
 
     plan.after(2, move || unsafe {
         record!("single-loaded", get!("chat", "loaded"));
-        record!("single-add", get!("addMembersRow", "visible"));
-        record!("single-invite", get!("inviteRow", "visible"));
         record!("single-leave", get!("leaveButton", "visible"));
         record!("single-edit", get!("editGroup", "visible"));
         record!("single-desc", get!("descriptionLabel", "visible"));
@@ -428,8 +438,6 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "load-single",
         "timer-pick",
         "membersRow",
-        "addMembersRow",
-        "inviteRow",
         "galleryRow",
         "desc-typed",
         "desc-cleared",
@@ -453,13 +461,25 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "the members row does not name the other member, without the reader. {context}"
     );
     assert_eq!(
-        value("invite-icon"),
-        "image://theme/icon-m-qr",
-        "the invite row does not show the QR icon. {context}"
+        (value("add-row"), value("invite-row")),
+        (
+            "missing:addMembersRow".to_string(),
+            "missing:inviteRow".to_string()
+        ),
+        "Add members or Invite still a row on the group page. {context}"
+    );
+    assert_eq!(
+        value("band"),
+        "true",
+        "no ambience band behind the group's top block. {context}"
+    );
+    // Top to bottom; Delete chat only once left.
+    assert_eq!(
+        value("menu-order"),
+        "encryptionInfo|leaveButton|deleteChat|editGroup|",
+        "the pulley is not encryption info, leave, edit, top to bottom. {context}"
     );
     for label in [
-        "add-offered",
-        "invite-offered",
         "leave-offered",
         "menu-offered",
         "edit-offered",
@@ -555,11 +575,9 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "leaving the edit page did not send each typed description, trimmed. {context}"
     );
     assert_eq!(
-        navigation,
-        "push:MembersPage.qml|push:AddMembersPage.qml|push:QrPage.qml|push:ChatMediaPage.qml|\
-         push:LeaveGroupDialog.qml|",
-        "the members row, Add members, Invite or Gallery opens no page of its own, or leaving \
-         the group is not asked about on one. {context}"
+        navigation, "push:MembersPage.qml|push:ChatMediaPage.qml|push:LeaveGroupDialog.qml|",
+        "the members row or Gallery opens no page of its own, or leaving the group is not \
+         asked about on one. {context}"
     );
     assert_eq!(
         (value("left-visible"), value("left-text")),
@@ -570,15 +588,9 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         (
             value("left-edit"),
             value("left-leave"),
-            value("left-delete"),
-            value("left-add")
+            value("left-delete")
         ),
-        (
-            "false".to_string(),
-            "false".to_string(),
-            "true".to_string(),
-            "false".to_string()
-        ),
+        ("false".to_string(), "false".to_string(), "true".to_string()),
         "a group the account has left still offers edits, or no Delete chat. {context}"
     );
 
@@ -588,8 +600,6 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "the one-to-one chat never loaded. {context}"
     );
     for label in [
-        "single-add",
-        "single-invite",
         "single-leave",
         "single-edit",
         "single-desc",

@@ -7,8 +7,8 @@ import Piirit 1.0
 /*
  * Group or channel: swipe left from conversation or tap header. Read first, as
  * contact page: picture with name beside it, description, rows to what the chat
- * holds and how it behaves, members as one row (as Chats in common) with Add members
- * and Invite under it. Name, description, picture on Edit group (pulley). Core owns
+ * holds and how it behaves, members as one row (as Chats in common); Add members and
+ * Invite on its page. Name, description, picture on Edit group (pulley). Core owns
  * data (ChatInfo); not joined: core refuses edits, entries hidden.
  */
 Page {
@@ -96,26 +96,8 @@ Page {
         onError: page.errorMessage = message
     }
 
-    /// Own channel: invite only way subscribers join.
-    readonly property bool offersInvite: (chat.can_edit && !chat.is_channel) || chat.is_own_channel
-    /// Core takes no members added to a channel.
-    readonly property bool offersAdd: chat.can_edit && !chat.is_channel
-
-    function addMembers() {
-        pageStack.push(Qt.resolvedUrl("AddMembersPage.qml"), {
-            accountId: page.accountId,
-            chat: chat
-        })
-    }
-
-    function invite() {
-        pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
-            accountId: page.accountId,
-            chatId: page.chatId,
-            chatName: chat.name,
-            isChannel: chat.is_channel
-        })
-    }
+    /// Members page holds Add members and Invite: reachable while empty too (new own channel).
+    readonly property bool offersGrowth: chat.can_edit || chat.is_own_channel
 
     function showMembers() {
         pageStack.push(Qt.resolvedUrl("MembersPage.qml"), {
@@ -168,6 +150,12 @@ Page {
             visible: chat.loaded
 
             MenuItem {
+                objectName: "encryptionInfo"
+                visible: chat.is_encrypted
+                text: qsTr("Show encryption info")
+                onClicked: page.showEncryption()
+            }
+            MenuItem {
                 objectName: "leaveButton"
                 visible: chat.can_edit
                 text: qsTr("Leave group")
@@ -180,12 +168,6 @@ Page {
                 onClicked: page.deleteChat()
             }
             MenuItem {
-                objectName: "encryptionInfo"
-                visible: chat.is_encrypted
-                text: qsTr("Show encryption info")
-                onClicked: page.showEncryption()
-            }
-            MenuItem {
                 objectName: "editGroup"
                 visible: chat.can_edit || chat.can_edit_description
                 //: Pulley on a group's page: opens the page to change its name,
@@ -195,18 +177,27 @@ Page {
             }
         }
 
+        HeaderBand {
+            headerBottom: pageHeader.y + pageHeader.height
+            pictureTop: identity.y + identity.pictureTop
+            lastBottom: description.visible ? description.y + description.height
+                        : identity.y + identity.height - identity.pictureTop
+        }
+
         Column {
             id: column
             width: parent.width
             spacing: Theme.paddingMedium
 
             PageHeader {
+                id: pageHeader
                 objectName: "pageHeader"
                 //: Delta Chat's "channel". Heading of a channel's page.
                 title: chat.is_channel ? qsTr("Channel") : qsTr("Group")
             }
 
             IdentityRow {
+                id: identity
                 initial: chat.loaded ? chat.name : page.chatName
                 ownColor: chat.color
                 picturePath: chat.avatar_path
@@ -243,6 +234,7 @@ Page {
 
             // What the group is for, full width: can run long.
             ClampedText {
+                id: description
                 objectName: "descriptionLabel"
                 visible: chat.description.length > 0
                 color: Theme.primaryColor
@@ -267,6 +259,11 @@ Page {
 
             ChatNotifications {
                 objectName: "notifications"
+                width: parent.width
+                accountId: page.accountId
+                chatId: page.chatId
+                chatName: chat.loaded ? chat.name : page.chatName
+                chat: chat
                 muted: chat.is_muted
                 // Nobody replies to reader in a channel. `=== true`: dconf undefined till read.
                 mentionsStillNotify: !chat.is_channel && Settings.notificationsEnabled === true
@@ -283,7 +280,7 @@ Page {
 
             SectionHeader {
                 objectName: "membersHeader"
-                visible: chat.member_count > 0
+                visible: chat.member_count > 0 || page.offersGrowth
                 //: Over the row to a group's members.
                 text: qsTr("Members")
             }
@@ -292,7 +289,7 @@ Page {
             BackgroundItem {
                 id: membersRow
                 objectName: "membersRow"
-                visible: chat.member_count > 0
+                visible: chat.member_count > 0 || page.offersGrowth
                 width: parent.width
                 height: Theme.itemSizeMedium
                 onClicked: page.showMembers()
@@ -349,23 +346,6 @@ Page {
                 }
             }
 
-            // The two ways a group grows.
-            PlusRow {
-                objectName: "addMembersRow"
-                visible: page.offersAdd
-                width: parent.width
-                text: qsTr("Add members")
-                onClicked: page.addMembers()
-            }
-            PlusRow {
-                objectName: "inviteRow"
-                visible: page.offersInvite
-                width: parent.width
-                iconSource: "image://theme/icon-m-qr"
-                //: Row on a group's page: opens the QR code others scan to join.
-                text: qsTr("Invite with a QR code")
-                onClicked: page.invite()
-            }
         }
 
         VerticalScrollDecorator {}

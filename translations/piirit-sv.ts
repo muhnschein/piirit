@@ -644,14 +644,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fäst</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Slå på ljud</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Tysta</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>Acceptera</translation>
     </message>
@@ -758,6 +750,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>Tryck på ”%1” för att visa alla kanaler</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Aviseringar</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -813,14 +810,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Notifications</source>
         <translation>Aviseringar</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>Tystad</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Aviseringar</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>På</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>Svep tillbaka för att spara.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Du får fortfarande en avisering när någon i den här gruppen svarar på ett av dina meddelanden.</translation>
     </message>
 </context>
 <context>
@@ -1342,10 +1348,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lämna grupp</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>Lägg till medlemmar</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>Grupp</translation>
     </message>
@@ -1399,11 +1401,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Settings</source>
         <translation>Inställningar</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>Bjud in med QR-kod</translation>
     </message>
 </context>
 <context>
@@ -1693,7 +1690,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>Bjud in med QR-kod</translation>
     </message>
     <message>
@@ -1766,44 +1763,88 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>Tysta</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n dag</numerusform>
+            <numerusform>%n dagar</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n timme</numerusform>
+            <numerusform>%n timmar</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 d %2 h</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>I 1 timme</translation>
+        <source>%1 d</source>
+        <translation>%1 d</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>I 8 timmar</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 h %2 min</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>I 1 dag</translation>
+        <source>%1 h</source>
+        <translation>%1 h</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>I 7 dagar</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 min</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>För alltid</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>Aviseringar på</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>Du får fortfarande en avisering när någon i den här gruppen svarar på ett av dina meddelanden.</translation>
+        <source>Mute forever</source>
+        <translation>Tysta för alltid</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Slå på ljud</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>Tysta i %1</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 kvar)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>På</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>Tystad för alltid</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Tystad (%1 kvar)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>Tystad i %1 (%2 kvar)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>Tystad</translation>
     </message>
 </context>
 <context>

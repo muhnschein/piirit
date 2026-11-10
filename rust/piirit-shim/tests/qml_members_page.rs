@@ -1,7 +1,7 @@
-//! Members page: every member, search by name (never address), invite opens group's QR code, tap
-//! opens a member's page where a chat with them exists, else their menu; Send message makes the
-//! chat and opens it; Remove waits out platform's countdown, then asks core. Search cleared once
-//! page gone (model shared with group page).
+//! Members page: every member, search by name (never address), pulley's invite opens group's QR
+//! code, tap opens a member's page where a chat with them exists, else their menu; Send message
+//! makes the chat and opens it; Remove waits out platform's countdown, then asks core. Search
+//! cleared once page gone (model shared with group page).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -194,8 +194,9 @@ fn the_members_page_finds_opens_and_removes_members() {
         }
         record!("title", get!("membersHeader", "title"));
         record!("count", get!("memberList", "count"));
-        record!("add-row", get!("addMembersRow", "visible"));
-        record!("invite-row", get!("inviteRow", "visible"));
+        record!("add-item", get!("addMembersItem", "visible"));
+        record!("invite-item", get!("inviteItem", "visible"));
+        record!("menu", get!("membersMenu", "visible"));
         record!("self-menu", get!("memberRow1", "menu"));
         // Name, any case.
         record!(
@@ -226,8 +227,8 @@ fn the_members_page_finds_opens_and_removes_members() {
             call!("setText", QString::from("searchField"), QString::from(""))
         );
         record!("all-again", get!("memberList", "count"));
-        record!("invite-icon", get!("inviteRow", "iconSource"));
-        record!("invite", call!("click", QString::from("inviteRow")));
+        record!("add", call!("click", QString::from("addMembersItem")));
+        record!("invite", call!("click", QString::from("inviteItem")));
         // Ada: chat with her exists, her page.
         record!("tap-ada", call!("click", QString::from("memberRow10")));
         true
@@ -327,6 +328,7 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         "search-name",
         "search-address",
         "search-clear",
+        "add",
         "invite",
         "tap-ada",
         "tap-stranger",
@@ -345,12 +347,12 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         ),
         ("count", "4", "the page does not list every member"),
         (
-            "invite-icon",
-            "image://theme/icon-m-qr",
-            "the invite row does not show the QR icon",
+            "add-item",
+            "true",
+            "the pulley does not offer to add members",
         ),
-        ("add-row", "true", "the page does not offer to add members"),
-        ("invite-row", "true", "the page does not offer an invite"),
+        ("invite-item", "true", "the pulley does not offer an invite"),
+        ("menu", "true", "the page has no pulley"),
         ("self-menu", "null", "the reader's own row has a menu"),
         (
             "found-by-name",
@@ -410,10 +412,11 @@ fn assert_members(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
 
-    // Group's own invite; Ada's page on her chat; member0's new chat opened, not their page.
+    // Add members, group's own invite; Ada's page on her chat; member0's new chat opened, not
+    // their page.
     assert_eq!(
         navigation,
-        "push:QrPage.qml(chat=2,channel=false)|push:ContactPage.qml(chat=1)|\
+        "push:AddMembersPage.qml(chat=0)|push:QrPage.qml(chat=2,channel=false)|push:ContactPage.qml(chat=1)|\
          push:ConversationPage.qml(chat=501)|",
         "a tap did not open the right page. {context}"
     );

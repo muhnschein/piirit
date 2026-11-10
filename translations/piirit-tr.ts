@@ -646,14 +646,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Sabitle</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Sesi aç</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation>Sessize al</translation>
-    </message>
-    <message>
         <source>Accept</source>
         <translation>Kabul et</translation>
     </message>
@@ -760,6 +752,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>%1 is the label of the unread filter, a button beside the search button.</extracomment>
         <translation>Tüm kanalları göstermek için &quot;%1&quot; öğesine dokunun</translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <extracomment>Row menu in the chat list: opens the chat&apos;s notifications page (on, or muted for how long). Delta Chat&apos;s &quot;Notifications&quot;.</extracomment>
+        <translation>Bildirimler</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaView</name>
@@ -814,14 +811,23 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Notifications</source>
         <translation>Bildirimler</translation>
     </message>
+</context>
+<context>
+    <name>ChatNotificationsPage</name>
     <message>
-        <source>Muted</source>
-        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page: chat muted, or notifications on.</extracomment>
-        <translation>Sessize alındı</translation>
+        <source>Notifications</source>
+        <extracomment>Heading of a chat&apos;s notifications page.</extracomment>
+        <translation>Bildirimler</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation>Açık</translation>
+        <source>Swipe back to save.</source>
+        <extracomment>Under the choices on a chat&apos;s notifications page.</extracomment>
+        <translation>Kaydetmek için geri kaydırın.</translation>
+    </message>
+    <message>
+        <source>You still get a notification when someone in this group replies to one of your messages.</source>
+        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
+        <translation>Bu gruptaki biri mesajlarınızdan birine yanıt verdiğinde yine de bildirim alırsınız.</translation>
     </message>
 </context>
 <context>
@@ -1339,10 +1345,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Gruptan ayrıl</translation>
     </message>
     <message>
-        <source>Add members</source>
-        <translation>Üye ekle</translation>
-    </message>
-    <message>
         <source>Group</source>
         <translation>Grup</translation>
     </message>
@@ -1395,11 +1397,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Settings</source>
         <translation>Ayarlar</translation>
-    </message>
-    <message>
-        <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s page: opens the QR code others scan to join.</extracomment>
-        <translation>QR koduyla davet et</translation>
     </message>
 </context>
 <context>
@@ -1687,7 +1684,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Invite with a QR code</source>
-        <extracomment>Row on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
+        <extracomment>Pulley on a group&apos;s member list: opens the QR code others scan to join.</extracomment>
         <translation>QR koduyla davet et</translation>
     </message>
     <message>
@@ -1760,44 +1757,86 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
-    <name>MuteDialog</name>
-    <message>
-        <source>Mute</source>
-        <translation>Sessize al</translation>
+    <name>Mute</name>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n günlüğüne</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <extracomment>How long a chat stays muted, in &quot;Mute for %1&quot;.</extracomment>
+        <translation>
+            <numerusform>%n saatliğine</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
+        <source>%1 d %2 h</source>
+        <extracomment>Mute time left, days and hours.</extracomment>
+        <translation>%1 g %2 sa</translation>
     </message>
     <message>
-        <source>For 1 hour</source>
-        <extracomment>How long a chat stays muted; one of five choices under the dialog&apos;s Mute button.</extracomment>
-        <translation>1 saatliğine</translation>
+        <source>%1 d</source>
+        <translation>%1 g</translation>
     </message>
     <message>
-        <source>For 8 hours</source>
-        <translation>8 saatliğine</translation>
+        <source>%1 h %2 min</source>
+        <extracomment>Mute time left, hours and minutes.</extracomment>
+        <translation>%1 sa %2 dk</translation>
     </message>
     <message>
-        <source>For 1 day</source>
-        <translation>1 günlüğüne</translation>
+        <source>%1 h</source>
+        <translation>%1 sa</translation>
     </message>
     <message>
-        <source>For 7 days</source>
-        <translation>7 günlüğüne</translation>
+        <source>%1 min</source>
+        <extracomment>Mute time left, minutes.</extracomment>
+        <translation>%1 dk</translation>
     </message>
     <message>
-        <source>Forever</source>
-        <translation>Süresiz</translation>
+        <source>Notifications active</source>
+        <extracomment>First choice on a chat&apos;s notifications page: not muted.</extracomment>
+        <translation>Bildirimler açık</translation>
     </message>
     <message>
-        <source>You still get a notification when someone in this group replies to one of your messages.</source>
-        <extracomment>Under the mute choices of a group, while &quot;Mentions&quot; is on in the notification settings.</extracomment>
-        <translation>Bu gruptaki biri mesajlarınızdan birine yanıt verdiğinde yine de bildirim alırsınız.</translation>
+        <source>Mute forever</source>
+        <translation>Süresiz sessize al</translation>
     </message>
     <message>
-        <source>Unmute</source>
-        <translation>Sesi aç</translation>
+        <source>Mute for %1</source>
+        <extracomment>Choice on a chat&apos;s notifications page. %1 is how long, e.g. &quot;8 hours&quot;.</extracomment>
+        <translation>%1 sessize al</translation>
+    </message>
+    <message>
+        <source>%1 (%2 remaining)</source>
+        <extracomment>The active mute choice. %1 is the choice, e.g. &quot;Mute for 8 hours&quot;; %2 the time left, e.g. &quot;5 h 12 min&quot;.</extracomment>
+        <translation>%1 (%2 kaldı)</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <extracomment>Value of the Notifications row on a contact&apos;s or group&apos;s page.</extracomment>
+        <translation>Açık</translation>
+    </message>
+    <message>
+        <source>Muted forever</source>
+        <translation>Süresiz sessizde</translation>
+    </message>
+    <message>
+        <source>Muted (%1 remaining)</source>
+        <extracomment>Notifications row when the full line doesn&apos;t fit. %1: time left.</extracomment>
+        <translation>Sessizde (%1 kaldı)</translation>
+    </message>
+    <message>
+        <source>Muted for %1 (%2 remaining)</source>
+        <extracomment>Notifications row. %1: how long, e.g. &quot;8 hours&quot;; %2: time left.</extracomment>
+        <translation>%1 sessizde (%2 kaldı)</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <extracomment>Notifications row: muted, end not known (muted on another device).</extracomment>
+        <translation>Sessize alındı</translation>
     </message>
 </context>
 <context>

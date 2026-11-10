@@ -232,11 +232,18 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
-        // Farthest from finger: undone only by hand (Delete, Block).
+        // Delete and Block away from finger: undone only by hand.
         PullDownMenu {
             objectName: "contactMenu"
             visible: page.contactId > 0
 
+            MenuItem {
+                objectName: "encryptionInfo"
+                //: Pulley on a contact's or group's page: opens the page with
+                //: the keys' fingerprints.
+                text: qsTr("Show encryption info")
+                onClicked: page.showEncryption()
+            }
             MenuItem {
                 objectName: "deleteChat"
                 //: Pulley on a contact's page: deletes the chat with them from this device.
@@ -249,18 +256,19 @@ Page {
                 onClicked: page.confirmBlock()
             }
             MenuItem {
-                objectName: "encryptionInfo"
-                //: Pulley on a contact's or group's page: opens the page with
-                //: the keys' fingerprints.
-                text: qsTr("Show encryption info")
-                onClicked: page.showEncryption()
-            }
-            MenuItem {
                 objectName: "editName"
                 //: Pulley on a contact's page: opens the page to give them a nickname.
                 text: qsTr("Edit name")
                 onClicked: page.editName()
             }
+        }
+
+        HeaderBand {
+            headerBottom: pageHeader.y + pageHeader.height
+            pictureTop: identity.y + identity.pictureTop
+            lastBottom: callButtons.visible ? callButtons.y + callButtons.height
+                        : statusText.visible ? statusText.y + statusText.height
+                        : identity.y + identity.height - identity.pictureTop
         }
 
         Column {
@@ -269,10 +277,12 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
+                id: pageHeader
                 title: qsTr("Contact")
             }
 
             IdentityRow {
+                id: identity
                 initial: page.displayName.length > 0 ? page.displayName : page.chatName
                 ownColor: page.contactColor
                 picturePath: page.avatarPath
@@ -342,6 +352,7 @@ Page {
 
             // Their own words about themselves, full width: can run long.
             ClampedText {
+                id: statusText
                 objectName: "statusLabel"
                 visible: page.statusLine.length > 0
                 color: Theme.primaryColor
@@ -350,28 +361,31 @@ Page {
 
             // Two buttons, one width each. Bindings, not Row: polish never runs headless.
             Item {
+                id: callButtons
                 objectName: "callButtons"
                 visible: chat.can_call
                 width: parent.width
                 height: visible ? callButton.height : 0
 
-                Button {
+                CallButton {
                     id: callButton
                     objectName: "callButton"
                     x: Theme.horizontalPageMargin
                     width: (parent.width - 2 * Theme.horizontalPageMargin - Theme.paddingLarge) / 2
-                    icon.source: "image://theme/icon-m-call"
+                    iconSource: "image://theme/icon-m-call"
+                    inkShift: Theme.dp(2)
                     //: Button on a contact's page: starts a voice call.
-                    text: qsTr("Call")
+                    label: qsTr("Call")
                     onClicked: page.placeCall(false)
                 }
-                Button {
+                CallButton {
                     objectName: "videoCallButton"
                     x: callButton.x + callButton.width + Theme.paddingLarge
                     width: callButton.width
-                    icon.source: "image://theme/icon-m-video"
+                    iconSource: "image://theme/icon-m-video"
+                    inkShift: Theme.dp(1)
                     //: Button on a contact's page: starts a call with camera on.
-                    text: qsTr("Video call")
+                    label: qsTr("Video call")
                     onClicked: page.placeCall(true)
                 }
             }
@@ -396,6 +410,11 @@ Page {
 
             ChatNotifications {
                 objectName: "notifications"
+                width: parent.width
+                accountId: page.accountId
+                chatId: page.chatId
+                chatName: page.displayName.length > 0 ? page.displayName : page.chatName
+                chat: chat
                 muted: chat.is_muted
                 onPicked: chat.set_mute_duration(seconds)
             }

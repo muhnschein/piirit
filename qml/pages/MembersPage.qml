@@ -3,9 +3,9 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Every member of a group, from its page's Members row. Search on top, then Add
- * members and Invite, then members built as they scroll in (groups reach
- * hundreds). Tap opens a member, hold for Send message and Remove.
+ * Every member of a group, from its page's Members row. Add members and Invite in
+ * pulley, search on top, members built as they scroll in (groups reach hundreds).
+ * Tap opens a member, hold for Send message and Remove.
  */
 Page {
     id: page
@@ -13,6 +13,9 @@ Page {
     property int accountId
     /// Group's ChatInfo, shared with its page: search filters its `members`.
     property QtObject chat
+
+    readonly property bool canAdd: page.chat.can_edit && !page.chat.is_channel
+    readonly property bool canInvite: page.canAdd || page.chat.is_own_channel
 
     /// Removal wait, ms. Tests lower it.
     property alias pendingDelay: removals.delay
@@ -63,11 +66,43 @@ Page {
         }
     }
 
-    // Search field outside list: header field would move with keystrokes.
+    // Search field outside list: header field would move with keystrokes. Non-scrolling
+    // flickable owns pulley, as ChatListPage.
     SilicaFlickable {
         anchors.fill: parent
         contentWidth: width
         contentHeight: height
+
+        // The two ways a group grows. Channel: core takes no members added. Menu's `visible`
+        // not from items': theirs reads menu's, never turns true.
+        PullDownMenu {
+            objectName: "membersMenu"
+            visible: page.canInvite
+
+            MenuItem {
+                id: addMembersItem
+                objectName: "addMembersItem"
+                visible: page.canAdd
+                text: qsTr("Add members")
+                onClicked: pageStack.push(Qt.resolvedUrl("AddMembersPage.qml"), {
+                    accountId: page.accountId,
+                    chat: page.chat
+                })
+            }
+            MenuItem {
+                id: inviteItem
+                objectName: "inviteItem"
+                visible: page.canInvite
+                //: Pulley on a group's member list: opens the QR code others scan to join.
+                text: qsTr("Invite with a QR code")
+                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
+                    accountId: page.accountId,
+                    chatId: page.chat.chat_id,
+                    chatName: page.chat.name,
+                    isChannel: page.chat.is_channel
+                })
+            }
+        }
 
         Column {
             id: heading
@@ -106,37 +141,6 @@ Page {
             // Else rows draw outside box: see NewChatPage.
             clip: true
             model: page.chat ? page.chat.members : null
-
-            // The two ways a group grows, first.
-            header: Column {
-                width: list.width
-
-                PlusRow {
-                    objectName: "addMembersRow"
-                    visible: page.chat.can_edit && !page.chat.is_channel
-                    width: parent.width
-                    text: qsTr("Add members")
-                    onClicked: pageStack.push(Qt.resolvedUrl("AddMembersPage.qml"), {
-                        accountId: page.accountId,
-                        chat: page.chat
-                    })
-                }
-                PlusRow {
-                    objectName: "inviteRow"
-                    visible: (page.chat.can_edit && !page.chat.is_channel)
-                             || page.chat.is_own_channel
-                    width: parent.width
-                    iconSource: "image://theme/icon-m-qr"
-                    //: Row on a group's member list: opens the QR code others scan to join.
-                    text: qsTr("Invite with a QR code")
-                    onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"), {
-                        accountId: page.accountId,
-                        chatId: page.chat.chat_id,
-                        chatName: page.chat.name,
-                        isChannel: page.chat.is_channel
-                    })
-                }
-            }
 
             delegate: MemberRow {
                 id: memberRow
