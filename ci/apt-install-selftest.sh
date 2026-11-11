@@ -198,6 +198,7 @@ while read -r host answer; do
     fi
 done <"$APT_SPEEDS"
 printf '000 0 0'
+echo "curl: (7) no connection to $url" >&2
 exit 7
 EOF
 chmod +x "$work/curl"
@@ -300,7 +301,9 @@ check "the retry goes to archive.ubuntu.com (sources.list)" \
 check "the retry goes to archive.ubuntu.com (image's mirror list)" \
     test "$(mirror_order)" = "https://archive.ubuntu.com/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ http://security.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
 check "after a failed index each other mirror is asked for its index, once" \
-    test "$(grep -c '/ubuntu/dists/$' "$work/probes")" -eq 2 -a "$(grep -c '' "$work/probes")" -eq 2
+    test "$(grep -cE '/ubuntu/dists/([a-z]+/InRelease)?$' "$work/probes")" -eq 2 -a "$(grep -c '' "$work/probes")" -eq 2
+check "a mirror gets 10 s to answer for its index" \
+    test "$(grep -c -- '--max-time 10 ' "$work/probes")" -eq 2
 check "the failed mirror is not asked again" \
     test "$(grep -c 'azure' "$work/probes")" -eq 0
 check "the mirror list keeps security.ubuntu.com" \
@@ -392,6 +395,8 @@ set_speeds 'azure.archive.ubuntu.com 206 2097152 0.2' \
 run_install once
 check "a next mirror that does not answer is passed over" \
     test "$(mirror_order)" = "https://mirrors.edge.kernel.org/ubuntu/ http://security.ubuntu.com/ubuntu/ https://archive.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
+check "the log says why curl got nothing from it" \
+    grep -q 'curl: (7) no connection to https://archive.ubuntu.com/ubuntu/dists/' "$work/out"
 check "the log names the mirror that does not answer" \
     grep -q 'https://archive.ubuntu.com/ubuntu/ does not answer' "$work/out"
 
