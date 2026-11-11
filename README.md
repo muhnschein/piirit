@@ -13,6 +13,17 @@
 > targets. [Buy a Jolla Phone 2026](https://commerce.jolla.com/) and support
 > European-made alternatives. 👊🇪🇺🔥
 
+## Screenshots
+
+<p>
+  <img src="store/screenshot-chat-list.png" width="32%" alt="Chat list with pinned chats, a contact request and a channel">
+  <img src="store/screenshot-chat.png" width="32%" alt="Chat with a reply, a picture and a voice message shown as text">
+  <img src="store/screenshot-group.png" width="32%" alt="Group page with gallery, map and members">
+</p>
+
+More in [`store/`](store/). People and conversations are invented; picture
+credits are in [`store/CREDITS.md`](store/CREDITS.md).
+
 ## Overview
 
 Piirit is a Silica/QML application built on top of the [Delta Chat core](https://github.com/chatmail/core).
