@@ -27,5 +27,8 @@ People, groups and conversations are invented. Pictures are from Wikimedia Commo
 | bakery | [Fresh Bread (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Fresh_Bread_(Unsplash).jpg) | Roman Kraft romankraft | CC0 |
 | coffee | [Coffee and Friends (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Coffee_and_Friends_(Unsplash).jpg) | Nathan Dumlao nate_dumlao | CC0 |
 | coast | [Lighthouse on rocks (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Lighthouse_on_rocks_(Unsplash).jpg) | Helvin Nyoliman helvinnyoliman | CC0 |
+| camera picture in the call | [Cat (Unsplash).jpg](https://commons.wikimedia.org/wiki/File:Cat_(Unsplash).jpg) | Marko Blažević kerber | CC0 |
 
 Map in `screenshot-map.jpg`: © OpenStreetMap contributors.
+
+`screenshot-call-outgoing.png`: the camera picture is put in afterwards; the rest is the app as it is.
