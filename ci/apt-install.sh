@@ -178,12 +178,12 @@ read_mirrors() {
     return 0
 }
 
-# Bytes per second <url> gives over its first 2 MiB, at most probe_seconds
-# long; 0 if error status or nothing came. Cut short = rate so far. curl's
+# probe <url> [seconds]: bytes per second over first 2 MiB, at most seconds
+# (probe_seconds) long; 0 if error status or nothing came. Cut short = rate so far. curl's
 # own error line goes to job log: says why mirror counted as silent.
 probe() {
-    local url=$1 out code size seconds
-    out=$("$curl_cmd" -sS -o /dev/null -r 0-2097151 --max-time "$probe_seconds" \
+    local url=$1 limit=${2-$probe_seconds} out code size seconds
+    out=$("$curl_cmd" -sS -o /dev/null -r 0-2097151 --max-time "$limit" \
         -w '%{http_code} %{size_download} %{time_total}' "$url") || true
     read -r code size seconds <<<"$out"
     case "$code" in
@@ -237,9 +237,9 @@ fastest_mirror_first() {
 
 # Fallback: first mirror let us down, it goes last. Rest, extra mirrors too:
 # those answering on their index first, list's order kept. None answers =
-# order as it was. Asked for release's InRelease, file apt fetches first
-# (directory listing: kernel.org silent 5 s on it while apt got InRelease);
-# 10 s: wrong "silent" costs apt 80 s per index file on dead mirror.
+# order as it was. Asked for release's InRelease, file apt fetches first;
+# 10 s (5 s cut kernel.org off though apt reached it): wrong "silent" costs
+# apt 80 s per index file on dead mirror.
 next_mirror_first() {
     [[ -f "$mirror_list" ]] || return 0
     read_mirrors
@@ -252,13 +252,13 @@ next_mirror_first() {
         rest+=("$url")
     done
     [[ "${#rest[@]}" -ge 1 ]] || return 0
-    local up=() down=() index=dists/ codename probe_seconds=10
+    local up=() down=() index=dists/ codename
     codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release 2>/dev/null) || true
     if [[ -n "$codename" ]]; then
         index=dists/$codename/InRelease
     fi
     for url in "${rest[@]}"; do
-        if [[ "$(probe "${url}${index}")" -gt 0 ]]; then
+        if [[ "$(probe "${url}${index}" 10)" -gt 0 ]]; then
             up+=("$url")
         else
             echo "apt-install: $url does not answer"
