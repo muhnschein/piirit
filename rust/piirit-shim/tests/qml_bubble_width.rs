@@ -70,6 +70,15 @@ const PROBE_QML: &str = r"
                    + (preview ? preview.wantsFullWidth : '-')
                    + '/' + (row.bodyWidth === row.maxWidth)
         }
+        // Body width, and first-page tile's ('-' for none built).
+        function pageRoom() {
+            var row = delegate.item
+            var page = findIn(row, 'attachmentPage')
+            var name = findIn(row, 'attachmentLabel')
+            var preview = findIn(row, 'attachment')
+            return row.bodyWidth + '/' + (page ? page.width : '-')
+                   + '/' + name.y + '/' + (preview.height - name.height)
+        }
     }
 ";
 
@@ -229,6 +238,27 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
             );
             record!(format!("{label}-bare"), call!("fills"));
         }
+        // File whose first page is drawn above its name: bubble as wide as the page.
+        for (label, mime) in [
+            ("pdf", "application/pdf"),
+            ("odt", "application/vnd.oasis.opendocument.text"),
+            (
+                "docx",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ),
+            ("zip", "application/zip"),
+        ] {
+            let props = json!({
+                "viewType": "File", "fileMime": mime, "fileName": "a",
+                "filePath": "/tmp/piirit-bubble-width/a",
+            });
+            call!(
+                "load",
+                QString::from(url.as_str()),
+                QString::from(props.to_string())
+            );
+            record!(format!("{label}-page"), call!("pageRoom"));
+        }
         (*engine_ptr).quit();
     });
 
@@ -277,6 +307,26 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
             value(&format!("{label}-bare")),
             "false/-/false",
             "a {label} message with no file filled the bubble. {context}"
+        );
+    }
+
+    // Stub theme: itemSizeExtraLarge 180. PDF, ODF: page tile, bubble holds it. OOXML (stored
+    // page rare), other files: name only, bubble as narrow as before.
+    for label in ["pdf", "odt"] {
+        assert_eq!(
+            value(&format!("{label}-page")),
+            "180/180/184/184",
+            "a {label}'s bubble is not as wide as its first page, or its name not below \
+             the page. {context}"
+        );
+    }
+    for label in ["docx", "zip"] {
+        let room = value(&format!("{label}-page"));
+        let (body, page) = room.split_once('/').unwrap_or((room.as_str(), ""));
+        assert_eq!(page, "-/0/0", "a {label} got a page tile. {context}");
+        assert!(
+            body.parse::<f64>().is_ok_and(|width| width < 180.0),
+            "a {label}'s bubble made room for a page it does not draw. {context}"
         );
     }
 }

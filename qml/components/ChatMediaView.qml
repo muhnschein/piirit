@@ -585,17 +585,16 @@ Item {
                                                fileName.height + fileDetail.height)
                                     : 0
 
-                            Image {
+                            // Page where one can be had, else type's icon.
+                            DocumentThumbnail {
                                 id: fileIcon
                                 objectName: "fileIcon"
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.iconSizeMedium
+                                width: Theme.itemSizeMedium
                                 height: width
-                                source: fileRow.shown && model.loaded
-                                        ? "image://theme/" + Media.fileIcon(model.file_mime)
-                                          + "?" + (row.highlighted ? Theme.highlightColor
-                                                                    : Theme.primaryColor)
-                                        : ""
+                                fileUrl: fileRow.shown ? "" + row.fileUrl : ""
+                                fileMime: fileRow.shown && model.loaded ? model.file_mime : ""
+                                highlighted: row.highlighted
                             }
 
                             Label {

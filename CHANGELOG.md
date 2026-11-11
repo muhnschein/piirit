@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- PDFs and office documents show their first page: in the chat (PDF, OpenDocument) and in a chat's Files ([#296](https://github.com/muhnschein/piirit/issues/296)). Word, Excel and PowerPoint files show it when the sender's app saved a preview.
 - The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
 - Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
 

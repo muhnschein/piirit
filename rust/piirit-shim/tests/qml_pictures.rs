@@ -313,3 +313,97 @@ fn a_settings_icon_is_inked_at_its_size_with_soft_edges_on_clear_ground() {
         );
     }
 }
+
+/// Zip of one stored entry, as an office file keeps its page picture.
+fn a_zip(dir: &Path, name: &str, data: &[u8]) -> PathBuf {
+    let size = u32::try_from(data.len()).expect("small").to_le_bytes();
+    let name_length = u16::try_from(name.len()).expect("short").to_le_bytes();
+    let mut out = b"PK\x03\x04".to_vec();
+    out.extend([0; 14]);
+    out.extend(size);
+    out.extend(size);
+    out.extend(name_length);
+    out.extend([0; 2]);
+    out.extend(name.as_bytes());
+    out.extend(data);
+    let directory_at = u32::try_from(out.len()).expect("small").to_le_bytes();
+    out.extend(b"PK\x01\x02");
+    out.extend([0; 16]);
+    out.extend(size);
+    out.extend(size);
+    out.extend(name_length);
+    out.extend([0; 16]);
+    out.extend(name.as_bytes());
+    let directory_length = u32::try_from(46 + name.len()).expect("small").to_le_bytes();
+    out.extend(b"PK\x05\x06");
+    out.extend([0, 0, 0, 0, 1, 0, 1, 0]);
+    out.extend(directory_length);
+    out.extend(directory_at);
+    out.extend([0; 2]);
+    let path = dir.join("letter.odt");
+    std::fs::write(&path, out).expect("write the office file");
+    path
+}
+
+/// Tall page, top red, rest green: tile must show the top.
+fn a_page() -> Vec<u8> {
+    let (width, height) = (20, 60);
+    let mut bytes = format!("P6\n{width} {height}\n255\n").into_bytes();
+    for y in 0..height {
+        for _ in 0..width {
+            let (r, g, b) = if y < 30 { LEFT } else { RIGHT };
+            bytes.extend([r, g, b]);
+        }
+    }
+    bytes
+}
+
+#[test]
+fn an_office_file_is_drawn_as_the_top_of_the_page_stored_in_it() {
+    let dir = a_dir("page");
+    let file = a_zip(&dir, "Thumbnails/thumbnail.png", &a_page());
+    let (pixels, width, height) = made("page", &file, 40);
+
+    assert_eq!((width, height), (40, 40), "a page is not made at its size");
+    for (x, y) in [(0, 0), (39, 0), (20, 20), (0, 39), (39, 39)] {
+        assert_eq!(
+            at(&pixels, width, x, y),
+            (255, LEFT.0, LEFT.1, LEFT.2),
+            "the tile at ({x}, {y}) is not the page's top, whole and uncut"
+        );
+    }
+    // As `file:` URL with encoded name, as QML asks.
+    let (pixels, width, _) = made_from(
+        &format!(
+            "page?file=file%3A%2F%2F{}",
+            file.display().to_string().replace('/', "%2F")
+        ),
+        40,
+    );
+    assert_eq!(
+        at(&pixels, width, 20, 20).1,
+        LEFT.0,
+        "a file URL is not read"
+    );
+}
+
+#[test]
+fn an_office_file_without_a_stored_page_or_a_plain_picture_is_no_page() {
+    let dir = a_dir("no-page");
+    let file = a_zip(&dir, "content.xml", &a_page());
+    assert!(
+        render_picture(&format!("page?file={}", file.display()), 40, 40).is_none(),
+        "a page was drawn from an office file that stores none"
+    );
+    let undrawable = a_zip(&dir, "Thumbnails/thumbnail.png", b"not a picture");
+    assert!(
+        render_picture(&format!("page?file={}", undrawable.display()), 40, 40).is_none(),
+        "a page was drawn from bytes that are no picture"
+    );
+    // Picture itself is no office file: `page` reads inside zips only.
+    let picture = a_picture(&dir);
+    assert!(
+        render_picture(&format!("page?file={}", picture.display()), 40, 40).is_none(),
+        "a plain picture was drawn as an office file's page"
+    );
+}

@@ -390,7 +390,10 @@ fn a_chats_media_has_pages_of_its_own_behind_rows() {
         record!("files-count", get!("media", "count"));
         record!("file-name", get!("fileName", "text"));
         record!("file-size", get!("fileDetail", "text"));
-        record!("file-icon", get!("fileIcon", "source"));
+        record!("file-icon", get!("documentIcon", "source"));
+        record!("file-page-type", get!("documentPdf", "mimeType"));
+        record!("file-page-source", get!("documentPdf", "source"));
+        record!("file-page-stored", get!("documentPage", "source"));
         record!("file-caption", get!("rowCaption", "text"));
         record!("files-title", get!("pageHeader", "title"));
         call!("setDownloads", QString::from(folder.clone()));
@@ -750,6 +753,22 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     assert!(
         value("file-icon").contains("icon-m-file-pdf"),
         "a PDF is not drawn with the theme's PDF icon. {context}"
+    );
+    // Page over icon: thumbnailer asked for the PDF's own file, as a PDF.
+    assert_eq!(
+        value("file-page-type"),
+        "application/pdf",
+        "the thumbnailer is not told the file is a PDF. {context}"
+    );
+    assert_eq!(
+        value("file-page-source"),
+        "file:///tmp/piirit-fake/6f5902ac237024bdd0c176cb93063dc4.pdf",
+        "the thumbnailer is not asked for the PDF's first page. {context}"
+    );
+    assert_eq!(
+        value("file-page-stored"),
+        "",
+        "a PDF was read as an office file. {context}"
     );
     assert!(
         value("file-caption").starts_with("Ada Lovelace · "),
