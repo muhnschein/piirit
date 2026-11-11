@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import Nemo.Thumbnailer 1.0
+import Nemo.KeepAlive 1.2
 
 /*
  * One video, played in-app (system player leaves Piirit, fails on device): GalleryPage's video
@@ -37,6 +38,9 @@ Item {
     readonly property int playingState: 1
 
     readonly property bool playing: player.playbackState === root.playingState
+
+    /// App on screen. Headless tests set it (can't change `Qt.application.state`).
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     /// Seek asked before player knew length: done once it does.
     property int pendingSeek: -1
@@ -108,6 +112,12 @@ Item {
                 root.pendingSeek = -1
             }
         }
+    }
+
+    // Lit while playing (no touch while watching), app in front.
+    DisplayBlanking {
+        objectName: "videoDisplay"
+        preventBlanking: root.playing && root.appActive
     }
 
     onActiveChanged: if (!root.active && root.playing) player.pause()
