@@ -134,7 +134,8 @@ fi
 # Mirror down: stand-in apt fails `update` while $APT_DOWN holds "once" (first
 # call) or "always"; `install` alike with "install-once", "install-always"
 # (index fine, package download fails). Trickling mirror: "update-slow",
-# "download-slow" hang that call once. "installed": nothing left to fetch.
+# "download-slow" hang that call once; "update-stuck", "download-stuck" every
+# time. "installed": nothing left to fetch.
 # `--print-uris` names two debs, big one first. Logs every call.
 cat >"$work/apt-get" <<'EOF'
 #!/usr/bin/env bash
@@ -152,6 +153,9 @@ case " $* " in
         rm -f "$APT_DOWN"
         exec sleep 60
     fi
+    if [[ "$mode" = update-stuck ]]; then
+        exec sleep 60
+    fi
     if [[ "$mode" = once ]]; then
         rm -f "$APT_DOWN"
         exit 100
@@ -163,6 +167,9 @@ case " $* " in
 *" install "*)
     if [[ "$mode" = download-slow ]] && [[ " $* " = *" --download-only "* ]]; then
         rm -f "$APT_DOWN"
+        exec sleep 60
+    fi
+    if [[ "$mode" = download-stuck ]] && [[ " $* " = *" --download-only "* ]]; then
         exec sleep 60
     fi
     if [[ "$mode" = install-once ]]; then
@@ -191,6 +198,7 @@ while read -r host answer; do
     fi
 done <"$APT_SPEEDS"
 printf '000 0 0'
+echo "curl: (7) no connection to $url" >&2
 exit 7
 EOF
 chmod +x "$work/curl"
@@ -235,6 +243,7 @@ run_again() {
     APT_SOURCES_DIR="$work/sources" APT_SOURCES_LIST="$work/sources.list" \
         APT_MIRROR_LIST="$work/apt-mirrors.txt" APT_GET="$work/apt-get" \
         APT_LOG="$work/apt.log" APT_DOWN="$work/down" APT_FIRST_TRY_SECONDS=1 \
+        APT_LAST_TRY_SECONDS=2 \
         APT_CURL="$work/curl" APT_SPEEDS="$work/speeds" \
         APT_PROBES="$work/probes" \
         "$script" qtbase5-dev >"$work/out" 2>&1
@@ -282,21 +291,28 @@ check "a working mirror stays first in the image's mirror list" \
     grep -q '^http://azure.archive.ubuntu.com/' "$work/apt-mirrors.txt"
 
 run_install once
-check "a failed mirror is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 3
+check "a failed mirror is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 4
+check "the second try only downloads under its cap too" \
+    test "$(grep -c -- '--download-only' "$work/apt.log")" -eq 1
 check "the retry goes to archive.ubuntu.com (deb822)" \
     grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
 check "the retry goes to archive.ubuntu.com (sources.list)" \
     grep -q 'deb http://archive.ubuntu.com/ubuntu jammy' "$work/sources.list"
 check "the retry goes to archive.ubuntu.com (image's mirror list)" \
-    test "$(mirror_order)" = "https://archive.ubuntu.com/ubuntu/ http://security.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
-check "a failed index is not followed by timing mirrors" test ! -s "$work/probes"
+    test "$(mirror_order)" = "https://archive.ubuntu.com/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ http://security.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
+check "after a failed index each other mirror is asked for its index, once" \
+    test "$(grep -cE '/ubuntu/dists/([a-z]+/InRelease)?$' "$work/probes")" -eq 2 -a "$(grep -c '' "$work/probes")" -eq 2
+check "a mirror gets 10 s to answer for its index" \
+    test "$(grep -c -- '--max-time 10 ' "$work/probes")" -eq 2
+check "the failed mirror is not asked again" \
+    test "$(grep -c 'azure' "$work/probes")" -eq 0
 check "the mirror list keeps security.ubuntu.com" \
     grep -q '^http://security.ubuntu.com/' "$work/apt-mirrors.txt"
 check "the log says the mirror was switched" \
     grep -q 'now uses archive.ubuntu.com' "$work/out"
 
 run_install install-once
-check "a failed download is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 5
+check "a failed download is tried once more" test "$(grep -c '' "$work/apt.log")" -eq 6
 check "the download retry goes to archive.ubuntu.com" \
     grep -q 'URIs: http://archive.ubuntu.com/ubuntu/' "$work/sources/ubuntu.sources"
 
@@ -371,6 +387,35 @@ set_speeds 'azure.archive.ubuntu.com 206 131072 5.0' \
 run_install download-slow
 check "a picked mirror that trickles after all hands over to the next fastest" \
     test "$(mirror_order)" = "https://mirrors.edge.kernel.org/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ http://security.ubuntu.com/ubuntu/ https://archive.ubuntu.com/ubuntu/ "
+
+# Runner's case: azure fails, archive.ubuntu.com silent too. Mirror that
+# answers goes first, silent one behind security, failed one last.
+set_speeds 'azure.archive.ubuntu.com 206 2097152 0.2' \
+    'mirrors.edge.kernel.org 206 2097152 0.5'
+run_install once
+check "a next mirror that does not answer is passed over" \
+    test "$(mirror_order)" = "https://mirrors.edge.kernel.org/ubuntu/ http://security.ubuntu.com/ubuntu/ https://archive.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
+check "the log says why curl got nothing from it" \
+    grep -q 'curl: (7) no connection to https://archive.ubuntu.com/ubuntu/dists/' "$work/out"
+check "the log names the mirror that does not answer" \
+    grep -q 'https://archive.ubuntu.com/ubuntu/ does not answer' "$work/out"
+
+set_speeds 'nowhere.example 206 1 1'
+run_install once
+check "no other mirror answering keeps the list's order, failed mirror last" \
+    test "$(mirror_order)" = "https://archive.ubuntu.com/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ http://security.ubuntu.com/ubuntu/ http://azure.archive.ubuntu.com/ubuntu/ "
+
+# stuck <mode> <why>: call hangs on every mirror. Job fails at second cap,
+# well before stand-in's 60 s.
+stuck() {
+    local mode=$1 why=$2 began=$SECONDS
+    run_install "$mode"
+    local rc=$?
+    check "$why" test "$rc" -ne 0 -a $((SECONDS - began)) -lt 30
+    return 0
+}
+stuck update-stuck "an index hanging on the second try too fails the job, never hangs it"
+stuck download-stuck "a download hanging on the second try too fails the job, never hangs it"
 
 # fails <mode> <why>: archive no better, job must fail.
 fails() {
