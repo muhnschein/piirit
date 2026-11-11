@@ -21,6 +21,11 @@
 # APT_FIRST_TRY_SECONDS (240), then next. Download only under cap: killed
 # apt-get mid-dpkg leaves system half-installed. Debs fetched stay, reused.
 #
+# Next mirror may be down too (seen: azure and archive.ubuntu.com both silent
+# from one runner, apt looping on the index 10 min): mirrors answering on
+# their index go first, and second try is capped too (APT_LAST_TRY_SECONDS,
+# 600): job fails, never hangs.
+#
 # Usage:  ci/apt-install.sh <package>...
 #         ci/apt-install.sh --prune-only     (drop lists, install nothing)
 #
@@ -49,6 +54,10 @@ apt_stub=$(printenv APT_GET || true)
 first_try=$(printenv APT_FIRST_TRY_SECONDS || true)
 if [[ -z "$first_try" ]]; then
     first_try=240
+fi
+last_try=$(printenv APT_LAST_TRY_SECONDS || true)
+if [[ -z "$last_try" ]]; then
+    last_try=600
 fi
 curl_cmd=$(printenv APT_CURL || true)
 if [[ -z "$curl_cmd" ]]; then
@@ -225,13 +234,36 @@ fastest_mirror_first() {
     return 0
 }
 
-# Fallback: first mirror let us down. Next goes first, it goes last.
+# Fallback: first mirror let us down, it goes last. Rest, extra mirrors too:
+# those answering on their index first, list's order kept. None answers =
+# order as it was.
 next_mirror_first() {
     [[ -f "$mirror_list" ]] || return 0
     read_mirrors
-    [[ "${#mirrors[@]}" -ge 2 ]] || return 0
-    write_mirrors "${mirrors[@]:1}" "${security[@]}" "${mirrors[0]}"
-    echo "apt-install: debs from ${mirrors[1]} first, ${mirrors[0]} last"
+    [[ "${#mirrors[@]}" -ge 1 ]] || return 0
+    local failed=${mirrors[0]} rest=("${mirrors[@]:1}") url known
+    for url in "${extra_mirrors[@]}"; do
+        for known in "${mirrors[@]}"; do
+            [[ "$known" = "$url" ]] && continue 2
+        done
+        rest+=("$url")
+    done
+    [[ "${#rest[@]}" -ge 1 ]] || return 0
+    local up=() down=()
+    for url in "${rest[@]}"; do
+        if [[ "$(probe "${url}dists/")" -gt 0 ]]; then
+            up+=("$url")
+        else
+            echo "apt-install: $url does not answer"
+            down+=("$url")
+        fi
+    done
+    if [[ "${#up[@]}" -eq 0 ]]; then
+        up=("${rest[@]}")
+        down=()
+    fi
+    write_mirrors "${up[@]}" "${security[@]}" "${down[@]}" "$failed"
+    echo "apt-install: debs from ${up[0]} first, $failed last"
     return 0
 }
 
@@ -244,5 +276,6 @@ fi
 echo "apt-install: mirror failed or slower than ${first_try} s; once more from the next" >&2
 next_mirror_first
 use_main_archive
-apt_get update
+apt_get --within "$last_try" update
+apt_get --within "$last_try" install -y --download-only "$@"
 apt_get install -y "$@"
