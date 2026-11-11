@@ -8,55 +8,28 @@ docs/BUILDING.md, "Cutting a release").
 
 ## 2.3.0 — 2026-11-11
 
-- Archived chats moved from the pull-down menu to an Archived button in the chat list's row of filter buttons. Tap it to see your archived chats in place of the others; the other filter buttons step aside until you tap it again. Search finds chats and messages everywhere either way.
-- The chat list can show your profile picture and name in its top left corner: turn it on in Settings, Messages (off by default). Tap it to open your profiles.
-- The chat list's title and filter buttons, a chat's title, and the top of contact and group pages all sit on the same faint band in your ambience colour, from the top of the screen. The search button is round when it shows only its icon.
-- **Settings, one page per topic.** Settings now lists your profile and then Messages, Notifications, Privacy and security, Quick actions, Experimental and About, each on its own page. Blocked contacts sit under Privacy and security, and say how many there are. Voice-message transcription is set up right under its switch in Experimental. The new About page shows the versions of Piirit and the Delta Chat core, copies them for a bug report, links the source code and replays the intro slides; swiping past the last one returns to About.
-- Contact and group pages are laid out anew. The picture sits beside the name, with when they were last seen under it. Gallery, Audio, Files, Apps, Calls and Map sit two to a line, or one per line when a name is too long for half; audio and files are grouped by age (Today, Yesterday, Last 7 days, Last 30 days, Older). Call and Video call show smaller icons, centred with their label. Changing a name, a group's description or picture, leaving or deleting the chat, blocking and encryption info are in the pull-down menu, with encryption info at the top.
-- **Chats in common.** A contact's page shows, at the bottom, the chats you share with them: your chat with them and each group they are in. Tap the row to see them all, and a chat to open it.
-- A group's members are one row near the end of its page, like Chats in common: three pictures, how many, and the first names. It opens the full list, where you can search members by name and remove one. Tapping a member opens their page if you already chat with them, otherwise offers Send message. Add members and Invite with a QR code are in the full list's pull-down menu.
-- A chat's notifications are now a page, opened from Notifications in the chat list's long-press menu (was Mute) or on the contact or group page: pick On, Off for a while (1 hour to 7 days) or Off, then swipe back to save. While off for a while, the page marks the choice with the time left, and the Notifications row on the contact or group page says for how long and how much time is left, or just the time left when the line is too narrow. A chat muted on another device shows as Off. In a group, a note says that replies to you still notify while Mentions is on in the notification settings.
-- Pictures and videos not yet downloaded show in a chat's gallery while it slides in, not only once it is open.
-- New Encryption info page for a contact or group: each key's fingerprint laid out to compare, the relays as domain names, and which group members' keys are missing. The pull-down menu copies the names and fingerprints.
-- Changing a group's name or description is saved when you swipe back from the Edit group page; a contact's nickname the same way from Edit name.
-- Once you have a channel, the chat list gets Chats and Channels buttons beside Unread to show one kind at a time, alone or with Unread. The row of buttons scrolls sideways when it doesn't fit.
-- The chat list's Search button shrinks to its magnifier when the buttons beside it wouldn't fit otherwise, such as with long words in your language or large text.
-- If the Delta Chat core stops while Piirit waits for news, Piirit notices, says it is reconnecting and starts the core again. Before, it could miss that and keep showing chats that no longer updated until restarted.
-- A notification for a voice message shows its text once it is ready: the same notification is updated, no new banner. With notifications set to hide message text, nothing changes.
-- With voice messages turned into text, the chat list shows a voice message's text instead of just "Voice message", and so does a reply's quote of it and the reply bar while you answer one. Until the text is there, or with the feature off, they read as before.
-- Voice messages can be turned into text on the phone itself (experimental, off by default; Settings, Experimental). Piirit downloads a speech model once; nothing you send or receive leaves the phone. Transcribe one voice message with a tap, or let Piirit do them on its own while charging (the default) or as soon as they arrive. The text shows under the voice message, can be copied from its menu, and a chat's Audio page can transcribe all its voice messages at once. It works in 13 languages so far, and the list says for which of them transcripts are likely to contain more mistakes; other languages can't be picked yet.
-- Search finds voice messages by what is said in them, once they are turned into text, and lists them with the text messages as 🎤 and their text, as the chat list shows them.
-- The cover shows everyone from the start; right after Piirit opened, some people could be missing from it until a new message came.
-- When many messages arrive at once, such as after a while offline, the chat list catches up in one go instead of once per message, and the cover only reads your chats while you look at it, so the app stays quicker to respond.
-- The page of a group with hundreds of members opens and slides back smoothly: member rows are made as you scroll to them, not all at once.
-- Chats open and scroll more smoothly: each message builds and lays out only the parts it shows.
-- The emoji picker opens and searches faster: each emoji is just its picture.
-- The camera opens more smoothly: it starts once its page is on screen, on the side and in the mode asked, not while the page slides in. The same goes for the QR scanner opened from the cover.
-- Long chats open sooner: Piirit loads one screen of messages before showing the chat, not fifty, and the rest right after.
-- The camera shows it is busy while a photo is being saved.
-- A second tap on the shutter while a photo is saved no longer takes another photo.
-- When adding members to a group, people already in it are greyed out even if the group's member list arrives after the picker opened.
-- Tapping a message or missed-call notification opens its chat again after you have opened Archived chats or switched profiles. Before, such taps did nothing until Piirit was restarted.
-- Emoji next to words have room on either side, in messages, chat names and previews alike, so they no longer run into the text.
-- Bundles deltachat-rpc-server 2.69.0 (was 2.65.0). Search finds words anywhere in a long message, not just in the part the chat shows, and resending a long message sends all of it; this holds for messages sent or received from now on. A webxdc app whose icon is broken now shows the standard webxdc icon instead of a plain grid. On a profile with several relays, the profiles list and the profile page now name the address of the relay it was first set up on, which Delta Chat now takes as the profile's own.
-- A profile without a picture shows its own colour on the profile page, as in the profiles list, not the theme's.
-- The big picture on the profile, contact and group pages shows its letter or emoji at a size that fits it, not list size.
-- A chat whose name starts with an emoji shows that emoji as its picture, not a "?".
-- Emoji are sharp at every size, in messages, reactions and the emoji picker.
-- A tap on a reply's quote goes to the quoted message and lights it up, however far up the chat it is. A quote of a message in another chat, such as a private reply to a group message, opens that chat at it. If the original is gone, a note says so.
-- A message of nothing but emoji, up to five of them, shows them big.
-- Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
-- "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
-- A setting changed twice in quick succession keeps the second choice; the first one could win before.
-- Emoji in names show as pictures, as they do in messages, with their colours muted: in the chat list, the chat header, contact and group pages, search results, contact lists and calls. In message previews and the reply bar they are grey like the text, so lists stay calm.
-- Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
-- The description under Settings → Notifications → Mentions says what the switch does: in a muted group, replies to your messages still notify. It no longer promises reactions, which never notify.
-- **Join a channel** by scanning its QR code or pasting its invite link on the QR code page, as for a contact or a group. The channel opens right away; it is read-only, and new posts arrive in it from then on.
-- **Make your own channel.** "New" in the chat list's pull-down menu opens a dialog to pick a new chat, group or channel, each with a line on what it is; back from the page you picked returns to it. A channel has a name and a picture but no members: from its page, "QR invite code" shows the code and link others scan to join it. Only you post in it.
-- Turning the unread filter off no longer flashes "No chats yet" before the chats come back.
-- After backing up a profile or handing it to a second device, swiping on to your chats ends there: swiping back no longer reopens the finished page.
-- "Add profile" under the profiles list opens a dialog to pick creating a profile, restoring a backup or adding this phone as a second device, each with a line on what it means; back from the page you picked returns to it.
-- **Share your location**, experimental as in Delta Chat: turn on Enable location streaming in Settings. Then share from the button beside the message field: once, or live for 30 minutes up to 24 hours. Sharing waits until the phone has found where it is, and says so when location is off in Settings. A message with a location shows just "Location": tap it to see the place on a map, the same map app as Delta Chat's, with each marker named after its sender. A chat's map is under Map on its contact or group page; all chats' locations are under All locations in the chat list's pull-down menu. The map opens framing every location of the last 24 hours, or says there are none. While you share live, Piirit keeps sending your position in the background; a line above the field shows the time left, warns when no position goes out, and stops sharing.
+**What's new**
+
+- **Voice messages as text (experimental):** transcribed on the phone itself, in 13 languages ([#286](https://github.com/muhnschein/piirit/pull/286)). The text shows under the message, in the chat list ([#290](https://github.com/muhnschein/piirit/pull/290)), in notifications ([#291](https://github.com/muhnschein/piirit/pull/291)), and search finds it ([#289](https://github.com/muhnschein/piirit/pull/289)).
+- **Share your location (experimental):** once or live for up to 24 hours, with a map per chat and one for all chats ([#259](https://github.com/muhnschein/piirit/pull/259)).
+- **Channels:** join one by QR code or invite link, or make your own ([#211](https://github.com/muhnschein/piirit/pull/211)).
+- **Settings, one page per topic:** Messages, Notifications, Privacy and security, Quick actions, Experimental, and a new About page ([#305](https://github.com/muhnschein/piirit/pull/305)).
+- **Contact and group pages anew:** picture beside the name, members as one row with a searchable list, and a new Encryption info page ([#303](https://github.com/muhnschein/piirit/pull/303)), chats in common ([#209](https://github.com/muhnschein/piirit/pull/209)), shared header band ([#310](https://github.com/muhnschein/piirit/pull/310)).
+- **Notifications per chat:** turn them off for 1 hour up to 7 days or for good ([#210](https://github.com/muhnschein/piirit/pull/210)), now a page with the time left shown ([#303](https://github.com/muhnschein/piirit/pull/303)).
+- **Chat list filters:** Chats and Channels buttons beside Unread ([#293](https://github.com/muhnschein/piirit/pull/293)), and Archived, moved there from the pull-down menu ([#311](https://github.com/muhnschein/piirit/pull/311)).
+- **Replies:** a tap on a quote jumps to the quoted message, even in another chat ([#208](https://github.com/muhnschein/piirit/pull/208)).
+
+**Other changes**
+
+- Emoji are sharp at every size ([#220](https://github.com/muhnschein/piirit/pull/220)), show as pictures in names ([#216](https://github.com/muhnschein/piirit/pull/216)), have room beside words ([#267](https://github.com/muhnschein/piirit/pull/267)), and a message of up to five emoji shows them big ([#213](https://github.com/muhnschein/piirit/pull/213)).
+- Avatars: an emoji at the start of a chat name is its picture ([#252](https://github.com/muhnschein/piirit/pull/252)), big pictures size their letter properly ([#263](https://github.com/muhnschein/piirit/pull/263)), a profile without a picture keeps its own colour ([#260](https://github.com/muhnschein/piirit/pull/260)).
+- Search results show the searched text in bold ([#215](https://github.com/muhnschein/piirit/pull/215)).
+- Optional profile picture and name in the chat list's corner ([#308](https://github.com/muhnschein/piirit/pull/308)). The Search button shrinks to its icon when space is tight ([#306](https://github.com/muhnschein/piirit/pull/306)).
+- New ([#211](https://github.com/muhnschein/piirit/pull/211)) and Add profile ([#224](https://github.com/muhnschein/piirit/pull/224)): one dialog to pick what to create.
+- Faster: opening long chats, scrolling, big groups, the emoji picker, the camera, and catching up after being offline ([#284](https://github.com/muhnschein/piirit/pull/284)).
+- Piirit notices when the Delta Chat core stops and restarts it ([#300](https://github.com/muhnschein/piirit/pull/300)).
+- Fixes: notification taps doing nothing after switching profiles and a double photo on a second shutter tap ([#284](https://github.com/muhnschein/piirit/pull/284)), blank chat on return ([#217](https://github.com/muhnschein/piirit/pull/217)), "Delete messages from device" resetting to Never ([#200](https://github.com/muhnschein/piirit/pull/200)), people missing from the cover ([#272](https://github.com/muhnschein/piirit/pull/272)), a setting changed twice quickly keeping the first choice ([#232](https://github.com/muhnschein/piirit/pull/232)), "No chats yet" flashing when Unread is turned off ([#230](https://github.com/muhnschein/piirit/pull/230)), swiping back reopening a finished backup page ([#207](https://github.com/muhnschein/piirit/pull/207)), the Mentions setting's description ([#218](https://github.com/muhnschein/piirit/pull/218)).
+- Delta Chat core (deltachat-rpc-server) 2.69.0, was 2.65.0 ([#258](https://github.com/muhnschein/piirit/pull/258), [#292](https://github.com/muhnschein/piirit/pull/292), [#307](https://github.com/muhnschein/piirit/pull/307)).
 
 ## 2.2.0 — 2026-10-23
 
