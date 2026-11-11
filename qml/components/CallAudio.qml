@@ -357,7 +357,8 @@ Item {
             { "type": "i", "value": audio.msgAudio },
             { "type": "u", "value": id },
             { "type": "u", "value": audio.next() },
-            { "type": "s", "value": "aliencall" },
+            // MEASURE-301 (temporary): stream group `call`: low-latency sink.
+            { "type": "s", "value": "call" },
             { "type": "s", "value": audio.appId },
             // All app streams: "*" matches all.
             { "type": "s", "value": "media.name" },
