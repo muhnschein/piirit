@@ -6,7 +6,7 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
-## Unreleased
+## 2.3.0 — 2026-11-11
 
 - Archived chats moved from the pull-down menu to an Archived button in the chat list's row of filter buttons. Tap it to see your archived chats in place of the others; the other filter buttons step aside until you tap it again. Search finds chats and messages everywhere either way.
 - The chat list can show your profile picture and name in its top left corner: turn it on in Settings, Messages (off by default). Tap it to open your profiles.
@@ -15,7 +15,7 @@ docs/BUILDING.md, "Cutting a release").
 - Contact and group pages are laid out anew. The picture sits beside the name, with when they were last seen under it. Gallery, Audio, Files, Apps, Calls and Map sit two to a line, or one per line when a name is too long for half; audio and files are grouped by age (Today, Yesterday, Last 7 days, Last 30 days, Older). Call and Video call show smaller icons, centred with their label. Changing a name, a group's description or picture, leaving or deleting the chat, blocking and encryption info are in the pull-down menu, with encryption info at the top.
 - **Chats in common.** A contact's page shows, at the bottom, the chats you share with them: your chat with them and each group they are in. Tap the row to see them all, and a chat to open it.
 - A group's members are one row near the end of its page, like Chats in common: three pictures, how many, and the first names. It opens the full list, where you can search members by name and remove one. Tapping a member opens their page if you already chat with them, otherwise offers Send message. Add members and Invite with a QR code are in the full list's pull-down menu.
-- A chat's notifications are now a page, opened from Notifications in the chat list's long-press menu (was Mute) or on the contact or group page: pick On, Off for a while (1 hour to 7 days) or Off, then swipe back to save. While off for a while, the page marks the choice with the time left, and the Notifications row on the contact or group page says for how long and how much time is left, or just the time left when the line is too narrow. A chat muted on another device shows as Off.
+- A chat's notifications are now a page, opened from Notifications in the chat list's long-press menu (was Mute) or on the contact or group page: pick On, Off for a while (1 hour to 7 days) or Off, then swipe back to save. While off for a while, the page marks the choice with the time left, and the Notifications row on the contact or group page says for how long and how much time is left, or just the time left when the line is too narrow. A chat muted on another device shows as Off. In a group, a note says that replies to you still notify while Mentions is on in the notification settings.
 - Pictures and videos not yet downloaded show in a chat's gallery while it slides in, not only once it is open.
 - New Encryption info page for a contact or group: each key's fingerprint laid out to compare, the relays as domain names, and which group members' keys are missing. The pull-down menu copies the names and fingerprints.
 - Changing a group's name or description is saved when you swipe back from the Edit group page; a contact's nickname the same way from Edit name.
@@ -47,7 +47,6 @@ docs/BUILDING.md, "Cutting a release").
 - A message of nothing but emoji, up to five of them, shows them big.
 - Coming back to a chat from another page no longer leaves it blank or at the top when it had lost its place meanwhile.
 - "Delete messages from device" in Settings keeps the period you pick; it no longer goes back to "Never".
-- **Mute a chat for a while.** Mute in a chat's long-press menu in the chat list now asks for how long: 1 hour, 8 hours, 1 day, 7 days or forever, as in the other Delta Chat apps; Unmute there works at once. A contact's or group's page has a Notifications row that says On or Muted and offers the same choices, plus Unmute. In a group, a note says that replies to you still notify while Mentions is on in the notification settings.
 - A setting changed twice in quick succession keeps the second choice; the first one could win before.
 - Emoji in names show as pictures, as they do in messages, with their colours muted: in the chat list, the chat header, contact and group pages, search results, contact lists and calls. In message previews and the reply bar they are grey like the text, so lists stay calm.
 - Search results show the text you searched for in bold, in the highlight colour, in every list you can search.
