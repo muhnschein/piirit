@@ -21,6 +21,11 @@
 # APT_FIRST_TRY_SECONDS (240), then next. Download only under cap: killed
 # apt-get mid-dpkg leaves system half-installed. Debs fetched stay, reused.
 #
+# Next mirror may be down too (seen: azure and archive.ubuntu.com both silent
+# from one runner, apt looping on the index 10 min): mirrors answering on
+# their index go first, and second try is capped too (APT_LAST_TRY_SECONDS,
+# 600): job fails, never hangs.
+#
 # Usage:  ci/apt-install.sh <package>...
 #         ci/apt-install.sh --prune-only     (drop lists, install nothing)
 #
@@ -49,6 +54,10 @@ apt_stub=$(printenv APT_GET || true)
 first_try=$(printenv APT_FIRST_TRY_SECONDS || true)
 if [[ -z "$first_try" ]]; then
     first_try=240
+fi
+last_try=$(printenv APT_LAST_TRY_SECONDS || true)
+if [[ -z "$last_try" ]]; then
+    last_try=600
 fi
 curl_cmd=$(printenv APT_CURL || true)
 if [[ -z "$curl_cmd" ]]; then
@@ -169,12 +178,13 @@ read_mirrors() {
     return 0
 }
 
-# Bytes per second <url> gives over its first 2 MiB, at most probe_seconds
-# long; 0 if error status or nothing came. Cut short = rate so far.
+# probe <url> [seconds]: bytes per second over first 2 MiB, at most seconds
+# (probe_seconds) long; 0 if error status or nothing came. Cut short = rate so far. curl's
+# own error line goes to job log: says why mirror counted as silent.
 probe() {
-    local url=$1 out code size seconds
-    out=$("$curl_cmd" -sS -o /dev/null -r 0-2097151 --max-time "$probe_seconds" \
-        -w '%{http_code} %{size_download} %{time_total}' "$url" 2>/dev/null) || true
+    local url=$1 limit=${2-$probe_seconds} out code size seconds
+    out=$("$curl_cmd" -sS -o /dev/null -r 0-2097151 --max-time "$limit" \
+        -w '%{http_code} %{size_download} %{time_total}' "$url") || true
     read -r code size seconds <<<"$out"
     case "$code" in
         200 | 206) ;;
@@ -225,13 +235,42 @@ fastest_mirror_first() {
     return 0
 }
 
-# Fallback: first mirror let us down. Next goes first, it goes last.
+# Fallback: first mirror let us down, it goes last. Rest, extra mirrors too:
+# those answering on their index first, list's order kept. None answers =
+# order as it was. Asked for release's InRelease, file apt fetches first;
+# 10 s (5 s cut kernel.org off though apt reached it): wrong "silent" costs
+# apt 80 s per index file on dead mirror.
 next_mirror_first() {
     [[ -f "$mirror_list" ]] || return 0
     read_mirrors
-    [[ "${#mirrors[@]}" -ge 2 ]] || return 0
-    write_mirrors "${mirrors[@]:1}" "${security[@]}" "${mirrors[0]}"
-    echo "apt-install: debs from ${mirrors[1]} first, ${mirrors[0]} last"
+    [[ "${#mirrors[@]}" -ge 1 ]] || return 0
+    local failed=${mirrors[0]} rest=("${mirrors[@]:1}") url known
+    for url in "${extra_mirrors[@]}"; do
+        for known in "${mirrors[@]}"; do
+            [[ "$known" = "$url" ]] && continue 2
+        done
+        rest+=("$url")
+    done
+    [[ "${#rest[@]}" -ge 1 ]] || return 0
+    local up=() down=() index=dists/ codename
+    codename=$(sed -n 's/^VERSION_CODENAME=//p' /etc/os-release 2>/dev/null) || true
+    if [[ -n "$codename" ]]; then
+        index=dists/$codename/InRelease
+    fi
+    for url in "${rest[@]}"; do
+        if [[ "$(probe "${url}${index}" 10)" -gt 0 ]]; then
+            up+=("$url")
+        else
+            echo "apt-install: $url does not answer"
+            down+=("$url")
+        fi
+    done
+    if [[ "${#up[@]}" -eq 0 ]]; then
+        up=("${rest[@]}")
+        down=()
+    fi
+    write_mirrors "${up[@]}" "${security[@]}" "${down[@]}" "$failed"
+    echo "apt-install: debs from ${up[0]} first, $failed last"
     return 0
 }
 
@@ -244,5 +283,6 @@ fi
 echo "apt-install: mirror failed or slower than ${first_try} s; once more from the next" >&2
 next_mirror_first
 use_main_archive
-apt_get update
+apt_get --within "$last_try" update
+apt_get --within "$last_try" install -y --download-only "$@"
 apt_get install -y "$@"
