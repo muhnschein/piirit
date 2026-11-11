@@ -160,7 +160,16 @@
                                 keep[k] = one[k];
                             }
                         }
-                        post("/log", "measure " + one.type + " " + JSON.stringify(keep));
+                        var line = "measure " + one.type;
+                        Object.keys(keep).forEach(function (k) {
+                            var add = " " + k + "=" + keep[k];
+                            if (line.length + add.length > 250) {
+                                post("/log", line);
+                                line = "measure " + one.type + " +";
+                            }
+                            line += add;
+                        });
+                        post("/log", line);
                     });
                 });
             }, 2000);
