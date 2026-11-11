@@ -36,7 +36,7 @@ itself *never* touches a mail server or a key.
 ## Limitations
 
 - No protocol or crypto reimplementation — ever. We never roll our own crypto.
-- Chats via regular email or any non-chatmail servers.
+- No chats via regular email or non-chatmail servers.
 - No OpenRepos/Chum.
 
 See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
