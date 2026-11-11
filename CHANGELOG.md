@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
 - Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
 
 ## 2.3.0 — 2026-11-11
