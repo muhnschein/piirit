@@ -526,16 +526,10 @@ pub fn label_call_audio(talking: bool) {
 fn pulse_properties(session: &str, talking: bool) -> String {
     if !talking {
         session.to_owned()
+    } else if session.trim().is_empty() {
+        CALL_ROLE.to_owned()
     } else {
-        // MEASURE-301 (temporary): role from env; "none" = no role.
-        let role = std::env::var("PIIRIT_MEASURE_ROLE").unwrap_or_else(|_| CALL_ROLE.to_owned());
-        if role == "none" {
-            session.to_owned()
-        } else if session.trim().is_empty() {
-            role
-        } else {
-            format!("{session} {role}")
-        }
+        format!("{session} {CALL_ROLE}")
     }
 }
 

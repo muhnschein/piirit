@@ -142,37 +142,6 @@
                 connection.setConfiguration = function () {};
             }
             piiritVideo.watch(connection);
-            /* MEASURE-301 (temporary, not for merge): audio stats every 2 s. */
-            post("/log", "measure ua " + navigator.userAgent);
-            var measure = window.setInterval(function () {
-                if (connection.signalingState === "closed") {
-                    window.clearInterval(measure);
-                    return;
-                }
-                connection.getStats(null).then(function (stats) {
-                    stats.forEach(function (one) {
-                        if ((one.kind || one.mediaType) !== "audio") {
-                            return;
-                        }
-                        var keep = {};
-                        for (var k in one) {
-                            if (typeof one[k] === "number" && k !== "timestamp" && k !== "ssrc") {
-                                keep[k] = one[k];
-                            }
-                        }
-                        var line = "measure " + one.type;
-                        Object.keys(keep).forEach(function (k) {
-                            var add = " " + k + "=" + keep[k];
-                            if (line.length + add.length > 250) {
-                                post("/log", line);
-                                line = "measure " + one.type + " +";
-                            }
-                            line += add;
-                        });
-                        post("/log", line);
-                    });
-                });
-            }, 2000);
             connection.addEventListener("iceconnectionstatechange", function () {
                 post("/state", connection.iceConnectionState);
             });
