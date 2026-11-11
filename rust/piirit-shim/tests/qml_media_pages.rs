@@ -761,13 +761,37 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     );
     // #298: screen timed out mid-video.
     for (label, lit, why) in [
-        ("opened-lit", "false", "a video waiting for play keeps the screen on"),
-        ("started-lit", "true", "the screen may time out while a video plays"),
+        (
+            "opened-lit",
+            "false",
+            "a video waiting for play keeps the screen on",
+        ),
+        (
+            "started-lit",
+            "true",
+            "the screen may time out while a video plays",
+        ),
         ("paused-lit", "false", "a paused video keeps the screen on"),
-        ("playing-lit", "true", "the screen may time out once a video plays again"),
-        ("background-lit", "false", "a video keeps the screen on with Piirit in the background"),
-        ("front-lit", "true", "the screen may time out once Piirit is in front again"),
-        ("ended-lit", "false", "a video that ended keeps the screen on"),
+        (
+            "playing-lit",
+            "true",
+            "the screen may time out once a video plays again",
+        ),
+        (
+            "background-lit",
+            "false",
+            "a video keeps the screen on with Piirit in the background",
+        ),
+        (
+            "front-lit",
+            "true",
+            "the screen may time out once Piirit is in front again",
+        ),
+        (
+            "ended-lit",
+            "false",
+            "a video that ended keeps the screen on",
+        ),
     ] {
         assert_eq!(value(label), lit, "{why}. {context}");
     }
