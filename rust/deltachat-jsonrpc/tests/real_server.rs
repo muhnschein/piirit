@@ -2850,7 +2850,7 @@ async fn channels_against(client: &RpcClient, mailbox: (u16, u16)) {
     channel_reactions_against(client, owner, channel).await;
 }
 
-/// Channel takes five reactions, refuses rest: ConversationList's channel `quickReactions`
+/// Channel takes five reactions, refuses rest: `ConversationList`'s channel `quickReactions`
 /// must be exactly these (core's `ALLOWED_REACTIONS`).
 async fn channel_reactions_against(client: &RpcClient, owner: u32, channel: u32) {
     let post: u32 = client
