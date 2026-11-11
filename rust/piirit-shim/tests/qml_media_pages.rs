@@ -98,6 +98,13 @@ const PROBE_QML: &str = r"
             loader.item[property] = value
             return 'ok'
         }
+        /// Video ran out: player stops by itself.
+        function stopPlayer() {
+            var player = findIn(loader.item, 'player')
+            if (!player) { return 'missing:player' }
+            player.stop()
+            return 'ok'
+        }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -426,6 +433,16 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("playbackState")
             ),
         ));
+        // Headless app is never "active": say it is in front.
+        call!("set", QString::from("appActive"), true);
+        (*steps_ptr).push((
+            "opened-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
+            ),
+        ));
         (*steps_ptr).push((
             "opened-poster",
             call!("flagOf", QString::from("poster"), QString::from("visible")),
@@ -437,6 +454,14 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 "flagOf",
                 QString::from("player"),
                 QString::from("playbackState")
+            ),
+        ));
+        (*steps_ptr).push((
+            "started-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
             ),
         ));
         (*steps_ptr).push((
@@ -452,6 +477,14 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("playbackState")
             ),
         ));
+        (*steps_ptr).push((
+            "paused-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
+            ),
+        ));
         (*steps_ptr).push(("play", call!("call", QString::from("toggle"))));
         (*steps_ptr).push((
             "playing",
@@ -459,6 +492,41 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 "flagOf",
                 QString::from("player"),
                 QString::from("playbackState")
+            ),
+        ));
+        (*steps_ptr).push((
+            "playing-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
+            ),
+        ));
+        call!("set", QString::from("appActive"), false);
+        (*steps_ptr).push((
+            "background-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
+            ),
+        ));
+        call!("set", QString::from("appActive"), true);
+        (*steps_ptr).push((
+            "front-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
+            ),
+        ));
+        (*steps_ptr).push(("end", call!("stopPlayer")));
+        (*steps_ptr).push((
+            "ended-lit",
+            call!(
+                "flagOf",
+                QString::from("videoDisplay"),
+                QString::from("preventBlanking")
             ),
         ));
         (*engine_ptr).quit();
@@ -691,4 +759,40 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         "1",
         "the play button did not start the video again. {context}"
     );
+    // #298: screen timed out mid-video.
+    for (label, lit, why) in [
+        (
+            "opened-lit",
+            "false",
+            "a video waiting for play keeps the screen on",
+        ),
+        (
+            "started-lit",
+            "true",
+            "the screen may time out while a video plays",
+        ),
+        ("paused-lit", "false", "a paused video keeps the screen on"),
+        (
+            "playing-lit",
+            "true",
+            "the screen may time out once a video plays again",
+        ),
+        (
+            "background-lit",
+            "false",
+            "a video keeps the screen on with Piirit in the background",
+        ),
+        (
+            "front-lit",
+            "true",
+            "the screen may time out once Piirit is in front again",
+        ),
+        (
+            "ended-lit",
+            "false",
+            "a video that ended keeps the screen on",
+        ),
+    ] {
+        assert_eq!(value(label), lit, "{why}. {context}");
+    }
 }
