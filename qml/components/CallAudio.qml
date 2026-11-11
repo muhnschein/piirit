@@ -18,10 +18,14 @@ import Nemo.DBus 2.0
  * Watcher can't tell: stopped mic counts shut after a few seconds.
  *
  * Set: class `aliencall` (Sailfish non-phone call) on ohm resource manager:
- * earpiece or headset first; with video playback: loudspeaker. Names streams
- * by libpulse id (Call.audio_id) to join call group; other music pauses. ohm
- * drops sets with app's bus connection (crash restores routing). Refused, no
- * manager, or no id: loudspeaker for good.
+ * earpiece or headset first; with video playback: loudspeaker; other music
+ * pauses. ohm drops sets with app's bus connection (crash restores routing).
+ * Refused, no manager, or no id: loudspeaker for good.
+ *
+ * Naming set (registered only): app's streams (Call.audio_id) join policy
+ * group `call`, pinned to low-latency output; route's group plays through
+ * media output (OnePlus 6: 170 ms held, vs 42). Own set: stream group becomes
+ * owner group, and owner `call` silences alarms, ringtones.
  *
  * Ringing: set class `ringtone`, no streams (ngfd rings), moves nothing of
  * app's. Released after; answered call's set acquired first: music stays off.
@@ -78,6 +82,9 @@ Item {
 
     /// Held set number; 0 none.
     property int held: 0
+
+    /// Naming set number (streams' group); 0 none. Lives as long as `held`.
+    property int named: 0
 
     /// Held set has video playback (loudspeaker).
     property bool heldLoud: false
@@ -345,25 +352,30 @@ Item {
         }
     }
 
-    /// Acquire call set: register, name streams, acquire.
+    /// Name streams (naming set, registered only), then acquire call set.
     function hold() {
         audio.count += 1
-        var id = audio.count
-        audio.held = id
-        audio.heldLoud = audio.speaker
-        audio.send(id, "register",
-                   audio.record(audio.msgRegister, id, "aliencall", audio.callResources()))
-        audio.send(id, "audio", [
+        var naming = audio.count
+        audio.named = naming
+        audio.send(naming, "register",
+                   audio.record(audio.msgRegister, naming, "aliencall", audio.audioPlayback))
+        audio.send(naming, "audio", [
             { "type": "i", "value": audio.msgAudio },
-            { "type": "u", "value": id },
+            { "type": "u", "value": naming },
             { "type": "u", "value": audio.next() },
-            { "type": "s", "value": "aliencall" },
+            { "type": "s", "value": "call" },
             { "type": "s", "value": audio.appId },
             // All app streams: "*" matches all.
             { "type": "s", "value": "media.name" },
             { "type": "i", "value": 0 },
             { "type": "s", "value": "*" }
         ])
+        audio.count += 1
+        var id = audio.count
+        audio.held = id
+        audio.heldLoud = audio.speaker
+        audio.send(id, "register",
+                   audio.record(audio.msgRegister, id, "aliencall", audio.callResources()))
         audio.send(id, "acquire", audio.plain(audio.msgAcquire, id))
     }
 
@@ -376,11 +388,14 @@ Item {
         audio.send(id, "acquire", audio.plain(audio.msgAcquire, id))
     }
 
-    /// Release call set.
+    /// Release call set, then naming set.
     function letGo() {
         var id = audio.held
+        var naming = audio.named
         audio.held = 0
+        audio.named = 0
         audio.drop(id)
+        audio.drop(naming)
     }
 
     /// Release ring set.
@@ -438,10 +453,11 @@ Item {
         })
     }
 
-    /// Refused or no manager: release set, loudspeaker for good. Only if still
-    /// held: refusal may be for a released set.
+    /// Refused or no manager: release sets, loudspeaker for good. Only if still
+    /// held: refusal may be for a released set. Unnamed streams under call set
+    /// would be paused as other music: naming refused counts the same.
     function refused(id) {
-        if (id === audio.held) {
+        if (id === audio.held || id === audio.named) {
             audio.letGo()
             audio.denied = true
             audio.speaker = true
