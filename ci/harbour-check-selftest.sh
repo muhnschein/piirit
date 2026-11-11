@@ -351,6 +351,24 @@ else
     echo "selftest: ok   rpmspec missing -> its waivers not stale, others still are"
 fi
 
+# Canary runs validate-rpm with waivers off: known blockers must fail again.
+cases=$((cases + 1))
+printf '%s\n' '!BEGIN!x' \
+    'ERROR|/usr/libexec/harbour-piirit/deltachat-rpc-server|Installation not allowed in this location' \
+    '!END!FAIL!x' > "$work/canary.log"
+printf '1.2.1  /usr/libexec/harbour-piirit/*  Installation not allowed*\n' > "$work/canary-waivers.conf"
+if ! HARBOUR_WAIVERS="$work/canary-waivers.conf" \
+        "$pristine/ci/harbour-validate-rpm.sh" --log "$work/canary.log" >/dev/null 2>&1; then
+    echo "selftest: FAIL a waived error should pass with its waiver file" >&2
+    status=1
+elif HARBOUR_WAIVERS=/dev/null \
+        "$pristine/ci/harbour-validate-rpm.sh" --log "$work/canary.log" >/dev/null 2>&1; then
+    echo "selftest: FAIL HARBOUR_WAIVERS=/dev/null should waive nothing" >&2
+    status=1
+else
+    echo "selftest: ok   waivers off -> a waived finding is rejected again"
+fi
+
 echo
 if [[ "$status" -eq 0 ]]; then
     echo "selftest: ok ($cases cases, $skipped skipped for want of a tool)"
