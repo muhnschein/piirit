@@ -500,6 +500,7 @@ Page {
             bottom: banner.top
         }
         model: messages.rows
+        channel: messages.is_channel
         // Model count: changes on arrival, not on view.
         messageCount: messages.count
         // Which rows are on screen, for model to fill.

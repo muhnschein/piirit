@@ -2847,6 +2847,29 @@ async fn channels_against(client: &RpcClient, mailbox: (u16, u16)) {
     );
     channel_row_says(client, owner, channel, "OutBroadcast").await;
     channel_row_says(client, reader, joined, "InBroadcast").await;
+    channel_reactions_against(client, owner, channel).await;
+}
+
+/// Channel takes five reactions, refuses rest: ConversationList's channel `quickReactions`
+/// must be exactly these (core's `ALLOWED_REACTIONS`).
+async fn channel_reactions_against(client: &RpcClient, owner: u32, channel: u32) {
+    let post: u32 = client
+        .call("misc_send_text_message", (owner, channel, "post"))
+        .await
+        .unwrap_or_else(|err| panic!("misc_send_text_message to the channel: {err}"));
+    for emoji in ["👍", "👎", "\u{2764}\u{FE0F}", "😂", "🙁"] {
+        client
+            .call::<_, Value>("send_reaction", (owner, post, vec![emoji]))
+            .await
+            .unwrap_or_else(|err| panic!("send_reaction {emoji} in a channel: {err}"));
+    }
+    for emoji in ["🚀", "😮", "😢", "🙏", "\u{2764}"] {
+        let words = refusal(client, "send_reaction", (owner, post, vec![emoji])).await;
+        assert!(
+            words.contains("Reaction not allowed"),
+            "the core refused {emoji} in a channel in other words: {words}"
+        );
+    }
 }
 
 /// Chat list's Chats and Channels filters split on a row's own `chatType`.

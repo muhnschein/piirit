@@ -6,6 +6,10 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+- Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
+
 ## 2.3.0 — 2026-11-11
 
 **What's new**
