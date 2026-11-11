@@ -140,8 +140,15 @@ SilicaListView {
         onRemove: root.deleteRequested(id, tag === true)
     }
 
+    /// Channel, own or joined.
+    property bool channel: false
+
     /// "+" opens pages/ReactionPickerPage.qml. Tapping another's chip answers in kind.
-    readonly property var quickReactions: ["👍", "❤️", "😂", "😮", "😢", "🙏"]
+    /// Channel: core's `ALLOWED_REACTIONS` (src/reaction/broadcast_reactions.rs), spelled
+    /// exactly; it refuses any other ("Reaction not allowed"), so no "+".
+    readonly property var quickReactions: root.channel
+        ? ["👍", "👎", "❤️", "😂", "🙁"]
+        : ["👍", "❤️", "😂", "😮", "😢", "🙏"]
 
     /// Picture/video open in PicturePage/VideoPage (ConversationPage.openAttachment),
     /// which offer Open and Save; row menu omits them.
@@ -504,7 +511,8 @@ SilicaListView {
                     /// Own reaction for picker to mark; read now likewise.
                     readonly property string myReaction: model.my_reaction
                     // Emoji and "+" centred, shrunk if needed; hand-laid (see MessageDelegate).
-                    readonly property int slots: root.quickReactions.length + 1
+                    readonly property int slots: root.quickReactions.length
+                                                 + (root.channel ? 0 : 1)
                     readonly property real slotGap: Theme.paddingSmall
                     readonly property real slotSize: Math.min(
                         Theme.itemSizeSmall,
@@ -540,6 +548,7 @@ SilicaListView {
                     MouseArea {
                         id: morePicker
                         objectName: "reactionMore"
+                        visible: !root.channel
                         x: reactionPicker.slotsX + root.quickReactions.length
                            * (reactionPicker.slotSize + reactionPicker.slotGap)
                         width: reactionPicker.slotSize

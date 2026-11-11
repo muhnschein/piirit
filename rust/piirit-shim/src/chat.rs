@@ -138,6 +138,11 @@ pub struct ChatMessages {
     pub is_channel_reader: qt_property!(bool; NOTIFY is_channel_reader_changed),
     /// Emitted once channel-ness known.
     pub is_channel_reader_changed: qt_signal!(),
+    /// Channel, own or joined (core's `OutBroadcast`, `InBroadcast`): core takes five
+    /// reactions there, list offers only those.
+    pub is_channel: qt_property!(bool; NOTIFY is_channel_changed),
+    /// Emitted once channel-ness known.
+    pub is_channel_changed: qt_signal!(),
     /// Accept request: core makes it ordinary chat; shape re-read (field comes back).
     pub accept_chat: qt_method!(fn(&mut self)),
     /// Block request's sender: core hides chat, contact goes on block list. Answers `closed`.
@@ -824,6 +829,7 @@ impl ChatMessages {
         self.member_count = shape.member_count;
         self.is_contact_request = shape.is_contact_request;
         self.is_channel_reader = shape.is_channel_reader;
+        self.is_channel = shape.is_channel;
         self.is_group_changed();
         self.can_send_changed();
         self.is_encrypted_changed();
@@ -831,6 +837,7 @@ impl ChatMessages {
         self.member_count_changed();
         self.is_contact_request_changed();
         self.is_channel_reader_changed();
+        self.is_channel_changed();
     }
 
     /// Accept contact request; see `accept_chat` property.
@@ -2421,7 +2428,7 @@ pub(crate) fn is_group_info(info: &serde_json::Value) -> bool {
 
 /// Chat facts beside messages: sender shown, writable, encrypted, calls, request, channel.
 #[derive(Clone, Copy, Default)]
-// Six facts, each bound on its own; see `ChatMessages`.
+// Facts, each bound on its own; see `ChatMessages`.
 #[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ChatShape {
     /// Group, mailing list or broadcast.
@@ -2438,6 +2445,8 @@ pub(crate) struct ChatShape {
     pub is_contact_request: bool,
     /// Channel joined; see `ChatMessages::is_channel_reader`.
     pub is_channel_reader: bool,
+    /// Channel, own or joined; see `ChatMessages::is_channel`.
+    pub is_channel: bool,
 }
 
 /// What a whole-chat call leaves: same chat, new shape (accepted), or nothing (blocked, deleted).
@@ -2508,6 +2517,10 @@ async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> Chat
         member_count,
         is_contact_request: json::flag(&info, "isContactRequest"),
         is_channel_reader: json::str_at(&info, "chatType") == "InBroadcast",
+        is_channel: matches!(
+            json::str_at(&info, "chatType"),
+            "OutBroadcast" | "InBroadcast"
+        ),
     }
 }
 

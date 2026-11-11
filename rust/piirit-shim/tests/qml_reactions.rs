@@ -130,6 +130,22 @@ const PROBE_QML: &str = r"
             more.choose()
             return 'ok'
         }
+        function moreVisible() {
+            var row = findIn(list.item, 'messageRow')
+            if (!row || !row.menu) { return 'no-menu' }
+            var more = findIn(row.menu, 'reactionMore')
+            return more ? '' + more.visible : 'missing'
+        }
+        function setChannel(on) {
+            list.item.channel = on
+            return 'ok'
+        }
+        function slots() {
+            var row = findIn(list.item, 'messageRow')
+            if (!row || !row.menu) { return 'no-menu' }
+            var picker = findIn(row.menu, 'reactionPicker')
+            return picker ? '' + picker.slots : 'missing'
+        }
         function pickerVisible() {
             var row = findIn(list.item, 'messageRow')
             if (!row || !row.menu) { return 'no-menu' }
@@ -276,6 +292,16 @@ fn reactions_are_chips_on_the_message_and_a_row_in_its_menu() {
         record!("menu-raised", call!("raisedSignal"));
         record!("more", call!("pickMore"));
         record!("more-raised", call!("raisedSignal"));
+        record!("more-visible", call!("moreVisible"));
+        record!("slots", call!("slots"));
+        call!("setChannel", true);
+    });
+    plan.after(1, move || unsafe {
+        record!("channel-options", call!("menuOptions"));
+        record!("channel-more", call!("moreVisible"));
+        record!("channel-slots", call!("slots"));
+        record!("channel-pick", call!("pickOption", 4));
+        record!("channel-raised", call!("raisedSignal"));
         (*engine_ptr).quit();
     });
 
@@ -404,5 +430,33 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "more:7:👍",
         "the '+' did not ask for the picker for this message, with the \
          reader's own reaction to mark. {context}"
+    );
+    assert_eq!(
+        value("more-visible"),
+        "true",
+        "an ordinary chat's menu hides the '+'. {context}"
+    );
+
+    // Channel: core's five, spelled as core compares them (heart with U+FE0F), no "+".
+    assert_eq!(
+        value("channel-options"),
+        "\u{1F44D}\u{1F44E}\u{2764}\u{FE0F}\u{1F602}\u{1F641}",
+        "a channel's quick reactions are not the five the core takes there. {context}"
+    );
+    assert_eq!(
+        value("channel-more"),
+        "false",
+        "a channel's menu offers every other emoji, which the core refuses there. {context}"
+    );
+    // Row centred over its slots: spare one would push five off centre.
+    assert_eq!(
+        (value("slots"), value("channel-slots")),
+        ("7".to_string(), "5".to_string()),
+        "the row is not laid out for six reactions and '+', or a channel's five. {context}"
+    );
+    assert_eq!(
+        value("channel-raised"),
+        "menu:7:\u{1F641}",
+        "picking in a channel did not name the message and the emoji. {context}"
     );
 }

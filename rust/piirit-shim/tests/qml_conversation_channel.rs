@@ -1,5 +1,5 @@
 //! Conversation page on a joined channel: no message field (only owner posts). Ordinary chat
-//! beside it keeps field.
+//! beside it keeps field. Channels, own too, tell list (it offers core's reactions only).
 //!
 //! Page loaded from QML tree copy with `EnterKey` taken out; see
 //! `common::qml_tree_without_enter_key`. Steps run in probe off page's own `loaded`, not clock.
@@ -16,11 +16,14 @@ mod common;
 const PATIENCE: u32 = 59;
 
 /// Readings probe takes, by label.
-const READINGS: [&str; 4] = [
+const READINGS: [&str; 7] = [
     "channel-field",
     "channel-field-height",
+    "channel-list",
     "chat-field",
     "chat-field-height",
+    "chat-list",
+    "own-list",
 ];
 
 const PROBE_QML: &str = r"
@@ -31,7 +34,7 @@ const PROBE_QML: &str = r"
         id: probe
         property string pageUrl: ''
         property var readings: ({})
-        // 0 channel opening, 1 ordinary chat opening, 2 done.
+        // 0 channel opening, 1 ordinary chat opening, 2 own channel opening, 3 done.
         property int step: 0
         Loader { id: loader }
         function open(chatId) {
@@ -67,6 +70,8 @@ const PROBE_QML: &str = r"
             var row = findIn(loader.item, 'inputRow')
             probe.readings[prefix + '-field'] = row ? '' + row.visible : 'missing'
             probe.readings[prefix + '-field-height'] = row ? '' + row.height : 'missing'
+            var list = findIn(loader.item, 'messageList')
+            probe.readings[prefix + '-list'] = list ? '' + list.channel : 'missing'
         }
         Timer {
             id: poll
@@ -82,11 +87,15 @@ const PROBE_QML: &str = r"
                 } else if (probe.step === 1) {
                     probe.take('chat')
                     probe.step = 2
+                    probe.open(3)
+                } else if (probe.step === 2) {
+                    probe.take('own')
+                    probe.step = 3
                     poll.running = false
                 }
             }
         }
-        function finished() { return probe.step === 2 ? 'yes' : 'no' }
+        function finished() { return probe.step === 3 ? 'yes' : 'no' }
         function reading(label) {
             var value = probe.readings[label]
             return value === undefined ? 'unread' : value
@@ -105,6 +114,7 @@ fn a_joined_channel_opens_without_a_message_field() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_CHANNELS", "2");
+        std::env::set_var("PIIRIT_FAKE_OWN_CHANNELS", "3");
     }
 
     piirit_shim::register_qml_types();
@@ -187,5 +197,22 @@ fn a_joined_channel_opens_without_a_message_field() {
         value("chat-field-height"),
         "0",
         "an ordinary chat's field takes no room. {context}"
+    );
+    assert_eq!(
+        value("channel-list"),
+        "true",
+        "a joined channel's list is not told it is one: it offers reactions the core \
+         refuses. {context}"
+    );
+    assert_eq!(
+        value("own-list"),
+        "true",
+        "an own channel's list is not told it is one: it offers reactions the core \
+         refuses. {context}"
+    );
+    assert_eq!(
+        value("chat-list"),
+        "false",
+        "an ordinary chat's list is told it is a channel: it lost reactions. {context}"
     );
 }
