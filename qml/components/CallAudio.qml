@@ -86,6 +86,9 @@ Item {
     /// Naming set number (streams' group); 0 none. Lives as long as `held`.
     property int named: 0
 
+    /// Naming set's number: call set's plus this.
+    readonly property int namingBase: 65536
+
     /// Held set has video playback (loudspeaker).
     property bool heldLoud: false
 
@@ -355,7 +358,8 @@ Item {
     /// Name streams (naming set, registered only), then acquire call set.
     function hold() {
         audio.count += 1
-        var naming = audio.count
+        var id = audio.count
+        var naming = audio.namingBase + id
         audio.named = naming
         audio.send(naming, "register",
                    audio.record(audio.msgRegister, naming, "aliencall", audio.audioPlayback))
@@ -370,8 +374,6 @@ Item {
             { "type": "i", "value": 0 },
             { "type": "s", "value": "*" }
         ])
-        audio.count += 1
-        var id = audio.count
         audio.held = id
         audio.heldLoud = audio.speaker
         audio.send(id, "register",
