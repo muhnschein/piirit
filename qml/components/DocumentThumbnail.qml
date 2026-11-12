@@ -38,14 +38,18 @@ Item {
     Loader {
         active: root.kind === "pdf"
         sourceComponent: Component {
-            // Draws over icon once made; failed: stays clear, icon shows. Thumbnailer crops to
-            // the middle: asked for a whole A4 page, top of it shown, where title is.
+            // Draws over icon once made; failed: stays clear, icon shows. Default fill crops
+            // to page's middle, title lost: whole page asked for, as wide as tile; its top
+            // shown, or all of it centred when shorter than tile. A4 until thumbnail tells.
             Thumbnail {
                 objectName: "documentPdf"
                 width: root.width
-                height: Math.max(root.height, Math.round(width * 1.414))
+                height: implicitWidth > 0 ? Math.round(width * implicitHeight / implicitWidth)
+                                          : Math.round(width * 1.414)
+                y: Math.max(0, Math.round((root.height - height) / 2))
+                fillMode: Thumbnail.PreserveAspectFit
                 sourceSize.width: width
-                sourceSize.height: height
+                sourceSize.height: 2 * width
                 mimeType: "application/pdf"
                 source: root.fileUrl
             }

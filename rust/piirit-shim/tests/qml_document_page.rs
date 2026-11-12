@@ -40,6 +40,13 @@ const PROBE_QML: &str = r"
             return null
         }
         function clipped(at) { return '' + shown[at].clip }
+        // Stub thumbnailer makes nothing: made thumbnail's size set by hand.
+        function shaped(at, w, h) {
+            var pdf = findIn(shown[at], 'documentPdf')
+            pdf.implicitWidth = w
+            pdf.implicitHeight = h
+            return pdf.width + 'x' + pdf.height + '@' + pdf.x + ',' + pdf.y
+        }
         function of(at, name, property) {
             var item = findIn(shown[at], name)
             return item ? '' + item[property] : '-'
@@ -184,7 +191,7 @@ fn a_document_shows_its_first_page_where_one_can_be_had_and_its_icon_where_not()
         (*steps_ptr).push((
             "pdf-shape",
             format!(
-                "{}x{} clip={}",
+                "{}x{} clip={} fit={} ask={} wide:{} tall:{}",
                 call!(
                     "of",
                     0,
@@ -197,7 +204,21 @@ fn a_document_shows_its_first_page_where_one_can_be_had_and_its_icon_where_not()
                     QString::from("documentPdf"),
                     QString::from("height")
                 ),
-                call!("clipped", 0)
+                call!("clipped", 0),
+                call!(
+                    "of",
+                    0,
+                    QString::from("documentPdf"),
+                    QString::from("fillMode")
+                ),
+                call!(
+                    "of",
+                    0,
+                    QString::from("documentPdf"),
+                    QString::from("sourceSize")
+                ),
+                call!("shaped", 0, 160, 90),
+                call!("shaped", 0, 100, 200)
             ),
         ));
         (*steps_ptr).push((
@@ -232,8 +253,8 @@ fn a_document_shows_its_first_page_where_one_can_be_had_and_its_icon_where_not()
         ),
         (
             "pdf-shape",
-            "96x136 clip=true",
-            "a PDF is not asked for as a whole page with its top shown",
+            "96x136 clip=true fit=1 ask=QSizeF(96, 192) wide:96x54@0,21 tall:96x192@0,0",
+            "a PDF is not asked for whole, as wide as its tile, top shown or centred when short",
         ),
         (
             "pdf-source",
