@@ -172,7 +172,7 @@ Item {
                 newestFirst: true
             })
         } else {
-            Qt.openUrlExternally(fileUrl)
+            saver.open(fileUrl, fileName)
         }
     }
 
@@ -510,7 +510,7 @@ Item {
                             //: Hands the attachment to whatever else on the phone
                             //: handles files of its kind.
                             text: qsTr("Open in another app")
-                            onClicked: Qt.openUrlExternally(row.fileUrl)
+                            onClicked: view.saver.open(row.fileUrl, model.file_name)
                         }
                         MenuItem {
                             objectName: "saveItem"
