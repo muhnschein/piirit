@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "."
+import "../js/Media.js" as Media
 import "../js/Format.js" as Format
 import "../js/Calls.js" as Calls
 import "../js/Emoji.js" as Emoji
@@ -254,6 +255,8 @@ Item {
             || root.viewType === "Gif" || root.viewType === "Video"
             || root.viewType === "Audio" || root.viewType === "Voice"
             || root.viewType === "Vcard"
+            || (Media.previewKind(root.fileMime) !== ""
+                && root.fileMime.indexOf("openxmlformats") === -1)
             || (root.viewType === "Webxdc" && root.appsEnabled
                 && root.webxdcName.length > 0))
     /// Bubble width: content, widened to hold offer.

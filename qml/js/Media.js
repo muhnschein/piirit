@@ -121,6 +121,19 @@ function fileIcon(mime) {
     return "icon-m-file-other"
 }
 
+/// How a file's first page can be drawn small (DocumentThumbnail): "pdf" platform
+/// thumbnailer; "page" picture stored in office file (ODF always, OOXML sometimes); "" not.
+function previewKind(mime) {
+    if (mime === "application/pdf") {
+        return "pdf"
+    }
+    if (mime.indexOf("application/vnd.oasis.opendocument.") === 0
+            || mime.indexOf("application/vnd.openxmlformats-officedocument.") === 0) {
+        return "page"
+    }
+    return ""
+}
+
 /// Peer's path as URL, encoded per segment (see AttachmentPreview.fileUrl).
 function fileUrl(path) {
     return "file://" + path.split("/").map(encodeURIComponent).join("/")

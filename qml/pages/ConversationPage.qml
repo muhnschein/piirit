@@ -917,7 +917,7 @@ Page {
                 previewWidth: previewWidth > 0 ? previewWidth : 0
             })
         } else {
-            Qt.openUrlExternally(fileUrl)
+            attachmentSaver.open(fileUrl, fileName)
         }
     }
 

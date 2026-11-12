@@ -172,7 +172,7 @@ Item {
                 newestFirst: true
             })
         } else {
-            Qt.openUrlExternally(fileUrl)
+            saver.open(fileUrl, fileName)
         }
     }
 
@@ -510,7 +510,7 @@ Item {
                             //: Hands the attachment to whatever else on the phone
                             //: handles files of its kind.
                             text: qsTr("Open in another app")
-                            onClicked: Qt.openUrlExternally(row.fileUrl)
+                            onClicked: view.saver.open(row.fileUrl, model.file_name)
                         }
                         MenuItem {
                             objectName: "saveItem"
@@ -587,17 +587,16 @@ Item {
                                                fileName.height + fileDetail.height)
                                     : 0
 
-                            Image {
+                            // Page where one can be had, else type's icon.
+                            DocumentThumbnail {
                                 id: fileIcon
                                 objectName: "fileIcon"
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.iconSizeMedium
+                                width: Theme.itemSizeMedium
                                 height: width
-                                source: fileRow.shown && model.loaded
-                                        ? "image://theme/" + Media.fileIcon(model.file_mime)
-                                          + "?" + (row.highlighted ? Theme.highlightColor
-                                                                    : Theme.primaryColor)
-                                        : ""
+                                fileUrl: fileRow.shown ? "" + row.fileUrl : ""
+                                fileMime: fileRow.shown && model.loaded ? model.file_mime : ""
+                                highlighted: row.highlighted
                             }
 
                             Label {

@@ -70,6 +70,21 @@ const PROBE_QML: &str = r"
                    + (preview ? preview.wantsFullWidth : '-')
                    + '/' + (row.bodyWidth === row.maxWidth)
         }
+        // Bubble at full width; first-page tile ('-' for none built) as wide, 3/4 as high,
+        // name right below it and nothing else in the preview.
+        function pageRoom() {
+            var row = delegate.item
+            var page = findIn(row, 'attachmentPage')
+            var name = findIn(row, 'attachmentLabel')
+            var preview = findIn(row, 'attachment')
+            var full = row.attachmentFillsBubble + '/' + preview.wantsFullWidth
+                       + '/' + (row.bodyWidth === row.maxWidth)
+            if (!page) { return full + '/-/' + name.y }
+            return full + '/' + (page.width === row.bodyWidth && page.width > 300)
+                   + '/' + (page.height === Math.round(page.width * 0.75))
+                   + '/' + (name.y === page.height + 4)
+                   + '/' + (preview.height === name.y + name.height)
+        }
     }
 ";
 
@@ -229,6 +244,27 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
             );
             record!(format!("{label}-bare"), call!("fills"));
         }
+        // File whose first page is drawn above its name: bubble as wide as the page.
+        for (label, mime) in [
+            ("pdf", "application/pdf"),
+            ("odt", "application/vnd.oasis.opendocument.text"),
+            (
+                "docx",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ),
+            ("zip", "application/zip"),
+        ] {
+            let props = json!({
+                "viewType": "File", "fileMime": mime, "fileName": "a",
+                "filePath": "/tmp/piirit-bubble-width/a",
+            });
+            call!(
+                "load",
+                QString::from(url.as_str()),
+                QString::from(props.to_string())
+            );
+            record!(format!("{label}-page"), call!("pageRoom"));
+        }
         (*engine_ptr).quit();
     });
 
@@ -277,6 +313,25 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
             value(&format!("{label}-bare")),
             "false/-/false",
             "a {label} message with no file filled the bubble. {context}"
+        );
+    }
+
+    // PDF, ODF: page fills bubble as picture does. OOXML (stored page rare), other files: name
+    // only, bubble as narrow as before.
+    for label in ["pdf", "odt"] {
+        assert_eq!(
+            value(&format!("{label}-page")),
+            "true/true/true/true/true/true/true",
+            "a {label}'s first page does not fill its bubble with the name right below \
+             (row fills/preview fills/bubble full/page wide/page 3:4/name below/nothing \
+             else). {context}"
+        );
+    }
+    for label in ["docx", "zip"] {
+        assert_eq!(
+            value(&format!("{label}-page")),
+            "false/false/false/-/0",
+            "a {label} got a page tile or a wide bubble. {context}"
         );
     }
 }

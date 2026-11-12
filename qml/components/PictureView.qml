@@ -181,7 +181,7 @@ Item {
                 //: Hands the attachment to whatever else on the phone
                 //: handles files of its kind.
                 text: qsTr("Open in another app")
-                onClicked: Qt.openUrlExternally(root.fileUrl)
+                onClicked: saver.open(root.fileUrl, root.fileName)
             }
             MenuItem {
                 objectName: "saveToDevice"
