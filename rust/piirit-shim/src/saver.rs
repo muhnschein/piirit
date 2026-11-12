@@ -3,6 +3,9 @@
 //! Blob dir goes with app; core names by content. Save = copy into Piirit's Downloads folder
 //! (`qml/components/AttachmentSaver.qml`) under sender's name, numbered if taken. Own thread:
 //! big video on Qt thread froze app.
+//!
+//! Open in another app = same copy, handed on: other apps' sandboxes can't read blob dir, and
+//! blob's name is a hash. Same file already there: that one, no second copy.
 
 use std::collections::VecDeque;
 use std::sync::{Mutex, PoisonError};
@@ -32,8 +35,13 @@ pub struct FileSaver {
     pub save: qt_method!(fn(&mut self, file_url: QString, folder: QString)),
     /// [`Self::save`] under `name` (sender's). Empty or path-only: file's own.
     pub save_as: qt_method!(fn(&mut self, file_url: QString, folder: QString, name: QString)),
+    /// [`Self::save_as`] for handing on: copy of same content already there is reused; answers
+    /// `opened`.
+    pub open_as: qt_method!(fn(&mut self, file_url: QString, folder: QString, name: QString)),
     /// The copy is at `path`.
     pub saved: qt_signal!(path: QString),
+    /// The copy to hand on is at `path`.
+    pub opened: qt_signal!(path: QString),
     /// Copy failed; message says why.
     pub error: qt_signal!(message: QString),
 
@@ -46,6 +54,8 @@ struct Request {
     source: String,
     folder: String,
     name: String,
+    /// For handing on: reuse same content, answer `opened`.
+    open: bool,
 }
 
 impl FileSaver {
@@ -56,10 +66,20 @@ impl FileSaver {
 
     /// Copy under `name`.
     pub fn save_as(&mut self, file_url: QString, folder: QString, name: QString) {
+        self.queue(&file_url, &folder, &name, false);
+    }
+
+    /// Copy under `name` unless already there, to hand on.
+    pub fn open_as(&mut self, file_url: QString, folder: QString, name: QString) {
+        self.queue(&file_url, &folder, &name, true);
+    }
+
+    fn queue(&mut self, file_url: &QString, folder: &QString, name: &QString, open: bool) {
         self.waiting.push_back(Request {
             source: local_path(&file_url.to_string()),
             folder: folder.to_string(),
             name: name.to_string(),
+            open,
         });
         // One at a time: answers in order.
         if !self.busy {
@@ -73,10 +93,12 @@ impl FileSaver {
     fn next(&mut self) {
         while let Some(request) = self.waiting.pop_front() {
             let ptr: QPointer<Self> = QPointer::from(&*self);
+            let open = request.open;
             let done = queued_callback(move |result: Result<String, String>| {
                 // Page closed mid-copy: copy still made.
                 let Some(this) = ptr.as_pinned() else { return };
                 match result {
+                    Ok(path) if open => this.borrow().opened(path.into()),
                     Ok(path) => this.borrow().saved(path.into()),
                     Err(message) => this.borrow().error(message.into()),
                 }
@@ -85,7 +107,12 @@ impl FileSaver {
             let started = std::thread::Builder::new()
                 .name("piirit-save".into())
                 .spawn(move || {
-                    done(copy_into(&request.source, &request.folder, &request.name));
+                    done(copy_into(
+                        &request.source,
+                        &request.folder,
+                        &request.name,
+                        request.open,
+                    ));
                 });
             match started {
                 Ok(_) => return,
@@ -101,8 +128,13 @@ impl FileSaver {
 static COPYING: Mutex<()> = Mutex::new(());
 
 /// Copy `source` to `folder` as `name` (empty/separators: source's), numbered if taken. Returns
-/// path.
-pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String, String> {
+/// path. `reuse`: file of that name (or numbered) with same content is returned, nothing copied.
+pub(crate) fn copy_into(
+    source: &str,
+    folder: &str,
+    name: &str,
+    reuse: bool,
+) -> Result<String, String> {
     if source.is_empty() {
         return Err("nothing to save".to_string());
     }
@@ -123,7 +155,10 @@ pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String
         .map_err(|err| format!("cannot create {}: {err}", folder.display()))?;
     // Poisoned: safe, name re-picked.
     let _copying = COPYING.lock().unwrap_or_else(PoisonError::into_inner);
-    let target = free_name(folder, &name);
+    let (target, there) = free_name(folder, &name, reuse.then_some(source));
+    if there {
+        return Ok(target.to_string_lossy().into_owned());
+    }
     std::fs::copy(source, &target).map_err(|err| {
         format!(
             "cannot copy {} to {}: {err}",
@@ -148,27 +183,59 @@ fn plain_name(name: &str) -> Option<String> {
     }
 }
 
-/// `name (2)`, `name (3)`... before extension: first free.
-fn free_name(folder: &std::path::Path, name: &str) -> std::path::PathBuf {
+/// `name (2)`, `name (3)`... before extension: first free (`false`), or first holding what
+/// `same_as` holds (`true`).
+fn free_name(
+    folder: &std::path::Path,
+    name: &str,
+    same_as: Option<&std::path::Path>,
+) -> (std::path::PathBuf, bool) {
     let first = folder.join(name);
-    if !first.exists() {
-        return first;
-    }
     let (stem, extension) = match name.rfind('.') {
         // Leading dot: hidden file, not extension.
         // `rfind` index is char boundary.
         Some(dot) if dot > 0 => name.split_at(dot),
         _ => (name, ""),
     };
-    (2..=u32::MAX)
-        .map(|number| folder.join(format!("{stem} ({number}){extension}")))
-        .find(|candidate| !candidate.exists())
-        .unwrap_or(first)
+    let numbered =
+        (2..=u32::MAX).map(|number| folder.join(format!("{stem} ({number}){extension}")));
+    for candidate in std::iter::once(first.clone()).chain(numbered) {
+        if !candidate.exists() {
+            return (candidate, false);
+        }
+        if same_as.is_some_and(|source| same_content(source, &candidate)) {
+            return (candidate, true);
+        }
+    }
+    (first, false)
+}
+
+/// Both readable, byte for byte equal.
+fn same_content(one: &std::path::Path, other: &std::path::Path) -> bool {
+    use std::io::Read;
+    let (Ok(one_size), Ok(other_size)) = (std::fs::metadata(one), std::fs::metadata(other)) else {
+        return false;
+    };
+    if one_size.len() != other_size.len() {
+        return false;
+    }
+    let (Ok(one), Ok(other)) = (std::fs::File::open(one), std::fs::File::open(other)) else {
+        return false;
+    };
+    let mut one = std::io::BufReader::new(one).bytes();
+    let mut other = std::io::BufReader::new(other).bytes();
+    loop {
+        match (one.next(), other.next()) {
+            (None, None) => return true,
+            (Some(Ok(left)), Some(Ok(right))) if left == right => {}
+            _ => return false,
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{copy_into, plain_name};
+    use super::{copy_into, plain_name, same_content};
 
     #[test]
     fn a_saved_file_keeps_its_name_and_a_second_copy_gets_a_number() {
@@ -179,13 +246,23 @@ mod tests {
         std::fs::write(&source, b"jpeg").expect("write source");
         let pictures = temp.join("Pictures");
 
-        let first = copy_into(&source.to_string_lossy(), &pictures.to_string_lossy(), "")
-            .expect("first copy");
+        let first = copy_into(
+            &source.to_string_lossy(),
+            &pictures.to_string_lossy(),
+            "",
+            false,
+        )
+        .expect("first copy");
         assert_eq!(first, pictures.join("holiday photo.jpg").to_string_lossy());
         assert_eq!(std::fs::read(&first).expect("read copy"), b"jpeg");
 
-        let second = copy_into(&source.to_string_lossy(), &pictures.to_string_lossy(), "")
-            .expect("second copy");
+        let second = copy_into(
+            &source.to_string_lossy(),
+            &pictures.to_string_lossy(),
+            "",
+            false,
+        )
+        .expect("second copy");
         assert_eq!(
             second,
             pictures.join("holiday photo (2).jpg").to_string_lossy()
@@ -199,16 +276,18 @@ mod tests {
             &crate::chat::local_path(&url),
             &pictures.to_string_lossy(),
             "",
+            false,
         )
         .expect("copy from a url");
         assert_eq!(saved, pictures.join("notes").to_string_lossy());
 
-        copy_into("", &pictures.to_string_lossy(), "").unwrap_err();
-        copy_into(&source.to_string_lossy(), "", "").unwrap_err();
+        copy_into("", &pictures.to_string_lossy(), "", false).unwrap_err();
+        copy_into(&source.to_string_lossy(), "", "", false).unwrap_err();
         copy_into(
             &temp.join("missing.png").to_string_lossy(),
             &pictures.to_string_lossy(),
             "",
+            false,
         )
         .unwrap_err();
         let _ = std::fs::remove_dir_all(&temp);
@@ -225,25 +304,62 @@ mod tests {
         let files = temp.join("Downloads");
         let files_str = files.to_string_lossy().into_owned();
 
-        let named = copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf").expect("copy");
+        let named =
+            copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf", false).expect("copy");
         assert_eq!(named, files.join("minutes.pdf").to_string_lossy());
         assert_eq!(std::fs::read(&named).expect("read copy"), b"%PDF");
 
-        let again = copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf").expect("copy");
+        let again =
+            copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf", false).expect("copy");
         assert_eq!(again, files.join("minutes (2).pdf").to_string_lossy());
 
         // Path-y name stays in asked folder.
-        let escaped =
-            copy_into(&blob.to_string_lossy(), &files_str, "../../escaped.pdf").expect("copy");
+        let escaped = copy_into(
+            &blob.to_string_lossy(),
+            &files_str,
+            "../../escaped.pdf",
+            false,
+        )
+        .expect("copy");
         assert_eq!(escaped, files.join("escaped.pdf").to_string_lossy());
 
         // No usable name: blob's own.
-        let unnamed = copy_into(&blob.to_string_lossy(), &files_str, "  ").expect("copy");
+        let unnamed = copy_into(&blob.to_string_lossy(), &files_str, "  ", false).expect("copy");
         assert_eq!(
             unnamed,
             files
                 .join("5d41402abc4b2a76b9719d911017c592.pdf")
                 .to_string_lossy()
+        );
+
+        // Handing on: same content there is reused, numbered copy included; other content
+        // under same name is left alone.
+        let reused =
+            copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf", true).expect("reuse");
+        assert_eq!(reused, files.join("minutes.pdf").to_string_lossy());
+        let other = temp.join("0cc175b9c0f1b6a831c399e269772661.pdf");
+        std::fs::write(&other, b"%PDX").expect("write other blob");
+        let fresh =
+            copy_into(&other.to_string_lossy(), &files_str, "minutes.pdf", true).expect("copy");
+        assert_eq!(fresh, files.join("minutes (3).pdf").to_string_lossy());
+        assert_eq!(std::fs::read(&fresh).expect("read copy"), b"%PDX");
+        let second =
+            copy_into(&other.to_string_lossy(), &files_str, "minutes.pdf", true).expect("reuse");
+        assert_eq!(
+            second, fresh,
+            "same content under a numbered name is not reused"
+        );
+        // Same length, last byte differs; and a shorter one.
+        assert!(!same_content(&blob, &other));
+        std::fs::write(&other, b"%PD").expect("shorten");
+        assert!(!same_content(&blob, &other));
+        assert!(!same_content(&blob, &temp.join("missing.pdf")));
+        assert!(!same_content(&temp.join("missing.pdf"), &blob));
+        assert!(same_content(&blob, &files.join("minutes (2).pdf")));
+        assert_eq!(
+            std::fs::read_dir(&files).expect("list").count(),
+            5,
+            "handing on made copies of what was already there"
         );
 
         assert_eq!(plain_name("a/b/c.txt").as_deref(), Some("c.txt"));

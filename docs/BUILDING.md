@@ -120,6 +120,7 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 | whisper.cpp (submodule, not crate; ggml inside) | voice message to text (`piirit-speech`) | runs Whisper on phone CPU (ARM NEON, dotprod), quantised models, no runtime deps; MIT |
 | Silero VAD v5.1.2 (ggml model file, `vendor/silero-vad`) | "No speech" check before transcribing | whisper.cpp runs it, nothing new linked; tells short speech from beeps, whisper's own score can't; MIT |
 | `rusqlite` 0.31 (+ `libsqlite3-sys`, `hashlink`, `hashbrown` 0.14, `ahash`, `zerocopy`, `fallible-*`, `smallvec`, `bitflags`; build: `pkg-config`, `vcpkg`, `version_check`) | voice transcripts (`transcripts/store.rs`), full-text index for search later | standard SQLite binding; links phone's `libsqlite3.so.0` (Harbour-allowed), no bundled copy; 0.32+ use `c"…"` literals (Rust 1.77) |
+| `miniz_oxide` 0.8 (+ `adler2`) | office file's stored page picture out of its zip (`page_preview.rs`) | inflate only, pure Rust, what `flate2` and std's backtrace use; zip directory read by hand: `zip` 2.x pulls a dozen crates, some past 1.75 |
 
 - `mp3lame-sys` carries LAME 3.100 C source, builds via its `configure` + `make` (C++ build host has both). Only non-Qt C dep; `rust/deny.toml` allows LGPL-3.0 for its two crates only (LGPL code conveyable in GPLv3 work).
 

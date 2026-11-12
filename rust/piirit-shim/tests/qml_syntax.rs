@@ -1454,6 +1454,43 @@ fn every_copy_goes_to_the_one_folder() {
     );
 }
 
+/// Chat file goes to another app as named copy (`AttachmentSaver.open`), never straight from
+/// chat's folder: other app's sandbox can't read it, and name there is a hash.
+#[test]
+fn a_chat_file_reaches_another_app_only_as_a_named_copy() {
+    let mut openers = Vec::new();
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
+        let name = file
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        if code.contains("aver.open(") {
+            openers.push(name.clone());
+        }
+        let direct = code.split("Qt.openUrlExternally(").skip(1).any(|rest| {
+            rest.split(')')
+                .next()
+                .unwrap_or_default()
+                .contains("fileUrl")
+        });
+        if direct {
+            offenders.push(name);
+        }
+    }
+    openers.sort();
+    assert_eq!(
+        openers,
+        ["ChatMediaView.qml", "ConversationPage.qml", "PictureView.qml"],
+        "a tap on a file in the chat, in a chat's Files, or Open in another app on a picture          no longer goes through AttachmentSaver.open"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these hand another app a file straight from the chat's folder: {offenders:?}"
+    );
+}
+
 /// Covered page must not stop its app.
 ///
 /// Handover dialog pushed over app; stopping on deactivate kills the request that asked

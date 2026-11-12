@@ -3,6 +3,7 @@ import QtQuick 2.5
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import Nemo.Thumbnailer 1.0
+import "../js/Media.js" as Media
 import "../js/Emoji.js" as Emoji
 import "../js/Format.js" as Format
 
@@ -120,7 +121,11 @@ Item {
     /// Fills bubble, not hugging text.
     readonly property bool wantsFullWidth: root.isPicture || root.isVideo
                                            || root.isSound || root.isCard
-                                           || app.shown
+                                           || app.shown || root.pagePreviewed
+    /// File draws first page above name, bubble wide, top 3/4 of a width high.
+    readonly property bool pagePreviewed: root.hasFile
+        && Media.previewKind(root.fileMime) !== ""
+        && root.fileMime.indexOf("openxmlformats") === -1
     /// Fallback row text; bubble measures it.
     readonly property string genericText: generic.text
     /// Tap opens picture, video, file; sound plays in place. Press passes to row: long press
@@ -139,6 +144,7 @@ Item {
             + (sound.item ? sound.item.height : 0)
             + (card.item ? card.item.height : 0)
             + (app.item ? app.item.height : 0)
+            + (page.item ? page.item.height + Theme.paddingSmall : 0)
             + generic.height
 
     /// Readable size.
@@ -653,6 +659,31 @@ Item {
         }
     }
 
+    // PDF or ODF: first page above name. Only kinds sure to have one: space kept from the
+    // start, row never grows after. OOXML (stored page rare): Files list only.
+    Loader {
+        id: page
+        readonly property bool shown: root.pagePreviewed
+        active: page.shown
+        sourceComponent: Component {
+            DocumentThumbnail {
+                objectName: "attachmentPage"
+                width: root.contentWidth
+                height: Math.round(width * 0.75)
+                fileUrl: "" + root.fileUrl
+                fileMime: root.fileMime
+                iconSize: Theme.iconSizeLarge
+
+                Rectangle {
+                    z: -1
+                    anchors.fill: parent
+                    radius: Theme.paddingSmall
+                    color: Theme.rgba(Theme.highlightDimmerColor, 0.6)
+                }
+            }
+        }
+    }
+
     // Any other file, undrawable webxdc too: named, sized, system on tap.
     Label {
         id: generic
@@ -662,7 +693,7 @@ Item {
                                       && !root.isSound && !root.isCard
                                       && !app.shown
         visible: generic.shown
-        y: 0
+        y: page.item ? page.item.height + Theme.paddingSmall : 0
         height: generic.shown ? implicitHeight : 0
         width: root.contentWidth
         truncationMode: TruncationMode.Fade

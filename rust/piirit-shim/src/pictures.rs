@@ -1,5 +1,5 @@
 //! Screen-ready pictures (avatar circle, tinted face, intro drawing, blurred backdrop, grey
-//! emoji), drawn by QML as plain `Image` (or `StyledText` `<img>`) of
+//! emoji, office file's stored page), drawn by QML as plain `Image` (or `StyledText` `<img>`) of
 //! `image://piirit/<kind>?<recipe>` ([`Recipe`]).
 //!
 //! Not `ShaderEffect`: Sailfish Qt 5.6 (fixed 5.15) hiding a persistent-scene-graph window
@@ -15,9 +15,10 @@
 #![allow(unsafe_code)]
 
 use cpp::cpp;
-use qmetaobject::QString;
+use qmetaobject::{QByteArray, QString};
 
 cpp! {{
+    #include <QtCore/QBuffer>
     #include <QtCore/QUrl>
     #include <QtGui/QImage>
     #include <QtGui/QImageReader>
@@ -57,7 +58,29 @@ cpp! {{
         if (kind < 0) {
             return QImage();
         }
-        QImageReader reader(piirit_local(file));
+        QBuffer stored;
+        QImageReader reader;
+        if (kind == 4) {
+            QString local = piirit_local(file);
+            QByteArray bytes;
+            bool found = rust!(PiiritPictures_page [local: &QString as "const QString &", bytes: &mut QByteArray as "QByteArray &"] -> bool as "bool" {
+                match crate::page_preview::embedded(std::path::Path::new(&local.to_string())) {
+                    Some(picture) => {
+                        *bytes = QByteArray::from(picture.as_slice());
+                        true
+                    }
+                    None => false,
+                }
+            });
+            if (!found) {
+                return QImage();
+            }
+            stored.setData(bytes);
+            stored.open(QIODevice::ReadOnly);
+            reader.setDevice(&stored);
+        } else {
+            reader.setFileName(piirit_local(file));
+        }
         // Decode at drawn size (12 MP photo = 48 MB for 200 px circle): covering draw in own
         // proportions, never above natural.
         QSize natural = reader.size();
@@ -95,6 +118,12 @@ cpp! {{
                                          Qt::SmoothTransformation);
             scaled = cover.copy((cover.width() - want.width()) / 2,
                                 (cover.height() - want.height()) / 2,
+                                want.width(), want.height());
+        } else if (kind == 4) {
+            // Page: top kept, where title is.
+            QImage cover = source.scaled(want, Qt::KeepAspectRatioByExpanding,
+                                         Qt::SmoothTransformation);
+            scaled = cover.copy((cover.width() - want.width()) / 2, 0,
                                 want.width(), want.height());
         } else {
             scaled = source.scaled(want, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -198,6 +227,8 @@ pub enum Kind {
     Blur = 2,
     /// Emoji picture, grey, shaded toward text colour.
     Emoji = 3,
+    /// Office file's stored first page (`page_preview.rs`), top of it.
+    Page = 4,
 }
 
 /// Colour as straight channels.
@@ -288,6 +319,7 @@ impl Recipe {
             "ink" => Kind::Ink,
             "blur" => Kind::Blur,
             "emoji" => Kind::Emoji,
+            "page" => Kind::Page,
             _ => return None,
         };
         let mut pairs = Vec::new();
@@ -351,6 +383,7 @@ impl Recipe {
             Kind::Ink => self.colour_ink(pixels, width, height, stride),
             Kind::Blur => blur(pixels, width, height, stride, self.radius),
             Kind::Emoji => self.grey_emoji(pixels, width, height, stride),
+            Kind::Page => {}
         }
     }
 

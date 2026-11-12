@@ -33,6 +33,8 @@ piirit-video = { path = "../piirit-video" }
 # Voice message transcription (src/transcripts.rs). whisper.cpp from source.
 piirit-speech = { path = "../piirit-speech" }
 rusqlite = { version = "0.31", default-features = false }
+# Office file's stored page picture (src/page_preview.rs): inflate only.
+miniz_oxide = "0.8"
 
 [build-dependencies]
 cpp_build = "0.5"

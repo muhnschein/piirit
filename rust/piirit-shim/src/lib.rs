@@ -51,6 +51,7 @@ mod media;
 mod mic_watch;
 mod models;
 mod mute;
+mod page_preview;
 mod pictures;
 mod prefetch;
 mod profile;
