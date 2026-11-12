@@ -482,6 +482,8 @@ pub fn prepare_media_plugins() {
     for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
         std::env::set_var(name, value);
     }
+    // MEASURE-301 (temporary): sound server buffers stay 25 ms under smaller engine latency.
+    std::env::set_var("PULSE_LATENCY_MSEC", "25");
     keep_pulse_properties();
 }
 

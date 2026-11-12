@@ -104,6 +104,8 @@ Item {
         if (!WebEngine.isInitialized()) {
             return
         }
+        // MEASURE-301 (temporary): smaller audio callback latency.
+        WebEngineSettings.setPreference("media.cubeb_latency_mtg_frames", 256, WebEngineSettings.IntPref)
         var where = root.allowed ? root.url : ""
         root.grant(root.authorityOf(where))
         root.target = where
