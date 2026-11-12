@@ -1,5 +1,5 @@
 // Public chatmail relays for pick lists (profile dialog, add-relay page).
-// chatmail.at/relays snapshot, 2026-10-24, partial. Refresh by hand; drop
+// chatmail.at/relays snapshot, 2026-11-12, partial. Refresh by hand; drop
 // relays unlisted there. Library: nothing translated, one shared copy.
 .pragma library
 
@@ -27,7 +27,8 @@ var list = [
     { domain: "uninterest.ing", location: "Elk Grove Village, USA" },
     { domain: "sweetfern.net", location: "Ashburn, USA" },
     { domain: "delta.disobey.net", location: "Roon, Netherlands" },
-    { domain: "toque.im", location: "Quebec, Canada" }
+    { domain: "toque.im", location: "Quebec, Canada" },
+    { domain: "delta.firx.org", location: "Denmark" }
 ]
 
 /// Row label: relay, then where or for whom.
