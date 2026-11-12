@@ -505,6 +505,8 @@ Item {
                         }
                         MenuItem {
                             objectName: "openItem"
+                            // Voice plays in row.
+                            visible: model.view_type !== "Voice"
                             //: Hands the attachment to whatever else on the phone
                             //: handles files of its kind.
                             text: qsTr("Open in another app")

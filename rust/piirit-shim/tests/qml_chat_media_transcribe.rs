@@ -229,6 +229,16 @@ fn the_audio_list_transcribes_a_chats_voice_messages() {
             "menu-transcribe",
             call!("offered", q!("mediaRow13"), q!("transcribeItem")),
         );
+        common::record(
+            &s,
+            "menu-open",
+            call!("offered", q!("mediaRow13"), q!("openItem")),
+        );
+        common::record(
+            &s,
+            "menu-save",
+            call!("offered", q!("mediaRow13"), q!("saveItem")),
+        );
 
         common::record(&s, "count-two", call!("counts", 2));
         common::record(&s, "two-left", call!("pulley"));
@@ -295,6 +305,13 @@ fn the_audio_list_transcribes_a_chats_voice_messages() {
         (value("menu-copy"), value("menu-transcribe")),
         ("false".to_string(), "true".to_string()),
         "the row menu should offer Transcribe before there is a transcript. {context}"
+    );
+    // #297: Open handed voice message to other app, which failed.
+    assert_eq!(
+        (value("menu-open"), value("menu-save")),
+        ("false".to_string(), "true".to_string()),
+        "the Audio list offers to open a voice message in another app, or no longer \
+         offers to save it. {context}"
     );
     assert_eq!(
         value("two-left"),
