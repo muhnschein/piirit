@@ -121,11 +121,11 @@ Item {
     /// Fills bubble, not hugging text.
     readonly property bool wantsFullWidth: root.isPicture || root.isVideo
                                            || root.isSound || root.isCard
-                                           || app.shown
-    /// File row draws first page above name; MessageDelegate.bodyWidth makes room by same rule.
-    readonly property bool pagePreviewed: Media.previewKind(root.fileMime) !== ""
+                                           || app.shown || root.pagePreviewed
+    /// File draws first page above name, bubble wide, top 3/4 of a width high.
+    readonly property bool pagePreviewed: root.hasFile
+        && Media.previewKind(root.fileMime) !== ""
         && root.fileMime.indexOf("openxmlformats") === -1
-    readonly property real pageSide: Math.min(root.contentWidth, Theme.itemSizeExtraLarge)
     /// Fallback row text; bubble measures it.
     readonly property string genericText: generic.text
     /// Tap opens picture, video, file; sound plays in place. Press passes to row: long press
@@ -663,13 +663,13 @@ Item {
     // start, row never grows after. OOXML (stored page rare): Files list only.
     Loader {
         id: page
-        readonly property bool shown: generic.shown && root.pagePreviewed
+        readonly property bool shown: root.pagePreviewed
         active: page.shown
         sourceComponent: Component {
             DocumentThumbnail {
                 objectName: "attachmentPage"
-                width: root.pageSide
-                height: width
+                width: root.contentWidth
+                height: Math.round(width * 0.75)
                 fileUrl: "" + root.fileUrl
                 fileMime: root.fileMime
                 iconSize: Theme.iconSizeLarge

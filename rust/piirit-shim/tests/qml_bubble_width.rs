@@ -70,14 +70,20 @@ const PROBE_QML: &str = r"
                    + (preview ? preview.wantsFullWidth : '-')
                    + '/' + (row.bodyWidth === row.maxWidth)
         }
-        // Body width, and first-page tile's ('-' for none built).
+        // Bubble at full width; first-page tile ('-' for none built) as wide, 3/4 as high,
+        // name right below it and nothing else in the preview.
         function pageRoom() {
             var row = delegate.item
             var page = findIn(row, 'attachmentPage')
             var name = findIn(row, 'attachmentLabel')
             var preview = findIn(row, 'attachment')
-            return row.bodyWidth + '/' + (page ? page.width : '-')
-                   + '/' + name.y + '/' + (preview.height - name.height)
+            var full = row.attachmentFillsBubble + '/' + preview.wantsFullWidth
+                       + '/' + (row.bodyWidth === row.maxWidth)
+            if (!page) { return full + '/-/' + name.y }
+            return full + '/' + (page.width === row.bodyWidth && page.width > 300)
+                   + '/' + (page.height === Math.round(page.width * 0.75))
+                   + '/' + (name.y === page.height + 4)
+                   + '/' + (preview.height === name.y + name.height)
         }
     }
 ";
@@ -310,23 +316,22 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
         );
     }
 
-    // Stub theme: itemSizeExtraLarge 180. PDF, ODF: page tile, bubble holds it. OOXML (stored
-    // page rare), other files: name only, bubble as narrow as before.
+    // PDF, ODF: page fills bubble as picture does. OOXML (stored page rare), other files: name
+    // only, bubble as narrow as before.
     for label in ["pdf", "odt"] {
         assert_eq!(
             value(&format!("{label}-page")),
-            "180/180/184/184",
-            "a {label}'s bubble is not as wide as its first page, or its name not below \
-             the page. {context}"
+            "true/true/true/true/true/true/true",
+            "a {label}'s first page does not fill its bubble with the name right below \
+             (row fills/preview fills/bubble full/page wide/page 3:4/name below/nothing \
+             else). {context}"
         );
     }
     for label in ["docx", "zip"] {
-        let room = value(&format!("{label}-page"));
-        let (body, page) = room.split_once('/').unwrap_or((room.as_str(), ""));
-        assert_eq!(page, "-/0/0", "a {label} got a page tile. {context}");
-        assert!(
-            body.parse::<f64>().is_ok_and(|width| width < 180.0),
-            "a {label}'s bubble made room for a page it does not draw. {context}"
+        assert_eq!(
+            value(&format!("{label}-page")),
+            "false/false/false/-/0",
+            "a {label} got a page tile or a wide bubble. {context}"
         );
     }
 }

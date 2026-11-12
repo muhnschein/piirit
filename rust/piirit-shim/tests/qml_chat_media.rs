@@ -394,6 +394,7 @@ fn a_chats_media_has_pages_of_its_own_behind_rows() {
         record!("file-page-type", get!("documentPdf", "mimeType"));
         record!("file-page-source", get!("documentPdf", "source"));
         record!("file-page-stored", get!("documentPage", "source"));
+        record!("file-page-twice", get!("attachmentPage", "objectName"));
         record!("file-caption", get!("rowCaption", "text"));
         record!("files-title", get!("pageHeader", "title"));
         call!("setDownloads", QString::from(folder.clone()));
@@ -764,6 +765,11 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         value("file-page-source"),
         "file:///tmp/piirit-fake/6f5902ac237024bdd0c176cb93063dc4.pdf",
         "the thumbnailer is not asked for the PDF's first page. {context}"
+    );
+    assert_eq!(
+        value("file-page-twice"),
+        "missing:attachmentPage",
+        "the files row drew the page a second time, as a chat bubble does. {context}"
     );
     assert_eq!(
         value("file-page-stored"),

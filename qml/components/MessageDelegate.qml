@@ -242,9 +242,6 @@ Item {
         Math.max(textMetric.implicitWidth,
                  root.bigPictures.width,
                  attachmentMetric.implicitWidth,
-                 root.hasFile && Media.previewKind(root.fileMime) !== ""
-                 && root.fileMime.indexOf("openxmlformats") === -1
-                 ? Theme.itemSizeExtraLarge : 0,
                  root.isCall ? callRow.wantedWidth : 0,
                  locationRow.shown ? locationRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
@@ -258,6 +255,8 @@ Item {
             || root.viewType === "Gif" || root.viewType === "Video"
             || root.viewType === "Audio" || root.viewType === "Voice"
             || root.viewType === "Vcard"
+            || (Media.previewKind(root.fileMime) !== ""
+                && root.fileMime.indexOf("openxmlformats") === -1)
             || (root.viewType === "Webxdc" && root.appsEnabled
                 && root.webxdcName.length > 0))
     /// Bubble width: content, widened to hold offer.
