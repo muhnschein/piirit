@@ -619,9 +619,11 @@ SilicaListView {
                 }
                 MenuItem {
                     objectName: "openItem"
-                    // Files only; not pictures/videos (own page) or Webxdc while apps on.
+                    // Files only; not pictures/videos (own page), voice (plays in row) or Webxdc
+                    // while apps on.
                     visible: model.file_path.length > 0
                              && !root.opensOnItsOwnPage(model.view_type)
+                             && model.view_type !== "Voice"
                              && !(root.appsEnabled
                                   && model.view_type === "Webxdc")
                     text: qsTr("Open")

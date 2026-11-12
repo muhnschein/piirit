@@ -6,7 +6,8 @@
 //! Webxdc app: no Open where apps are on (run, not handed over); off, .xdc offered like a note.
 //! Save always offered. Tap: `qml_row_tap.rs`.
 //!
-//! Picture and video: no menu offers; their page's pull-down already has Open and Save.
+//! Picture and video: no menu offers; their page's pull-down already has Open and Save. Voice:
+//! Save, no Open; plays in its row.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -103,6 +104,39 @@ const PROBE_QML: &str = r"
                 file_name: 'clip.mp4',
                 file_mime: 'video/mp4', file_bytes: 204800,
                 view_type: 'Video', image_width: 0, image_height: 0,
+                is_new: false, has_html: false, is_edited: false,
+                download_state: 'Done', vcard_name: '', vcard_addr: '',
+                vcard_color: '', webxdc_name: '', webxdc_document: '',
+                webxdc_summary: '', webxdc_icon: '', reactions: '',
+                my_reaction: '', loaded: true
+            })
+            // A voice message (plays in its row) and a sound file.
+            rows.append({
+                message_id: 12, text: '', styled_text: '',
+                is_outgoing: false, is_info: false, show_padlock: true,
+                state: 16, timestamp: 1700000500, day_number: 19675,
+                sender_name: 'Ada', sender_color: '#00875a',
+                is_forwarded: false, quote_text: '', quote_author: '',
+                file_path: '/tmp/piirit-menu/voice.mp3',
+                file_name: '',
+                file_mime: 'audio/mpeg', file_bytes: 8192,
+                view_type: 'Voice', image_width: 0, image_height: 0,
+                is_new: false, has_html: false, is_edited: false,
+                download_state: 'Done', vcard_name: '', vcard_addr: '',
+                vcard_color: '', webxdc_name: '', webxdc_document: '',
+                webxdc_summary: '', webxdc_icon: '', reactions: '',
+                my_reaction: '', loaded: true
+            })
+            rows.append({
+                message_id: 13, text: '', styled_text: '',
+                is_outgoing: false, is_info: false, show_padlock: true,
+                state: 16, timestamp: 1700000600, day_number: 19675,
+                sender_name: 'Ada', sender_color: '#00875a',
+                is_forwarded: false, quote_text: '', quote_author: '',
+                file_path: '/tmp/piirit-menu/song.mp3',
+                file_name: 'song.mp3',
+                file_mime: 'audio/mpeg', file_bytes: 81920,
+                view_type: 'Audio', image_width: 0, image_height: 0,
                 is_new: false, has_html: false, is_edited: false,
                 download_state: 'Done', vcard_name: '', vcard_addr: '',
                 vcard_color: '', webxdc_name: '', webxdc_document: '',
@@ -268,6 +302,9 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         );
         record!("video-open", call!("offered", 4, QString::from("openItem")));
         record!("video-save", call!("offered", 4, QString::from("saveItem")));
+        record!("voice-open", call!("offered", 5, QString::from("openItem")));
+        record!("voice-save", call!("offered", 5, QString::from("saveItem")));
+        record!("sound-open", call!("offered", 6, QString::from("openItem")));
         record!("raised", call!("raisedSignal"));
         (*engine_ptr).quit();
     });
@@ -346,6 +383,19 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
         ("false".to_string(), "false".to_string()),
         "a video's menu offers Open or Save, which the page a tap opens \
          already carries on its pull-down. {context}"
+    );
+
+    // #297: Open handed voice message to other app, which failed.
+    assert_eq!(
+        (value("voice-open"), value("voice-save")),
+        ("false".to_string(), "true".to_string()),
+        "a voice message's menu offers Open, though it plays in its row, or no \
+         longer offers Save. {context}"
+    );
+    assert_eq!(
+        value("sound-open"),
+        "true",
+        "a sound file someone sent is no longer offered to other apps. {context}"
     );
 
     assert_eq!(

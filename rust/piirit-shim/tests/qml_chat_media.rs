@@ -396,6 +396,7 @@ fn a_chats_media_has_pages_of_its_own_behind_rows() {
         record!("file-page-stored", get!("documentPage", "source"));
         record!("file-page-twice", get!("attachmentPage", "objectName"));
         record!("file-caption", get!("rowCaption", "text"));
+        record!("file-open", get!("openItem", "visible"));
         record!("files-title", get!("pageHeader", "title"));
         call!("setDownloads", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
@@ -779,6 +780,11 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     assert!(
         value("file-caption").starts_with("Ada Lovelace · "),
         "the row does not say who sent the file and when. {context}"
+    );
+    assert_eq!(
+        value("file-open"),
+        "true",
+        "a file's menu no longer offers to open it in another app. {context}"
     );
 
     // Audio: player row; apps: name from core.
