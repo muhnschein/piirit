@@ -23,6 +23,8 @@ Item {
     /// Page picture drawn (PDF: asked for; thumbnailer tells nothing back).
     readonly property bool drawn: stored.status === Image.Ready
 
+    clip: true
+
     Image {
         objectName: "documentIcon"
         anchors.centerIn: parent
@@ -34,12 +36,14 @@ Item {
     }
 
     Loader {
-        anchors.fill: parent
         active: root.kind === "pdf"
         sourceComponent: Component {
-            // Draws over icon once made; failed: stays clear, icon shows.
+            // Draws over icon once made; failed: stays clear, icon shows. Thumbnailer crops to
+            // the middle: asked for a whole A4 page, top of it shown, where title is.
             Thumbnail {
                 objectName: "documentPdf"
+                width: root.width
+                height: Math.max(root.height, Math.round(width * 1.414))
                 sourceSize.width: width
                 sourceSize.height: height
                 mimeType: "application/pdf"

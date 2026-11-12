@@ -39,6 +39,7 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        function clipped(at) { return '' + shown[at].clip }
         function of(at, name, property) {
             var item = findIn(shown[at], name)
             return item ? '' + item[property] : '-'
@@ -181,6 +182,25 @@ fn a_document_shows_its_first_page_where_one_can_be_had_and_its_icon_where_not()
             (*steps_ptr).push((label, call!("state", at)));
         }
         (*steps_ptr).push((
+            "pdf-shape",
+            format!(
+                "{}x{} clip={}",
+                call!(
+                    "of",
+                    0,
+                    QString::from("documentPdf"),
+                    QString::from("width")
+                ),
+                call!(
+                    "of",
+                    0,
+                    QString::from("documentPdf"),
+                    QString::from("height")
+                ),
+                call!("clipped", 0)
+            ),
+        ));
+        (*steps_ptr).push((
             "pdf-source",
             call!(
                 "of",
@@ -209,6 +229,11 @@ fn a_document_shows_its_first_page_where_one_can_be_had_and_its_icon_where_not()
             "pdf",
             "kind=pdf drawn=false icon=true page=false pdf=application/pdf",
             "a PDF is not asked of the thumbnailer over its icon",
+        ),
+        (
+            "pdf-shape",
+            "96x136 clip=true",
+            "a PDF is not asked for as a whole page with its top shown",
         ),
         (
             "pdf-source",
