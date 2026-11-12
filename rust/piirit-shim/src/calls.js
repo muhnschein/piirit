@@ -100,117 +100,6 @@
         xhr.send(next.body);
     }
 
-    /* MEASURE-301: temp. Raw mic; beep (1 kHz) onsets of far and mic sound in one audio clock. */
-    var m301 = { ctx: null, keep: [] };
-    function m301log(text) {
-        post("/log", "M301 " + text);
-    }
-    function m301tap(stream, name) {
-        try {
-            if (!m301.ctx) {
-                m301.ctx = new AudioContext();
-                m301log("ctx rate=" + m301.ctx.sampleRate + " base=" + m301.ctx.baseLatency
-                    + " out=" + m301.ctx.outputLatency);
-            }
-            var ctx = m301.ctx;
-            var src = ctx.createMediaStreamSource(stream);
-            var proc = ctx.createScriptProcessor(256, 1, 1);
-            var quiet = ctx.createGain();
-            quiet.gain.value = 0;
-            var k = 2 * Math.cos(2 * Math.PI * 1000 / ctx.sampleRate);
-            var floor = -1;
-            var run = 0;
-            var first = 0;
-            var firstWall = 0;
-            var firstNow = 0;
-            var lastOn = -10;
-            var count = 0;
-            proc.onaudioprocess = function (e) {
-                var d = e.inputBuffer.getChannelData(0);
-                var a = 0;
-                var b = 0;
-                for (var i = 0; i < d.length; i++) {
-                    var t = d[i] + k * a - b;
-                    b = a;
-                    a = t;
-                }
-                var p = (a * a + b * b - k * a * b) / (d.length * d.length);
-                if (floor < 0) {
-                    floor = p;
-                }
-                var limit = Math.max(floor * 20, 1e-9);
-                if (p > limit) {
-                    if (run === 0) {
-                        first = e.playbackTime;
-                        firstWall = Date.now();
-                        firstNow = ctx.currentTime;
-                    }
-                    run += 1;
-                    if (run === 3 && first - lastOn > 0.5) {
-                        lastOn = first;
-                        count += 1;
-                        if (count <= 60) {
-                            m301log(name + " audio=" + (first * 1000).toFixed(1) + " wall=" + firstWall
-                                + " now=" + (firstNow * 1000).toFixed(1) + " p=" + p.toExponential(2)
-                                + " floor=" + floor.toExponential(2));
-                        }
-                    }
-                } else {
-                    run = 0;
-                }
-                floor += 0.02 * (Math.min(p, 2 * floor + 1e-12) - floor);
-            };
-            src.connect(proc);
-            proc.connect(quiet);
-            quiet.connect(ctx.destination);
-            m301.keep.push(src, proc, quiet);
-            m301log(name + " tapped");
-        } catch (err) {
-            m301log(name + " tap failed " + err);
-        }
-    }
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        var m301gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-        navigator.mediaDevices.getUserMedia = function (wanted) {
-            if (wanted && wanted.audio) {
-                wanted.audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
-            }
-            return m301gum(wanted).then(function (stream) {
-                if (stream.getAudioTracks().length) {
-                    m301tap(new MediaStream(stream.getAudioTracks()), "mic");
-                }
-                return stream;
-            });
-        };
-    }
-    function m301watch(connection) {
-        connection.addEventListener("track", function (ev) {
-            if (ev.track.kind === "audio") {
-                m301tap(new MediaStream([ev.track]), "far");
-            }
-        });
-        var told = 0;
-        window.setInterval(function () {
-            connection.getStats().then(function (stats) {
-                stats.forEach(function (s) {
-                    if (s.type === "inbound-rtp" && s.kind === "audio" && told < 12) {
-                        told += 1;
-                        if (told === 1) {
-                            m301log("stats keys " + Object.keys(s).join(","));
-                        }
-                        var picked = [];
-                        for (var key in s) {
-                            if (/jitter|delay|buffer|conceal|emitted|samples|packets/i.test(key)) {
-                                picked.push(key + "=" + s[key]);
-                            }
-                        }
-                        m301log("stats " + picked.join(" "));
-                    }
-                });
-            });
-        }, 5000);
-    }
-
     /* Video (call_video.js, served ahead): hears every peer connection, takes camera commands. */
     piiritVideo.attach(post);
 
@@ -253,7 +142,6 @@
                 connection.setConfiguration = function () {};
             }
             piiritVideo.watch(connection);
-            m301watch(connection);
             connection.addEventListener("iceconnectionstatechange", function () {
                 post("/state", connection.iceConnectionState);
             });
