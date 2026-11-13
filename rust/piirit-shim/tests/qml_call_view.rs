@@ -6,6 +6,9 @@
 //!
 //! Nor does page come up before call's sound has its way out (`allowed`): mic opened before sound
 //! is moved brings phone's sound server down when it is.
+//!
+//! With page, view cuts engine's audio latency (mic sound queues in engine 8x that long), and
+//! puts usual back when it goes: setting is engine-wide.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(unsafe_code, unused_unsafe, clippy::borrow_as_ptr, clippy::expect_used)]
@@ -41,6 +44,8 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function allow(on) { WebEngine.notified = ''; holder.item.allowed = on; return said() }
+        function drop() { WebEngine.notified = ''; holder.source = ''; return 'ok' }
+        function heard() { return WebEngine.notified.replace(/\n/g, ';') }
     }
 ";
 
@@ -91,6 +96,11 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
         (*steps_ptr).push(("held", call!("said")));
         (*steps_ptr).push(("allowed", call!("allow", true)));
         (*steps_ptr).push(("kept", call!("allow", false)));
+        (*steps_ptr).push(("drop", call!("drop")));
+    });
+    // Own turn: view goes on loop's next turn.
+    plan.after(0, move || unsafe {
+        (*steps_ptr).push(("gone", call!("heard")));
         (*engine_ptr).quit();
     });
 
@@ -120,6 +130,12 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
         "once the engine was up, the page's origin was not granted the \
          microphone and the view pointed at the page: {up}. {context}"
     );
+    let tuned = "pref media.cubeb_latency_mtg_frames=256 kind=2;";
+    assert!(
+        up.contains(&format!("{tuned}|")),
+        "with the page, the engine's audio latency was not cut, after the grants: {up}. \
+         {context}"
+    );
     assert_eq!(value("held-load"), "ok", "{context}");
     assert_eq!(
         value("held"),
@@ -129,12 +145,20 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
     let allowed = value("allowed");
     assert!(
         allowed.starts_with("embedui:perms {\"msg\":\"add\",\"uri\":\"http://127.0.0.1:4242\"")
-            && allowed.ends_with(&format!(";|{url}|{url}")),
-        "allowed, the page was not granted and gone to: {allowed}. {context}"
+            && allowed.ends_with(&format!(";{tuned}|{url}|{url}")),
+        "allowed, the page was not granted, latency cut and gone to: {allowed}. {context}"
     );
     assert_eq!(
         value("kept"),
         format!("|{url}|{url}"),
         "a page that was up was taken down, or its grant taken back. {context}"
+    );
+    let gone = value("gone");
+    assert!(
+        gone.contains("\"msg\":\"remove\"")
+            && gone.ends_with("pref media.cubeb_latency_mtg_frames=1200 kind=2;")
+            && gone.matches("pref ").count() == gone.matches("=1200 ").count(),
+        "gone, the view did not take its grant back and put the engine's usual audio latency \
+         back: {gone}. {context}"
     );
 }

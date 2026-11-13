@@ -476,7 +476,8 @@ fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
 }
 
 /// Before any thread: point Gecko at H.264 encoder (`encoder_path`), give it call log path
-/// (plugin process inherits). `PIIRIT_GMP_DIR` overrides encoder. Ensures `PULSE_PROP`.
+/// (plugin process inherits). `PIIRIT_GMP_DIR` overrides encoder. Ensures `PULSE_PROP`,
+/// `PULSE_LATENCY`.
 pub fn prepare_media_plugins() {
     let log = crate::qr::cache_file(LOG_FILE).ok();
     for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
@@ -485,18 +486,24 @@ pub fn prepare_media_plugins() {
     keep_pulse_properties();
 }
 
-/// Ensure `PULSE_PROP` exists, keep value. Single-threaded only: see `label_call_audio`.
+/// Ensure `PULSE_PROP`, `PULSE_LATENCY` exist, keep values. Single-threaded only: see
+/// `label_call_audio`.
 fn keep_pulse_properties() {
-    let session = match std::env::var(PULSE_PROP) {
-        Ok(session) => session,
-        Err(std::env::VarError::NotPresent) => {
-            std::env::set_var(PULSE_PROP, "");
-            String::new()
-        }
-        // Not ours to read or overwrite.
-        Err(std::env::VarError::NotUnicode(_)) => return,
-    };
-    SESSION_PULSE_PROP.get_or_init(|| session);
+    for (name, kept) in [
+        (PULSE_PROP, &SESSION_PULSE_PROP),
+        (PULSE_LATENCY, &SESSION_PULSE_LATENCY),
+    ] {
+        let session = match std::env::var(name) {
+            Ok(session) => session,
+            Err(std::env::VarError::NotPresent) => {
+                std::env::set_var(name, "");
+                String::new()
+            }
+            // Not ours to read or overwrite.
+            Err(std::env::VarError::NotUnicode(_)) => continue,
+        };
+        kept.get_or_init(|| session);
+    }
 }
 
 /// `PulseAudio` connection properties, read at open.
@@ -508,7 +515,17 @@ const CALL_ROLE: &str = "media.role=voip";
 /// `PULSE_PROP` as found, by `prepare_media_plugins`. Unset: var never written.
 static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
 
-/// Label call sound as call while talking.
+/// Sound server buffer time (ms) of streams opened while set; empty: stream's own.
+const PULSE_LATENCY: &str = "PULSE_LATENCY_MSEC";
+
+/// Engine's usual buffer time. Call cuts engine's latency (`CallView.qml` `callLatency`),
+/// which shrinks these too: sound drops out (measured, #301). Held here instead.
+const CALL_LATENCY_MS: &str = "25";
+
+/// `PULSE_LATENCY` as found. Unset: var never written.
+static SESSION_PULSE_LATENCY: OnceLock<String> = OnceLock::new();
+
+/// Label call sound as call while talking, hold its sound server buffers (`CALL_LATENCY_MS`).
 ///
 /// Engine sets no role, so sound server used media volume (`x-maemo-match.table`) while volume
 /// keys set call volume: keys did nothing. `PULSE_PROP` role applies to connections opened
@@ -519,6 +536,18 @@ static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
 pub fn label_call_audio(talking: bool) {
     if let Some(session) = SESSION_PULSE_PROP.get() {
         std::env::set_var(PULSE_PROP, pulse_properties(session, talking));
+    }
+    if let Some(session) = SESSION_PULSE_LATENCY.get() {
+        std::env::set_var(PULSE_LATENCY, pulse_latency(session, talking));
+    }
+}
+
+/// `PULSE_LATENCY` value: session's if it set one, else call's while talking.
+fn pulse_latency(session: &str, talking: bool) -> &str {
+    if talking && session.trim().is_empty() {
+        CALL_LATENCY_MS
+    } else {
+        session
     }
 }
 
@@ -871,8 +900,9 @@ mod tests {
     use super::{
         back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
         facing_command, keep_pulse_properties, label_call_audio, log_line, media_environment,
-        media_plugins, microphone_command, percent_encode, pulse_properties, shown_command,
-        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE, PULSE_PROP,
+        media_plugins, microphone_command, percent_encode, pulse_latency, pulse_properties,
+        shown_command, CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE, PULSE_LATENCY,
+        PULSE_PROP,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1173,15 +1203,30 @@ mod tests {
     fn a_call_labels_the_sound_while_it_is_on_and_puts_it_back() {
         // Only test writing env.
         let read = || std::env::var(PULSE_PROP);
+        let latency = || std::env::var(PULSE_LATENCY);
         std::env::remove_var(PULSE_PROP);
+        std::env::remove_var(PULSE_LATENCY);
         label_call_audio(true);
         assert!(read().is_err(), "{:?}", read());
+        assert!(latency().is_err(), "{:?}", latency());
         keep_pulse_properties();
         assert_eq!(read().as_deref(), Ok(""));
+        assert_eq!(latency().as_deref(), Ok(""));
         label_call_audio(true);
         assert_eq!(read().as_deref(), Ok("media.role=voip"));
+        assert_eq!(latency().as_deref(), Ok("25"));
         label_call_audio(false);
         assert_eq!(read().as_deref(), Ok(""));
+        assert_eq!(latency().as_deref(), Ok(""));
+    }
+
+    #[test]
+    fn a_call_holds_the_sound_buffers_unless_the_session_set_its_own() {
+        assert_eq!(pulse_latency("", false), "");
+        assert_eq!(pulse_latency("", true), "25");
+        assert_eq!(pulse_latency(" ", true), "25");
+        assert_eq!(pulse_latency("60", true), "60");
+        assert_eq!(pulse_latency("60", false), "60");
     }
 
     #[test]

@@ -97,6 +97,20 @@ Item {
         root.granted = ""
     }
 
+    /// Engine's audio callback latency, frames. Engine queues mic sound in buffer of 8x
+    /// this and never drains it: usual 1200 (25 ms at 48 kHz) held voice ~135 ms, stalls
+    /// added more for good (#301). Sound server buffers stay 25 ms (call_host.rs).
+    readonly property int callLatency: 256
+    readonly property int usualLatency: 1200
+
+    /// Latency set for call; put back at end: engine-wide, hits webxdc apps too.
+    property bool tuned: false
+
+    function tune(frames) {
+        WebEngineSettings.setPreference("media.cubeb_latency_mtg_frames", frames,
+                                        WebEngineSettings.IntPref)
+    }
+
     /// Grant origin, then point view. Not before engine up (event loop after first
     /// import, i.e. first call): earlier requests dropped with warning, call opens
     /// on mic prompt.
@@ -106,6 +120,10 @@ Item {
         }
         var where = root.allowed ? root.url : ""
         root.grant(root.authorityOf(where))
+        if (where.length > 0) {
+            root.tune(root.callLatency)
+            root.tuned = true
+        }
         root.target = where
     }
 
@@ -122,7 +140,12 @@ Item {
         }
     }
     Component.onCompleted: root.go()
-    Component.onDestruction: root.revoke()
+    Component.onDestruction: {
+        root.revoke()
+        if (root.tuned) {
+            root.tune(root.usualLatency)
+        }
+    }
 
     // `active`: WebView.qml's binding (`shown`) until page up. Hidden document
     // pauses media (other end's voice): active for the call. Never-active view
