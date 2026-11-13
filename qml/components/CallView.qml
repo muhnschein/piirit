@@ -99,7 +99,7 @@ Item {
 
     /// Engine's audio callback latency, frames. Engine queues mic sound in buffer of 8x
     /// this and never drains it: usual 1200 (25 ms at 48 kHz) held voice ~135 ms, stalls
-    /// added more for good (#301). Sound server buffers stay 25 ms (call_host.rs).
+    /// added more for good (#301). Sound server buffers held at 50 ms (call_host.rs).
     readonly property int callLatency: 256
     readonly property int usualLatency: 1200
 

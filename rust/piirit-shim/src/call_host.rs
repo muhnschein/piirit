@@ -518,9 +518,9 @@ static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
 /// Sound server buffer time (ms) of streams opened while set; empty: stream's own.
 const PULSE_LATENCY: &str = "PULSE_LATENCY_MSEC";
 
-/// Engine's usual buffer time. Call cuts engine's latency (`CallView.qml` `callLatency`),
-/// which shrinks these too: sound drops out (measured, #301). Held here instead.
-const CALL_LATENCY_MS: &str = "25";
+/// Call cuts engine's latency (`CallView.qml` `callLatency`), which shrinks these too.
+/// Test phone, idle: at 35 ms and under ~7 % of voice lost, 40 and up none (#301).
+const CALL_LATENCY_MS: &str = "50";
 
 /// `PULSE_LATENCY` as found. Unset: var never written.
 static SESSION_PULSE_LATENCY: OnceLock<String> = OnceLock::new();
@@ -1214,7 +1214,7 @@ mod tests {
         assert_eq!(latency().as_deref(), Ok(""));
         label_call_audio(true);
         assert_eq!(read().as_deref(), Ok("media.role=voip"));
-        assert_eq!(latency().as_deref(), Ok("25"));
+        assert_eq!(latency().as_deref(), Ok("50"));
         label_call_audio(false);
         assert_eq!(read().as_deref(), Ok(""));
         assert_eq!(latency().as_deref(), Ok(""));
@@ -1223,8 +1223,8 @@ mod tests {
     #[test]
     fn a_call_holds_the_sound_buffers_unless_the_session_set_its_own() {
         assert_eq!(pulse_latency("", false), "");
-        assert_eq!(pulse_latency("", true), "25");
-        assert_eq!(pulse_latency(" ", true), "25");
+        assert_eq!(pulse_latency("", true), "50");
+        assert_eq!(pulse_latency(" ", true), "50");
         assert_eq!(pulse_latency("60", true), "60");
         assert_eq!(pulse_latency("60", false), "60");
     }
