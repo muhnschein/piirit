@@ -1,2 +1,3 @@
 module Sailfish.WebEngine
 singleton WebEngine 1.0 WebEngine.qml
+singleton WebEngineSettings 1.0 WebEngineSettings.qml

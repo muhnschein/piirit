@@ -642,8 +642,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-answered"),
-        "register:3",
-        "a video call does not ask the policy for its sound with video playback: the loudspeaker. {context}"
+        "register:1",
+        "an answered call did not first register the set that names its streams. {context}"
     );
     assert_eq!(
         value("engine-held"),
@@ -657,8 +657,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-had"),
-        "audio,acquire,release,unregister",
-        "the ring's set was not given back once the call's own was had. {context}"
+        "audio,register:3,acquire,release,unregister",
+        "a video call does not ask the policy for its sound with video playback (the loudspeaker), \
+         or the ring's set was not given back once the call's own was had. {context}"
     );
     assert_eq!(
         value("view"),
@@ -972,8 +973,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-given-back"),
-        "release,unregister",
-        "once the microphone shut, the call's set was not given back. {context}"
+        "release,unregister,release,unregister",
+        "once the microphone shut, the call's set and its naming set were not given back. {context}"
     );
     assert_eq!(
         value("audio-talking-over"),
