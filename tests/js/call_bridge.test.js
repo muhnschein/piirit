@@ -637,6 +637,99 @@ test("a camera that will not open says so every time it is asked for", async () 
         "a second failure is not news to the app: " + JSON.stringify(after));
 });
 
+/* Phone's cameras named as Gecko's plugins name them; front one dead (#328). */
+const NAMED_CAMERAS = [
+    { deviceId: "cam-r", label: "Droid rear camera", facing: "environment" },
+    { deviceId: "cam-f", label: "Droid front camera", facing: "user" },
+];
+const FRONT_DEAD = { cameras: NAMED_CAMERAS, cameraFails: (facing) => facing === "user" };
+
+test("a front camera that will not open makes way for the back one, and the call faces it", async () => {
+    const world = makeWorld(VIDEO, FRONT_DEAD);
+    const { connection, stream, picture, pageSwitch } = await page(world);
+
+    assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["camera-environment"],
+        "the back camera was not tried when the front one would not open");
+    assert.equal(videoSender(connection).track.label, "camera-environment");
+    assert.ok(world.log.some((line) => line.startsWith("gum:") && line.includes('"cam-r"')),
+        "the back camera was not asked for by its id: " + world.log);
+    assert.deepEqual(lastVideo(world),
+        { local: true, remote: false, localPainted: false, remotePainted: false, front: false, failed: false });
+    assert.equal(picture.style.transform, "none", "the back camera's picture is mirrored");
+    assert.equal(pageSwitch.on, true, "the page's switch went off though a camera is open");
+    assert.ok(posts(world, "/log").includes(
+        "camera would not open: NotReadableError: Failed to allocate videosource; trying the other camera"),
+        "the log does not say why the other camera opened: " + posts(world, "/log"));
+});
+
+test("switched on later, a front camera that will not open makes way for the back one", async () => {
+    const world = makeWorld(VOICE, FRONT_DEAD);
+    const { connection } = await page(world);
+
+    await command(world, "camera-on");
+
+    assert.equal(videoSender(connection).track.label, "camera-environment");
+    assert.equal(lastVideo(world).front, false);
+    assert.equal(lastVideo(world).failed, false);
+});
+
+test("when neither camera opens, the first one's reason is told and the call still faces front", async () => {
+    const world = makeWorld(VIDEO, {
+        cameras: NAMED_CAMERAS,
+        cameraFails: (facing) => facing === "user" || world.backFails(),
+    });
+    world.backFails = () => true;
+    const { stream } = await page(world);
+
+    assert.equal(world.log.filter((line) => line.startsWith("gum:{\"video\"")).length, 2,
+        "not both cameras were tried: " + world.log);
+    assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["blank"]);
+    assert.equal(lastVideo(world).failed, true);
+    assert.equal(lastVideo(world).front, true, "a failed fallback left the call facing back");
+    assert.equal(lastVideo(world).error, "NotReadableError: Failed to allocate videosource");
+});
+
+test("with one camera, one that will not open is not asked for again", async () => {
+    const world = makeWorld(VIDEO, {
+        cameras: [{ deviceId: "cam-f", label: "Droid front camera", facing: "user" }],
+        cameraFails: () => true,
+    });
+    await page(world);
+
+    assert.equal(world.log.filter((line) => line.startsWith("gum:{\"video\"")).length, 1,
+        "the only camera was asked for twice: " + world.log);
+    assert.equal(lastVideo(world).failed, true);
+    assert.equal(lastVideo(world).front, true);
+});
+
+test("a camera that will not turn does not try a third way, it goes back", async () => {
+    const world = makeWorld(VIDEO, { cameras: NAMED_CAMERAS, cameraFails: (facing) => facing === "environment" });
+    const { connection } = await page(world);
+    world.log.length = 0;
+
+    await command(world, "facing-environment");
+
+    const asked = world.log.filter((line) => line.startsWith("gum:"));
+    assert.deepEqual(asked.map((line) => JSON.parse(line.slice(4)).video.deviceId.exact), ["cam-r", "cam-f"],
+        "a failed turn asked for more than the other camera and then its own: " + asked);
+    assert.equal(videoSender(connection).track.label, "camera-user");
+    assert.equal(lastVideo(world).front, true);
+    assert.ok(posts(world, "/log").some((line) => line.startsWith("camera would not turn:"))
+              && !posts(world, "/log").some((line) => line.endsWith("trying the other camera")),
+        "a failed turn was taken for a camera that would not open: " + posts(world, "/log"));
+});
+
+test("cameras without names: the other one is asked for by the way it faces", async () => {
+    const world = makeWorld(VIDEO, { honoursFacing: true, cameraFails: (facing) => facing === "user" });
+    const { connection } = await page(world);
+
+    const asked = world.log.filter((line) => line.startsWith("gum:{\"video\""));
+    assert.deepEqual(asked.map((line) => JSON.parse(line.slice(4)).video.facingMode), [
+        { ideal: "user" }, { ideal: "environment" }]);
+    assert.equal(videoSender(connection).track.label, "camera-environment");
+    assert.equal(lastVideo(world).front, false);
+});
+
 test("a camera switched off while it opens is let go when it does", async () => {
     const world = makeWorld(VOICE);
     const { connection } = await page(world);

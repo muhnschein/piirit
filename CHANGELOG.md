@@ -14,6 +14,7 @@ docs/BUILDING.md, "Cutting a release").
 - Voice messages no longer offer "Open" in their menu; it failed, and they play right in the chat ([#297](https://github.com/muhnschein/piirit/issues/297)).
 - The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
 - Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
+- Video calls: when the front camera will not start, the call uses the back camera instead of sending no picture ([#328](https://github.com/muhnschein/piirit/issues/328)).
 
 ## 2.3.0 — 2026-11-11
 

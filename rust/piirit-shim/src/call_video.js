@@ -241,7 +241,7 @@ var piiritVideo = (function () {
         });
     }
 
-    /* Open camera facing `which`; `avoid` = one open before turn. */
+    /* Open camera facing `facing`; `avoid` = one open before turn. */
     function capture(avoid) {
         if (!ask) {
             return Promise.reject(new Error("no camera"));
@@ -272,6 +272,31 @@ var piiritVideo = (function () {
                 }
             });
             return track;
+        });
+    }
+
+    /* Open wanted camera; refused: other way once, facing follows (dead front camera, #328).
+     * Turn not here: it falls back to camera it had. */
+    function captureAny() {
+        return capture().catch(function (err) {
+            if (!media.enumerateDevices) {
+                throw err;
+            }
+            var first = facing;
+            return cameraList().then(function (cameras) {
+                if (cameras.length < 2) {
+                    throw err;
+                }
+                note("camera would not open: " + (describe(err) || "no reason given")
+                    + "; trying the other camera");
+                facing = first === "user" ? "environment" : "user";
+                return capture();
+            }, function () {
+                throw err;
+            }).catch(function () {
+                facing = first;
+                throw err;
+            });
         });
     }
 
@@ -767,10 +792,11 @@ var piiritVideo = (function () {
         report();
     }
 
-    /* Open camera, put in place; `otherwise` on failure. Switched off meanwhile: let go. */
-    function open(otherwise, avoid) {
+    /* Open camera by `opener`, put in place; `otherwise` on failure. Switched off meanwhile:
+     * let go. */
+    function open(otherwise, opener) {
         opening = true;
-        capture(avoid).then(function (track) {
+        opener().then(function (track) {
             opening = false;
             if (!wanted || !stream) {
                 turned = 0;
@@ -804,7 +830,7 @@ var piiritVideo = (function () {
         if (camera || opening || !stream) {
             return;
         }
-        open(giveUp);
+        open(giveUp, captureAny);
     }
 
     function cameraOff() {
@@ -840,8 +866,10 @@ var piiritVideo = (function () {
         open(function (err) {
             note("camera would not turn: " + describe(err));
             facing = before;
-            open(giveUp);
-        }, was);
+            open(giveUp, capture);
+        }, function () {
+            return capture(was);
+        });
     }
 
     /* Log turned camera's first picture; rest is startup (`camera open`). */
@@ -1129,7 +1157,7 @@ var piiritVideo = (function () {
                 return given;
             }
             opening = true;
-            return capture().then(function (track) {
+            return captureAny().then(function (track) {
                 opening = false;
                 if (!wanted) {
                     track.stop();
