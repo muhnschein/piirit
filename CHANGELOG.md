@@ -13,6 +13,7 @@ docs/BUILDING.md, "Cutting a release").
 - New relay to pick for a profile: delta.firx.org (Denmark), now listed on [chatmail.at/relays](https://chatmail.at/relays).
 - Voice messages no longer offer "Open" in their menu; it failed, and they play right in the chat ([#297](https://github.com/muhnschein/piirit/issues/297)).
 - The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
+- Calls have less delay: the other side's voice plays through the phone's low-latency sound output, and your own no longer waits in a queue that grew whenever the phone was busy ([#301](https://github.com/muhnschein/piirit/issues/301)).
 - Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
 
 ## 2.3.0 — 2026-11-11

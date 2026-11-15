@@ -8,9 +8,11 @@
 //! `PulseAudio` has no app recording stream left (`micKnown`, `micOpen`), then lets mic back. Set
 //! given back after call the same way, or with no watcher, a while after.
 //!
-//! Content, in libresource's message layout: set of class `aliencall` registered, streams named by
-//! app id, acquired, with video playback for loudspeaker (policy's call loudspeaker); updated for
-//! switch; given back when manager refuses any of it or is absent. Nothing asked without app id
+//! Content, in libresource's message layout: naming set registered, never acquired, app's streams
+//! named by app id into policy group `call` (low-latency output; route's own group lags through
+//! media output); then set of class `aliencall` registered, acquired, with video playback for
+//! loudspeaker (policy's call loudspeaker); updated for switch; both given back when manager
+//! refuses any of it or is absent. Nothing asked without app id
 //! (would hold back call's own streams). One message at a time, each once last is answered, as
 //! libresource clients do: manager answers register only after asking bus who sent it, and refuses
 //! anything about the set sent before.
@@ -134,15 +136,31 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Whole call set asked: set `id`, requests numbered from `first`, loudspeaker or not.
+/// Naming set's number for call set `id` (`CallAudio.namingBase`).
+const NAMING: u32 = 65536;
+
+/// Whole call asked: streams named into group `call` by naming set (registered, never acquired),
+/// then call set `id` acquired, loudspeaker or not. Requests numbered from `first`.
 fn asked(id: u32, first: u32, loud: bool) -> String {
     let all = if loud { 3 } else { 1 };
+    let naming = NAMING + id;
     format!(
-        "register 0 {id} {first} {all} 0 0 0 1234 aliencall 0;\
-         audio 7 {id} {} aliencall 1234 media.name 0 *;\
+        "register 0 {naming} {first} 1 0 0 0 1234 aliencall 0;\
+         audio 7 {naming} {} call 1234 media.name 0 *;\
+         register 0 {id} {} {all} 0 0 0 1234 aliencall 0;\
          acquire 3 {id} {}",
         first + 1,
-        first + 2
+        first + 2,
+        first + 3
+    )
+}
+
+/// Call over: call set `id` given back, then its naming set. Requests numbered from `first`.
+fn let_go(id: u32, first: u32) -> String {
+    format!(
+        "{};{}",
+        given_back(id, first),
+        given_back(NAMING + id, first + 2)
     )
 }
 
@@ -240,6 +258,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("voice-state", call!("state"));
         record!("voice-patience", running!("patience"));
         record!("voice-audio", call!("flush"));
+        record!("voice-register", call!("flush"));
         record!("voice-acquire", call!("flush"));
         record!("voice-acquire-settling", running!("settling"));
         record!("voice-had", call!("flush"));
@@ -598,8 +617,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         (
             "voice",
-            "register 0 1 1 1 0 0 0 1234 aliencall 0".into(),
-            "more than the register went out before the manager answered it",
+            "register 0 65537 1 1 0 0 0 1234 aliencall 0".into(),
+            "more than the naming set's register went out before the manager answered it",
         ),
         (
             "voice-state",
@@ -609,10 +628,17 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ("voice-patience", "true".into(), "the call does not keep time on the policy"),
         (
             "voice-audio",
-            "audio 7 1 2 aliencall 1234 media.name 0 *".into(),
-            "the set's streams were not named once it was registered",
+            "audio 7 65537 2 call 1234 media.name 0 *".into(),
+            "the app's streams were not named into group call (low-latency output) by a set of \
+             their own, once it was registered: named by the call's set, alarms go silent; \
+             unnamed or named aliencall, sound lags through the media output",
         ),
-        ("voice-acquire", "acquire 3 1 3".into(), "the set was not acquired"),
+        (
+            "voice-register",
+            "register 0 1 3 1 0 0 0 1234 aliencall 0".into(),
+            "the call's set was not registered once the streams were named",
+        ),
+        ("voice-acquire", "acquire 3 1 4".into(), "the set was not acquired"),
         ("voice-acquire-settling", "false".into(), "the page's moment came with the acquire still out"),
         ("voice-had", String::new(), "something went out after the acquire"),
         (
@@ -681,7 +707,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ("loud-shut-quieting", "true".into(), "the microphone shutting is not waited on"),
         (
             "loud-moved",
-            changed(1, 4, true),
+            changed(1, 5, true),
             "with the microphone shut, the set was not turned for the loudspeaker",
         ),
         (
@@ -713,7 +739,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "a call that is over still lets its page up, or forgot its microphone is open",
         ),
         ("over-quieting", "false".into(), "a microphone still open is taken as shut"),
-        ("over-shut", given_back(1, 6), "once the microphone shut, the set was not given back"),
+        ("over-shut", let_go(1, 7), "once the microphone shut, the set was not given back"),
         (
             "over-shut-state",
             "0|loud|speaker|held-back|shut|no-mic|still|fixed".into(),
@@ -721,7 +747,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         (
             "video",
-            asked(2, 8, true),
+            asked(2, 11, true),
             "a video call does not ask for video playback with its sound: the loudspeaker",
         ),
         (
@@ -729,16 +755,16 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "2|loud|speaker|held-back|shut|no-mic|still|switchable".into(),
             "{context}",
         ),
-        ("video-ear", changed(2, 11, false), "a video call was not switched to the earpiece"),
+        ("video-ear", changed(2, 15, false), "a video call was not switched to the earpiece"),
         ("blind-over", String::new(), "{context}"),
         ("blind-over-shutting", "true".into(), "without the watcher, nothing waits for the microphone"),
         ("blind-over-quieting", "false".into(), "{context}"),
         (
             "blind-shut",
-            given_back(2, 13),
+            let_go(2, 17),
             "without the watcher, the set was not given back a while after the call",
         ),
-        ("blind", asked(3, 15, false), "{context}"),
+        ("blind", asked(3, 21, false), "{context}"),
         ("blind-tap", String::new(), "without the watcher, the switch moved the sound"),
         (
             "blind-state",
@@ -757,7 +783,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "3|ear|earpiece|ready|open|mic|still|switchable".into(),
             "a switch given up on did not put the microphone back, or the switch as the sound is",
         ),
-        ("silent-switch", "update 2 3 18 3 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("silent-switch", "update 2 3 25 3 0 0 0 1234 aliencall 0".into(), "{context}"),
         ("silent-switch-gave-up", String::new(), "{context}"),
         (
             "silent-switch-state",
@@ -769,25 +795,25 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             String::new(),
             "the rest of the switch went out with the microphone back",
         ),
-        ("silent-switch-over", "release 4 3 20".into(), "{context}"),
-        ("silent-switch-rest", "unregister 1 3 21".into(), "{context}"),
-        ("pictures-call", asked(4, 22, false), "{context}"),
+        ("silent-switch-over", "release 4 3 27".into(), "{context}"),
+        ("silent-switch-rest", format!("unregister 1 3 28;{}", given_back(NAMING + 3, 29)), "{context}"),
+        ("pictures-call", asked(4, 31, false), "{context}"),
         ("pictures", String::new(), "pictures moved the sound with the microphone open"),
         (
             "pictures-state",
             "4|ear|speaker|ready|open|no-mic|switching|fixed".into(),
             "pictures did not start a switch to the loudspeaker",
         ),
-        ("pictures-moved", changed(4, 25, true), "{context}"),
-        ("chosen-moved", changed(4, 27, false), "{context}"),
+        ("pictures-moved", changed(4, 35, true), "{context}"),
+        ("chosen-moved", changed(4, 37, false), "{context}"),
         ("chosen-pictures", String::new(), "pictures overrode the reader's choice"),
         (
             "chosen-pictures-state",
             "4|ear|earpiece|ready|open|mic|still|switchable".into(),
             "pictures overrode the reader's choice",
         ),
-        ("pictures-over", given_back(4, 29), "{context}"),
-        ("first-call", asked(5, 31, false), "{context}"),
+        ("pictures-over", let_go(4, 39), "{context}"),
+        ("first-call", asked(5, 43, false), "{context}"),
         (
             "next-call",
             String::new(),
@@ -810,11 +836,11 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "5|ear|earpiece|ready|open|mic|still|switchable".into(),
             "{context}",
         ),
-        ("next-call-over", given_back(5, 34), "{context}"),
-        ("refused-sent", "register 0 6 36 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("next-call-over", let_go(5, 47), "{context}"),
+        ("refused-sent", "register 0 65542 51 1 0 0 0 1234 aliencall 0".into(), "{context}"),
         (
             "refused",
-            given_back(6, 39),
+            let_go(6, 55),
             "a set the manager refused was not given back, or acquired anyway",
         ),
         (
@@ -824,18 +850,18 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         ("refused-tap", String::new(), "refused once, the switch asked again"),
         ("refused-over", String::new(), "a set already given back was given back again"),
-        ("after-refusal", asked(7, 41, false), "a refusal outlived its call"),
+        ("after-refusal", asked(7, 59, false), "a refusal outlived its call"),
         (
             "after-refusal-quieting",
             "true".into(),
             "a page let up and gone is not waited out before the set goes",
         ),
-        ("after-refusal-over", given_back(7, 44), "{context}"),
-        ("mid-call", asked(8, 46, false), "{context}"),
-        ("mid-update", "update 2 8 49 3 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("after-refusal-over", let_go(7, 63), "{context}"),
+        ("mid-call", asked(8, 67, false), "{context}"),
+        ("mid-update", "update 2 8 71 3 0 0 0 1234 aliencall 0".into(), "{context}"),
         (
             "mid-refused",
-            given_back(8, 51),
+            let_go(8, 73),
             "an update the manager refused did not give the set back",
         ),
         (
@@ -844,10 +870,10 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "refused mid-switch, the microphone did not come back, or the switch is not dimmed",
         ),
         ("mid-over", String::new(), "{context}"),
-        ("absent-sent", "register 0 9 53 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("absent-sent", "register 0 65545 77 1 0 0 0 1234 aliencall 0".into(), "{context}"),
         (
             "absent",
-            given_back(9, 56),
+            let_go(9, 81),
             "with no manager there, the set was not let go of at once",
         ),
         (
@@ -856,7 +882,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "{context}",
         ),
         ("absent-over", String::new(), "{context}"),
-        ("silent-sent", "register 0 10 58 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("silent-sent", "register 0 65546 85 1 0 0 0 1234 aliencall 0".into(), "{context}"),
         ("silent-in", String::new(), "{context}"),
         (
             "silent-state",
@@ -870,13 +896,13 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         (
             "silent-over",
-            "release 4 10 61".into(),
+            "release 4 10 89".into(),
             "what was not sent was sent after all, or the set not given back",
         ),
-        ("silent-rest", "unregister 1 10 62".into(), "{context}"),
+        ("silent-rest", format!("unregister 1 10 90;{}", given_back(NAMING + 10, 91)), "{context}"),
         (
             "late",
-            format!("{};{}", given_back(11, 66), asked(12, 68, false)),
+            format!("{};{}", let_go(11, 97), asked(12, 101, false)),
             "a late refusal for a call that is over gave back the next one's set",
         ),
         (
@@ -884,10 +910,10 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "12|ear|earpiece|held-back|shut|no-mic|still|switchable".into(),
             "{context}",
         ),
-        ("late-over", given_back(12, 71), "{context}"),
+        ("late-over", let_go(12, 105), "{context}"),
         (
             "ring",
-            rung(13, 73),
+            rung(13, 109),
             "a ringing call did not ask for the ring's set, or asked for more than sound",
         ),
         (
@@ -898,14 +924,14 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ("ring-held", "13".into(), "{context}"),
         ("ring-over", String::new(), "the ring's set went before the call's state had settled"),
         ("ring-over-waits", "true".into(), "{context}"),
-        ("ring-gone", given_back(13, 75), "the ring's set was not given back once it stopped ringing"),
+        ("ring-gone", given_back(13, 111), "the ring's set was not given back once it stopped ringing"),
         ("ring-gone-held", "0".into(), "{context}"),
         (
             "answer-ring",
-            "register 0 14 77 1 0 0 0 1234 ringtone 0".into(),
+            "register 0 14 113 1 0 0 0 1234 ringtone 0".into(),
             "more than the ring's register went out before it was answered",
         ),
-        ("answer-ring-acquire", "acquire 3 14 78".into(), "{context}"),
+        ("answer-ring-acquire", "acquire 3 14 114".into(), "{context}"),
         ("answer-ring-had", String::new(), "{context}"),
         (
             "answered-between",
@@ -914,15 +940,16 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         (
             "answered",
-            "register 0 15 79 1 0 0 0 1234 aliencall 0".into(),
+            "register 0 65551 115 1 0 0 0 1234 aliencall 0".into(),
             "an answered call did not ask for its own set, or the ring's went first",
         ),
         ("answered-turn", String::new(), "something went out with a message still unanswered"),
         (
             "answered-rest",
             format!(
-                "audio 7 15 80 aliencall 1234 media.name 0 *;acquire 3 15 81;{}",
-                given_back(14, 82)
+                "audio 7 65551 116 call 1234 media.name 0 *;\
+                 register 0 15 117 1 0 0 0 1234 aliencall 0;acquire 3 15 118;{}",
+                given_back(14, 119)
             ),
             "the ring's set went before the call's own was had: the music would come back",
         ),
@@ -933,21 +960,21 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         ("answered-held", "0".into(), "{context}"),
         ("answered-in", String::new(), "{context}"),
-        ("answered-over", given_back(15, 84), "{context}"),
-        ("again-ring", rung(16, 86), "{context}"),
-        ("again-answered", asked(17, 88, false), "{context}"),
+        ("answered-over", let_go(15, 121), "{context}"),
+        ("again-ring", rung(16, 125), "{context}"),
+        ("again-answered", asked(17, 127, false), "{context}"),
         ("again-unrung", String::new(), "{context}"),
-        ("again-ring-gone", given_back(16, 91), "{context}"),
+        ("again-ring-gone", given_back(16, 131), "{context}"),
         ("again-settling", "true".into(), "{context}"),
-        ("again-over", given_back(17, 93), "{context}"),
+        ("again-over", let_go(17, 133), "{context}"),
         (
             "ring-refused-sent",
-            "register 0 18 95 1 0 0 0 1234 ringtone 0".into(),
+            "register 0 18 137 1 0 0 0 1234 ringtone 0".into(),
             "{context}",
         ),
         (
             "ring-refused",
-            given_back(18, 97),
+            given_back(18, 139),
             "a ring's set the manager refused was not given back, or acquired anyway",
         ),
         ("ring-refused-held", "0".into(), "{context}"),
@@ -957,8 +984,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             "a ring's set refused was asked for again while the call rang",
         ),
         ("ring-refused-over", String::new(), "a ring's set already given back was given back again"),
-        ("next-ring", rung(19, 99), "a refusal outlived the ring it was for"),
-        ("next-ring-over", given_back(19, 101), "{context}"),
+        ("next-ring", rung(19, 141), "a refusal outlived the ring it was for"),
+        ("next-ring-over", given_back(19, 143), "{context}"),
         (
             "left-open",
             String::new(),
@@ -966,7 +993,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         (
             "left",
-            given_back(1, 4),
+            let_go(1, 5),
             "a set held on the way out, the page not yet up, was not given back",
         ),
         (
