@@ -15,6 +15,7 @@ docs/BUILDING.md, "Cutting a release").
 - The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
 - Calls have less delay: the other side's voice plays through the phone's low-latency sound output, and your own no longer waits in a queue that grew whenever the phone was busy ([#301](https://github.com/muhnschein/piirit/issues/301)).
 - Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
+- Video calls: when the front camera will not start, the call uses the back camera instead of sending no picture ([#328](https://github.com/muhnschein/piirit/issues/328)).
 
 ## 2.3.0 — 2026-11-11
 
