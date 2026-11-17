@@ -6,7 +6,7 @@
 //! until player knows it (Qt 5.6's -1 read "-1:0-1" mid-swipe), double tap 10 s on (controls
 //! stay), play puts controls away and holds list still, tap brings them, they go again after a
 //! while unless seek bar held, seek bar follows video but not under finger and seeks on release;
-//! Share hands sheet file (video paused); Save copies; lone video seeks once length known.
+//! Share hands sheet Downloads copy (video paused); Save copies; lone video seeks once length known.
 //!
 //! Headless vs stub Silica; group seeded with picture (10, Ada Lovelace) and video (15, 7 s).
 //! Turn = page's width and height swapped, as Silica does. Steps a second apart, each after one
@@ -438,13 +438,12 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
     let downloads_for_probe = downloads.to_string_lossy().into_owned();
     plan.after(1, move || unsafe {
         record!("controls-back", call!("controls"));
-        // Share: sheet gets video's file; video waits.
+        // Share: video waits (its fake file has nothing to copy; picture's share below).
         record!(
             "share-offered",
             call!("get", s!("shareButton"), s!("visible"))
         );
         record!("share", call!("click", s!("shareButton"), false));
-        record!("shared", call!("shared"));
         record!(
             "shared-state",
             call!("current", s!("player"), s!("playbackState"))
@@ -484,6 +483,13 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
 
     plan.after(1, move || unsafe {
         record!("saved", call!("get", s!("viewerNoticeLabel"), s!("text")));
+        // Share: sheet gets Downloads copy (saved one reused), not chat's own file.
+        record!("share-picture", call!("click", s!("shareButton"), false));
+    });
+
+    plan.after(1, move || unsafe {
+        record!("shared", call!("shared"));
+        record!("share-opened", call!("get", s!("sharer"), s!("handedOn")));
         (*engine_ptr).quit();
     });
 
@@ -531,6 +537,7 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         "lone-learns",
         "load-picture",
         "save",
+        "share-picture",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -760,11 +767,6 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         ),
         ("share-offered", "true", "the viewer offers no Share"),
         (
-            "shared",
-            "1|video/mp4|file:///tmp/piirit-fake/clip.mp4",
-            "Share does not hand the share sheet the video's file and kind",
-        ),
-        (
             "shared-state",
             "2",
             "the video plays on under the share sheet (Jolla's pauses it)",
@@ -820,6 +822,22 @@ fn the_viewer_turns_with_the_phone_and_a_tap_fades_its_controls() {
         "Save did not put a copy of what is on screen in Piirit's folder in Downloads: {}. \
          {context}",
         copy.display()
+    );
+    // Share targets run sandboxed: chat's own folder is closed to them.
+    assert_eq!(
+        value("shared"),
+        format!("1|image/jpeg|file://{}", copy.display()),
+        "Share does not hand the share sheet the Downloads copy of what is on screen. {context}"
+    );
+    assert_eq!(
+        value("share-opened"),
+        "",
+        "Share also opened the copy in another app. {context}"
+    );
+    let entries = std::fs::read_dir(downloads.join("Piirit")).map_or(0, Iterator::count);
+    assert_eq!(
+        entries, 1,
+        "Share made a second copy of a file already saved. {context}"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }

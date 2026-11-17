@@ -18,6 +18,8 @@ FileSaver {
 
     /// URL last handed to another app.
     property string handedOn: ""
+    /// Copy from `open` goes to `Qt.openUrlExternally`; false: page takes `opened` itself.
+    property bool handsOn: true
 
     /// Copy as `keep` (same file already there: that one), then hand copy to another app:
     /// their sandboxes can't read chat's own folder, and file there is named by hash.
@@ -25,12 +27,17 @@ FileSaver {
         saver.open_as(fileUrl, saver.folder, fileName)
     }
 
+    /// `file://` URL of copy at `path`.
+    function urlOf(path) {
+        return "file://" + path.split("/").map(encodeURIComponent).join("/")
+    }
+
     function handOn(copy) {
-        saver.handedOn = "file://" + copy.split("/").map(encodeURIComponent).join("/")
+        saver.handedOn = saver.urlOf(copy)
         Qt.openUrlExternally(saver.handedOn)
     }
 
-    onOpened: saver.handOn(path)
+    onOpened: if (saver.handsOn) saver.handOn(path)
 
     /// Copy `fileUrl` as `fileName` (or own name). Off Qt thread (slow for video), `busy`
     /// meanwhile; answers `saved` or `error`, in request order.
