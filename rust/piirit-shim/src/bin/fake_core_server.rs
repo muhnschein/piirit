@@ -7,7 +7,8 @@ use std::fmt::Write as _;
 use std::io::Write;
 use std::sync::Arc;
 
-use chrono::{Local, TimeZone};
+use jiff::tz::TimeZone;
+use jiff::Timestamp;
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::sync::Mutex;
@@ -730,13 +731,12 @@ fn message_timestamp(msg: u64) -> i64 {
 
 /// Local midnight of `timestamp`'s day, as core's markers. Checked in three zones.
 fn day_start(timestamp: i64) -> i64 {
-    let Some(when) = Local.timestamp_opt(timestamp, 0).single() else {
+    let Ok(when) = Timestamp::from_second(timestamp) else {
         return timestamp.div_euclid(86_400) * 86_400;
     };
-    when.date_naive()
-        .and_hms_opt(0, 0, 0)
-        .and_then(|midnight| midnight.and_local_timezone(Local).earliest())
-        .map_or(timestamp, |midnight| midnight.timestamp())
+    when.to_zoned(TimeZone::system())
+        .start_of_day()
+        .map_or(timestamp, |midnight| midnight.timestamp().as_second())
 }
 
 /// Fake archive: page, script, icon. Script fetched by absolute dir path, as bundlers write
