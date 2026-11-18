@@ -168,14 +168,16 @@ Page {
         return type === "Video" ? "video/mp4" : type === "Gif" ? "image/gif" : "image/jpeg"
     }
 
-    /// Sheet over page: video waits (Jolla's).
+    /// Sheet over page: video waits (Jolla's). Sheet gets Downloads copy, as Open does: share
+    /// targets' sandboxes can't read chat's own folder.
     function share() {
         var file = String(page.shownFile())
-        if (file.length > 0 && shareAction.item) {
+        if (file.length > 0 && shareAction.item && !sharer.busy) {
             if (page.videoPlaying) {
                 page.currentVideo.pause()
             }
-            shareAction.item.shareFile(file, page.shownMime())
+            sharer.mimeType = page.shownMime()
+            sharer.open(file, page.shownName())
         }
     }
 
@@ -392,6 +394,19 @@ Page {
             notice.tone = "info"
             notice.show(saver.savedText)
         }
+        onError: {
+            notice.tone = "error"
+            notice.show(message)
+        }
+    }
+
+    // Copy for share sheet.
+    AttachmentSaver {
+        id: sharer
+        objectName: "sharer"
+        property string mimeType
+        handsOn: false
+        onOpened: if (shareAction.item) shareAction.item.shareFile(sharer.urlOf(path), sharer.mimeType)
         onError: {
             notice.tone = "error"
             notice.show(message)
