@@ -113,7 +113,7 @@ Few, each justified; `cargo tree` = list, table = why, so drop proposal starts f
 | `tokio` | server subprocess, pipes, event loop | async transport; `process` reaps child |
 | `serde`, `serde_json` | wire JSON | core contract = JSON-RPC |
 | `qmetaobject` (vendored), `qttypes`, `cpp`, `cpp_build` | Qt from Rust | whole UI; `default-features = false` drops `log` bridge |
-| `chrono` | viewer timezone, day headings | not in `std`; `localtime_r` needs denied `unsafe` |
+| `jiff` 0.2 (+ `jiff-core`) | viewer timezone, day headings, capture names | not in `std`; `localtime_r` needs denied `unsafe`; `chrono` unmaintained (RUSTSEC-2026-0543), `time` past 1.75 and no local offset with threads; 1.0 needs Rust 1.85 |
 | `qrcode` | invite as code | one crate, no deps |
 | `rqrr` (+ `g2p`, `lru`) | code from camera | QR decoder too big to vendor |
 | `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | voice message MP3 (`voice.rs`) | phone recorder has no encoder iOS plays as voice; LAME = desktop client's; pure-Rust ones need Rust > 1.75 or are shine ports (no psychoacoustic model) |

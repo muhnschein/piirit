@@ -618,7 +618,7 @@ fn record(job: &Job, result: Result<Outcome, Error>) {
         chat: job.chat,
         timestamp: job.timestamp,
         model: files::MODEL_FILE.to_owned(),
-        updated: chrono::Utc::now().timestamp(),
+        updated: jiff::Timestamp::now().as_second(),
         ..Row::default()
     };
     match result {

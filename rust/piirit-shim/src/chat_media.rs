@@ -375,7 +375,7 @@ impl ChatMedia {
             .collect();
         let mut landed: usize = 0;
         let gallery = self.kind.to_string() == "gallery";
-        let today = local_day_number(chrono::Utc::now().timestamp());
+        let today = local_day_number(jiff::Timestamp::now().as_second());
         for mut item in items {
             if let Some(index) = index_of.get(&item.message_id).copied() {
                 item.date_group = date_group(item.day_number, today);
