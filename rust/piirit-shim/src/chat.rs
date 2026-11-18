@@ -7,8 +7,10 @@ use std::collections::{BTreeMap, HashSet, VecDeque};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use chrono::{DateTime, Local, TimeZone};
 use deltachat_jsonrpc::RpcClient;
+use jiff::civil::Date;
+use jiff::tz::TimeZone;
+use jiff::Timestamp;
 use qmetaobject::*;
 
 use crate::core::connection;
@@ -2547,13 +2549,15 @@ pub(crate) async fn member_count(rpc: &RpcClient, account_id: u32, chat_id: u32)
 /// DST-crossing messages an hour out. Unplaceable timestamp: UTC, not missing list.
 #[must_use]
 pub fn local_day_number(timestamp: i64) -> i64 {
-    let Some(when) = Local.timestamp_opt(timestamp, 0).single() else {
+    let Ok(when) = Timestamp::from_second(timestamp) else {
         return timestamp.div_euclid(86_400);
     };
     // Whole days: zone behind UTC doesn't borrow a day as (ts + offset) / 86400 would.
-    when.date_naive()
-        .signed_duration_since(DateTime::UNIX_EPOCH.date_naive())
-        .num_days()
+    let date = when.to_zoned(TimeZone::system()).date();
+    date.since(Date::constant(1970, 1, 1))
+        .map_or(timestamp.div_euclid(86_400), |span| {
+            i64::from(span.get_days())
+        })
 }
 
 /// Placeholder for unfetched entry, one per id-list message: row 0 stays first.

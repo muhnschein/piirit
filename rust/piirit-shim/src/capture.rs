@@ -149,7 +149,7 @@ fn capture_name(kind: &str, extension: &str, stamp: String) -> String {
 
 /// The local time now, as `YYYYMMDD-HHMMSS`.
 fn now_stamp() -> String {
-    chrono::Local::now().format("%Y%m%d-%H%M%S").to_string()
+    jiff::Zoned::now().strftime("%Y%m%d-%H%M%S").to_string()
 }
 
 #[cfg(test)]

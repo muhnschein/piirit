@@ -75,3 +75,11 @@ fn a_message_near_midnight_lands_on_its_own_local_day_either_side_of_dst() {
         );
     }
 }
+
+#[test]
+fn a_timestamp_past_year_9999_still_gets_a_day() {
+    // Bogus sender clock. Past calendar's range: UTC day, no panic.
+    let far = 300_000_000_000_i64;
+    assert_eq!(local_day_number(far), far.div_euclid(86_400));
+    assert_eq!(local_day_number(-far), (-far).div_euclid(86_400));
+}
