@@ -233,10 +233,11 @@ else
 
         # install(1) calls: mode and destination of every packaged file.
         # Continuation lines joined (split call = one src, one dst);
-        # expanded %{buildroot} prefix stripped from destination.
+        # expanded %{buildroot} prefix stripped from destination: rpm <4.20
+        # `.../BUILDROOT/<name>-<v>-<r>.<arch>`, newer `.../BUILDROOT`.
         install_section=$(echo "$expanded" | sed -n '/^%install/,/^%files/p' |
             sed -e ':a' -e '/\\$/{N;s/\\\n[[:space:]]*/ /;ta' -e '}' |
-            sed -E 's#[^ ]*/BUILDROOT/[^/ ]+##g')
+            sed -E "s#[^ ]*/BUILDROOT(/$name-[^/ ]+)?##g")
         while read -r line; do
             mode=$(echo "$line" | sed -n 's/.*-D\{0,1\}m[[:space:]]*\([0-7]\{3,4\}\).*/\1/p')
             [[ -n "$mode" ]] || continue
