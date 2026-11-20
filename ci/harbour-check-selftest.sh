@@ -351,6 +351,43 @@ else
     echo "selftest: ok   rpmspec missing -> its waivers not stale, others still are"
 fi
 
+# Both buildroot shapes read alike (rpm <4.20 adds `<name>-<v>-<r>.<arch>`
+# below BUILDROOT, newer doesn't): stand-in rpmspec rewrites real one's.
+real_rpmspec=$(command -v rpmspec || true)
+for shape in /r/BUILDROOT/harbour-piirit-2.3.0-1.aarch64 /r/BUILD/harbour-piirit-2.3.0-build/BUILDROOT; do
+    cases=$((cases + 1))
+    if [[ -z "$real_rpmspec" ]]; then
+        echo "selftest: SKIP buildroot $shape (no rpmspec)"
+        skipped=$((skipped + 1))
+        continue
+    fi
+    fake="$work/fake-rpmspec"
+    mkdir -p "$fake"
+    printf '#!/bin/sh\n"%s" "$@" | sed -E "s#[^ \\"]*/BUILDROOT(/harbour-piirit-[^/ \\"]+)?#%s#g"\n' \
+        "$real_rpmspec" "$shape" > "$fake/rpmspec"
+    chmod +x "$fake/rpmspec"
+    # Server planted: 1.6.7 then reads its landing path.
+    rm -rf "$work/case"
+    cp -a "$pristine" "$work/case"
+    ( cd "$work/case" && plant_server "$exe" )
+    out=$(PATH="$fake:$PATH" HARBOUR_CHECK_STRICT=0 "$work/case/ci/harbour-check.sh" 2>&1)
+    lint=$(PATH="$fake:$PATH" PACKAGING_LINT_STRICT=0 "$work/case/ci/packaging-lint.sh" 2>&1)
+    if ! PATH="$fake:$PATH" rpmspec -P "$pristine/$S" | grep -qF "$shape/usr/bin/"; then
+        echo "selftest: FAIL stand-in rpmspec did not plant buildroot $shape" >&2
+        status=1
+    elif grep -q 'FAIL \[\|SKIP \[1\.6\.7\]' <<< "$out"; then
+        echo "selftest: FAIL buildroot $shape misread by harbour-check" >&2
+        grep 'FAIL \[\|SKIP \[1\.6\.7\]' <<< "$out" >&2
+        status=1
+    elif ! grep -q 'deltachat-rpc-server where the app looks' <<< "$lint"; then
+        echo "selftest: FAIL buildroot $shape misread by packaging-lint" >&2
+        grep 'deltachat-rpc-server' <<< "$lint" >&2
+        status=1
+    else
+        echo "selftest: ok   buildroot $shape -> install paths read"
+    fi
+done
+
 # Canary runs validate-rpm with waivers off: known blockers must fail again.
 cases=$((cases + 1))
 printf '%s\n' '!BEGIN!x' \

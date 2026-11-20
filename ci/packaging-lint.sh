@@ -32,9 +32,10 @@ if command -v rpmspec >/dev/null 2>&1; then
         status=1
     fi
     # App finds bundled server only at BUNDLED_SERVER; spec moved alone = app without core.
+    # Buildroot: rpm <4.20 `.../BUILDROOT/<name>-<v>-<r>.<arch>`, newer `.../BUILDROOT`.
     installed=$(rpmspec -P --target aarch64 "$root/rpm/harbour-piirit.spec" 2>/dev/null |
         sed -e ':a' -e '/\\$/{N;s/\\\n[[:space:]]*/ /;ta' -e '}' |
-        sed -n 's#^install .*/deltachat-rpc-server .*/BUILDROOT/[^/ ]*\(/[^ ]*\)$#\1#p')
+        sed -n 's#^install .*/deltachat-rpc-server .*/BUILDROOT\(/harbour-piirit-[^/ ]*\)\{0,1\}\(/[^ ]*\)$#\2#p')
     wanted=$(sed -n 's/^pub const BUNDLED_SERVER: &str = "\(.*\)";$/\1/p' \
         "$root/rust/piirit-shim/src/core.rs")
     if [ -n "$installed" ] && [ "$installed" = "$wanted" ]; then
