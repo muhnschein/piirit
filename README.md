@@ -1,6 +1,6 @@
 # Piirit
 
-![Piirit - Secure decentralised chat based on Delta Chat.](store/cover.png)
+![Piirit - Delta Chat for Sailfish OS.](store/cover.png)
 
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=coverage)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)
 
