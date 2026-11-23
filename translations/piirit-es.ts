@@ -3694,11 +3694,6 @@ Esperando que el dispositivo de %2$s responda…</translation>
         <translation>Reintentar</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Transcrito en este teléfono</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Mostrar todo</translation>

@@ -3698,11 +3698,6 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <translation>Proovi uuesti</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Transkribeeritud selles telefonis</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Näita kõike</translation>

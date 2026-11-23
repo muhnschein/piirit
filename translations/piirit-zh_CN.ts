@@ -3681,11 +3681,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>重试</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>已在这部手机上转写</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>显示全部</translation>

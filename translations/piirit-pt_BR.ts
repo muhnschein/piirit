@@ -3698,11 +3698,6 @@ Aguardando resposta do aparelho de %2$s…</translation>
         <translation>Tentar novamente</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Transcrito neste celular</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Mostrar tudo</translation>

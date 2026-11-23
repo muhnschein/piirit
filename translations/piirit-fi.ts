@@ -3694,11 +3694,6 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <translation>Yritä uudelleen</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Litteroitu tässä puhelimessa</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Näytä kaikki</translation>

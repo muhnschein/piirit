@@ -31,8 +31,6 @@ Item {
     property bool charging: false
     /// Auto-transcribe: 0 never, 1 while charging, 2 always.
     property int mode: 0
-    /// Phone's language, whisper code: footer names only another.
-    property string phoneLanguage: Speech.codeOf(Qt.locale().name)
     /// Audio list: folds to three lines, tap unfolds. Chat: six, "Show all".
     property bool compact: false
 
@@ -137,18 +135,8 @@ Item {
         }
     }
 
-    readonly property string footer: {
-        if (root.drawn !== "done") {
-            return ""
-        }
-        //: Under a voice message's transcript: it was made on the phone itself.
-        var made = qsTr("Transcribed on this phone")
-        return root.language.length > 0 && root.language !== root.phoneLanguage
-               ? made + " · " + root.languageName : made
-    }
-
     visible: root.drawn !== "hidden"
-    height: root.drawn === "hidden" ? 0 : footerLabel.y + footerLabel.height
+    height: root.drawn === "hidden" ? 0 : button.y + button.height
 
     /// Button pressed.
     function act() {
@@ -267,20 +255,5 @@ Item {
         height: button.shown ? implicitHeight : 0
         text: root.buttonText
         onClicked: root.act()
-    }
-
-    Label {
-        id: footerLabel
-        objectName: "transcriptFooter"
-        readonly property bool shown: root.footer.length > 0
-        y: button.y + button.height + (footerLabel.shown ? Theme.paddingSmall : 0)
-        width: parent.width
-        visible: footerLabel.shown
-        height: footerLabel.shown ? implicitHeight : 0
-        truncationMode: TruncationMode.Fade
-        font.pixelSize: Theme.fontSizeExtraSmall
-        color: Theme.secondaryColor
-        textFormat: Text.PlainText
-        text: root.footer
     }
 }

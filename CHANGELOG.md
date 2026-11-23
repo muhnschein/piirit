@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Transcripts of voice messages no longer carry the line "Transcribed on this phone" underneath, in chats and in a chat's Audio list.
 - Voice messages you send are transcribed on their own too, like the ones you receive. Before, they stayed without text until you tapped Transcribe ([#335](https://github.com/muhnschein/piirit/issues/335)).
 - Pictures and videos shared from the viewer reach the other app, as a copy in Downloads/Piirit. Before, the app picked in the share menu could not read them.
 - Files opened in another app (Documents and others) now arrive there under their real name, as a copy in Downloads/Piirit. Before, the other app often could not read them ([#296](https://github.com/muhnschein/piirit/issues/296)).
