@@ -3694,11 +3694,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>மீண்டும் முயல்க</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>இந்தத் தொலைபேசியில் எழுத்தாக்கப்பட்டது</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>அனைத்தையும் காட்டு</translation>

@@ -3711,11 +3711,6 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <translation>Încearcă din nou</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Transcris pe acest telefon</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Arată tot</translation>

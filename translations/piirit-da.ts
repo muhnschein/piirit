@@ -3698,11 +3698,6 @@ Venter på svar fra %2$s&apos;s enhed…</translation>
         <translation>Prøv igen</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Transskriberet på denne telefon</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Vis alt</translation>

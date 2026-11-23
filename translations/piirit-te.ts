@@ -3694,11 +3694,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>మళ్లీ ప్రయత్నించండి</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>ఈ ఫోన్‌లో లిప్యంతరీకరించబడింది</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>అన్నీ చూపించు</translation>

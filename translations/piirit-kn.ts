@@ -3698,11 +3698,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>ಈ ಫೋನ್‌ನಲ್ಲಿ ಲಿಪ್ಯಂತರಿಸಲಾಗಿದೆ</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>ಎಲ್ಲವನ್ನೂ ತೋರಿಸಿ</translation>

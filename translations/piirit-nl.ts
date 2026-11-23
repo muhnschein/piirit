@@ -3694,11 +3694,6 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <translation>Opnieuw proberen</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Uitgeschreven op deze telefoon</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Alles tonen</translation>

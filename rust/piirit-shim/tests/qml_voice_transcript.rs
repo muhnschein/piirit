@@ -38,7 +38,7 @@ const PROBE_QML: &str = r"
                 transcriptState: 0, manual: false, permille: 0, text: '',
                 language: '', hasFile: true, modelState: 2, modelPermille: 0,
                 powerSaving: false, charging: false, mode: 0,
-                phoneLanguage: 'en', compact: false, unfolded: false
+                compact: false, unfolded: false
             }
             var own = JSON.parse(json)
             for (var key in base) {
@@ -67,12 +67,27 @@ const PROBE_QML: &str = r"
             if (!node) { return 'missing:' + name }
             return node.visible && node.height > 0 ? 'yes' : 'no'
         }
-        // What the bubble says: drawn state, line, button, text, footer, bar, Show all.
+        // Words drawn by anything but state line, button, transcript: none wanted.
+        function otherWords(node) {
+            var known = ['transcriptStatus', 'transcriptButton', 'transcriptText']
+            var words = ''
+            var kids = node.children
+            for (var i = 0; kids && i < kids.length; i++) {
+                var kid = kids[i]
+                if (known.indexOf(kid.objectName) < 0 && kid.visible && kid.height > 0
+                        && typeof kid.text === 'string' && kid.text.length > 0) {
+                    words += kid.text + ';'
+                }
+                words += otherWords(kid)
+            }
+            return words
+        }
+        // What the bubble says: drawn state, line, button, text, other words, bar, Show all.
         function drawn() {
             var item = loader.item
             return [item.drawn, shownText('transcriptStatus'),
                     shownText('transcriptButton'), shownText('transcriptText'),
-                    shownText('transcriptFooter'), shown('transcriptModelBar'),
+                    otherWords(item) || '-', shown('transcriptModelBar'),
                     shown('transcriptShowAll'), item.visible ? 'visible' : 'hidden']
                 .join('|')
         }
@@ -310,14 +325,8 @@ fn each_state_shows_its_line_and_its_button() {
             "6-running",
             "running|Transcribing… 40%|-|Okay so about Saturday|-|no|no|visible",
         ),
-        (
-            "7-done",
-            "done|-|-|Moi! Tuletko saunaan?|Transcribed on this phone · Suomi|no|no|visible",
-        ),
-        (
-            "7-done-own",
-            "done|-|-|Running late.|Transcribed on this phone|no|no|visible",
-        ),
+        ("7-done", "done|-|-|Moi! Tuletko saunaan?|-|no|no|visible"),
+        ("7-done-own", "done|-|-|Running late.|-|no|no|visible"),
         (
             "9-other",
             "other|This voice message seems to be in Español, which is not selected.|\
@@ -343,7 +352,7 @@ fn each_state_shows_its_line_and_its_button() {
             value(label),
             expected,
             "state {label} does not draw what the States board shows \
-             (drawn|line|button|text|footer|bar|show all|visible). {context}"
+             (drawn|line|button|text|other words|bar|show all|visible). {context}"
         );
     }
 

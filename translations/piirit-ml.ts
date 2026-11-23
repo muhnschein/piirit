@@ -3698,11 +3698,6 @@ Waiting for the device of %2$s to reply…</source>
         <translation>വീണ്ടും ശ്രമിക്കുക</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>ഈ ഫോണിൽ എഴുത്താക്കിയത്</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>എല്ലാം കാണിക്കുക</translation>

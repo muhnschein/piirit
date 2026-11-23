@@ -3715,11 +3715,6 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
         <translation>Spróbuj ponownie</translation>
     </message>
     <message>
-        <source>Transcribed on this phone</source>
-        <extracomment>Under a voice message&apos;s transcript: it was made on the phone itself.</extracomment>
-        <translation>Przetranskrybowano na tym telefonie</translation>
-    </message>
-    <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Pokaż wszystko</translation>
