@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Voice messages you send are transcribed on their own too, like the ones you receive. Before, they stayed without text until you tapped Transcribe ([#335](https://github.com/muhnschein/piirit/issues/335)).
 - Pictures and videos shared from the viewer reach the other app, as a copy in Downloads/Piirit. Before, the app picked in the share menu could not read them.
 - Files opened in another app (Documents and others) now arrive there under their real name, as a copy in Downloads/Piirit. Before, the other app often could not read them ([#296](https://github.com/muhnschein/piirit/issues/296)).
 - PDFs and office documents show their first page: in the chat (PDF, OpenDocument) and in a chat's Files ([#296](https://github.com/muhnschein/piirit/issues/296)). Word, Excel and PowerPoint files show it when the sender's app saved a preview.

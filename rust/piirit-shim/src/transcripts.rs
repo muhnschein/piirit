@@ -392,7 +392,7 @@ impl Transcriber {
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
         let msg = crate::json::u32_at(&payload, "msgId");
         match kind.to_string().as_str() {
-            // Arrival; `MsgsChanged` also when a limited download lands.
+            // Arrival; `MsgsChanged`: own message sent (here or other device), limited download landed.
             "IncomingMsg" | "MsgsChanged" if msg != 0 => hub::arrived(context_id, msg),
             "MsgDeleted" if msg != 0 => hub::deleted(context_id, msg),
             "AccountsChanged" => hub::accounts_changed(),
