@@ -858,6 +858,9 @@ fn message_object(msg: u64) -> Value {
             message["fileBytes"] = json!(4_096);
             // Ms, as sender writes: row shows length before play.
             message["duration"] = json!(4_000);
+            if std::env::var_os("PIIRIT_FAKE_OWN_VOICE").is_some() {
+                message["fromId"] = json!(SELF);
+            }
         }
         14 => {
             message["viewType"] = json!("Webxdc");

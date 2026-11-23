@@ -29,9 +29,6 @@ use crate::json;
 const PAGE: usize = 50;
 const SWEEP_PAGE: usize = 500;
 
-/// `DC_CONTACT_ID_SELF`: own messages never queue by themselves.
-const SELF: u32 = 1;
-
 /// What a `Transcript` shows.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct Shown {
@@ -94,7 +91,6 @@ struct Found {
     chat: u32,
     timestamp: i64,
     path: PathBuf,
-    from_self: bool,
 }
 
 /// Core message JSON: `Some` if downloaded voice message with file.
@@ -113,7 +109,6 @@ fn voice_of(account: u32, msg: u32, message: &Value) -> Option<Found> {
         chat: json::u32_at(message, "chatId"),
         timestamp: json::i64_at(message, "timestamp"),
         path: PathBuf::from(file),
-        from_self: json::u32_at(message, "fromId") == SELF,
     })
 }
 
@@ -673,7 +668,6 @@ pub(crate) fn transcribe(key: Key, any_language: bool) {
                     chat: 0,
                     timestamp: 0,
                     path: PathBuf::new(),
-                    from_self: false,
                 },
                 Kind::Manual,
                 any_language,
@@ -734,7 +728,7 @@ pub(crate) fn cancel(key: Key) {
     refresh(key);
 }
 
-/// Core event: message arrived or changed (limited download landing).
+/// Core event: message arrived, sent, or changed (limited download landing).
 pub(crate) fn arrived(account: u32, msg: u32) {
     let key = (account, msg);
     let wanted = with(|hub| {
@@ -749,9 +743,10 @@ pub(crate) fn arrived(account: u32, msg: u32) {
     let store = with(Hub::existing_store);
     // Some: voice to queue; None: look no more; not called: may change still.
     let done = queued_callback(move |found: Option<Found>| {
-        let queued = with(|hub| match found {
-            Some(found) if !found.from_self => hub.enqueue(&found, Kind::New, false),
-            _ => {
+        let queued = with(|hub| {
+            if let Some(found) = found {
+                hub.enqueue(&found, Kind::New, false)
+            } else {
                 hub.skip.insert(key);
                 false
             }
@@ -944,7 +939,6 @@ fn queue_all(found: &[Found], kind: Kind) {
     let queued: Vec<Key> = with(|hub| {
         found
             .iter()
-            .filter(|found| kind == Kind::Manual || !found.from_self)
             .filter(|found| hub.enqueue(found, kind, false))
             .map(|found| found.key)
             .collect()
