@@ -655,7 +655,7 @@ test("a camera switched off while it opens is let go when it does", async () => 
 });
 
 test("the other end's picture is reported while it comes and they have it on", async () => {
-    const world = makeWorld(VOICE);
+    const world = makeWorld(VIDEO);
     const { connection } = await page(world);
     const theirs = new Track("video", "theirs");
     connection.fire("track", { track: theirs, streams: [new Stream([theirs])] });
@@ -678,6 +678,25 @@ test("the other end's picture is reported while it comes and they have it on", a
     assert.equal(lastVideo(world).remote, false, "a picture with no frames still counts");
 
     connection.channels.mutedState.say("not json");
+    assert.equal(lastVideo(world).remote, false);
+});
+
+test("in a voice call their picture counts only once they say their camera is on", async () => {
+    // Their switched-off camera sends black frames, often before they say it is off: a picture
+    // reported then turns the call to loudspeaker.
+    const world = makeWorld(VOICE);
+    const { connection } = await page(world);
+    const theirs = new Track("video", "theirs");
+    connection.fire("track", { track: theirs, streams: [new Stream([theirs])] });
+    assert.equal(lastVideo(world).remote, false, "black frames before their word count as a picture");
+
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: false }));
+    assert.equal(lastVideo(world).remote, false);
+
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
+    assert.equal(lastVideo(world).remote, true, "a camera they switched on is not shown");
+
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: false }));
     assert.equal(lastVideo(world).remote, false);
 });
 
