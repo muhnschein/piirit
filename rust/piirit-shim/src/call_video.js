@@ -66,6 +66,9 @@ var piiritVideo = (function () {
     /* Camera wanted at start (page query). */
     var wanted = !window.location.search.includes("noOutgoingVideoInitially")
         && !window.location.search.includes("disableVideoCompletely");
+    /* Voice call: their picture counts only once they say camera on. Their switched-off camera
+     * still sends black frames, often before they say off (loudspeaker, CallAudio.qml). */
+    var voiceCall = !wanted;
     /* Facing: "user" or "environment". */
     var facing = "user";
     /* Facing of camera behind picture (sets mirroring). Old camera's until new track in place,
@@ -451,7 +454,7 @@ var piiritVideo = (function () {
     }
 
     function remoteShown() {
-        if (!remote || remoteEnabled === false) {
+        if (!remote || remoteEnabled === false || (voiceCall && remoteEnabled !== true)) {
             return false;
         }
         return remote.getVideoTracks().some(function (track) {
