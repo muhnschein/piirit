@@ -3559,6 +3559,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>किसी वॉइस संदेश को टेक्स्ट में बदलने के लिए उस पर लिप्यंतरण करें टैप करें।</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>बैटरी का स्तर कम से कम 50% होना चाहिए।</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>इसे चालू करने से पहले आए वॉइस संदेशों का लिप्यंतरण फ़ोन के चार्ज होते समय होता है।</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>बैटरी का स्तर कम से कम 50% होना चाहिए।</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>सब दिखाएँ</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>बैटरी का स्तर कम से कम 50% होना चाहिए।</translation>
     </message>
 </context>
 <context>

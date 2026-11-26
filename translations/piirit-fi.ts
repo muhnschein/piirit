@@ -3555,6 +3555,10 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Napauta ääniviestin Litteroi-painiketta muuttaaksesi sen tekstiksi.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akun varaustason on oltava vähintään 50 %.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3603,6 +3607,10 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Ääniviestit, jotka saapuivat ennen tämän käyttöönottoa, litteroidaan, kun puhelin latautuu.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akun varaustason on oltava vähintään 50 %.</translation>
     </message>
 </context>
 <context>
@@ -3697,6 +3705,10 @@ Odotetaan käyttäjän %2$s laitteen vastausta…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Näytä kaikki</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akun varaustason on oltava vähintään 50 %.</translation>
     </message>
 </context>
 <context>

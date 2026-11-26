@@ -29,6 +29,7 @@ const PROBE_QML: &str = r"
             property int model_permille: 0
             property bool power_saving: false
             property bool charging: false
+            property bool charger_ready: false
             property int mode: 0
         }
 
@@ -146,6 +147,12 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function setEnabled(on) { transcriber.enabled = on; return 'ok' }
+        function setCharger(charging, ready) {
+            transcriber.mode = 1
+            transcriber.charging = charging
+            transcriber.charger_ready = ready
+            return 'ok'
+        }
         function heard() { var was = calls + raised; calls = ''; raised = ''; return was }
     }
 ";
@@ -225,6 +232,17 @@ fn a_voice_message_draws_and_offers_its_own_transcript() {
         );
         common::record(&s, "running-copy", menu!(0, "copyTranscriptItem"));
         common::record(&s, "running-transcribe", menu!(0, "transcribeItem"));
+
+        // Queued on its own, While charging: charger in but battery too low still waits.
+        call!("setCharger", true, false);
+        call!(
+            "setState",
+            0,
+            QString::from(r#"{"state": 1, "manual": false}"#)
+        );
+        common::record(&s, "low-bubble", call!("bubble", 0));
+        call!("setCharger", true, true);
+        common::record(&s, "ready-bubble", call!("bubble", 0));
 
         // Other language: bubble skips language check on its button.
         call!(
@@ -322,6 +340,17 @@ fn a_voice_message_draws_and_offers_its_own_transcript() {
         (value("running-copy"), value("running-transcribe")),
         ("false".to_string(), "false".to_string()),
         "a voice message being transcribed offers to copy or start again. {context}"
+    );
+    assert_eq!(
+        value("low-bubble"),
+        "This voice message is transcribed when the phone is charging. \
+         The battery level must be at least 50%.|Transcribe now",
+        "a bubble read the charger alone, not whether the battery lets it run. {context}"
+    );
+    assert_eq!(
+        value("ready-bubble"),
+        "Waiting for other voice messages to be transcribed.|-",
+        "a bubble still waits for the charger once the battery lets it run. {context}"
     );
     assert_eq!(
         value("other-bubble"),

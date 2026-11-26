@@ -3559,6 +3559,10 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Puuduta häälsõnumi juures nuppu Transkribeeri, et see tekstiks muuta.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Aku laetus peab olema vähemalt 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Häälsõnumid, mis saabusid enne selle sisselülitamist, transkribeeritakse telefoni laadimise ajal.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Aku laetus peab olema vähemalt 50%.</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Ootan vastust kasutaja %2$s seadmest…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Näita kõike</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Aku laetus peab olema vähemalt 50%.</translation>
     </message>
 </context>
 <context>

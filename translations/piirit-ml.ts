@@ -3559,6 +3559,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>ഒരു ശബ്ദ സന്ദേശം എഴുത്താക്കാൻ അതിലെ എഴുത്താക്കുക ടാപ്പ് ചെയ്യുക.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ബാറ്ററി നില കുറഞ്ഞത് 50% ആയിരിക്കണം.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>ഇത് ഓണാക്കുന്നതിന് മുമ്പ് വന്ന ശബ്ദ സന്ദേശങ്ങൾ ഫോൺ ചാർജ് ചെയ്യുമ്പോൾ എഴുത്താക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ബാറ്ററി നില കുറഞ്ഞത് 50% ആയിരിക്കണം.</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>എല്ലാം കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ബാറ്ററി നില കുറഞ്ഞത് 50% ആയിരിക്കണം.</translation>
     </message>
 </context>
 <context>

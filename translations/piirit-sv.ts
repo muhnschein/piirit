@@ -3559,6 +3559,10 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Tryck på Transkribera på ett röstmeddelande för att göra om det till text.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Batterinivån måste vara minst 50 %.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Väntar på att enheten hos %2$s ska svara...</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Röstmeddelanden som kom innan du slog på detta transkriberas medan telefonen laddas.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Batterinivån måste vara minst 50 %.</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Väntar på att enheten hos %2$s ska svara...</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Visa allt</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Batterinivån måste vara minst 50 %.</translation>
     </message>
 </context>
 <context>

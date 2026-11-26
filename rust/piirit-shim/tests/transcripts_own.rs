@@ -32,6 +32,7 @@ const PROBE_QML: &str = r#"
                 '{"kind":"MsgsChanged","chatId":2,"msgId":13}')
             else if (what === 'older on charger') {
                 transcriber.charging = true
+                transcriber.battery_level = 100
                 transcriber.older = true
             }
         }

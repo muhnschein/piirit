@@ -3536,6 +3536,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>撳語音訊息上嘅「轉寫」就可以將佢轉成文字。</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>電池電量必須最少有 50%。</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3584,6 +3588,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>開啟呢個功能之前收到嘅語音訊息會喺手機充電時轉寫。</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>電池電量必須最少有 50%。</translation>
     </message>
 </context>
 <context>
@@ -3678,6 +3686,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>顯示全部</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>電池電量必須最少有 50%。</translation>
     </message>
 </context>
 <context>

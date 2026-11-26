@@ -3576,6 +3576,10 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Bakstelėkite Transkribuoti prie balso žinutės, kad paverstumėte ją tekstu.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumuliatoriaus įkrova turi būti bent 50 %.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3624,6 +3628,10 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Balso žinutės, gautos prieš įjungiant šią funkciją, transkribuojamos, kol telefonas kraunamas.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumuliatoriaus įkrova turi būti bent 50 %.</translation>
     </message>
 </context>
 <context>
@@ -3718,6 +3726,10 @@ Laukiama, kol atsakys naudotojo %2$s įrenginys…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Rodyti viską</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumuliatoriaus įkrova turi būti bent 50 %.</translation>
     </message>
 </context>
 <context>

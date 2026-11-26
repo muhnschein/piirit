@@ -3555,6 +3555,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>குரல் செய்தியை எழுத்தாக மாற்ற அதில் எழுத்தாக்கு என்பதைத் தட்டவும்.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>பேட்டரி அளவு குறைந்தது 50% ஆக இருக்க வேண்டும்.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3603,6 +3607,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>இதை இயக்குவதற்கு முன் வந்த குரல் செய்திகள் தொலைபேசி சார்ஜ் ஆகும்போது எழுத்தாக்கப்படும்.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>பேட்டரி அளவு குறைந்தது 50% ஆக இருக்க வேண்டும்.</translation>
     </message>
 </context>
 <context>
@@ -3697,6 +3705,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>அனைத்தையும் காட்டு</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>பேட்டரி அளவு குறைந்தது 50% ஆக இருக்க வேண்டும்.</translation>
     </message>
 </context>
 <context>

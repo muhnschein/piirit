@@ -1,12 +1,13 @@
-//! When transcription runs: every mode × charger × battery saving × job kind, and order.
+//! When transcription runs: every mode × charger × battery level × battery saving × job kind,
+//! and order.
 
 #[allow(dead_code)]
 #[path = "../src/transcripts/schedule.rs"]
 mod schedule;
 
 use schedule::{
-    keeps, may_run, next, queues_backlog, queues_new, Conditions, Entry, Kind, MODE_ALWAYS,
-    MODE_CHARGING, MODE_NEVER,
+    charger_ready, keeps, may_run, next, queues_backlog, queues_new, Conditions, Entry, Kind,
+    MODE_ALWAYS, MODE_CHARGING, MODE_NEVER,
 };
 
 const KINDS: [Kind; 3] = [Kind::Manual, Kind::New, Kind::Backlog];
@@ -16,12 +17,13 @@ fn expected(kind: Kind, c: &Conditions) -> bool {
     if !c.enabled || !c.model_ready {
         return false;
     }
+    let charger = c.charging && c.battery_percent >= 50 && !c.power_saving;
     match kind {
         Kind::Manual => true,
-        Kind::New if c.mode == MODE_CHARGING => c.charging && !c.power_saving,
+        Kind::New if c.mode == MODE_CHARGING => charger,
         Kind::New if c.mode == MODE_ALWAYS => !c.power_saving,
         Kind::New => false,
-        Kind::Backlog => c.older && c.charging && !c.power_saving,
+        Kind::Backlog => c.older && charger,
     }
 }
 
@@ -30,22 +32,30 @@ fn all() -> Vec<Conditions> {
     let mut out = Vec::new();
     for bits in 0..32_u32 {
         for mode in [MODE_NEVER, MODE_CHARGING, MODE_ALWAYS] {
-            out.push(Conditions {
-                enabled: bits & 1 != 0,
-                model_ready: bits & 2 != 0,
-                older: bits & 4 != 0,
-                charging: bits & 8 != 0,
-                power_saving: bits & 16 != 0,
-                mode,
-            });
+            for battery_percent in [-1, 0, 49, 50, 51, 100] {
+                out.push(Conditions {
+                    enabled: bits & 1 != 0,
+                    model_ready: bits & 2 != 0,
+                    older: bits & 4 != 0,
+                    charging: bits & 8 != 0,
+                    power_saving: bits & 16 != 0,
+                    mode,
+                    battery_percent,
+                });
+            }
         }
     }
     out
 }
 
 #[test]
-fn every_mode_charger_and_battery_saving_case_runs_as_the_settings_say() {
+fn every_mode_charger_battery_and_battery_saving_case_runs_as_the_settings_say() {
     for c in all() {
+        assert_eq!(
+            charger_ready(&c),
+            c.charging && c.battery_percent >= 50 && !c.power_saving,
+            "{c:?}"
+        );
         for kind in KINDS {
             assert_eq!(
                 may_run(kind, &c),
@@ -65,6 +75,7 @@ fn taps_ignore_charger_and_battery_saving_but_not_the_model_or_the_switch() {
         older: false,
         charging: false,
         power_saving: true,
+        battery_percent: 5,
     };
     assert!(may_run(Kind::Manual, &on));
     assert!(!may_run(
@@ -92,9 +103,39 @@ fn spelled_out_cases() {
         older: true,
         charging: true,
         power_saving: false,
+        battery_percent: 50,
     };
-    // While charging: plugged runs, unplugged waits, battery saving pauses.
+    // While charging: plugged at 50 % runs; unplugged, below 50 % or unknown level waits;
+    // battery saving pauses.
     assert!(may_run(Kind::New, &base));
+    for battery_percent in [49, -1] {
+        let low = Conditions {
+            battery_percent,
+            ..base
+        };
+        assert!(!may_run(Kind::New, &low), "{low:?}");
+        assert!(!may_run(Kind::Backlog, &low), "{low:?}");
+        // Taps and Always don't wait for the battery.
+        assert!(may_run(Kind::Manual, &low), "{low:?}");
+        assert!(
+            may_run(
+                Kind::New,
+                &Conditions {
+                    mode: MODE_ALWAYS,
+                    ..low
+                }
+            ),
+            "{low:?}"
+        );
+    }
+    assert!(!may_run(
+        Kind::Backlog,
+        &Conditions {
+            battery_percent: 100,
+            power_saving: true,
+            ..base
+        }
+    ));
     assert!(!may_run(
         Kind::New,
         &Conditions {
@@ -187,6 +228,7 @@ fn taps_first_then_arrivals_in_order_then_newest_backlog() {
         older: true,
         charging: true,
         power_saving: false,
+        battery_percent: 80,
     };
     let queue = [
         entry(Kind::Backlog, 1, 100),

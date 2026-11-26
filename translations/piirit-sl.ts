@@ -3593,6 +3593,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Tapnite Prepiši pri glasovnem sporočilu, da ga pretvorite v besedilo.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Raven napolnjenosti baterije mora biti vsaj 50 %.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3641,6 +3645,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Glasovna sporočila, ki so prispela, preden ste to vklopili, se prepišejo, ko se telefon polni.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Raven napolnjenosti baterije mora biti vsaj 50 %.</translation>
     </message>
 </context>
 <context>
@@ -3735,6 +3743,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Pokaži vse</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Raven napolnjenosti baterije mora biti vsaj 50 %.</translation>
     </message>
 </context>
 <context>

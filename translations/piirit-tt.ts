@@ -3542,6 +3542,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Тавышлы хәбәрне текстка әйләндерү өчен андагы «Язуга күчерү» төймәсенә басыгыз.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Батарея дәрәҗәсе кимендә 50% булырга тиеш.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3590,6 +3594,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Моны кабызганчы килгән тавышлы хәбәрләр телефон корылганда язуга күчерелә.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Батарея дәрәҗәсе кимендә 50% булырга тиеш.</translation>
     </message>
 </context>
 <context>
@@ -3684,6 +3692,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Барысын да күрсәтү</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Батарея дәрәҗәсе кимендә 50% булырга тиеш.</translation>
     </message>
 </context>
 <context>

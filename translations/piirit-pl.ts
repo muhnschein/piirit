@@ -3576,6 +3576,10 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Stuknij Transkrybuj przy wiadomości głosowej, aby zamienić ją na tekst.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Poziom naładowania baterii musi wynosić co najmniej 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3624,6 +3628,10 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Wiadomości głosowe, które przyszły przed włączeniem tej opcji, są transkrybowane, gdy telefon się ładuje.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Poziom naładowania baterii musi wynosić co najmniej 50%.</translation>
     </message>
 </context>
 <context>
@@ -3718,6 +3726,10 @@ Czekam na odpowiedź urządzenia %2$s…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Pokaż wszystko</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Poziom naładowania baterii musi wynosić co najmniej 50%.</translation>
     </message>
 </context>
 <context>
