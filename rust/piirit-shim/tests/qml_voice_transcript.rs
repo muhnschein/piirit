@@ -292,8 +292,8 @@ fn each_state_shows_its_line_and_its_button() {
         ("1-ready", "ready|-|Transcribe|-|-|no|no|visible"),
         (
             "2-charger",
-            "charger|This voice message is transcribed when the phone is charging.|\
-             Transcribe now|-|-|no|no|visible",
+            "charger|This voice message is transcribed when the phone is charging. \
+             The battery level must be at least 50%.|Transcribe now|-|-|no|no|visible",
         ),
         (
             "2-charging",
@@ -301,8 +301,8 @@ fn each_state_shows_its_line_and_its_button() {
         ),
         (
             "2-backlog",
-            "charger|This voice message is transcribed when the phone is charging.|\
-             Transcribe now|-|-|no|no|visible",
+            "charger|This voice message is transcribed when the phone is charging. \
+             The battery level must be at least 50%.|Transcribe now|-|-|no|no|visible",
         ),
         (
             "3-saving",

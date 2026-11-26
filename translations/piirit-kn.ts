@@ -3559,6 +3559,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪಠ್ಯವಾಗಿ ಬದಲಾಯಿಸಲು ಅದರ ಮೇಲೆ ಲಿಪ್ಯಂತರಿಸಿ ಟ್ಯಾಪ್ ಮಾಡಿ.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ಬ್ಯಾಟರಿ ಮಟ್ಟ ಕನಿಷ್ಠ 50% ಇರಬೇಕು.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>ಇದನ್ನು ಆನ್ ಮಾಡುವ ಮೊದಲು ಬಂದ ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು ಫೋನ್ ಚಾರ್ಜ್ ಆಗುವಾಗ ಲಿಪ್ಯಂತರಿಸಲಾಗುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ಬ್ಯಾಟರಿ ಮಟ್ಟ ಕನಿಷ್ಠ 50% ಇರಬೇಕು.</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>ಎಲ್ಲವನ್ನೂ ತೋರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ಬ್ಯಾಟರಿ ಮಟ್ಟ ಕನಿಷ್ಠ 50% ಇರಬೇಕು.</translation>
     </message>
 </context>
 <context>

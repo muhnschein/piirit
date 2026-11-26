@@ -1,4 +1,4 @@
-//! Charger and battery saving mode from MCE, as auto-transcription reads them. Asked on load
+//! Charger, battery level and battery saving mode from MCE, as auto-transcription reads them. Asked on load
 //! and on MCE (re)appearance, then signals only. Loaded as shipped vs stub `Nemo.DBus`.
 
 // Qt harness: see qml_share.rs.
@@ -27,9 +27,12 @@ const PROBE_QML: &str = r"
         function asked() {
             return bus('mceRequest').called.trim().split('\n').join(',')
         }
-        function power() { return loader.item.charging + '|' + loader.item.saving }
+        function power() {
+            return loader.item.charging + '|' + loader.item.saving + '|' + loader.item.battery
+        }
         function charger(state) { bus('mceSignal').charger_state_ind(state); return power() }
         function saving(active) { bus('mceSignal').psm_state_ind(active); return power() }
+        function battery(level) { bus('mceSignal').battery_level_ind(level); return power() }
         // MCE gone, then back on bus, answering `value` to every ask.
         function reappear(value) {
             var request = bus('mceRequest')
@@ -43,6 +46,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn power_state_follows_mce_without_polling() {
     // SAFETY: single thread; pre-Qt.
     unsafe {
@@ -82,8 +86,13 @@ fn power_state_follows_mce_without_polling() {
         common::record(&s, "unknown", call!("charger", QString::from("unknown")));
         common::record(&s, "saving-on", call!("saving", true));
         common::record(&s, "saving-off", call!("saving", false));
+        common::record(&s, "battery-50", call!("battery", 50));
+        common::record(&s, "battery-49", call!("battery", 49));
+        common::record(&s, "battery-unknown", call!("battery", -1));
+        common::record(&s, "battery-junk", call!("battery", QString::from("80")));
         common::record(&s, "back-on", call!("reappear", QString::from("on")));
         common::record(&s, "back-true", call!("reappear", true));
+        common::record(&s, "back-73", call!("reappear", 73));
         (*engine_ptr).quit();
     });
 
@@ -95,35 +104,68 @@ fn power_state_follows_mce_without_polling() {
     assert_eq!(value("load"), "ok", "PowerWatch did not load: {steps:?}");
     assert_eq!(
         value("asked"),
-        "get_charger_state [],get_psm_state []",
-        "MCE was not asked for charger and saving mode on load"
+        "get_charger_state [],get_psm_state [],get_battery_level []",
+        "MCE was not asked for charger, saving mode and battery level on load"
     );
     assert_eq!(
         value("unanswered"),
-        "false|false",
+        "false|false|-1",
         "power state was guessed before MCE answered"
     );
-    assert_eq!(value("plugged"), "true|false", "charger in not heard");
-    assert_eq!(value("unplugged"), "false|false", "charger out not heard");
+    assert_eq!(value("plugged"), "true|false|-1", "charger in not heard");
+    assert_eq!(
+        value("unplugged"),
+        "false|false|-1",
+        "charger out not heard"
+    );
     assert_eq!(
         value("unknown"),
-        "false|false",
+        "false|false|-1",
         "unknown charger counted as charging"
     );
-    assert_eq!(value("saving-on"), "false|true", "saving mode on not heard");
+    assert_eq!(
+        value("saving-on"),
+        "false|true|-1",
+        "saving mode on not heard"
+    );
     assert_eq!(
         value("saving-off"),
-        "false|false",
+        "false|false|-1",
         "saving mode off not heard"
     );
     assert_eq!(
+        value("battery-50"),
+        "false|false|50",
+        "battery level not heard"
+    );
+    assert_eq!(
+        value("battery-49"),
+        "false|false|49",
+        "battery level change not heard"
+    );
+    assert_eq!(
+        value("battery-unknown"),
+        "false|false|-1",
+        "unknown battery level not kept unknown"
+    );
+    assert_eq!(
+        value("battery-junk"),
+        "false|false|-1",
+        "a battery level that is no number was taken as one"
+    );
+    assert_eq!(
         value("back-on"),
-        "get_charger_state [],get_psm_state []=true|false",
+        "get_charger_state [],get_psm_state [],get_battery_level []=true|false|-1",
         "MCE coming back was not asked again, or its charger answer was misread"
     );
     assert_eq!(
         value("back-true"),
-        "get_charger_state [],get_psm_state []=false|true",
+        "get_charger_state [],get_psm_state [],get_battery_level []=false|true|-1",
         "saving mode answer misread, or a non-\"on\" charger answer counted as charging"
+    );
+    assert_eq!(
+        value("back-73"),
+        "get_charger_state [],get_psm_state [],get_battery_level []=false|false|73",
+        "MCE coming back did not ask the battery level again, or its answer was misread"
     );
 }

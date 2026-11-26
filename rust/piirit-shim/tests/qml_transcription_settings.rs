@@ -366,6 +366,16 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         );
         common::record(
             &s,
+            "older-says",
+            call!(
+                "get",
+                q!("top"),
+                q!("transcriptionOlderSwitch"),
+                q!("description")
+            ),
+        );
+        common::record(
+            &s,
             "pick-older",
             call!("click", q!("top"), q!("transcriptionOlderSwitch")),
         );
@@ -623,9 +633,11 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (value("when-mode"), value("when-mode-says")),
         (
             "1".to_string(),
-            "New voice messages are transcribed while the phone is charging.".to_string()
+            "New voice messages are transcribed while the phone is charging. \
+             The battery level must be at least 50%."
+                .to_string()
         ),
-        "a fresh phone does not start on While charging, said in one sentence. {context}"
+        "a fresh phone does not start on While charging, said with its battery floor. {context}"
     );
     assert_eq!(
         (value("mode-stored"), value("when-mode-now")),
@@ -639,6 +651,12 @@ fn the_switch_leads_through_languages_and_timing_and_cancel_leaves_it_off() {
         (value("older-at-first"), value("older-stored")),
         ("true".to_string(), "false".to_string()),
         "older voice messages are not on at first, or the switch stored nothing. {context}"
+    );
+    assert_eq!(
+        value("older-says"),
+        "Voice messages that arrived before you turned this on are transcribed while the phone \
+         is charging. The battery level must be at least 50%.",
+        "older voice messages do not say they wait for the charger and battery. {context}"
     );
     assert_eq!(
         (value("back-to-settings"), value("depth-after-done")),

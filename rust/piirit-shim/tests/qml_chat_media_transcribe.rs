@@ -29,6 +29,7 @@ const PROBE_QML: &str = r"
             property int model_permille: 0
             property bool power_saving: false
             property bool charging: false
+            property bool charger_ready: false
             property int mode: 0
             // What count_chat answers next.
             property int untranscribed: 0

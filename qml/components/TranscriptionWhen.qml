@@ -54,6 +54,7 @@ Column {
         objectName: "transcriptionOlderSwitch"
         text: qsTr("Transcribe older voice messages")
         description: qsTr("Voice messages that arrived before you turned this on are transcribed while the phone is charging.")
+                     + " " + qsTr("The battery level must be at least 50%.")
         automaticCheck: false
         checked: Settings.transcriptionOlder === true
         onClicked: Settings.transcriptionOlder = !checked

@@ -9,6 +9,9 @@ pub(crate) const MODE_CHARGING: u32 = 1;
 /// `Transcriber.mode`: arrivals run unless battery saving.
 pub(crate) const MODE_ALWAYS: u32 = 2;
 
+/// Least battery level, percent, for jobs that wait for the charger.
+pub(crate) const CHARGER_MIN_PERCENT: i32 = 50;
+
 /// Why a job is queued. Order = priority.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum Kind {
@@ -37,6 +40,15 @@ pub(crate) struct Conditions {
     pub charging: bool,
     /// Battery saving on.
     pub power_saving: bool,
+    /// Battery level, percent; -1 unknown.
+    pub battery_percent: i32,
+}
+
+/// Charger lets automatic jobs run: in, battery high enough, no battery saving.
+pub(crate) fn charger_ready(conditions: &Conditions) -> bool {
+    conditions.charging
+        && conditions.battery_percent >= CHARGER_MIN_PERCENT
+        && !conditions.power_saving
 }
 
 /// Job of `kind` may start now.
@@ -44,7 +56,7 @@ pub(crate) fn may_run(kind: Kind, conditions: &Conditions) -> bool {
     if !conditions.enabled || !conditions.model_ready {
         return false;
     }
-    let plugged = conditions.charging && !conditions.power_saving;
+    let plugged = charger_ready(conditions);
     match kind {
         Kind::Manual => true,
         Kind::New => match conditions.mode {

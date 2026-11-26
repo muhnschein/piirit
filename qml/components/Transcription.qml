@@ -22,6 +22,7 @@ Item {
         older: Settings.transcriptionOlder === true
         charging: power.charging
         power_saving: power.saving
+        battery_level: power.battery
     }
 
     PowerWatch {
