@@ -19,10 +19,11 @@ import "../js/Media.js" as Media
  * Foot: up to two quick actions (home screen draws); grid fades into strip. Taps:
  * window's (piirit.qml).
  *
- * Call up: cover is call's. Faint picture, darkest at name and foot; no picture:
- * avatar over name. Name, time/status, mic/camera pills, mic toggle. No hang-up
- * (mis-tap), no camera (let go while cover shows). Ringing: no action, no pills.
- * Inside side margins, above strip; small covers scale down.
+ * Call up: cover is call's. Faint picture, darkest behind words and foot; no
+ * picture: avatar over name. Name, time/status, mic/camera pills, centred top to
+ * strip; mic toggle. No hang-up (mis-tap), no camera (let go while cover shows).
+ * Ringing: no action, no pills. Inside side margins, above strip; small covers
+ * scale down.
  *
  * Plain picture file (blur = no face); no shaders on cover (Avatar.qml).
  */
@@ -457,15 +458,22 @@ CoverBackground {
             source: cover.callPicturePath.length > 0 ? Media.fileUrl(cover.callPicturePath) : ""
         }
 
-        // Shade: dark top and foot so name and action read over face.
+        // Shade: dark behind words and foot so they and action read over face.
         Rectangle {
+            id: callShade
             objectName: "callShade"
             anchors.fill: parent
             visible: cover.callPictured
+            /// Words' middle, share of height.
+            readonly property real words: height > 0
+                ? Math.min(0.7, (callBody.y + (callHead.y + callBody.needed / 2) * callBody.scale)
+                                / height)
+                : 0.4
             gradient: Gradient {
-                GradientStop { position: 0.0; color: cover.shade(0.6) }
-                GradientStop { position: 0.45; color: cover.shade(0.1) }
-                GradientStop { position: 0.6; color: cover.shade(0.15) }
+                GradientStop { position: 0.0; color: cover.shade(0.3) }
+                GradientStop { position: Math.max(0.05, callShade.words - 0.2); color: cover.shade(0.5) }
+                GradientStop { position: callShade.words + 0.1; color: cover.shade(0.5) }
+                GradientStop { position: Math.min(0.95, callShade.words + 0.25); color: cover.shade(0.15) }
                 GradientStop { position: 1.0; color: cover.shade(0.85) }
             }
         }
@@ -556,6 +564,8 @@ CoverBackground {
             Column {
                 id: callHead
                 objectName: "callHead"
+                // Who and pills centred as one, top to strip.
+                y: Math.round(Math.max(0, (callBody.height - callBody.needed) / 2))
                 width: parent.width
                 spacing: callBody.sized(Theme.paddingSmall)
 
@@ -609,16 +619,12 @@ CoverBackground {
                 }
             }
 
-            // Call facts as pills, centred between name and action.
+            // Call facts as pills, under time.
             Column {
                 id: callNotes
                 objectName: "callNotes"
-                readonly property real roomTop: callHead.height + callBody.gap
-                // Natural size, before scale.
-                readonly property real roomBottom: Math.max(callBody.height, callBody.needed)
                 anchors.horizontalCenter: parent.horizontalCenter
-                y: Math.round(callNotes.roomTop
-                              + Math.max(0, (callNotes.roomBottom - callNotes.roomTop - height) / 2))
+                y: callHead.y + callHead.height + callBody.gap
                 spacing: callBody.sized(Theme.paddingSmall)
 
                 // Undoable from here: loud.

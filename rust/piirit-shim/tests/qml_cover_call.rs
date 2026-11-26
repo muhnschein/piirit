@@ -1,8 +1,9 @@
-//! Cover while call up, not grid. Who, large, near top; under it duration, or state until
-//! connected. Their picture behind it all, else plain cover with avatar. Pills: mic off, camera
-//! paused, each only when so. One action, mic: icon is what a tap does, tap does it -- never hangs
-//! up, never camera; none while only ringing. Reader's own quick actions gone for call, back after.
-//! Grid not re-laid out under it; call clock ticks only when looked at.
+//! Cover while call up, not grid. Who, large, centred with pills between top and action strip;
+//! under it duration, or state until connected. Their picture behind it all, else plain cover
+//! with avatar. Pills: mic off, camera paused, each only when so. One action, mic: icon is what a
+//! tap does, tap does it -- never hangs up, never camera; none while only ringing. Reader's own
+//! quick actions gone for call, back after. Grid not re-laid out under it; call clock ticks only
+//! when looked at.
 //!
 //! Call is a stand-in with real one's names (`calls.rs`), so cover can be put in any state; probe
 //! checks names against a real `Call` so the two can't drift.
@@ -304,7 +305,14 @@ const PROBE_QML: &str = r"
             var body = findIn(cover, 'callBody')
             var scale = body ? body.scale : 1
             var note = findIn(findIn(cover, 'micNote'), 'callNoteText')
+            // Room left above the call's words less room below, in the body.
+            var head = findIn(cover, 'callHead')
+            var notes = findIn(cover, 'callNotes')
+            var foot = notes.implicitHeight > 0 ? notes.y + notes.implicitHeight
+                                                : head.y + head.height
+            var off = Math.round(head.y - Math.max(0, body.height - foot))
             return 'strays=' + strays(findIn(cover, 'callView'), room, []).join(',')
+                + '|off=' + off
                 + '|crowded=' + crowding().join(',')
                 + '|avatar=' + shown('callAvatar')
                 + '|picture=' + shown('callPicture')
@@ -973,6 +981,12 @@ fn the_cover_shows_the_call_while_one_is_up() {
             got("crowded"),
             "",
             "{label}: the call's pieces are drawn over one another. {context}"
+        );
+        let off = size(label, "off");
+        assert!(
+            off.abs() <= 1,
+            "{label}: the call is not centred between the cover's top and the action \
+             strip (room above less room below: {off} px). {context}"
         );
         let lines = size(label, "lines");
         assert!(
