@@ -3559,6 +3559,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>ਆਵਾਜ਼ ਸੁਨੇਹੇ ਨੂੰ ਲਿਖਤ ਵਿੱਚ ਬਦਲਣ ਲਈ ਉਸ &apos;ਤੇ ਲਿਖਤ ਬਣਾਓ ਨੂੰ ਟੈਪ ਕਰੋ।</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ਬੈਟਰੀ ਦਾ ਪੱਧਰ ਘੱਟੋ-ਘੱਟ 50% ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3607,6 +3611,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>ਇਹ ਚਾਲੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਆਏ ਆਵਾਜ਼ ਸੁਨੇਹੇ ਫ਼ੋਨ ਚਾਰਜ ਹੋਣ ਵੇਲੇ ਲਿਖਤ ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ਬੈਟਰੀ ਦਾ ਪੱਧਰ ਘੱਟੋ-ਘੱਟ 50% ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>
@@ -3701,6 +3709,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>ਸਭ ਦਿਖਾਓ</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>ਬੈਟਰੀ ਦਾ ਪੱਧਰ ਘੱਟੋ-ਘੱਟ 50% ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

@@ -26,7 +26,7 @@ Item {
     /// `Transcriber.model_state`, `model_permille`.
     property int modelState: 0
     property int modelPermille: 0
-    /// Battery saving mode on; charger in.
+    /// Battery saving mode on; charger lets automatic jobs run (`Transcriber.charger_ready`).
     property bool powerSaving: false
     property bool charging: false
     /// Auto-transcribe: 0 never, 1 while charging, 2 always.
@@ -92,7 +92,9 @@ Item {
     readonly property string status: {
         switch (root.drawn) {
         case "charger":
-            return qsTr("This voice message is transcribed when the phone is charging.")
+            // One sentence per string (docs/PROJECT.md).
+            return qsTr("This voice message is transcribed when the phone is charging.") + " "
+                   + qsTr("The battery level must be at least 50%.")
         case "saving":
             return qsTr("Transcription is paused while battery saving mode is on.")
         case "waiting":

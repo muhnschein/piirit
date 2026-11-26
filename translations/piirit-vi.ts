@@ -3538,6 +3538,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Chạm Chép lời trên một tin nhắn thoại để chuyển nó thành văn bản.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Mức pin phải đạt ít nhất 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3586,6 +3590,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Tin nhắn thoại đến trước khi bạn bật tính năng này được chép lời khi điện thoại đang sạc.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Mức pin phải đạt ít nhất 50%.</translation>
     </message>
 </context>
 <context>
@@ -3680,6 +3688,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Hiện tất cả</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Mức pin phải đạt ít nhất 50%.</translation>
     </message>
 </context>
 <context>

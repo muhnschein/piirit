@@ -3555,6 +3555,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Докоснете „Транскрибиране“ на гласово съобщение, за да го превърнете в текст.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Нивото на батерията трябва да е поне 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3603,6 +3607,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Гласовите съобщения, пристигнали преди да включите това, се транскрибират, докато телефонът се зарежда.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Нивото на батерията трябва да е поне 50%.</translation>
     </message>
 </context>
 <context>
@@ -3697,6 +3705,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Показване на всичко</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Нивото на батерията трябва да е поне 50%.</translation>
     </message>
 </context>
 <context>

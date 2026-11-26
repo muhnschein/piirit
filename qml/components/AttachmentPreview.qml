@@ -494,7 +494,8 @@ Item {
                                    ? root.transcriber.model_permille : 0
                     powerSaving: root.transcriber !== null
                                  && root.transcriber.power_saving === true
-                    charging: root.transcriber !== null && root.transcriber.charging === true
+                    charging: root.transcriber !== null
+                              && root.transcriber.charger_ready === true
                     mode: root.transcriber !== null ? root.transcriber.mode : 0
                     compact: root.compactTranscript
                     onTranscribeRequested: voiceText.source.transcribe(anyLanguage)

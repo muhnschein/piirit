@@ -2,8 +2,8 @@ import QtQuick 2.0
 import Nemo.DBus 2.0
 
 /*
- * Charger and battery saving mode, from MCE on system bus (sailjail `Base` grants
- * `com.nokia.mce`). Asked once per MCE appearance, then signals only: no polling.
+ * Charger, battery level and battery saving mode, from MCE on system bus (sailjail `Base`
+ * grants `com.nokia.mce`). Asked once per MCE appearance, then signals only: no polling.
  * Names: mce-dev `dbus-names.h`, `mode-names.h`.
  */
 Item {
@@ -13,6 +13,8 @@ Item {
     property bool charging: false
     /// Battery saving mode on (`psm_state`). False until MCE answers.
     property bool saving: false
+    /// Battery level, percent (`battery_level_ind`). -1 until MCE answers, or unknown.
+    property int battery: -1
 
     /// `DBusInterface.Available` by value; see NetworkWatch.
     readonly property int dbusAvailable: 2
@@ -27,6 +29,11 @@ Item {
         watch.saving = active === true
     }
 
+    /// MCE battery level in; anything but a number unknown.
+    function heardBattery(level) {
+        watch.battery = typeof level === "number" ? Math.floor(level) : -1
+    }
+
     /// Ask MCE now. Failure: state kept (false: automatic jobs wait for charger).
     function look() {
         request.typedCall("get_charger_state", [], function (state) {
@@ -34,6 +41,9 @@ Item {
         }, function () {})
         request.typedCall("get_psm_state", [], function (active) {
             watch.heardSaving(active)
+        }, function () {})
+        request.typedCall("get_battery_level", [], function (level) {
+            watch.heardBattery(level)
         }, function () {})
     }
 
@@ -68,6 +78,10 @@ Item {
 
         function psm_state_ind(active) {
             watch.heardSaving(active)
+        }
+
+        function battery_level_ind(level) {
+            watch.heardBattery(level)
         }
     }
 

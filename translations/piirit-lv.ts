@@ -3576,6 +3576,10 @@ Gaida %2$s ierīces atbildi…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Pieskarieties Atšifrēt pie balss ziņas, lai pārvērstu to tekstā.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumulatora uzlādes līmenim jābūt vismaz 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3624,6 +3628,10 @@ Gaida %2$s ierīces atbildi…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Balss ziņas, kas pienāca pirms šīs funkcijas ieslēgšanas, tiek atšifrētas, kamēr tālrunis lādējas.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumulatora uzlādes līmenim jābūt vismaz 50%.</translation>
     </message>
 </context>
 <context>
@@ -3718,6 +3726,10 @@ Gaida %2$s ierīces atbildi…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Rādīt visu</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Akumulatora uzlādes līmenim jābūt vismaz 50%.</translation>
     </message>
 </context>
 <context>

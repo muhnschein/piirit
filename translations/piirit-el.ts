@@ -3555,6 +3555,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Πατήστε Μεταγραφή σε ένα φωνητικό μήνυμα για να το μετατρέψετε σε κείμενο.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Η στάθμη της μπαταρίας πρέπει να είναι τουλάχιστον 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3603,6 +3607,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Τα φωνητικά μηνύματα που έφτασαν πριν το ενεργοποιήσετε μεταγράφονται όσο το τηλέφωνο φορτίζει.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Η στάθμη της μπαταρίας πρέπει να είναι τουλάχιστον 50%.</translation>
     </message>
 </context>
 <context>
@@ -3697,6 +3705,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Εμφάνιση όλων</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Η στάθμη της μπαταρίας πρέπει να είναι τουλάχιστον 50%.</translation>
     </message>
 </context>
 <context>

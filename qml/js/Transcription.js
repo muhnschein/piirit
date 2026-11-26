@@ -18,7 +18,8 @@ function modeName(mode) {
 /// One sentence under choice.
 function modeDescription(mode) {
     if (mode === 1) {
-        return qsTr("New voice messages are transcribed while the phone is charging.")
+        return qsTr("New voice messages are transcribed while the phone is charging.") + " "
+               + qsTr("The battery level must be at least 50%.")
     }
     if (mode === 2) {
         // One sentence per string (docs/PROJECT.md).

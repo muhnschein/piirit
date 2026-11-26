@@ -3555,6 +3555,10 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Tik op Uitschrijven bij een spraakbericht om het in tekst om te zetten.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Het batterijniveau moet minstens 50% zijn.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3603,6 +3607,10 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Spraakberichten die binnenkwamen voordat je dit aanzette, worden uitgeschreven terwijl de telefoon oplaadt.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Het batterijniveau moet minstens 50% zijn.</translation>
     </message>
 </context>
 <context>
@@ -3697,6 +3705,10 @@ Er wordt gewacht op antwoord van het apparaat van %2$s…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Alles tonen</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Het batterijniveau moet minstens 50% zijn.</translation>
     </message>
 </context>
 <context>

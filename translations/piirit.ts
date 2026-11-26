@@ -3515,6 +3515,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3562,6 +3566,10 @@ Waiting for the device of %2$s to reply…</source>
     </message>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3656,6 +3664,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

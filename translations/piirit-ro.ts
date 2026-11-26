@@ -3572,6 +3572,10 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Atinge Transcrie pe un mesaj vocal pentru a-l transforma în text.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Nivelul bateriei trebuie să fie de cel puțin 50%.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3620,6 +3624,10 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Mesajele vocale sosite înainte de activare sunt transcrise în timp ce telefonul se încarcă.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Nivelul bateriei trebuie să fie de cel puțin 50%.</translation>
     </message>
 </context>
 <context>
@@ -3714,6 +3722,10 @@ Se așteaptă răspunsul dispozitivului lui %2$s…</translation>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Arată tot</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Nivelul bateriei trebuie să fie de cel puțin 50%.</translation>
     </message>
 </context>
 <context>

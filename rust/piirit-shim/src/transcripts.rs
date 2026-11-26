@@ -57,6 +57,7 @@ pub const MODEL_FAILED: u32 = 3;
 ///     older: Settings.transcriptionOlder
 ///     charging: power.charging
 ///     power_saving: power.saving
+///     battery_level: power.battery
 /// }
 /// ```
 // One flag per Qt property: QML binds each.
@@ -80,6 +81,10 @@ pub struct Transcriber {
     pub charging: qt_property!(bool; WRITE set_charging NOTIFY power_changed),
     /// Battery saving mode on (MCE, from QML). Pauses automatic jobs.
     pub power_saving: qt_property!(bool; WRITE set_power_saving NOTIFY power_changed),
+    /// Battery level, percent; -1 unknown (MCE, from QML).
+    pub battery_level: qt_property!(i32; WRITE set_battery_level NOTIFY power_changed),
+    /// Charger lets automatic jobs run: in, battery at least 50 %, no battery saving.
+    pub charger_ready: qt_property!(bool; NOTIFY power_changed),
     /// Emitted when power state changes.
     pub power_changed: qt_signal!(),
 
@@ -165,8 +170,8 @@ impl Transcriber {
     pub fn set_charging(&mut self, charging: bool) {
         if self.charging != charging {
             self.charging = charging;
-            self.power_changed();
             self.settle();
+            self.power_changed();
         }
     }
 
@@ -174,8 +179,17 @@ impl Transcriber {
     pub fn set_power_saving(&mut self, power_saving: bool) {
         if self.power_saving != power_saving {
             self.power_saving = power_saving;
-            self.power_changed();
             self.settle();
+            self.power_changed();
+        }
+    }
+
+    /// Set battery level.
+    pub fn set_battery_level(&mut self, battery_level: i32) {
+        if self.battery_level != battery_level {
+            self.battery_level = battery_level;
+            self.settle();
+            self.power_changed();
         }
     }
 
@@ -190,15 +204,18 @@ impl Transcriber {
             self.auto_started = true;
             self.download_model();
         }
+        let conditions = Conditions {
+            enabled: self.enabled,
+            model_ready: self.model_state == MODEL_READY,
+            mode: self.mode,
+            older: self.older,
+            charging: self.charging,
+            power_saving: self.power_saving,
+            battery_percent: self.battery_level,
+        };
+        self.charger_ready = schedule::charger_ready(&conditions);
         hub::set_conditions(
-            Conditions {
-                enabled: self.enabled,
-                model_ready: self.model_state == MODEL_READY,
-                mode: self.mode,
-                older: self.older,
-                charging: self.charging,
-                power_saving: self.power_saving,
-            },
+            conditions,
             self.languages
                 .to_string()
                 .split(',')

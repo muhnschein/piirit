@@ -27,7 +27,7 @@ fn probe_qml() -> String {
         function state() {{
             var t = loader.item.transcriber
             return [t.objectName, t.enabled, t.languages, t.mode, t.older, t.charging,
-                    t.power_saving].join('|')
+                    t.power_saving, t.battery_level, t.charger_ready].join('|')
         }}
         function set(json) {{
             var values = JSON.parse(json)
@@ -55,6 +55,7 @@ fn probe_qml() -> String {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_transcriber_follows_settings_and_power() {
     // SAFETY: single thread; pre-Qt.
     unsafe {
@@ -118,6 +119,17 @@ fn the_transcriber_follows_settings_and_power() {
         );
         common::record(
             &s,
+            "half",
+            call!("mce", QString::from("battery_level_ind"), 50),
+        );
+        common::record(
+            &s,
+            "low",
+            call!("mce", QString::from("battery_level_ind"), 49),
+        );
+        call!("mce", QString::from("battery_level_ind"), 80);
+        common::record(
+            &s,
             "saving",
             call!("mce", QString::from("psm_state_ind"), true),
         );
@@ -136,27 +148,37 @@ fn the_transcriber_follows_settings_and_power() {
     );
     assert_eq!(
         value("fresh"),
-        "transcriber|false||1|true|false|false",
+        "transcriber|false||1|true|false|false|-1|false",
         "a fresh install's transcriber is not off with nothing chosen, While charging, older on"
     );
     assert_eq!(
         value("settings"),
-        "transcriber|false|fi,en|0|false|false|false",
+        "transcriber|false|fi,en|0|false|false|false|-1|false",
         "languages, auto-transcribe or older did not reach the transcriber"
     );
     assert_eq!(
         value("always"),
-        "transcriber|false|fi,en|2|false|false|false",
+        "transcriber|false|fi,en|2|false|false|false|-1|false",
         "a changed auto-transcribe choice did not reach the transcriber"
     );
     assert_eq!(
         value("plugged"),
-        "transcriber|false|fi,en|2|false|true|false",
-        "charger in did not reach the transcriber"
+        "transcriber|false|fi,en|2|false|true|false|-1|false",
+        "charger in did not reach the transcriber, or counted with the battery level unknown"
+    );
+    assert_eq!(
+        value("half"),
+        "transcriber|false|fi,en|2|false|true|false|50|true",
+        "battery level did not reach the transcriber, or 50 % on the charger does not let it run"
+    );
+    assert_eq!(
+        value("low"),
+        "transcriber|false|fi,en|2|false|true|false|49|false",
+        "49 % on the charger lets automatic transcription run"
     );
     assert_eq!(
         value("saving"),
-        "transcriber|false|fi,en|2|false|true|true",
+        "transcriber|false|fi,en|2|false|true|true|80|false",
         "battery saving mode did not reach the transcriber"
     );
 }

@@ -3576,6 +3576,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Tap Transcribe on a voice message to turn it into text.</source>
         <translation>Klepnutím na Přepsat u hlasové zprávy ji převedete na text.</translation>
     </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Baterie musí být nabitá alespoň na 50 %.</translation>
+    </message>
 </context>
 <context>
     <name>TranscriptionLanguagesDialog</name>
@@ -3624,6 +3628,10 @@ Waiting for the device of %2$s to reply…</source>
     <message>
         <source>Voice messages that arrived before you turned this on are transcribed while the phone is charging.</source>
         <translation>Hlasové zprávy, které přišly před zapnutím této funkce, se přepisují, když se telefon nabíjí.</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Baterie musí být nabitá alespoň na 50 %.</translation>
     </message>
 </context>
 <context>
@@ -3718,6 +3726,10 @@ Waiting for the device of %2$s to reply…</source>
         <source>Show all</source>
         <extracomment>Under a long transcript cut short: shows the rest.</extracomment>
         <translation>Zobrazit vše</translation>
+    </message>
+    <message>
+        <source>The battery level must be at least 50%.</source>
+        <translation>Baterie musí být nabitá alespoň na 50 %.</translation>
     </message>
 </context>
 <context>
