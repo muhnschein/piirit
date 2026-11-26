@@ -24,6 +24,8 @@ In this order; later step only once earlier ones hold:
 
 PR opens as draft on first push. Mark ready for review only once steps 1–7 hold and their evidence is posted (visual: project thread; text: PR body).
 
+No phone run when change can't show on phone: docs, CI, build scripts (RPM contents unchanged), tests only. Steps 6–7 skipped; PR says why.
+
 Feature reachable from several places (chat, contact/group page, cover, quick actions) → all of them.
 
 User tests RPM on phone; that test judges feel, lag, transitions. Say exactly what to check on device.
