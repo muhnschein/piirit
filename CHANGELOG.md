@@ -8,6 +8,8 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Voice calls stay on the earpiece. Before, a call often switched to the loudspeaker as it connected, when the other side's switched-off camera sent black frames.
+- During a call, the cover shows the caller's name and the call's time in the middle, not at the top.
 - Transcripts of voice messages no longer carry the line "Transcribed on this phone" underneath, in chats and in a chat's Audio list.
 - Voice messages you send are transcribed on their own too, like the ones you receive. Before, they stayed without text until you tapped Transcribe ([#335](https://github.com/muhnschein/piirit/issues/335)).
 - Pictures and videos shared from the viewer reach the other app, as a copy in Downloads/Piirit. Before, the app picked in the share menu could not read them.
