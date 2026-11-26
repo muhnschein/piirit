@@ -1898,3 +1898,53 @@ fn qml_draws_nothing_through_a_shader_of_its_own() {
         offenders.join("\n  ")
     );
 }
+
+/// Own icons drawn like Sailfish's: every line 2 px per pixel ratio wide at the size shown
+/// (settings rows `Theme.iconSizeMedium`, 64 at ratio 1; cover `Theme.iconSizeSmall`, 32).
+#[test]
+fn own_icons_draw_their_lines_as_wide_as_the_theme_does() {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let mut checked = 0;
+    for (dir, shown) in [("qml/art/settings", 64.0), ("icons/cover", 32.0)] {
+        let mut files: Vec<_> = fs::read_dir(root.join(dir))
+            .unwrap_or_else(|error| panic!("read {dir}: {error}"))
+            .map(|entry| entry.expect("read a directory entry").path())
+            .filter(|path| path.extension().is_some_and(|ext| ext == "svg"))
+            .collect();
+        files.sort();
+        for file in files {
+            let text = fs::read_to_string(&file).expect("read an icon");
+            let name = file.display();
+            let view_box = text
+                .split("viewBox=\"")
+                .nth(1)
+                .and_then(|rest| rest.split('"').next())
+                .unwrap_or_else(|| panic!("{name} has no viewBox"));
+            let units: f64 = view_box
+                .split_whitespace()
+                .nth(2)
+                .and_then(|width| width.parse().ok())
+                .unwrap_or_else(|| panic!("{name}'s viewBox has no width"));
+            let widths: Vec<f64> = text
+                .split("stroke-width=\"")
+                .skip(1)
+                .map(|rest| {
+                    rest.split('"')
+                        .next()
+                        .and_then(|width| width.parse().ok())
+                        .unwrap_or_else(|| panic!("{name} has a stroke-width that is no number"))
+                })
+                .collect();
+            assert!(!widths.is_empty(), "{name} sets no stroke-width");
+            for width in widths {
+                let pixels = width / units * shown;
+                assert!(
+                    (pixels - 2.0).abs() < 0.01,
+                    "{name} draws a line {pixels} px wide at {shown} px, not 2 as the theme's"
+                );
+            }
+            checked += 1;
+        }
+    }
+    assert_eq!(checked, 25, "not every own icon was checked");
+}

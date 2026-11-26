@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Settings rows have more room between them, and Piirit's own icons (Quick actions, Experimental, the cover's quick actions) are drawn with lines as thin as the system's icons.
 - Voice calls stay on the earpiece. Before, a call often switched to the loudspeaker as it connected, when the other side's switched-off camera sent black frames.
 - During a call, the cover shows the caller's name and the call's time in the middle, not at the top.
 - Transcripts of voice messages no longer carry the line "Transcribed on this phone" underneath, in chats and in a chat's Audio list.

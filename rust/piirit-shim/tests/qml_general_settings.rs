@@ -146,6 +146,14 @@ fn probe_qml() -> String {
             if (!item || !item.parent) {{ return 'missing:' + name }}
             return item.parent.children[1].objectName
         }}
+        // Topic rows as high as Theme.itemSizeMedium (Lautta's spacing), each named.
+        function tallRows() {{
+            var keys = ['messages', 'notifications', 'privacy', 'quickActions', 'experimental',
+                        'about']
+            return keys.filter(function (key) {{
+                return get(key + 'Entry', 'height') === '' + Theme.itemSizeMedium
+            }}).join(',')
+        }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
         function appKey(name) {{ return '' + Settings[name].key }}
     }}
@@ -253,6 +261,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
         record!("top-rows", call!("rows"));
+        record!("tall-rows", call!("tallRows"));
         record!("top-switch", get!("markdownSwitch", "checked"));
         record!("opens-messages", call!("opens", QString::from("messages")));
         record!(
@@ -666,6 +675,10 @@ fn the_settings_page_writes_what_the_app_reads() {
         (
             "top-rows",
             "messagesEntry,notificationsEntry,privacyEntry,quickActionsEntry,experimentalEntry,aboutEntry",
+        ),
+        (
+            "tall-rows",
+            "messages,notifications,privacy,quickActions,experimental,about",
         ),
         ("top-switch", "missing:markdownSwitch"),
         (
