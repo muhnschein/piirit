@@ -44,7 +44,7 @@ Changed source string orphans translation in every catalog; `tests/translation_c
 
 - Toolchain floor **Rust 1.75.0, Qt 5.6.3** (what Sailfish ships).
 - Built vs **5.2** SDK (Jolla Phone baseline). Older out of scope: newer-SDK binary may call symbols older phone lacks; accepted. Harbour demands 5.x anyway (`__libc_start_main@GLIBC_2.34`, `HARBOUR.md`).
-- `aarch64`, `armv7hl` devices; `i486`, `x86_64` emulator.
+- `aarch64` devices only: no `armv7hl` test phone, so no `armv7hl` build (#352). `i486`, `x86_64` emulator.
 - Accounts: core's storage, in sailjail grant `$XDG_DATA_HOME/piirit/piirit/accounts` (`PIIRIT_ACCOUNTS_DIR` overrides).
 
 ## What is missing
