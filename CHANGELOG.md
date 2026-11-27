@@ -6,22 +6,22 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
-## Unreleased
+## 2.4.0 — 2026-11-27
 
-- Settings rows have more room between them, and Piirit's own icons (Quick actions, Experimental, the cover's quick actions) are drawn with lines as thin as the system's icons.
-- Voice calls stay on the earpiece. Before, a call often switched to the loudspeaker as it connected, when the other side's switched-off camera sent black frames.
-- During a call, the cover shows the caller's name and the call's time in the middle, not at the top.
-- Voice messages transcribed "While charging" now wait until the battery is at least 50% charged, so a phone that has just been plugged in charges first. Older voice messages wait the same way. Battery saving mode still pauses all automatic transcription.
-- Transcripts of voice messages no longer carry the line "Transcribed on this phone" underneath, in chats and in a chat's Audio list.
-- Voice messages you send are transcribed on their own too, like the ones you receive. Before, they stayed without text until you tapped Transcribe ([#335](https://github.com/muhnschein/piirit/issues/335)).
-- Pictures and videos shared from the viewer reach the other app, as a copy in Downloads/Piirit. Before, the app picked in the share menu could not read them.
-- Files opened in another app (Documents and others) now arrive there under their real name, as a copy in Downloads/Piirit. Before, the other app often could not read them ([#296](https://github.com/muhnschein/piirit/issues/296)).
-- PDFs and office documents show their first page: in the chat (PDF, OpenDocument) and in a chat's Files ([#296](https://github.com/muhnschein/piirit/issues/296)). Word, Excel and PowerPoint files show it when the sender's app saved a preview.
-- New relay to pick for a profile: delta.firx.org (Denmark), now listed on [chatmail.at/relays](https://chatmail.at/relays).
-- Voice messages no longer offer "Open" in their menu; it failed, and they play right in the chat ([#297](https://github.com/muhnschein/piirit/issues/297)).
-- The screen stays on while a video plays ([#298](https://github.com/muhnschein/piirit/issues/298)).
-- Calls have less delay: the other side's voice plays through the phone's low-latency sound output, and your own no longer waits in a queue that grew whenever the phone was busy ([#301](https://github.com/muhnschein/piirit/issues/301)).
-- Channels offer only the five reactions that work there (👍 👎 ❤️ 😂 🙁). Others, like 🚀, used to end in a "Reaction not allowed" error.
+**What's new**
+
+- **PDFs and office documents show their first page**, in the chat and in a chat's Files. Files opened in another app arrive there under their real name ([#320](https://github.com/muhnschein/piirit/pull/320)).
+- **Calls:** less delay ([#321](https://github.com/muhnschein/piirit/pull/321)), voice calls stay on the earpiece instead of switching to the loudspeaker, and the cover shows the caller and the call's time in the middle ([#343](https://github.com/muhnschein/piirit/pull/343)).
+- **Voice messages as text:** the ones you send are transcribed too ([#339](https://github.com/muhnschein/piirit/pull/339)), without the "Transcribed on this phone" line ([#340](https://github.com/muhnschein/piirit/pull/340)), and "While charging" waits until the battery is at least 50% charged ([#345](https://github.com/muhnschein/piirit/pull/345)).
+
+**Other changes**
+
+- Pictures and videos shared from the viewer reach the app picked in the share menu ([#333](https://github.com/muhnschein/piirit/pull/333)).
+- The screen stays on while a video plays ([#318](https://github.com/muhnschein/piirit/pull/318)).
+- Channels offer only the five reactions that work there ([#317](https://github.com/muhnschein/piirit/pull/317)).
+- Voice messages no longer offer "Open", which failed ([#319](https://github.com/muhnschein/piirit/pull/319)).
+- New relay to pick: delta.firx.org (Denmark) ([#322](https://github.com/muhnschein/piirit/pull/322)).
+- Settings rows have more room, and Piirit's own icons are drawn as thin as the system's ([#346](https://github.com/muhnschein/piirit/pull/346)).
 
 ## 2.3.0 — 2026-11-11
 

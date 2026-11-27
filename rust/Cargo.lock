@@ -127,7 +127,7 @@ dependencies = [
 
 [[package]]
 name = "deltachat-jsonrpc"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -364,7 +364,7 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
 name = "piirit-app"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "cpp",
  "cpp_build",
@@ -375,7 +375,7 @@ dependencies = [
 
 [[package]]
 name = "piirit-shim"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "cpp",
  "cpp_build",
@@ -396,7 +396,7 @@ dependencies = [
 
 [[package]]
 name = "piirit-speech"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "cc",
  "piirit-video",
@@ -404,7 +404,7 @@ dependencies = [
 
 [[package]]
 name = "piirit-video"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "cc",
 ]
