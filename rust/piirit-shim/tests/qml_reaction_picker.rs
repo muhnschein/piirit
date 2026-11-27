@@ -244,7 +244,17 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         record!("row-count", call!("rowCount"));
         record!("heading-fit", call!("headingFit"));
         record!("options", call!("options"));
-        record!("cells", call!("cells", 4));
+    });
+    // Pictures load off thread ('!' until drawn at size): loaded runner takes seconds.
+    plan.until(1, 30, move |last| unsafe {
+        let cells = call!("cells", 4);
+        let done = !cells.contains('!');
+        if done || last {
+            record!("cells", cells);
+        }
+        done
+    });
+    plan.after(1, move || unsafe {
         record!(
             "strip",
             call!("get", QString::from("groupStrip"), QString::from("visible"))
@@ -261,7 +271,16 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
     });
     plan.after(1, move || unsafe {
         record!("found", call!("results"));
-        record!("found-cells", call!("cells", 1));
+    });
+    plan.until(1, 30, move |last| unsafe {
+        let cells = call!("cells", 1);
+        let done = !cells.contains('!');
+        if done || last {
+            record!("found-cells", cells);
+        }
+        done
+    });
+    plan.after(1, move || unsafe {
         record!(
             "strip-searching",
             call!("get", QString::from("groupStrip"), QString::from("visible"))
