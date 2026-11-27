@@ -8,6 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- Settings rows have more room between them, and Piirit's own icons (Quick actions, Experimental, the cover's quick actions) are drawn with lines as thin as the system's icons.
 - Voice calls stay on the earpiece. Before, a call often switched to the loudspeaker as it connected, when the other side's switched-off camera sent black frames.
 - During a call, the cover shows the caller's name and the call's time in the middle, not at the top.
 - Voice messages transcribed "While charging" now wait until the battery is at least 50% charged, so a phone that has just been plugged in charges first. Older voice messages wait the same way. Battery saving mode still pauses all automatic transcription.

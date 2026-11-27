@@ -94,7 +94,7 @@ Page {
                     id: topic
                     objectName: modelData.key + "Entry"
                     width: column.width
-                    height: Theme.itemSizeSmall
+                    height: Theme.itemSizeMedium
 
                     readonly property color tint: topic.highlighted ? Theme.highlightColor
                                                                      : Theme.primaryColor
